@@ -1,0 +1,110 @@
+services:
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: kavi_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - kavi_network
+
+  # PHP-FPM
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: kavi_php
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - DB_HOST=mysql
+      - REDIS_HOST=redis
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - kavi_network
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: kavi_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: kavi
+      MYSQL_USER: kavi
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - kavi_network
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:alpine
+    container_name: kavi_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - kavi_network
+
+  # Queue Worker
+  queue:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: kavi_queue
+    command: php /var/www/html/artisan queue:work redis --sleep=3 --tries=3
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - kavi_network
+
+  # Scheduler
+  scheduler:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: kavi_scheduler
+    command: >
+      sh -c "while true; do
+        php /var/www/html/artisan schedule:run --verbose --no-interaction &
+        sleep 60
+      done"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - kavi_network
+
+  # MailHog for Email Testing
+  mailhog:
+    image: mailhog/mailhog
+    container_name: kavi_mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - kavi_network
+
+networks:
+  kavi_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
