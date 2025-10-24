@@ -37,6 +37,13 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'packeta' => [
+        'api_key' => env('PACKETA_API_KEY'),
+        'api_password' => env('PACKETA_API_PASSWORD'),
+        'sender_id' => env('PACKETA_SENDER_ID'),
+        'widget_key' => env('PACKETA_WIDGET_KEY'),
+    ],
+
 ];
 
 

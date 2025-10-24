@@ -129,25 +129,25 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
-                <!-- Shipping Address -->
+                <!-- Billing Address -->
                 <div class="card p-8">
-                    <h2 class="font-display text-2xl font-bold text-dark-800 mb-6">Dodací adresa</h2>
+                    <h2 class="font-display text-2xl font-bold text-dark-800 mb-6">Fakturační adresa</h2>
                     
                     <div class="space-y-6">
                         <div>
-                            <label for="address" class="block text-sm font-medium text-dark-700 mb-2">
+                            <label for="billing_address" class="block text-sm font-medium text-dark-700 mb-2">
                                 Ulice a číslo popisné <span class="text-red-500">*</span>
                             </label>
                             <input 
                                 type="text" 
-                                id="address" 
-                                name="address" 
-                                value="<?php echo e(old('address')); ?>" 
+                                id="billing_address" 
+                                name="billing_address" 
+                                value="<?php echo e(old('billing_address', auth()->user()->address ?? '')); ?>" 
                                 required
                                 class="input"
                                 placeholder="Např. Karlova 123"
                             >
-                            <?php $__errorArgs = ['address'];
+                            <?php $__errorArgs = ['billing_address'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -161,19 +161,19 @@ unset($__errorArgs, $__bag); ?>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="city" class="block text-sm font-medium text-dark-700 mb-2">
+                                <label for="billing_city" class="block text-sm font-medium text-dark-700 mb-2">
                                     Město <span class="text-red-500">*</span>
                                 </label>
                                 <input 
                                     type="text" 
-                                    id="city" 
-                                    name="city" 
-                                    value="<?php echo e(old('city')); ?>" 
+                                    id="billing_city" 
+                                    name="billing_city" 
+                                    value="<?php echo e(old('billing_city', auth()->user()->city ?? '')); ?>" 
                                     required
                                     class="input"
                                     placeholder="Např. Praha"
                                 >
-                                <?php $__errorArgs = ['city'];
+                                <?php $__errorArgs = ['billing_city'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -186,19 +186,19 @@ unset($__errorArgs, $__bag); ?>
                             </div>
 
                             <div>
-                                <label for="postal_code" class="block text-sm font-medium text-dark-700 mb-2">
+                                <label for="billing_postal_code" class="block text-sm font-medium text-dark-700 mb-2">
                                     PSČ <span class="text-red-500">*</span>
                                 </label>
                                 <input 
                                     type="text" 
-                                    id="postal_code" 
-                                    name="postal_code" 
-                                    value="<?php echo e(old('postal_code')); ?>" 
+                                    id="billing_postal_code" 
+                                    name="billing_postal_code" 
+                                    value="<?php echo e(old('billing_postal_code', auth()->user()->postal_code ?? '')); ?>" 
                                     required
                                     class="input"
                                     placeholder="123 45"
                                 >
-                                <?php $__errorArgs = ['postal_code'];
+                                <?php $__errorArgs = ['billing_postal_code'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -210,6 +210,68 @@ endif;
 unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Packeta Pickup Point -->
+                <div class="card p-8">
+                    <h2 class="font-display text-2xl font-bold text-dark-800 mb-6">Výběr výdejního místa</h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Hidden fields for Packeta data -->
+                        <input type="hidden" id="packeta_point_id" name="packeta_point_id" value="<?php echo e(old('packeta_point_id', auth()->user()->packeta_point_id ?? '')); ?>">
+                        <input type="hidden" id="packeta_point_name" name="packeta_point_name" value="<?php echo e(old('packeta_point_name', auth()->user()->packeta_point_name ?? '')); ?>">
+                        <input type="hidden" id="packeta_point_address" name="packeta_point_address" value="<?php echo e(old('packeta_point_address', auth()->user()->packeta_point_address ?? '')); ?>">
+
+                        <!-- Packeta selection display -->
+                        <div id="packeta-selection">
+                            <?php if(old('packeta_point_id', auth()->user()->packeta_point_id ?? '')): ?>
+                            <!-- Selected point display -->
+                            <div id="selected-point" class="p-4 bg-primary-50 border-2 border-primary-500 rounded-xl">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center mb-2">
+                                            <svg class="w-5 h-5 text-primary-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="font-semibold text-dark-800">Vybrané výdejní místo:</span>
+                                        </div>
+                                        <p class="text-dark-800 font-medium ml-7" id="selected-point-name"><?php echo e(old('packeta_point_name', auth()->user()->packeta_point_name ?? '')); ?></p>
+                                        <p class="text-sm text-dark-600 ml-7" id="selected-point-address"><?php echo e(old('packeta_point_address', auth()->user()->packeta_point_address ?? '')); ?></p>
+                                    </div>
+                                    <button type="button" id="change-point-btn" class="text-sm text-primary-500 hover:text-primary-600 underline whitespace-nowrap ml-4">
+                                        Změnit
+                                    </button>
+                                </div>
+                            </div>
+                            <?php else: ?>
+                            <!-- Select button -->
+                            <button type="button" id="select-point-btn" class="btn btn-primary w-full">
+                                <svg class="w-5 h-5 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                Vybrat výdejní místo Zásilkovna
+                            </button>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php $__errorArgs = ['packeta_point_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <p class="text-red-600 text-sm mt-2"><?php echo e($message); ?></p>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+
+                        <p class="text-sm text-dark-600">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            Káva vám bude doručena na vybrané výdejní místo Zásilkovny
+                        </p>
                     </div>
                 </div>
 
@@ -440,6 +502,77 @@ unset($__errorArgs, $__bag); ?>
         </div>
     </div>
 </div>
+
+<script src="https://widget.packeta.com/v6/www/js/library.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Packeta Widget Configuration
+    const packetaApiKey = '<?php echo e(config("services.packeta.widget_key")); ?>';
+    
+    function openPacketaWidget() {
+        if (!packetaApiKey) {
+            alert('Packeta widget není správně nakonfigurován. Kontaktujte administrátora.');
+            return;
+        }
+
+        Packeta.Widget.pick(packetaApiKey, function(point) {
+            if (point) {
+                // Fill hidden fields with selected point data
+                document.getElementById('packeta_point_id').value = point.id;
+                document.getElementById('packeta_point_name').value = point.name;
+                
+                // Format address
+                let address = point.street;
+                if (point.city) {
+                    address += ', ' + (point.zip ? point.zip + ' ' : '') + point.city;
+                }
+                document.getElementById('packeta_point_address').value = address;
+
+                // Update UI to show selected point
+                const selectionDiv = document.getElementById('packeta-selection');
+                selectionDiv.innerHTML = `
+                    <div id="selected-point" class="p-4 bg-primary-50 border-2 border-primary-500 rounded-xl">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-2">
+                                    <svg class="w-5 h-5 text-primary-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="font-semibold text-dark-800">Vybrané výdejní místo:</span>
+                                </div>
+                                <p class="text-dark-800 font-medium ml-7">${point.name}</p>
+                                <p class="text-sm text-dark-600 ml-7">${address}</p>
+                            </div>
+                            <button type="button" id="change-point-btn" class="text-sm text-primary-500 hover:text-primary-600 underline whitespace-nowrap ml-4">
+                                Změnit
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Re-attach event listener to the new change button
+                document.getElementById('change-point-btn').addEventListener('click', openPacketaWidget);
+            }
+        }, {
+            country: 'cz',
+            language: 'cs',
+            // Můžete zde přidat vendors pro omezení dopravců, např:
+            // vendors: ['packeta', 'zasilkovna'],
+        });
+    }
+
+    // Event listeners for opening widget
+    const selectBtn = document.getElementById('select-point-btn');
+    if (selectBtn) {
+        selectBtn.addEventListener('click', openPacketaWidget);
+    }
+
+    const changeBtn = document.getElementById('change-point-btn');
+    if (changeBtn) {
+        changeBtn.addEventListener('click', openPacketaWidget);
+    }
+});
+</script>
 <?php $__env->stopSection(); ?>
 
 

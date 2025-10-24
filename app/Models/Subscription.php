@@ -23,6 +23,9 @@ class Subscription extends Model
         'frequency_months',
         'shipping_address',
         'payment_method',
+        'packeta_point_id',
+        'packeta_point_name',
+        'packeta_point_address',
     ];
 
     protected $casts = [

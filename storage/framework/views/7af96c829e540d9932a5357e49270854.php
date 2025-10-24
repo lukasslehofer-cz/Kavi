@@ -10,7 +10,13 @@
     <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 mb-8 text-white">
         <div class="flex justify-between items-start">
             <div>
-                <h2 class="text-2xl font-bold mb-2">Vaše aktivní předplatné</h2>
+                <h2 class="text-2xl font-bold mb-2">
+                    <?php if($activeSubscriptions->count() > 1): ?>
+                        Vaše aktivní předplatná (<?php echo e($activeSubscriptions->count()); ?>)
+                    <?php else: ?>
+                        Vaše aktivní předplatné
+                    <?php endif; ?>
+                </h2>
                 <p class="text-blue-100 text-lg">
                     <?php echo e($activeSubscription->plan ? $activeSubscription->plan->name : 'Kávové předplatné'); ?>
 
@@ -41,7 +47,11 @@
                 <?php endif; ?>
             </div>
             <a href="<?php echo e(route('dashboard.subscription')); ?>" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition font-semibold">
-                Spravovat předplatné
+                <?php if($activeSubscriptions->count() > 1): ?>
+                    Zobrazit všechna předplatná
+                <?php else: ?>
+                    Spravovat předplatné
+                <?php endif; ?>
             </a>
         </div>
     </div>

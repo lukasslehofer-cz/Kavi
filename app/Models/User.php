@@ -21,6 +21,9 @@ class User extends Authenticatable
         'country',
         'is_admin',
         'stripe_customer_id',
+        'packeta_point_id',
+        'packeta_point_name',
+        'packeta_point_address',
     ];
 
     protected $hidden = [
@@ -49,6 +52,13 @@ class User extends Authenticatable
         return $this->hasOne(Subscription::class)
             ->where('status', 'active')
             ->latest();
+    }
+
+    public function activeSubscriptions()
+    {
+        return $this->hasMany(Subscription::class)
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc');
     }
 }
 

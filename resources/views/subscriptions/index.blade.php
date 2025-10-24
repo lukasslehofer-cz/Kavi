@@ -3,33 +3,15 @@
 @section('title', 'Kávové předplatné - Kavi Coffee')
 
 @section('content')
-<!-- Hero Section -->
-<section class="relative bg-gradient-to-br from-dark-800 via-dark-700 to-dark-800 text-white py-24 md:py-32 overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
-        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
-    </div>
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="inline-block mb-6">
-            <span class="badge bg-primary-500 text-white px-6 py-2 text-sm uppercase tracking-wide">Kávové předplatné</span>
-        </div>
-        <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            Čerstvá káva<br/>každý měsíc
-        </h1>
-        <p class="text-xl md:text-2xl text-bluegray-100 max-w-3xl mx-auto leading-relaxed">
-            Objevte svět prémiové kávy s našimi měsíčními balíčky. Čerstvě pražená káva přímo k vám domů, bez starostí.
-        </p>
-    </div>
-</section>
-
 <!-- Subscription Configurator Section -->
-<section class="section bg-white">
+<section class="section bg-bluegray-50">
     <div class="container-custom">
         <div class="text-center mb-16">
-            <h2 class="font-display text-4xl md:text-5xl font-bold text-dark-800 mb-4">
-                Nakonfigurujte si předplatné
+            <h2 class="font-display text-3xl md:text-4xl font-black text-dark-800 mb-4">
+                Konfigurátor předplatného
             </h2>
-            <p class="text-xl text-dark-600 max-w-2xl mx-auto">
-                Flexibilní předplatné bez závazků. Kdykoli můžete změnit, pozastavit nebo zrušit.
+            <p class="text-lg text-dark-600 max-w-2xl mx-auto">
+                Přizpůsobte si předplatné přesně podle svých potřeb. Flexibilně, bez závazků.
             </p>
         </div>
 
@@ -81,28 +63,75 @@
                 <!-- Step 1: Množství kávy -->
                 <div id="step-1" class="config-step active">
                     <h3 class="font-display text-2xl md:text-3xl font-bold text-dark-800 mb-3 text-center">
-                        Kolik kávy denně pijete?
+                        Vyberte množství kávy
                     </h3>
-                    <p class="text-dark-600 text-center mb-8">Pomozte nám určit ideální množství kávy pro vás</p>
+                    <p class="text-dark-600 text-center mb-8">Zvolte balíček, který vám vyhovuje</p>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-                        <button type="button" class="coffee-amount-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-amount="2" data-cups="1-2">
-                            <div class="text-5xl mb-4">☕</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">1-2 šálky</div>
-                            <div class="text-sm mb-4 font-bold uppercase tracking-widest opacity-70">Pro příležitostné pití</div>
-                            <div class="text-primary-500 group-hover:text-white font-black text-lg">2 BALENÍ</div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                        <!-- 500g Option -->
+                        <button type="button" class="coffee-amount-option p-6 bg-white hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl border-2 border-bluegray-200 hover:border-primary-500" data-amount="2" data-cups="500g" data-price="{{ $subscriptionPricing['2'] }}">
+                            <div class="text-4xl font-black text-primary-500 group-hover:text-white mb-3">500 G</div>
+                            <div class="text-2xl font-black text-dark-800 group-hover:text-white mb-4">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }} Kč měsíčně</div>
+                            <div class="text-sm font-bold mb-4">250g × 2 balíčky</div>
+                            <ul class="text-left space-y-2 text-sm mb-4">
+                                <li class="flex items-start">
+                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>2 typy výběrové kávy z nejlepších evropských pražíren</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>KAVI přispěje na 6 měsíců čisté vody každý měsíc předplatného</span>
+                                </li>
+                            </ul>
                         </button>
-                        <button type="button" class="coffee-amount-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-amount="3" data-cups="3-4">
-                            <div class="text-5xl mb-4">☕☕</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">3-4 šálky</div>
-                            <div class="text-sm mb-4 font-bold uppercase tracking-widest opacity-70">Pro pravidelné milovníky</div>
-                            <div class="text-primary-500 group-hover:text-white font-black text-lg">3 BALENÍ</div>
+                        
+                        <!-- 750g Option - Popular -->
+                        <button type="button" class="coffee-amount-option p-6 bg-white hover:bg-primary-500 hover:text-white transition-all text-center group shadow-xl border-4 border-primary-500 relative" data-amount="3" data-cups="750g" data-price="{{ $subscriptionPricing['3'] }}">
+                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                                <span class="bg-primary-500 text-white text-xs font-black px-3 py-1">OBLÍBENÉ</span>
+                            </div>
+                            <div class="text-4xl font-black text-primary-500 group-hover:text-white mb-3">750 G</div>
+                            <div class="text-2xl font-black text-dark-800 group-hover:text-white mb-4">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }} Kč měsíčně</div>
+                            <div class="text-sm font-bold mb-4">250g × 3 balíčky</div>
+                            <ul class="text-left space-y-2 text-sm mb-4">
+                                <li class="flex items-start">
+                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>3 typy výběrové kávy z nejlepších evropských pražíren</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>KAVI přispěje na 9 měsíců čisté vody každý měsíc předplatného</span>
+                                </li>
+                            </ul>
                         </button>
-                        <button type="button" class="coffee-amount-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-amount="4" data-cups="5+">
-                            <div class="text-5xl mb-4">☕☕☕</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">5+ šálků</div>
-                            <div class="text-sm mb-4 font-bold uppercase tracking-widest opacity-70">Pro kávové nadšence</div>
-                            <div class="text-primary-500 group-hover:text-white font-black text-lg">4 BALENÍ</div>
+                        
+                        <!-- 1000g Option -->
+                        <button type="button" class="coffee-amount-option p-6 bg-white hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl border-2 border-bluegray-200 hover:border-primary-500" data-amount="4" data-cups="1000g" data-price="{{ $subscriptionPricing['4'] }}">
+                            <div class="text-4xl font-black text-primary-500 group-hover:text-white mb-3">1000 G</div>
+                            <div class="text-2xl font-black text-dark-800 group-hover:text-white mb-4">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }} Kč měsíčně</div>
+                            <div class="text-sm font-bold mb-4">250g × 4 balíčky</div>
+                            <ul class="text-left space-y-2 text-sm mb-4">
+                                <li class="flex items-start">
+                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>4 typy výběrové kávy z nejlepších evropských pražíren</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>KAVI přispěje na 12 měsíců čisté vody každý měsíc předplatného</span>
+                                </li>
+                            </ul>
                         </button>
                     </div>
                 </div>
@@ -134,48 +163,43 @@
 
                     <!-- Decaf Option (shown for espresso or filter) -->
                     <div id="decaf-option" class="hidden max-w-2xl mx-auto mb-8">
-                        <div class="bg-primary-50 p-8 shadow-lg">
-                            <label class="flex items-center justify-center cursor-pointer">
-                                <input type="checkbox" id="decaf-checkbox" class="w-7 h-7 text-primary-500 focus:ring-2 focus:ring-primary-500 mr-4">
-                                <div class="flex items-center">
-                                    <span class="text-4xl mr-4">🌙</span>
-                                    <div class="text-left">
-                                        <div class="font-black text-xl uppercase tracking-wider">Chci decaf variantu</div>
-                                        <div class="text-sm font-bold uppercase tracking-widest text-dark-600">Bez kofeinu, plná chuť</div>
+                        <div class="bg-bluegray-50 p-8 shadow-lg">
+                            <h4 class="font-black text-xl mb-6 text-center uppercase tracking-wider">Chcete přidat decaf variantu?</h4>
+                            <p class="text-sm text-dark-600 text-center mb-8 font-bold">
+                                Posouváním slideru doprava zvýšíte množství decaf kávy
+                            </p>
+                            
+                            <div class="space-y-6">
+                                <!-- Labels -->
+                                <div class="flex justify-between items-center px-2">
+                                    <div class="text-center">
+                                        <div class="text-2xl mb-1">🌙</div>
+                                        <span class="font-bold text-sm uppercase tracking-wider">Decaf</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl mb-1" id="single-normal-icon-top">🎯</div>
+                                        <span class="font-bold text-sm uppercase tracking-wider" id="single-normal-label-top">Espresso</span>
                                     </div>
                                 </div>
-                            </label>
-                        </div>
-                        
-                        <!-- Decaf Slider (shown when checkbox is checked) -->
-                        <div id="decaf-slider-container" class="hidden mt-6">
-                            <div class="bg-bluegray-50 p-8 shadow-lg">
-                                <h4 class="font-black text-xl mb-4 text-center uppercase tracking-wider">Kolik decaf balení chcete?</h4>
-                                <p class="text-sm text-dark-600 text-center mb-6 font-bold uppercase tracking-widest">
-                                    Zbytek balení bude běžná <span id="coffee-type-name">káva</span>
-                                </p>
                                 
-                                <div class="space-y-4">
-                                    <div>
-                                        <div class="flex justify-between items-center mb-3">
-                                            <label class="font-bold flex items-center uppercase tracking-wider">
-                                                <span class="text-3xl mr-3" id="single-decaf-icon">🎯🌙</span>
-                                                <span id="single-decaf-label">Espresso Decaf</span>
-                                            </label>
-                                            <span class="font-black text-primary-500 text-lg"><span id="single-decaf-count">0</span> BALENÍ</span>
+                                <!-- Slider -->
+                                <div class="relative">
+                                    <input type="range" id="single-decaf-slider" min="0" max="4" value="0" class="w-full h-4 bg-gradient-to-r from-blue-200 to-primary-200 appearance-none cursor-pointer slider rounded-full">
+                                </div>
+                                
+                                <!-- Counts Display -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-blue-50 p-4 rounded text-center border-2 border-blue-200">
+                                        <div class="text-3xl font-black text-blue-600 mb-1"><span id="single-decaf-count">0</span></div>
+                                        <div class="text-xs font-bold uppercase tracking-wider text-dark-600">
+                                            <span id="single-decaf-label">Decaf</span> balení
                                         </div>
-                                        <input type="range" id="single-decaf-slider" min="1" max="4" value="1" class="w-full h-3 bg-bluegray-200 appearance-none cursor-pointer slider">
                                     </div>
-                                    
-                                    <div class="bg-white p-6 shadow-md">
-                                        <div class="flex justify-between items-center">
-                                            <label class="font-bold flex items-center text-dark-600 uppercase tracking-wider">
-                                                <span class="text-3xl mr-3" id="single-normal-icon">🎯</span>
-                                                <span id="single-normal-label">Espresso</span>
-                                            </label>
-                                            <span class="font-black text-dark-800 text-lg"><span id="single-normal-count">0</span> BALENÍ</span>
+                                    <div class="bg-primary-50 p-4 rounded text-center border-2 border-primary-200">
+                                        <div class="text-3xl font-black text-primary-600 mb-1"><span id="single-normal-count">0</span></div>
+                                        <div class="text-xs font-bold uppercase tracking-wider text-dark-600">
+                                            <span id="single-normal-label">Espresso</span> balení
                                         </div>
-                                        <p class="text-xs text-dark-500 mt-2 text-right font-bold uppercase tracking-widest">Automaticky dopočítáno</p>
                                     </div>
                                 </div>
                             </div>

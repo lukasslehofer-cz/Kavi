@@ -12,7 +12,13 @@
     <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 mb-8 text-white">
         <div class="flex justify-between items-start">
             <div>
-                <h2 class="text-2xl font-bold mb-2">Vaše aktivní předplatné</h2>
+                <h2 class="text-2xl font-bold mb-2">
+                    @if($activeSubscriptions->count() > 1)
+                        Vaše aktivní předplatná ({{ $activeSubscriptions->count() }})
+                    @else
+                        Vaše aktivní předplatné
+                    @endif
+                </h2>
                 <p class="text-blue-100 text-lg">
                     {{ $activeSubscription->plan ? $activeSubscription->plan->name : 'Kávové předplatné' }}
                 </p>
@@ -40,7 +46,11 @@
                 @endif
             </div>
             <a href="{{ route('dashboard.subscription') }}" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition font-semibold">
-                Spravovat předplatné
+                @if($activeSubscriptions->count() > 1)
+                    Zobrazit všechna předplatná
+                @else
+                    Spravovat předplatné
+                @endif
             </a>
         </div>
     </div>

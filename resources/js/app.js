@@ -196,47 +196,28 @@ function initSubscriptionConfigurator() {
         const isEspresso = config.type === 'espresso';
         const normalIcon = isEspresso ? '🎯' : '💧';
         const normalLabel = isEspresso ? 'Espresso' : 'Filter';
-        const decafIcon = isEspresso ? '🎯🌙' : '💧🌙';
-        const decafLabel = isEspresso ? 'Espresso Decaf' : 'Filter Decaf';
-        const typeName = isEspresso ? 'espresso' : 'filter';
         
         const elements = {
-            normalIcon: document.getElementById('single-normal-icon'),
+            normalIconTop: document.getElementById('single-normal-icon-top'),
+            normalLabelTop: document.getElementById('single-normal-label-top'),
             normalLabel: document.getElementById('single-normal-label'),
-            decafIcon: document.getElementById('single-decaf-icon'),
-            decafLabel: document.getElementById('single-decaf-label'),
-            typeName: document.getElementById('coffee-type-name')
+            decafLabel: document.getElementById('single-decaf-label')
         };
         
-        if (elements.normalIcon) elements.normalIcon.textContent = normalIcon;
+        if (elements.normalIconTop) elements.normalIconTop.textContent = normalIcon;
+        if (elements.normalLabelTop) elements.normalLabelTop.textContent = normalLabel;
         if (elements.normalLabel) elements.normalLabel.textContent = normalLabel;
-        if (elements.decafIcon) elements.decafIcon.textContent = decafIcon;
-        if (elements.decafLabel) elements.decafLabel.textContent = decafLabel;
-        if (elements.typeName) elements.typeName.textContent = typeName;
+        if (elements.decafLabel) elements.decafLabel.textContent = `${normalLabel} Decaf`;
+        
+        // Initialize slider
+        if (singleDecafSlider) {
+            singleDecafSlider.max = config.amount || 4;
+            singleDecafSlider.value = 0;
+            updateSingleTypeDisplay();
+        }
     }
 
-    // Decaf checkbox
-    if (decafCheckbox) {
-        decafCheckbox.addEventListener('change', function() {
-            config.isDecaf = this.checked;
-            
-            if (this.checked) {
-                decafSliderContainer?.classList.remove('hidden');
-                // Initialize slider
-                if (singleDecafSlider) {
-                    singleDecafSlider.max = config.amount || 4;
-                    singleDecafSlider.value = 1;
-                    updateSingleTypeDisplay();
-                }
-            } else {
-                decafSliderContainer?.classList.add('hidden');
-                // Reset counts
-                config.mix = { espresso: 0, espressoDecaf: 0, filter: 0, filterDecaf: 0 };
-            }
-        });
-    }
-
-    // Single type decaf slider
+    // Single type decaf slider (always visible, no checkbox needed)
     if (singleDecafSlider) {
         singleDecafSlider.addEventListener('input', updateSingleTypeDisplay);
     }
@@ -252,6 +233,9 @@ function initSubscriptionConfigurator() {
         
         if (decafCountEl) decafCountEl.textContent = decafCount;
         if (normalCountEl) normalCountEl.textContent = normalCount;
+        
+        // Update config - mark as decaf if any decaf selected
+        config.isDecaf = decafCount > 0;
         
         // Store in config
         if (config.type === 'espresso') {

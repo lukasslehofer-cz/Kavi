@@ -55,9 +55,12 @@ class CheckoutController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'required|string',
-            'address' => 'required|string',
-            'city' => 'required|string',
-            'postal_code' => 'required|string',
+            'billing_address' => 'required|string',
+            'billing_city' => 'required|string',
+            'billing_postal_code' => 'required|string',
+            'packeta_point_id' => 'required|string',
+            'packeta_point_name' => 'required|string',
+            'packeta_point_address' => 'nullable|string',
             'payment_method' => 'required|in:card,transfer',
         ]);
 
@@ -108,12 +111,22 @@ class CheckoutController extends Controller
                     'name' => $request->name,
                     'email' => $request->email,
                     'phone' => $request->phone,
-                    'address' => $request->address,
-                    'city' => $request->city,
-                    'postal_code' => $request->postal_code,
+                    'billing_address' => $request->billing_address,
+                    'billing_city' => $request->billing_city,
+                    'billing_postal_code' => $request->billing_postal_code,
+                    'packeta_point_id' => $request->packeta_point_id,
+                    'packeta_point_name' => $request->packeta_point_name,
+                    'packeta_point_address' => $request->packeta_point_address,
                     'country' => 'CZ',
                 ],
                 'customer_notes' => $request->notes,
+            ]);
+
+            // Save Packeta pickup point to user for future use
+            auth()->user()->update([
+                'packeta_point_id' => $request->packeta_point_id,
+                'packeta_point_name' => $request->packeta_point_name,
+                'packeta_point_address' => $request->packeta_point_address,
             ]);
 
             foreach ($orderItems as $item) {

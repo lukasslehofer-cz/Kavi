@@ -55,6 +55,7 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::get('/objednavky', [DashboardController::class, 'orders'])->name('orders');
     Route::get('/objednavka/{order}', [DashboardController::class, 'orderDetail'])->name('order.detail');
     Route::get('/predplatne', [DashboardController::class, 'subscription'])->name('subscription');
+    Route::post('/predplatne/update-packeta', [DashboardController::class, 'updatePacketaPoint'])->name('subscription.update-packeta');
 });
 
 // Admin Panel - requires auth + admin

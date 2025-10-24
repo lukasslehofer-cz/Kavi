@@ -161,9 +161,12 @@ class SubscriptionController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => auth()->check() ? 'required|string|max:20' : 'nullable|string|max:20',
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
+            'billing_address' => 'required|string|max:255',
+            'billing_city' => 'required|string|max:100',
+            'billing_postal_code' => 'required|string|max:20',
+            'packeta_point_id' => 'required|string',
+            'packeta_point_name' => 'required|string',
+            'packeta_point_address' => 'nullable|string',
             'payment_method' => 'required|in:card,transfer',
             'delivery_notes' => 'nullable|string|max:500',
         ]);
@@ -209,14 +212,26 @@ class SubscriptionController extends Controller
                     'name' => $validated['name'],
                     'email' => $validated['email'],
                     'phone' => $validated['phone'] ?? null,
-                    'address' => $validated['address'],
-                    'city' => $validated['city'],
-                    'postal_code' => $validated['postal_code'],
+                    'billing_address' => $validated['billing_address'],
+                    'billing_city' => $validated['billing_city'],
+                    'billing_postal_code' => $validated['billing_postal_code'],
                     'country' => 'CZ',
                 ],
                 'payment_method' => $validated['payment_method'],
+                'packeta_point_id' => $validated['packeta_point_id'],
+                'packeta_point_name' => $validated['packeta_point_name'],
+                'packeta_point_address' => $validated['packeta_point_address'],
                 'delivery_notes' => $validated['delivery_notes'] ?? null,
             ]);
+
+            // Save Packeta pickup point to user for future use (if authenticated)
+            if (auth()->check()) {
+                auth()->user()->update([
+                    'packeta_point_id' => $validated['packeta_point_id'],
+                    'packeta_point_name' => $validated['packeta_point_name'],
+                    'packeta_point_address' => $validated['packeta_point_address'],
+                ]);
+            }
 
             // Here you would integrate with Stripe for payment
             // For now, we'll just mark it as active
