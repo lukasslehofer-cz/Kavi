@@ -66,7 +66,18 @@ function initSubscriptionConfigurator() {
         frequencyText: null
     };
 
-    const PRICE_PER_BAG = 250; // Cena za jedno balení v Kč
+    // Load pricing from data attribute
+    const configuratorElement = document.getElementById('subscription-configurator');
+    let PRICING = { '2': 500, '3': 720, '4': 920 }; // Default pricing
+    
+    if (configuratorElement && configuratorElement.dataset.pricing) {
+        try {
+            PRICING = JSON.parse(configuratorElement.dataset.pricing);
+            console.log('Loaded pricing:', PRICING);
+        } catch (e) {
+            console.error('Failed to parse pricing data:', e);
+        }
+    }
 
     // Get button references at the start
     const configureBtn = document.getElementById('configure-subscription');
@@ -457,7 +468,7 @@ function initSubscriptionConfigurator() {
 
         // Price
         if (config.amount) {
-            const totalPrice = config.amount * PRICE_PER_BAG;
+            const totalPrice = PRICING[config.amount.toString()] || 0;
             document.getElementById('summary-price').textContent = 
                 `${totalPrice.toLocaleString('cs-CZ')} Kč`;
         }

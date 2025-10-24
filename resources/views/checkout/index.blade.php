@@ -232,13 +232,18 @@
                 <!-- Price Summary -->
                 <dl class="space-y-4 mb-6">
                     <div class="flex justify-between items-center">
-                        <dt class="text-dark-600">Mezisoučet:</dt>
-                        <dd class="font-semibold text-dark-800 text-lg">{{ number_format($subtotal, 0, ',', ' ') }} Kč</dd>
+                        <dt class="text-dark-600">Mezisoučet (bez DPH):</dt>
+                        <dd class="font-semibold text-dark-800">{{ number_format($totalWithoutVat, 2, ',', ' ') }} Kč</dd>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <dt class="text-dark-600">DPH (21%):</dt>
+                        <dd class="font-semibold text-dark-800">{{ number_format($vat, 2, ',', ' ') }} Kč</dd>
                     </div>
                     
                     <div class="flex justify-between items-center">
                         <dt class="text-dark-600">Doprava:</dt>
-                        <dd class="font-semibold text-lg">
+                        <dd class="font-semibold">
                             @if($shipping == 0)
                             <span class="text-green-600">Zdarma</span>
                             @else
@@ -249,9 +254,9 @@
 
                     <div class="border-t-2 border-bluegray-200 pt-4">
                         <div class="flex justify-between items-center">
-                            <dt class="font-display font-bold text-dark-800 text-lg">Celkem:</dt>
+                            <dt class="font-display font-bold text-dark-800 text-lg">Celkem (včetně DPH):</dt>
                             <dd class="font-bold text-primary-500 text-3xl">
-                                {{ number_format($total, 0, ',', ' ') }} Kč
+                                {{ number_format($totalWithVat, 0, ',', ' ') }} Kč
                             </dd>
                         </div>
                     </div>

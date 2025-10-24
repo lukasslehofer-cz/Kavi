@@ -19,3 +19,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 
+

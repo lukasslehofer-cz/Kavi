@@ -368,20 +368,25 @@ unset($__errorArgs, $__bag); ?>
                 <!-- Price Summary -->
                 <dl class="space-y-4 mb-6">
                     <div class="flex justify-between items-center">
-                        <dt class="text-dark-600"><?php echo e($configuration['amount']); ?>× balení kávy:</dt>
-                        <dd class="font-semibold text-dark-800 text-lg"><?php echo e(number_format($price, 0, ',', ' ')); ?> Kč</dd>
+                        <dt class="text-dark-600"><?php echo e($configuration['amount']); ?>× balení kávy (bez DPH):</dt>
+                        <dd class="font-semibold text-dark-800"><?php echo e(number_format($priceWithoutVat, 2, ',', ' ')); ?> Kč</dd>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <dt class="text-dark-600">DPH (21%):</dt>
+                        <dd class="font-semibold text-dark-800"><?php echo e(number_format($vat, 2, ',', ' ')); ?> Kč</dd>
                     </div>
                     
                     <div class="flex justify-between items-center">
                         <dt class="text-dark-600">Doprava:</dt>
-                        <dd class="font-semibold text-lg">
+                        <dd class="font-semibold">
                             <span class="text-green-600">Zdarma</span>
                         </dd>
                     </div>
 
                     <div class="border-t-2 border-bluegray-200 pt-4">
                         <div class="flex justify-between items-center">
-                            <dt class="font-display font-bold text-dark-800 text-lg">Celkem:</dt>
+                            <dt class="font-display font-bold text-dark-800 text-lg">Celkem (včetně DPH):</dt>
                             <dd class="font-bold text-primary-500 text-3xl">
                                 <?php echo e(number_format($price, 0, ',', ' ')); ?> Kč
                             </dd>

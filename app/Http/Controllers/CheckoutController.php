@@ -40,9 +40,13 @@ class CheckoutController extends Controller
         }
 
         $shipping = $subtotal >= 1000 ? 0 : 99; // Free shipping over 1000 CZK
-        $total = $subtotal + $shipping;
+        $totalWithVat = $subtotal + $shipping;
+        
+        // Calculate VAT (all prices include 21% VAT)
+        $totalWithoutVat = round($totalWithVat / 1.21, 2);
+        $vat = round($totalWithVat - $totalWithoutVat, 2);
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total'));
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'totalWithVat', 'totalWithoutVat', 'vat'));
     }
 
     public function store(Request $request)
@@ -84,15 +88,19 @@ class CheckoutController extends Controller
             }
 
             $shipping = $subtotal >= 1000 ? 0 : 99;
-            $total = $subtotal + $shipping;
+            $totalWithVat = $subtotal + $shipping;
+            
+            // Calculate VAT (all prices include 21% VAT)
+            $totalWithoutVat = round($totalWithVat / 1.21, 2);
+            $tax = round($totalWithVat - $totalWithoutVat, 2);
 
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => auth()->id(),
                 'subtotal' => $subtotal,
                 'shipping' => $shipping,
-                'tax' => 0,
-                'total' => $total,
+                'tax' => $tax,
+                'total' => $totalWithVat,
                 'status' => 'pending',
                 'payment_status' => 'pending',
                 'payment_method' => $request->payment_method,
@@ -150,5 +158,6 @@ class CheckoutController extends Controller
         return view('checkout.confirmation', compact('order'));
     }
 }
+
 
 

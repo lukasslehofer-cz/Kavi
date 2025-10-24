@@ -16,7 +16,14 @@ class SubscriptionController extends Controller
             ->orderBy('price')
             ->get();
 
-        return view('subscriptions.index', compact('plans'));
+        // Get subscription pricing configuration
+        $subscriptionPricing = [
+            '2' => SubscriptionConfig::get('price_2_bags', 500),
+            '3' => SubscriptionConfig::get('price_3_bags', 720),
+            '4' => SubscriptionConfig::get('price_4_bags', 920),
+        ];
+
+        return view('subscriptions.index', compact('plans', 'subscriptionPricing'));
     }
 
     public function show(SubscriptionPlan $plan)
@@ -92,19 +99,27 @@ class SubscriptionController extends Controller
             }
         }
 
-        // Calculate price
-        $pricePerBag = SubscriptionConfig::get('price_per_bag', 250);
-        $totalPrice = $validated['amount'] * $pricePerBag;
+        // Calculate price based on amount (tiered pricing)
+        $pricingKey = 'price_' . $validated['amount'] . '_bags';
+        $totalPriceWithVat = SubscriptionConfig::get($pricingKey, 500); // Default to 500 if not found
+        
+        // Calculate VAT (all prices include 21% VAT)
+        $priceWithoutVat = round($totalPriceWithVat / 1.21, 2);
+        $vat = round($totalPriceWithVat - $priceWithoutVat, 2);
 
         // Store configuration in session for checkout
         session([
             'subscription_configuration' => $validated,
-            'subscription_price' => $totalPrice,
+            'subscription_price' => $totalPriceWithVat,
+            'subscription_price_without_vat' => $priceWithoutVat,
+            'subscription_vat' => $vat,
         ]);
 
         logger()->info('Configuration stored in session. Redirecting to checkout.', [
             'config' => $validated,
-            'price' => $totalPrice
+            'price' => $totalPriceWithVat,
+            'price_without_vat' => $priceWithoutVat,
+            'vat' => $vat
         ]);
 
         // Proceed to checkout (accessible for everyone now)
@@ -118,13 +133,15 @@ class SubscriptionController extends Controller
     {
         $configuration = session('subscription_configuration');
         $price = session('subscription_price');
+        $priceWithoutVat = session('subscription_price_without_vat');
+        $vat = session('subscription_vat');
 
         if (!$configuration || !$price) {
             return redirect()->route('subscriptions.index')
                 ->with('error', 'Konfigurace předplatného nenalezena. Prosím nakonfigurujte si předplatné znovu.');
         }
 
-        return view('subscriptions.checkout', compact('configuration', 'price'));
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat'));
     }
 
     /**
@@ -208,7 +225,12 @@ class SubscriptionController extends Controller
             DB::commit();
 
             // Clear session
-            session()->forget(['subscription_configuration', 'subscription_price']);
+            session()->forget([
+                'subscription_configuration', 
+                'subscription_price',
+                'subscription_price_without_vat',
+                'subscription_vat'
+            ]);
 
             if (auth()->check()) {
                 return redirect()->route('dashboard.subscription')

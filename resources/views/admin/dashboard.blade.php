@@ -109,7 +109,7 @@
             <a href="{{ route('admin.products.index') }}" class="btn btn-outline text-center">
                 Spravovat produkty
             </a>
-            <a href="#" class="btn btn-outline text-center">
+            <a href="{{ route('admin.orders.index') }}" class="btn btn-outline text-center">
                 Zobrazit objednávky
             </a>
             <a href="{{ route('admin.subscription-config.index') }}" class="btn btn-outline text-center">
@@ -164,7 +164,7 @@
                             {{ $order->created_at->format('d.m.Y H:i') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="#" class="text-coffee-700 hover:text-coffee-900 underline">Detail</a>
+                            <a href="{{ route('admin.orders.show', $order) }}" class="text-coffee-700 hover:text-coffee-900 underline">Detail</a>
                         </td>
                     </tr>
                     @empty

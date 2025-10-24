@@ -54,7 +54,7 @@
         <?php endif; ?>
 
         <!-- Configurator Card -->
-        <div class="max-w-4xl mx-auto" id="subscription-configurator">
+        <div class="max-w-4xl mx-auto" id="subscription-configurator" data-pricing='<?php echo json_encode($subscriptionPricing, 15, 512) ?>'>
             <div class="card p-8 md:p-12">
                 <!-- Progress Indicator -->
                 <div class="mb-12">

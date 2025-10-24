@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\SubscriptionConfig;
 use App\Models\SubscriptionPlan;
 
 class HomeController extends Controller
@@ -19,8 +20,16 @@ class HomeController extends Controller
             ->orderBy('price')
             ->get();
 
-        return view('home', compact('featuredProducts', 'subscriptionPlans'));
+        // Get subscription pricing configuration
+        $subscriptionPricing = [
+            '2' => SubscriptionConfig::get('price_2_bags', 500),
+            '3' => SubscriptionConfig::get('price_3_bags', 720),
+            '4' => SubscriptionConfig::get('price_4_bags', 920),
+        ];
+
+        return view('home', compact('featuredProducts', 'subscriptionPlans', 'subscriptionPricing'));
     }
 }
+
 
 
