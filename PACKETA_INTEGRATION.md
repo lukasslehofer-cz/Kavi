@@ -225,3 +225,4 @@ Pro podporu kontaktujte:
 
 - Packeta: [podpora@packeta.com](mailto:podpora@packeta.com)
 - Dokumentace API: [https://www.zasilkovna.cz/api/dokumentace](https://www.zasilkovna.cz/api/dokumentace)
+

@@ -110,21 +110,41 @@
             <!-- Shipping Address -->
             <div class="card p-6">
                 <h3 class="font-display text-xl font-bold text-coffee-900 mb-4">Doručovací adresa</h3>
-                <div class="text-coffee-700">
-                    <p class="font-medium"><?php echo e($order->shipping_name); ?></p>
-                    <p><?php echo e($order->shipping_address); ?></p>
-                    <p><?php echo e($order->shipping_postal_code); ?> <?php echo e($order->shipping_city); ?></p>
-                    <?php if($order->shipping_phone): ?>
-                    <p class="mt-2">Tel: <?php echo e($order->shipping_phone); ?></p>
+                <div class="text-coffee-700 space-y-4">
+                    <div>
+                        <p class="font-medium"><?php echo e($order->shipping_address['name'] ?? 'N/A'); ?></p>
+                        <?php if(!empty($order->shipping_address['email'])): ?>
+                        <p class="text-sm"><?php echo e($order->shipping_address['email']); ?></p>
+                        <?php endif; ?>
+                        <?php if(!empty($order->shipping_address['phone'])): ?>
+                        <p class="text-sm">Tel: <?php echo e($order->shipping_address['phone']); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if(!empty($order->shipping_address['packeta_point_id'])): ?>
+                    <!-- Packeta Pickup Point -->
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded">
+                        <p class="font-medium text-sm text-blue-900 mb-1">📦 Výdejní místo Packeta</p>
+                        <p class="font-bold"><?php echo e($order->shipping_address['packeta_point_name'] ?? 'N/A'); ?></p>
+                        <p class="text-sm"><?php echo e($order->shipping_address['packeta_point_address'] ?? 'N/A'); ?></p>
+                        <p class="text-xs text-gray-600 mt-1">ID: <?php echo e($order->shipping_address['packeta_point_id']); ?></p>
+                    </div>
                     <?php endif; ?>
+
+                    <div>
+                        <p class="text-sm font-medium text-coffee-600 mb-1">Fakturační adresa:</p>
+                        <p><?php echo e($order->shipping_address['billing_address'] ?? 'N/A'); ?></p>
+                        <p><?php echo e($order->shipping_address['billing_postal_code'] ?? ''); ?> <?php echo e($order->shipping_address['billing_city'] ?? ''); ?></p>
+                        <p><?php echo e($order->shipping_address['country'] ?? 'CZ'); ?></p>
+                    </div>
                 </div>
             </div>
 
             <!-- Delivery Notes -->
-            <?php if($order->delivery_notes): ?>
+            <?php if($order->customer_notes): ?>
             <div class="card p-6">
                 <h3 class="font-display text-xl font-bold text-coffee-900 mb-4">Poznámka k objednávce</h3>
-                <p class="text-coffee-700"><?php echo e($order->delivery_notes); ?></p>
+                <p class="text-coffee-700"><?php echo e($order->customer_notes); ?></p>
             </div>
             <?php endif; ?>
         </div>

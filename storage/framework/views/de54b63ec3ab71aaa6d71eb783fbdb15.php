@@ -110,8 +110,18 @@
             <a href="<?php echo e(route('admin.orders.index')); ?>" class="btn btn-outline text-center">
                 Zobrazit objednávky
             </a>
+            <a href="<?php echo e(route('admin.subscriptions.index')); ?>" class="btn btn-outline text-center">
+                Spravovat předplatná
+            </a>
+            <a href="<?php echo e(route('admin.subscriptions.shipments')); ?>" class="btn btn-primary text-center">
+                <svg class="w-5 h-5 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
+                </svg>
+                Rozesílka předplatných
+            </a>
             <a href="<?php echo e(route('admin.subscription-config.index')); ?>" class="btn btn-outline text-center">
-                Spravovat předplatné
+                Nastavení konfiguratoru
             </a>
         </div>
     </div>
@@ -170,6 +180,80 @@
                     <tr>
                         <td colspan="6" class="px-6 py-12 text-center text-coffee-600">
                             Žádné objednávky
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent Subscriptions -->
+    <div class="card mt-12">
+        <div class="p-6 border-b border-cream-200">
+            <div class="flex items-center justify-between">
+                <h2 class="font-display text-2xl font-bold text-coffee-900">Poslední předplatná</h2>
+                <a href="<?php echo e(route('admin.subscriptions.index')); ?>" class="text-coffee-700 hover:text-coffee-900 font-semibold">
+                    Zobrazit všechny →
+                </a>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-cream-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-coffee-600 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-coffee-600 uppercase tracking-wider">Zákazník</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-coffee-600 uppercase tracking-wider">Plán</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-coffee-600 uppercase tracking-wider">Cena</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-coffee-600 uppercase tracking-wider">Stav</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-coffee-600 uppercase tracking-wider">Datum</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-coffee-600 uppercase tracking-wider">Akce</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-cream-200">
+                    <?php $__empty_1 = true; $__currentLoopData = $recentSubscriptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subscription): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="font-mono text-sm">#<?php echo e($subscription->id); ?></span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-coffee-900"><?php echo e($subscription->user->name ?? 'Host'); ?></span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-coffee-900">
+                                <?php echo e($subscription->plan ? $subscription->plan->name : 'Vlastní'); ?>
+
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm font-bold text-coffee-900">
+                                <?php echo e(number_format($subscription->configured_price ?? $subscription->plan->price ?? 0, 0, ',', ' ')); ?> Kč
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <?php if($subscription->status === 'active'): ?>
+                            <span class="badge badge-success">Aktivní</span>
+                            <?php elseif($subscription->status === 'pending'): ?>
+                            <span class="badge badge-warning">Čeká</span>
+                            <?php elseif($subscription->status === 'canceled'): ?>
+                            <span class="badge" style="background-color: #fee2e2; color: #991b1b;">Zrušeno</span>
+                            <?php else: ?>
+                            <span class="badge"><?php echo e($subscription->status); ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-coffee-600">
+                            <?php echo e($subscription->created_at->format('d.m.Y H:i')); ?>
+
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <a href="<?php echo e(route('admin.subscriptions.show', $subscription)); ?>" class="text-coffee-700 hover:text-coffee-900 underline">Detail</a>
+                        </td>
+                    </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-coffee-600">
+                            Žádná předplatná
                         </td>
                     </tr>
                     <?php endif; ?>

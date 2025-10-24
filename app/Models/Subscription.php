@@ -16,6 +16,7 @@ class Subscription extends Model
         'status',
         'starts_at',
         'next_billing_date',
+        'last_shipment_date',
         'ends_at',
         'delivery_notes',
         'configuration',
@@ -31,6 +32,7 @@ class Subscription extends Model
     protected $casts = [
         'starts_at' => 'date',
         'next_billing_date' => 'date',
+        'last_shipment_date' => 'date',
         'ends_at' => 'date',
         'configuration' => 'array',
         'shipping_address' => 'array',
@@ -83,6 +85,22 @@ class Subscription extends Model
     public function resume()
     {
         $this->update(['status' => 'active']);
+    }
+
+    /**
+     * Get the next shipment date for this subscription
+     */
+    public function getNextShipmentDateAttribute(): ?\Carbon\Carbon
+    {
+        return \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($this);
+    }
+
+    /**
+     * Check if this subscription should ship on the given date
+     */
+    public function shouldShipOn(\Carbon\Carbon $date): bool
+    {
+        return \App\Helpers\SubscriptionHelper::shouldShipInNextBatch($this, $date);
     }
 }
 

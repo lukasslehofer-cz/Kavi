@@ -22,6 +22,8 @@ class Product extends Model
         'attributes',
         'is_active',
         'is_featured',
+        'is_coffee_of_month',
+        'coffee_of_month_date',
         'sort_order',
     ];
 
@@ -32,6 +34,8 @@ class Product extends Model
         'attributes' => 'array',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
+        'is_coffee_of_month' => 'boolean',
+        'coffee_of_month_date' => 'date',
     ];
 
     public function orderItems()
@@ -42,6 +46,18 @@ class Product extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeForShop($query)
+    {
+        // Pro eshop - aktivní produkty, které NEJSOU kávy měsíce
+        return $query->where('is_active', true)
+                     ->where('is_coffee_of_month', false);
+    }
+
+    public function scopeCoffeeOfMonth($query)
+    {
+        return $query->where('is_coffee_of_month', true);
     }
 
     public function scopeFeatured($query)

@@ -72,8 +72,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Orders
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show', 'update', 'destroy']);
     
-    // Subscriptions - to be implemented
-    // Route::resource('subscriptions', AdminSubscriptionController::class);
+    // Subscriptions
+    Route::resource('subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class)->only(['index', 'show', 'update', 'destroy']);
+    Route::get('/subscriptions-shipments', [\App\Http\Controllers\Admin\SubscriptionController::class, 'shipments'])->name('subscriptions.shipments');
 });
 
 // Auth routes (Laravel Breeze/Jetstream or custom implementation)

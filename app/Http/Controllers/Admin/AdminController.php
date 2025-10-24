@@ -31,7 +31,12 @@ class AdminController extends Controller
             ->take(10)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentOrders'));
+        $recentSubscriptions = Subscription::with(['user', 'plan'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'recentOrders', 'recentSubscriptions'));
     }
 }
 

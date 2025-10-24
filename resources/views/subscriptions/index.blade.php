@@ -481,6 +481,165 @@
     </div>
 </section>
 
+<!-- Shipping Date Info -->
+<section class="section bg-white border-t border-bluegray-200">
+    <div class="container-custom">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-primary-50 border-2 border-primary-200 p-8 mb-6">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0">
+                        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-dark-800 mb-2">Termín následující rozesílky</h3>
+                        <p class="text-dark-700 mb-3"><strong>{{ $shippingInfo['cutoff_message'] }}</strong></p>
+                        <p class="text-sm text-dark-600 leading-relaxed">
+                            <strong>Jak to funguje:</strong> Rozesílka kávy probíhá vždy <strong>20. dne v měsíci</strong>. 
+                            Objednávky uzavíráme <strong>15. dne v měsíci o půlnoci</strong>. 
+                            Pokud si objednáte od 16. dne, vaše první zásilka dorazí až při následující rozesílce.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Coffees of the Month -->
+@if($coffeesOfMonth->count() > 0)
+<section class="section bg-bluegray-50">
+    <div class="container-custom">
+        <div class="text-center mb-12">
+            <h2 class="font-display text-3xl md:text-4xl font-black text-dark-800 mb-4">
+                Kávy v následující rozesílce
+            </h2>
+            <p class="text-lg text-dark-600 max-w-2xl mx-auto">
+                Tyto speciálně vybrané kávy budou součástí vašeho příštího předplatného
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            @foreach($coffeesOfMonth as $coffee)
+            <div class="bg-white overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                <div class="aspect-square overflow-hidden bg-bluegray-50 relative">
+                    @if($coffee->image)
+                    <img src="{{ $coffee->image }}" alt="{{ $coffee->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    @else
+                    <div class="w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-bluegray-100 to-bluegray-200">
+                        <svg class="w-16 h-16 text-bluegray-400 mb-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
+                        </svg>
+                        <p class="text-center text-xs text-dark-600 font-bold">{{ $coffee->name }}</p>
+                    </div>
+                    @endif
+                    <!-- Badge indicating coffee of the month -->
+                    <div class="absolute top-3 right-3 bg-primary-500 text-white px-3 py-1 text-xs font-bold uppercase">
+                        Káva měsíce
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-dark-800 mb-1 text-base">
+                                {{ $coffee->name }}
+                            </h3>
+                            @if($coffee->short_description)
+                            <p class="text-xs text-dark-600 mb-3 line-clamp-2">{{ $coffee->short_description }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    @if($coffee->description)
+                    <div class="pt-3 border-t border-bluegray-100">
+                        <button 
+                            onclick="showCoffeeModal({{ $coffee->id }})"
+                            class="text-primary-500 hover:text-primary-600 font-bold text-sm transition-colors">
+                            Zobrazit detail →
+                        </button>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<!-- Coffee Detail Modal -->
+<div id="coffee-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white max-w-3xl w-full max-h-[90vh] overflow-y-auto relative">
+        <button onclick="closeCoffeeModal()" class="absolute top-4 right-4 text-dark-400 hover:text-dark-800 transition-colors z-10">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+        <div id="coffee-modal-content" class="p-8">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+function showCoffeeModal(coffeeId) {
+    const coffees = @json($coffeesOfMonth);
+    const coffee = coffees.find(c => c.id === coffeeId);
+    
+    if (!coffee) return;
+    
+    const modal = document.getElementById('coffee-modal');
+    const content = document.getElementById('coffee-modal-content');
+    
+    let imagesHtml = '';
+    if (coffee.image) {
+        imagesHtml = `<img src="${coffee.image}" alt="${coffee.name}" class="w-full h-80 object-cover mb-6">`;
+    }
+    
+    content.innerHTML = `
+        ${imagesHtml}
+        <h2 class="font-display text-3xl font-black text-dark-800 mb-4">${coffee.name}</h2>
+        ${coffee.short_description ? `<p class="text-lg text-dark-700 font-bold mb-4">${coffee.short_description}</p>` : ''}
+        ${coffee.description ? `<div class="text-dark-600 prose max-w-none">${coffee.description}</div>` : ''}
+        ${coffee.attributes ? `
+            <div class="mt-6 grid grid-cols-2 gap-4">
+                ${Object.entries(coffee.attributes).map(([key, value]) => `
+                    <div class="bg-bluegray-50 p-3">
+                        <p class="text-xs text-dark-600 font-bold uppercase mb-1">${key}</p>
+                        <p class="text-dark-800 font-bold">${value}</p>
+                    </div>
+                `).join('')}
+            </div>
+        ` : ''}
+    `;
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCoffeeModal() {
+    const modal = document.getElementById('coffee-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCoffeeModal();
+    }
+});
+
+// Close modal on backdrop click
+document.getElementById('coffee-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCoffeeModal();
+    }
+});
+</script>
+@endif
+
 <!-- CTA -->
 <section class="section bg-gradient-to-br from-primary-500 to-primary-700 text-white">
     <div class="container-custom text-center">

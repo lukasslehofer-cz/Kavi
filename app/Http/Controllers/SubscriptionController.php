@@ -23,7 +23,16 @@ class SubscriptionController extends Controller
             '4' => SubscriptionConfig::get('price_4_bags', 920),
         ];
 
-        return view('subscriptions.index', compact('plans', 'subscriptionPricing'));
+        // Get shipping date info
+        $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
+
+        // Get coffees of the month for next shipment
+        $coffeesOfMonth = \App\Models\Product::coffeeOfMonth()
+            ->orderBy('sort_order')
+            ->take(6)
+            ->get();
+
+        return view('subscriptions.index', compact('plans', 'subscriptionPricing', 'shippingInfo', 'coffeesOfMonth'));
     }
 
     public function show(SubscriptionPlan $plan)
@@ -141,7 +150,10 @@ class SubscriptionController extends Controller
                 ->with('error', 'Konfigurace předplatného nenalezena. Prosím nakonfigurujte si předplatné znovu.');
         }
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat'));
+        // Get shipping date info
+        $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
+
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo'));
     }
 
     /**

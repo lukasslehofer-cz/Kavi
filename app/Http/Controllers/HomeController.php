@@ -10,7 +10,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $featuredProducts = Product::active()
+        $featuredProducts = Product::forShop()
             ->featured()
             ->orderBy('sort_order')
             ->take(6)

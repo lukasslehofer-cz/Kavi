@@ -9,7 +9,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::active();
+        $query = Product::forShop(); // Exclude coffee of month products
 
         if ($request->has('category')) {
             $query->category($request->category);
@@ -36,11 +36,12 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        if (!$product->is_active) {
+        // If product is coffee of month, don't show in regular shop
+        if ($product->is_coffee_of_month || !$product->is_active) {
             abort(404);
         }
 
-        $relatedProducts = Product::active()
+        $relatedProducts = Product::forShop()
             ->where('category', $product->category)
             ->where('id', '!=', $product->id)
             ->take(4)

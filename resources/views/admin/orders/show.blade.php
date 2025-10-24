@@ -110,21 +110,41 @@
             <!-- Shipping Address -->
             <div class="card p-6">
                 <h3 class="font-display text-xl font-bold text-coffee-900 mb-4">Doručovací adresa</h3>
-                <div class="text-coffee-700">
-                    <p class="font-medium">{{ $order->shipping_name }}</p>
-                    <p>{{ $order->shipping_address }}</p>
-                    <p>{{ $order->shipping_postal_code }} {{ $order->shipping_city }}</p>
-                    @if($order->shipping_phone)
-                    <p class="mt-2">Tel: {{ $order->shipping_phone }}</p>
+                <div class="text-coffee-700 space-y-4">
+                    <div>
+                        <p class="font-medium">{{ $order->shipping_address['name'] ?? 'N/A' }}</p>
+                        @if(!empty($order->shipping_address['email']))
+                        <p class="text-sm">{{ $order->shipping_address['email'] }}</p>
+                        @endif
+                        @if(!empty($order->shipping_address['phone']))
+                        <p class="text-sm">Tel: {{ $order->shipping_address['phone'] }}</p>
+                        @endif
+                    </div>
+
+                    @if(!empty($order->shipping_address['packeta_point_id']))
+                    <!-- Packeta Pickup Point -->
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded">
+                        <p class="font-medium text-sm text-blue-900 mb-1">📦 Výdejní místo Packeta</p>
+                        <p class="font-bold">{{ $order->shipping_address['packeta_point_name'] ?? 'N/A' }}</p>
+                        <p class="text-sm">{{ $order->shipping_address['packeta_point_address'] ?? 'N/A' }}</p>
+                        <p class="text-xs text-gray-600 mt-1">ID: {{ $order->shipping_address['packeta_point_id'] }}</p>
+                    </div>
                     @endif
+
+                    <div>
+                        <p class="text-sm font-medium text-coffee-600 mb-1">Fakturační adresa:</p>
+                        <p>{{ $order->shipping_address['billing_address'] ?? 'N/A' }}</p>
+                        <p>{{ $order->shipping_address['billing_postal_code'] ?? '' }} {{ $order->shipping_address['billing_city'] ?? '' }}</p>
+                        <p>{{ $order->shipping_address['country'] ?? 'CZ' }}</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Delivery Notes -->
-            @if($order->delivery_notes)
+            @if($order->customer_notes)
             <div class="card p-6">
                 <h3 class="font-display text-xl font-bold text-coffee-900 mb-4">Poznámka k objednávce</h3>
-                <p class="text-coffee-700">{{ $order->delivery_notes }}</p>
+                <p class="text-coffee-700">{{ $order->customer_notes }}</p>
             </div>
             @endif
         </div>

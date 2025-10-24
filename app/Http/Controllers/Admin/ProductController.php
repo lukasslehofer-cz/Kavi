@@ -41,16 +41,25 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'short_description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'price' => 'nullable|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
             'category' => 'required|in:espresso,filter,accessories,merch',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'is_coffee_of_month' => 'boolean',
+            'coffee_of_month_date' => 'nullable|date',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
+        $validated['is_coffee_of_month'] = $request->has('is_coffee_of_month');
+        
+        // If product is coffee of month, price and stock are optional
+        if ($validated['is_coffee_of_month']) {
+            $validated['price'] = $validated['price'] ?? 0;
+            $validated['stock'] = $validated['stock'] ?? 0;
+        }
 
         Product::create($validated);
 
@@ -76,16 +85,25 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'short_description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'price' => 'nullable|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
             'category' => 'required|in:espresso,filter,accessories,merch',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'is_coffee_of_month' => 'boolean',
+            'coffee_of_month_date' => 'nullable|date',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
+        $validated['is_coffee_of_month'] = $request->has('is_coffee_of_month');
+        
+        // If product is coffee of month, price and stock are optional
+        if ($validated['is_coffee_of_month']) {
+            $validated['price'] = $validated['price'] ?? 0;
+            $validated['stock'] = $validated['stock'] ?? 0;
+        }
 
         $product->update($validated);
 

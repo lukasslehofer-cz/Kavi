@@ -427,6 +427,25 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
+                <!-- Shipping Date Info -->
+                <div class="bg-primary-50 border-2 border-primary-200 rounded-lg p-6 mb-6">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-dark-800 mb-2">Informace o dodání</h3>
+                            <p class="text-sm text-dark-700 mb-2">
+                                <strong><?php echo e($shippingInfo['cutoff_message']); ?></strong>
+                            </p>
+                            <p class="text-xs text-dark-600">
+                                Rozesílka probíhá vždy <strong>20. den v měsíci</strong>. Objednávky do 15. v měsíci jsou zahrnuty v aktuální rozesílce, 
+                                objednávky od 16. dne jsou zahrnuty až v následující rozesílce.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Price Summary -->
                 <dl class="space-y-4 mb-6">
                     <div class="flex justify-between items-center">

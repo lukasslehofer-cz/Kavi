@@ -68,10 +68,16 @@
                             </div>
                             @endif
                             
-                            @if($subscription->next_billing_date || $subscription->current_period_end)
+                            @php
+                                $nextShipment = $subscription->next_shipment_date;
+                            @endphp
+                            @if($nextShipment)
                             <div class="flex justify-between">
-                                <span class="text-gray-600">Další dodávka:</span>
-                                <span class="font-medium text-blue-600">{{ ($subscription->next_billing_date ?? \Carbon\Carbon::parse($subscription->current_period_end))->format('d.m.Y') }}</span>
+                                <span class="text-gray-600">Další rozesílka:</span>
+                                <span class="font-medium text-blue-600">{{ $nextShipment->format('d.m.Y') }}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 text-right mt-1">
+                                Rozesílka probíhá vždy 20. v měsíci
                             </div>
                             @endif
                         </div>
