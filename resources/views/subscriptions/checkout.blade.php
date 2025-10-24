@@ -36,7 +36,7 @@
                     
                     @guest
                     <!-- Login option for guests -->
-                    <div class="mb-6 bg-primary-50 rounded-xl p-6 border-2 border-primary-200">
+                    <div class="mb-6 bg-primary-50  p-6 border-2 border-primary-200">
                         <div class="flex items-start">
                             <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
@@ -178,7 +178,7 @@
                     <h2 class="font-display text-2xl font-bold text-dark-800 mb-6">Způsob platby</h2>
                     
                     <div class="space-y-4">
-                        <label class="flex items-start p-4 border-2 border-bluegray-200 rounded-xl cursor-pointer hover:border-primary-500 transition-colors has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+                        <label class="flex items-start p-4 border-2 border-bluegray-200  cursor-pointer hover:border-primary-500 transition-colors has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
                             <input type="radio" name="payment_method" value="card" checked required class="mt-1 w-5 h-5 text-primary-500">
                             <div class="ml-4 flex-1">
                                 <div class="font-semibold text-dark-800">Platební kartou</div>
@@ -191,7 +191,7 @@
                             </svg>
                         </label>
 
-                        <label class="flex items-start p-4 border-2 border-bluegray-200 rounded-xl cursor-pointer hover:border-primary-500 transition-colors has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+                        <label class="flex items-start p-4 border-2 border-bluegray-200  cursor-pointer hover:border-primary-500 transition-colors has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
                             <input type="radio" name="payment_method" value="transfer" required class="mt-1 w-5 h-5 text-primary-500">
                             <div class="ml-4 flex-1">
                                 <div class="font-semibold text-dark-800">Bankovním převodem</div>
@@ -232,7 +232,7 @@
                 <h3 class="font-display text-2xl font-bold text-dark-800 mb-6">Souhrn předplatného</h3>
                 
                 <!-- Subscription Details -->
-                <div class="bg-bluegray-50 rounded-xl p-6 mb-6">
+                <div class="bg-bluegray-50  p-6 mb-6">
                     <div class="space-y-4 text-sm">
                         <div class="flex justify-between items-start">
                             <span class="text-dark-600 font-medium">Množství:</span>
@@ -349,7 +349,7 @@
                 </button>
 
                 <div class="flex items-start mb-4">
-                    <input type="checkbox" id="terms" required form="subscription-checkout-form" class="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500 mr-3 mt-0.5">
+                    <input type="checkbox" id="terms" required form="subscription-checkout-form" class="w-5 h-5 text-primary-500 border-gray-300 focus:ring-primary-500 mr-3 mt-0.5">
                     <label for="terms" class="text-sm text-dark-700">
                         Souhlasím s <a href="#" class="text-primary-500 hover:text-primary-600 underline">obchodními podmínkami</a> 
                         a <a href="#" class="text-primary-500 hover:text-primary-600 underline">zásadami ochrany osobních údajů</a>

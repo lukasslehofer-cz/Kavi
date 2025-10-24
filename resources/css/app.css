@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,14 +10,14 @@
     }
     
     h1, h2, h3, h4, h5, h6 {
-        @apply font-display;
+        @apply font-display font-bold;
     }
 }
 
 @layer components {
-    /* Buttons - Kaffebox style */
+    /* Buttons - Bold & Clean (no borders) */
     .btn {
-        @apply px-8 py-4 rounded-full font-semibold transition-all duration-300 inline-block text-center shadow-sm hover:shadow-md transform hover:-translate-y-0.5;
+        @apply px-8 py-4 font-bold transition-all duration-300 inline-block text-center uppercase tracking-wider text-sm shadow-lg hover:shadow-2xl transform hover:-translate-y-1;
     }
     
     .btn-primary {
@@ -29,55 +29,59 @@
     }
     
     .btn-outline {
-        @apply border-2 border-dark-800 text-dark-800 hover:bg-dark-800 hover:text-white bg-transparent;
+        @apply bg-white text-dark-800 hover:bg-bluegray-100;
     }
     
     .btn-white {
-        @apply bg-white text-dark-800 hover:bg-bluegray-50;
+        @apply bg-white text-dark-800 hover:bg-bluegray-50 shadow-xl;
     }
 
-    /* Cards - Modern minimal style */
+    /* Cards - Clean surfaces */
     .card {
-        @apply bg-white rounded-2xl overflow-hidden border border-bluegray-100 hover:border-primary-200 transition-all duration-300;
+        @apply bg-white overflow-hidden transition-all duration-300 shadow-md hover:shadow-2xl;
     }
     
     .card-hover {
-        @apply hover:shadow-2xl hover:-translate-y-1 transition-all duration-300;
+        @apply hover:-translate-y-2 transition-all duration-300;
     }
 
-    /* Inputs */
+    /* Inputs - Clean */
     .input {
-        @apply w-full px-5 py-3 border-2 border-bluegray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all;
+        @apply w-full px-5 py-4 bg-bluegray-50 focus:bg-white focus:ring-2 focus:ring-primary-500 transition-all font-medium;
     }
 
-    /* Badges */
+    /* Badges - Bold blocks */
     .badge {
-        @apply inline-flex items-center px-4 py-1.5 text-sm font-semibold rounded-full;
+        @apply inline-flex items-center px-4 py-2 text-xs font-black uppercase tracking-wider;
     }
 
     .badge-success {
-        @apply bg-green-100 text-green-700;
+        @apply bg-green-500 text-white;
     }
 
     .badge-warning {
-        @apply bg-yellow-100 text-yellow-700;
+        @apply bg-yellow-500 text-white;
     }
 
     .badge-error {
-        @apply bg-red-100 text-red-700;
+        @apply bg-red-500 text-white;
     }
     
     .badge-primary {
-        @apply bg-primary-100 text-primary-700;
+        @apply bg-primary-500 text-white;
     }
     
     /* Section styling */
     .section {
-        @apply py-20 md:py-28;
+        @apply py-24 md:py-32;
     }
     
     .section-gray {
         @apply bg-bluegray-50;
+    }
+    
+    .section-dark {
+        @apply bg-dark-800 text-white;
     }
     
     /* Container */
@@ -85,27 +89,31 @@
         @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
     }
     
-    /* Hero text gradient */
+    /* Hero text gradient - Bold */
     .text-gradient {
-        @apply bg-gradient-to-r from-primary-500 to-primary-700 bg-clip-text text-transparent;
+        @apply bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700 bg-clip-text text-transparent;
     }
     
-    /* Image placeholder */
+    /* Image placeholder - Large format */
     .img-placeholder {
-        @apply flex items-center justify-center bg-bluegray-100 text-bluegray-400 font-medium text-center p-6;
-    }
-
-    /* Subscription Configurator */
-    .config-step {
-        @apply hidden;
+        @apply flex items-center justify-center bg-gradient-to-br from-bluegray-200 to-bluegray-300 text-dark-800 font-bold text-center p-12;
     }
     
-    .config-step.active {
-        @apply block animate-fadeIn;
+    /* Photo overlay text */
+    .photo-overlay {
+        @apply absolute inset-0 bg-dark-800 bg-opacity-40 flex items-center justify-center text-white font-black text-2xl uppercase tracking-wider p-8 text-center;
     }
 
+    /* Subscription configurator styles */
+    .coffee-amount-option.selected,
+    .coffee-type-option.selected,
+    .frequency-option.selected {
+        @apply bg-primary-500 text-white shadow-2xl transform -translate-y-1;
+    }
+
+    /* Progress indicators */
     .step-indicator {
-        @apply text-dark-400 transition-colors;
+        @apply text-bluegray-400;
     }
 
     .step-indicator.active {
@@ -117,64 +125,40 @@
     }
 
     .step-number {
-        @apply w-10 h-10 rounded-full border-2 border-bluegray-200 flex items-center justify-center font-bold transition-all;
+        @apply w-10 h-10 flex items-center justify-center bg-bluegray-200 text-bluegray-600 font-black text-lg;
     }
 
     .step-indicator.active .step-number {
-        @apply border-primary-500 bg-primary-500 text-white;
+        @apply bg-primary-500 text-white;
     }
 
     .step-indicator.completed .step-number {
-        @apply border-primary-500 bg-primary-500 text-white;
+        @apply bg-primary-500 text-white;
     }
 
-    .step-line {
-        @apply transition-all;
+    /* Config steps */
+    .config-step {
+        @apply hidden;
     }
 
-    .step-indicator.completed ~ .step-line {
-        @apply bg-primary-500;
+    .config-step.active {
+        @apply block;
     }
 
-    .coffee-amount-option.selected,
-    .coffee-type-option.selected,
-    .frequency-option.selected {
-        @apply border-primary-500 bg-primary-50 shadow-lg transform scale-105;
-    }
-
-    /* Range Slider Styling */
+    /* Range slider styling */
     .slider::-webkit-slider-thumb {
-        @apply appearance-none w-6 h-6 rounded-full bg-primary-500 cursor-pointer;
+        @apply appearance-none w-6 h-6 bg-primary-500 cursor-pointer shadow-lg;
     }
 
     .slider::-moz-range-thumb {
-        @apply w-6 h-6 rounded-full bg-primary-500 cursor-pointer border-0;
+        @apply w-6 h-6 bg-primary-500 cursor-pointer shadow-lg border-0;
     }
 
     .slider::-webkit-slider-runnable-track {
-        @apply bg-bluegray-200 rounded-lg h-2;
+        @apply w-full h-3 cursor-pointer bg-bluegray-200;
     }
 
     .slider::-moz-range-track {
-        @apply bg-bluegray-200 rounded-lg h-2;
+        @apply w-full h-3 cursor-pointer bg-bluegray-200;
     }
 }
-
-@layer utilities {
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .animate-fadeIn {
-        animation: fadeIn 0.3s ease-out;
-    }
-}
-
-

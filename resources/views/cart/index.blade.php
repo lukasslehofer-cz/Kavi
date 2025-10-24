@@ -24,7 +24,7 @@
     <!-- Empty Cart -->
     <div class="max-w-2xl mx-auto">
         <div class="card p-12 text-center">
-            <div class="w-32 h-32 bg-bluegray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div class="w-32 h-32 bg-bluegray-100  flex items-center justify-center mx-auto mb-6">
                 <svg class="w-16 h-16 text-bluegray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
@@ -46,7 +46,7 @@
                 <div class="card p-6 hover:shadow-lg transition-shadow">
                     <div class="flex gap-6">
                         <!-- Product Image -->
-                        <div class="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 img-placeholder">
+                        <div class="w-32 h-32  overflow-hidden flex-shrink-0 img-placeholder">
                             @if($item['product']->image)
                             <img src="{{ $item['product']->image }}" alt="{{ $item['product']->name }}" class="w-full h-full object-cover">
                             @else
@@ -78,7 +78,7 @@
                                 <form action="{{ route('cart.update', $item['product']->id) }}" method="POST" class="flex items-center gap-3">
                                     @csrf
                                     @method('PATCH')
-                                    <div class="flex items-center border-2 border-bluegray-200 rounded-xl overflow-hidden bg-white">
+                                    <div class="flex items-center border-2 border-bluegray-200  overflow-hidden bg-white">
                                         <button type="button" class="px-4 py-2 text-dark-700 hover:bg-bluegray-50 transition-colors font-semibold">-</button>
                                         <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1" max="{{ $item['product']->stock }}" 
                                                class="w-16 text-center text-lg font-semibold border-0 focus:ring-0 py-2" data-quantity-input>
@@ -93,7 +93,7 @@
                                 <form action="{{ route('cart.remove', $item['product']->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                    <button type="submit" class="p-2 text-red-500 hover:text-red-600 hover:bg-red-50  transition-colors">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16"/>
                                         </svg>
@@ -144,7 +144,7 @@
                     </div>
 
                     @if($total < 1000)
-                    <div class="bg-primary-50 border border-primary-200 p-4 rounded-xl">
+                    <div class="bg-primary-50 border border-primary-200 p-4 ">
                         <p class="text-sm text-primary-700 font-medium">
                             <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
@@ -153,7 +153,7 @@
                         </p>
                     </div>
                     @else
-                    <div class="bg-green-50 border border-green-200 p-4 rounded-xl">
+                    <div class="bg-green-50 border border-green-200 p-4 ">
                         <p class="text-sm text-green-700 font-medium">
                             <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>

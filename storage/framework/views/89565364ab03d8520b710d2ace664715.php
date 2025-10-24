@@ -17,7 +17,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
         <!-- Product Image -->
         <div class="sticky top-24">
-            <div class="aspect-square rounded-3xl overflow-hidden shadow-xl img-placeholder">
+            <div class="aspect-square  overflow-hidden shadow-xl img-placeholder">
                 <?php if($product->image): ?>
                 <img src="<?php echo e($product->image); ?>" alt="<?php echo e($product->name); ?>" class="w-full h-full object-cover">
                 <?php else: ?>
@@ -54,10 +54,10 @@
             <?php if($product->isInStock()): ?>
             <form action="<?php echo e(route('cart.add', $product)); ?>" method="POST" class="mb-10">
                 <?php echo csrf_field(); ?>
-                <div class="bg-bluegray-50 rounded-2xl p-6 mb-6">
+                <div class="bg-bluegray-50  p-6 mb-6">
                     <label class="block text-dark-700 font-semibold mb-3">Množství:</label>
                     <div class="flex items-center gap-4">
-                        <div class="flex items-center border-2 border-bluegray-200 rounded-xl overflow-hidden bg-white">
+                        <div class="flex items-center border-2 border-bluegray-200  overflow-hidden bg-white">
                             <button type="button" class="px-6 py-4 text-dark-700 hover:bg-bluegray-100 transition-colors font-semibold">-</button>
                             <input type="number" name="quantity" value="1" min="1" max="<?php echo e($product->stock); ?>" 
                                    class="w-20 text-center text-lg font-semibold border-0 focus:ring-0 bg-transparent" data-quantity-input>
@@ -92,7 +92,7 @@
                 </div>
             </form>
             <?php else: ?>
-            <div class="bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-8">
+            <div class="bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4  mb-8">
                 <p class="font-semibold">Tento produkt je momentálně vyprodaný.</p>
             </div>
             <?php endif; ?>
@@ -108,7 +108,7 @@
 
             <!-- Product Attributes -->
             <?php if($product->attributes): ?>
-            <div class="bg-bluegray-50 rounded-2xl p-8">
+            <div class="bg-bluegray-50  p-8">
                 <h3 class="font-display text-xl font-bold text-dark-800 mb-6">Specifikace</h3>
                 <dl class="space-y-4">
                     <?php $__currentLoopData = $product->attributes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
