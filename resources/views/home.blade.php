@@ -4,487 +4,506 @@
 
 @section('content')
 
-<!-- Hero Section - KaffeBox Inspired -->
-<section class="relative overflow-hidden bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-12 items-center min-h-[600px] py-12 lg:py-0">
-            <!-- Hero Content -->
-            <div class="order-2 lg:order-1">
-                <h1 class="font-display text-3xl md:text-4xl lg:text-5xl font-black text-dark-800 mb-6 leading-tight">
-                    Čerstvě pražená káva<br/>
-                    <span class="text-primary-500">doručená přímo<br/>k vám</span>
-                </h1>
-                <div class="space-y-4 mb-8">
-                    <p class="text-lg text-dark-600 flex items-center">
-                        <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        Objevte novou prémiovou kávu každý měsíc
-                    </p>
-                    <p class="text-xl text-dark-600 flex items-center">
-                        <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        Praženo maximálně 7 dní před expedicí
-                    </p>
-                    <p class="text-xl text-dark-600 flex items-center">
-                        <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        Bez závazků, zrušte kdykoli
-                    </p>
+<!-- Hero Section - E-shop Style -->
+<div class="bg-white">
+    <section class="mx-auto max-w-screen-xl px-4 md:px-8">
+        <div class="mb-8 flex flex-wrap justify-between md:mb-16">
+            <div class="mb-6 flex w-full flex-col justify-center sm:mb-12 lg:mb-0 lg:w-1/3 lg:pb-24 lg:pt-48">
+                <h1 class="mb-4 text-4xl font-bold text-black sm:text-5xl md:mb-8 md:text-6xl">Prémiová káva<br />přímo k vám</h1>
+
+                <p class="max-w-md leading-relaxed text-gray-500 xl:text-lg mb-8">Objevte novou vynikající kávu každý měsíc. Praženo maximálně 7 dní před expedicí. Bez závazků, zrušte kdykoliv.</p>
+
+                <div class="flex flex-col gap-2.5 sm:flex-row sm:justify-center lg:justify-start">
+                    <a href="{{ route('subscriptions.index') }}" class="inline-block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Začít předplatné</a>
+
+                    <a href="{{ route('products.index') }}" class="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-primary-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base">Prozkoumat obchod</a>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="{{ route('subscriptions.index') }}" class="btn btn-primary text-lg">
-                        Začít předplatné
-                    </a>
-                    <a href="{{ route('products.index') }}" class="btn btn-outline text-lg">
-                        Prozkoumat obchod
-                    </a>
+            </div>
+
+            <div class="mb-12 flex w-full md:mb-16 lg:w-2/3">
+                <div class="relative left-12 top-12 z-10 -ml-12 overflow-hidden rounded-lg bg-gray-100 shadow-lg md:left-16 md:top-16 lg:ml-0">
+                    <img src="https://images.unsplash.com/photo-1733860442875-aa8c87757b3a?auto=format&q=75&fit=crop&w=550&h=550" loading="lazy" alt="Kávová zrna" class="h-full w-full object-cover object-center" />
+                </div>
+
+                <div class="overflow-hidden rounded-lg bg-gray-100 shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&q=75&fit=crop&w=550&h=550" loading="lazy" alt="Šálek kávy" class="h-full w-full object-cover object-center" />
                 </div>
             </div>
             
-            <!-- Hero Image -->
-            <div class="order-1 lg:order-2">
-                <div class="aspect-square img-placeholder rounded-lg overflow-hidden shadow-2xl">
-                    <div class="w-full h-full bg-gradient-to-br from-bluegray-200 to-bluegray-300 flex items-center justify-center p-12">
-                        <div class="text-center">
-                            <svg class="w-32 h-32 text-dark-800 mx-auto mb-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
-                            </svg>
-                            <p class="font-bold text-dark-800">Balení Kavi kávy<br/>s kávovými zrny</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
-</section>
 
-<!-- Stats Bar -->
-<section class="bg-primary-500 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-            <div>
-                <p class="text-5xl font-black mb-2">1900+</p>
-                <p class="text-sm font-bold uppercase tracking-widest">Zákazníků</p>
-            </div>
-            <div>
-                <p class="text-5xl font-black mb-2">100%</p>
-                <p class="text-sm font-bold uppercase tracking-widest">Kvalita</p>
-            </div>
-            <div>
-                <p class="text-5xl font-black mb-2">24/7</p>
-                <p class="text-sm font-bold uppercase tracking-widest">Podpora</p>
-            </div>
-            <div>
-                <p class="text-5xl font-black mb-2">0 Kč</p>
-                <p class="text-sm font-bold uppercase tracking-widest">Doprava</p>
-            </div>
-        </div>
-    </div>
-</section>
+        
+    </section>
+</div>
 
-<!-- Features Section - Clean Blocks -->
-<section class="section bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
-            <div class="text-center">
-                <div class="w-24 h-24 bg-primary-500 flex items-center justify-center mx-auto mb-8 shadow-xl">
-                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <h3 class="font-display text-3xl font-black mb-4 uppercase tracking-wide">Čerstvost</h3>
-                <p class="text-dark-600 font-bold text-lg">Praženo na objednávku, maxim álně 7 dní před expedicí</p>
-            </div>
-            
-            <div class="text-center">
-                <div class="w-24 h-24 bg-primary-500 flex items-center justify-center mx-auto mb-8 shadow-xl">
-                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                </div>
-                <h3 class="font-display text-3xl font-black mb-4 uppercase tracking-wide">Doprava</h3>
-                <p class="text-dark-600 font-bold text-lg">Zdarma při objednávce nad 1000 Kč přímo do vašich dveří</p>
-            </div>
-            
-            <div class="text-center">
-                <div class="w-24 h-24 bg-primary-500 flex items-center justify-center mx-auto mb-8 shadow-xl">
-                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <h3 class="font-display text-3xl font-black mb-4 uppercase tracking-wide">Kvalita</h3>
-                <p class="text-dark-600 font-bold text-lg">100% Arabica z ověřených plantáží po celém světě</p>
-            </div>
+<!-- Features Section -->
+<div class="bg-white py-16 sm:py-16 lg:py-16">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="grid gap-12 sm:grid-cols-2 xl:grid-cols-3 xl:gap-16">
+      <!-- feature - start -->
+      <div class="flex flex-col items-center">
+        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-primary-500 text-white shadow-lg md:h-14 md:w-14 md:rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
         </div>
-    </div>
-</section>
 
-<!-- Photo Section with Split -->
-<section class="py-0">
-    <div class="grid grid-cols-1 lg:grid-cols-2">
-        <!-- Photo -->
-        <div class="h-[500px] lg:h-[700px] img-placeholder">
-            <div class="w-full h-full bg-gradient-to-br from-bluegray-300 to-bluegray-400 flex items-center justify-center p-12">
-                <div class="text-center">
-                    <svg class="w-32 h-32 text-dark-800 mx-auto mb-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/>
-                    </svg>
-                    <p class="font-black uppercase text-2xl text-dark-800 tracking-widest">FOTO:<br/>Detail balení kávy<br/>s kávovými zrny</p>
-                </div>
-            </div>
+        <h3 class="mb-2 text-center text-lg font-semibold md:text-xl">Čerstvá káva</h3>
+        <p class="mb-2 text-center text-gray-500">Praženo na objednávku, maximálně 7 dní před expedicí. Vždy čerstvá, vždy výjimečná.</p>
+        <a href="{{ route('subscriptions.index') }}" class="font-bold text-primary-500 transition duration-100 hover:text-primary-600 active:text-primary-700">Zjistit více</a>
+      </div>
+      <!-- feature - end -->
+
+      <!-- feature - start -->
+      <div class="flex flex-col items-center">
+        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-primary-500 text-white shadow-lg md:h-14 md:w-14 md:rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
         </div>
-        <!-- Content -->
-        <div class="bg-bluegray-50 p-12 lg:p-20 flex items-center">
-            <div>
-                <h2 class="font-display text-5xl md:text-6xl font-black uppercase text-dark-800 mb-8 leading-tight">
-                    Káva,<br/>kterou<br/>budete<br/>milovat
-                </h2>
-                <p class="text-xl text-dark-700 font-bold mb-8 leading-relaxed">
-                    Pečlivě vybíráme nejkvalitnější kávu z malých pražíren. Každý měsíc nové chutě přímo k vám domů.
-                </p>
-                <a href="{{ route('subscriptions.index') }}" class="btn btn-primary text-lg">Zjistit více →</a>
-            </div>
+
+        <h3 class="mb-2 text-center text-lg font-semibold md:text-xl">Prémiová kvalita</h3>
+        <p class="mb-2 text-center text-gray-500">100% Arabica z ověřených plantáží. Každá šarže kávy prochází pečlivou kontrolou kvality.</p>
+        <a href="{{ route('products.index') }}" class="font-bold text-primary-500 transition duration-100 hover:text-primary-600 active:text-primary-700">Prozkoumat</a>
+      </div>
+      <!-- feature - end -->
+
+      <!-- feature - start -->
+      <div class="flex flex-col items-center">
+        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-primary-500 text-white shadow-lg md:h-14 md:w-14 md:rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
         </div>
+
+        <h3 class="mb-2 text-center text-lg font-semibold md:text-xl">Doprava zdarma</h3>
+        <p class="mb-2 text-center text-gray-500">Doprava zdarma při objednávce nad 1000 Kč. Káva dorazí přímo k vašim dveřím.</p>
+        <a href="#" class="font-bold text-primary-500 transition duration-100 hover:text-primary-600 active:text-primary-700">Více info</a>
+      </div>
+      <!-- feature - end -->
     </div>
-</section>
+  </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-white py-6 sm:py-8 lg:py-12">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="flex flex-col overflow-hidden rounded-lg bg-gray-100 sm:flex-row md:h-80">
+      <!-- image - start -->
+      <div class="order-first h-48 w-full bg-gray-300 sm:order-none sm:h-auto sm:w-1/2 lg:w-3/5">
+        <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&q=75&fit=crop&w=1000" loading="lazy" alt="Kávová zrna" class="h-full w-full object-cover object-center" />
+      </div>
+      <!-- image - end -->
+
+      <!-- content - start -->
+      <div class="flex w-full flex-col p-12 sm:w-1/2 sm:p-12 lg:w-2/5">
+        <h2 class="mb-4 text-xl font-bold text-gray-800 md:text-2xl lg:text-4xl">Káva, kterou budete milovat</h2>
+
+        <p class="mb-8 max-w-md text-gray-600">Pečlivě vybíráme nejkvalitnější kávu z ověřených pražíren. Každý měsíc objevte nové chutě přímo u vás doma.</p>
+
+        <div class="mt-auto">
+          <a href="{{ route('subscriptions.index') }}" class="inline-block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Začít předplatné</a>
+        </div>
+      </div>
+      <!-- content - end -->
+    </div>
+  </div>
+</div>
 
 <!-- Subscription Plans Section -->
-<section class="section bg-bluegray-50" id="subscriptions">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="font-display text-3xl md:text-4xl font-black text-dark-800 mb-4">
-                Kávové předplatné
-            </h2>
-            <p class="text-lg text-dark-600 max-w-2xl mx-auto">
-                Vyberte si množství, které vám vyhovuje. Kdykoli můžete změnit, pozastavit nebo zrušit.
-            </p>
+<div class="bg-white py-6 sm:py-8 lg:py-12">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    <h2 class="mb-4 text-center text-2xl font-bold text-gray-800 md:mb-8 lg:text-3xl xl:mb-12">Naše kávové předplatné</h2>
+
+    <div class="mb-6 grid gap-6 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 lg:gap-8">
+      <!-- plan - start -->
+      <div class="flex flex-col rounded-lg border p-4 pt-6">
+        <div class="mb-12">
+          <div class="mb-2 text-center text-4xl font-bold text-gray-800">500g</div>
+
+          <p class="mx-auto mb-8 px-8 text-center text-gray-500">Ideální pro jednotlivce nebo páry, které si chtějí vychutnat kvalitní kávu</p>
+
+          <div class="space-y-2">
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">2 balíčky po 250g</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">2 druhy prémiové kávy</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">Doprava zdarma</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">Zrušení kdykoliv</span>
+            </div>
+            <!-- check - end -->
+          </div>
         </div>
 
-        <!-- Subscription Tiers Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
-            <!-- 500g Plan -->
-            <a href="{{ route('subscriptions.index') }}" class="bg-white hover:bg-bluegray-50 transition-all text-center group shadow-lg hover:shadow-xl border-2 border-bluegray-200 hover:border-primary-500 p-6">
-                <div class="text-4xl font-black text-primary-500 group-hover:scale-110 transition-transform mb-3">500 G</div>
-                <div class="text-2xl font-black text-dark-800 mb-4">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }} Kč měsíčně</div>
-                <div class="text-sm font-bold mb-4">250g × 2 balíčky</div>
-                <ul class="text-left space-y-2 text-sm mb-4">
-                    <li class="flex items-start">
-                        <svg class="w-4 h-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>2 typy výběrové kávy z nejlepších evropských pražíren</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-4 h-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>KAVI přispěje na 6 měsíců čisté vody</span>
-                    </li>
-                </ul>
-            </a>
-            
-            <!-- 750g Plan - Popular -->
-            <a href="{{ route('subscriptions.index') }}" class="bg-white hover:bg-primary-50 transition-all text-center group shadow-xl border-4 border-primary-500 relative p-6">
-                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span class="bg-primary-500 text-white text-xs font-black px-3 py-1">OBLÍBENÉ</span>
-                </div>
-                <div class="text-4xl font-black text-primary-500 group-hover:scale-110 transition-transform mb-3">750 G</div>
-                <div class="text-2xl font-black text-dark-800 mb-4">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }} Kč měsíčně</div>
-                <div class="text-sm font-bold mb-4">250g × 3 balíčky</div>
-                <ul class="text-left space-y-2 text-sm mb-4">
-                    <li class="flex items-start">
-                        <svg class="w-4 h-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>3 typy výběrové kávy z nejlepších evropských pražíren</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-4 h-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>KAVI přispěje na 9 měsíců čisté vody</span>
-                    </li>
-                </ul>
-            </a>
-            
-            <!-- 1000g Plan -->
-            <a href="{{ route('subscriptions.index') }}" class="bg-white hover:bg-bluegray-50 transition-all text-center group shadow-lg hover:shadow-xl border-2 border-bluegray-200 hover:border-primary-500 p-6">
-                <div class="text-4xl font-black text-primary-500 group-hover:scale-110 transition-transform mb-3">1000 G</div>
-                <div class="text-2xl font-black text-dark-800 mb-4">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }} Kč měsíčně</div>
-                <div class="text-sm font-bold mb-4">250g × 4 balíčky</div>
-                <ul class="text-left space-y-2 text-sm mb-4">
-                    <li class="flex items-start">
-                        <svg class="w-4 h-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>4 typy výběrové kávy z nejlepších evropských pražíren</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="w-4 h-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>KAVI přispěje na 12 měsíců čisté vody</span>
-                    </li>
-                </ul>
-            </a>
+        <div class="mt-auto flex flex-col gap-8">
+          <div class="flex items-end justify-center gap-1">
+            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span>
+            <span class="text-gray-500">Kč/měsíc</span>
+          </div>
+
+          <a href="{{ route('subscriptions.index') }}" class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat plán</a>
+        </div>
+      </div>
+      <!-- plan - end -->
+
+      <!-- plan - start -->
+      <div class="relative flex flex-col rounded-lg border-2 border-primary-500 p-4 pt-6">
+        <div class="mb-12">
+          <div class="absolute inset-x-0 -top-3 flex justify-center">
+            <span class="flex h-6 items-center justify-center rounded-full bg-primary-500 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white">nejoblíbenější</span>
+          </div>
+
+          <div class="mb-2 text-center text-4xl font-bold text-gray-800">750g</div>
+
+          <p class="mx-auto mb-8 px-8 text-center text-gray-500">Nejpopulárnější volba pro pravidelné milovníky kávy</p>
+
+          <div class="space-y-2">
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">3 balíčky po 250g</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">3 druhy prémiové kávy</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">Doprava zdarma</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">Zrušení kdykoliv</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">Prioritní podpora</span>
+            </div>
+            <!-- check - end -->
+          </div>
         </div>
 
-        <div class="text-center">
-            <p class="text-dark-600 mb-4">Chcete více možností? Přizpůsobte si předplatné přesně na míru</p>
-            <a href="{{ route('subscriptions.index') }}" class="text-primary-500 hover:text-primary-600 font-bold inline-flex items-center">
-                Konfigurátor předplatného
-                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </a>
+        <div class="mt-auto flex flex-col gap-8">
+          <div class="flex items-end justify-center gap-1">
+            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span>
+            <span class="text-gray-500">Kč/měsíc</span>
+          </div>
+
+          <a href="{{ route('subscriptions.index') }}" class="block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Vybrat plán</a>
         </div>
+      </div>
+      <!-- plan - end -->
+
+      <!-- plan - start -->
+      <div class="flex flex-col rounded-lg border p-4 pt-6">
+        <div class="mb-12">
+          <div class="mb-2 text-center text-4xl font-bold text-gray-800">1000g</div>
+
+          <p class="mx-auto mb-8 px-8 text-center text-gray-500">Pro kávové nadšence a větší domácnosti</p>
+
+          <div class="space-y-2">
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">4 balíčky po 250g</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">4 druhy prémiové kávy</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">Doprava zdarma</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">Zrušení kdykoliv</span>
+            </div>
+            <!-- check - end -->
+
+            <!-- check - start -->
+            <div class="flex gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              <span class="text-gray-600">VIP podpora</span>
+            </div>
+            <!-- check - end -->
+          </div>
+        </div>
+
+        <div class="mt-auto flex flex-col gap-8">
+          <div class="flex items-end justify-center gap-1">
+            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span>
+            <span class="text-gray-500">Kč/měsíc</span>
+          </div>
+
+          <a href="{{ route('subscriptions.index') }}" class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat plán</a>
+        </div>
+      </div>
+      <!-- plan - end -->
     </div>
-</section>
+
+    <div class="text-center text-sm text-gray-500 sm:text-base">Chcete více možností? <a href="{{ route('subscriptions.index') }}" class="text-gray-500 underline transition duration-100 hover:text-primary-500 active:text-primary-600">Konfigurátor předplatného</a></div>
+  </div>
+</div>
 
 <!-- Testimonials Section -->
-<section class="section bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="font-display text-3xl md:text-4xl font-black text-dark-800 mb-4">
-                Co říkají naši zákazníci
-            </h2>
-            <p class="text-lg text-dark-600">1900+ spokojených milovníků kávy</p>
+<div class="bg-white py-6 sm:py-8 lg:py-12">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    <h2 class="mb-8 text-center text-2xl font-bold text-gray-800 md:mb-12 lg:text-3xl">Co říkají naši zákazníci</h2>
+
+    <div class="grid gap-y-10 sm:grid-cols-2 sm:gap-y-12 lg:grid-cols-3 lg:divide-x">
+      <!-- quote - start -->
+      <div class="flex flex-col items-center gap-4 sm:px-4 md:gap-6 lg:px-8">
+        <div class="text-center text-gray-600">"Nejlepší káva, kterou jsem kdy měla! Pravidelné dodávky znamenají, že nikdy nedojdu a kvalita je vždy konzistentní."</div>
+
+        <div class="flex flex-col items-center gap-2 sm:flex-row md:gap-3">
+          <div class="h-12 w-12 overflow-hidden rounded-full bg-gray-100 shadow-lg md:h-14 md:w-14">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Jana Nováková" class="h-full w-full object-cover object-center" />
+          </div>
+
+          <div>
+            <div class="text-center text-sm font-bold text-primary-500 sm:text-left md:text-base">Jana Nováková</div>
+            <p class="text-center text-sm text-gray-500 sm:text-left md:text-sm">Zákaznice 2+ roky</p>
+          </div>
         </div>
+      </div>
+      <!-- quote - end -->
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Testimonial 1 -->
-            <div class="bg-bluegray-50 p-8 rounded-lg">
-                <div class="flex items-center mb-4">
-                    <div class="flex text-primary-500">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                    </div>
-                </div>
-                <p class="text-dark-700 mb-6 italic leading-relaxed">
-                    "Nejlepší káva, kterou jsem kdy měla! Pravidelné dodávky znamenají, že nikdy nedojdu a kvalita je vždy konzistentní."
-                </p>
-                <div>
-                    <p class="font-bold text-dark-800">Jana Nováková</p>
-                    <p class="text-sm text-dark-600">Zákaznice 2+ let</p>
-                </div>
-            </div>
+      <!-- quote - start -->
+      <div class="flex flex-col items-center gap-4 sm:px-4 md:gap-6 lg:px-8">
+        <div class="text-center text-gray-600">"Skvělý servis a prvotřídní káva. Flexibilita předplatného je skvělá - můžu kdykoli změnit množství nebo typ kávy."</div>
 
-            <!-- Testimonial 2 -->
-            <div class="bg-bluegray-50 p-8 rounded-lg">
-                <div class="flex items-center mb-4">
-                    <div class="flex text-primary-500">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                    </div>
-                </div>
-                <p class="text-dark-700 mb-6 italic leading-relaxed">
-                    "Skvělý servis a prvotřídní káva. Flexibilita předplatného je skvělá - můžu kdykoli změnit množství nebo typ kávy."
-                </p>
-                <div>
-                    <p class="font-bold text-dark-800">Petr Dvořák</p>
-                    <p class="text-sm text-dark-600">Zákazník 1+ rok</p>
-                </div>
-            </div>
+        <div class="flex flex-col items-center gap-2 sm:flex-row md:gap-3">
+          <div class="h-12 w-12 overflow-hidden rounded-full bg-gray-100 shadow-lg md:h-14 md:w-14">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Petr Dvořák" class="h-full w-full object-cover object-center" />
+          </div>
 
-            <!-- Testimonial 3 -->
-            <div class="bg-bluegray-50 p-8 rounded-lg">
-                <div class="flex items-center mb-4">
-                    <div class="flex text-primary-500">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                    </div>
-                </div>
-                <p class="text-dark-700 mb-6 italic leading-relaxed">
-                    "Konečně káva, která chutn  á jako z kavárny! Čerstvost je znát a výběr různých druhů je skvělý."
-                </p>
-                <div>
-                    <p class="font-bold text-dark-800">Marie Horáková</p>
-                    <p class="text-sm text-dark-600">Zákaznice 6+ měsíců</p>
-                </div>
-            </div>
+          <div>
+            <div class="text-center text-sm font-bold text-primary-500 sm:text-left md:text-base">Petr Dvořák</div>
+            <p class="text-center text-sm text-gray-500 sm:text-left md:text-sm">Zákazník 1+ rok</p>
+          </div>
         </div>
+      </div>
+      <!-- quote - end -->
+
+      <!-- quote - start -->
+      <div class="flex flex-col items-center gap-4 sm:px-4 md:gap-6 lg:px-8">
+        <div class="text-center text-gray-600">"Konečně káva, která chutná jako z kavárny! Čerstvost je znát a výběr různých druhů je skvělý."</div>
+
+        <div class="flex flex-col items-center gap-2 sm:flex-row md:gap-3">
+          <div class="h-12 w-12 overflow-hidden rounded-full bg-gray-100 shadow-lg md:h-14 md:w-14">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Marie Horáková" class="h-full w-full object-cover object-center" />
+          </div>
+
+          <div>
+            <div class="text-center text-sm font-bold text-primary-500 sm:text-left md:text-base">Marie Horáková</div>
+            <p class="text-center text-sm text-gray-500 sm:text-left md:text-sm">Zákaznice 6+ měsíců</p>
+          </div>
+        </div>
+      </div>
+      <!-- quote - end -->
     </div>
-</section>
+  </div>
+</div>
 
 <!-- Large Photo Section -->
-<section class="py-0">
-    <div class="h-[600px] lg:h-[800px] relative img-placeholder">
-        <div class="absolute inset-0 bg-gradient-to-r from-dark-900 via-dark-800 to-dark-900 flex items-center justify-center">
-            <div class="text-center p-12">
-                <svg class="w-40 h-40 text-bluegray-700 mx-auto mb-8" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
-                </svg>
-                <p class="text-bluegray-500 text-3xl font-black uppercase tracking-widest">VELKOPLOŠNÁ FOTO:<br/>Lifestyle záběr s kávou<br/>(člověk s kávou, kavárna, interiér)</p>
-            </div>
-        </div>
-        <div class="absolute inset-0 flex items-center justify-center text-white text-center">
-            <div class="max-w-4xl px-4">
-                <h2 class="font-display text-5xl md:text-7xl font-black uppercase mb-8 leading-tight">
-                    Objevte svět<br/>prémiové kávy
-                </h2>
-                <a href="{{ route('products.index') }}" class="btn btn-white text-lg shadow-2xl">Prozkoumat kávy →</a>
-            </div>
-        </div>
+<div class="relative bg-white py-16 sm:py-20 lg:py-24">
+  <!-- Background Image -->
+  <div class="absolute inset-0 z-0">
+    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&q=75&fit=crop&w=2000" alt="Káva pozadí" class="h-full w-full object-cover" />
+    <div class="absolute inset-0 bg-black opacity-60"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="mx-auto flex max-w-xl flex-col items-center text-center">
+      <p class="mb-4 font-semibold text-primary-400 md:mb-6 md:text-lg xl:text-xl">Káva, která vás nadchne</p>
+
+      <h1 class="mb-8 text-3xl font-bold text-white sm:text-4xl md:mb-12 md:text-5xl">Objevte svět prémiové kávy</h1>
+
+      <div class="flex w-full flex-col gap-2.5 sm:flex-row sm:justify-center">
+        <a href="{{ route('subscriptions.index') }}" class="inline-block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Začít předplatné</a>
+
+        <a href="{{ route('products.index') }}" class="inline-block rounded-lg bg-white px-8 py-3 text-center text-sm font-semibold text-gray-800 outline-none ring-primary-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:text-base">Prozkoumat kávy</a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
 <!-- Featured Products Section -->
 @if($featuredProducts->count() > 0)
-<section class="section bg-bluegray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="mb-20">
-            <div class="inline-block bg-primary-500 px-8 py-4 shadow-xl mb-8">
-                <span class="font-black uppercase tracking-widest text-white">Naše kávy</span>
-            </div>
-            <h2 class="font-display text-6xl md:text-7xl font-black uppercase text-dark-800 leading-none">
-                Premium<br/>selection
-            </h2>
-        </div>
+<div class="bg-white py-6 sm:py-8 lg:py-12">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="mb-6 flex items-end justify-between gap-4">
+      <h2 class="text-2xl font-bold text-gray-800 lg:text-3xl">Naše kávy</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-            @foreach($featuredProducts as $product)
-            <a href="{{ route('products.show', $product) }}" class="card card-hover group">
-                <div class="aspect-square overflow-hidden img-placeholder">
-                    @if($product->image)
-                    <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                    @else
-                    <div class="w-full h-full bg-gradient-to-br from-bluegray-200 to-bluegray-300 flex items-center justify-center p-12">
-                        <div class="text-center">
-                            <svg class="w-24 h-24 text-dark-800 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/>
-                            </svg>
-                            <p class="font-black uppercase text-sm text-dark-800">FOTO:<br/>{{ $product->name }}</p>
-                        </div>
-                    </div>
-                    @endif
-                </div>
-                <div class="p-8">
-                    <div class="mb-3">
-                        <span class="badge badge-primary text-xs">{{ $product->category ?? 'KÁVA' }}</span>
-                    </div>
-                    <h3 class="font-display text-2xl font-black uppercase mb-3 group-hover:text-primary-500 transition-colors">
-                        {{ $product->name }}
-                    </h3>
-                    @if($product->short_description)
-                    <p class="font-bold text-sm mb-6 line-clamp-2 text-dark-600">{{ $product->short_description }}</p>
-                    @endif
-                    <div class="flex items-center justify-between">
-                        <span class="text-4xl font-black text-dark-800">{{ number_format($product->price, 0, ',', ' ') }}</span>
-                        <span class="badge badge-success text-xs">SKLADEM</span>
-                    </div>
-                </div>
-            </a>
-            @endforeach
-        </div>
-
-        <div class="text-center mt-16">
-            <a href="{{ route('products.index') }}" class="btn btn-secondary text-lg">Všechny produkty →</a>
-        </div>
+      <a href="{{ route('products.index') }}" class="inline-block rounded-lg border bg-white px-4 py-2 text-center text-sm font-semibold text-gray-500 outline-none ring-primary-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base">Zobrazit více</a>
     </div>
-</section>
+
+    <div class="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:gap-x-6 lg:grid-cols-3 xl:grid-cols-4">
+      @foreach($featuredProducts->take(4) as $product)
+      <!-- product - start -->
+      <div>
+        <a href="{{ route('products.show', $product) }}" class="group relative mb-2 block h-80 overflow-hidden rounded-lg bg-gray-100 lg:mb-3">
+          @if($product->image)
+          <img src="{{ $product->image }}" loading="lazy" alt="{{ $product->name }}" class="h-full w-full object-cover object-center transition duration-200 group-hover:scale-110" />
+          @else
+          <div class="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center p-8">
+            <div class="text-center">
+              <svg class="w-16 h-16 text-gray-400 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/>
+                <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
+              </svg>
+              <p class="text-xs font-semibold text-gray-500">{{ $product->name }}</p>
+            </div>
+          </div>
+          @endif
+
+          @if($product->is_on_sale ?? false)
+          <span class="absolute left-0 top-0 rounded-br-lg bg-red-500 px-3 py-1.5 text-sm uppercase tracking-wider text-white">sleva</span>
+          @endif
+        </a>
+
+        <div>
+          <a href="{{ route('products.show', $product) }}" class="hover:text-gray-800 mb-1 text-gray-500 transition duration-100 lg:text-lg">{{ $product->name }}</a>
+
+          <div class="flex items-end gap-2">
+            <span class="font-bold text-gray-800 lg:text-lg">{{ number_format($product->price, 0, ',', ' ') }} Kč</span>
+            @if($product->original_price ?? false)
+            <span class="mb-0.5 text-red-500 line-through">{{ number_format($product->original_price, 0, ',', ' ') }} Kč</span>
+            @endif
+          </div>
+        </div>
+      </div>
+      <!-- product - end -->
+      @endforeach
+    </div>
+  </div>
+</div>
 @endif
 
 <!-- Impact Section -->
-<section class="section bg-primary-500 text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-                <h2 class="font-display text-3xl md:text-4xl font-black mb-6">
-                    Káva s dopadem
-                </h2>
-                <p class="text-lg mb-8 opacity-95 leading-relaxed">
-                    Každé balení kávy z Kavi podporuje udržitelný rozvoj kávových komunit. Spolupracujeme pouze s pražírnami, které nakupují přímo od farmářů za férové ceny a podporují lokální komunity.
-                </p>
-                <div class="grid grid-cols-2 gap-6">
-                    <div>
-                        <div class="text-5xl font-black mb-2">100%</div>
-                        <p class="text-sm opacity-90">Fair Trade káva</p>
-                    </div>
-                    <div>
-                        <div class="text-5xl font-black mb-2">50+</div>
-                        <p class="text-sm opacity-90">Podpořených komunit</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white/10 p-12 rounded-lg backdrop-blur-sm">
-                <div class="text-center">
-                    <div class="text-7xl font-black mb-4">1900+</div>
-                    <p class="text-2xl font-bold mb-4">spokojených zákazníků</p>
-                    <p class="opacity-90">
-                        Připojte se k naší komunitě milovníků prémiové kávy a podporujte udržitelné pěstování kávy po celém světě.
-                    </p>
-                </div>
-            </div>
+<div class="bg-white py-6 sm:py-8 lg:py-12">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="flex flex-col overflow-hidden rounded-lg bg-gray-900 sm:flex-row">
+      <!-- content - start -->
+      <div class="flex w-full flex-col p-12 sm:w-1/2 sm:p-16 lg:w-2/5">
+        <h2 class="mb-4 text-xl font-bold text-white md:text-2xl lg:text-4xl">Káva s dopadem</h2>
+
+        <p class="mb-8 max-w-md text-gray-400">Každé balení kávy z Kavi podporuje udržitelný rozvoj kávových komunit. Spolupracujeme pouze s pražírnami, které nakupují přímo od farmářů za férové ceny a podporují lokální komunity.</p>
+
+        <div class="mt-auto">
+          <a href="#" class="inline-block rounded-lg bg-white px-8 py-3 text-center text-sm font-semibold text-gray-800 outline-none ring-primary-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:text-base">Více informací</a>
         </div>
+      </div>
+      <!-- content - end -->
+
+      <!-- image - start -->
+      <div class="order-first h-48 w-full bg-gray-700 sm:order-none sm:h-auto sm:w-1/2 lg:w-3/5">
+        <img src="https://images.unsplash.com/photo-1523805009345-7448845a9e53?auto=format&q=75&fit=crop&crop=center&w=1000&h=500" loading="lazy" alt="Africká káva" class="h-full w-full object-cover object-center" />
+      </div>
+      <!-- image - end -->
     </div>
-</section>
+  </div>
+</div>
 
 <!-- CTA Section -->
-<section class="section bg-bluegray-50">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="font-display text-3xl md:text-4xl font-black text-dark-800 mb-6">
-            Začněte svou kávovou cestu ještě dnes
-        </h2>
-        <p class="text-lg text-dark-600 mb-10">
-            Připojte se k tisícům spokojených zákazníků • Bez závazků
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('subscriptions.index') }}" class="btn btn-primary text-lg">
-                Vybrat předplatné
-            </a>
-            <a href="{{ route('products.index') }}" class="btn btn-outline text-lg">
-                Procházet kávy
-            </a>
-        </div>
+<div class="bg-white py-6 sm:py-8 lg:py-12">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="mx-auto flex max-w-xl flex-col items-center text-center">
+      <p class="mb-4 font-semibold text-primary-500 md:mb-6 md:text-lg xl:text-xl">Připojte se k nám</p>
+
+      <h1 class="mb-8 text-3xl font-bold text-black sm:text-4xl md:mb-12 md:text-5xl">Začněte svou kávovou cestu ještě dnes</h1>
+
+      <div class="flex w-full flex-col gap-2.5 sm:flex-row sm:justify-center">
+        <a href="{{ route('subscriptions.index') }}" class="inline-block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Vybrat předplatné</a>
+
+        <a href="{{ route('products.index') }}" class="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-primary-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base">Procházet kávy</a>
+      </div>
     </div>
-</section>
+  </div>
+</div>
 
 @endsection
