@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
@@ -47,7 +48,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/pokladna', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/pokladna', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/objednavka/{order}/potvrzeni', [CheckoutController::class, 'confirmation'])->name('order.confirmation');
+    
+    // Payment routes
+    Route::get('/platba/karta/{order}', [PaymentController::class, 'cardPayment'])->name('payment.card');
 });
+
+// Stripe webhook - public endpoint (no auth, no CSRF)
+Route::post('/webhook/stripe', [PaymentController::class, 'webhook'])->name('stripe.webhook');
 
 // User Dashboard - requires auth
 Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(function () {

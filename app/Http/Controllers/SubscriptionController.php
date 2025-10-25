@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Subscription;
 use App\Models\SubscriptionConfig;
 use App\Models\SubscriptionPlan;
+use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends Controller
 {
+    public function __construct(private StripeService $stripeService)
+    {
+    }
+
     public function index()
     {
         $plans = SubscriptionPlan::active()
@@ -138,8 +143,30 @@ class SubscriptionController extends Controller
     /**
      * Show checkout page
      */
-    public function checkout()
+    public function checkout(Request $request)
     {
+        // Handle successful return from Stripe
+        if ($request->has('success') && $request->success == 1) {
+            // Clear subscription session data
+            session()->forget([
+                'subscription_configuration', 
+                'subscription_price',
+                'subscription_price_without_vat',
+                'subscription_vat',
+                'subscription_shipping_address',
+                'subscription_packeta',
+                'subscription_delivery_notes',
+            ]);
+
+            if (auth()->check()) {
+                return redirect()->route('dashboard.subscription')
+                    ->with('success', 'Děkujeme! Vaše platba byla úspěšně zpracována a předplatné je nyní aktivní.');
+            } else {
+                return redirect()->route('subscriptions.index')
+                    ->with('success', 'Děkujeme za objednávku! Brzy vám zašleme potvrzení na email.');
+            }
+        }
+
         $configuration = session('subscription_configuration');
         $price = session('subscription_price');
         $priceWithoutVat = session('subscription_price_without_vat');
@@ -184,19 +211,11 @@ class SubscriptionController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
-
-            $userId = null;
-            
-            if (auth()->check()) {
-                // Authenticated user
-                $userId = auth()->id();
-            } else {
-                // Guest checkout - check if user with email exists
+            // Check for existing user if guest checkout
+            if (!auth()->check()) {
                 $existingUser = \App\Models\User::where('email', $validated['email'])->first();
                 
                 if ($existingUser) {
-                    // Email exists - they need to login
                     return back()
                         ->withInput()
                         ->with('error', 'Účet s tímto emailem již existuje. Prosím přihlaste se.');
@@ -210,32 +229,6 @@ class SubscriptionController extends Controller
                 ]);
             }
 
-            // Create subscription
-            $subscription = Subscription::create([
-                'user_id' => $userId,
-                'subscription_plan_id' => null, // Custom configuration, no plan
-                'configuration' => $configuration,
-                'configured_price' => $price,
-                'frequency_months' => $configuration['frequency'],
-                'status' => 'pending', // Will be activated after payment
-                'starts_at' => now(),
-                'next_billing_date' => now()->addMonths($configuration['frequency']),
-                'shipping_address' => [
-                    'name' => $validated['name'],
-                    'email' => $validated['email'],
-                    'phone' => $validated['phone'] ?? null,
-                    'billing_address' => $validated['billing_address'],
-                    'billing_city' => $validated['billing_city'],
-                    'billing_postal_code' => $validated['billing_postal_code'],
-                    'country' => 'CZ',
-                ],
-                'payment_method' => $validated['payment_method'],
-                'packeta_point_id' => $validated['packeta_point_id'],
-                'packeta_point_name' => $validated['packeta_point_name'],
-                'packeta_point_address' => $validated['packeta_point_address'],
-                'delivery_notes' => $validated['delivery_notes'] ?? null,
-            ]);
-
             // Save Packeta pickup point to user for future use (if authenticated)
             if (auth()->check()) {
                 auth()->user()->update([
@@ -245,35 +238,110 @@ class SubscriptionController extends Controller
                 ]);
             }
 
-            // Here you would integrate with Stripe for payment
-            // For now, we'll just mark it as active
-            $subscription->update(['status' => 'active']);
-
-            DB::commit();
-
-            // Clear session
-            session()->forget([
-                'subscription_configuration', 
-                'subscription_price',
-                'subscription_price_without_vat',
-                'subscription_vat'
+            // Store shipping address and delivery notes in session for webhook
+            session([
+                'subscription_shipping_address' => [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'] ?? null,
+                    'billing_address' => $validated['billing_address'],
+                    'billing_city' => $validated['billing_city'],
+                    'billing_postal_code' => $validated['billing_postal_code'],
+                    'country' => 'CZ',
+                ],
+                'subscription_packeta' => [
+                    'packeta_point_id' => $validated['packeta_point_id'],
+                    'packeta_point_name' => $validated['packeta_point_name'],
+                    'packeta_point_address' => $validated['packeta_point_address'],
+                ],
+                'subscription_delivery_notes' => $validated['delivery_notes'] ?? null,
             ]);
 
-            if (auth()->check()) {
-                return redirect()->route('dashboard.subscription')
-                    ->with('success', 'Předplatné bylo úspěšně vytvořeno!');
+            // Handle payment method
+            if ($validated['payment_method'] === 'card') {
+                // Create Stripe Checkout Session
+                $shippingAddress = [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'] ?? null,
+                    'billing_address' => $validated['billing_address'],
+                    'billing_city' => $validated['billing_city'],
+                    'billing_postal_code' => $validated['billing_postal_code'],
+                    'packeta_point_id' => $validated['packeta_point_id'],
+                    'packeta_point_name' => $validated['packeta_point_name'],
+                    'packeta_point_address' => $validated['packeta_point_address'],
+                    'delivery_notes' => $validated['delivery_notes'] ?? null,
+                ];
+
+                $session = $this->stripeService->createConfiguredSubscriptionCheckoutSession(
+                    auth()->user(),
+                    $configuration,
+                    $price,
+                    $shippingAddress
+                );
+
+                // Redirect to Stripe Checkout
+                return redirect($session->url);
             } else {
-                // Guest checkout - show success and send registration link (implement later)
-                return redirect()->route('subscriptions.index')
-                    ->with('success', 'Děkujeme za objednávku! Na email ' . $validated['email'] . ' vám zašleme potvrzení a odkaz pro dokončení registrace.');
+                // Bank transfer - create subscription directly as pending
+                DB::beginTransaction();
+
+                $subscription = Subscription::create([
+                    'user_id' => auth()->id() ?? null,
+                    'subscription_plan_id' => null, // Custom configuration, no plan
+                    'configuration' => $configuration,
+                    'configured_price' => $price,
+                    'frequency_months' => $configuration['frequency'],
+                    'status' => 'pending', // Will be activated after payment confirmation
+                    'starts_at' => now(),
+                    'next_billing_date' => now()->addMonths($configuration['frequency']),
+                    'shipping_address' => [
+                        'name' => $validated['name'],
+                        'email' => $validated['email'],
+                        'phone' => $validated['phone'] ?? null,
+                        'billing_address' => $validated['billing_address'],
+                        'billing_city' => $validated['billing_city'],
+                        'billing_postal_code' => $validated['billing_postal_code'],
+                        'country' => 'CZ',
+                    ],
+                    'payment_method' => 'transfer',
+                    'packeta_point_id' => $validated['packeta_point_id'],
+                    'packeta_point_name' => $validated['packeta_point_name'],
+                    'packeta_point_address' => $validated['packeta_point_address'],
+                    'delivery_notes' => $validated['delivery_notes'] ?? null,
+                ]);
+
+                DB::commit();
+
+                // Clear session
+                session()->forget([
+                    'subscription_configuration', 
+                    'subscription_price',
+                    'subscription_price_without_vat',
+                    'subscription_vat',
+                    'subscription_shipping_address',
+                    'subscription_packeta',
+                    'subscription_delivery_notes',
+                ]);
+
+                if (auth()->check()) {
+                    return redirect()->route('dashboard.subscription')
+                        ->with('success', 'Předplatné bylo vytvořeno! Po přijetí platby bude aktivováno.');
+                } else {
+                    return redirect()->route('subscriptions.index')
+                        ->with('success', 'Děkujeme za objednávku! Na email ' . $validated['email'] . ' vám zašleme platební údaje.');
+                }
             }
 
         } catch (\Exception $e) {
-            DB::rollBack();
+            \Log::error('Subscription checkout failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             
             return back()
                 ->withInput()
-                ->with('error', 'Nastala chyba při vytváření předplatného: ' . $e->getMessage());
+                ->with('error', 'Nastala chyba při vytváření předplatného. Zkuste to prosím znovu.');
         }
     }
 }
