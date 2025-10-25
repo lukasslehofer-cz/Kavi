@@ -113,13 +113,13 @@
 <!-- Subscription Plans Section -->
 <div class="bg-white py-6 sm:py-8 lg:py-12">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
-    <h2 class="mb-4 text-center text-2xl font-bold text-gray-800 md:mb-8 lg:text-3xl xl:mb-12">Naše kávové předplatné</h2>
+    <h2 class="mb-4 text-center text-2xl font-bold text-gray-800 md:mb-8 lg:text-3xl xl:mb-12">Vyberte si ideální kávový box pro vás</h2>
 
     <div class="mb-6 grid gap-6 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 lg:gap-8">
       <!-- plan - start -->
       <div class="flex flex-col rounded-lg border p-4 pt-6">
         <div class="mb-12">
-          <div class="mb-2 text-center text-4xl font-bold text-gray-800">500g</div>
+          <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">500g</div>
 
           <p class="mx-auto mb-8 px-8 text-center text-gray-500">Ideální pro jednotlivce nebo páry, které si chtějí vychutnat kvalitní kávu</p>
 
@@ -168,8 +168,8 @@
 
         <div class="mt-auto flex flex-col gap-8">
           <div class="flex items-end justify-center gap-1">
-            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span>
-            <span class="text-gray-500">Kč/měsíc</span>
+            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }},-</span>
+            <span class="text-gray-500">Kč/box</span>
           </div>
 
           <a href="{{ route('subscriptions.index') }}" class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat plán</a>
@@ -184,7 +184,7 @@
             <span class="flex h-6 items-center justify-center rounded-full bg-primary-500 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white">nejoblíbenější</span>
           </div>
 
-          <div class="mb-2 text-center text-4xl font-bold text-gray-800">750g</div>
+          <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">750g</div>
 
           <p class="mx-auto mb-8 px-8 text-center text-gray-500">Nejpopulárnější volba pro pravidelné milovníky kávy</p>
 
@@ -243,8 +243,8 @@
 
         <div class="mt-auto flex flex-col gap-8">
           <div class="flex items-end justify-center gap-1">
-            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span>
-            <span class="text-gray-500">Kč/měsíc</span>
+            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }},-</span>
+            <span class="text-gray-500">Kč/box</span>
           </div>
 
           <a href="{{ route('subscriptions.index') }}" class="block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Vybrat plán</a>
@@ -255,7 +255,7 @@
       <!-- plan - start -->
       <div class="flex flex-col rounded-lg border p-4 pt-6">
         <div class="mb-12">
-          <div class="mb-2 text-center text-4xl font-bold text-gray-800">1000g</div>
+          <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">1000g</div>
 
           <p class="mx-auto mb-8 px-8 text-center text-gray-500">Pro kávové nadšence a větší domácnosti</p>
 
@@ -314,8 +314,8 @@
 
         <div class="mt-auto flex flex-col gap-8">
           <div class="flex items-end justify-center gap-1">
-            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span>
-            <span class="text-gray-500">Kč/měsíc</span>
+            <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }},-</span>
+            <span class="text-gray-500">Kč/box</span>
           </div>
 
           <a href="{{ route('subscriptions.index') }}" class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat plán</a>
@@ -324,7 +324,7 @@
       <!-- plan - end -->
     </div>
 
-    <div class="text-center text-sm text-gray-500 sm:text-base">Chcete více možností? <a href="{{ route('subscriptions.index') }}" class="text-gray-500 underline transition duration-100 hover:text-primary-500 active:text-primary-600">Konfigurátor předplatného</a></div>
+    <div class="text-center text-sm text-gray-500 sm:text-base">Další nastavení vašeho kávového předplatného následuje v dalším kroku.</div>
   </div>
 </div>
 
@@ -428,7 +428,7 @@
       <div>
         <a href="{{ route('products.show', $product) }}" class="group relative mb-2 block h-80 overflow-hidden rounded-lg bg-gray-100 lg:mb-3">
           @if($product->image)
-          <img src="{{ $product->image }}" loading="lazy" alt="{{ $product->name }}" class="h-full w-full object-cover object-center transition duration-200 group-hover:scale-110" />
+          <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->name }}" class="h-full w-full object-cover object-center transition duration-200 group-hover:scale-110" />
           @else
           <div class="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center p-8">
             <div class="text-center">

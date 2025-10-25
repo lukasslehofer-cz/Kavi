@@ -266,7 +266,7 @@
                     <div class="flex items-center gap-4">
                         <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-bluegray-100">
                             @if($item['product']->image)
-                            <img src="{{ $item['product']->image }}" alt="{{ $item['product']->name }}" class="w-full h-full object-cover">
+                            <img src="{{ asset($item['product']->image) }}" alt="{{ $item['product']->name }}" class="w-full h-full object-cover">
                             @else
                             <div class="w-full h-full flex items-center justify-center">
                                 <svg class="w-8 h-8 text-bluegray-300" fill="currentColor" viewBox="0 0 24 24">

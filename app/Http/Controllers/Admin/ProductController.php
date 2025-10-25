@@ -44,6 +44,7 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'category' => 'required|in:espresso,filter,accessories,merch',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'is_coffee_of_month' => 'boolean',
@@ -59,6 +60,14 @@ class ProductController extends Controller
         if ($validated['is_coffee_of_month']) {
             $validated['price'] = $validated['price'] ?? 0;
             $validated['stock'] = $validated['stock'] ?? 0;
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/products'), $filename);
+            $validated['image'] = 'images/products/' . $filename;
         }
 
         Product::create($validated);
@@ -88,6 +97,7 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'category' => 'required|in:espresso,filter,accessories,merch',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'is_coffee_of_month' => 'boolean',
@@ -105,6 +115,19 @@ class ProductController extends Controller
             $validated['stock'] = $validated['stock'] ?? 0;
         }
 
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($product->image && file_exists(public_path($product->image))) {
+                unlink(public_path($product->image));
+            }
+            
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/products'), $filename);
+            $validated['image'] = 'images/products/' . $filename;
+        }
+
         $product->update($validated);
 
         return redirect()->route('admin.products.index')
@@ -113,6 +136,11 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        // Delete product image if exists
+        if ($product->image && file_exists(public_path($product->image))) {
+            unlink(public_path($product->image));
+        }
+        
         $product->delete();
 
         return redirect()->route('admin.products.index')

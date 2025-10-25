@@ -9,7 +9,7 @@
         <p class="text-coffee-600">Vytvořte nový produkt v eshopu</p>
     </div>
 
-    <form action="{{ route('admin.products.store') }}" method="POST" class="card p-8">
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="card p-8">
         @csrf
 
         <div class="space-y-6">
@@ -20,6 +20,24 @@
                 @error('name')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-coffee-900 mb-2">Fotka produktu</label>
+                <input type="file" name="image" accept="image/*" 
+                       class="input @error('image') border-red-500 @enderror"
+                       onchange="previewImage(event)">
+                
+                <div id="image-preview" class="mt-4 hidden">
+                    <p class="text-sm text-coffee-600 mb-2">Náhled:</p>
+                    <img id="preview" src="" alt="Náhled" 
+                         class="w-48 h-48 object-cover rounded-lg border-2 border-primary-300">
+                </div>
+                
+                @error('image')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-coffee-600 mt-1">Podporované formáty: JPG, PNG, GIF. Maximální velikost: 2MB</p>
             </div>
 
             <div>
@@ -124,6 +142,21 @@
 </div>
 
 <script>
+function previewImage(event) {
+    const preview = document.getElementById('preview');
+    const previewContainer = document.getElementById('image-preview');
+    const file = event.target.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.classList.remove('hidden');
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const coffeeOfMonthCheckbox = document.getElementById('coffee-of-month-checkbox');
     const coffeeOfMonthDateContainer = document.getElementById('coffee-of-month-date-container');

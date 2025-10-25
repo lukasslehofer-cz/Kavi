@@ -21,7 +21,7 @@
         <div class="sticky top-24">
             <div class="aspect-square  overflow-hidden shadow-xl img-placeholder">
                 @if($product->image)
-                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                 @else
                 <div class="w-full h-full flex flex-col items-center justify-center p-12">
                     <svg class="w-32 h-32 text-bluegray-300 mb-4" fill="currentColor" viewBox="0 0 24 24">
@@ -132,7 +132,7 @@
             <a href="{{ route('products.show', $relatedProduct) }}" class="card card-hover group">
                 <div class="aspect-square overflow-hidden img-placeholder">
                     @if($relatedProduct->image)
-                    <img src="{{ $relatedProduct->image }}" alt="{{ $relatedProduct->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img src="{{ asset($relatedProduct->image) }}" alt="{{ $relatedProduct->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     @else
                     <div class="w-full h-full flex flex-col items-center justify-center p-6">
                         <svg class="w-16 h-16 text-bluegray-300 mb-2" fill="currentColor" viewBox="0 0 24 24">

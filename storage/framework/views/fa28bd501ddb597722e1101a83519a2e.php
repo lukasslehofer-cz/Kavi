@@ -7,7 +7,7 @@
         <p class="text-coffee-600">Upravte informace o produktu</p>
     </div>
 
-    <form action="<?php echo e(route('admin.products.update', $product)); ?>" method="POST" class="card p-8">
+    <form action="<?php echo e(route('admin.products.update', $product)); ?>" method="POST" enctype="multipart/form-data" class="card p-8">
         <?php echo csrf_field(); ?>
         <?php echo method_field('PUT'); ?>
 
@@ -33,6 +33,47 @@ $message = $__bag->first($__errorArgs[0]); ?>
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-coffee-900 mb-2">Fotka produktu</label>
+                
+                <?php if($product->image): ?>
+                <div class="mb-4">
+                    <p class="text-sm text-coffee-600 mb-2">Aktuální fotka:</p>
+                    <img src="<?php echo e(asset($product->image)); ?>" alt="<?php echo e($product->name); ?>" 
+                         class="w-48 h-48 object-cover rounded-lg border-2 border-cream-300">
+                </div>
+                <?php endif; ?>
+                
+                <input type="file" name="image" accept="image/*" 
+                       class="input <?php $__errorArgs = ['image'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                       onchange="previewImage(event)">
+                
+                <div id="image-preview" class="mt-4 hidden">
+                    <p class="text-sm text-coffee-600 mb-2">Náhled nové fotky:</p>
+                    <img id="preview" src="" alt="Náhled" 
+                         class="w-48 h-48 object-cover rounded-lg border-2 border-primary-300">
+                </div>
+                
+                <?php $__errorArgs = ['image'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <p class="text-red-600 text-sm mt-1"><?php echo e($message); ?></p>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                <p class="text-xs text-coffee-600 mt-1">Podporované formáty: JPG, PNG, GIF. Maximální velikost: 2MB</p>
             </div>
 
             <div>
@@ -224,6 +265,21 @@ unset($__errorArgs, $__bag); ?>
 </div>
 
 <script>
+function previewImage(event) {
+    const preview = document.getElementById('preview');
+    const previewContainer = document.getElementById('image-preview');
+    const file = event.target.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.classList.remove('hidden');
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const coffeeOfMonthCheckbox = document.getElementById('coffee-of-month-checkbox');
     const coffeeOfMonthDateContainer = document.getElementById('coffee-of-month-date-container');

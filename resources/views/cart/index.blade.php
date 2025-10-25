@@ -48,7 +48,7 @@
                         <!-- Product Image -->
                         <div class="w-32 h-32  overflow-hidden flex-shrink-0 img-placeholder">
                             @if($item['product']->image)
-                            <img src="{{ $item['product']->image }}" alt="{{ $item['product']->name }}" class="w-full h-full object-cover">
+                            <img src="{{ asset($item['product']->image) }}" alt="{{ $item['product']->name }}" class="w-full h-full object-cover">
                             @else
                             <div class="w-full h-full flex flex-col items-center justify-center p-4">
                                 <svg class="w-12 h-12 text-bluegray-300 mb-2" fill="currentColor" viewBox="0 0 24 24">

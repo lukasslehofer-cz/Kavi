@@ -33,9 +33,13 @@
                     <tr>
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                <div class="w-12 h-12 bg-cream-100 rounded-lg mr-3 flex-shrink-0">
+                                <div class="w-12 h-12 bg-cream-100 rounded-lg mr-3 flex-shrink-0 flex items-center justify-center">
                                     <?php if($product->image): ?>
-                                    <img src="<?php echo e($product->image); ?>" alt="<?php echo e($product->name); ?>" class="w-full h-full object-cover rounded-lg">
+                                    <img src="<?php echo e(asset($product->image)); ?>" alt="<?php echo e($product->name); ?>" class="w-full h-full object-cover rounded-lg">
+                                    <?php else: ?>
+                                    <svg class="w-6 h-6 text-cream-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
                                     <?php endif; ?>
                                 </div>
                                 <span class="font-medium text-coffee-900"><?php echo e($product->name); ?></span>
