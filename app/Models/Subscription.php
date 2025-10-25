@@ -27,6 +27,9 @@ class Subscription extends Model
         'packeta_point_id',
         'packeta_point_name',
         'packeta_point_address',
+        'packeta_packet_id',
+        'packeta_shipment_status',
+        'packeta_sent_at',
     ];
 
     protected $casts = [
@@ -34,6 +37,7 @@ class Subscription extends Model
         'next_billing_date' => 'date',
         'last_shipment_date' => 'date',
         'ends_at' => 'date',
+        'packeta_sent_at' => 'datetime',
         'configuration' => 'array',
         'shipping_address' => 'array',
         'configured_price' => 'decimal:2',

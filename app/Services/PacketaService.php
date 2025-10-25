@@ -11,7 +11,7 @@ class PacketaService
     protected $apiPassword;
     protected $senderId;
     protected $widgetKey;
-    protected $apiUrl = 'https://api.packeta.com/v1';
+    protected $apiUrl = 'https://www.zasilkovna.cz/api/rest';
 
     public function __construct()
     {
@@ -46,30 +46,86 @@ class PacketaService
     public function createPacket(array $data): ?array
     {
         try {
-            $response = Http::withBasicAuth($this->apiKey, $this->apiPassword)
-                ->post("{$this->apiUrl}/packets", [
-                    'senderId' => $this->senderId,
-                    'name' => $data['name'],
-                    'surname' => $data['surname'] ?? '',
-                    'company' => $data['company'] ?? null,
-                    'email' => $data['email'],
-                    'phone' => $data['phone'],
-                    'addressId' => $data['packeta_point_id'],
-                    'cod' => $data['cod'] ?? null,
-                    'value' => $data['value'],
-                    'weight' => $data['weight'],
-                    'eshop' => $data['order_number'] ?? null,
-                    'note' => $data['note'] ?? null,
-                ]);
-
-            if ($response->successful()) {
-                return $response->json();
+            // Packeta API uses XML format with apiPassword as CHILD ELEMENT (not attribute!)
+            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><createPacket/>');
+            
+            // API password as child element (not attribute!)
+            $xml->addChild('apiPassword', $this->apiPassword);
+            
+            $packetAttributes = $xml->addChild('packetAttributes');
+            $packetAttributes->addChild('number', $data['order_number'] ?? '');
+            $packetAttributes->addChild('name', $data['name']);
+            $packetAttributes->addChild('surname', $data['surname'] ?? '');
+            $packetAttributes->addChild('email', $data['email']);
+            $packetAttributes->addChild('phone', $data['phone']);
+            $packetAttributes->addChild('addressId', $data['packeta_point_id']);
+            $packetAttributes->addChild('value', number_format($data['value'], 2, '.', ''));
+            $packetAttributes->addChild('weight', number_format($data['weight'], 2, '.', ''));
+            $packetAttributes->addChild('eshop', $this->senderId);
+            
+            if (!empty($data['cod'])) {
+                $packetAttributes->addChild('cod', number_format($data['cod'], 2, '.', ''));
+            }
+            
+            if (!empty($data['note'])) {
+                $packetAttributes->addChild('note', $data['note']);
             }
 
-            Log::error('Packeta API Error: ' . $response->body());
+            $xmlString = $xml->asXML();
+
+            Log::info('Packeta API Request', [
+                'url' => $this->apiUrl,
+                'xml' => $xmlString,
+                'api_password_length' => strlen($this->apiPassword),
+                'api_password_start' => substr($this->apiPassword, 0, 8) . '...',
+            ]);
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'text/xml; charset=utf-8',
+            ])->send('POST', $this->apiUrl, [
+                'body' => $xmlString,
+            ]);
+
+            Log::info('Packeta API Response', [
+                'status' => $response->status(),
+                'successful' => $response->successful(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                // Parse XML response
+                $responseXml = simplexml_load_string($response->body());
+                
+                if ($responseXml && $responseXml->getName() === 'response') {
+                    $status = (string)$responseXml->status;
+                    
+                    if ($status === 'ok') {
+                        return [
+                            'id' => (string)$responseXml->result->id,
+                            'barcode' => (string)$responseXml->result->barcode ?? null,
+                        ];
+                    } else {
+                        Log::error('Packeta API returned error', [
+                            'status' => $status,
+                            'fault' => (string)($responseXml->fault ?? 'Unknown error'),
+                            'detail' => (string)($responseXml->detail ?? ''),
+                        ]);
+                        return null;
+                    }
+                }
+            }
+
+            Log::error('Packeta API Error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
             return null;
         } catch (\Exception $e) {
-            Log::error('Packeta Service Exception: ' . $e->getMessage());
+            Log::error('Packeta Service Exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
+            ]);
             return null;
         }
     }

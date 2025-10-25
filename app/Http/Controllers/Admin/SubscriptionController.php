@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subscription;
+use App\Services\PacketaService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SubscriptionController extends Controller
 {
@@ -106,9 +108,20 @@ class SubscriptionController extends Controller
             ->where('status', 'active')
             ->get();
 
-        // Filter subscriptions that should ship on target date
+        // Filter subscriptions that should ship on target date OR were already sent on target date
         $subscriptions = $allSubscriptions->filter(function($subscription) use ($targetDate) {
-            return $subscription->shouldShipOn($targetDate);
+            // Include if should ship on this date
+            if ($subscription->shouldShipOn($targetDate)) {
+                return true;
+            }
+            
+            // Also include if already sent on this exact date
+            if ($subscription->last_shipment_date && 
+                $subscription->last_shipment_date->format('Y-m-d') === $targetDate->format('Y-m-d')) {
+                return true;
+            }
+            
+            return false;
         });
 
         // Group by frequency for stats
@@ -120,5 +133,130 @@ class SubscriptionController extends Controller
         ];
 
         return view('admin.subscriptions.shipments', compact('subscriptions', 'targetDate', 'stats'));
+    }
+
+    /**
+     * Send selected subscriptions to Packeta API
+     */
+    public function sendToPacketa(Request $request)
+    {
+        $request->validate([
+            'subscription_ids' => 'required|array|min:1',
+            'subscription_ids.*' => 'exists:subscriptions,id',
+            'target_date' => 'nullable|date',
+        ]);
+
+        // Get target ship date (from hidden field or default)
+        $targetDate = $request->has('target_date') 
+            ? \Carbon\Carbon::parse($request->target_date)
+            : \App\Helpers\SubscriptionHelper::getNextShippingDate();
+
+        $packetaService = new PacketaService();
+        $successCount = 0;
+        $errorCount = 0;
+        $errors = [];
+
+        foreach ($request->subscription_ids as $subscriptionId) {
+            $subscription = Subscription::with('user')->find($subscriptionId);
+
+            // Skip if already sent
+            if ($subscription->packeta_shipment_status === 'sent') {
+                continue;
+            }
+
+            // Validate required data
+            if (!$subscription->packeta_point_id) {
+                $errors[] = "Předplatné #{$subscription->id}: Chybí výdejní místo Packety";
+                $errorCount++;
+                continue;
+            }
+
+            // Get shipping address
+            $shippingAddress = is_string($subscription->shipping_address) 
+                ? json_decode($subscription->shipping_address, true) 
+                : $subscription->shipping_address;
+
+            // Get configuration for weight calculation
+            $config = is_string($subscription->configuration) 
+                ? json_decode($subscription->configuration, true) 
+                : $subscription->configuration;
+            
+            $amount = $config['amount'] ?? 1;
+            // Assume each package weighs approximately 0.25 kg
+            $weight = $amount * 0.25;
+
+            // Prepare data for Packeta
+            $name = $shippingAddress['name'] ?? $subscription->user->name ?? '';
+            $nameParts = explode(' ', $name, 2);
+            
+            $packetData = [
+                'name' => $nameParts[0] ?? $name,
+                'surname' => $nameParts[1] ?? '',
+                'email' => $shippingAddress['email'] ?? $subscription->user->email ?? '',
+                'phone' => $shippingAddress['phone'] ?? $subscription->user->phone ?? '',
+                'packeta_point_id' => $subscription->packeta_point_id,
+                'value' => $subscription->configured_price ?? 500,
+                'weight' => $weight,
+                'order_number' => 'SUB-' . $subscription->id,
+                'note' => $subscription->delivery_notes ?? null,
+            ];
+
+            try {
+                // Send to Packeta API
+                $result = $packetaService->createPacket($packetData);
+
+                if ($result && isset($result['id'])) {
+                    // Update subscription with Packeta data
+                    // Use target date for last_shipment_date to keep proper shipping schedule
+                    $subscription->update([
+                        'packeta_packet_id' => $result['id'],
+                        'packeta_shipment_status' => 'sent',
+                        'packeta_sent_at' => now(),
+                        'last_shipment_date' => $targetDate,
+                    ]);
+
+                    $successCount++;
+                    Log::info("Zásilka odeslána do Packety", [
+                        'subscription_id' => $subscription->id,
+                        'packet_id' => $result['id']
+                    ]);
+                } else {
+                    $errors[] = "Předplatné #{$subscription->id}: Nepodařilo se vytvořit zásilku v Packeta API";
+                    $errorCount++;
+                    Log::error("Chyba při vytváření zásilky v Packeta", [
+                        'subscription_id' => $subscription->id,
+                        'response' => $result
+                    ]);
+                }
+            } catch (\Exception $e) {
+                $errors[] = "Předplatné #{$subscription->id}: " . $e->getMessage();
+                $errorCount++;
+                Log::error("Exception při odesílání do Packety", [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        // Prepare success message
+        $message = '';
+        if ($successCount > 0) {
+            $message .= "Úspěšně odesláno {$successCount} " . 
+                ($successCount === 1 ? 'zásilka' : ($successCount < 5 ? 'zásilky' : 'zásilek')) . 
+                " do systému Packeta. ";
+        }
+        if ($errorCount > 0) {
+            $message .= "{$errorCount} " . 
+                ($errorCount === 1 ? 'zásilka selhala' : ($errorCount < 5 ? 'zásilky selhaly' : 'zásilek selhalo')) . ". ";
+        }
+
+        if ($errorCount > 0 && count($errors) > 0) {
+            return redirect()->route('admin.subscriptions.shipments')
+                ->with('warning', $message)
+                ->with('errors', $errors);
+        }
+
+        return redirect()->route('admin.subscriptions.shipments')
+            ->with('success', $message);
     }
 }
