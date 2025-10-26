@@ -3,349 +3,774 @@
 @section('title', 'Kávové předplatné - Kavi Coffee')
 
 @section('content')
-<!-- Subscription Configurator Section -->
-<section class="section bg-bluegray-50">
-    <div class="container-custom">
-        <div class="text-center mb-16">
-            <h2 class="font-display text-3xl md:text-4xl font-black text-dark-800 mb-4">
-                Konfigurátor předplatného
-            </h2>
-            <p class="text-lg text-dark-600 max-w-2xl mx-auto">
-                Přizpůsobte si předplatné přesně podle svých potřeb. Flexibilně, bez závazků.
-            </p>
+<!-- Main Header -->
+<div class="bg-white pb-6 sm:pb-8 lg:pb-12">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="mb-10 md:mb-16 text-center">
+      <h2 class="mb-4 text-2xl font-bold text-gray-800 md:mb-6 lg:text-4xl">Sestavte si své kávové předplatné</h2>
+      <p class="mx-auto max-w-screen-md text-gray-500 md:text-lg">Vyberte si množství, typ kávy a frekvenci dodání. Jednoduše a bez závazků.</p>
+    </div>
+
+    <!-- Error Messages -->
+    @if($errors->any())
+    <div class="max-w-4xl mx-auto mb-6">
+      <div class="bg-red-100 border-2 border-red-400 text-red-700 px-6 py-4 rounded-lg">
+        <p class="font-bold mb-2">⚠️ Chyba při zpracování konfigurace:</p>
+        <ul class="list-disc list-inside space-y-1">
+          @foreach($errors->all() as $error)
+          <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="max-w-4xl mx-auto mb-6">
+      <div class="bg-red-100 border-2 border-red-400 text-red-700 px-6 py-4 rounded-lg">
+        <p class="font-bold">⚠️ {{ session('error') }}</p>
+      </div>
+    </div>
+    @endif
+
+    <!-- Configurator -->
+    <div class="max-w-5xl mx-auto" id="subscription-configurator" data-pricing='@json($subscriptionPricing)'>
+      
+      <!-- Step 1 Header -->
+      <div class="flex flex-col items-center justify-between gap-4 rounded-lg bg-gray-100 p-4 sm:flex-row md:p-8 mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-primary-500 md:text-2xl">Krok 1: Množství kávy</h2>
+          <p class="text-gray-600">Vyberte balíček, který vám vyhovuje</p>
         </div>
+      </div>
 
-        <!-- Error Messages -->
-        @if($errors->any())
-        <div class="max-w-4xl mx-auto mb-6">
-            <div class="bg-red-100 border-2 border-red-400 text-red-700 px-6 py-4">
-                <p class="font-bold mb-2">⚠️ Chyba při zpracování konfigurace:</p>
-                <ul class="list-disc list-inside space-y-1">
-                    @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+      <!-- Step 1: Množství kávy -->
+      <div id="step-1" class="mb-12">
+        <div class="mb-6 grid gap-6 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 lg:gap-8">
+          <!-- plan - start -->
+          <div class="flex flex-col rounded-lg border p-4 pt-6 coffee-amount-option" data-amount="2" data-cups="500g" data-price="{{ $subscriptionPricing['2'] }}">
+            <div class="mb-12">
+              <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">500g</div>
+
+              <p class="mx-auto mb-8 px-8 text-center text-gray-500">Ideální pro jednotlivce nebo páry, které si chtějí vychutnat kvalitní kávu</p>
+
+              <div class="space-y-2">
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">2 balíčky po 250g</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">2 druhy prémiové kávy</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">Doprava zdarma</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">Zrušení kdykoliv</span>
+                </div>
+                <!-- check - end -->
+              </div>
             </div>
+
+            <div class="mt-auto flex flex-col gap-8">
+              <div class="flex items-end justify-center gap-1">
+                <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }},-</span>
+                <span class="text-gray-500">Kč/box</span>
+              </div>
+
+              <button type="button" class="plan-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat plán</button>
+            </div>
+          </div>
+          <!-- plan - end -->
+
+          <!-- plan - start -->
+          <div class="flex flex-col rounded-lg border p-4 pt-6 coffee-amount-option" data-amount="3" data-cups="750g" data-price="{{ $subscriptionPricing['3'] }}">
+            <div class="mb-12">
+              <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">750g</div>
+
+              <p class="mx-auto mb-8 px-8 text-center text-gray-500">Nejpopulárnější volba pro pravidelné milovníky kávy</p>
+
+              <div class="space-y-2">
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">3 balíčky po 250g</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">3 druhy prémiové kávy</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">Doprava zdarma</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">Zrušení kdykoliv</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">Prioritní podpora</span>
+                </div>
+                <!-- check - end -->
+              </div>
+            </div>
+
+            <div class="mt-auto flex flex-col gap-8">
+              <div class="flex items-end justify-center gap-1">
+                <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }},-</span>
+                <span class="text-gray-500">Kč/box</span>
+              </div>
+
+              <button type="button" class="plan-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat plán</button>
+            </div>
+          </div>
+          <!-- plan - end -->
+
+          <!-- plan - start -->
+          <div class="flex flex-col rounded-lg border p-4 pt-6 coffee-amount-option" data-amount="4" data-cups="1000g" data-price="{{ $subscriptionPricing['4'] }}">
+            <div class="mb-12">
+              <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">1000g</div>
+
+              <p class="mx-auto mb-8 px-8 text-center text-gray-500">Pro kávové nadšence a větší domácnosti</p>
+
+              <div class="space-y-2">
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">4 balíčky po 250g</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">4 druhy prémiové kávy</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">Doprava zdarma</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">Zrušení kdykoliv</span>
+                </div>
+                <!-- check - end -->
+
+                <!-- check - start -->
+                <div class="flex gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+
+                  <span class="text-gray-600">VIP podpora</span>
+                </div>
+                <!-- check - end -->
+              </div>
+            </div>
+
+            <div class="mt-auto flex flex-col gap-8">
+              <div class="flex items-end justify-center gap-1">
+                <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }},-</span>
+                <span class="text-gray-500">Kč/box</span>
+              </div>
+
+              <button type="button" class="plan-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat plán</button>
+            </div>
+          </div>
+          <!-- plan - end -->
         </div>
-        @endif
+      </div>
 
-        @if(session('error'))
-        <div class="max-w-4xl mx-auto mb-6">
-            <div class="bg-red-100 border-2 border-red-400 text-red-700 px-6 py-4">
-                <p class="font-bold">⚠️ {{ session('error') }}</p>
-            </div>
-                </div>
-                @endif
-                
-        <!-- Configurator Card -->
-        <div class="max-w-4xl mx-auto" id="subscription-configurator" data-pricing='@json($subscriptionPricing)'>
-            <div class="card p-8 md:p-12">
-                <!-- Progress Indicator -->
-                <div class="mb-12">
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center space-x-2 step-indicator active" data-step="1">
-                            <div class="step-number">1</div>
-                            <span class="hidden md:inline text-sm font-medium">Množství</span>
-                        </div>
-                        <div class="flex-1 h-1 bg-bluegray-200 mx-2 step-line"></div>
-                        <div class="flex items-center space-x-2 step-indicator" data-step="2">
-                            <div class="step-number">2</div>
-                            <span class="hidden md:inline text-sm font-medium">Typ kávy</span>
-                        </div>
-                        <div class="flex-1 h-1 bg-bluegray-200 mx-2 step-line"></div>
-                        <div class="flex items-center space-x-2 step-indicator" data-step="3">
-                            <div class="step-number">3</div>
-                            <span class="hidden md:inline text-sm font-medium">Frekvence</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 1: Množství kávy -->
-                <div id="step-1" class="config-step active">
-                    <h3 class="font-display text-2xl md:text-3xl font-bold text-dark-800 mb-3 text-center">
-                        Vyberte množství kávy
-                    </h3>
-                    <p class="text-dark-600 text-center mb-8">Zvolte balíček, který vám vyhovuje</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                        <!-- 500g Option -->
-                        <button type="button" class="coffee-amount-option p-6 bg-white hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl border-2 border-bluegray-200 hover:border-primary-500" data-amount="2" data-cups="500g" data-price="{{ $subscriptionPricing['2'] }}">
-                            <div class="text-4xl font-black text-primary-500 group-hover:text-white mb-3">500 G</div>
-                            <div class="text-2xl font-black text-dark-800 group-hover:text-white mb-4">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }} Kč měsíčně</div>
-                            <div class="text-sm font-bold mb-4">250g × 2 balíčky</div>
-                            <ul class="text-left space-y-2 text-sm mb-4">
-                                <li class="flex items-start">
-                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span>2 typy výběrové kávy z nejlepších evropských pražíren</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span>KAVI přispěje na 6 měsíců čisté vody každý měsíc předplatného</span>
-                                </li>
-                            </ul>
-                        </button>
-                        
-                        <!-- 750g Option - Popular -->
-                        <button type="button" class="coffee-amount-option p-6 bg-white hover:bg-primary-500 hover:text-white transition-all text-center group shadow-xl border-4 border-primary-500 relative" data-amount="3" data-cups="750g" data-price="{{ $subscriptionPricing['3'] }}">
-                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                <span class="bg-primary-500 text-white text-xs font-black px-3 py-1">OBLÍBENÉ</span>
-                            </div>
-                            <div class="text-4xl font-black text-primary-500 group-hover:text-white mb-3">750 G</div>
-                            <div class="text-2xl font-black text-dark-800 group-hover:text-white mb-4">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }} Kč měsíčně</div>
-                            <div class="text-sm font-bold mb-4">250g × 3 balíčky</div>
-                            <ul class="text-left space-y-2 text-sm mb-4">
-                                <li class="flex items-start">
-                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span>3 typy výběrové kávy z nejlepších evropských pražíren</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span>KAVI přispěje na 9 měsíců čisté vody každý měsíc předplatného</span>
-                                </li>
-                            </ul>
-                        </button>
-                        
-                        <!-- 1000g Option -->
-                        <button type="button" class="coffee-amount-option p-6 bg-white hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl border-2 border-bluegray-200 hover:border-primary-500" data-amount="4" data-cups="1000g" data-price="{{ $subscriptionPricing['4'] }}">
-                            <div class="text-4xl font-black text-primary-500 group-hover:text-white mb-3">1000 G</div>
-                            <div class="text-2xl font-black text-dark-800 group-hover:text-white mb-4">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }} Kč měsíčně</div>
-                            <div class="text-sm font-bold mb-4">250g × 4 balíčky</div>
-                            <ul class="text-left space-y-2 text-sm mb-4">
-                                <li class="flex items-start">
-                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span>4 typy výběrové kávy z nejlepších evropských pražíren</span>
-                                </li>
-                                <li class="flex items-start">
-                                    <svg class="w-4 h-4 text-primary-500 group-hover:text-white mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span>KAVI přispěje na 12 měsíců čisté vody každý měsíc předplatného</span>
-                                </li>
-                            </ul>
-                        </button>
-                    </div>
+                <!-- Step 2 Header -->
+                <div class="flex flex-col items-center justify-between gap-4 rounded-lg bg-gray-100 p-4 sm:flex-row md:p-8 mb-6">
+                  <div>
+                    <h2 class="text-xl font-bold text-primary-500 md:text-2xl">Krok 2: Preferovaný typ kávy</h2>
+                    <p class="text-gray-600">Vyberte si váš oblíbený způsob přípravy</p>
+                  </div>
                 </div>
 
                 <!-- Step 2: Typ kávy -->
-                <div id="step-2" class="config-step">
-                    <h3 class="font-display text-2xl md:text-3xl font-bold text-dark-800 mb-3 text-center">
-                        Jaký typ kávy preferujete?
-                    </h3>
-                    <p class="text-dark-600 text-center mb-8">Vyberte si váš oblíbený způsob přípravy</p>
+                <div id="step-2" class="mb-12">
+                  <div class="mb-6 grid gap-6 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 lg:gap-8">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
-                        <button type="button" class="coffee-type-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-type="espresso">
-                            <div class="text-5xl mb-4">🎯</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">Espresso</div>
-                            <div class="text-sm font-bold uppercase tracking-widest opacity-70">Intenzivní a plné chutě</div>
-                        </button>
-                        <button type="button" class="coffee-type-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-type="filter">
-                            <div class="text-5xl mb-4">💧</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">Filter</div>
-                            <div class="text-sm font-bold uppercase tracking-widest opacity-70">Jemné a čisté chutě</div>
-                        </button>
-                        <button type="button" class="coffee-type-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-type="mix">
-                            <div class="text-5xl mb-4">🎨</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">Kombinace</div>
-                            <div class="text-sm font-bold uppercase tracking-widest opacity-70">Mix podle vašich preferencí</div>
-                        </button>
-                    </div>
+                    <!-- Espresso - start -->
+                    <div class="flex flex-col rounded-lg border p-4 pt-6 coffee-type-card" data-type="espresso">
+                      <div class="mb-12">
+                        <div class="mb-2 text-center text-3xl font-bold text-gray-800">Espresso</div>
 
-                    <!-- Decaf Option (shown for espresso or filter) -->
-                    <div id="decaf-option" class="hidden max-w-2xl mx-auto mb-8">
-                        <div class="bg-bluegray-50 p-8 shadow-lg">
-                            <h4 class="font-black text-xl mb-6 text-center uppercase tracking-wider">Chcete přidat decaf variantu?</h4>
-                            <p class="text-sm text-dark-600 text-center mb-8 font-bold">
-                                Posouváním slideru doprava zvýšíte množství decaf kávy
-                            </p>
-                            
-                            <div class="space-y-6">
-                                <!-- Labels -->
-                                <div class="flex justify-between items-center px-2">
-                                    <div class="text-center">
-                                        <div class="text-2xl mb-1">🌙</div>
-                                        <span class="font-bold text-sm uppercase tracking-wider">Decaf</span>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl mb-1" id="single-normal-icon-top">🎯</div>
-                                        <span class="font-bold text-sm uppercase tracking-wider" id="single-normal-label-top">Espresso</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Slider -->
-                                <div class="relative">
-                                    <input type="range" id="single-decaf-slider" min="0" max="4" value="0" class="w-full h-4 bg-gradient-to-r from-blue-200 to-primary-200 appearance-none cursor-pointer slider rounded-full">
-                                </div>
-                                
-                                <!-- Counts Display -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-blue-50 p-4 rounded text-center border-2 border-blue-200">
-                                        <div class="text-3xl font-black text-blue-600 mb-1"><span id="single-decaf-count">0</span></div>
-                                        <div class="text-xs font-bold uppercase tracking-wider text-dark-600">
-                                            <span id="single-decaf-label">Decaf</span> balení
-                                        </div>
-                                    </div>
-                                    <div class="bg-primary-50 p-4 rounded text-center border-2 border-primary-200">
-                                        <div class="text-3xl font-black text-primary-600 mb-1"><span id="single-normal-count">0</span></div>
-                                        <div class="text-xs font-bold uppercase tracking-wider text-dark-600">
-                                            <span id="single-normal-label">Espresso</span> balení
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <p class="mx-auto mb-8 px-8 text-center text-gray-500">Ideální pro přípravu v kávovaru nebo moka konvici</p>
+
+                        <div class="space-y-2">
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Plné tělo a intenzita</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Sladká chuť s nízkým kyselým tónem</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Tmavší pražení</span>
+                          </div>
                         </div>
-                    </div>
+                      </div>
 
-                    <!-- Mix Options (shown only when "mix" is selected) -->
-                    <div id="mix-options" class="hidden max-w-2xl mx-auto">
-                        <div class="bg-bluegray-50 p-8 shadow-lg">
-                            <h4 class="font-black text-2xl mb-6 text-center uppercase tracking-wider">Jak chcete kombinovat?</h4>
-                            
-                            <!-- Progress indicator -->
-                            <div class="bg-white p-6 mb-8 shadow-md">
-                                <div class="flex items-center justify-between mb-4">
-                                    <span class="text-dark-600 font-black uppercase tracking-widest text-sm">Vybráno balení:</span>
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-4xl font-black text-primary-500" id="total-bags">0</span>
-                                        <span class="text-2xl text-dark-600 font-black">/</span>
-                                        <span class="text-3xl font-black text-dark-800" id="required-bags-display">0</span>
-                                    </div>
-                                </div>
-                                <div class="w-full bg-bluegray-200 h-4 overflow-hidden">
-                                    <div id="mix-progress-bar" class="bg-gradient-to-r from-primary-400 to-primary-600 h-4 transition-all duration-300" style="width: 0%"></div>
-                                </div>
-                                <div id="mix-status" class="text-center mt-4 font-black uppercase tracking-widest text-sm"></div>
-                            </div>
-                            
-                            <div class="space-y-6">
-                                <div>
-                                    <div class="flex justify-between items-center mb-3">
-                                        <label class="font-bold flex items-center uppercase tracking-wider">
-                                            <span class="text-3xl mr-3">🎯</span>
-                                            <span>Espresso</span>
-                                        </label>
-                                        <span class="font-black text-primary-500 text-lg"><span id="espresso-count">0</span> BALENÍ</span>
-                                    </div>
-                                    <input type="range" id="espresso-slider" min="0" max="4" value="0" class="w-full h-3 bg-bluegray-200 appearance-none cursor-pointer slider">
-                                </div>
-                                <div>
-                                    <div class="flex justify-between items-center mb-3">
-                                        <label class="font-bold flex items-center uppercase tracking-wider">
-                                            <span class="text-3xl mr-3">🎯🌙</span>
-                                            <span>Espresso Decaf</span>
-                                        </label>
-                                        <span class="font-black text-primary-500 text-lg"><span id="espresso-decaf-count">0</span> BALENÍ</span>
-                                    </div>
-                                    <input type="range" id="espresso-decaf-slider" min="0" max="4" value="0" class="w-full h-3 bg-bluegray-200 appearance-none cursor-pointer slider">
-                                </div>
-                                <div>
-                                    <div class="flex justify-between items-center mb-3">
-                                        <label class="font-bold flex items-center uppercase tracking-wider">
-                                            <span class="text-3xl mr-3">💧</span>
-                                            <span>Filter</span>
-                                        </label>
-                                        <span class="font-black text-primary-500 text-lg"><span id="filter-count">0</span> BALENÍ</span>
-                                    </div>
-                                    <input type="range" id="filter-slider" min="0" max="4" value="0" class="w-full h-3 bg-bluegray-200 appearance-none cursor-pointer slider">
-                                </div>
-                                <div>
-                                    <div class="flex justify-between items-center mb-3">
-                                        <label class="font-bold flex items-center uppercase tracking-wider">
-                                            <span class="text-3xl mr-3">💧🌙</span>
-                                            <span>Filter Decaf</span>
-                                        </label>
-                                        <span class="font-black text-primary-500 text-lg"><span id="filter-decaf-count">0</span> BALENÍ</span>
-                                    </div>
-                                    <input type="range" id="filter-decaf-slider" min="0" max="4" value="0" class="w-full h-3 bg-bluegray-200 appearance-none cursor-pointer slider">
-                                </div>
-                            </div>
+                      <div class="mt-auto flex flex-col gap-4">
+                        <!-- Checkbox jako button -->
+                        <label class="flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors border border-gray-300">
+                          <input type="checkbox" class="decaf-checkbox w-5 h-5 text-primary-500 rounded border-gray-300 focus:ring-primary-500 cursor-pointer" />
+                          <span class="text-sm font-semibold text-gray-700">1x káva bez kofeinu</span>
+                          <span class="w-12 ml-auto text-gray-400">
+                            <span class="text-sm font-semibold text-gray-700">+ 100,-</span>
+                          </span>
+                        </label>
+
+                        <button type="button" class="method-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat metodu</button>
+                      </div>
+                    </div>
+                    <!-- Espresso - end -->
+
+                    <!-- Filtr - start -->
+                    <div class="flex flex-col rounded-lg border p-4 pt-6 coffee-type-card" data-type="filter">
+                      <div class="mb-12">
+                        <div class="mb-2 text-center text-3xl font-bold text-gray-800">Filtr</div>
+
+                        <p class="mx-auto mb-8 px-8 text-center text-gray-500">Pro překapávanou kávu nebo french press</p>
+
+                        <div class="space-y-2">
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Lehčí tělo a vyšší kyselost</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Ovocné a květinové tóny</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Světlejší pražení</span>
+                          </div>
                         </div>
-                    </div>
+                      </div>
 
-                    <div class="flex justify-between mt-8">
-                        <button type="button" id="back-to-step-1" class="btn btn-outline !px-6 !py-3">
-                            ← Zpět
-                        </button>
-                        <button type="button" id="next-to-step-3" class="btn btn-primary !px-6 !py-3" disabled>
-                            Pokračovat →
-                        </button>
+                      <div class="mt-auto flex flex-col gap-4">
+                        <!-- Checkbox jako button -->
+                        <label class="flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors border border-gray-300">
+                          <input type="checkbox" class="decaf-checkbox w-5 h-5 text-primary-500 rounded border-gray-300 focus:ring-primary-500 cursor-pointer" />
+                          <span class="text-sm font-semibold text-gray-700">1x káva bez kofeinu</span>
+                          <span class="w-12 ml-auto text-gray-400">
+                            <span class="text-sm font-semibold text-gray-700">+ 100,-</span>
+                          </span>
+                        </label>
+
+                        <button type="button" class="method-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat metodu</button>
+                      </div>
                     </div>
+                    <!-- Filtr - end -->
+
+                    <!-- Kombinace - start -->
+                    <div class="flex flex-col rounded-lg border p-4 pt-6 coffee-type-card" data-type="mix">
+                      <div class="mb-12">
+                        <div class="mb-2 text-center text-3xl font-bold text-gray-800">Kombinace</div>
+
+                        <p class="mx-auto mb-8 px-8 text-center text-gray-500">Rozmanitost pro ty, kteří chtějí vyzkoušet obojí</p>
+
+                        <div class="space-y-2">
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Espresso i filtr v jednom</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Možnost přidat i decaf varianty</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Maximální rozmanitost</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mt-auto flex flex-col gap-4">
+                        <!-- Checkbox jako button -->
+                        <label class="flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors border border-gray-300">
+                          <input type="checkbox" class="decaf-checkbox w-5 h-5 text-primary-500 rounded border-gray-300 focus:ring-primary-500 cursor-pointer" />
+                          <span class="text-sm font-semibold text-gray-700">1x káva bez kofeinu</span>
+                          <span class="w-12 ml-auto text-gray-400">
+                            <span class="text-sm font-semibold text-gray-700">+ 100,-</span>
+                          </span>
+                        </label>
+
+                        <button type="button" class="method-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">Vybrat metodu</button>
+                      </div>
+                    </div>
+                    <!-- Kombinace - end -->
+
+                  </div>
+
+                  <!-- Rozdělení kávy -->
+                  <div id="caffeine-distribution" class="hidden mb-8">
+                    <div class="bg-gray-50 p-6 rounded-lg border">
+                      <h4 class="text-3xl text-center font-bold text-gray-800 mb-4">Rozdělení kávy</h4>
+                      
+                      <!-- Layout pro Espresso/Filtr s decaf: 2 sloupce vedle sebe -->
+                      <div id="simple-distribution" class="hidden grid grid-cols-2 gap-4">
+                        <!-- Kofeinová verze -->
+                        <div class="flex flex-col p-4 bg-white rounded-lg border">
+                          <div class="mb-3">
+                            <span class="font-semibold text-gray-800 block mb-1" id="caffeine-label">Espresso</span>
+                            <p class="text-xs text-gray-500">250g balení</p>
+                          </div>
+                          
+                          <div class="flex items-center justify-center gap-3 mt-auto">
+                            <button type="button" id="caffeine-minus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                              </svg>
+                            </button>
+                            <span class="w-12 text-center text-2xl font-bold text-gray-800" id="caffeine-count">0</span>
+                            <button type="button" id="caffeine-plus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <!-- Bezkofeinová verze -->
+                        <div class="flex flex-col p-4 bg-white rounded-lg border">
+                          <div class="mb-3">
+                            <span class="font-semibold text-gray-800 block mb-1" id="decaf-label">Decaf espresso</span>
+                            <p class="text-xs text-gray-500">250g balení</p>
+                          </div>
+                          
+                          <div class="flex items-center justify-center gap-3 mt-auto">
+                            <button type="button" id="decaf-minus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                              </svg>
+                            </button>
+                            <span class="w-12 text-center text-2xl font-bold text-gray-800" id="decaf-count">0</span>
+                            <button type="button" id="decaf-plus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Layout pro Kombinaci BEZ decaf: 2 sloupce (Espresso, Filtr) -->
+                      <div id="mix-no-decaf-distribution" class="hidden grid grid-cols-2 gap-4">
+                        <!-- Espresso -->
+                        <div class="flex flex-col p-4 bg-white rounded-lg border">
+                          <div class="mb-3">
+                            <span class="font-semibold text-gray-800 block mb-1">Espresso</span>
+                            <p class="text-xs text-gray-500">250g balení</p>
+                          </div>
+                          
+                          <div class="flex items-center justify-center gap-3 mt-auto">
+                            <button type="button" id="mix-espresso-minus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                              </svg>
+                            </button>
+                            <span class="w-12 text-center text-2xl font-bold text-gray-800" id="mix-espresso-count">0</span>
+                            <button type="button" id="mix-espresso-plus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <!-- Filtr -->
+                        <div class="flex flex-col p-4 bg-white rounded-lg border">
+                          <div class="mb-3">
+                            <span class="font-semibold text-gray-800 block mb-1">Filtr</span>
+                            <p class="text-xs text-gray-500">250g balení</p>
+                          </div>
+                          
+                          <div class="flex items-center justify-center gap-3 mt-auto">
+                            <button type="button" id="mix-filter-minus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                              </svg>
+                            </button>
+                            <span class="w-12 text-center text-2xl font-bold text-gray-800" id="mix-filter-count">0</span>
+                            <button type="button" id="mix-filter-plus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Layout pro Kombinaci S decaf: 2 řádky po 2 sloupcích -->
+                      <div id="mix-with-decaf-distribution" class="hidden space-y-4">
+                        <!-- První řádek: Espresso + Decaf espresso -->
+                        <div class="grid grid-cols-2 gap-4">
+                          <!-- Espresso -->
+                          <div class="flex flex-col p-4 bg-white rounded-lg border">
+                            <div class="mb-3">
+                              <span class="font-semibold text-gray-800 block mb-1">Espresso</span>
+                              <p class="text-xs text-gray-500">250g balení</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-center gap-3 mt-auto">
+                              <button type="button" id="mix-espresso-caf-minus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                </svg>
+                              </button>
+                              <span class="w-12 text-center text-2xl font-bold text-gray-800" id="mix-espresso-caf-count">0</span>
+                              <button type="button" id="mix-espresso-caf-plus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <!-- Decaf espresso -->
+                          <div class="flex flex-col p-4 bg-white rounded-lg border">
+                            <div class="mb-3">
+                              <span class="font-semibold text-gray-800 block mb-1">Decaf espresso</span>
+                              <p class="text-xs text-gray-500">250g balení</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-center gap-3 mt-auto">
+                              <button type="button" id="mix-espresso-decaf-minus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                </svg>
+                              </button>
+                              <span class="w-12 text-center text-2xl font-bold text-gray-800" id="mix-espresso-decaf-count">0</span>
+                              <button type="button" id="mix-espresso-decaf-plus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Druhý řádek: Filtr + Decaf filtr -->
+                        <div class="grid grid-cols-2 gap-4">
+                          <!-- Filtr -->
+                          <div class="flex flex-col p-4 bg-white rounded-lg border">
+                            <div class="mb-3">
+                              <span class="font-semibold text-gray-800 block mb-1">Filtr</span>
+                              <p class="text-xs text-gray-500">250g balení</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-center gap-3 mt-auto">
+                              <button type="button" id="mix-filter-caf-minus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                </svg>
+                              </button>
+                              <span class="w-12 text-center text-2xl font-bold text-gray-800" id="mix-filter-caf-count">0</span>
+                              <button type="button" id="mix-filter-caf-plus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <!-- Decaf filtr -->
+                          <div class="flex flex-col p-4 bg-white rounded-lg border">
+                            <div class="mb-3">
+                              <span class="font-semibold text-gray-800 block mb-1">Decaf filtr</span>
+                              <p class="text-xs text-gray-500">250g balení</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-center gap-3 mt-auto">
+                              <button type="button" id="mix-filter-decaf-minus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                </svg>
+                              </button>
+                              <span class="w-12 text-center text-2xl font-bold text-gray-800" id="mix-filter-decaf-count">0</span>
+                              <button type="button" id="mix-filter-decaf-plus" class="flex h-10 w-10 items-center justify-center rounded-md border-2 border-gray-800 bg-white text-gray-800 transition duration-100 hover:bg-gray-800 hover:text-white active:bg-gray-900 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-800 disabled:border-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Step 3 Header -->
+                <div class="flex flex-col items-center justify-between gap-4 rounded-lg bg-gray-100 p-4 sm:flex-row md:p-8 mb-6">
+                  <div>
+                    <h2 class="text-xl font-bold text-primary-500 md:text-2xl">Krok 3: Frekvence dodání</h2>
+                    <p class="text-gray-600">Jak často chcete kávu dostávat?</p>
+                  </div>
                 </div>
 
                 <!-- Step 3: Frekvence -->
-                <div id="step-3" class="config-step">
-                    <h3 class="font-display text-2xl md:text-3xl font-bold text-dark-800 mb-3 text-center">
-                        Jak často chcete kávu dostávat?
-                    </h3>
-                    <p class="text-dark-600 text-center mb-8">Vyberte interval dodávky</p>
+                <div id="step-3" class="mb-12">
+                  <div class="mb-6 grid gap-6 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 lg:gap-8">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
-                        <button type="button" class="frequency-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-frequency="1" data-frequency-text="Každý měsíc">
-                            <div class="text-5xl mb-4">📦</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">Každý měsíc</div>
-                            <div class="text-sm font-bold uppercase tracking-widest opacity-70">Pro pravidelnou spotřebu</div>
-                        </button>
-                        <button type="button" class="frequency-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-frequency="2" data-frequency-text="Jednou za 2 měsíce">
-                            <div class="text-5xl mb-4">📦📦</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">Jednou za 2 měsíce</div>
-                            <div class="text-sm font-bold uppercase tracking-widest opacity-70">Pro střední spotřebu</div>
-                        </button>
-                        <button type="button" class="frequency-option p-8 bg-bluegray-100 hover:bg-primary-500 hover:text-white transition-all text-center group shadow-lg hover:shadow-xl transform hover:-translate-y-1" data-frequency="3" data-frequency-text="Jednou za 3 měsíce">
-                            <div class="text-5xl mb-4">📦📦📦</div>
-                            <div class="font-black text-xl mb-2 uppercase tracking-wider">Jednou za 3 měsíce</div>
-                            <div class="text-sm font-bold uppercase tracking-widest opacity-70">Pro občasné pití</div>
-                        </button>
+                    <!-- Každý měsíc - start -->
+                    <div class="flex flex-col rounded-lg border p-4 pt-6 frequency-card" data-frequency="1" data-frequency-text="Každý měsíc">
+                      <div class="mb-12">
+                        <div class="mb-2 text-center text-3xl font-bold text-gray-800">Každý měsíc</div>
+
+                        <p class="mx-auto mb-8 px-8 text-center text-gray-500">Pro pravidelnou spotřebu a čerstvou kávu vždy po ruce</p>
+
+                        <div class="space-y-2">
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Nejčerstvější káva</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Nikdy vám nedojde</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Ideální pro denní pití</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mt-auto">
+                        <button type="button" class="frequency-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base w-full">Vybrat frekvenci</button>
+                      </div>
                     </div>
+                    <!-- Každý měsíc - end -->
 
-                    <!-- Summary & Price -->
-                    <div class="bg-gradient-to-br from-primary-50 to-primary-100 p-10 max-w-2xl mx-auto shadow-lg">
-                        <h4 class="font-display text-3xl font-black text-center mb-8 uppercase tracking-wider">Shrnutí vašeho předplatného</h4>
-                        
-                        <div class="bg-white p-8 mb-6 shadow-md">
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-dark-600 font-bold uppercase tracking-widest text-sm">Množství:</span>
-                                    <span class="font-black text-lg" id="summary-amount">-</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-dark-600 font-bold uppercase tracking-widest text-sm">Typ kávy:</span>
-                                    <span class="font-black text-lg" id="summary-type">-</span>
-                                </div>
-                                <div id="summary-mix" class="hidden pl-4 text-sm text-dark-600">
-                                    <div id="summary-mix-details"></div>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-dark-600 font-bold uppercase tracking-widest text-sm">Frekvence:</span>
-                                    <span class="font-black text-lg" id="summary-frequency">-</span>
-                                </div>
-                                <div class="border-t-4 border-primary-200 pt-4 mt-4">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-xl font-black uppercase tracking-widest">Cena:</span>
-                                        <span class="text-4xl font-black text-primary-500" id="summary-price">-</span>
-                                    </div>
-                                    <p class="text-xs text-dark-600 text-right mt-2 font-bold uppercase tracking-widest">při každé dodávce</p>
-                                </div>
+                    <!-- Jednou za 2 měsíce - start -->
+                    <div class="flex flex-col rounded-lg border p-4 pt-6 frequency-card" data-frequency="2" data-frequency-text="Jednou za 2 měsíce">
+                      <div class="mb-12">
+                        <div class="mb-2 text-center text-3xl font-bold text-gray-800">Jednou za 2 měsíce</div>
+
+                        <p class="mx-auto mb-8 px-8 text-center text-gray-500">Pro střední spotřebu, když kávu pijete občas</p>
+
+                        <div class="space-y-2">
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Vyvážená frekvence</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Optimální pro menší spotřebu</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Stále čerstvá káva</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mt-auto">
+                        <button type="button" class="frequency-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base w-full">Vybrat frekvenci</button>
+                      </div>
+                    </div>
+                    <!-- Jednou za 2 měsíce - end -->
+
+                    <!-- Jednou za 3 měsíce - start -->
+                    <div class="flex flex-col rounded-lg border p-4 pt-6 frequency-card" data-frequency="3" data-frequency-text="Jednou za 3 měsíce">
+                      <div class="mb-12">
+                        <div class="mb-2 text-center text-3xl font-bold text-gray-800">Jednou za 3 měsíce</div>
+
+                        <p class="mx-auto mb-8 px-8 text-center text-gray-500">Pro občasné pití, když kávu konzumujete jen výjimečně</p>
+
+                        <div class="space-y-2">
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Minimální závazek</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Pro příležitostné pití</span>
+                          </div>
+
+                          <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-gray-600">Flexibilní řešení</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mt-auto">
+                        <button type="button" class="frequency-button block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base w-full">Vybrat frekvenci</button>
+                      </div>
+                    </div>
+                    <!-- Jednou za 3 měsíce - end -->
+
+                  </div>
+
+                    <!-- Summary Section -->
+                    <div class="mt-12">
+                      <div class="flex flex-col overflow-hidden rounded-lg bg-gray-100 sm:flex-row md:min-h-80 border-2 border-gray-200 shadow-lg">
+                        <!-- image - start -->
+                        <div class="order-first h-64 w-full bg-gray-300 sm:order-none sm:h-auto sm:w-1/2 lg:w-2/5">
+                          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&q=75&fit=crop&w=1000" loading="lazy" alt="Kávový box" class="h-full w-full object-cover object-center" id="summary-image" />
+                        </div>
+                        <!-- image - end -->
+
+                        <!-- content - start -->
+                        <div class="flex w-full flex-col p-6 sm:w-1/2 sm:p-8 lg:w-3/5 lg:p-10">
+                          <h2 class="mb-4 text-2xl font-bold text-gray-800 md:text-3xl">Shrnutí vašeho předplatného</h2>
+
+                          <div class="mb-6 space-y-3">
+                            <div class="flex justify-between items-center py-2 border-b border-gray-300">
+                              <span class="text-gray-600 font-semibold">Množství:</span>
+                              <span class="font-bold text-gray-800" id="summary-amount">-</span>
                             </div>
-                        </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-300">
+                              <span class="text-gray-600 font-semibold">Typ kávy:</span>
+                              <span class="font-bold text-gray-800" id="summary-type">-</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-300">
+                              <span class="text-gray-600 font-semibold">Frekvence:</span>
+                              <span class="font-bold text-gray-800" id="summary-frequency">-</span>
+                            </div>
+                            <div class="flex justify-between items-center py-3 mt-4">
+                              <span class="text-xl font-bold text-gray-800">Cena:</span>
+                              <span class="text-3xl font-bold text-primary-500" id="summary-price">-</span>
+                            </div>
+                            <p class="text-xs text-gray-500 text-right">při každé dodávce</p>
+                          </div>
 
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <button type="button" id="back-to-step-2" class="btn btn-outline !px-6 !py-3 flex-1">
-                                ← Zpět
+                          <div class="mt-auto">
+                            <button type="button" id="configure-subscription" class="w-full inline-block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base opacity-50 cursor-not-allowed" disabled>
+                              Pokračovat k objednávce
                             </button>
-                            <button type="button" id="configure-subscription" class="btn btn-primary !px-6 !py-3 flex-1 opacity-50 cursor-not-allowed" disabled>
-                                Pokračovat k objednávce →
-                            </button>
+                            <p class="text-xs text-gray-500 text-center mt-3">✓ Bez závazků  ✓ Kdykoli zrušte  ✓ Doprava zdarma</p>
+                          </div>
                         </div>
+                        <!-- content - end -->
+                      </div>
                     </div>
                 </div>
             </div>
@@ -361,7 +786,7 @@
             </div>
         </div>
     </div>
-</section>
+</div>
 
 <!-- How it works -->
 <section class="section section-gray">
@@ -659,4 +1084,523 @@ document.getElementById('coffee-modal').addEventListener('click', function(e) {
         </div>
     </div>
 </section>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const configurator = document.getElementById('subscription-configurator');
+    const pricingData = JSON.parse(configurator.dataset.pricing);
+    
+    let selectedAmount = null;
+    let selectedType = null;
+    let maxBags = 0;
+    let selectedFrequency = null;
+    
+    // Pro Espresso/Filtr s decaf
+    let caffeineCount = 0;
+    let decafCount = 0;
+    
+    // Pro Mix BEZ decaf
+    let mixEspressoCount = 0;
+    let mixFilterCount = 0;
+    
+    // Pro Mix S decaf
+    let mixEspressoCafCount = 0;
+    let mixEspressoDecafCount = 0;
+    let mixFilterCafCount = 0;
+    let mixFilterDecafCount = 0;
+    
+    // Step 1: Množství kávy
+    document.querySelectorAll('.coffee-amount-option .plan-button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const card = this.closest('.coffee-amount-option');
+            
+            // Ulož aktuální scroll pozici
+            const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Reset všechny karty
+            document.querySelectorAll('.coffee-amount-option').forEach(c => {
+                c.classList.remove('border-2', 'border-primary-500');
+                c.classList.add('border');
+                const b = c.querySelector('.plan-button');
+                if (b) {
+                    b.classList.remove('bg-primary-500', 'hover:bg-primary-600', 'active:bg-primary-700');
+                    b.classList.add('bg-gray-800', 'hover:bg-gray-700', 'active:bg-gray-600');
+                    b.textContent = 'Vybrat plán';
+                }
+            });
+            
+            // Aktivuj vybranou kartu
+            card.classList.remove('border');
+            card.classList.add('border-2', 'border-primary-500');
+            this.classList.remove('bg-gray-800', 'hover:bg-gray-700', 'active:bg-gray-600');
+            this.classList.add('bg-primary-500', 'hover:bg-primary-600', 'active:bg-primary-700');
+            this.textContent = 'Vybráno';
+            
+            selectedAmount = parseInt(card.dataset.amount);
+            maxBags = selectedAmount;
+            
+            // Pokud je vybraná kombinace, přepočítej počty
+            if (selectedType === 'mix') {
+                mixEspressoCount = Math.floor(maxBags / 2);
+                mixFilterCount = maxBags - mixEspressoCount;
+                updateMixNoDecafDisplay();
+            }
+            
+            // Vrať scroll na původní pozici
+            window.scrollTo(0, scrollPos);
+            
+            // Dynamický přepočet shrnutí
+            updateSummary();
+            
+            console.log('Selected amount:', selectedAmount, 'Max bags:', maxBags);
+            
+            return false;
+        });
+    });
+    
+    // Funkce pro zobrazení správného layoutu Rozdělení kávy
+    function showDistributionLayout() {
+        const caffeineDistribution = document.getElementById('caffeine-distribution');
+        const simpleDistribution = document.getElementById('simple-distribution');
+        const mixNoDecafDistribution = document.getElementById('mix-no-decaf-distribution');
+        const mixWithDecafDistribution = document.getElementById('mix-with-decaf-distribution');
+        
+        // Skryj všechny layouty
+        simpleDistribution.classList.add('hidden');
+        mixNoDecafDistribution.classList.add('hidden');
+        mixWithDecafDistribution.classList.add('hidden');
+        
+        const card = document.querySelector('.coffee-type-card.border-primary-500');
+        if (!card) return;
+        
+        const checkbox = card.querySelector('.decaf-checkbox');
+        const isDecafChecked = checkbox ? checkbox.checked : false;
+        
+        if (selectedType === 'espresso' || selectedType === 'filter') {
+            // Pro Espresso/Filtr NEzobrazovat Rozdělení kávy (i když je decaf zaškrtnutý)
+            caffeineDistribution.classList.add('hidden');
+        } else if (selectedType === 'mix') {
+            // Pro mix vždy zobraz blok jen s Espresso a Filtr (bez decaf variant)
+            caffeineDistribution.classList.remove('hidden');
+            mixNoDecafDistribution.classList.remove('hidden');
+            
+            // Reset počítadel
+            mixEspressoCount = Math.floor(maxBags / 2);
+            mixFilterCount = maxBags - mixEspressoCount;
+            updateMixNoDecafDisplay();
+        }
+        
+        // Vždy aktualizuj shrnutí
+        updateSummary();
+    }
+    
+    // Step 2: Typ kávy - kliknutí na kartu
+    document.querySelectorAll('.coffee-type-card').forEach(card => {
+        const btn = card.querySelector('.method-button');
+        const checkbox = card.querySelector('.decaf-checkbox');
+        
+        // Kliknutí na button
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Reset všechny karty
+            document.querySelectorAll('.coffee-type-card').forEach(c => {
+                c.classList.remove('border-2', 'border-primary-500');
+                c.classList.add('border');
+                const b = c.querySelector('.method-button');
+                if (b) {
+                    b.classList.remove('bg-primary-500', 'hover:bg-primary-600', 'active:bg-primary-700');
+                    b.classList.add('bg-gray-800', 'hover:bg-gray-700', 'active:bg-gray-600');
+                    b.textContent = 'Vybrat metodu';
+                }
+            });
+            
+            // Aktivuj vybranou kartu
+            card.classList.remove('border');
+            card.classList.add('border-2', 'border-primary-500');
+            btn.classList.remove('bg-gray-800', 'hover:bg-gray-700', 'active:bg-gray-600');
+            btn.classList.add('bg-primary-500', 'hover:bg-primary-600', 'active:bg-primary-700');
+            btn.textContent = 'Vybráno';
+            
+            selectedType = card.dataset.type;
+            
+            // Zobraz správný layout
+            showDistributionLayout();
+            
+            console.log('Selected type:', selectedType);
+        });
+        
+        // Změna checkboxu - zobraz/skryj rozdělení kávy a přepočítej shrnutí
+        if (checkbox) {
+            checkbox.addEventListener('change', function() {
+                // Pouze pokud je karta vybraná
+                if (card.classList.contains('border-primary-500')) {
+                    showDistributionLayout();
+                    updateSummary(); // Dynamický přepočet
+                }
+            });
+        }
+    });
+    
+    // Funkce pro update Simple distribution (Espresso/Filtr s decaf)
+    function updateSimpleDisplay() {
+        document.getElementById('caffeine-count').textContent = caffeineCount;
+        document.getElementById('decaf-count').textContent = decafCount;
+        
+        const caffeinePlus = document.getElementById('caffeine-plus');
+        const caffeineMinus = document.getElementById('caffeine-minus');
+        const decafPlus = document.getElementById('decaf-plus');
+        const decafMinus = document.getElementById('decaf-minus');
+        
+        caffeineMinus.disabled = caffeineCount <= 0;
+        caffeinePlus.disabled = decafCount <= 0;
+        decafMinus.disabled = decafCount <= 0;
+        decafPlus.disabled = caffeineCount <= 0;
+    }
+    
+    // Event listenery pro Simple distribution
+    document.getElementById('caffeine-plus').addEventListener('click', function() {
+        if (decafCount > 0) {
+            caffeineCount++;
+            decafCount--;
+            updateSimpleDisplay();
+        }
+    });
+    
+    document.getElementById('caffeine-minus').addEventListener('click', function() {
+        if (caffeineCount > 0) {
+            caffeineCount--;
+            decafCount++;
+            updateSimpleDisplay();
+        }
+    });
+    
+    document.getElementById('decaf-plus').addEventListener('click', function() {
+        if (caffeineCount > 0) {
+            decafCount++;
+            caffeineCount--;
+            updateSimpleDisplay();
+        }
+    });
+    
+    document.getElementById('decaf-minus').addEventListener('click', function() {
+        if (decafCount > 0) {
+            decafCount--;
+            caffeineCount++;
+            updateSimpleDisplay();
+        }
+    });
+    
+    // Funkce pro update Mix NO decaf distribution
+    function updateMixNoDecafDisplay() {
+        document.getElementById('mix-espresso-count').textContent = mixEspressoCount;
+        document.getElementById('mix-filter-count').textContent = mixFilterCount;
+        
+        const mixEspressoPlus = document.getElementById('mix-espresso-plus');
+        const mixEspressoMinus = document.getElementById('mix-espresso-minus');
+        const mixFilterPlus = document.getElementById('mix-filter-plus');
+        const mixFilterMinus = document.getElementById('mix-filter-minus');
+        
+        mixEspressoMinus.disabled = mixEspressoCount <= 0;
+        mixEspressoPlus.disabled = mixFilterCount <= 0;
+        mixFilterMinus.disabled = mixFilterCount <= 0;
+        mixFilterPlus.disabled = mixEspressoCount <= 0;
+        
+        // Dynamický přepočet shrnutí
+        updateSummary();
+    }
+    
+    // Event listenery pro Mix NO decaf distribution
+    document.getElementById('mix-espresso-plus').addEventListener('click', function() {
+        if (mixFilterCount > 0) {
+            mixEspressoCount++;
+            mixFilterCount--;
+            updateMixNoDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-espresso-minus').addEventListener('click', function() {
+        if (mixEspressoCount > 0) {
+            mixEspressoCount--;
+            mixFilterCount++;
+            updateMixNoDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-filter-plus').addEventListener('click', function() {
+        if (mixEspressoCount > 0) {
+            mixFilterCount++;
+            mixEspressoCount--;
+            updateMixNoDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-filter-minus').addEventListener('click', function() {
+        if (mixFilterCount > 0) {
+            mixFilterCount--;
+            mixEspressoCount++;
+            updateMixNoDecafDisplay();
+        }
+    });
+    
+    // Funkce pro update Mix WITH decaf distribution
+    function updateMixWithDecafDisplay() {
+        document.getElementById('mix-espresso-caf-count').textContent = mixEspressoCafCount;
+        document.getElementById('mix-espresso-decaf-count').textContent = mixEspressoDecafCount;
+        document.getElementById('mix-filter-caf-count').textContent = mixFilterCafCount;
+        document.getElementById('mix-filter-decaf-count').textContent = mixFilterDecafCount;
+        
+        const total = mixEspressoCafCount + mixEspressoDecafCount + mixFilterCafCount + mixFilterDecafCount;
+        const canIncrease = total < maxBags;
+        const canDecrease = (count) => count > 0;
+        
+        document.getElementById('mix-espresso-caf-plus').disabled = !canIncrease;
+        document.getElementById('mix-espresso-caf-minus').disabled = !canDecrease(mixEspressoCafCount);
+        document.getElementById('mix-espresso-decaf-plus').disabled = !canIncrease;
+        document.getElementById('mix-espresso-decaf-minus').disabled = !canDecrease(mixEspressoDecafCount);
+        document.getElementById('mix-filter-caf-plus').disabled = !canIncrease;
+        document.getElementById('mix-filter-caf-minus').disabled = !canDecrease(mixFilterCafCount);
+        document.getElementById('mix-filter-decaf-plus').disabled = !canIncrease;
+        document.getElementById('mix-filter-decaf-minus').disabled = !canDecrease(mixFilterDecafCount);
+    }
+    
+    // Event listenery pro Mix WITH decaf distribution
+    document.getElementById('mix-espresso-caf-plus').addEventListener('click', function() {
+        const total = mixEspressoCafCount + mixEspressoDecafCount + mixFilterCafCount + mixFilterDecafCount;
+        if (total < maxBags) {
+            mixEspressoCafCount++;
+            updateMixWithDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-espresso-caf-minus').addEventListener('click', function() {
+        if (mixEspressoCafCount > 0) {
+            mixEspressoCafCount--;
+            updateMixWithDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-espresso-decaf-plus').addEventListener('click', function() {
+        const total = mixEspressoCafCount + mixEspressoDecafCount + mixFilterCafCount + mixFilterDecafCount;
+        if (total < maxBags) {
+            mixEspressoDecafCount++;
+            updateMixWithDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-espresso-decaf-minus').addEventListener('click', function() {
+        if (mixEspressoDecafCount > 0) {
+            mixEspressoDecafCount--;
+            updateMixWithDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-filter-caf-plus').addEventListener('click', function() {
+        const total = mixEspressoCafCount + mixEspressoDecafCount + mixFilterCafCount + mixFilterDecafCount;
+        if (total < maxBags) {
+            mixFilterCafCount++;
+            updateMixWithDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-filter-caf-minus').addEventListener('click', function() {
+        if (mixFilterCafCount > 0) {
+            mixFilterCafCount--;
+            updateMixWithDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-filter-decaf-plus').addEventListener('click', function() {
+        const total = mixEspressoCafCount + mixEspressoDecafCount + mixFilterCafCount + mixFilterDecafCount;
+        if (total < maxBags) {
+            mixFilterDecafCount++;
+            updateMixWithDecafDisplay();
+        }
+    });
+    
+    document.getElementById('mix-filter-decaf-minus').addEventListener('click', function() {
+        if (mixFilterDecafCount > 0) {
+            mixFilterDecafCount--;
+            updateMixWithDecafDisplay();
+        }
+    });
+    
+    // Step 3: Frekvence
+    document.querySelectorAll('.frequency-card .frequency-button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const card = this.closest('.frequency-card');
+            
+            // Ulož aktuální scroll pozici
+            const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Reset všechny karty
+            document.querySelectorAll('.frequency-card').forEach(c => {
+                c.classList.remove('border-2', 'border-primary-500');
+                c.classList.add('border');
+                const b = c.querySelector('.frequency-button');
+                if (b) {
+                    b.classList.remove('bg-primary-500', 'hover:bg-primary-600', 'active:bg-primary-700');
+                    b.classList.add('bg-gray-800', 'hover:bg-gray-700', 'active:bg-gray-600');
+                    b.textContent = 'Vybrat frekvenci';
+                }
+            });
+            
+            // Aktivuj vybranou kartu
+            card.classList.remove('border');
+            card.classList.add('border-2', 'border-primary-500');
+            this.classList.remove('bg-gray-800', 'hover:bg-gray-700', 'active:bg-gray-600');
+            this.classList.add('bg-primary-500', 'hover:bg-primary-600', 'active:bg-primary-700');
+            this.textContent = 'Vybráno';
+            
+            selectedFrequency = parseInt(card.dataset.frequency);
+            const frequencyText = card.dataset.frequencyText;
+            
+            // Vrať scroll na původní pozici
+            window.scrollTo(0, scrollPos);
+            
+            updateSummary();
+            
+            console.log('Selected frequency:', selectedFrequency);
+            
+            return false;
+        });
+    });
+    
+    function updateSummary() {
+        // Zkontroluj jestli je decaf zaškrtnutý
+        const card = document.querySelector('.coffee-type-card.border-primary-500');
+        const checkbox = card ? card.querySelector('.decaf-checkbox') : null;
+        const isDecafChecked = checkbox ? checkbox.checked : false;
+        
+        // Aktualizuj shrnutí - zobraz i částečné informace
+        if (selectedAmount) {
+            document.getElementById('summary-amount').textContent = (selectedAmount * 250) + 'g (' + selectedAmount + ' balení)';
+        } else {
+            document.getElementById('summary-amount').textContent = '-';
+        }
+        
+        let typeText = '-';
+        
+        if (selectedType === 'espresso' || selectedType === 'filter') {
+            const typeName = selectedType === 'espresso' ? 'Espresso' : 'Filtr';
+            if (isDecafChecked) {
+                typeText = typeName + ' (vč. 1x decaf)';
+            } else {
+                typeText = typeName;
+            }
+        } else if (selectedType === 'mix') {
+            // Pro mix zobraz rozdělení
+            typeText = 'Kombinace (' + mixEspressoCount + ' espresso, ' + mixFilterCount + ' filtr';
+            if (isDecafChecked) {
+                typeText += ', vč. 1x decaf';
+            }
+            typeText += ')';
+        }
+        document.getElementById('summary-type').textContent = typeText;
+        
+        const freqTexts = {
+            1: 'Každý měsíc',
+            2: 'Jednou za 2 měsíce',
+            3: 'Jednou za 3 měsíce'
+        };
+        document.getElementById('summary-frequency').textContent = freqTexts[selectedFrequency] || '-';
+        
+        // Vypočítej cenu - základní cena + decaf přirážka
+        if (selectedAmount) {
+            let price = pricingData[selectedAmount] || 0;
+            if (isDecafChecked) {
+                price += 100; // Přirážka za decaf
+            }
+            document.getElementById('summary-price').textContent = price.toLocaleString('cs-CZ') + ' Kč';
+        } else {
+            document.getElementById('summary-price').textContent = '-';
+        }
+        
+        // Povol tlačítko pouze pokud jsou všechny kroky dokončeny
+        const configureButton = document.getElementById('configure-subscription');
+        if (selectedAmount && selectedType && selectedFrequency) {
+            configureButton.disabled = false;
+            configureButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+            configureButton.disabled = true;
+            configureButton.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    }
+    
+    // Submit formuláře
+    document.getElementById('configure-subscription').addEventListener('click', function() {
+        if (!selectedAmount || !selectedType || !selectedFrequency) {
+            alert('Prosím dokončete všechny kroky konfigurace.');
+            return;
+        }
+        
+        // Zkontroluj decaf checkbox
+        const card = document.querySelector('.coffee-type-card.border-primary-500');
+        const checkbox = card ? card.querySelector('.decaf-checkbox') : null;
+        const isDecafChecked = checkbox ? checkbox.checked : false;
+        
+        // Vytvoř formulář a odešli data
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("subscriptions.configure.checkout") }}';
+        
+        // CSRF token
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
+        
+        // Data
+        const amountInput = document.createElement('input');
+        amountInput.type = 'hidden';
+        amountInput.name = 'amount';
+        amountInput.value = selectedAmount;
+        form.appendChild(amountInput);
+        
+        const typeInput = document.createElement('input');
+        typeInput.type = 'hidden';
+        typeInput.name = 'type';
+        typeInput.value = selectedType;
+        form.appendChild(typeInput);
+        
+        // Decaf flag (0 nebo 1)
+        const decafInput = document.createElement('input');
+        decafInput.type = 'hidden';
+        decafInput.name = 'decaf';
+        decafInput.value = isDecafChecked ? 1 : 0;
+        form.appendChild(decafInput);
+        
+        // Pro kombinaci pošli i espresso/filter counts
+        if (selectedType === 'mix') {
+            const espressoInput = document.createElement('input');
+            espressoInput.type = 'hidden';
+            espressoInput.name = 'mix_espresso';
+            espressoInput.value = mixEspressoCount;
+            form.appendChild(espressoInput);
+            
+            const filterInput = document.createElement('input');
+            filterInput.type = 'hidden';
+            filterInput.name = 'mix_filter';
+            filterInput.value = mixFilterCount;
+            form.appendChild(filterInput);
+        }
+        
+        const frequencyInput = document.createElement('input');
+        frequencyInput.type = 'hidden';
+        frequencyInput.name = 'frequency';
+        frequencyInput.value = selectedFrequency;
+        form.appendChild(frequencyInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    });
+});
+</script>
 @endsection

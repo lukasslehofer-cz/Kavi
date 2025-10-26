@@ -178,7 +178,7 @@
       <!-- plan - end -->
 
       <!-- plan - start -->
-      <div class="relative flex flex-col rounded-lg border-2 border-primary-500 p-4 pt-6">
+      <div class="relative flex flex-col rounded-lg border-2 p-4 pt-6">
         <div class="mb-12">
           <div class="absolute inset-x-0 -top-3 flex justify-center">
             <span class="flex h-6 items-center justify-center rounded-full bg-primary-500 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white">nejoblíbenější</span>
@@ -247,7 +247,7 @@
             <span class="text-gray-500">Kč/box</span>
           </div>
 
-          <a href="{{ route('subscriptions.index') }}" class="block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Vybrat plán</a>
+          <a href="{{ route('subscriptions.index') }}" class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Vybrat plán</a>
         </div>
       </div>
       <!-- plan - end -->
