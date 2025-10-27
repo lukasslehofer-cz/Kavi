@@ -58,9 +58,7 @@ function initSubscriptionConfigurator() {
         isDecaf: false,
         mix: {
             espresso: 0,
-            espressoDecaf: 0,
-            filter: 0,
-            filterDecaf: 0
+            filter: 0
         },
         frequency: null,
         frequencyText: null
@@ -168,7 +166,7 @@ function initSubscriptionConfigurator() {
             
             // Reset decaf state
             config.isDecaf = false;
-            config.mix = { espresso: 0, espressoDecaf: 0, filter: 0, filterDecaf: 0 };
+            config.mix = { espresso: 0, filter: 0 };
             if (decafCheckbox) decafCheckbox.checked = false;
             if (decafSliderContainer) decafSliderContainer.classList.add('hidden');
             
@@ -237,52 +235,40 @@ function initSubscriptionConfigurator() {
         // Update config - mark as decaf if any decaf selected
         config.isDecaf = decafCount > 0;
         
-        // Store in config
+        // Store in config - always use the main type fields
+        // The +100 CZK decaf surcharge is handled on the backend
         if (config.type === 'espresso') {
             config.mix.espresso = normalCount;
-            config.mix.espressoDecaf = decafCount;
         } else if (config.type === 'filter') {
             config.mix.filter = normalCount;
-            config.mix.filterDecaf = decafCount;
         }
     }
 
     // Mix sliders
     const espressoSlider = document.getElementById('espresso-slider');
-    const espressoDecafSlider = document.getElementById('espresso-decaf-slider');
     const filterSlider = document.getElementById('filter-slider');
-    const filterDecafSlider = document.getElementById('filter-decaf-slider');
 
     function updateSliderMaxValues() {
         const maxAmount = config.amount || 4;
         if (espressoSlider) espressoSlider.max = maxAmount;
-        if (espressoDecafSlider) espressoDecafSlider.max = maxAmount;
         if (filterSlider) filterSlider.max = maxAmount;
-        if (filterDecafSlider) filterDecafSlider.max = maxAmount;
         const reqBagsDisplay = document.getElementById('required-bags-display');
         if (reqBagsDisplay) reqBagsDisplay.textContent = maxAmount;
     }
 
     function updateMixDisplay() {
         config.mix.espresso = parseInt(espressoSlider?.value || 0);
-        config.mix.espressoDecaf = parseInt(espressoDecafSlider?.value || 0);
         config.mix.filter = parseInt(filterSlider?.value || 0);
-        config.mix.filterDecaf = parseInt(filterDecafSlider?.value || 0);
 
-        const total = config.mix.espresso + config.mix.espressoDecaf + 
-                     config.mix.filter + config.mix.filterDecaf;
+        const total = config.mix.espresso + config.mix.filter;
 
         // Update counts
         const espressoCount = document.getElementById('espresso-count');
-        const espressoDecafCount = document.getElementById('espresso-decaf-count');
         const filterCount = document.getElementById('filter-count');
-        const filterDecafCount = document.getElementById('filter-decaf-count');
         const totalBags = document.getElementById('total-bags');
         
         if (espressoCount) espressoCount.textContent = config.mix.espresso;
-        if (espressoDecafCount) espressoDecafCount.textContent = config.mix.espressoDecaf;
         if (filterCount) filterCount.textContent = config.mix.filter;
-        if (filterDecafCount) filterDecafCount.textContent = config.mix.filterDecaf;
         if (totalBags) totalBags.textContent = total;
 
         // Update progress bar
@@ -323,9 +309,9 @@ function initSubscriptionConfigurator() {
 
     if (espressoSlider) {
         espressoSlider.addEventListener('input', updateMixDisplay);
-        espressoDecafSlider?.addEventListener('input', updateMixDisplay);
+    }
+    if (filterSlider) {
         filterSlider.addEventListener('input', updateMixDisplay);
-        filterDecafSlider?.addEventListener('input', updateMixDisplay);
     }
 
     // Step navigation buttons
@@ -381,62 +367,18 @@ function initSubscriptionConfigurator() {
         const summaryMixDetails = document.getElementById('summary-mix-details');
         
         if (config.type === 'espresso') {
-            if (config.isDecaf) {
-                // Has decaf mix
-                const normalCount = config.mix.espresso || 0;
-                const decafCount = config.mix.espressoDecaf || 0;
-                
-                if (normalCount > 0 && decafCount > 0) {
-                    typeText = 'Espresso + Decaf';
-                    summaryMix.classList.remove('hidden');
-                    summaryMixDetails.innerHTML = `
-                        <div class="flex items-center py-1"><span class="text-primary-500 mr-2">•</span>${normalCount}× Espresso</div>
-                        <div class="flex items-center py-1"><span class="text-primary-500 mr-2">•</span>${decafCount}× Espresso Decaf</div>
-                    `;
-                } else if (decafCount > 0) {
-                    typeText = 'Espresso Decaf 🌙';
-                    summaryMix.classList.add('hidden');
-                } else {
-                    typeText = 'Espresso';
-                    summaryMix.classList.add('hidden');
-                }
-            } else {
-                typeText = 'Espresso';
-                summaryMix.classList.add('hidden');
-            }
+            typeText = config.isDecaf ? 'Espresso (vč. 1× decaf)' : 'Espresso';
+            summaryMix.classList.add('hidden');
         } else if (config.type === 'filter') {
-            if (config.isDecaf) {
-                // Has decaf mix
-                const normalCount = config.mix.filter || 0;
-                const decafCount = config.mix.filterDecaf || 0;
-                
-                if (normalCount > 0 && decafCount > 0) {
-                    typeText = 'Filter + Decaf';
-                    summaryMix.classList.remove('hidden');
-                    summaryMixDetails.innerHTML = `
-                        <div class="flex items-center py-1"><span class="text-primary-500 mr-2">•</span>${normalCount}× Filter</div>
-                        <div class="flex items-center py-1"><span class="text-primary-500 mr-2">•</span>${decafCount}× Filter Decaf</div>
-                    `;
-                } else if (decafCount > 0) {
-                    typeText = 'Filter Decaf 🌙';
-                    summaryMix.classList.add('hidden');
-                } else {
-                    typeText = 'Filter';
-                    summaryMix.classList.add('hidden');
-                }
-            } else {
-                typeText = 'Filter';
-                summaryMix.classList.add('hidden');
-            }
+            typeText = config.isDecaf ? 'Filtr (vč. 1× decaf)' : 'Filtr';
+            summaryMix.classList.add('hidden');
         } else if (config.type === 'mix') {
-            typeText = 'Kombinace';
+            typeText = config.isDecaf ? 'Kombinace (vč. 1× decaf)' : 'Kombinace';
             summaryMix.classList.remove('hidden');
             
             const mixParts = [];
             if (config.mix.espresso > 0) mixParts.push(`${config.mix.espresso}× Espresso`);
-            if (config.mix.espressoDecaf > 0) mixParts.push(`${config.mix.espressoDecaf}× Espresso Decaf`);
-            if (config.mix.filter > 0) mixParts.push(`${config.mix.filter}× Filter`);
-            if (config.mix.filterDecaf > 0) mixParts.push(`${config.mix.filterDecaf}× Filter Decaf`);
+            if (config.mix.filter > 0) mixParts.push(`${config.mix.filter}× Filtr`);
             
             summaryMixDetails.innerHTML = mixParts.map(part => 
                 `<div class="flex items-center py-1"><span class="text-primary-500 mr-2">•</span>${part}</div>`

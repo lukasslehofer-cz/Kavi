@@ -117,9 +117,16 @@
                             </div>
                             <?php endif; ?>
 
-                            <?php if(isset($config['mix']) && ($config['type'] === 'mix' || $config['isDecaf'])): ?>
+                            <?php if(isset($config['isDecaf']) && $config['isDecaf']): ?>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Decaf varianta:</span>
+                                <span class="font-medium text-blue-600">Ano (+100 Kč)</span>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if(isset($config['mix']) && $config['type'] === 'mix'): ?>
                             <div class="pt-2 border-t">
-                                <span class="text-gray-600 block mb-2">Rozložení:</span>
+                                <span class="text-gray-600 block mb-2">Rozložení mixu:</span>
                                 <div class="space-y-1 ml-2">
                                     <?php if(isset($config['mix']['espresso']) && $config['mix']['espresso'] > 0): ?>
                                     <div class="flex items-center text-gray-700">
@@ -127,22 +134,10 @@
                                         <span><?php echo e($config['mix']['espresso']); ?>× Espresso</span>
                                     </div>
                                     <?php endif; ?>
-                                    <?php if(isset($config['mix']['espressoDecaf']) && $config['mix']['espressoDecaf'] > 0): ?>
-                                    <div class="flex items-center text-gray-700">
-                                        <span class="text-blue-500 mr-2">•</span>
-                                        <span><?php echo e($config['mix']['espressoDecaf']); ?>× Espresso Decaf</span>
-                                    </div>
-                                    <?php endif; ?>
                                     <?php if(isset($config['mix']['filter']) && $config['mix']['filter'] > 0): ?>
                                     <div class="flex items-center text-gray-700">
                                         <span class="text-blue-500 mr-2">•</span>
-                                        <span><?php echo e($config['mix']['filter']); ?>× Filter</span>
-                                    </div>
-                                    <?php endif; ?>
-                                    <?php if(isset($config['mix']['filterDecaf']) && $config['mix']['filterDecaf'] > 0): ?>
-                                    <div class="flex items-center text-gray-700">
-                                        <span class="text-blue-500 mr-2">•</span>
-                                        <span><?php echo e($config['mix']['filterDecaf']); ?>× Filter Decaf</span>
+                                        <span><?php echo e($config['mix']['filter']); ?>× Filtr</span>
                                     </div>
                                     <?php endif; ?>
                                 </div>

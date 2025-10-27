@@ -347,12 +347,21 @@ unset($__errorArgs, $__bag); ?>
             <div class="card p-8 sticky top-24">
                 <h3 class="font-display text-2xl font-bold text-dark-800 mb-6">Souhrn předplatného</h3>
                 
+                <?php
+                $frequencyTexts = [
+                    1 => 'Každý měsíc',
+                    2 => 'Jednou za 2 měsíce',
+                    3 => 'Jednou za 3 měsíce'
+                ];
+                $frequencyText = $frequencyTexts[$configuration['frequency']] ?? '';
+                ?>
+                
                 <!-- Subscription Details -->
                 <div class="bg-bluegray-50  p-6 mb-6">
                     <div class="space-y-4 text-sm">
                         <div class="flex justify-between items-start">
                             <span class="text-dark-600 font-medium">Množství:</span>
-                            <span class="font-bold text-right"><?php echo e($configuration['amount']); ?> balení<br><span class="text-xs font-normal text-dark-500">(<?php echo e($configuration['cups']); ?> šálky/den)</span></span>
+                            <span class="font-bold text-right"><?php echo e($configuration['amount']); ?> balení (<?php echo e($configuration['amount'] * 250); ?>g)</span>
                         </div>
                         
                         <div class="border-t border-bluegray-200 pt-4">
@@ -360,37 +369,16 @@ unset($__errorArgs, $__bag); ?>
                                 <span class="text-dark-600 font-medium">Typ kávy:</span>
                                 <span class="font-bold text-right">
                                     <?php if($configuration['type'] === 'espresso'): ?>
-                                        <?php if($configuration['isDecaf'] && isset($configuration['mix']['espressoDecaf']) && $configuration['mix']['espressoDecaf'] > 0): ?>
-                                            Espresso + Decaf
-                                        <?php else: ?>
-                                            Espresso
-                                        <?php endif; ?>
+                                        Espresso <?php if($configuration['isDecaf']): ?>(vč. 1× decaf)<?php endif; ?>
                                     <?php elseif($configuration['type'] === 'filter'): ?>
-                                        <?php if($configuration['isDecaf'] && isset($configuration['mix']['filterDecaf']) && $configuration['mix']['filterDecaf'] > 0): ?>
-                                            Filter + Decaf
-                                        <?php else: ?>
-                                            Filter
-                                        <?php endif; ?>
+                                        Filtr <?php if($configuration['isDecaf']): ?>(vč. 1× decaf)<?php endif; ?>
                                     <?php else: ?>
-                                        Kombinace
+                                        Kombinace <?php if($configuration['isDecaf']): ?>(vč. 1× decaf)<?php endif; ?>
                                     <?php endif; ?>
                                 </span>
                             </div>
                             
-                            <?php
-                                $showMixDetails = false;
-                                if ($configuration['type'] === 'mix') {
-                                    $showMixDetails = true;
-                                } elseif ($configuration['type'] === 'espresso' && $configuration['isDecaf']) {
-                                    $showMixDetails = isset($configuration['mix']['espresso']) && $configuration['mix']['espresso'] > 0 && 
-                                                     isset($configuration['mix']['espressoDecaf']) && $configuration['mix']['espressoDecaf'] > 0;
-                                } elseif ($configuration['type'] === 'filter' && $configuration['isDecaf']) {
-                                    $showMixDetails = isset($configuration['mix']['filter']) && $configuration['mix']['filter'] > 0 && 
-                                                     isset($configuration['mix']['filterDecaf']) && $configuration['mix']['filterDecaf'] > 0;
-                                }
-                            ?>
-                            
-                            <?php if($showMixDetails): ?>
+                            <?php if($configuration['type'] === 'mix'): ?>
                             <div class="mt-2 pl-4 space-y-1 text-xs text-dark-600">
                                 <?php if(isset($configuration['mix']['espresso']) && $configuration['mix']['espresso'] > 0): ?>
                                 <div class="flex items-center">
@@ -398,22 +386,10 @@ unset($__errorArgs, $__bag); ?>
                                     <?php echo e($configuration['mix']['espresso']); ?>× Espresso
                                 </div>
                                 <?php endif; ?>
-                                <?php if(isset($configuration['mix']['espressoDecaf']) && $configuration['mix']['espressoDecaf'] > 0): ?>
-                                <div class="flex items-center">
-                                    <span class="text-primary-500 mr-2">•</span>
-                                    <?php echo e($configuration['mix']['espressoDecaf']); ?>× Espresso Decaf
-                                </div>
-                                <?php endif; ?>
                                 <?php if(isset($configuration['mix']['filter']) && $configuration['mix']['filter'] > 0): ?>
                                 <div class="flex items-center">
                                     <span class="text-primary-500 mr-2">•</span>
-                                    <?php echo e($configuration['mix']['filter']); ?>× Filter
-                                </div>
-                                <?php endif; ?>
-                                <?php if(isset($configuration['mix']['filterDecaf']) && $configuration['mix']['filterDecaf'] > 0): ?>
-                                <div class="flex items-center">
-                                    <span class="text-primary-500 mr-2">•</span>
-                                    <?php echo e($configuration['mix']['filterDecaf']); ?>× Filter Decaf
+                                    <?php echo e($configuration['mix']['filter']); ?>× Filtr
                                 </div>
                                 <?php endif; ?>
                             </div>
@@ -422,7 +398,7 @@ unset($__errorArgs, $__bag); ?>
                         
                         <div class="flex justify-between items-center border-t border-bluegray-200 pt-4">
                             <span class="text-dark-600 font-medium">Frekvence:</span>
-                            <span class="font-bold"><?php echo e($configuration['frequencyText']); ?></span>
+                            <span class="font-bold"><?php echo e($frequencyText); ?></span>
                         </div>
                     </div>
                 </div>
@@ -472,7 +448,7 @@ unset($__errorArgs, $__bag); ?>
                                 <?php echo e(number_format($price, 0, ',', ' ')); ?> Kč
                             </dd>
                         </div>
-                        <p class="text-xs text-dark-600 text-right mt-1"><?php echo e($configuration['frequencyText']); ?></p>
+                        <p class="text-xs text-dark-600 text-right mt-1"><?php echo e($frequencyText); ?></p>
                     </div>
                 </dl>
 

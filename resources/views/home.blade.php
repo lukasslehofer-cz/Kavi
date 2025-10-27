@@ -6,34 +6,33 @@
 
 <!-- Hero Section - E-shop Style -->
 <div class="bg-white">
-    <section class="mx-auto max-w-screen-xl px-4 md:px-8">
-        <div class="mb-8 flex flex-wrap justify-between md:mb-16">
-            <div class="mb-6 flex w-full flex-col justify-center sm:mb-12 lg:mb-0 lg:w-1/3 lg:pb-24 lg:pt-48">
-                <h1 class="mb-4 text-4xl font-bold text-black sm:text-5xl md:mb-8 md:text-6xl">Prémiová káva<br />přímo k vám</h1>
 
-                <p class="max-w-md leading-relaxed text-gray-500 xl:text-lg mb-8">Objevte novou vynikající kávu každý měsíc. Praženo maximálně 7 dní před expedicí. Bez závazků, zrušte kdykoliv.</p>
+    <div class="mx-auto max-w-screen-2xl px-4 md:px-8">
 
-                <div class="flex flex-col gap-2.5 sm:flex-row sm:justify-center lg:justify-start">
-                    <a href="{{ route('subscriptions.index') }}" class="inline-block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base">Začít předplatné</a>
+    <section class="min-h-96 relative flex flex-1 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100 py-16 shadow-lg md:py-20 xl:py-48">
+      <!-- image - start -->
+      <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1961" loading="lazy" alt="Photo by Fakurian Design" class="absolute inset-0 h-full w-full object-cover object-center" />
+      <!-- image - end -->
 
-                    <a href="{{ route('products.index') }}" class="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-primary-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base">Prozkoumat obchod</a>
-                </div>
-            </div>
+      <!-- overlay - start -->
+      <div class="absolute inset-0 bg-primary-200 mix-blend-multiply"></div>
+      <!-- overlay - end -->
 
-            <div class="mb-12 flex w-full md:mb-16 lg:w-2/3">
-                <div class="relative left-12 top-12 z-10 -ml-12 overflow-hidden rounded-lg bg-gray-100 shadow-lg md:left-16 md:top-16 lg:ml-0">
-                    <img src="https://images.unsplash.com/photo-1733860442875-aa8c87757b3a?auto=format&q=75&fit=crop&w=550&h=550" loading="lazy" alt="Kávová zrna" class="h-full w-full object-cover object-center" />
-                </div>
+      <!-- text start -->
+      <div class="relative flex flex-col items-center p-4 sm:max-w-xl">
+        <p class="mb-4 text-center text-lg text-indigo-200 sm:text-xl md:mb-8">Doručíme pravidelně k vám domů</p>
+        <h1 class="mb-8 text-center text-4xl font-bold text-white sm:text-5xl md:mb-12 md:text-6xl">Objevte tu nejlepší kávu z celé Evropy</h1>
 
-                <div class="overflow-hidden rounded-lg bg-gray-100 shadow-lg">
-                    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&q=75&fit=crop&w=550&h=550" loading="lazy" alt="Šálek kávy" class="h-full w-full object-cover object-center" />
-                </div>
-            </div>
-            
+        <div class="flex w-full flex-col gap-2.5 sm:flex-row sm:justify-center">
+          <a href="{{ route('subscriptions.index') }}" class="inline-block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-indigo-300 transition duration-100 hover:bg-indigo-600 focus-visible:ring active:bg-indigo-700 md:text-base">Sestavte si vlastní box</a>
+
+          <a href="{{ route('products.index') }}" class="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base">Jak to funguje?</a>
         </div>
-
-        
+      </div>
+      <!-- text end -->
     </section>
+    </div>
+
 </div>
 
 <!-- Features Section -->
@@ -50,7 +49,6 @@
 
         <h3 class="mb-2 text-center text-lg font-semibold md:text-xl">Čerstvá káva</h3>
         <p class="mb-2 text-center text-gray-500">Praženo na objednávku, maximálně 7 dní před expedicí. Vždy čerstvá, vždy výjimečná.</p>
-        <a href="{{ route('subscriptions.index') }}" class="font-bold text-primary-500 transition duration-100 hover:text-primary-600 active:text-primary-700">Zjistit více</a>
       </div>
       <!-- feature - end -->
 
@@ -63,8 +61,7 @@
         </div>
 
         <h3 class="mb-2 text-center text-lg font-semibold md:text-xl">Prémiová kvalita</h3>
-        <p class="mb-2 text-center text-gray-500">100% Arabica z ověřených plantáží. Každá šarže kávy prochází pečlivou kontrolou kvality.</p>
-        <a href="{{ route('products.index') }}" class="font-bold text-primary-500 transition duration-100 hover:text-primary-600 active:text-primary-700">Prozkoumat</a>
+        <p class="mb-2 text-center text-gray-500">100% Arabica z ověřených plantáží. Každá šarže kávy prochází pečlivou kontrolou kvality.</p>        
       </div>
       <!-- feature - end -->
 
@@ -78,7 +75,6 @@
 
         <h3 class="mb-2 text-center text-lg font-semibold md:text-xl">Doprava zdarma</h3>
         <p class="mb-2 text-center text-gray-500">Doprava zdarma při objednávce nad 1000 Kč. Káva dorazí přímo k vašim dveřím.</p>
-        <a href="#" class="font-bold text-primary-500 transition duration-100 hover:text-primary-600 active:text-primary-700">Více info</a>
       </div>
       <!-- feature - end -->
     </div>

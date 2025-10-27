@@ -116,9 +116,16 @@
                             </div>
                             @endif
 
-                            @if(isset($config['mix']) && ($config['type'] === 'mix' || $config['isDecaf']))
+                            @if(isset($config['isDecaf']) && $config['isDecaf'])
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Decaf varianta:</span>
+                                <span class="font-medium text-blue-600">Ano (+100 Kč)</span>
+                            </div>
+                            @endif
+
+                            @if(isset($config['mix']) && $config['type'] === 'mix')
                             <div class="pt-2 border-t">
-                                <span class="text-gray-600 block mb-2">Rozložení:</span>
+                                <span class="text-gray-600 block mb-2">Rozložení mixu:</span>
                                 <div class="space-y-1 ml-2">
                                     @if(isset($config['mix']['espresso']) && $config['mix']['espresso'] > 0)
                                     <div class="flex items-center text-gray-700">
@@ -126,22 +133,10 @@
                                         <span>{{ $config['mix']['espresso'] }}× Espresso</span>
                                     </div>
                                     @endif
-                                    @if(isset($config['mix']['espressoDecaf']) && $config['mix']['espressoDecaf'] > 0)
-                                    <div class="flex items-center text-gray-700">
-                                        <span class="text-blue-500 mr-2">•</span>
-                                        <span>{{ $config['mix']['espressoDecaf'] }}× Espresso Decaf</span>
-                                    </div>
-                                    @endif
                                     @if(isset($config['mix']['filter']) && $config['mix']['filter'] > 0)
                                     <div class="flex items-center text-gray-700">
                                         <span class="text-blue-500 mr-2">•</span>
-                                        <span>{{ $config['mix']['filter'] }}× Filter</span>
-                                    </div>
-                                    @endif
-                                    @if(isset($config['mix']['filterDecaf']) && $config['mix']['filterDecaf'] > 0)
-                                    <div class="flex items-center text-gray-700">
-                                        <span class="text-blue-500 mr-2">•</span>
-                                        <span>{{ $config['mix']['filterDecaf'] }}× Filter Decaf</span>
+                                        <span>{{ $config['mix']['filter'] }}× Filtr</span>
                                     </div>
                                     @endif
                                 </div>

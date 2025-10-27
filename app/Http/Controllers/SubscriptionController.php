@@ -68,25 +68,26 @@ class SubscriptionController extends Controller
     public function configureCheckout(Request $request)
     {
         // Log incoming data for debugging
-        logger()->info('Subscription configurator data received:', $request->all());
+        logger()->info('=== FORMULÁŘ ODESLÁN ===');
+        logger()->info('URL: ' . $request->fullUrl());
+        logger()->info('Method: ' . $request->method());
+        logger()->info('Raw POST data:', $request->all());
+        logger()->info('Headers:', $request->headers->all());
+        logger()->info('Cookies:', $request->cookies->all());
         
         try {
             $validated = $request->validate([
                 'amount' => 'required|integer|between:2,4',
-                'cups' => 'required|string',
                 'type' => 'required|in:espresso,filter,mix',
-                'isDecaf' => 'nullable|in:0,1,true,false',  // Accept string "0"/"1" or boolean
+                'isDecaf' => 'nullable|in:0,1',  // 0 = ne, 1 = ano
                 'mix' => 'nullable|array',
                 'mix.espresso' => 'nullable|integer|min:0',
-                'mix.espressoDecaf' => 'nullable|integer|min:0',
                 'mix.filter' => 'nullable|integer|min:0',
-                'mix.filterDecaf' => 'nullable|integer|min:0',
                 'frequency' => 'required|integer|in:1,2,3',
-                'frequencyText' => 'required|string',
             ]);
             
             // Convert isDecaf to boolean
-            $validated['isDecaf'] = in_array($validated['isDecaf'] ?? '0', ['1', 1, true, 'true'], true);
+            $validated['isDecaf'] = ($validated['isDecaf'] ?? '0') === '1';
             
             logger()->info('Validation passed successfully', ['validated' => $validated]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -104,11 +105,9 @@ class SubscriptionController extends Controller
         // Validate mix total if type is mix
         if ($validated['type'] === 'mix') {
             $mixTotal = ($validated['mix']['espresso'] ?? 0) + 
-                       ($validated['mix']['espressoDecaf'] ?? 0) +
-                       ($validated['mix']['filter'] ?? 0) +
-                       ($validated['mix']['filterDecaf'] ?? 0);
+                       ($validated['mix']['filter'] ?? 0);
             
-            if ($mixTotal !== $validated['amount']) {
+            if ($mixTotal != $validated['amount']) {
                 return back()->withErrors(['mix' => 'Celkový počet balení v mixu musí být ' . $validated['amount']]);
             }
         }
@@ -116,6 +115,11 @@ class SubscriptionController extends Controller
         // Calculate price based on amount (tiered pricing)
         $pricingKey = 'price_' . $validated['amount'] . '_bags';
         $totalPriceWithVat = SubscriptionConfig::get($pricingKey, 500); // Default to 500 if not found
+        
+        // Add decaf surcharge if selected
+        if ($validated['isDecaf']) {
+            $totalPriceWithVat += 100; // +100 Kč za decaf variantu
+        }
         
         // Calculate VAT (all prices include 21% VAT)
         $priceWithoutVat = round($totalPriceWithVat / 1.21, 2);

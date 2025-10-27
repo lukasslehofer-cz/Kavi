@@ -24,7 +24,7 @@
     <!-- Banner - end -->
 
     <!-- Navigation - E-shop Header -->
-    <header class="bg-white sticky top-0 z-50 border-b mb-12">
+    <header class="bg-white sticky top-0 z-50 border-b mb-8">
         <div class="mx-auto flex max-w-screen-xl items-center justify-between px-4 md:px-8">
             <!-- logo - start -->
             <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5 text-2xl font-bold text-black md:text-3xl" aria-label="logo">

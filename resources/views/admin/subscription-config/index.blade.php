@@ -1,50 +1,28 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Nastavení konfiguratoru - Admin')
+@section('title', 'Nastavení konfiguratoru')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="p-6">
+    <!-- Header -->
     <div class="mb-8">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="font-display text-4xl font-bold text-dark-800 mb-2">Nastavení konfiguratoru předplatného</h1>
-                <p class="text-dark-600">Upravte parametry pro konfigurátor kávového předplatného</p>
-            </div>
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline">
-                ← Zpět na dashboard
-            </a>
-        </div>
+        <h1 class="text-3xl font-bold text-gray-900">Nastavení konfiguratoru předplatného</h1>
+        <p class="text-gray-600 mt-1">Upravte parametry pro konfigurátor kávového předplatného</p>
     </div>
 
-    @if(session('success'))
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6">
-        {{ session('success') }}
-    </div>
-    @endif
-
-    @if($errors->any())
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
-        <ul class="list-disc list-inside">
-            @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-
-    <div class="card p-8">
+    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
         <form action="{{ route('admin.subscription-config.update') }}" method="POST">
             @csrf
             
             <div class="space-y-8">
                 @foreach($configs as $index => $config)
-                <div class="border-b pb-6 last:border-b-0">
-                    <label class="block text-lg font-bold text-dark-800 mb-2">
+                <div class="border-b pb-6 last:border-b-0 border-gray-200">
+                    <label class="block text-lg font-bold text-gray-900 mb-2">
                         {{ $config->label }}
                     </label>
                     
                     @if($config->description)
-                    <p class="text-sm text-dark-600 mb-4">{{ $config->description }}</p>
+                    <p class="text-sm text-gray-600 mb-4">{{ $config->description }}</p>
                     @endif
                     
                     <div class="flex items-center space-x-4">
@@ -55,9 +33,9 @@
                                 name="configs[{{ $index }}][value]" 
                                 value="1"
                                 {{ $config->value ? 'checked' : '' }}
-                                class="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                                class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             >
-                            <span class="ml-3 text-dark-700">Zapnuto</span>
+                            <span class="ml-3 text-gray-700 font-medium">Zapnuto</span>
                         </label>
                         @elseif($config->type === 'decimal')
                         <div class="relative flex-1 max-w-xs">
@@ -67,9 +45,9 @@
                                 name="configs[{{ $index }}][value]" 
                                 value="{{ $config->value }}"
                                 required
-                                class="input pr-12"
+                                class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
-                            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-dark-600">
+                            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">
                                 Kč
                             </span>
                         </div>
@@ -79,7 +57,7 @@
                             name="configs[{{ $index }}][value]" 
                             value="{{ $config->value }}"
                             required
-                            class="input max-w-xs"
+                            class="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                         @else
                         <input 
@@ -87,14 +65,14 @@
                             name="configs[{{ $index }}][value]" 
                             value="{{ $config->value }}"
                             required
-                            class="input max-w-md"
+                            class="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                         @endif
                         
                         <input type="hidden" name="configs[{{ $index }}][key]" value="{{ $config->key }}">
                         
-                        <div class="text-sm text-dark-500">
-                            Typ: <code class="bg-bluegray-100 px-2 py-1 rounded">{{ $config->type }}</code>
+                        <div class="text-sm text-gray-500">
+                            Typ: <code class="bg-gray-100 px-2 py-1 rounded text-xs font-mono">{{ $config->type }}</code>
                         </div>
                     </div>
                 </div>
@@ -102,14 +80,14 @@
             </div>
             
             <div class="mt-8 flex items-center justify-between">
-                <p class="text-sm text-dark-600">
-                    <svg class="w-5 h-5 inline mr-1 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
+                <p class="flex items-center gap-2 text-sm text-gray-600">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                     </svg>
                     Změny se projeví okamžitě na frontendovém konfiguratoru.
                 </p>
                 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
                     Uložit změny
                 </button>
             </div>
@@ -117,9 +95,14 @@
     </div>
 
     <!-- Info Panel -->
-    <div class="mt-8 card p-6 bg-bluegray-50">
-        <h3 class="font-bold text-lg text-dark-800 mb-4">ℹ️ Informace o nastavení</h3>
-        <div class="space-y-3 text-sm text-dark-700">
+    <div class="mt-8 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+        <h3 class="flex items-center gap-2 font-bold text-lg text-gray-900 mb-4">
+            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            Informace o nastavení
+        </h3>
+        <div class="space-y-3 text-sm text-gray-700">
             <p>
                 <strong>Cena za balení:</strong> Základní cena, kterou zákazník zaplatí za jedno balení kávy. 
                 Celková cena se vypočítá jako: počet balení × cena za balení.
@@ -127,11 +110,13 @@
             <p>
                 <strong>Minimální/maximální počet balení:</strong> Tyto hodnoty určují rozsah posuvníků v konfiguratoru.
             </p>
-            <p class="text-primary-600">
-                💡 <strong>Tip:</strong> Po změně ceny doporučujeme otestovat konfigurátor na frontendové stránce.
+            <p class="flex items-center gap-2 text-blue-700 font-medium bg-white p-3 rounded-lg">
+                <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <strong>Tip:</strong> Po změně ceny doporučujeme otestovat konfigurátor na frontendové stránce.
             </p>
         </div>
     </div>
 </div>
 @endsection
-
