@@ -2,12 +2,12 @@
 
 <?php $__env->startSection('content'); ?>
 <!-- Hero Header Section -->
-<div class="relative bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 py-16 md:py-20 lg:py-24 overflow-hidden">
+<div class="relative bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 py-16 md:py-20 overflow-hidden">
   <!-- Background Decoration -->
   <div class="absolute inset-0 overflow-hidden">
-    <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-gradient-to-tr from-gray-300/15 to-slate-300/15 rounded-full blur-3xl"></div>
-  </div>
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-[36rem] h-[36rem] bg-gradient-to-tr from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
+    </div>
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="text-center max-w-4xl mx-auto">

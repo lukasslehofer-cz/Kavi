@@ -6,8 +6,8 @@
 <div class="relative bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 overflow-hidden">
     <!-- Animated Background Elements -->
     <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary-400/10 to-pink-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-gray-400/20 to-slate-400/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-[36rem] h-[36rem] bg-gradient-to-tr from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
     </div>
 
     <div class="relative mx-auto max-w-screen-2xl px-4 md:px-8 py-16 md:py-24 lg:py-32">
@@ -866,10 +866,29 @@
 
         <div class="space-y-2">
           <a href="<?php echo e(route('products.show', $product)); ?>" class="block">
-            <h3 class="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors"><?php echo e($product->name); ?></h3>
+            <h3 class="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors mb-1"><?php echo e($product->name); ?></h3>
           </a>
+          
+          <!-- Roaster/Manufacturer -->
+          <?php if(!empty($product->attributes['roaster'])): ?>
+          <p class="text-sm text-gray-500 font-medium flex items-center gap-1">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <?php echo e($product->attributes['roaster']); ?>
 
-          <div class="flex items-baseline gap-2">
+          </p>
+          <?php elseif(!empty($product->attributes['manufacturer'])): ?>
+          <p class="text-sm text-gray-500 font-medium flex items-center gap-1">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+            <?php echo e($product->attributes['manufacturer']); ?>
+
+          </p>
+          <?php endif; ?>
+
+          <div class="flex items-baseline gap-2 pt-1">
             <span class="text-2xl font-black text-gray-900"><?php echo e(number_format($product->price, 0, ',', ' ')); ?> Kč</span>
             <?php if($product->original_price ?? false): ?>
             <span class="text-sm text-gray-500 line-through"><?php echo e(number_format($product->original_price, 0, ',', ' ')); ?> Kč</span>
