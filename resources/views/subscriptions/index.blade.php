@@ -3,13 +3,61 @@
 @section('title', 'Kávové předplatné - Kavi Coffee')
 
 @section('content')
-<!-- Main Header -->
-<div class="bg-white pb-6 sm:pb-8 lg:pb-12">
-  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
-    <div class="mb-10 md:mb-16 text-center">
-      <h2 class="mb-4 text-2xl font-bold text-gray-800 md:mb-6 lg:text-4xl">Sestavte si své kávové předplatné</h2>
-      <p class="mx-auto max-w-screen-md text-gray-500 md:text-lg">Vyberte si množství, typ kávy a frekvenci dodání. Jednoduše a bez závazků.</p>
+<!-- Hero Header Section -->
+<div class="relative bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 py-16 md:py-20 lg:py-24 overflow-hidden">
+  <!-- Background Decoration -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-gradient-to-tr from-gray-300/15 to-slate-300/15 rounded-full blur-3xl"></div>
+  </div>
+  
+  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="text-center max-w-4xl mx-auto">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-100 to-pink-100 rounded-full px-4 py-2 mb-6">
+        <svg class="w-5 h-5 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+        <span class="text-sm font-bold text-primary-700">Konfigurátor předplatného</span>
+      </div>
+
+      <!-- Main Heading -->
+      <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-black text-gray-900">
+        Sestavte si své <span class="bg-gradient-to-r from-primary-600 to-pink-600 bg-clip-text text-transparent">kávové předplatné</span>
+      </h1>
+      
+      <p class="mx-auto max-w-2xl text-lg md:text-xl text-gray-600 mb-8">
+        Vyberte si množství, typ kávy a frekvenci dodání. <span class="font-semibold text-gray-900">Jednoduše a bez závazků.</span>
+      </p>
+
+      <!-- Features Pills -->
+      <div class="flex flex-wrap items-center justify-center gap-4 mb-8">
+        <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md border border-gray-200">
+          <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span class="text-sm font-semibold text-gray-700">Doprava zdarma</span>
+        </div>
+        <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md border border-gray-200">
+          <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="text-sm font-semibold text-gray-700">Flexibilní platba</span>
+        </div>
+        <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md border border-gray-200">
+          <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span class="text-sm font-semibold text-gray-700">Zrušení kdykoliv</span>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- Main Content Container -->
+<div class="bg-white py-12 sm:py-16 lg:py-20">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
     <!-- Error Messages -->
     @if($errors->any())
@@ -42,11 +90,19 @@
         <input type="hidden" name="mix[filter]" id="mix-filter-value" value="0">
         
         <!-- Step 1 Header -->
-        <div class="flex flex-col items-center justify-between gap-4 rounded-lg bg-gray-100 p-4 sm:flex-row md:p-8 mb-6">
-            <div>
-                <h2 class="text-xl font-bold text-primary-500 md:text-2xl">Krok 1: Množství kávy</h2>
-                <p class="text-gray-600">Vyberte balíček, který vám vyhovuje</p>
+        <div class="relative mb-12 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-slate-50 to-gray-100 rounded-3xl"></div>
+          <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-200/20 to-pink-300/20 rounded-full blur-3xl"></div>
+          
+          <div class="relative flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-gray-200 p-8 md:p-10 text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500 to-pink-600 text-white text-2xl font-bold shadow-lg">
+              1
             </div>
+            <div>
+              <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-2">Množství kávy</h2>
+              <p class="text-lg text-gray-600 max-w-2xl">Vyberte balíček, který vám vyhovuje</p>
+            </div>
+          </div>
         </div>
 
         <div class="mb-12">
@@ -54,8 +110,8 @@
             <div class="mb-8">
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <!-- 500g plán -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="amount" value="2" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="amount" value="2" class="hidden" required>
                         <div class="mb-8">
                             <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">500g</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Ideální pro jednotlivce nebo páry</p>
@@ -70,13 +126,13 @@
                                 <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }},-</span>
                                 <span class="text-gray-500">Kč/box</span>
                             </div>
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat plán</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat plán</span>
                         </div>
                     </label>
                     
                     <!-- 750g plán -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="amount" value="3" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="amount" value="3" class="hidden" required>
                         <div class="mb-8">
                             <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">750g</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Nejpopulárnější volba</p>
@@ -91,13 +147,13 @@
                                 <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }},-</span>
                                 <span class="text-gray-500">Kč/box</span>
                             </div>
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat plán</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat plán</span>
                         </div>
                     </label>
 
                     <!-- 1000g plán -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="amount" value="4" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="amount" value="4" class="hidden" required>
                         <div class="mb-8">
                             <div class="mb-2 text-center text-4xl font-bold text-primary-500 pt-6">1000g</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Pro kávové nadšence</p>
@@ -112,7 +168,7 @@
                                 <span class="text-4xl font-bold text-gray-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }},-</span>
                                 <span class="text-gray-500">Kč/box</span>
                             </div>
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat plán</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat plán</span>
                         </div>
                     </label>
                 </div>
@@ -120,11 +176,19 @@
         </div>
 
         <!-- Step 2 Header -->
-        <div class="flex flex-col items-center justify-between gap-4 rounded-lg bg-gray-100 p-4 sm:flex-row md:p-8 mb-6">
-            <div>
-                <h2 class="text-xl font-bold text-primary-500 md:text-2xl">Krok 2: Preferovaný typ kávy</h2>
-                <p class="text-gray-600">Vyberte si váš oblíbený způsob přípravy</p>
+        <div class="relative mb-12 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-slate-50 to-gray-100 rounded-3xl"></div>
+          <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-200/20 to-indigo-300/20 rounded-full blur-3xl"></div>
+          
+          <div class="relative flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-gray-200 p-8 md:p-10 text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-2xl font-bold shadow-lg">
+              2
             </div>
+            <div>
+              <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-2">Preferovaný typ kávy</h2>
+              <p class="text-lg text-gray-600 max-w-2xl">Vyberte si váš oblíbený způsob přípravy</p>
+            </div>
+          </div>
         </div>
 
         <div class="mb-12">
@@ -132,8 +196,8 @@
             <div class="mb-8">
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <!-- Espresso -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="type" value="espresso" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="type" value="espresso" class="hidden" required>
                         <div class="mb-12">
                             <div class="mb-2 text-center text-3xl font-bold text-gray-800">Espresso</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Ideální pro přípravu v kávovaru nebo moka konvici</p>
@@ -150,13 +214,13 @@
                                 <span class="text-sm font-semibold text-gray-700">1x káva bez kofeinu</span>
                                 <span class="ml-auto text-sm font-semibold text-gray-700">+ 100,-</span>
                             </label>
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat metodu</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat metodu</span>
                         </div>
                     </label>
 
                     <!-- Filtr -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="type" value="filter" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="type" value="filter" class="hidden" required>
                         <div class="mb-12">
                             <div class="mb-2 text-center text-3xl font-bold text-gray-800">Filtr</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Pro překapávanou kávu nebo french press</p>
@@ -173,13 +237,13 @@
                                 <span class="text-sm font-semibold text-gray-700">1x káva bez kofeinu</span>
                                 <span class="ml-auto text-sm font-semibold text-gray-700">+ 100,-</span>
                             </label>
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat metodu</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat metodu</span>
                         </div>
                     </label>
 
                     <!-- Kombinace -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="type" value="mix" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="type" value="mix" class="hidden" required>
                         <div class="mb-12">
                             <div class="mb-2 text-center text-3xl font-bold text-gray-800">Kombinace</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Rozmanitost pro ty, kteří chtějí vyzkoušet obojí</p>
@@ -196,7 +260,7 @@
                                 <span class="text-sm font-semibold text-gray-700">1x káva bez kofeinu</span>
                                 <span class="ml-auto text-sm font-semibold text-gray-700">+ 100,-</span>
                             </label>
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat metodu</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat metodu</span>
                         </div>
                     </label>
                 </div>
@@ -402,11 +466,19 @@
         </div>
 
         <!-- Step 3 Header -->
-        <div class="flex flex-col items-center justify-between gap-4 rounded-lg bg-gray-100 p-4 sm:flex-row md:p-8 mb-6">
-            <div>
-                <h2 class="text-xl font-bold text-primary-500 md:text-2xl">Krok 3: Frekvence dodání</h2>
-                <p class="text-gray-600">Jak často chcete kávu dostávat?</p>
+        <div class="relative mb-12 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-slate-50 to-gray-100 rounded-3xl"></div>
+          <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-200/20 to-emerald-300/20 rounded-full blur-3xl"></div>
+          
+          <div class="relative flex flex-col items-center justify-center gap-4 rounded-3xl border-2 border-gray-200 p-8 md:p-10 text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 text-white text-2xl font-bold shadow-lg">
+              3
             </div>
+            <div>
+              <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-2">Frekvence dodání</h2>
+              <p class="text-lg text-gray-600 max-w-2xl">Jak často chcete kávu dostávat?</p>
+            </div>
+          </div>
         </div>
 
         <div class="mb-12">
@@ -414,8 +486,8 @@
             <div class="mb-8">
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <!-- Každý měsíc -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="frequency" value="1" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="frequency" value="1" class="hidden" required>
                         <div class="mb-8">
                             <div class="mb-2 text-center text-3xl font-bold text-gray-800 pt-6">Každý měsíc</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Pro pravidelnou spotřebu a čerstvou kávu</p>
@@ -426,13 +498,13 @@
                             </div>
                         </div>
                         <div class="mt-auto">
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat frekvenci</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat frekvenci</span>
                         </div>
                     </label>
 
                     <!-- Jednou za 2 měsíce -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="frequency" value="2" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="frequency" value="2" class="hidden" required>
                         <div class="mb-8">
                             <div class="mb-2 text-center text-3xl font-bold text-gray-800 pt-6">Jednou za 2 měsíce</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Pro střední spotřebu</p>
@@ -443,13 +515,13 @@
                             </div>
                         </div>
                         <div class="mt-auto">
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat frekvenci</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat frekvenci</span>
                         </div>
                     </label>
 
                     <!-- Jednou za 3 měsíce -->
-                    <label class="flex flex-col rounded-lg border-2 p-4 pt-6 cursor-pointer transition-all duration-200 has-[:checked]:border-primary-500 has-[:checked]:shadow-lg hover:border-primary-300">
-                        <input type="radio" name="frequency" value="3" class="hidden peer" required>
+                    <label class="group flex flex-col rounded-2xl border-2 border-gray-200 p-6 pt-8 cursor-pointer transition-all duration-300 bg-white shadow-xl hover:shadow-2xl hover:border-primary-300 has-[:checked]:border-primary-500 has-[:checked]:scale-105 has-[:checked]:shadow-2xl transform hover:-translate-y-1">
+                        <input type="radio" name="frequency" value="3" class="hidden" required>
                         <div class="mb-8">
                             <div class="mb-2 text-center text-3xl font-bold text-gray-800 pt-6">Jednou za 3 měsíce</div>
                             <p class="mx-auto mb-8 px-4 text-center text-gray-500">Pro občasné pití</p>
@@ -460,7 +532,7 @@
                             </div>
                         </div>
                         <div class="mt-auto">
-                            <span class="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white transition duration-100 hover:bg-gray-700 md:text-base">Vybrat frekvenci</span>
+                            <span class="block rounded-xl bg-gray-700 hover:bg-gradient-to-r hover:from-primary-500 hover:to-pink-600 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-primary-500 group-has-[:checked]:to-pink-600 px-8 py-3 text-center text-sm font-bold text-white transition duration-200 shadow-lg group-has-[:checked]:shadow-xl group-has-[:checked]:scale-105 md:text-base">Vybrat frekvenci</span>
                         </div>
                     </label>
                 </div>
@@ -468,15 +540,28 @@
         </div>
 
             <!-- Souhrn předplatného -->
-            <div class="mt-12">
-                <div class="flex flex-col overflow-hidden rounded-lg bg-gray-100 sm:flex-row md:min-h-80 border-2 border-gray-200 shadow-lg">
-                    <!-- image -->
-                    <div class="order-first h-64 w-full bg-gray-300 sm:order-none sm:h-auto sm:w-1/2 lg:w-2/5">
-                        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&q=75&fit=crop&w=1000" loading="lazy" alt="Kávový box" class="h-full w-full object-cover object-center" />
-                    </div>
-                    <!-- content -->
-                    <div class="flex w-full flex-col p-6 sm:w-1/2 sm:p-8 lg:w-3/5 lg:p-10">
-                        <h2 class="mb-4 text-2xl font-bold text-gray-800 md:text-3xl">Shrnutí vašeho předplatného</h2>
+            <div class="mt-16">
+                <div class="relative overflow-hidden">
+                    <!-- Background decoration -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-slate-50 to-gray-100 rounded-3xl"></div>
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-200/20 to-pink-300/20 rounded-full blur-3xl"></div>
+                    
+                    <div class="relative flex flex-col overflow-hidden rounded-3xl bg-white sm:flex-row md:min-h-80 border-2 border-gray-200 shadow-2xl">
+                        <!-- image -->
+                        <div class="order-first h-64 w-full bg-gray-300 sm:order-none sm:h-auto sm:w-1/2 lg:w-2/5 relative group">
+                            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&q=75&fit=crop&w=1000" loading="lazy" alt="Kávový box" class="h-full w-full object-cover object-center transform group-hover:scale-110 transition-transform duration-700" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                        </div>
+                        <!-- content -->
+                        <div class="flex w-full flex-col p-6 sm:w-1/2 sm:p-8 lg:w-3/5 lg:p-10">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-pink-600 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </div>
+                                <h2 class="text-2xl md:text-3xl font-black text-gray-900">Shrnutí předplatného</h2>
+                            </div>
 
                         <div class="mb-6 space-y-3">
                             <div class="flex justify-between items-center py-2 border-b border-gray-300">
@@ -491,19 +576,47 @@
                                 <span class="text-gray-600 font-semibold">Frekvence:</span>
                                 <span class="font-bold text-gray-800" id="summary-frequency">-</span>
                             </div>
-                            <div class="flex justify-between items-center py-3 mt-4">
-                                <span class="text-xl font-bold text-gray-800">Cena:</span>
-                                <span class="text-3xl font-bold text-primary-500" id="summary-price">-</span>
+                            <div class="flex justify-between items-center py-4 mt-4 border-t-2 border-gray-200">
+                                <span class="text-xl font-bold text-gray-800">Celková cena:</span>
+                                <div class="text-right flex flex-col items-end">
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="text-5xl font-bold bg-gradient-to-r from-primary-500 to-pink-600 bg-clip-text text-transparent" id="summary-price">-</span>
+                                        <span class="text-xl text-gray-700 font-bold">Kč</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">při každé dodávce</p>
+                                </div>
                             </div>
-                            <p class="text-xs text-gray-500 text-right">při každé dodávce</p>
                         </div>
 
                         <div class="mt-auto">
-                            <button type="submit" id="submit-button" class="w-full inline-block rounded-lg bg-primary-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary-300 transition duration-100 hover:bg-primary-600 focus-visible:ring active:bg-primary-700 md:text-base opacity-50 cursor-not-allowed" disabled>
-                                Pokračovat k objednávce →
+                            <button type="submit" id="submit-button" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-pink-600 hover:from-primary-600 hover:to-pink-700 px-8 py-4 text-center text-base font-bold text-white outline-none ring-primary-300 transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 md:text-lg opacity-50 cursor-not-allowed" disabled>
+                                <span>Pokračovat k objednávce</span>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
                             </button>
-                            <p class="text-xs text-gray-500 text-center mt-3">✓ Bez závazků  ✓ Kdykoli zrušte  ✓ Doprava zdarma</p>
+                            <div class="flex items-center justify-center gap-4 mt-4 text-xs text-gray-600">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Bez závazků
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Kdykoli zrušte
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Doprava zdarma
+                                </span>
+                            </div>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -511,25 +624,32 @@
     </form>
 
 <!-- Shipping Date Info -->
-    <div class="max-w-3xl mx-auto mb-8">
-        <div class="bg-primary-50 border-2 border-primary-200 p-6 rounded-lg">
+    <div class="max-w-5xl mx-auto mt-16 mb-12">
+        <div class="relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-primary-50 to-pink-50 rounded-2xl"></div>
+            <div class="relative bg-white border-2 border-primary-200 p-6 md:p-8 rounded-2xl shadow-lg">
                 <div class="flex items-start gap-4">
                     <div class="flex-shrink-0">
-                        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-pink-600 flex items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
                     </div>
-                    <div>
-                    <h3 class="font-bold text-lg text-gray-800 mb-2">Termín následující rozesílky</h3>
-                    <p class="text-gray-700 mb-3"><strong>{{ $shippingInfo['cutoff_message'] }}</strong></p>
+                    <div class="flex-1">
+                    <h3 class="font-black text-xl text-gray-900 mb-3">Termín následující rozesílky</h3>
+                    <div class="bg-gradient-to-r from-primary-100 to-pink-100 border-l-4 border-primary-500 rounded-lg p-4 mb-4">
+                        <p class="text-gray-900 font-bold">{{ $shippingInfo['cutoff_message'] }}</p>
+                    </div>
                     <p class="text-sm text-gray-600 leading-relaxed">
-                            <strong>Jak to funguje:</strong> Rozesílka kávy probíhá vždy <strong>20. dne v měsíci</strong>. 
-                            Objednávky uzavíráme <strong>15. dne v měsíci o půlnoci</strong>. 
-                            Pokud si objednáte od 16. dne, vaše první zásilka dorazí až při následující rozesílce.
-                        </p>
+                        <strong class="text-gray-900">Jak to funguje:</strong> Rozesílka kávy probíhá vždy <strong class="text-primary-600">20. dne v měsíci</strong>. 
+                        Objednávky uzavíráme <strong class="text-primary-600">15. dne v měsíci o půlnoci</strong>. 
+                        Pokud si objednáte od 16. dne, vaše první zásilka dorazí až při následující rozesílce.
+                    </p>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </div>
@@ -588,6 +708,19 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', function() {
             selectedType = this.value;
             
+            // Odškrtnout všechny decaf checkboxy kromě toho ve vybraném bloku
+            document.querySelectorAll('input[name="isDecaf"]').forEach(checkbox => {
+                const checkboxLabel = checkbox.closest('label.group');
+                const radioLabel = this.closest('label.group');
+                if (checkboxLabel !== radioLabel) {
+                    checkbox.checked = false;
+                }
+            });
+            
+            // Aktualizovat isDecaf stav
+            const currentDecafCheckbox = this.closest('label.group').querySelector('input[name="isDecaf"]');
+            isDecaf = currentDecafCheckbox ? currentDecafCheckbox.checked : false;
+            
             // Vizuální feedback
             document.querySelectorAll('input[name="type"]').forEach(r => {
                 const label = r.closest('label');
@@ -614,14 +747,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Decaf checkbox
-    const decafCheckbox = document.querySelector('input[name="isDecaf"]');
-    if (decafCheckbox) {
-        decafCheckbox.addEventListener('change', function() {
-            isDecaf = this.checked;
-            updateSummary();
+    // Decaf checkboxy - jeden pro každý typ kávy
+    document.querySelectorAll('input[name="isDecaf"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // Najít příslušný radio button v tomto bloku
+            const radioButton = this.closest('label.group').querySelector('input[name="type"]');
+            
+            if (this.checked && radioButton) {
+                // Automaticky vybrat příslušný typ kávy
+                radioButton.checked = true;
+                // Trigger change event pro aktualizaci UI
+                radioButton.dispatchEvent(new Event('change'));
+            } else {
+                // Aktualizovat isDecaf stav
+                isDecaf = this.checked;
+                updateSummary();
+            }
         });
-    }
+    });
     
     // Frekvence
     document.querySelectorAll('input[name="frequency"]').forEach(radio => {
