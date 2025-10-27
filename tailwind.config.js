@@ -50,6 +50,25 @@ export default {
         sans: ['Roboto', 'system-ui', 'sans-serif'],
         display: ['Roboto', 'system-ui', 'sans-serif'],
       },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        gradient: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+      },
+      animation: {
+        float: 'float 6s ease-in-out infinite',
+        'fade-in': 'fade-in 1s ease-out',
+        gradient: 'gradient 3s ease infinite',
+      },
     },
   },
   plugins: [
