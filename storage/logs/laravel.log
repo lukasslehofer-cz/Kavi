@@ -423,3 +423,44 @@
 #35 /Users/lukas/Kavi/artisan(24): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
 #36 {main}
 "} 
+[2025-10-29 00:37:10] local.INFO: === FORMULÁŘ ODESLÁN ===  
+[2025-10-29 00:37:10] local.INFO: URL: http://localhost/predplatne/konfigurator/checkout  
+[2025-10-29 00:37:10] local.INFO: Method: POST  
+[2025-10-29 00:37:10] local.INFO: Raw POST data: {"_token":"NNafLUPdFn8Du7t9G5t97PI2oArEaMDGJX7iaVRe","mix":{"espresso":"0","filter":"0"},"amount":"2","type":"espresso","frequency":"1"} 
+[2025-10-29 00:37:10] local.INFO: Headers: {"connection":["keep-alive"],"cookie":["XSRF-TOKEN=eyJpdiI6ImRXVWFMaEJQNmxFYUhZMkJDUFc4Unc9PSIsInZhbHVlIjoiVjNTQUFCZTRTd2sxOXRuL0YwQ2hPU01TVjhTZ0VkdWM0UzdJL1RrVzd6ZHNJOHdHQ0xNSkJqd3lsNXBaSmpGeDIzYmM5SE9oM3orSTNMMCtkeWx5SXBLazR3WTYvN3JMaFJiRytYeStQWHZoRGYwYytpVThKQ1hCUUQ5S2VUL2QiLCJtYWMiOiI5ZWRlNDMxNDI5OWYyMTVmYTdiNWU1Yjk5YjhlZWRhMWU5ODU0NThmNjQxNWQ5YzE5YjVkZmU5ZmFiZjE1NjNhIiwidGFnIjoiIn0%3D; kavi_coffee_session=eyJpdiI6Ik1WenEvMzdoSEo3azBlM0Z2ZkpIZXc9PSIsInZhbHVlIjoiTHhZOVhLK1c1cElLTDVjTDJYV3AydXIwYitVenVZenVMKzh2WkN2clpqUUpjL0pFTDRWeUNhZXVqSGtBZGw5UFFDQ2FmRE9qNXp2TUVjckpQR1lUWHBFc0ZMVkpKUlRNb1ROdWROd2Z0MmhnZFgxZk5UdHBIa25idWJESHArN3EiLCJtYWMiOiJlY2I2MjE5ZDVmZjg1YWI4NjYwYjBmYzkxNmJjNWU2MDFmN2RiMjQ2ZDc3MjNkYzE0YmNkNWE4NzIwNjA1ZGI3IiwidGFnIjoiIn0%3D; remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d=eyJpdiI6Ii84YWFWdEdqRWgvbThVZHNtSzdHdkE9PSIsInZhbHVlIjoibW95R1JTZmtoK21QWlVVYXBBR0JGbHNvdGhObUxpRGxTSndLVStyc2FldkZubzNBdEI5Wm1nMnhLemFOUzBOcTlMWkhueTZrblUvQmN1bnVWekNKVmFYeHhMelp0dUY3ZitGZzYrY0hscFdHeVJyb1UzUUtReDltZDRIdjMxLzQxVWYxTGhsR2pJTDJScVBtTGttbzVRPT0iLCJtYWMiOiI5NzUyYjI1OWVlZDc2MjQ2OGUwNWE5OWRjY2VhNWMyMjljYWE4MjA1ZDNlZDQ5MjgxOTZiZGU0OTY2ZTY1NGFmIiwidGFnIjoiIn0%3D"],"accept-encoding":["gzip, deflate"],"priority":["u=0, i"],"accept-language":["cs-CZ,cs;q=0.9"],"content-length":["120"],"sec-fetch-dest":["document"],"referer":["http://localhost/predplatne"],"user-agent":["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15"],"sec-fetch-mode":["navigate"],"upgrade-insecure-requests":["1"],"sec-fetch-site":["same-origin"],"origin":["http://localhost"],"content-type":["application/x-www-form-urlencoded"],"accept":["text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"],"host":["localhost"]} 
+[2025-10-29 00:37:10] local.INFO: Cookies: {"XSRF-TOKEN":"NNafLUPdFn8Du7t9G5t97PI2oArEaMDGJX7iaVRe","kavi_coffee_session":"PzUNnZVMEXmHI7EEG630ztwaVeVtfA3tT0D6DNhz","remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d":null} 
+[2025-10-29 00:37:10] local.INFO: Validation passed successfully {"validated":{"amount":"2","type":"espresso","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false}} 
+[2025-10-29 00:37:10] local.INFO: Configuration stored in session. Redirecting to checkout. {"config":{"amount":"2","type":"espresso","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false},"price":850.0,"price_without_vat":702.48,"vat":147.52} 
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"checkout.session.completed","id":"evt_1SNMSXK28RZARKowoW3MgPtp"} 
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"charge.succeeded","id":"evt_3SNMSTK28RZARKow1hDIplSv"} 
+[2025-10-29 00:37:49] local.INFO: Unhandled webhook event type: charge.succeeded  
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"payment_method.attached","id":"evt_1SNMSXK28RZARKowCfvIIAyL"} 
+[2025-10-29 00:37:49] local.INFO: Unhandled webhook event type: payment_method.attached  
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"customer.subscription.updated","id":"evt_1SNMSXK28RZARKows6hf3Xxe"} 
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"customer.subscription.created","id":"evt_1SNMSXK28RZARKowLgFzeO9S"} 
+[2025-10-29 00:37:49] local.INFO: handleSubscriptionCreated called {"subscription_id":"sub_1SNMSTK28RZARKowxYRZFk1t","metadata":{"packeta_point_id":"13932","packeta_point_address":"V. P. Čkalova 449/10, 160 00 Praha","shipping_address":"{\"name\":\"Luk\\u00e1\\u0161 \\u0160lehofer\",\"email\":\"admin@kavi.cz\",\"phone\":\"+420777110957\",\"billing_address\":\"Muchova 242\\/2\",\"billing_city\":\"Praha 6\",\"billing_postal_code\":\"16000\",\"country\":\"CZ\"}","user_id":"1","configuration":"{\"amount\":\"2\",\"type\":\"espresso\",\"mix\":{\"espresso\":\"0\",\"filter\":\"0\"},\"frequency\":\"1\",\"isDecaf\":false}","configured_price":"850","packeta_point_name":"Praha 6, Bubeneč, V. P. Čkalova 449/10 (papírnictví)"},"customer":"cus_TImzfDy70oI4E3"} 
+[2025-10-29 00:37:49] local.INFO: Parsed metadata {"user_id":"1","plan_id":null,"configuration":{"amount":"2","type":"espresso","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false}} 
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"payment_intent.succeeded","id":"evt_3SNMSTK28RZARKow12qNfU1J"} 
+[2025-10-29 00:37:49] local.INFO: Unhandled webhook event type: payment_intent.succeeded  
+[2025-10-29 00:37:49] local.INFO: Creating subscription record {"subscription_number":"SUB--0001","user_id":"1","stripe_subscription_id":"sub_1SNMSTK28RZARKowxYRZFk1t","status":"active","starts_at":"2025-10-29 00:37:49","next_billing_date":"2025-12-15 00:37:49","configuration":{"amount":"2","type":"espresso","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false},"configured_price":"850","frequency_months":"1","shipping_address":{"name":"Lukáš Šlehofer","email":"admin@kavi.cz","phone":"+420777110957","billing_address":"Muchova 242/2","billing_city":"Praha 6","billing_postal_code":"16000","country":"CZ"},"packeta_point_id":"13932","packeta_point_name":"Praha 6, Bubeneč, V. P. Čkalova 449/10 (papírnictví)","packeta_point_address":"V. P. Čkalova 449/10, 160 00 Praha"} 
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"payment_intent.created","id":"evt_3SNMSTK28RZARKow1Ntflgcy"} 
+[2025-10-29 00:37:49] local.INFO: Unhandled webhook event type: payment_intent.created  
+[2025-10-29 00:37:49] local.INFO: Subscription created successfully {"id":8} 
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"invoice.created","id":"evt_1SNMSXK28RZARKowDG4uj5d7"} 
+[2025-10-29 00:37:49] local.INFO: Unhandled webhook event type: invoice.created  
+[2025-10-29 00:37:49] local.INFO: Stripe webhook received {"type":"invoice.finalized","id":"evt_1SNMSXK28RZARKowBV5PD0YS"} 
+[2025-10-29 00:37:49] local.INFO: Unhandled webhook event type: invoice.finalized  
+[2025-10-29 00:37:50] local.INFO: Stripe webhook received {"type":"invoice.paid","id":"evt_1SNMSXK28RZARKowxytL2pKg"} 
+[2025-10-29 00:37:50] local.INFO: Unhandled webhook event type: invoice.paid  
+[2025-10-29 00:37:50] local.INFO: Stripe webhook received {"type":"invoice.updated","id":"evt_1SNMSXK28RZARKow8iEA1skO"} 
+[2025-10-29 00:37:50] local.INFO: Unhandled webhook event type: invoice.updated  
+[2025-10-29 00:37:50] local.INFO: Stripe webhook received {"type":"invoice.payment_succeeded","id":"evt_1SNMSXK28RZARKown21jKKCO"} 
+[2025-10-29 00:37:50] local.INFO: Using cached Fakturoid subject ID from user {"user_id":1,"subject_id":28669028} 
+[2025-10-29 00:37:50] local.INFO: Fakturoid subject updated {"subject_id":28669028,"name":"Lukáš Šlehofer"} 
+[2025-10-29 00:37:51] local.INFO: Fakturoid invoice created for subscription {"subscription_id":8,"payment_id":4,"invoice_id":52162622,"invoice_number":"K250050"} 
+[2025-10-29 00:37:51] local.INFO: Fakturoid subscription invoice marked as paid {"invoice_id":52162622} 
+[2025-10-29 00:37:51] local.INFO: Subscription confirmation email sent {"subscription_id":8} 
+[2025-10-29 00:37:52] local.INFO: Fakturoid subscription invoice PDF downloaded {"payment_id":4,"invoice_id":52162622,"filename":"invoices/subscription_8_payment_4_invoice_52162622.pdf"} 
+[2025-10-29 00:37:52] local.INFO: Fakturoid invoice created for subscription payment {"payment_id":4,"subscription_id":8} 
+[2025-10-29 00:38:27] local.INFO: Stripe webhook received {"type":"invoice_payment.paid","id":"evt_1SNMT9K28RZARKowgHYLZtxM"} 
+[2025-10-29 00:38:27] local.INFO: Unhandled webhook event type: invoice_payment.paid  

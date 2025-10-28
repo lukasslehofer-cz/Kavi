@@ -85,7 +85,7 @@ class Order extends Model
 
     public static function generateOrderNumber(): string
     {
-        return 'KV-' . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+        return 'KV-' .  str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
     }
 }
 

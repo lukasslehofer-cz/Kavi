@@ -118,7 +118,7 @@ unset($__errorArgs, $__bag); ?>
                                 type="tel" 
                                 id="phone" 
                                 name="phone" 
-                                value="<?php echo e(old('phone')); ?>" 
+                                value="<?php echo e(old('phone', auth()->user()->phone ?? '')); ?>" 
                                 <?php if(auth()->guard()->check()): ?> required <?php endif; ?>
                                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="+420 123 456 789"

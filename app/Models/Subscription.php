@@ -118,7 +118,7 @@ class Subscription extends Model
      */
     public static function generateSubscriptionNumber(): string
     {
-        return 'SUB-' . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+        return 'SUB-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
     }
 }
 
