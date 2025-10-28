@@ -151,6 +151,14 @@ class SubscriptionController extends Controller
     {
         // Handle successful return from Stripe
         if ($request->has('success') && $request->success == 1) {
+            // Get the latest subscription for this user
+            $subscription = null;
+            if (auth()->check()) {
+                $subscription = Subscription::where('user_id', auth()->id())
+                    ->latest()
+                    ->first();
+            }
+            
             // Clear subscription session data
             session()->forget([
                 'subscription_configuration', 
@@ -162,9 +170,9 @@ class SubscriptionController extends Controller
                 'subscription_delivery_notes',
             ]);
 
-            if (auth()->check()) {
-                return redirect()->route('dashboard.subscription')
-                    ->with('success', 'Děkujeme! Vaše platba byla úspěšně zpracována a předplatné je nyní aktivní.');
+            // Redirect to confirmation page with subscription
+            if ($subscription) {
+                return redirect()->route('subscriptions.confirmation', $subscription);
             } else {
                 return redirect()->route('subscriptions.index')
                     ->with('success', 'Děkujeme za objednávku! Brzy vám zašleme potvrzení na email.');
@@ -290,6 +298,13 @@ class SubscriptionController extends Controller
                 // Bank transfer - create subscription directly as pending
                 DB::beginTransaction();
 
+                // Calculate next billing date (15th of the next billing cycle)
+                // Billing cycle: 16th of one month to 15th of next month
+                $currentBillingCycleEnd = now()->day <= 15 
+                    ? now()->copy()->setDay(15) 
+                    : now()->copy()->addMonth()->setDay(15);
+                $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($configuration['frequency']);
+
                 $subscription = Subscription::create([
                     'user_id' => auth()->id() ?? null,
                     'subscription_plan_id' => null, // Custom configuration, no plan
@@ -298,7 +313,7 @@ class SubscriptionController extends Controller
                     'frequency_months' => $configuration['frequency'],
                     'status' => 'pending', // Will be activated after payment confirmation
                     'starts_at' => now(),
-                    'next_billing_date' => now()->addMonths($configuration['frequency']),
+                    'next_billing_date' => $nextBillingDate,
                     'shipping_address' => [
                         'name' => $validated['name'],
                         'email' => $validated['email'],
@@ -347,6 +362,18 @@ class SubscriptionController extends Controller
                 ->withInput()
                 ->with('error', 'Nastala chyba při vytváření předplatného. Zkuste to prosím znovu.');
         }
+    }
+
+    /**
+     * Show subscription confirmation page
+     */
+    public function confirmation(Subscription $subscription)
+    {
+        if ($subscription->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        return view('subscriptions.confirmation', compact('subscription'));
     }
 }
 

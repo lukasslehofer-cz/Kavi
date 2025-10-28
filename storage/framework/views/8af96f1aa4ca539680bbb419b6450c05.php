@@ -11,14 +11,10 @@
 <body class="min-h-screen flex flex-col">
     <!-- Top Announcement Banner - Flowrift -->
     <div class="bg-white">
-        <div class="flex flex-wrap bg-dark-800 px-4 py-3 sm:flex-nowrap sm:items-center sm:justify-center sm:gap-3 md:px-8">
+        <div class="flex flex-wrap bg-dark-800 px-4 py-2 sm:flex-nowrap sm:items-center sm:justify-center sm:gap-3 md:px-8">
             <div class="order-1 mb-2 inline-block w-full max-w-screen-sm text-sm text-white sm:order-none sm:mb-0 sm:w-auto md:text-base">
                 🎉 Doprava zdarma nad 1000 Kč
             </div>
-
-            <a href="<?php echo e(route('subscriptions.index')); ?>" class="order-last inline-block w-full whitespace-nowrap rounded-lg bg-dark-900 px-4 py-2 text-center text-xs font-semibold text-white outline-none ring-dark-700 transition duration-100 hover:bg-dark-700 focus-visible:ring active:bg-dark-600 sm:order-none sm:w-auto md:text-sm">
-                Zjistit více
-            </a>
         </div>
     </div>
     <!-- Banner - end -->
@@ -102,34 +98,84 @@
         </div>
 
         <!-- Mobile Navigation -->
-        <div id="mobile-menu" class="lg:hidden border-t border-gray-200 bg-white" style="display: none;">
-            <div class="max-w-screen-xl mx-auto px-4 py-6 space-y-4">
-                <a href="<?php echo e(route('home')); ?>" class="block text-gray-700 hover:text-primary-600 font-semibold py-2 transition-colors">Domů</a>
-                <a href="<?php echo e(route('subscriptions.index')); ?>" class="block text-gray-700 hover:text-primary-600 font-semibold py-2 transition-colors">Předplatné</a>
-                <a href="<?php echo e(route('products.index')); ?>" class="block text-gray-700 hover:text-primary-600 font-semibold py-2 transition-colors">Obchod</a>
-                <a href="#" class="block text-gray-700 hover:text-primary-600 font-semibold py-2 transition-colors">O nás</a>
-                
-                <!-- Mobile CTA Button -->
-                <a href="<?php echo e(route('subscriptions.index')); ?>" class="flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500 to-pink-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg mt-4">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        <div id="mobile-menu" class="lg:hidden absolute top-full left-0 right-0 bg-gradient-to-br from-white via-gray-50 to-white backdrop-blur-xl shadow-2xl border-t-2 border-gray-200" style="display: none;">
+            <div class="max-w-screen-xl mx-auto px-6 py-8 space-y-2">
+                <!-- Navigation Links -->
+                <a href="<?php echo e(route('home')); ?>" class="group flex items-center justify-between text-gray-900 hover:text-primary-600 font-bold py-3.5 px-4 rounded-xl hover:bg-gradient-to-r hover:from-primary-50 hover:to-pink-50 transition-all duration-200">
+                    <span>Domů</span>
+                    <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
-                    <span>Vybrat předplatné</span>
+                </a>
+                <a href="<?php echo e(route('subscriptions.index')); ?>" class="group flex items-center justify-between text-gray-900 hover:text-primary-600 font-bold py-3.5 px-4 rounded-xl hover:bg-gradient-to-r hover:from-primary-50 hover:to-pink-50 transition-all duration-200">
+                    <span>Předplatné</span>
+                    <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <a href="<?php echo e(route('products.index')); ?>" class="group flex items-center justify-between text-gray-900 hover:text-primary-600 font-bold py-3.5 px-4 rounded-xl hover:bg-gradient-to-r hover:from-primary-50 hover:to-pink-50 transition-all duration-200">
+                    <span>Obchod</span>
+                    <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <a href="#" class="group flex items-center justify-between text-gray-900 hover:text-primary-600 font-bold py-3.5 px-4 rounded-xl hover:bg-gradient-to-r hover:from-primary-50 hover:to-pink-50 transition-all duration-200">
+                    <span>O nás</span>
+                    <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
                 </a>
                 
-                <div class="pt-4 mt-4 border-t border-gray-200">
+                <!-- Mobile CTA Button -->
+                <div class="pt-4">
+                    <a href="<?php echo e(route('subscriptions.index')); ?>" class="flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500 to-pink-600 hover:from-primary-600 hover:to-pink-700 text-white font-bold px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Vybrat předplatné</span>
+                    </a>
+                </div>
+                
+                <!-- Account Section -->
+                <div class="pt-6 mt-4 border-t-2 border-gray-200 space-y-2">
                     <?php if(auth()->guard()->check()): ?>
-                        <a href="<?php echo e(route('dashboard.index')); ?>" class="block text-gray-700 hover:text-primary-600 font-semibold py-2 transition-colors">Můj účet</a>
+                        <a href="<?php echo e(route('dashboard.index')); ?>" class="flex items-center gap-3 text-gray-900 hover:text-primary-600 font-semibold py-3 px-4 rounded-xl hover:bg-gray-100 transition-all">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span>Můj účet</span>
+                        </a>
                         <?php if(auth()->user()->is_admin): ?>
-                        <a href="<?php echo e(route('admin.dashboard')); ?>" class="block text-gray-700 hover:text-primary-600 font-semibold py-2 transition-colors">Admin</a>
+                        <a href="<?php echo e(route('admin.dashboard')); ?>" class="flex items-center gap-3 text-gray-900 hover:text-primary-600 font-semibold py-3 px-4 rounded-xl hover:bg-gray-100 transition-all">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Admin</span>
+                        </a>
                         <?php endif; ?>
-                        <form action="<?php echo e(route('logout')); ?>" method="POST" class="pt-2">
+                        <form action="<?php echo e(route('logout')); ?>" method="POST">
                             <?php echo csrf_field(); ?>
-                            <button type="submit" class="text-gray-700 hover:text-primary-600 font-semibold text-left py-2 w-full">Odhlásit se</button>
+                            <button type="submit" class="w-full flex items-center gap-3 text-red-600 hover:text-red-700 font-semibold py-3 px-4 rounded-xl hover:bg-red-50 transition-all">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                <span>Odhlásit se</span>
+                            </button>
                         </form>
                     <?php else: ?>
-                        <a href="<?php echo e(route('login')); ?>" class="block text-gray-700 hover:text-primary-600 font-semibold py-2 transition-colors">Přihlásit se</a>
-                        <a href="<?php echo e(route('register')); ?>" class="block bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 font-semibold transition-all text-center mt-2 rounded-xl">Registrovat</a>
+                        <a href="<?php echo e(route('login')); ?>" class="flex items-center gap-3 text-gray-900 hover:text-primary-600 font-semibold py-3 px-4 rounded-xl hover:bg-gray-100 transition-all">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                            <span>Přihlásit se</span>
+                        </a>
+                        <a href="<?php echo e(route('register')); ?>" class="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3.5 font-bold transition-all text-center rounded-xl shadow-md hover:shadow-lg">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            <span>Registrovat</span>
+                        </a>
                     <?php endif; ?>
                 </div>
             </div>

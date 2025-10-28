@@ -127,17 +127,41 @@ class StripeService
         float $price,
         array $shippingAddress
     ): StripeSession {
-        // Prepare metadata for subscription
+        // Prepare metadata for subscription (includes Packeta and delivery_notes)
         $subscriptionMetadata = [
             'configuration' => json_encode($configuration),
             'configured_price' => $price,
-            'shipping_address' => json_encode($shippingAddress),
+            'shipping_address' => json_encode([
+                'name' => $shippingAddress['name'],
+                'email' => $shippingAddress['email'],
+                'phone' => $shippingAddress['phone'] ?? null,
+                'billing_address' => $shippingAddress['billing_address'],
+                'billing_city' => $shippingAddress['billing_city'],
+                'billing_postal_code' => $shippingAddress['billing_postal_code'],
+                'country' => 'CZ',
+            ]),
+            'packeta_point_id' => $shippingAddress['packeta_point_id'],
+            'packeta_point_name' => $shippingAddress['packeta_point_name'],
+            'packeta_point_address' => $shippingAddress['packeta_point_address'] ?? null,
+            'delivery_notes' => $shippingAddress['delivery_notes'] ?? null,
         ];
 
+        // Get base product ID for all subscriptions
+        $productId = $this->getOrCreateBaseSubscriptionProduct();
+
+        // Create session with dynamic pricing (price_data instead of fixed price ID)
         $sessionData = [
             'payment_method_types' => ['card'],
             'line_items' => [[
-                'price' => $this->getStripePriceIdForConfiguration($configuration),
+                'price_data' => [
+                    'currency' => 'czk',
+                    'product' => $productId,
+                    'recurring' => [
+                        'interval' => 'month',
+                        'interval_count' => $configuration['frequency'] ?? 1,
+                    ],
+                    'unit_amount' => (int)($price * 100), // Convert to haléře
+                ],
                 'quantity' => 1,
             ]],
             'mode' => 'subscription',
@@ -163,7 +187,56 @@ class StripeService
     }
 
     /**
+     * Get or create base subscription product in Stripe
+     * Used for all dynamic subscription pricing
+     */
+    private function getOrCreateBaseSubscriptionProduct(): string
+    {
+        // Check if we have a product ID stored in config
+        $productId = SubscriptionConfig::get('stripe_base_product_id');
+
+        if ($productId) {
+            // Verify the product exists in Stripe
+            try {
+                \Stripe\Product::retrieve($productId);
+                return $productId;
+            } catch (\Exception $e) {
+                // Product doesn't exist, create a new one
+                \Log::warning('Stored Stripe product ID not found, creating new one', [
+                    'stored_id' => $productId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Create a new base product
+        $product = \Stripe\Product::create([
+            'name' => 'Kavi Kávové Předplatné',
+            'description' => 'Prémiové kávové předplatné s vlastní konfigurací',
+            'metadata' => [
+                'type' => 'configurable_subscription',
+            ],
+        ]);
+
+        // Store the product ID in config for future use
+        SubscriptionConfig::updateOrCreate(
+            ['key' => 'stripe_base_product_id'],
+            [
+                'value' => $product->id,
+                'type' => 'string',
+                'label' => 'Stripe Base Product ID',
+                'description' => 'Base product for all configurable subscriptions',
+            ]
+        );
+
+        \Log::info('Created new Stripe base product', ['product_id' => $product->id]);
+
+        return $product->id;
+    }
+
+    /**
      * Get Stripe Price ID based on configuration (amount and frequency)
+     * @deprecated This method is no longer used with dynamic pricing
      */
     private function getStripePriceIdForConfiguration(array $configuration): string
     {
@@ -199,13 +272,25 @@ class StripeService
     ): array {
         $customerId = $this->getOrCreateCustomer($user);
         
-        $priceId = $this->getStripePriceIdForConfiguration($configuration);
+        // Get base product ID
+        $productId = $this->getOrCreateBaseSubscriptionProduct();
+
+        // Create a Price object with dynamic pricing
+        $stripePrice = \Stripe\Price::create([
+            'currency' => 'czk',
+            'product' => $productId,
+            'recurring' => [
+                'interval' => 'month',
+                'interval_count' => $configuration['frequency'] ?? 1,
+            ],
+            'unit_amount' => (int)($price * 100),
+        ]);
 
         $subscription = StripeSubscription::create([
             'customer' => $customerId,
             'default_payment_method' => $paymentMethodId,
             'items' => [
-                ['price' => $priceId],
+                ['price' => $stripePrice->id],
             ],
             'metadata' => [
                 'user_id' => $user->id,
@@ -310,14 +395,27 @@ class StripeService
         }
 
         try {
+            // Calculate next billing date (15th of the next billing cycle)
+            // Billing cycle: 16th of one month to 15th of next month
+            $subscriptionStartDate = now();
+            $currentBillingCycleEnd = $subscriptionStartDate->day <= 15 
+                ? $subscriptionStartDate->copy()->setDay(15) 
+                : $subscriptionStartDate->copy()->addMonth()->setDay(15);
+            
+            // Get frequency from configuration if available, otherwise default to 1 month
+            $frequencyMonths = 1;
+            if ($configuration && isset($configuration['frequency'])) {
+                $frequencyMonths = $configuration['frequency'];
+            }
+            
+            $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($frequencyMonths);
+            
             $subscriptionRecord = [
                 'user_id' => $userId,
                 'stripe_subscription_id' => $subscriptionData['id'],
                 'status' => 'active',
-                'starts_at' => now(),
-                'next_billing_date' => isset($subscriptionData['current_period_end']) 
-                    ? \Carbon\Carbon::createFromTimestamp($subscriptionData['current_period_end'])
-                    : now()->addMonth(),
+                'starts_at' => $subscriptionStartDate,
+                'next_billing_date' => $nextBillingDate,
             ];
 
             if ($planId) {
@@ -332,6 +430,18 @@ class StripeService
                 // Add shipping address if available
                 if (isset($subscriptionData['metadata']['shipping_address'])) {
                     $subscriptionRecord['shipping_address'] = json_decode($subscriptionData['metadata']['shipping_address'], true);
+                }
+                
+                // Add Packeta data if available
+                if (isset($subscriptionData['metadata']['packeta_point_id'])) {
+                    $subscriptionRecord['packeta_point_id'] = $subscriptionData['metadata']['packeta_point_id'];
+                    $subscriptionRecord['packeta_point_name'] = $subscriptionData['metadata']['packeta_point_name'] ?? null;
+                    $subscriptionRecord['packeta_point_address'] = $subscriptionData['metadata']['packeta_point_address'] ?? null;
+                }
+                
+                // Add delivery notes if available
+                if (isset($subscriptionData['metadata']['delivery_notes'])) {
+                    $subscriptionRecord['delivery_notes'] = $subscriptionData['metadata']['delivery_notes'];
                 }
             }
 

@@ -24,7 +24,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Checkout Form -->
         <div class="lg:col-span-2">
-            <form action="<?php echo e(route('checkout.store')); ?>" method="POST" class="space-y-6">
+            <form action="<?php echo e(route('checkout.store')); ?>" method="POST">
                 <?php echo csrf_field(); ?>
 
                 <!-- Contact Information -->
@@ -115,7 +115,7 @@ unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <!-- Billing Address -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mt-6">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -207,9 +207,9 @@ unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <!-- Packeta Pickup Point -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mt-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full bg-[#ba1b02] flex items-center justify-center shadow-md">
                             <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                             </svg>
@@ -227,11 +227,11 @@ unset($__errorArgs, $__bag); ?>
                         <div id="packeta-selection">
                             <?php if(old('packeta_point_id', auth()->user()->packeta_point_id ?? '')): ?>
                             <!-- Selected point display -->
-                            <div id="selected-point" class="p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-xl">
+                            <div id="selected-point" class="p-5 bg-gradient-to-r from-primary-50 to-pink-50 border-2 border-primary-400 rounded-xl">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
                                         <div class="flex items-center mb-2">
-                                            <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg class="w-5 h-5 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                             </svg>
                                             <span class="font-bold text-gray-900">Vybrané výdejní místo:</span>
@@ -239,14 +239,14 @@ unset($__errorArgs, $__bag); ?>
                                         <p class="text-gray-900 font-semibold ml-7" id="selected-point-name"><?php echo e(old('packeta_point_name', auth()->user()->packeta_point_name ?? '')); ?></p>
                                         <p class="text-sm text-gray-700 ml-7" id="selected-point-address"><?php echo e(old('packeta_point_address', auth()->user()->packeta_point_address ?? '')); ?></p>
                                     </div>
-                                    <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-primary-600 font-semibold px-4 py-2 rounded-lg border border-gray-200 whitespace-nowrap ml-4 transition-colors">
+                                    <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-[#ba1b02] font-semibold px-4 py-2 rounded-lg border border-gray-200 whitespace-nowrap ml-4 transition-colors">
                                         Změnit
                                     </button>
                                 </div>
                             </div>
                             <?php else: ?>
                             <!-- Select button -->
-                            <button type="button" id="select-point-btn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                            <button type="button" id="select-point-btn" class="w-full flex items-center justify-center gap-2 bg-[#ba1b02] hover:bg-[#a01701] text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                 </svg>
@@ -278,7 +278,7 @@ unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <!-- Payment Method -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mt-6">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -288,46 +288,42 @@ unset($__errorArgs, $__bag); ?>
                         <h2 class="text-2xl font-black text-gray-900">Způsob platby</h2>
                     </div>
                     
-                    <div class="space-y-3">
-                        <label class="flex items-start p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-primary-400 hover:shadow-md transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-gradient-to-r has-[:checked]:from-primary-50 has-[:checked]:to-pink-50 has-[:checked]:shadow-lg group">
-                            <input type="radio" name="payment_method" value="card" checked required class="mt-1 w-5 h-5 text-primary-600 focus:ring-primary-500">
-                            <div class="ml-4 flex-1">
-                                <div class="font-bold text-gray-900 group-has-[:checked]:text-primary-700">Platební kartou</div>
-                                <div class="text-sm text-gray-600 mt-1">Visa, Mastercard, Apple Pay, Google Pay</div>
+                    <!-- Single Payment Method Info -->
+                    <div class="p-5 border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-pink-50 rounded-xl shadow-lg">
+                        <input type="hidden" name="payment_method" value="card">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-pink-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
                             </div>
-                            <svg class="w-12 h-8 flex-shrink-0" viewBox="0 0 48 32" fill="none">
-                                <rect width="48" height="32" rx="4" fill="#1E3A8A"/>
-                                <circle cx="18" cy="16" r="8" fill="#EB001B"/>
-                                <circle cx="30" cy="16" r="8" fill="#FF5F00" fill-opacity="0.8"/>
-                            </svg>
-                        </label>
-
-                        <label class="flex items-start p-5 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-primary-400 hover:shadow-md transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-gradient-to-r has-[:checked]:from-primary-50 has-[:checked]:to-pink-50 has-[:checked]:shadow-lg group">
-                            <input type="radio" name="payment_method" value="transfer" required class="mt-1 w-5 h-5 text-primary-600 focus:ring-primary-500">
-                            <div class="ml-4 flex-1">
-                                <div class="font-bold text-gray-900 group-has-[:checked]:text-primary-700">Bankovním převodem</div>
-                                <div class="text-sm text-gray-600 mt-1">Zboží odešleme po připsání platby</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-gray-900 mb-1 text-lg">Platební kartou</div>
+                                <div class="text-sm text-gray-700 mb-3">Po odeslání objednávky budete přesměrováni na bezpečnou platební bránu</div>
+                                <div class="flex items-center gap-3 flex-wrap">
+                                    <span class="text-xs text-gray-600 font-semibold">Akceptujeme:</span>
+                                    <div class="flex items-center gap-2">
+                                        <div class="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
+                                            <span class="text-xs font-bold text-blue-700">Visa</span>
+                                        </div>
+                                        <div class="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
+                                            <span class="text-xs font-bold text-orange-600">Mastercard</span>
+                                        </div>
+                                        <div class="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
+                                            <span class="text-xs font-bold text-gray-700">Apple Pay</span>
+                                        </div>
+                                        <div class="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
+                                            <span class="text-xs font-bold text-blue-600">Google Pay</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <svg class="w-12 h-8 flex-shrink-0" viewBox="0 0 48 32" fill="none">
-                                <rect width="48" height="32" rx="4" fill="#10B981"/>
-                                <path d="M24 8L16 16L24 24M24 16H32" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </label>
+                        </div>
                     </div>
-                    <?php $__errorArgs = ['payment_method'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <p class="text-red-600 text-sm mt-2"><?php echo e($message); ?></p>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <!-- Additional Notes -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mt-6">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-500 to-slate-600 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -508,11 +504,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update UI to show selected point
                 const selectionDiv = document.getElementById('packeta-selection');
                 selectionDiv.innerHTML = `
-                    <div id="selected-point" class="p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-xl">
+                    <div id="selected-point" class="p-5 bg-gradient-to-r from-primary-50 to-pink-50 border-2 border-primary-400 rounded-xl">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center mb-2">
-                                    <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-5 h-5 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                     </svg>
                                     <span class="font-bold text-gray-900">Vybrané výdejní místo:</span>
@@ -520,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <p class="text-gray-900 font-semibold ml-7">${point.name}</p>
                                 <p class="text-sm text-gray-700 ml-7">${address}</p>
                             </div>
-                            <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-primary-600 font-semibold px-4 py-2 rounded-lg border border-gray-200 whitespace-nowrap ml-4 transition-colors">
+                            <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-[#ba1b02] font-semibold px-4 py-2 rounded-lg border border-gray-200 whitespace-nowrap ml-4 transition-colors">
                                 Změnit
                             </button>
                         </div>

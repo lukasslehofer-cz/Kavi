@@ -4,112 +4,91 @@
 
 @section('content')
 
-<!-- Hero Section - Modern Dynamic -->
-<div class="relative bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 overflow-hidden">
-    <!-- Animated Background Elements -->
-    <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-24 -left-24 w-[36rem] h-[36rem] bg-gradient-to-tr from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
-    </div>
+<!-- Hero Section - Video Background -->
+<div class="relative h-[88vh] min-h-[550px] max-h-[850px] overflow-hidden">
+    <!-- Fallback Background Image -->
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1920');"></div>
+    
+    <!-- Video Background -->
+    <video 
+        autoplay 
+        loop 
+        muted 
+        playsinline
+        webkit-playsinline
+        class="absolute inset-0 w-full h-full object-cover"
+    >
+        <source src="https://www.pexels.com/cs-cz/download/video/4794528/" type="video/mp4">
+    </video>
+    
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-900/20 via-gray-900/65 to-primary-900/75"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-gray-900/20 via-transparent to-gray-900/50"></div>
 
-    <div class="relative mx-auto max-w-screen-2xl px-4 md:px-8 py-16 md:py-24 lg:py-32">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <!-- Left Content -->
-            <div class="text-center lg:text-left space-y-8 animate-fade-in">
-                <!-- Badge -->
-                <div class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-100 to-pink-100 border border-primary-200 rounded-full px-4 py-2 shadow-sm">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
-                    </span>
-                    <span class="text-sm font-semibold text-gray-700">Nově praženo každý týden</span>
-                </div>
-
-                <!-- Heading -->
-                <div class="space-y-4">
-                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                        <span class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">Objevte tu nejlepší</span>
-                        <span class="block bg-gradient-to-r from-primary-600 via-pink-600 to-primary-700 bg-clip-text text-transparent animate-gradient">kávu z celé Evropy</span>
-                    </h1>
-                    <p class="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto lg:mx-0">
-                        Prémiová káva s měsíčním předplatným. Čerstvě pražená, pečlivě vybraná, doručená přímo k vám domů.
-                    </p>
-                </div>
-
-                <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                    <a href="{{ route('subscriptions.index') }}" class="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500 to-pink-600 hover:from-primary-600 hover:to-pink-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                        <span>Sestavte si vlastní box</span>
-                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                    </a>
-                    <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-semibold px-8 py-4 rounded-xl shadow-md hover:shadow-lg border-2 border-gray-200 hover:border-gray-300 transform hover:-translate-y-0.5 transition-all duration-200">
-                        <span>Prozkoumat kávy</span>
-                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </a>
-                </div>
-
-                <!-- Social Proof -->
-                <div class="flex items-center gap-8 justify-center lg:justify-start pt-4">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-900">2500+</div>
-                        <div class="text-sm text-gray-600">Spokojených zákazníků</div>
-                    </div>
-                    <div class="w-px h-12 bg-gray-300"></div>
-                    <div class="text-center">
-                        <div class="flex items-center gap-1 justify-center">
-                            <span class="text-3xl font-bold text-gray-900">4.9</span>
-                            <svg class="w-6 h-6 text-primary-500 fill-current" viewBox="0 0 20 20">
-                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                            </svg>
-                        </div>
-                        <div class="text-sm text-gray-600">Průměrné hodnocení</div>
-                    </div>
-                </div>
+    <!-- Content -->
+    <div class="relative h-full flex items-center justify-center px-4 md:px-8">
+        <div class="max-w-4xl mx-auto text-center space-y-6 animate-fade-in">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 shadow-lg">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
+                </span>
+                <span class="text-sm font-semibold text-white">Nově praženo každý týden</span>
             </div>
 
-            <!-- Right Image -->
-            <div class="relative lg:h-[600px] h-96">
-                <!-- Main Image -->
-                <div class="absolute inset-0 rounded-3xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
-                    <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1200" alt="Premium Coffee" class="w-full h-full object-cover" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                </div>
-                
-                <!-- Floating Card 1 -->
-                <div class="absolute top-8 right-8 bg-white rounded-2xl shadow-xl p-4 backdrop-blur-sm bg-white/95 transform hover:scale-110 transition-transform duration-300">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-pink-500 flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="font-bold text-gray-900">100% Arabica</div>
-                            <div class="text-xs text-gray-600">Prémiová kvalita</div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Heading -->
+            <div class="space-y-5">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black leading-tight">
+                    <span class="block text-white drop-shadow-2xl">Objevte tu nejlepší</span>
+                    <span class="block bg-gradient-to-r from-primary-400 via-pink-400 to-primary-500 bg-clip-text text-transparent drop-shadow-lg">kávu z celé Evropy</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto drop-shadow-lg leading-relaxed">
+                    Prémiová káva s měsíčním předplatným. Čerstvě pražená, pečlivě vybraná, doručená přímo k vám domů.
+                </p>
+            </div>
 
-                <!-- Floating Card 2 -->
-                <div class="absolute bottom-8 left-8 bg-white rounded-2xl shadow-xl p-4 backdrop-blur-sm bg-white/95 transform hover:scale-110 transition-transform duration-300">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="font-bold text-gray-900">Čerstvé pražení</div>
-                            <div class="text-xs text-gray-600">Každý týden</div>
-                        </div>
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <a href="{{ route('subscriptions.index') }}" class="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500 to-pink-600 hover:from-primary-600 hover:to-pink-700 text-white font-bold text-base px-8 py-4 rounded-xl shadow-2xl hover:shadow-primary-500/50 transform hover:-translate-y-1 transition-all duration-200">
+                    <span>Sestavte si vlastní box</span>
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
+                <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-bold text-base px-8 py-4 rounded-xl shadow-xl border-2 border-white/30 hover:border-white/50 transform hover:-translate-y-1 transition-all duration-200">
+                    <span>Prozkoumat kávy</span>
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Social Proof -->
+            <div class="flex items-center gap-6 justify-center pt-6">
+                <div class="text-center backdrop-blur-sm bg-white/5 rounded-xl px-5 py-3 border border-white/10">
+                    <div class="text-3xl font-black text-white drop-shadow-lg">2500+</div>
+                    <div class="text-xs text-gray-200 font-medium">Spokojených zákazníků</div>
+                </div>
+                <div class="w-px h-12 bg-white/20"></div>
+                <div class="text-center backdrop-blur-sm bg-white/5 rounded-xl px-5 py-3 border border-white/10">
+                    <div class="flex items-center gap-1.5 justify-center">
+                        <span class="text-3xl font-black text-white drop-shadow-lg">4.9</span>
+                        <svg class="w-6 h-6 text-primary-400 fill-current drop-shadow-lg" viewBox="0 0 20 20">
+                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                        </svg>
                     </div>
+                    <div class="text-xs text-gray-200 font-medium">Průměrné hodnocení</div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-12 left-1/2 -translate-x-1/2 hidden md:block">
+        <svg class="w-6 h-6 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
     </div>
 </div>
 

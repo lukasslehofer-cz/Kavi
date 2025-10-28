@@ -31,6 +31,7 @@ Route::get('/predplatne', [SubscriptionController::class, 'index'])->name('subsc
 Route::post('/predplatne/konfigurator/checkout', [SubscriptionController::class, 'configureCheckout'])->name('subscriptions.configure.checkout');
 Route::get('/predplatne/pokladna', [SubscriptionController::class, 'checkout'])->name('subscriptions.checkout');
 Route::post('/predplatne/pokladna', [SubscriptionController::class, 'processCheckout'])->name('subscriptions.checkout.process');
+Route::get('/predplatne/{subscription}/potvrzeni', [SubscriptionController::class, 'confirmation'])->middleware('auth')->name('subscriptions.confirmation');
 
 // Subscription plans (keep this route last as it catches everything)
 Route::get('/predplatne/{plan}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
@@ -59,10 +60,14 @@ Route::post('/webhook/stripe', [PaymentController::class, 'webhook'])->name('str
 // User Dashboard - requires auth
 Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
+    Route::get('/profil', [DashboardController::class, 'profile'])->name('profile');
+    Route::put('/profil', [DashboardController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/heslo', [DashboardController::class, 'updatePassword'])->name('password.update');
     Route::get('/objednavky', [DashboardController::class, 'orders'])->name('orders');
     Route::get('/objednavka/{order}', [DashboardController::class, 'orderDetail'])->name('order.detail');
     Route::get('/predplatne', [DashboardController::class, 'subscription'])->name('subscription');
     Route::post('/predplatne/update-packeta', [DashboardController::class, 'updatePacketaPoint'])->name('subscription.update-packeta');
+    Route::get('/notifikace', [DashboardController::class, 'notifications'])->name('notifications');
 });
 
 // Admin Panel - requires auth + admin

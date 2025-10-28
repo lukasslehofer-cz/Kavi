@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class DashboardController extends Controller
 {
@@ -95,8 +97,43 @@ class DashboardController extends Controller
             'message' => 'Výdejní místo bylo úspěšně změněno.',
         ]);
     }
+
+    public function profile()
+    {
+        return view('dashboard.profile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . auth()->id()],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        auth()->user()->update($validated);
+
+        return redirect()->route('dashboard.profile')
+            ->with('success', 'Profil byl úspěšně aktualizován.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ]);
+
+        auth()->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return redirect()->route('dashboard.profile')
+            ->with('success', 'Heslo bylo úspěšně změněno.');
+    }
+
+    public function notifications()
+    {
+        return view('dashboard.notifications');
+    }
 }
-
-
-
-

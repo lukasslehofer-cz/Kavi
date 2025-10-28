@@ -13,3 +13,21 @@
         @apply font-display font-bold;
     }
 }
+
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg;
+    }
+    
+    .btn-primary {
+        @apply bg-gradient-to-r from-primary-500 to-pink-600 hover:from-primary-600 hover:to-pink-700 text-white transform hover:-translate-y-0.5;
+    }
+    
+    .card {
+        @apply bg-white rounded-2xl shadow-lg;
+    }
+    
+    .input {
+        @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all;
+    }
+}

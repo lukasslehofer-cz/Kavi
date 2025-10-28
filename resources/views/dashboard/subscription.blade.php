@@ -1,47 +1,47 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
+
+@section('title', 'Předplatné - Kavi Coffee')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="mb-8">
-        <a href="{{ route('dashboard.index') }}" class="text-blue-600 hover:text-blue-700 font-medium mb-4 inline-block">
-            ← Zpět na dashboard
-        </a>
-        <h1 class="text-3xl font-bold text-gray-900">Správa předplatných</h1>
-        <p class="mt-2 text-gray-600">Přehled všech vašich aktivních předplatných ({{ $subscriptions->count() }})</p>
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        <h1 class="text-3xl font-bold text-dark-800">Správa předplatných</h1>
+        <p class="mt-2 text-dark-600">Přehled všech vašich aktivních předplatných ({{ $subscriptions->count() }})</p>
     </div>
 
     @foreach($subscriptions as $subscription)
-    <div class="bg-white rounded-lg shadow-md mb-8 overflow-hidden" id="subscription-{{ $subscription->id }}">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-l-4 border-primary-500" id="subscription-{{ $subscription->id }}">
         <!-- Subscription Header -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
-            <div class="flex justify-between items-start">
-                <div>
+        <div class="bg-gradient-to-r from-primary-50 to-pink-50 p-6 border-b border-primary-100">
+            <div class="flex justify-between items-start flex-wrap gap-4">
+                <div class="flex-1">
                     @if($subscription->plan)
-                        <h2 class="text-2xl font-bold">{{ $subscription->plan->name }}</h2>
-                        <p class="text-blue-100 mt-1">{{ $subscription->plan->description }}</p>
+                        <h2 class="text-2xl font-bold text-dark-800 mb-1">{{ $subscription->plan->name }}</h2>
+                        <p class="text-dark-600">{{ $subscription->plan->description }}</p>
                     @else
-                        <h2 class="text-2xl font-bold">Kávové předplatné #{{ $subscription->id }}</h2>
-                        <p class="text-blue-100 mt-1">Váš vlastní konfigurace</p>
+                        <h2 class="text-2xl font-bold text-dark-800 mb-1">Kávové předplatné #{{ $subscription->id }}</h2>
+                        <p class="text-dark-600">Váš vlastní konfigurace</p>
                     @endif
                     
                     <div class="mt-3">
                         @if($subscription->status === 'active')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-500 text-white">
-                                <span class="w-2 h-2 bg-white rounded-full mr-2"></span>
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-800 border-2 border-green-500">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
                                 Aktivní
                             </span>
                         @else
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-yellow-500 text-white">
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 border-2 border-yellow-500">
                                 {{ ucfirst($subscription->status) }}
                             </span>
                         @endif
                     </div>
                 </div>
                 <div class="text-right">
-                    <div class="text-3xl font-bold">
+                    <div class="text-4xl font-bold text-primary-600">
                         {{ number_format($subscription->configured_price ?? $subscription->plan->price, 0, ',', ' ') }} Kč
                     </div>
-                    <div class="text-sm text-blue-100">
+                    <div class="text-sm text-dark-600 mt-1">
                         @if($subscription->frequency_months)
                             / {{ $subscription->frequency_months == 1 ? 'měsíc' : ($subscription->frequency_months . ' měsíce') }}
                         @else
