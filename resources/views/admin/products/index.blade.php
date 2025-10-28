@@ -50,9 +50,22 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                {{ ucfirst($product->category) }}
-                            </span>
+                            <div class="flex flex-wrap gap-1">
+                                @php
+                                    $categoryLabels = [
+                                        'espresso' => 'Espresso',
+                                        'filter' => 'Filtr',
+                                        'accessories' => 'Příslušenství',
+                                        'merch' => 'Merch',
+                                    ];
+                                    $categories = is_array($product->category) ? $product->category : [$product->category];
+                                @endphp
+                                @foreach($categories as $cat)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        {{ $categoryLabels[$cat] ?? ucfirst($cat) }}
+                                    </span>
+                                @endforeach
+                            </div>
                         </td>
                         <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Kč</td>
                         <td class="px-6 py-4 text-sm">

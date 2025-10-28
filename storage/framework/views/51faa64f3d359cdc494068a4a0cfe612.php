@@ -1,33 +1,40 @@
 <?php $__env->startSection('title', 'Naše pražírny - Kavi Coffee'); ?>
 
 <?php $__env->startSection('content'); ?>
-<!-- Hero Header Section -->
-<div class="relative bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 py-16 md:py-20 overflow-hidden">
-  <!-- Background Decoration -->
+<!-- Hero Header Section - Minimal -->
+<div class="relative bg-gray-100 py-16 md:py-20 overflow-hidden">
+  <!-- Subtle Organic Shapes -->
   <div class="absolute inset-0 overflow-hidden">
-    <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-24 -left-24 w-[36rem] h-[36rem] bg-gradient-to-tr from-primary-300/10 to-pink-400/10 rounded-full blur-3xl"></div>
+    <div class="absolute -top-32 -right-32 w-96 h-96 bg-primary-100 rounded-full"></div>
+    <div class="absolute -bottom-32 -left-32 w-[36rem] h-[36rem] bg-primary-50 rounded-full"></div>
   </div>
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="text-center max-w-3xl mx-auto">
-      <!-- Badge -->
-      <div class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-100 to-pink-100 rounded-full px-4 py-2 mb-6">
-        <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <!-- Minimal Badge -->
+      <div class="inline-flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 mb-6">
+        <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
         </svg>
-        <span class="text-sm font-bold text-primary-700">Prémiové pražírny</span>
+        <span class="text-sm font-medium text-gray-900">Prémiové pražírny</span>
       </div>
 
-      <!-- Main Heading -->
-      <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-black text-gray-900">
-        Naše <span class="bg-gradient-to-r from-primary-600 to-pink-600 bg-clip-text text-transparent">pražírny</span>
+      <!-- Clean Heading -->
+      <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
+        Naše pražírny
       </h1>
       
-      <p class="mx-auto max-w-2xl text-lg md:text-xl text-gray-600 mb-8">
-        Spolupracujeme s těmi nejlepšími pražírnami z celé Evropy. <span class="font-semibold text-gray-900">Kvalita, tradice a láska ke kávě.</span>
+      <p class="mx-auto max-w-2xl text-lg text-gray-600 font-light">
+        Spolupracujeme s těmi nejlepšími pražírnami z celé Evropy. Kvalita, tradice a láska ke kávě.
       </p>
     </div>
+  </div>
+  
+  <!-- Wave Divider -->
+  <div class="absolute bottom-[-1px] left-0 right-0">
+    <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+      <path d="M0 80L60 73C120 67 240 53 360 48C480 43 600 47 720 53C840 59 960 67 1080 69C1200 71 1320 67 1380 65L1440 63V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="#ffffff"/>
+    </svg>
   </div>
 </div>
 
@@ -35,18 +42,18 @@
 <div class="bg-white py-12 sm:py-16 lg:py-20">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
-    <!-- Country Filters - start -->
-    <div class="mb-12">
+    <!-- Country Filters - Minimal -->
+    <div class="mb-10">
       <div class="text-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-2">Filtrovat podle země</h2>
-        <p class="text-gray-600">Vyberte zemi, ze které chcete vidět pražírny</p>
+        <h2 class="text-xl font-semibold text-gray-900 mb-1">Filtrovat podle země</h2>
+        <p class="text-gray-600 text-sm font-light">Vyberte zemi, ze které chcete vidět pražírny</p>
       </div>
       
-      <div class="flex flex-wrap justify-center gap-3">
+      <div class="flex flex-wrap justify-center gap-2">
         <a href="<?php echo e(route('roasteries.index')); ?>" 
-           class="group relative inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-200 <?php echo e(!$selectedCountry ? 'bg-gradient-to-r from-primary-500 to-pink-600 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5' : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-primary-300 shadow-md hover:shadow-lg'); ?>">
+           class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 <?php echo e(!$selectedCountry ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300'); ?>">
           <?php if(!$selectedCountry): ?>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
           <?php endif; ?>
@@ -55,13 +62,13 @@
         
         <?php $__currentLoopData = $countries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $country => $flag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <a href="<?php echo e(route('roasteries.index', ['country' => $country])); ?>" 
-           class="group relative inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-200 <?php echo e($selectedCountry == $country ? 'bg-gradient-to-r from-primary-500 to-pink-600 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5' : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-primary-300 shadow-md hover:shadow-lg'); ?>">
+           class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 <?php echo e($selectedCountry == $country ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300'); ?>">
           <?php if($selectedCountry == $country): ?>
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
           <?php endif; ?>
-          <span class="text-2xl"><?php echo e($flag); ?></span>
+          <span class="text-lg"><?php echo e($flag); ?></span>
           <span><?php echo e($country); ?></span>
         </a>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -69,84 +76,81 @@
     </div>
     <!-- Country Filters - end -->
 
-    <!-- Roasteries Grid -->
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Roasteries Grid - Minimal -->
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <?php $__empty_1 = true; $__currentLoopData = $roasteries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $roastery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
       <!-- roastery - start -->
-      <div class="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-gray-200 hover:border-primary-300">
+      <div class="group relative bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-200">
         <!-- Image Container -->
-        <a href="<?php echo e(route('roasteries.show', $roastery)); ?>" class="relative block h-64 overflow-hidden">
+        <a href="<?php echo e(route('roasteries.show', $roastery)); ?>" class="relative block h-56 overflow-hidden bg-gray-50">
           <?php if($roastery->image): ?>
-          <img src="<?php echo e(asset($roastery->image)); ?>" loading="lazy" alt="<?php echo e($roastery->name); ?>" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-110" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          <img src="<?php echo e(asset($roastery->image)); ?>" loading="lazy" alt="<?php echo e($roastery->name); ?>" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105" />
           <?php else: ?>
-          <div class="h-full w-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-primary-100 to-pink-100">
-            <svg class="w-20 h-20 text-primary-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="h-full w-full flex flex-col items-center justify-center p-8 bg-gray-100">
+            <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
             </svg>
           </div>
           <?php endif; ?>
 
-          <!-- Country Flag - Top Right -->
-          <div class="absolute right-4 top-4">
-            <span class="text-5xl drop-shadow-2xl"><?php echo e($roastery->country_flag); ?></span>
+          <!-- Country Flag -->
+          <div class="absolute right-3 top-3 text-3xl">
+            <?php echo e($roastery->country_flag); ?>
+
           </div>
           
-          <!-- Coffee Count - Top Left -->
-          <div class="absolute left-4 top-4 bg-primary-600 text-white rounded-lg px-3 py-1.5 text-xs font-bold shadow-lg">
+          <!-- Coffee Count -->
+          <div class="absolute left-3 top-3 bg-gray-900 text-white rounded-full px-2.5 py-1 text-xs font-medium">
             <?php echo e($roastery->products()->count()); ?> <?php echo e($roastery->products()->count() == 1 ? 'káva' : 'káv'); ?>
 
           </div>
         </a>
 
-        <!-- Content -->
-        <div class="p-6">
-          <a href="<?php echo e(route('roasteries.show', $roastery)); ?>" class="block mb-3">
-            <h3 class="text-2xl font-black text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">
+        <!-- Content - Minimal -->
+        <div class="p-5">
+          <a href="<?php echo e(route('roasteries.show', $roastery)); ?>" class="block mb-2">
+            <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-gray-600 transition-colors">
               <?php echo e($roastery->name); ?>
 
             </h3>
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center gap-1.5 text-sm text-gray-500">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
               </svg>
-              <span class="font-medium"><?php echo e($roastery->city ?? $roastery->country); ?></span>
+              <span class="font-light"><?php echo e($roastery->city ?? $roastery->country); ?></span>
             </div>
           </a>
 
           <?php if($roastery->short_description): ?>
-          <p class="text-gray-700 text-sm mb-4 line-clamp-3">
+          <p class="text-gray-600 text-sm mb-4 line-clamp-3 font-light">
             <?php echo e($roastery->short_description); ?>
 
           </p>
           <?php endif; ?>
 
-          <!-- Links -->
-          <div class="flex items-center gap-3 mb-4">
+          <!-- Links - Minimal -->
+          <div class="flex items-center gap-2 mb-4">
             <?php if($roastery->website_url): ?>
-            <a href="<?php echo e($roastery->website_url); ?>" target="_blank" rel="noopener" class="text-gray-600 hover:text-primary-600 transition-colors" title="Web">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="<?php echo e($roastery->website_url); ?>" target="_blank" rel="noopener" class="text-gray-500 hover:text-gray-900 transition-colors" title="Web">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
               </svg>
             </a>
             <?php endif; ?>
             
             <?php if($roastery->instagram): ?>
-            <a href="https://instagram.com/<?php echo e(str_replace('@', '', $roastery->instagram)); ?>" target="_blank" rel="noopener" class="text-gray-600 hover:text-pink-600 transition-colors" title="Instagram">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a href="https://instagram.com/<?php echo e(str_replace('@', '', $roastery->instagram)); ?>" target="_blank" rel="noopener" class="text-gray-500 hover:text-pink-600 transition-colors" title="Instagram">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
               </svg>
             </a>
             <?php endif; ?>
           </div>
 
-          <!-- CTA Button -->
-          <a href="<?php echo e(route('roasteries.show', $roastery)); ?>" class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-pink-600 text-white font-bold py-3 px-6 rounded-xl hover:from-primary-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full justify-center">
-            <span>Zobrazit detail</span>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
+          <!-- CTA Button - Minimal -->
+          <a href="<?php echo e(route('roasteries.show', $roastery)); ?>" class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm flex items-center justify-center">
+            Zobrazit detail
           </a>
         </div>
       </div>

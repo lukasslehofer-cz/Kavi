@@ -361,3 +361,5 @@ Každé předplatné má svůj Price objekt.
 
 **Vytvořeno:** 28. října 2025
 **Status:** Ready for testing
+
+

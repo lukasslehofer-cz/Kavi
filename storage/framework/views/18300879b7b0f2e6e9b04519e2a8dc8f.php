@@ -56,9 +56,13 @@
             'accessories' => ['label' => 'Příslušenství', 'color' => 'bg-purple-500'],
             'merch' => ['label' => 'Merch', 'color' => 'bg-green-500'],
           ];
-          if (isset($categoryLabels[$product->category])) {
-            $cat = $categoryLabels[$product->category];
-            echo '<span class="px-3 py-1 rounded-lg text-xs font-bold ' . $cat['color'] . ' text-white shadow-lg">' . $cat['label'] . '</span>';
+          if (is_array($product->category) && !empty($product->category)) {
+            foreach ($product->category as $cat) {
+              if (isset($categoryLabels[$cat])) {
+                $catData = $categoryLabels[$cat];
+                echo '<span class="px-3 py-1 rounded-lg text-xs font-bold ' . $catData['color'] . ' text-white shadow-lg">' . $catData['label'] . '</span>';
+              }
+            }
           }
         }
       ?>

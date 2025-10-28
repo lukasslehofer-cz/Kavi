@@ -1,25 +1,24 @@
 <?php $__env->startSection('title', $roastery->name . ' - Naše pražírny - Kavi Coffee'); ?>
 
 <?php $__env->startSection('content'); ?>
-<!-- Hero with Breadcrumb -->
-<div class="relative bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 py-8 border-b border-gray-200">
+<!-- Minimal Breadcrumb -->
+<div class="bg-white py-3 border-b border-gray-100">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Breadcrumb -->
     <nav class="text-sm">
-      <ol class="flex items-center space-x-2 text-gray-600">
-        <li><a href="<?php echo e(route('home')); ?>" class="hover:text-primary-600 transition-colors font-medium">Domů</a></li>
-        <li class="text-gray-400">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <ol class="flex items-center space-x-2 text-gray-500">
+        <li><a href="<?php echo e(route('home')); ?>" class="hover:text-gray-900 transition-colors font-light">Domů</a></li>
+        <li class="text-gray-300">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </li>
-        <li><a href="<?php echo e(route('roasteries.index')); ?>" class="hover:text-primary-600 transition-colors font-medium">Naše pražírny</a></li>
-        <li class="text-gray-400">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <li><a href="<?php echo e(route('roasteries.index')); ?>" class="hover:text-gray-900 transition-colors font-light">Naše pražírny</a></li>
+        <li class="text-gray-300">
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </li>
-        <li class="text-gray-900 font-bold truncate max-w-xs"><?php echo e($roastery->name); ?></li>
+        <li class="text-gray-900 font-medium truncate max-w-xs"><?php echo e($roastery->name); ?></li>
       </ol>
     </nav>
   </div>
@@ -30,45 +29,45 @@
 
     <!-- Roastery Detail - Info LEFT, Image RIGHT -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
-        <!-- Roastery Info -->
+        <!-- Roastery Info - Minimal -->
         <div>
-            <!-- Country Flag - simple, no box -->
-            <div class="mb-6">
-              <span class="text-8xl"><?php echo e($roastery->country_flag); ?></span>
+            <!-- Country Flag -->
+            <div class="mb-5">
+              <span class="text-7xl"><?php echo e($roastery->country_flag); ?></span>
             </div>
             
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-4 leading-tight">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight tracking-tight">
                 <?php echo e($roastery->name); ?>
 
             </h1>
             
-            <!-- Location -->
-            <div class="mb-6">
-              <p class="text-lg text-gray-600 font-medium flex items-center gap-2">
-                <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <!-- Location - Minimal -->
+            <div class="mb-5">
+              <p class="text-base text-gray-600 font-light flex items-center gap-2">
+                <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                <span class="font-bold"><?php echo e($roastery->country); ?></span>
+                <span class="font-medium"><?php echo e($roastery->country); ?></span>
                 <?php if($roastery->city): ?>
                 <span class="text-gray-400">•</span>
                 <span><?php echo e($roastery->city); ?></span>
                 <?php endif; ?>
               </p>
               <?php if($roastery->address): ?>
-              <p class="text-sm text-gray-500 ml-7 mt-1"><?php echo e($roastery->address); ?></p>
+              <p class="text-sm text-gray-500 ml-6 mt-1 font-light"><?php echo e($roastery->address); ?></p>
               <?php endif; ?>
             </div>
             
             <?php if($roastery->short_description): ?>
-            <p class="text-xl text-gray-600 mb-8 leading-relaxed"><?php echo e($roastery->short_description); ?></p>
+            <p class="text-lg text-gray-600 mb-8 leading-relaxed font-light"><?php echo e($roastery->short_description); ?></p>
             <?php endif; ?>
             
-            <!-- Links -->
-            <div class="flex flex-wrap items-center gap-4 mb-8">
+            <!-- Links - Minimal -->
+            <div class="flex flex-wrap items-center gap-3 mb-8">
               <?php if($roastery->website_url): ?>
-              <a href="<?php echo e($roastery->website_url); ?>" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <a href="<?php echo e($roastery->website_url); ?>" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 px-5 rounded-full transition-all duration-200 text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
                 </svg>
                 <span>Navštívit web</span>
@@ -76,8 +75,8 @@
               <?php endif; ?>
               
               <?php if($roastery->instagram): ?>
-              <a href="https://instagram.com/<?php echo e(str_replace('@', '', $roastery->instagram)); ?>" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <a href="https://instagram.com/<?php echo e(str_replace('@', '', $roastery->instagram)); ?>" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 font-medium py-2.5 px-5 rounded-full transition-all duration-200 text-sm">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
                 <span><?php echo e($roastery->instagram); ?></span>
@@ -125,107 +124,100 @@
             <?php endif; ?>
         </div>
 
-        <!-- Roastery Image (RIGHT side, sticky) -->
+        <!-- Roastery Image (RIGHT side, sticky) - Minimal -->
         <div class="lg:sticky lg:top-24 h-fit">
-            <div class="relative aspect-square rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-200 bg-gradient-to-br from-gray-100 to-gray-50">
+            <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50">
                 <?php if($roastery->image): ?>
                 <img src="<?php echo e(asset($roastery->image)); ?>" alt="<?php echo e($roastery->name); ?>" class="w-full h-full object-cover">
                 <?php else: ?>
-                <div class="w-full h-full flex flex-col items-center justify-center p-12 bg-gradient-to-br from-primary-100 to-pink-100">
-                    <svg class="w-32 h-32 text-primary-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-full h-full flex flex-col items-center justify-center p-12 bg-gray-100">
+                    <svg class="w-32 h-32 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
-                    <p class="text-center text-primary-700 font-semibold"><?php echo e($roastery->name); ?></p>
+                    <p class="text-center text-gray-600 font-medium"><?php echo e($roastery->name); ?></p>
                 </div>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <!-- Coffees Section -->
+    <!-- Coffees Section - Minimal -->
     <div>
-      <div class="text-center mb-12">
-        <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-          Naše kávy od <span class="bg-gradient-to-r from-primary-600 to-pink-600 bg-clip-text text-transparent"><?php echo e($roastery->name); ?></span>
+      <div class="text-center mb-10">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
+          Naše kávy od <?php echo e($roastery->name); ?>
+
         </h2>
-        <p class="text-xl text-gray-600">
+        <p class="text-lg text-gray-600 font-light">
           Prozkoumejte všechny kávy, které jsme od této pražírny měli nebo momentálně máme v nabídce
         </p>
       </div>
 
       <!-- Coffee of Month Products + Subscription Promo (Priority #1) -->
       <?php if($coffeeOfMonthProducts->count() > 0): ?>
-      <div class="mb-16">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary-500 to-pink-600 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+      <div class="mb-14">
+        <div class="flex items-center gap-2.5 mb-6">
+          <div class="flex-shrink-0 w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
           </div>
-          <h3 class="text-2xl font-black text-gray-900">V aktuálním předplatném</h3>
+          <h3 class="text-xl font-bold text-gray-900">V aktuálním předplatném</h3>
         </div>
         
-        <!-- Coffees Grid (max 3 columns for wider cards) -->
-        <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <!-- Coffees Grid - Minimal -->
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
           <?php $__currentLoopData = $coffeeOfMonthProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-          <!-- Coffee of Month Card (no price, opens modal) -->
-          <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-primary-200 hover:shadow-2xl transition-all duration-300">
-            <!-- Coffee Image -->
-            <div class="relative h-80 overflow-hidden cursor-pointer" onclick="openCoffeeModal(<?php echo e($product->id); ?>, '<?php echo e(addslashes($product->name)); ?>', '<?php echo e($product->image ? asset($product->image) : ''); ?>', '<?php echo e(addslashes($product->short_description ?? '')); ?>', <?php echo e(json_encode($product->attributes ?? [])); ?>)">
+          <!-- Coffee of Month Card - Minimal -->
+          <div class="bg-white rounded-2xl border border-gray-200 hover:border-gray-300 overflow-hidden transition-all duration-200">
+            <!-- Coffee Image - Minimal -->
+            <div class="relative h-64 overflow-hidden cursor-pointer bg-gray-50" onclick="openCoffeeModal(<?php echo e($product->id); ?>, '<?php echo e(addslashes($product->name)); ?>', '<?php echo e($product->image ? asset($product->image) : ''); ?>', '<?php echo e(addslashes($product->short_description ?? '')); ?>', <?php echo e(json_encode($product->attributes ?? [])); ?>)">
               <?php if($product->image): ?>
               <img src="<?php echo e(asset($product->image)); ?>" 
                    alt="<?php echo e($product->name); ?>"
-                   class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                   class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
               <?php else: ?>
-              <div class="w-full h-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                <svg class="w-32 h-32 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+              <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                <svg class="w-20 h-20 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
                 </svg>
               </div>
               <?php endif; ?>
 
-              <!-- Category Badges -->
-              <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+              <!-- Category Badges - Minimal -->
+              <div class="absolute top-3 left-3 flex flex-wrap gap-2">
                 <?php if(is_array($product->category)): ?>
                   <?php $__currentLoopData = $product->category; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <?php if($cat === 'espresso'): ?>
-                    <span class="px-3 py-1 rounded-lg text-xs font-bold bg-amber-500 text-white shadow-lg">Espresso</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">Espresso</span>
                     <?php elseif($cat === 'filter'): ?>
-                    <span class="px-3 py-1 rounded-lg text-xs font-bold bg-blue-500 text-white shadow-lg">Filtr</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">Filtr</span>
                     <?php endif; ?>
                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <?php endif; ?>
               </div>
-
-              <!-- Overlay with click hint -->
-              <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                <svg class="w-16 h-16 text-white opacity-0 hover:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
             </div>
 
-            <!-- Coffee Info -->
-            <div class="p-6">
-              <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+            <!-- Coffee Info - Minimal -->
+            <div class="p-5">
+              <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
                 <?php echo e($product->name); ?>
 
               </h3>
 
               <?php if($product->short_description): ?>
-              <p class="text-sm text-gray-600 mb-4 line-clamp-3">
+              <p class="text-sm text-gray-600 mb-4 line-clamp-3 font-light">
                 <?php echo e($product->short_description); ?>
 
               </p>
               <?php endif; ?>
 
               <button onclick="openCoffeeModal(<?php echo e($product->id); ?>, '<?php echo e(addslashes($product->name)); ?>', '<?php echo e($product->image ? asset($product->image) : ''); ?>', '<?php echo e(addslashes($product->short_description ?? '')); ?>', <?php echo e(json_encode($product->attributes ?? [])); ?>)" 
-                      class="w-full py-3 bg-gradient-to-r from-primary-500 to-pink-600 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-pink-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                      class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
                 Zobrazit detail
               </button>
 
-              <p class="text-xs text-center text-gray-500 mt-3">
+              <p class="text-xs text-center text-gray-500 mt-3 font-light">
                 Tuto kávu nelze zakoupit samostatně
               </p>
             </div>
@@ -233,23 +225,21 @@
           <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
         
-        <!-- Subscription Promo Banner (below coffee cards) -->
-        <div class="bg-gradient-to-r from-primary-600 to-pink-600 rounded-3xl shadow-2xl p-8 md:p-12 text-white">
-          <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm mb-6">
-              <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            </div>
-            <h3 class="text-3xl md:text-4xl font-black mb-4"><?php echo e($coffeeOfMonthProducts->count() === 1 ? 'Chcete tuto kávu vyzkoušet?' : 'Chcete tyto kávy vyzkoušet?'); ?></h3>
-            <p class="text-lg md:text-xl text-primary-100 mb-8 leading-relaxed max-w-2xl mx-auto">
+        <!-- Subscription Promo Banner - Minimal -->
+        <div class="relative bg-gray-100 rounded-2xl p-10 md:p-12 text-center overflow-hidden">
+          <!-- Organic shape -->
+          <div class="absolute top-0 right-0 w-64 h-64 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
+          
+          <div class="relative max-w-3xl mx-auto">
+            <h3 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 tracking-tight"><?php echo e($coffeeOfMonthProducts->count() === 1 ? 'Chcete tuto kávu vyzkoušet?' : 'Chcete tyto kávy vyzkoušet?'); ?></h3>
+            <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto font-light">
               Připojte se k našemu předplatnému a dostávejte každý měsíc exkluzivní kávy přímo od <?php echo e($roastery->name); ?> a dalších skvělých pražíren!
             </p>
-            <a href="<?php echo e(route('subscriptions.index')); ?>" class="inline-flex items-center gap-2 bg-white text-primary-600 hover:bg-gray-100 font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+            <a href="<?php echo e(route('subscriptions.index')); ?>" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-8 rounded-full transition-all duration-200">
               <span>Vybrat předplatné</span>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </a>
           </div>
         </div>
@@ -263,13 +253,13 @@
           $allOtherProducts = $activeProducts->concat($historicalProducts);
         ?>
         
-        <div class="flex items-center gap-3 mb-6">
-          <div class="flex-shrink-0 w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-2.5 mb-6">
+          <div class="flex-shrink-0 w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
-          <h3 class="text-2xl font-black text-gray-900">Další kávy od <?php echo e($roastery->name); ?></h3>
+          <h3 class="text-xl font-bold text-gray-900">Další kávy od <?php echo e($roastery->name); ?></h3>
         </div>
         
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -281,12 +271,12 @@
       <?php endif; ?>
 
       <?php if($coffeeOfMonthProducts->count() == 0 && $activeProducts->count() == 0 && $historicalProducts->count() == 0): ?>
-      <div class="text-center py-16 bg-gray-50 rounded-3xl">
-        <svg class="mx-auto h-24 w-24 text-gray-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="text-center py-16 bg-gray-100 rounded-2xl border border-gray-200">
+        <svg class="mx-auto h-20 w-20 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
         </svg>
-        <h3 class="text-2xl font-bold text-gray-900 mb-2">Zatím žádné kávy</h3>
-        <p class="text-gray-600">Od této pražírny momentálně nemáme žádné kávy v nabídce.</p>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Zatím žádné kávy</h3>
+        <p class="text-gray-600 font-light">Od této pražírny momentálně nemáme žádné kávy v nabídce.</p>
       </div>
       <?php endif; ?>
     </div>
@@ -305,45 +295,36 @@
         </svg>
       </button>
       
-      <!-- Coffee Image -->
-      <div id="modalImage" class="w-full h-72 bg-gradient-to-br from-primary-100 to-pink-100 rounded-t-3xl overflow-hidden"></div>
+      <!-- Coffee Image - Minimal -->
+      <div id="modalImage" class="aspect-square w-full bg-gray-100 rounded-t-3xl overflow-hidden"></div>
       
       <!-- Content -->
       <div class="p-8">
-        <!-- Badge -->
-        <div class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-100 to-pink-100 rounded-full px-4 py-2 mb-4">
-          <svg class="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+        <!-- Badge - Minimal -->
+        <div class="inline-flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5 mb-4">
+          <svg class="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
           </svg>
-          <span class="text-sm font-bold text-primary-700">V aktuálním předplatném</span>
+          <span class="text-xs font-medium text-gray-900">V aktuálním předplatném</span>
         </div>
         
-        <h2 id="modalTitle" class="text-3xl md:text-4xl font-black text-gray-900 mb-4"></h2>
+        <h2 id="modalTitle" class="text-2xl md:text-3xl font-bold text-gray-900 mb-3 tracking-tight"></h2>
         
-        <div id="modalDescription" class="text-lg text-gray-600 mb-6"></div>
+        <div id="modalDescription" class="text-base text-gray-600 mb-6 font-light"></div>
         
         <!-- Attributes -->
         <div id="modalAttributes" class="space-y-3 mb-8"></div>
         
-        <!-- CTA -->
-        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200">
-          <div class="flex items-start gap-4">
-            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-500 to-pink-600 rounded-xl flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-              </svg>
-            </div>
-            <div class="flex-1">
-              <h3 class="font-bold text-gray-900 mb-2">Chcete tuto kávu vyzkoušet?</h3>
-              <p class="text-sm text-gray-600 mb-4">Tato káva je dostupná pouze v našem měsíčním předplatném. Připojte se a každý měsíc objevujte nové chuti!</p>
-              <a href="<?php echo e(route('subscriptions.index')); ?>" class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-pink-600 hover:from-primary-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                <span>Vybrat předplatné</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                </svg>
-              </a>
-            </div>
-          </div>
+        <!-- CTA - Minimal -->
+        <div class="bg-gray-100 rounded-2xl p-6 border border-gray-200">
+          <h3 class="font-semibold text-gray-900 mb-2">Chcete tuto kávu vyzkoušet?</h3>
+          <p class="text-sm text-gray-600 mb-4 font-light">Tato káva je dostupná pouze v našem měsíčním předplatném. Připojte se a každý měsíc objevujte nové chuti!</p>
+          <a href="<?php echo e(route('subscriptions.index')); ?>" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 px-6 rounded-full transition-all duration-200 text-sm">
+            <span>Vybrat předplatné</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
         </div>
       </div>
     </div>

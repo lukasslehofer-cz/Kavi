@@ -312,3 +312,5 @@ Vše bez nutnosti vytvářet nové Price ID!
 **Implementováno:** 28. října 2025
 **Status:** ✅ Produkčně ready
 **Testing:** Doporučeno otestovat všechny varianty před nasazením
+
+
