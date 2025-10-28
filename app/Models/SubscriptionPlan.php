@@ -18,7 +18,6 @@ class SubscriptionPlan extends Model
         'coffee_count',
         'coffee_weight',
         'coffee_type',
-        'stripe_price_id',
         'is_active',
         'features',
     ];

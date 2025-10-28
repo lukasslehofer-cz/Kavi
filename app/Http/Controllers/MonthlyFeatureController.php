@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Roastery;
+use App\Models\Product;
+use Illuminate\Http\Request;
+
+class MonthlyFeatureController extends Controller
+{
+    /**
+     * Show the roastery and coffees of the month
+     */
+    public function index()
+    {
+        // Get the target month based on current date
+        $today = now();
+        $currentDay = $today->day;
+        
+        // If today is 16th or later, show next month
+        if ($currentDay >= 16) {
+            $displayMonth = $today->copy()->addMonth();
+        } else {
+            $displayMonth = $today->copy();
+        }
+        
+        $targetMonth = $displayMonth->format('Y-m');
+        $monthName = $displayMonth->locale('cs')->isoFormat('MMMM YYYY');
+        
+        // Get roasteries of the month
+        $roasteries = Roastery::getRoasteriesOfMonth();
+        
+        // Get coffees of month with eager loaded roastery
+        $coffees = Product::with('roastery')
+            ->where('is_coffee_of_month', true)
+            ->where('coffee_of_month_date', $targetMonth)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        return view('monthly-feature.index', compact('roasteries', 'coffees', 'monthName'));
+    }
+}
+

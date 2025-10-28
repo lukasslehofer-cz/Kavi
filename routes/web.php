@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\RoasteryController as AdminRoasteryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
@@ -9,6 +10,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\RoasteryController;
+use App\Http\Controllers\MonthlyFeatureController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +26,13 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Products
 Route::get('/produkty', [ProductController::class, 'index'])->name('products.index');
 Route::get('/produkt/{product}', [ProductController::class, 'show'])->name('products.show');
+
+// Roasteries
+Route::get('/prazirny', [RoasteryController::class, 'index'])->name('roasteries.index');
+Route::get('/prazirna/{roastery}', [RoasteryController::class, 'show'])->name('roasteries.show');
+
+// Monthly Feature (Roastery & Coffee of the Month)
+Route::get('/kava-mesice', [MonthlyFeatureController::class, 'index'])->name('monthly-feature.index');
 
 // Subscriptions
 Route::get('/predplatne', [SubscriptionController::class, 'index'])->name('subscriptions.index');
@@ -77,9 +87,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Products
     Route::resource('products', AdminProductController::class)->except(['show']);
     
+    // Roasteries
+    Route::resource('roasteries', AdminRoasteryController::class)->except(['show']);
+    
     // Subscription Config
     Route::get('/konfigurator-nastaveni', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'index'])->name('subscription-config.index');
     Route::post('/konfigurator-nastaveni', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'update'])->name('subscription-config.update');
+    Route::post('/konfigurator-nastaveni/harmonogram', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'updateSchedule'])->name('subscription-config.update-schedule');
+    Route::post('/konfigurator-nastaveni/vytvorit-dalsi-rok', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'createNextYearSchedules'])->name('subscription-config.create-next-year');
+    Route::get('/konfigurator-nastaveni/rok/{year}', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'getYearSchedules'])->name('subscription-config.year-schedules');
     
     // Orders
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show', 'update', 'destroy']);

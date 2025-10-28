@@ -38,8 +38,16 @@
                         Předplatné
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
                     </a>
+                    <a href="<?php echo e(route('monthly-feature.index')); ?>" class="text-base font-semibold text-gray-700 hover:text-primary-600 transition-colors duration-200 relative group">
+                        Káva měsíce
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
+                    </a>
                     <a href="<?php echo e(route('products.index')); ?>" class="text-base font-semibold text-gray-700 hover:text-primary-600 transition-colors duration-200 relative group">
                         Obchod
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                    <a href="<?php echo e(route('roasteries.index')); ?>" class="text-base font-semibold text-gray-700 hover:text-primary-600 transition-colors duration-200 relative group">
+                        Naše pražírny
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-500 to-pink-600 group-hover:w-full transition-all duration-300"></span>
                     </a>
                     <a href="#" class="text-base font-semibold text-gray-700 hover:text-primary-600 transition-colors duration-200 relative group">
@@ -113,8 +121,20 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                 </a>
+                <a href="<?php echo e(route('monthly-feature.index')); ?>" class="group flex items-center justify-between text-gray-900 hover:text-primary-600 font-bold py-3.5 px-4 rounded-xl hover:bg-gradient-to-r hover:from-primary-50 hover:to-pink-50 transition-all duration-200">
+                    <span>Káva měsíce</span>
+                    <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
                 <a href="<?php echo e(route('products.index')); ?>" class="group flex items-center justify-between text-gray-900 hover:text-primary-600 font-bold py-3.5 px-4 rounded-xl hover:bg-gradient-to-r hover:from-primary-50 hover:to-pink-50 transition-all duration-200">
                     <span>Obchod</span>
+                    <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <a href="<?php echo e(route('roasteries.index')); ?>" class="group flex items-center justify-between text-gray-900 hover:text-primary-600 font-bold py-3.5 px-4 rounded-xl hover:bg-gradient-to-r hover:from-primary-50 hover:to-pink-50 transition-all duration-200">
+                    <span>Naše pražírny</span>
                     <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>

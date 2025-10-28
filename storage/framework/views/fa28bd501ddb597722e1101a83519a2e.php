@@ -172,20 +172,21 @@ unset($__errorArgs, $__bag); ?>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-900 mb-2">Kategorie</label>
-                    <select name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent <?php $__errorArgs = ['category'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> border-red-500 <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>">
-                        <option value="">Vyberte kategorii</option>
+                    <div class="space-y-2">
+                        <?php
+                            $productCategories = old('categories', is_array($product->category) ? $product->category : [$product->category]);
+                        ?>
                         <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($key); ?>" <?php echo e(old('category', $product->category) == $key ? 'selected' : ''); ?>><?php echo e($label); ?></option>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="categories[]" value="<?php echo e($key); ?>" 
+                                   <?php echo e(in_array($key, $productCategories) ? 'checked' : ''); ?>
+
+                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700"><?php echo e($label); ?></span>
+                        </label>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                    <?php $__errorArgs = ['category'];
+                    </div>
+                    <?php $__errorArgs = ['categories'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -195,7 +196,72 @@ $message = $__bag->first($__errorArgs[0]); ?>
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
+                    <p class="text-xs text-gray-600 mt-1">Můžete vybrat více kategorií (např. káva může být espresso i filtr)</p>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">Pražírna</label>
+                <select name="roastery_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent <?php $__errorArgs = ['roastery_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> border-red-500 <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>">
+                    <option value="">Bez pražírny</option>
+                    <?php $__currentLoopData = $roasteries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $roastery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($roastery->id); ?>" <?php echo e(old('roastery_id', $product->roastery_id) == $roastery->id ? 'selected' : ''); ?>>
+                        <?php echo e($roastery->country_flag); ?> <?php echo e($roastery->name); ?> (<?php echo e($roastery->country); ?>)
+                    </option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </select>
+                <?php $__errorArgs = ['roastery_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <p class="text-red-600 text-sm mt-1"><?php echo e($message); ?></p>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                <p class="text-xs text-gray-600 mt-1">Vyberte pražírnu, od které je káva</p>
+            </div>
+
+            <div id="preparation-methods-container" style="display: none;">
+                <label class="block text-sm font-medium text-gray-900 mb-2">Typ pražení (pro kávu)</label>
+                <div class="space-y-2">
+                    <?php
+                        $currentMethods = old('preparation_methods', $product->attributes['preparation_methods'] ?? []);
+                    ?>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="preparation_methods[]" value="espresso" 
+                               <?php echo e(in_array('espresso', $currentMethods) ? 'checked' : ''); ?>
+
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">Espresso</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="preparation_methods[]" value="filter" 
+                               <?php echo e(in_array('filter', $currentMethods) ? 'checked' : ''); ?>
+
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">Filtr</span>
+                    </label>
+                </div>
+                <?php $__errorArgs = ['preparation_methods'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <p class="text-red-600 text-sm mt-1"><?php echo e($message); ?></p>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                <p class="text-xs text-gray-600 mt-1">Můžete vybrat obě možnosti, pokud je káva vhodná pro espresso i filtr</p>
             </div>
 
             <div class="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 p-6 rounded-lg">
@@ -217,9 +283,8 @@ unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div id="coffee-of-month-date-container" style="display: none;">
-                    <label class="block text-sm font-medium text-gray-900 mb-2">Datum rozesílky</label>
-                    <input type="date" name="coffee_of_month_date" value="<?php echo e(old('coffee_of_month_date', $product->coffee_of_month_date ? $product->coffee_of_month_date->format('Y-m-d') : '')); ?>" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent <?php $__errorArgs = ['coffee_of_month_date'];
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Rozesílka (Měsíc kávy)</label>
+                    <select name="coffee_of_month_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent <?php $__errorArgs = ['coffee_of_month_date'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -227,6 +292,24 @@ $message = $__bag->first($__errorArgs[0]); ?> border-red-500 <?php unset($messag
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>">
+                        <option value="">Vyberte měsíc rozesílky</option>
+                        <?php
+                            $currentDate = now();
+                            // Get current value - handle both date object and string format
+                            $currentValue = old('coffee_of_month_date', $product->coffee_of_month_date);
+                            if ($currentValue instanceof \Carbon\Carbon) {
+                                $currentValue = $currentValue->format('Y-m');
+                            }
+                            
+                            for ($i = -2; $i <= 12; $i++) {
+                                $date = $currentDate->copy()->addMonths($i);
+                                $value = $date->format('Y-m');
+                                $label = $date->locale('cs')->isoFormat('MMMM YYYY');
+                                $selected = $currentValue == $value ? 'selected' : '';
+                                echo "<option value=\"{$value}\" {$selected}>" . ucfirst($label) . "</option>";
+                            }
+                        ?>
+                    </select>
                     <?php $__errorArgs = ['coffee_of_month_date'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -237,7 +320,7 @@ $message = $__bag->first($__errorArgs[0]); ?>
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-                    <p class="text-xs text-gray-600 mt-1">Pro kterou rozesílku je káva určena (20. dne v měsíci)</p>
+                    <p class="text-xs text-gray-600 mt-1">Vyberte měsíc, kdy bude káva součástí rozesílky (zobrazuje se do 15. dne aktuálního měsíce, pak se přepne na následující měsíc)</p>
                 </div>
             </div>
 

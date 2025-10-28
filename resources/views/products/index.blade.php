@@ -92,21 +92,14 @@
                 'merch' => ['label' => 'Merch', 'color' => 'bg-green-500'],
               ];
               
-              // Pro kávy zobrazíme preparation methods
-              if (!empty($product->attributes['preparation_methods'])) {
-                $methods = $product->attributes['preparation_methods'];
-                foreach ($methods as $method) {
-                  if ($method === 'espresso') {
-                    echo '<span class="px-3 py-1 rounded-lg text-xs font-bold bg-amber-500 text-white shadow-lg">Espresso</span>';
-                  } elseif ($method === 'filter') {
-                    echo '<span class="px-3 py-1 rounded-lg text-xs font-bold bg-blue-500 text-white shadow-lg">Filtr</span>';
+              // Zobrazíme všechny kategorie produktu
+              if (is_array($product->category) && !empty($product->category)) {
+                foreach ($product->category as $cat) {
+                  if (isset($categoryLabels[$cat])) {
+                    $catData = $categoryLabels[$cat];
+                    echo '<span class="px-3 py-1 rounded-lg text-xs font-bold ' . $catData['color'] . ' text-white shadow-lg">' . $catData['label'] . '</span>';
                   }
                 }
-              } 
-              // Pro ostatní kategorie zobrazíme kategorii
-              elseif (isset($categoryLabels[$product->category])) {
-                $cat = $categoryLabels[$product->category];
-                echo '<span class="px-3 py-1 rounded-lg text-xs font-bold ' . $cat['color'] . ' text-white shadow-lg">' . $cat['label'] . '</span>';
               }
             @endphp
           </div>
@@ -138,7 +131,14 @@
             </a>
             
             <!-- Roaster / Manufacturer -->
-            @if(!empty($product->attributes['roaster']))
+            @if($product->roastery)
+            <p class="text-sm text-gray-500 font-medium mb-2 flex items-center gap-1">
+              <span class="text-lg">{{ $product->roastery->country_flag }}</span>
+              <a href="{{ route('roasteries.show', $product->roastery) }}" class="hover:text-primary-600 transition-colors">
+                {{ $product->roastery->name }}
+              </a>
+            </p>
+            @elseif(!empty($product->attributes['roaster']))
             <p class="text-sm text-gray-500 font-medium mb-2 flex items-center gap-1">
               <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />

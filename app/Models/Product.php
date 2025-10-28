@@ -19,6 +19,7 @@ class Product extends Model
         'image',
         'images',
         'category',
+        'roastery_id',
         'attributes',
         'is_active',
         'is_featured',
@@ -32,15 +33,20 @@ class Product extends Model
         'stock' => 'integer',
         'images' => 'array',
         'attributes' => 'array',
+        'category' => 'array',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'is_coffee_of_month' => 'boolean',
-        'coffee_of_month_date' => 'date',
     ];
 
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function roastery()
+    {
+        return $this->belongsTo(Roastery::class);
     }
 
     public function scopeActive($query)
@@ -67,7 +73,7 @@ class Product extends Model
 
     public function scopeCategory($query, $category)
     {
-        return $query->where('category', $category);
+        return $query->whereJsonContains('category', $category);
     }
 
     public function isInStock(): bool
@@ -78,6 +84,35 @@ class Product extends Model
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    /**
+     * Get coffees of the month based on current date
+     * Logic: Show coffees for next month starting from 16th of current month
+     */
+    public static function getCoffeesOfMonth()
+    {
+        $today = now();
+        $currentDay = $today->day;
+        
+        // If today is 16th or later, show next month's coffees
+        if ($currentDay >= 16) {
+            $targetMonth = $today->copy()->addMonth()->format('Y-m');
+        } else {
+            $targetMonth = $today->format('Y-m');
+        }
+        
+        return self::where('is_coffee_of_month', true)
+            ->where('coffee_of_month_date', $targetMonth)
+            ->get();
+    }
+
+    /**
+     * Scope to get products by coffee_of_month_date (format: Y-m)
+     */
+    public function scopeByMonthDate($query, $month)
+    {
+        return $query->where('coffee_of_month_date', $month);
     }
 }
 

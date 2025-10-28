@@ -2,18 +2,27 @@
 
 namespace App\Helpers;
 
+use App\Models\ShipmentSchedule;
 use Carbon\Carbon;
 
 class SubscriptionHelper
 {
     /**
-     * Get the next shipping date (always 20th of the month)
-     * If today is 16th or later, it's 20th of next month
-     * If today is 15th or earlier, it's 20th of this month
+     * Get the next shipping date based on shipment schedule
+     * Falls back to 20th if no schedule is found
      */
     public static function getNextShippingDate(): Carbon
     {
         $today = Carbon::now();
+        
+        // Try to get the next scheduled shipment
+        $nextShipment = ShipmentSchedule::getNextShipment();
+        
+        if ($nextShipment) {
+            return $nextShipment->shipment_date->copy()->startOfDay();
+        }
+        
+        // Fallback to default logic (20th of month)
         $dayOfMonth = $today->day;
         
         if ($dayOfMonth >= 16) {
@@ -26,20 +35,50 @@ class SubscriptionHelper
     }
 
     /**
-     * Get the next billing cycle end date (always 15th of the month at midnight)
+     * Get the next billing date based on shipment schedule
+     * Falls back to 15th if no schedule is found
      */
-    public static function getNextBillingCycleEnd(): Carbon
+    public static function getNextBillingDate(): Carbon
     {
         $today = Carbon::now();
+        $currentYear = $today->year;
+        $currentMonth = $today->month;
+        
+        // Get current month's schedule
+        $currentSchedule = ShipmentSchedule::getForMonth($currentYear, $currentMonth);
+        
+        if ($currentSchedule && $today->lessThan($currentSchedule->billing_date)) {
+            // Current month's billing hasn't happened yet
+            return $currentSchedule->billing_date->copy()->startOfDay();
+        }
+        
+        // Get next month's schedule
+        $nextMonth = $today->copy()->addMonth();
+        $nextSchedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
+        
+        if ($nextSchedule) {
+            return $nextSchedule->billing_date->copy()->startOfDay();
+        }
+        
+        // Fallback to default logic (15th of month)
         $dayOfMonth = $today->day;
         
         if ($dayOfMonth >= 16) {
             // Next cycle ends on 15th of next month
-            return Carbon::now()->addMonth()->day(15)->endOfDay();
+            return Carbon::now()->addMonth()->day(15)->startOfDay();
         } else {
             // Current cycle ends on 15th of this month
-            return Carbon::now()->day(15)->endOfDay();
+            return Carbon::now()->day(15)->startOfDay();
         }
+    }
+
+    /**
+     * Get the next billing cycle end date (for compatibility)
+     * @deprecated Use getNextBillingDate() instead
+     */
+    public static function getNextBillingCycleEnd(): Carbon
+    {
+        return self::getNextBillingDate()->endOfDay();
     }
 
     /**
@@ -52,20 +91,45 @@ class SubscriptionHelper
         $lastShipmentDate = $subscription->last_shipment_date;
         
         if (!$lastShipmentDate) {
-            // First shipment - use creation logic
+            // First shipment - find next scheduled shipment
             $createdAt = $subscription->created_at;
+            $createdYear = $createdAt->year;
+            $createdMonth = $createdAt->month;
             
+            // Get current month's schedule
+            $currentSchedule = ShipmentSchedule::getForMonth($createdYear, $createdMonth);
+            
+            if ($currentSchedule && $createdAt->lessThan($currentSchedule->billing_date)) {
+                // Created before billing date, can get this month's shipment
+                return $currentSchedule->shipment_date->copy()->startOfDay();
+            }
+            
+            // Otherwise, get next month's schedule
+            $nextMonth = $createdAt->copy()->addMonth();
+            $nextSchedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
+            
+            if ($nextSchedule) {
+                return $nextSchedule->shipment_date->copy()->startOfDay();
+            }
+            
+            // Fallback to old logic
             if ($createdAt->day >= 16) {
-                // Created after 15th, first shipment is next month
                 return Carbon::parse($createdAt)->addMonth()->day(20)->startOfDay();
             } else {
-                // Created before 16th, first shipment is this month
                 return Carbon::parse($createdAt)->day(20)->startOfDay();
             }
         }
         
         // Calculate next shipment based on last one + frequency
-        return Carbon::parse($lastShipmentDate)->addMonths($frequencyMonths)->day(20)->startOfDay();
+        $nextDate = Carbon::parse($lastShipmentDate)->addMonths($frequencyMonths);
+        $nextSchedule = ShipmentSchedule::getForMonth($nextDate->year, $nextDate->month);
+        
+        if ($nextSchedule) {
+            return $nextSchedule->shipment_date->copy()->startOfDay();
+        }
+        
+        // Fallback
+        return $nextDate->day(20)->startOfDay();
     }
 
     /**
@@ -93,19 +157,31 @@ class SubscriptionHelper
     public static function getShippingDateInfo(): array
     {
         $nextShipping = self::getNextShippingDate();
-        $cycleEnd = self::getNextBillingCycleEnd();
+        $nextBilling = self::getNextBillingDate();
         $today = Carbon::now();
         
-        $isAfterCutoff = $today->day >= 16;
+        // Check if we're after the billing cutoff for this month's shipment
+        $currentYear = $today->year;
+        $currentMonth = $today->month;
+        $currentSchedule = ShipmentSchedule::getForMonth($currentYear, $currentMonth);
+        
+        $isAfterCutoff = false;
+        if ($currentSchedule) {
+            $isAfterCutoff = $today->greaterThanOrEqualTo($currentSchedule->billing_date);
+        } else {
+            // Fallback to old logic
+            $isAfterCutoff = $today->day >= 16;
+        }
         
         return [
             'next_shipping_date' => $nextShipping,
             'next_shipping_formatted' => $nextShipping->format('d.m.Y'),
-            'cycle_end' => $cycleEnd,
+            'next_billing_date' => $nextBilling,
+            'cycle_end' => $nextBilling->endOfDay(), // For backward compatibility
             'is_after_cutoff' => $isAfterCutoff,
             'cutoff_message' => $isAfterCutoff 
                 ? 'První dodávka bude odeslána ' . $nextShipping->format('d.m.Y')
-                : 'První dodávka bude odeslána ' . $nextShipping->format('d.m.Y') . ' (do ' . $cycleEnd->format('d.m.') . ' lze upravit)',
+                : 'První dodávka bude odeslána ' . $nextShipping->format('d.m.Y') . ' (do ' . $nextBilling->format('d.m.') . ' lze upravit)',
         ];
     }
 }

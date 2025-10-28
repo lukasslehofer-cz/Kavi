@@ -9,7 +9,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::forShop(); // Exclude coffee of month products
+        $query = Product::with('roastery')->forShop(); // Exclude coffee of month products
 
         if ($request->has('category')) {
             $query->category($request->category);
@@ -40,6 +40,9 @@ class ProductController extends Controller
         if ($product->is_coffee_of_month || !$product->is_active) {
             abort(404);
         }
+
+        // Load roastery relation
+        $product->load('roastery');
 
         $relatedProducts = Product::forShop()
             ->where('category', $product->category)

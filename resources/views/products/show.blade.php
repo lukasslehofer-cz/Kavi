@@ -110,7 +110,14 @@
             </h1>
             
             <!-- Roaster / Manufacturer -->
-            @if(!empty($product->attributes['roaster']))
+            @if($product->roastery)
+            <p class="text-lg text-gray-600 font-medium mb-6 flex items-center gap-2">
+              <span class="text-2xl">{{ $product->roastery->country_flag }}</span>
+              <a href="{{ route('roasteries.show', $product->roastery) }}" class="hover:text-primary-600 transition-colors font-semibold">
+                {{ $product->roastery->name }}
+              </a>
+            </p>
+            @elseif(!empty($product->attributes['roaster']))
             <p class="text-lg text-gray-600 font-medium mb-6 flex items-center gap-2">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />

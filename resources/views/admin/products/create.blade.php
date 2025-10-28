@@ -79,17 +79,39 @@
 
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Kategorie</label>
-                    <select name="category" required class="input @error('category') border-red-500 @enderror">
-                        <option value="">Vyberte kategorii</option>
+                    <div class="space-y-2">
                         @foreach($categories as $key => $label)
-                        <option value="{{ $key }}" {{ old('category') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="categories[]" value="{{ $key }}" 
+                                   {{ in_array($key, old('categories', [])) ? 'checked' : '' }}
+                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">{{ $label }}</span>
+                        </label>
                         @endforeach
-                    </select>
-                    @error('category')
+                    </div>
+                    @error('categories')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
+                    <p class="text-xs text-coffee-600 mt-1">Můžete vybrat více kategorií (např. káva může být espresso i filtr)</p>
                 </div>
             </div>
+
+            <div>
+                <label class="block text-sm font-medium text-coffee-900 mb-2">Pražírna</label>
+                <select name="roastery_id" class="input @error('roastery_id') border-red-500 @enderror">
+                    <option value="">Bez pražírny</option>
+                    @foreach($roasteries as $roastery)
+                    <option value="{{ $roastery->id }}" {{ old('roastery_id') == $roastery->id ? 'selected' : '' }}>
+                        {{ $roastery->country_flag }} {{ $roastery->name }} ({{ $roastery->country }})
+                    </option>
+                    @endforeach
+                </select>
+                @error('roastery_id')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-coffee-600 mt-1">Vyberte pražírnu, od které je káva</p>
+            </div>
+
 
             <div class="bg-primary-50 border-2 border-primary-200 p-6 rounded-lg">
                 <div class="flex items-start gap-3 mb-4">
@@ -109,13 +131,24 @@
                 </div>
 
                 <div id="coffee-of-month-date-container" style="display: none;">
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Datum rozesílky</label>
-                    <input type="date" name="coffee_of_month_date" value="{{ old('coffee_of_month_date') }}" 
-                           class="input @error('coffee_of_month_date') border-red-500 @enderror">
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Rozesílka (Měsíc kávy)</label>
+                    <select name="coffee_of_month_date" class="input @error('coffee_of_month_date') border-red-500 @enderror">
+                        <option value="">Vyberte měsíc rozesílky</option>
+                        @php
+                            $currentDate = now();
+                            for ($i = -2; $i <= 12; $i++) {
+                                $date = $currentDate->copy()->addMonths($i);
+                                $value = $date->format('Y-m');
+                                $label = $date->locale('cs')->isoFormat('MMMM YYYY');
+                                $selected = old('coffee_of_month_date') == $value ? 'selected' : '';
+                                echo "<option value=\"{$value}\" {$selected}>" . ucfirst($label) . "</option>";
+                            }
+                        @endphp
+                    </select>
                     @error('coffee_of_month_date')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-xs text-coffee-600 mt-1">Pro kterou rozesílku je káva určena (20. dne v měsíci)</p>
+                    <p class="text-xs text-coffee-600 mt-1">Vyberte měsíc, kdy bude káva součástí rozesílky (zobrazuje se do 15. dne aktuálního měsíce, pak se přepne na následující měsíc)</p>
                 </div>
             </div>
 

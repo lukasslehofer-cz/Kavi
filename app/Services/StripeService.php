@@ -90,35 +90,6 @@ class StripeService
     }
 
     /**
-     * Create checkout session for subscription (predefined plan)
-     */
-    public function createSubscriptionCheckoutSession(User $user, SubscriptionPlan $plan): StripeSession
-    {
-        $customerId = $this->getOrCreateCustomer($user);
-
-        // Ensure Stripe price exists
-        if (!$plan->stripe_price_id) {
-            throw new \Exception('Subscription plan does not have a Stripe price ID configured.');
-        }
-
-        return StripeSession::create([
-            'customer' => $customerId,
-            'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price' => $plan->stripe_price_id,
-                'quantity' => 1,
-            ]],
-            'mode' => 'subscription',
-            'success_url' => route('dashboard.subscription') . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('subscriptions.show', $plan),
-            'metadata' => [
-                'user_id' => $user->id,
-                'subscription_plan_id' => $plan->id,
-            ],
-        ]);
-    }
-
-    /**
      * Create checkout session for custom configured subscription
      */
     public function createConfiguredSubscriptionCheckoutSession(
@@ -232,33 +203,6 @@ class StripeService
         \Log::info('Created new Stripe base product', ['product_id' => $product->id]);
 
         return $product->id;
-    }
-
-    /**
-     * Get Stripe Price ID based on configuration (amount and frequency)
-     * @deprecated This method is no longer used with dynamic pricing
-     */
-    private function getStripePriceIdForConfiguration(array $configuration): string
-    {
-        $amount = $configuration['amount'];
-        $frequency = $configuration['frequency'];
-
-        // Build config key based on frequency
-        $configKey = "stripe_price_id_{$amount}_bags";
-        
-        if ($frequency == 2) {
-            $configKey .= '_2months';
-        } elseif ($frequency == 3) {
-            $configKey .= '_3months';
-        }
-
-        $priceId = SubscriptionConfig::get($configKey);
-
-        if (!$priceId) {
-            throw new \Exception("Stripe Price ID not found for configuration: {$configKey}. Please run 'php artisan stripe:setup-products'");
-        }
-
-        return $priceId;
     }
 
     /**

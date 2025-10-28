@@ -31,8 +31,10 @@ class ProductController extends Controller
             'accessories' => 'Příslušenství',
             'merch' => 'Merch'
         ];
+        
+        $roasteries = \App\Models\Roastery::orderBy('name')->get();
 
-        return view('admin.products.create', compact('categories'));
+        return view('admin.products.create', compact('categories', 'roasteries'));
     }
 
     public function store(Request $request)
@@ -43,15 +45,19 @@ class ProductController extends Controller
             'short_description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
-            'category' => 'required|in:espresso,filter,accessories,merch',
+            'categories' => 'required|array',
+            'categories.*' => 'in:espresso,filter,accessories,merch',
+            'roastery_id' => 'nullable|exists:roasteries,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'is_coffee_of_month' => 'boolean',
-            'coffee_of_month_date' => 'nullable|date',
+            'coffee_of_month_date' => 'nullable|string|regex:/^\d{4}-\d{2}$/',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+        $validated['category'] = $validated['categories']; // Store as array
+        unset($validated['categories']);
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
         $validated['is_coffee_of_month'] = $request->has('is_coffee_of_month');
@@ -84,8 +90,10 @@ class ProductController extends Controller
             'accessories' => 'Příslušenství',
             'merch' => 'Merch'
         ];
+        
+        $roasteries = \App\Models\Roastery::orderBy('name')->get();
 
-        return view('admin.products.edit', compact('product', 'categories'));
+        return view('admin.products.edit', compact('product', 'categories', 'roasteries'));
     }
 
     public function update(Request $request, Product $product)
@@ -96,15 +104,19 @@ class ProductController extends Controller
             'short_description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
-            'category' => 'required|in:espresso,filter,accessories,merch',
+            'categories' => 'required|array',
+            'categories.*' => 'in:espresso,filter,accessories,merch',
+            'roastery_id' => 'nullable|exists:roasteries,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'is_coffee_of_month' => 'boolean',
-            'coffee_of_month_date' => 'nullable|date',
+            'coffee_of_month_date' => 'nullable|string|regex:/^\d{4}-\d{2}$/',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+        $validated['category'] = $validated['categories']; // Store as array
+        unset($validated['categories']);
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
         $validated['is_coffee_of_month'] = $request->has('is_coffee_of_month');
