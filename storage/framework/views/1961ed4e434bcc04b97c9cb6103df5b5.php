@@ -3,33 +3,33 @@
 <?php $__env->startSection('content'); ?>
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="bg-white rounded-2xl shadow-lg p-6">
-        <h1 class="text-3xl font-bold text-dark-800">Správa předplatných</h1>
-        <p class="mt-2 text-dark-600">Přehled všech vašich aktivních předplatných (<?php echo e($subscriptions->count()); ?>)</p>
+    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+        <h1 class="text-xl font-bold text-gray-900">Správa předplatných</h1>
+        <p class="mt-2 text-gray-600 font-light">Přehled všech vašich aktivních předplatných (<?php echo e($subscriptions->count()); ?>)</p>
     </div>
 
     <?php $__currentLoopData = $subscriptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subscription): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-l-4 border-primary-500" id="subscription-<?php echo e($subscription->id); ?>">
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden border border-gray-200" id="subscription-<?php echo e($subscription->id); ?>">
         <!-- Subscription Header -->
-        <div class="bg-gradient-to-r from-primary-50 to-pink-50 p-6 border-b border-primary-100">
+        <div class="bg-gray-100 p-6 border-b border-gray-200">
             <div class="flex justify-between items-start flex-wrap gap-4">
                 <div class="flex-1">
                     <?php if($subscription->plan): ?>
-                        <h2 class="text-2xl font-bold text-dark-800 mb-1"><?php echo e($subscription->plan->name); ?></h2>
-                        <p class="text-dark-600"><?php echo e($subscription->plan->description); ?></p>
+                        <h2 class="text-xl font-bold text-gray-900 mb-1"><?php echo e($subscription->plan->name); ?></h2>
+                        <p class="text-gray-600 font-light"><?php echo e($subscription->plan->description); ?></p>
                     <?php else: ?>
-                        <h2 class="text-2xl font-bold text-dark-800 mb-1">Kávové předplatné #<?php echo e($subscription->id); ?></h2>
-                        <p class="text-dark-600">Váš vlastní konfigurace</p>
+                        <h2 class="text-xl font-bold text-gray-900 mb-1">Kávové předplatné #<?php echo e($subscription->id); ?></h2>
+                        <p class="text-gray-600 font-light">Váš vlastní konfigurace</p>
                     <?php endif; ?>
                     
                     <div class="mt-3">
                         <?php if($subscription->status === 'active'): ?>
-                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-800 border-2 border-green-500">
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
                                 <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
                                 Aktivní
                             </span>
                         <?php else: ?>
-                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 border-2 border-yellow-500">
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
                                 <?php echo e(ucfirst($subscription->status)); ?>
 
                             </span>
@@ -37,10 +37,10 @@
                     </div>
                 </div>
                 <div class="text-right">
-                    <div class="text-4xl font-bold text-primary-600">
+                    <div class="text-2xl font-bold text-primary-600">
                         <?php echo e(number_format($subscription->configured_price ?? $subscription->plan->price, 0, ',', ' ')); ?> Kč
                     </div>
-                    <div class="text-sm text-dark-600 mt-1">
+                    <div class="text-sm text-gray-600 font-light mt-1">
                         <?php if($subscription->frequency_months): ?>
                             / <?php echo e($subscription->frequency_months == 1 ? 'měsíc' : ($subscription->frequency_months . ' měsíce')); ?>
 
@@ -60,7 +60,7 @@
                 <div class="space-y-6">
                     <!-- Dates -->
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Důležité datumy</h3>
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Důležité datumy</h3>
                         <div class="space-y-2 text-sm">
                             <?php if($subscription->starts_at || $subscription->current_period_start): ?>
                             <div class="flex justify-between">
@@ -87,7 +87,7 @@
                     <!-- Configuration -->
                     <?php if($subscription->configuration): ?>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Konfigurace</h3>
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Konfigurace</h3>
                         <div class="space-y-2 text-sm">
                             <?php
                                 $config = is_string($subscription->configuration) 
@@ -157,7 +157,7 @@
                     <!-- Shipping Address -->
                     <?php if($subscription->shipping_address): ?>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Dodací adresa</h3>
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Dodací adresa</h3>
                         <?php
                             $address = is_string($subscription->shipping_address) 
                                 ? json_decode($subscription->shipping_address, true) 
@@ -185,7 +185,7 @@
                     <!-- Packeta Pickup Point -->
                     <div>
                         <div class="flex justify-between items-start mb-3">
-                            <h3 class="text-lg font-semibold text-gray-900">Výdejní místo Zásilkovna</h3>
+                            <h3 class="text-lg font-medium text-gray-900">Výdejní místo Zásilkovna</h3>
                             <button type="button" 
                                     class="change-packeta-point text-sm text-blue-600 hover:text-blue-700 underline"
                                     data-subscription-id="<?php echo e($subscription->id); ?>"
@@ -216,15 +216,15 @@
 
                     <!-- Actions -->
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Akce</h3>
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Akce</h3>
                         <div class="space-y-2">
                             <?php if($subscription->status === 'active'): ?>
-                            <button type="button" class="w-full text-center px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+                            <button type="button" class="w-full text-center px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition font-medium">
                                 Pozastavit předplatné
                             </button>
 
                             <button type="button" 
-                                    class="w-full text-center px-4 py-2 text-sm border border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition font-medium" 
+                                    class="w-full text-center px-4 py-2 text-sm border border-red-600 text-red-600 rounded-full hover:bg-red-50 transition font-medium" 
                                     onclick="return confirm('Opravdu chcete zrušit toto předplatné?')">
                                 Zrušit předplatné
                             </button>
@@ -238,10 +238,10 @@
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
     <!-- Add New Subscription -->
-    <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 text-center">
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">Chcete přidat další předplatné?</h3>
+    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Chcete přidat další předplatné?</h3>
         <p class="text-gray-600 mb-4">Nakonfigurujte si další předplatné podle svých potřeb</p>
-        <a href="<?php echo e(route('subscriptions.index')); ?>" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+        <a href="<?php echo e(route('subscriptions.index')); ?>" class="inline-block px-6 py-3 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition font-medium">
             <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>

@@ -3,17 +3,17 @@
 @section('title', 'Pokladna - Kávové předplatné')
 
 @section('content')
-<!-- Hero Header -->
-<div class="relative bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 py-12 border-b-2 border-gray-200">
+<!-- Hero Header - Minimal -->
+<div class="relative bg-gray-100 py-12 border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-2">Dokončení objednávky předplatného</h1>
-                <p class="text-lg text-gray-600">Ještě pár informací a vaše káva bude pravidelně na cestě k vám</p>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">Dokončení objednávky předplatného</h1>
+                <p class="text-lg text-gray-600 font-light">Ještě pár informací a vaše káva bude pravidelně na cestě k vám</p>
             </div>
             <div class="hidden md:block">
-                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-pink-600 flex items-center justify-center shadow-lg">
-                    <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-14 h-14 rounded-full bg-gray-900 flex items-center justify-center">
+                    <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                 </div>
@@ -23,36 +23,36 @@
 </div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Checkout Form -->
         <div class="lg:col-span-2">
             <form action="{{ route('subscriptions.checkout.process') }}" method="POST" id="subscription-checkout-form" class="lg:pt-0">
                 @csrf
                 
                 <!-- Contact Information -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
+                <div class="bg-white rounded-2xl p-6 border border-gray-200">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                         </div>
-                        <h2 class="text-2xl font-black text-gray-900">Kontaktní údaje</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Kontaktní údaje</h2>
                     </div>
                     
                     @guest
-                    <!-- Login option for guests -->
-                    <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border-2 border-blue-200">
+                    <!-- Login option for guests - Minimal -->
+                    <div class="mb-6 bg-blue-50 p-5 rounded-xl border border-blue-200">
                         <div class="flex items-start">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md mr-3">
-                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0 mr-3">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-gray-900 mb-2">Máte již účet?</h3>
-                                <p class="text-sm text-gray-700 mb-3">Přihlaste se pro rychlejší dokončení objednávky.</p>
-                                <a href="{{ route('login') }}?redirect={{ urlencode(route('subscriptions.checkout')) }}" class="inline-block bg-white hover:bg-gray-50 text-blue-600 font-semibold px-6 py-2.5 rounded-lg shadow-sm hover:shadow-md border border-blue-200 hover:border-blue-300 transition-all text-sm">
+                                <h3 class="font-medium text-gray-900 mb-1.5">Máte již účet?</h3>
+                                <p class="text-sm text-gray-600 mb-3 font-light">Přihlaste se pro rychlejší dokončení objednávky.</p>
+                                <a href="{{ route('login') }}?redirect={{ urlencode(route('subscriptions.checkout')) }}" class="inline-block bg-white hover:bg-gray-50 text-blue-600 font-medium px-5 py-2 rounded-full border border-blue-200 hover:border-blue-300 transition-all text-sm">
                                     Přihlásit se
                                 </a>
                             </div>
@@ -62,7 +62,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
-                            <label for="name" class="block text-sm font-bold text-gray-700 mb-2">
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
                                 Jméno a příjmení <span class="text-red-500">*</span>
                             </label>
                             <input 
@@ -71,7 +71,7 @@
                                 name="name" 
                                 value="{{ old('name', auth()->user()->name ?? '') }}" 
                                 required
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                             >
                             @error('name')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -79,7 +79,7 @@
                         </div>
 
                         <div>
-                            <label for="email" class="block text-sm font-bold text-gray-700 mb-2">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
                                 Email <span class="text-red-500">*</span>
                             </label>
                             <input 
@@ -88,7 +88,7 @@
                                 name="email" 
                                 value="{{ old('email', auth()->user()->email ?? '') }}" 
                                 required
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                             >
                             @error('email')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -99,7 +99,7 @@
                         </div>
 
                         <div>
-                            <label for="phone" class="block text-sm font-bold text-gray-700 mb-2">
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
                                 Telefon @guest<span class="text-gray-500">(volitelné)</span>@else<span class="text-red-500">*</span>@endguest
                             </label>
                             <input 
@@ -108,7 +108,7 @@
                                 name="phone" 
                                 value="{{ old('phone') }}" 
                                 @auth required @endauth
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="+420 123 456 789"
                             >
                             @error('phone')
@@ -119,20 +119,20 @@
                 </div>
 
                 <!-- Billing Address -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mt-6">
+                <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                         </div>
-                        <h2 class="text-2xl font-black text-gray-900">Fakturační adresa</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Fakturační adresa</h2>
                     </div>
                     
                     <div class="space-y-6">
                         <div>
-                            <label for="billing_address" class="block text-sm font-bold text-gray-700 mb-2">
+                            <label for="billing_address" class="block text-sm font-medium text-gray-700 mb-2">
                                 Ulice a číslo popisné <span class="text-red-500">*</span>
                             </label>
                             <input 
@@ -141,7 +141,7 @@
                                 name="billing_address" 
                                 value="{{ old('billing_address', auth()->user()->address ?? '') }}" 
                                 required
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="Např. Karlova 123"
                             >
                             @error('billing_address')
@@ -151,7 +151,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="billing_city" class="block text-sm font-bold text-gray-700 mb-2">
+                                <label for="billing_city" class="block text-sm font-medium text-gray-700 mb-2">
                                     Město <span class="text-red-500">*</span>
                                 </label>
                                 <input 
@@ -160,7 +160,7 @@
                                     name="billing_city" 
                                     value="{{ old('billing_city', auth()->user()->city ?? '') }}" 
                                     required
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                     placeholder="Např. Praha"
                                 >
                                 @error('billing_city')
@@ -169,7 +169,7 @@
                             </div>
 
                             <div>
-                                <label for="billing_postal_code" class="block text-sm font-bold text-gray-700 mb-2">
+                                <label for="billing_postal_code" class="block text-sm font-medium text-gray-700 mb-2">
                                     PSČ <span class="text-red-500">*</span>
                                 </label>
                                 <input 
@@ -178,7 +178,7 @@
                                     name="billing_postal_code" 
                                     value="{{ old('billing_postal_code', auth()->user()->postal_code ?? '') }}" 
                                     required
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                     placeholder="123 45"
                                 >
                                 @error('billing_postal_code')
@@ -190,14 +190,14 @@
                 </div>
 
                 <!-- Packeta Pickup Point -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mt-6">
+                <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-[#ba1b02] flex items-center justify-center shadow-md">
-                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                             </svg>
                         </div>
-                        <h2 class="text-2xl font-black text-gray-900">Výběr výdejního místa</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Výběr výdejního místa</h2>
                     </div>
                     
                     <div class="space-y-4">
@@ -209,28 +209,28 @@
                         <!-- Packeta selection display -->
                         <div id="packeta-selection">
                             @if(old('packeta_point_id', auth()->user()->packeta_point_id ?? ''))
-                            <!-- Selected point display -->
-                            <div id="selected-point" class="p-5 bg-gradient-to-r from-primary-50 to-pink-50 border-2 border-primary-400 rounded-xl">
+                            <!-- Selected point display - Minimal -->
+                            <div id="selected-point" class="p-4 bg-primary-50 border border-primary-300 rounded-xl">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
-                                        <div class="flex items-center mb-2">
-                                            <svg class="w-5 h-5 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <div class="flex items-center mb-1.5">
+                                            <svg class="w-4 h-4 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                             </svg>
-                                            <span class="font-bold text-gray-900">Vybrané výdejní místo:</span>
+                                            <span class="font-medium text-gray-900 text-sm">Vybrané výdejní místo:</span>
                                         </div>
-                                        <p class="text-gray-900 font-semibold ml-7" id="selected-point-name">{{ old('packeta_point_name', auth()->user()->packeta_point_name ?? '') }}</p>
-                                        <p class="text-sm text-gray-700 ml-7" id="selected-point-address">{{ old('packeta_point_address', auth()->user()->packeta_point_address ?? '') }}</p>
+                                        <p class="text-gray-900 font-medium ml-6" id="selected-point-name">{{ old('packeta_point_name', auth()->user()->packeta_point_name ?? '') }}</p>
+                                        <p class="text-sm text-gray-600 ml-6 font-light" id="selected-point-address">{{ old('packeta_point_address', auth()->user()->packeta_point_address ?? '') }}</p>
                                     </div>
-                                    <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-[#ba1b02] font-semibold px-4 py-2 rounded-lg border border-gray-200 whitespace-nowrap ml-4 transition-colors">
+                                    <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-[#ba1b02] font-medium px-4 py-2 rounded-full border border-gray-200 whitespace-nowrap ml-4 transition-colors">
                                         Změnit
                                     </button>
                                 </div>
                             </div>
                             @else
-                            <!-- Select button -->
-                            <button type="button" id="select-point-btn" class="w-full flex items-center justify-center gap-2 bg-[#ba1b02] hover:bg-[#a01701] text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <!-- Select button - Minimal -->
+                            <button type="button" id="select-point-btn" class="w-full flex items-center justify-center gap-2 bg-[#ba1b02] hover:bg-[#a01701] text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                 </svg>
                                 <span>Vybrat výdejní místo Zásilkovna</span>
@@ -242,54 +242,54 @@
                             <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                         @enderror
 
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-2">
-                            <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-start gap-2">
+                            <svg class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
-                            <p class="text-sm text-blue-700 font-medium">
+                            <p class="text-sm text-blue-700 font-light">
                                 Káva vám bude doručena na vybrané výdejní místo Zásilkovny
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Payment Method -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mt-6">
+                <!-- Payment Method - Minimal -->
+                <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                             </svg>
                         </div>
-                        <h2 class="text-2xl font-black text-gray-900">Způsob platby</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Způsob platby</h2>
                     </div>
                     
-                    <!-- Single Payment Method Info -->
-                    <div class="p-5 border-2 border-primary-500 bg-gradient-to-r from-primary-50 to-pink-50 rounded-xl shadow-lg">
+                    <!-- Single Payment Method Info - Minimal -->
+                    <div class="p-4 border border-primary-400 bg-primary-50 rounded-xl">
                         <input type="hidden" name="payment_method" value="card">
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-pink-600 flex items-center justify-center flex-shrink-0 shadow-md">
-                                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <div class="font-bold text-gray-900 mb-1 text-lg">Platební kartou</div>
-                                <div class="text-sm text-gray-700 mb-3">Po odeslání objednávky budete přesměrováni na bezpečnou platební bránu</div>
-                                <div class="flex items-center gap-3 flex-wrap">
-                                    <span class="text-xs text-gray-600 font-semibold">Akceptujeme:</span>
+                                <div class="font-bold text-gray-900 mb-1">Platební kartou</div>
+                                <div class="text-sm text-gray-600 mb-3 font-light">Po odeslání objednávky budete přesměrováni na bezpečnou platební bránu</div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-xs text-gray-500 font-medium">Akceptujeme:</span>
                                     <div class="flex items-center gap-2">
-                                        <div class="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
-                                            <span class="text-xs font-bold text-blue-700">Visa</span>
+                                        <div class="px-2.5 py-1 bg-white rounded-lg border border-gray-200">
+                                            <span class="text-xs font-semibold text-blue-700">Visa</span>
                                         </div>
-                                        <div class="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
-                                            <span class="text-xs font-bold text-orange-600">Mastercard</span>
+                                        <div class="px-2.5 py-1 bg-white rounded-lg border border-gray-200">
+                                            <span class="text-xs font-semibold text-orange-600">Mastercard</span>
                                         </div>
-                                        <div class="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
-                                            <span class="text-xs font-bold text-gray-700">Apple Pay</span>
+                                        <div class="px-2.5 py-1 bg-white rounded-lg border border-gray-200">
+                                            <span class="text-xs font-semibold text-gray-700">Apple Pay</span>
                                         </div>
-                                        <div class="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-200">
-                                            <span class="text-xs font-bold text-blue-600">Google Pay</span>
+                                        <div class="px-2.5 py-1 bg-white rounded-lg border border-gray-200">
+                                            <span class="text-xs font-semibold text-blue-600">Google Pay</span>
                                         </div>
                                     </div>
                                 </div>
@@ -298,22 +298,22 @@
                     </div>
                 </div>
 
-                <!-- Additional Notes -->
-                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200 mt-6">
+                <!-- Additional Notes - Minimal -->
+                <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-500 to-slate-600 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                             </svg>
                         </div>
-                        <h2 class="text-2xl font-black text-gray-900">Poznámka <span class="text-base font-normal text-gray-500">(volitelné)</span></h2>
+                        <h2 class="text-xl font-bold text-gray-900">Poznámka <span class="text-base font-light text-gray-500">(volitelné)</span></h2>
                     </div>
                     
                     <textarea 
                         id="delivery_notes" 
                         name="delivery_notes" 
                         rows="4" 
-                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                         placeholder="Např. 'Prosím zvonit na 2. patro' nebo 'Nechat u vrátnice'"
                     >{{ old('delivery_notes') }}</textarea>
                     @error('delivery_notes')
@@ -325,14 +325,14 @@
 
         <!-- Order Summary Sidebar -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-2xl p-8 sticky top-24 shadow-xl border-2 border-gray-200">
+            <div class="bg-white rounded-2xl p-6 sticky top-24 border border-gray-200">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-pink-600 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-black text-gray-900">Souhrn předplatného</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Souhrn předplatného</h3>
                 </div>
                 
                 @php
@@ -345,17 +345,17 @@
                 @endphp
                 
                 <!-- Subscription Details -->
-                <div class="bg-gradient-to-br from-gray-50 to-slate-50 p-6 rounded-xl mb-6 border border-gray-200">
+                <div class="bg-gray-100 p-6 rounded-xl mb-6 border border-gray-200">
                     <div class="space-y-4 text-sm">
                         <div class="flex justify-between items-start">
                             <span class="text-gray-700 font-semibold">Množství:</span>
-                            <span class="font-black text-gray-900 text-right">{{ $configuration['amount'] }} balení ({{ $configuration['amount'] * 250 }}g)</span>
+                            <span class="font-bold text-gray-900 text-right">{{ $configuration['amount'] }} balení ({{ $configuration['amount'] * 250 }}g)</span>
                         </div>
                         
-                        <div class="border-t-2 border-gray-200 pt-4">
+                        <div class="border-t border-gray-200 pt-4">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-gray-700 font-semibold">Typ kávy:</span>
-                                <span class="font-black text-gray-900 text-right">
+                                <span class="font-bold text-gray-900 text-right">
                                     @if($configuration['type'] === 'espresso')
                                         Espresso @if($configuration['isDecaf'])(vč. 1× decaf)@endif
                                     @elseif($configuration['type'] === 'filter')
@@ -384,27 +384,27 @@
                             @endif
                         </div>
                         
-                        <div class="flex justify-between items-center border-t-2 border-gray-200 pt-4">
+                        <div class="flex justify-between items-center border-t border-gray-200 pt-4">
                             <span class="text-gray-700 font-semibold">Frekvence:</span>
-                            <span class="font-black text-gray-900">{{ $frequencyText }}</span>
+                            <span class="font-bold text-gray-900">{{ $frequencyText }}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Shipping Date Info -->
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 mb-6 shadow-md">
+                <!-- Shipping Date Info - Minimal -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
                     <div class="flex items-start">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md mr-3">
-                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0 mr-3">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <h3 class="font-bold text-gray-900 mb-2 text-base">Informace o dodání</h3>
-                            <p class="text-sm text-gray-800 mb-2 font-semibold">
+                            <h3 class="font-medium text-gray-900 mb-2">Informace o dodání</h3>
+                            <p class="text-sm text-gray-800 mb-2 font-medium">
                                 {{ $shippingInfo['cutoff_message'] }}
                             </p>
-                            <p class="text-xs text-gray-700 leading-relaxed">
+                            <p class="text-xs text-gray-600 leading-relaxed font-light">
                                 Rozesílka probíhá vždy <strong>20. den v měsíci</strong>. Objednávky do 15. v měsíci jsou zahrnuty v aktuální rozesílce, 
                                 objednávky od 16. dne jsou zahrnuty až v následující rozesílce.
                             </p>
@@ -436,10 +436,10 @@
                         </dd>
                     </div>
 
-                    <div class="border-t-2 border-gray-200 pt-5 mt-2">
+                    <div class="border-t border-gray-200 pt-5 mt-2">
                         <div class="flex justify-between items-center mb-1">
                             <dt class="font-bold text-gray-900 text-lg">Celkem:</dt>
-                            <dd class="text-4xl font-black bg-gradient-to-r from-primary-600 to-pink-600 bg-clip-text text-transparent">
+                            <dd class="text-3xl font-bold text-gray-900">
                                 {{ number_format($price, 0, ',', ' ') }} Kč
                             </dd>
                         </div>
@@ -447,50 +447,50 @@
                     </div>
                 </dl>
 
-                <button type="submit" form="subscription-checkout-form" class="group w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500 to-pink-600 hover:from-primary-600 hover:to-pink-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 mb-3">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button type="submit" form="subscription-checkout-form" class="group w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-3">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span>Dokončit objednávku</span>
-                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </button>
 
-                <div class="flex items-start mb-4 p-4 bg-gray-50 rounded-xl">
-                    <input type="checkbox" id="terms" required form="subscription-checkout-form" class="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mr-3 mt-0.5 flex-shrink-0">
-                    <label for="terms" class="text-sm text-gray-700">
-                        Souhlasím s <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold underline">obchodními podmínkami</a> 
-                        a <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold underline">zásadami ochrany osobních údajů</a>
+                <div class="flex items-start mb-4 p-3 bg-gray-50 rounded-xl">
+                    <input type="checkbox" id="terms" required form="subscription-checkout-form" class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mr-2.5 mt-0.5 flex-shrink-0">
+                    <label for="terms" class="text-xs text-gray-600 font-light">
+                        Souhlasím s <a href="#" class="text-primary-600 hover:text-primary-700 font-medium underline">obchodními podmínkami</a> 
+                        a <a href="#" class="text-primary-600 hover:text-primary-700 font-medium underline">zásadami ochrany osobních údajů</a>
                     </label>
                 </div>
 
-                <a href="{{ route('subscriptions.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-semibold px-8 py-3 rounded-xl shadow-md hover:shadow-lg border-2 border-gray-200 hover:border-gray-300 transition-all duration-200 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <a href="{{ route('subscriptions.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                     <span>Zpět na konfigurátor</span>
                 </a>
 
-                <!-- Trust Badges -->
-                <div class="mt-6 pt-6 border-t-2 border-gray-200 space-y-3">
-                    <div class="flex items-center text-sm text-gray-700 p-3 bg-green-50 rounded-lg">
-                        <svg class="w-5 h-5 text-green-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <!-- Trust Badges - Minimal -->
+                <div class="mt-6 pt-6 border-t border-gray-100 space-y-2.5">
+                    <div class="flex items-center text-sm text-gray-600 font-light">
+                        <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span class="font-medium">Bez závazků - kdykoli zrušte</span>
+                        <span>Bez závazků - kdykoli zrušte</span>
                     </div>
-                    <div class="flex items-center text-sm text-gray-700 p-3 bg-blue-50 rounded-lg">
-                        <svg class="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="flex items-center text-sm text-gray-600 font-light">
+                        <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span class="font-medium">Čerstvě pražená káva</span>
+                        <span>Čerstvě pražená káva</span>
                     </div>
-                    <div class="flex items-center text-sm text-gray-700 p-3 bg-purple-50 rounded-lg">
-                        <svg class="w-5 h-5 text-purple-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="flex items-center text-sm text-gray-600 font-light">
+                        <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span class="font-medium">Doprava vždy zdarma</span>
+                        <span>Doprava vždy zdarma</span>
                     </div>
                 </div>
             </div>
@@ -524,22 +524,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 document.getElementById('packeta_point_address').value = address;
 
-                // Update UI to show selected point
+                // Update UI to show selected point - Minimal
                 const selectionDiv = document.getElementById('packeta-selection');
                 selectionDiv.innerHTML = `
-                    <div id="selected-point" class="p-5 bg-gradient-to-r from-primary-50 to-pink-50 border-2 border-primary-400 rounded-xl">
+                    <div id="selected-point" class="p-4 bg-primary-50 border border-primary-300 rounded-xl">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <div class="flex items-center mb-2">
-                                    <svg class="w-5 h-5 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <div class="flex items-center mb-1.5">
+                                    <svg class="w-4 h-4 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                     </svg>
-                                    <span class="font-bold text-gray-900">Vybrané výdejní místo:</span>
+                                    <span class="font-medium text-gray-900 text-sm">Vybrané výdejní místo:</span>
                                 </div>
-                                <p class="text-gray-900 font-semibold ml-7">${point.name}</p>
-                                <p class="text-sm text-gray-700 ml-7">${address}</p>
+                                <p class="text-gray-900 font-medium ml-6">${point.name}</p>
+                                <p class="text-sm text-gray-600 ml-6 font-light">${address}</p>
                             </div>
-                            <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-[#ba1b02] font-semibold px-4 py-2 rounded-lg border border-gray-200 whitespace-nowrap ml-4 transition-colors">
+                            <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-[#ba1b02] font-medium px-4 py-2 rounded-full border border-gray-200 whitespace-nowrap ml-4 transition-colors">
                                 Změnit
                             </button>
                         </div>
