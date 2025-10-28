@@ -10,6 +10,7 @@ class Subscription extends Model
     use HasFactory;
 
     protected $fillable = [
+        'subscription_number',
         'user_id',
         'subscription_plan_id',
         'stripe_subscription_id',
@@ -56,6 +57,11 @@ class Subscription extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(SubscriptionPayment::class)->orderBy('paid_at', 'desc');
     }
 
     public function scopeActive($query)
@@ -105,6 +111,14 @@ class Subscription extends Model
     public function shouldShipOn(\Carbon\Carbon $date): bool
     {
         return \App\Helpers\SubscriptionHelper::shouldShipInNextBatch($this, $date);
+    }
+
+    /**
+     * Generate unique subscription number
+     */
+    public static function generateSubscriptionNumber(): string
+    {
+        return 'SUB-' . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
     }
 }
 

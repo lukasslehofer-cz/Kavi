@@ -77,7 +77,7 @@
 </div>
 
 <!-- Features Section - Minimal & Clean -->
-<div class="relative bg-white py-24 sm:py-32 lg:py-40">
+<div class="relative bg-white py-24 sm:py-24 lg:py-32">
   <!-- Organic shape decoration -->
   <div class="absolute top-20 right-0 w-72 h-72 bg-primary-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-60"></div>
   
@@ -133,13 +133,13 @@
   <!-- Wave Divider -->
   <div class="absolute bottom-[-1px] left-0 right-0">
     <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-      <path d="M0 80L60 75C120 70 240 60 360 55C480 50 600 50 720 53.3C840 56.7 960 63.3 1080 65C1200 66.7 1320 63.3 1380 61.7L1440 60V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="#F9FAFB"/>
+      <path d="M0 80L60 75C120 70 240 60 360 55C480 50 600 50 720 53.3C840 56.7 960 63.3 1080 65C1200 66.7 1320 63.3 1380 61.7L1440 60V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="#F3F4F6"/>
     </svg>
   </div>
 </div>
 
 <!-- Love Your Coffee Section - Minimal with organic shapes -->
-<div class="relative bg-gray-50 py-24 sm:py-32 lg:py-40 overflow-hidden">
+<div class="relative bg-gray-100 py-24 sm:py-24 lg:py-32 overflow-hidden">
   <!-- Organic shape decorations -->
   <div class="absolute bottom-0 left-0 w-96 h-96 bg-primary-100/50 rounded-full -translate-x-1/3 translate-y-1/3"></div>
 
@@ -240,7 +240,7 @@
 </div>
 
 <!-- Subscription Plans Section - Minimal & Clean -->
-<div class="relative bg-white py-24 sm:py-32 lg:py-40 overflow-hidden">
+<div class="relative bg-white py-24 sm:py-24 lg:py-32 overflow-hidden">
   <!-- Organic shape decoration -->
   <div class="absolute top-1/2 right-0 w-80 h-80 bg-gray-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
 
@@ -451,7 +451,7 @@
 </div>
 
 <!-- Testimonials Section - Minimal -->
-<div class="relative bg-gray-50 py-24 sm:py-32 lg:py-40 overflow-hidden">
+<div class="relative bg-gray-50 py-24 sm:py-24 lg:py-32">
   <!-- Organic shape decoration -->
   <div class="absolute top-0 left-0 w-72 h-72 bg-primary-50 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
   
@@ -549,9 +549,9 @@
 </div>
 
 <!-- Coffee Origins Section - Minimal -->
-<div class="relative bg-white py-24 sm:py-32 lg:py-40 overflow-hidden">
+<div class="relative bg-white py-24 sm:py-24 lg:py-32">
   <!-- Organic shape decoration -->
-  <div class="absolute bottom-0 right-0 w-96 h-96 bg-gray-100 rounded-full translate-x-1/3 translate-y-1/3"></div>
+  <div class="absolute bottom-0 right-0 w-96 h-96 bg-gray-100 rounded-full translate-x-1/3 translate-y-1/3" style="z-index: 10;"></div>
 
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="grid lg:grid-cols-2 gap-16 items-center">
@@ -606,14 +606,14 @@
   <!-- Wave Divider -->
   <div class="absolute bottom-[-1px] left-0 right-0">
     <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-      <path d="M0 80L60 74C120 68 240 56 360 50C480 44 600 44 720 48C840 52 960 60 1080 64C1200 68 1320 68 1380 68L1440 68V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="#F9FAFB"/>
+      <path d="M0 80L60 74C120 68 240 56 360 50C480 44 600 44 720 48C840 52 960 60 1080 64C1200 68 1320 68 1380 68L1440 68V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="white"/>
     </svg>
   </div>
 </div>
 
 <!-- Featured Products Section - Minimal -->
 @if($featuredProducts->count() > 0)
-<div class="relative bg-gray-50 py-24 sm:py-32 lg:py-40">
+<div class="relative bg-gray-50 py-24 sm:py-24 lg:py-32">
   <!-- Organic shape decoration -->
   <div class="absolute top-0 right-0 w-80 h-80 bg-primary-50 rounded-full translate-x-1/2 -translate-y-1/2"></div>
   
@@ -718,7 +718,7 @@
 @endif
 
 <!-- Impact Section - Minimal -->
-<div class="relative bg-white py-24 sm:py-32 lg:py-40 overflow-hidden">
+<div class="relative bg-white py-24 sm:py-24 lg:py-32">
   <!-- Organic shape decoration -->
   <div class="absolute top-0 left-0 w-72 h-72 bg-primary-50 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
   
@@ -764,7 +764,7 @@
 </div>
 
 <!-- Final CTA Section - Clean Minimal -->
-<div class="relative bg-gray-100 py-20 lg:py-24 overflow-hidden">
+<div class="relative bg-gray-100 py-20 lg:py-24">
   <!-- Subtle organic shape decoration -->
   <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
 

@@ -75,7 +75,9 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::put('/heslo', [DashboardController::class, 'updatePassword'])->name('password.update');
     Route::get('/objednavky', [DashboardController::class, 'orders'])->name('orders');
     Route::get('/objednavka/{order}', [DashboardController::class, 'orderDetail'])->name('order.detail');
+    Route::get('/objednavka/{order}/faktura', [DashboardController::class, 'downloadInvoice'])->name('order.invoice');
     Route::get('/predplatne', [DashboardController::class, 'subscription'])->name('subscription');
+    Route::get('/predplatne/platba/{payment}/faktura', [DashboardController::class, 'downloadSubscriptionInvoice'])->name('subscription.payment.invoice');
     Route::post('/predplatne/update-packeta', [DashboardController::class, 'updatePacketaPoint'])->name('subscription.update-packeta');
     Route::get('/notifikace', [DashboardController::class, 'notifications'])->name('notifications');
 });

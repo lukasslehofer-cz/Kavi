@@ -292,6 +292,18 @@ class StripeService
                     'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
                     'paid_at' => now(),
                 ]);
+
+                // Create invoice in Fakturoid and download PDF
+                try {
+                    $fakturoidService = app(\App\Services\FakturoidService::class);
+                    $fakturoidService->processInvoiceForOrder($order);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create Fakturoid invoice after payment', [
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Don't fail the webhook if Fakturoid fails
+                }
             }
         }
     }
@@ -355,6 +367,7 @@ class StripeService
             $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($frequencyMonths);
             
             $subscriptionRecord = [
+                'subscription_number' => Subscription::generateSubscriptionNumber(),
                 'user_id' => $userId,
                 'stripe_subscription_id' => $subscriptionData['id'],
                 'status' => 'active',
@@ -392,6 +405,17 @@ class StripeService
             \Log::info('Creating subscription record', $subscriptionRecord);
             $subscription = Subscription::create($subscriptionRecord);
             \Log::info('Subscription created successfully', ['id' => $subscription->id]);
+            
+            // Send subscription confirmation email
+            try {
+                $email = $subscription->shipping_address['email'] ?? $subscription->user->email ?? null;
+                if ($email) {
+                    \Mail::to($email)->send(new \App\Mail\SubscriptionConfirmation($subscription));
+                    \Log::info('Subscription confirmation email sent', ['subscription_id' => $subscription->id]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send subscription confirmation email: ' . $e->getMessage());
+            }
         } catch (\Exception $e) {
             \Log::error('Failed to create subscription', [
                 'error' => $e->getMessage(),
@@ -456,7 +480,7 @@ class StripeService
             $subscription = Subscription::where('stripe_subscription_id', $subscriptionId)->first();
             
             if ($subscription) {
-                // Update last shipment date and next billing date
+                // Update subscription
                 $subscription->update([
                     'status' => 'active',
                     'next_billing_date' => isset($invoiceData['period_end']) 
@@ -464,7 +488,42 @@ class StripeService
                         : $subscription->next_billing_date,
                 ]);
 
-                // TODO: Optionally create an order record for tracking shipments
+                // Create payment record
+                $payment = \App\Models\SubscriptionPayment::create([
+                    'subscription_id' => $subscription->id,
+                    'stripe_invoice_id' => $invoiceData['id'],
+                    'stripe_payment_intent_id' => $invoiceData['payment_intent'] ?? null,
+                    'amount' => ($invoiceData['amount_paid'] ?? 0) / 100, // Convert from cents
+                    'currency' => $invoiceData['currency'] ?? 'czk',
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'period_start' => isset($invoiceData['period_start']) 
+                        ? \Carbon\Carbon::createFromTimestamp($invoiceData['period_start'])
+                        : null,
+                    'period_end' => isset($invoiceData['period_end']) 
+                        ? \Carbon\Carbon::createFromTimestamp($invoiceData['period_end'])
+                        : null,
+                ]);
+
+                // Create invoice in Fakturoid
+                try {
+                    $fakturoidService = app(\App\Services\FakturoidService::class);
+                    $result = $fakturoidService->processInvoiceForSubscriptionPayment($payment);
+                    
+                    if ($result) {
+                        \Log::info('Fakturoid invoice created for subscription payment', [
+                            'payment_id' => $payment->id,
+                            'subscription_id' => $subscription->id,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create Fakturoid invoice for subscription payment', [
+                        'payment_id' => $payment->id,
+                        'subscription_id' => $subscription->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Don't fail the webhook if Fakturoid fails
+                }
             }
         }
     }

@@ -44,6 +44,14 @@ return [
         'widget_key' => env('PACKETA_WIDGET_KEY'),
     ],
 
+    'fakturoid' => [
+        'client_id' => env('FAKTUROID_CLIENT_ID'),
+        'client_secret' => env('FAKTUROID_CLIENT_SECRET'),
+        'slug' => env('FAKTUROID_SLUG'),
+        'number_format' => env('FAKTUROID_NUMBER_FORMAT'),
+        'user_agent' => env('FAKTUROID_USER_AGENT', 'Kavi (info@kavi.cz)'),
+    ],
+
 ];
 
 

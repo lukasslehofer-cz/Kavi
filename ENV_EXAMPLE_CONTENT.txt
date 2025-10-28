@@ -37,13 +37,23 @@ REDIS_PASSWORD=null
 REDIS_PORT=6379
 
 MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_HOST=smtp.eu.mailgun.org
+MAIL_PORT=587
+MAIL_USERNAME=postmaster@your-domain.com
+MAIL_PASSWORD=your-mailgun-smtp-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="objednavky@kavi.cz"
 MAIL_FROM_NAME="${APP_NAME}"
+
+# Mailgun Configuration
+# Get your credentials from: https://app.mailgun.com/
+# Go to Sending -> Domain Settings -> SMTP credentials
+# Domain: Your verified domain (e.g., mg.kavi.cz or kavi.cz)
+# Secret: Your Mailgun API key (starts with key-...)
+# Endpoint: Use 'api.eu.mailgun.net' for EU region, 'api.mailgun.net' for US
+MAILGUN_DOMAIN=mg.kavi.cz
+MAILGUN_SECRET=key-your-mailgun-api-key
+MAILGUN_ENDPOINT=api.eu.mailgun.net
 
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
@@ -76,6 +86,20 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 # Get your credentials from: https://client.packeta.com/
 PACKETA_API_KEY=
 PACKETA_API_PASSWORD=
+
+# Fakturoid Configuration (OAuth 2.0)
+# Get your credentials from: https://app.fakturoid.cz/
+# Go to Settings -> Integrations -> API Applications
+# Create new application or use existing one
+# Client ID and Client Secret are shown there
+# Slug is your account name in URL (e.g., 'digimix' from app.fakturoid.cz/digimix)
+# Number format is optional - if not set, uses default from Fakturoid settings
+# To get number format ID: Settings -> Number Formats -> select format -> ID is in URL
+FAKTUROID_CLIENT_ID=
+FAKTUROID_CLIENT_SECRET=
+FAKTUROID_SLUG=
+FAKTUROID_NUMBER_FORMAT=
+FAKTUROID_USER_AGENT="Kavi (info@kavi.cz)"
 
 -------------------------------------------------------------------
 

@@ -21,6 +21,8 @@ class Order extends Model
         'payment_status',
         'payment_method',
         'stripe_payment_intent_id',
+        'fakturoid_invoice_id',
+        'invoice_pdf_path',
         'shipping_address',
         'billing_address',
         'customer_notes',
@@ -83,7 +85,7 @@ class Order extends Model
 
     public static function generateOrderNumber(): string
     {
-        return 'KV-' . date('Ymd') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+        return 'KV-' . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
     }
 }
 

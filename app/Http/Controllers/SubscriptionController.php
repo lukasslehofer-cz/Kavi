@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SubscriptionConfirmation;
 use App\Models\Subscription;
 use App\Models\SubscriptionConfig;
 use App\Models\SubscriptionPlan;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class SubscriptionController extends Controller
 {
@@ -241,9 +243,13 @@ class SubscriptionController extends Controller
                 ]);
             }
 
-            // Save Packeta pickup point to user for future use (if authenticated)
+            // Save contact info, billing address and Packeta pickup point to user for future use (if authenticated)
             if (auth()->check()) {
                 auth()->user()->update([
+                    'phone' => $validated['phone'] ?? auth()->user()->phone,
+                    'address' => $validated['billing_address'],
+                    'city' => $validated['billing_city'],
+                    'postal_code' => $validated['billing_postal_code'],
                     'packeta_point_id' => $validated['packeta_point_id'],
                     'packeta_point_name' => $validated['packeta_point_name'],
                     'packeta_point_address' => $validated['packeta_point_address'],
@@ -306,6 +312,7 @@ class SubscriptionController extends Controller
                 $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($configuration['frequency']);
 
                 $subscription = Subscription::create([
+                    'subscription_number' => Subscription::generateSubscriptionNumber(),
                     'user_id' => auth()->id() ?? null,
                     'subscription_plan_id' => null, // Custom configuration, no plan
                     'configuration' => $configuration,
@@ -331,6 +338,13 @@ class SubscriptionController extends Controller
                 ]);
 
                 DB::commit();
+                
+                // Send subscription confirmation email
+                try {
+                    Mail::to($validated['email'])->send(new SubscriptionConfirmation($subscription));
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send subscription confirmation email: ' . $e->getMessage());
+                }
 
                 // Clear session
                 session()->forget([

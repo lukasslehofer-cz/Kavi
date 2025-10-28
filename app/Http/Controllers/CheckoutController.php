@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderConfirmation;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Services\FakturoidService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -122,8 +125,12 @@ class CheckoutController extends Controller
                 'customer_notes' => $request->notes,
             ]);
 
-            // Save Packeta pickup point to user for future use
+            // Save contact info, billing address and Packeta pickup point to user for future use
             auth()->user()->update([
+                'phone' => $request->phone,
+                'address' => $request->billing_address,
+                'city' => $request->billing_city,
+                'postal_code' => $request->billing_postal_code,
                 'packeta_point_id' => $request->packeta_point_id,
                 'packeta_point_name' => $request->packeta_point_name,
                 'packeta_point_address' => $request->packeta_point_address,
@@ -145,6 +152,25 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // Generate invoice from Fakturoid (must happen BEFORE sending email)
+            try {
+                $fakturoidService = app(FakturoidService::class);
+                $fakturoidService->processInvoiceForOrder($order);
+                // Refresh order to get updated invoice_pdf_path
+                $order->refresh();
+            } catch (\Exception $e) {
+                // Log error but don't fail the order
+                \Log::error('Failed to generate Fakturoid invoice: ' . $e->getMessage());
+            }
+
+            // Send order confirmation email (with invoice attachment if available)
+            try {
+                Mail::to($request->email)->send(new OrderConfirmation($order));
+            } catch (\Exception $e) {
+                // Log error but don't fail the order
+                \Log::error('Failed to send order confirmation email: ' . $e->getMessage());
+            }
 
             // Clear cart
             session()->forget('cart');

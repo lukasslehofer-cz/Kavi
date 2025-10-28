@@ -234,6 +234,93 @@
                 </div>
             </div>
         </div>
+
+        <!-- Payment History -->
+        <?php
+            $payments = $subscription->payments()->orderBy('paid_at', 'desc')->get();
+        ?>
+        
+        <?php if($payments->count() > 0): ?>
+        <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden mt-6">
+            <div class="bg-gray-50 p-6 border-b border-gray-200">
+                <h3 class="text-base font-bold text-gray-900">Historie plateb</h3>
+                <p class="text-sm text-gray-600 mt-1">Přehled všech plateb a faktur</p>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                Datum platby
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                Období
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                Částka
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                Stav
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                Faktura
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        <?php $__currentLoopData = $payments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $payment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <?php echo e($payment->paid_at ? $payment->paid_at->format('d.m.Y') : '-'); ?>
+
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-light">
+                                <?php if($payment->period_start && $payment->period_end): ?>
+                                    <?php echo e($payment->period_start->format('d.m.Y')); ?> - <?php echo e($payment->period_end->format('d.m.Y')); ?>
+
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <?php echo e(number_format($payment->amount, 0, ',', ' ')); ?> Kč
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <?php if($payment->status === 'paid'): ?>
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
+                                        ✓ Zaplaceno
+                                    </span>
+                                <?php elseif($payment->status === 'pending'): ?>
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                        ⏱ Čeká
+                                    </span>
+                                <?php else: ?>
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800 border border-red-200">
+                                        ✕ Selhalo
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <?php if($payment->hasFaktura()): ?>
+                                    <a href="<?php echo e(route('dashboard.subscription.payment.invoice', $payment)); ?>" 
+                                       class="inline-flex items-center gap-1.5 text-primary-600 hover:text-primary-700 font-medium">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                        </svg>
+                                        Stáhnout
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-gray-400 text-xs">Není k dispozici</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 

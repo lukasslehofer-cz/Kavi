@@ -108,5 +108,31 @@
         </p>
     </div>
     @endif
+
+    @if($order->invoice_pdf_path)
+    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+        <h2 class="text-base font-bold text-gray-900 mb-4">Faktura</h2>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg bg-primary-50 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-gray-900">Daňový doklad</p>
+                    <p class="text-xs text-gray-600 font-light">Objednávka {{ $order->order_number }}</p>
+                </div>
+            </div>
+            <a href="{{ route('dashboard.order.invoice', $order) }}" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Stáhnout fakturu
+            </a>
+        </div>
+    </div>
+    @endif
 </div>
 @endsection

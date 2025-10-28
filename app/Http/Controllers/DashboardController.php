@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class DashboardController extends Controller
@@ -109,6 +110,12 @@ class DashboardController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . auth()->id()],
             'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
+            'packeta_point_id' => ['nullable', 'string'],
+            'packeta_point_name' => ['nullable', 'string'],
+            'packeta_point_address' => ['nullable', 'string'],
         ]);
 
         auth()->user()->update($validated);
@@ -135,5 +142,61 @@ class DashboardController extends Controller
     public function notifications()
     {
         return view('dashboard.notifications');
+    }
+
+    public function downloadInvoice(Order $order)
+    {
+        // Verify order belongs to authenticated user
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Check if invoice PDF exists
+        if (!$order->invoice_pdf_path) {
+            abort(404, 'Faktura není k dispozici.');
+        }
+
+        // Check if file exists in storage
+        if (!Storage::exists($order->invoice_pdf_path)) {
+            abort(404, 'Soubor faktury nebyl nalezen.');
+        }
+
+        // Download the PDF
+        return Storage::download(
+            $order->invoice_pdf_path,
+            "faktura_{$order->order_number}.pdf",
+            [
+                'Content-Type' => 'application/pdf',
+            ]
+        );
+    }
+
+    public function downloadSubscriptionInvoice(\App\Models\SubscriptionPayment $payment)
+    {
+        // Verify payment belongs to authenticated user's subscription
+        if ($payment->subscription->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Check if invoice PDF exists
+        if (!$payment->invoice_pdf_path) {
+            abort(404, 'Faktura není k dispozici.');
+        }
+
+        // Check if file exists in storage
+        if (!Storage::exists($payment->invoice_pdf_path)) {
+            abort(404, 'Soubor faktury nebyl nalezen.');
+        }
+
+        // Download the PDF
+        $filename = "faktura_predplatne_" . $payment->subscription_id . "_" . $payment->paid_at->format('Y-m') . ".pdf";
+        
+        return Storage::download(
+            $payment->invoice_pdf_path,
+            $filename,
+            [
+                'Content-Type' => 'application/pdf',
+            ]
+        );
     }
 }

@@ -21,6 +21,7 @@ class User extends Authenticatable
         'country',
         'is_admin',
         'stripe_customer_id',
+        'fakturoid_subject_id',
         'packeta_point_id',
         'packeta_point_name',
         'packeta_point_address',

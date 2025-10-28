@@ -48,9 +48,6 @@
                     <a href="<?php echo e(route('roasteries.index')); ?>" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         Naše pražírny
                     </a>
-                    <a href="#" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
-                        O nás
-                    </a>
                 </nav>
 
                 <!-- Right Side Actions -->
