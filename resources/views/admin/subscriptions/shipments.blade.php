@@ -91,7 +91,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="font-mono text-sm font-medium text-gray-900">#{{ $subscription->id }}</span>
+                                <span class="font-mono text-sm font-medium text-gray-900">{{ $subscription->subscription_number ?? '#' . $subscription->id }}</span>
                             </td>
                         <td class="px-6 py-4">
                             <div class="text-sm">

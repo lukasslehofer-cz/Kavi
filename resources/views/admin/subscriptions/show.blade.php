@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="mb-8 flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Předplatné #{{ $subscription->id }}</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Předplatné {{ $subscription->subscription_number ?? '#' . $subscription->id }}</h1>
             <p class="text-gray-600 mt-1">{{ $subscription->created_at->format('d.m.Y H:i') }}</p>
         </div>
         <a href="{{ route('admin.subscriptions.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
@@ -44,6 +44,53 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if($subscription->discount_amount > 0 && $subscription->coupon)
+                        <div class="border-t border-gray-200 pt-4">
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                        </svg>
+                                        <span class="font-bold text-green-900">Aktivní sleva</span>
+                                    </div>
+                                    <span class="text-lg font-bold text-green-700">-{{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-700">Kód kupónu:</span>
+                                        <span class="font-mono font-bold text-gray-900">{{ $subscription->coupon_code }}</span>
+                                    </div>
+                                    @if($subscription->discount_months_total)
+                                    @php
+                                    $originalPrice = $subscription->configured_price + $subscription->discount_amount;
+                                    // Calculate when discount ends
+                                    $nextBillingDate = $subscription->next_billing_date ? \Carbon\Carbon::parse($subscription->next_billing_date) : now();
+                                    $discountEndsAt = $nextBillingDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);
+                                    @endphp
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-700">Zbývá plateb se slevou:</span>
+                                        <span class="font-semibold text-gray-900">{{ $subscription->discount_months_remaining }} z {{ $subscription->discount_months_total }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-700">Sleva platí do:</span>
+                                        <span class="font-semibold text-gray-900">{{ $discountEndsAt->format('d.m.Y') }}</span>
+                                    </div>
+                                    <div class="flex justify-between pt-2 border-t border-green-300">
+                                        <span class="text-gray-700">Plná cena od {{ $discountEndsAt->copy()->addMonths($subscription->frequency_months)->format('d.m.Y') }}:</span>
+                                        <span class="font-bold text-gray-900">{{ number_format($originalPrice, 0, ',', ' ') }} Kč</span>
+                                    </div>
+                                    @else
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-700">Trvání:</span>
+                                        <span class="font-semibold text-green-700">Permanentní sleva</span>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endif
 
                         <div class="border-t border-gray-200 pt-4">
                             <div class="grid grid-cols-2 gap-4 text-sm">
@@ -241,6 +288,8 @@
                         <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" onchange="this.form.submit()">
                             <option value="pending" {{ $subscription->status === 'pending' ? 'selected' : '' }}>Čeká</option>
                             <option value="active" {{ $subscription->status === 'active' ? 'selected' : '' }}>Aktivní</option>
+                            <option value="unpaid" {{ $subscription->status === 'unpaid' ? 'selected' : '' }}>⚠️ Neuhrazeno</option>
+                            <option value="paused" {{ $subscription->status === 'paused' ? 'selected' : '' }}>Pozastaveno</option>
                             <option value="trialing" {{ $subscription->status === 'trialing' ? 'selected' : '' }}>Zkušební období</option>
                             <option value="past_due" {{ $subscription->status === 'past_due' ? 'selected' : '' }}>Po splatnosti</option>
                             <option value="canceled" {{ $subscription->status === 'canceled' ? 'selected' : '' }}>Zrušeno</option>
@@ -252,16 +301,47 @@
                     <div class="text-sm text-gray-600 mb-2">Aktuální stav:</div>
                         @if($subscription->status === 'active')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Aktivní</span>
-                            @elseif($subscription->status === 'pending')
+                        @elseif($subscription->status === 'unpaid')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300">⚠️ Neuhrazeno</span>
+                        @elseif($subscription->status === 'paused')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pozastaveno</span>
+                        @elseif($subscription->status === 'pending')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Čeká</span>
-                            @elseif($subscription->status === 'trialing')
+                        @elseif($subscription->status === 'trialing')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Zkušební</span>
-                            @elseif($subscription->status === 'past_due')
+                        @elseif($subscription->status === 'past_due')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Po splatnosti</span>
-                            @elseif($subscription->status === 'canceled')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Zrušeno</span>
-                            @endif
+                        @elseif($subscription->status === 'canceled')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Zrušeno</span>
+                        @endif
                 </div>
+                
+                <!-- Payment Failure Warning -->
+                @if($subscription->status === 'unpaid' && $subscription->pending_invoice_id)
+                <div class="mt-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+                    <h4 class="text-sm font-bold text-red-900 mb-2">⚠️ Neuhrazená platba</h4>
+                    <div class="text-xs text-red-800 space-y-1">
+                        @if($subscription->pending_invoice_amount)
+                        <div class="flex justify-between font-semibold">
+                            <span>K úhradě:</span>
+                            <span>{{ number_format($subscription->pending_invoice_amount, 0, ',', ' ') }} Kč</span>
+                        </div>
+                        @endif
+                        @if($subscription->payment_failure_count)
+                        <div>Počet pokusů: {{ $subscription->payment_failure_count }}</div>
+                        @endif
+                        @if($subscription->last_payment_failure_at)
+                        <div>Poslední pokus: {{ $subscription->last_payment_failure_at->format('d.m.Y H:i') }}</div>
+                        @endif
+                        @if($subscription->last_payment_failure_reason)
+                        <div class="pt-2 border-t border-red-300 mt-2">
+                            <strong>Důvod:</strong><br>
+                            {{ $subscription->last_payment_failure_reason }}
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Customer Info -->

@@ -73,6 +73,10 @@ class PaymentController extends Controller
                     $this->stripeService->handleInvoicePaymentFailed($eventData);
                     break;
 
+                case 'payment_intent.payment_failed':
+                    $this->stripeService->handleOrderPaymentFailed($eventData);
+                    break;
+
                 default:
                     \Log::info('Unhandled webhook event type: ' . $event->type);
             }

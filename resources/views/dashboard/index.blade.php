@@ -10,6 +10,121 @@
         <p class="text-base text-gray-600 font-light">Jsme rádi, že vás opět vidíme, <span class="text-primary-600 font-medium">{{ auth()->user()->name }}</span></p>
     </div>
 
+    <!-- Unpaid Subscriptions Alert -->
+    @if($unpaidSubscriptions->isNotEmpty())
+    <div class="bg-red-50 rounded-2xl border-2 border-red-200 p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-red-900 mb-2">
+                    Problém s platbou {{ $unpaidSubscriptions->count() > 1 ? 'předplatných' : 'předplatného' }}
+                </h3>
+                <p class="text-red-800 mb-4">
+                    {{ $unpaidSubscriptions->count() > 1 
+                        ? 'U několika vašich předplatných selhala platba. Neobdržíte další kávové boxy, dokud nebude platba uhrazena.' 
+                        : 'Platba za vaše předplatné se nezdařila. Neobdržíte další kávový box, dokud nebude platba uhrazena.'
+                    }}
+                </p>
+                
+                @foreach($unpaidSubscriptions as $unpaidSub)
+                <div class="bg-white rounded-xl border border-red-200 p-4 mb-3">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="text-gray-900 font-bold text-base mb-2">
+                                Předplatné #{{ $unpaidSub->id }}
+                                @if($unpaidSub->subscription_number)
+                                    <span class="text-sm font-normal text-gray-600">({{ $unpaidSub->subscription_number }})</span>
+                                @endif
+                            </div>
+                            @if($unpaidSub->pending_invoice_amount)
+                            <div class="text-gray-700 text-sm mb-1">
+                                <span class="text-gray-600">Částka k úhradě:</span> 
+                                <span class="font-bold text-red-600">{{ number_format($unpaidSub->pending_invoice_amount, 0, ',', ' ') }} Kč</span>
+                            </div>
+                            @endif
+                            @if($unpaidSub->last_payment_failure_reason)
+                            <div class="text-gray-600 text-xs">
+                                <span class="font-medium">Důvod:</span> {{ $unpaidSub->last_payment_failure_reason }}
+                            </div>
+                            @endif
+                        </div>
+                        <form method="POST" action="{{ route('dashboard.subscription.pay', $unpaidSub) }}">
+                            @csrf
+                            <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-full transition-colors">
+                                Zaplatit nyní
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endforeach
+                
+                <div class="text-sm text-gray-600 mt-3">
+                    Bezpečná platba kartou přes Stripe
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Unpaid Orders Alert -->
+    @if($unpaidOrders->isNotEmpty())
+    <div class="bg-red-50 rounded-2xl border-2 border-red-200 p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-red-900 mb-2">
+                    Problém s platbou {{ $unpaidOrders->count() > 1 ? 'objednávek' : 'objednávky' }}
+                </h3>
+                <p class="text-red-800 mb-4">
+                    {{ $unpaidOrders->count() > 1 
+                        ? 'U několika vašich objednávek selhala platba. Objednávky nebudou zpracovány, dokud nebude platba uhrazena.' 
+                        : 'Platba za vaši objednávku se nezdařila. Objednávka nebude zpracována, dokud nebude platba uhrazena.'
+                    }}
+                </p>
+                
+                @foreach($unpaidOrders as $unpaidOrder)
+                <div class="bg-white rounded-xl border border-red-200 p-4 mb-3">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="text-gray-900 font-bold text-base mb-2">
+                                Objednávka {{ $unpaidOrder->order_number }}
+                            </div>
+                            <div class="text-gray-700 text-sm mb-1">
+                                <span class="text-gray-600">Částka k úhradě:</span> 
+                                <span class="font-bold text-red-600">{{ number_format($unpaidOrder->total, 0, ',', ' ') }} Kč</span>
+                            </div>
+                            @if($unpaidOrder->last_payment_failure_reason)
+                            <div class="text-gray-600 text-xs">
+                                <span class="font-medium">Důvod:</span> {{ $unpaidOrder->last_payment_failure_reason }}
+                            </div>
+                            @endif
+                        </div>
+                        <form method="POST" action="{{ route('order.pay', $unpaidOrder) }}">
+                            @csrf
+                            <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-full transition-colors">
+                                Zaplatit nyní
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endforeach
+                
+                <div class="text-sm text-gray-600 mt-3">
+                    Bezpečná platba kartou přes Stripe
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Active Subscription -->
     @if($activeSubscription)
     <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
@@ -162,7 +277,7 @@
                     @foreach($orders as $order)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            #{{ $order->id }}
+                            {{ $order->order_number ?? '#' . $order->id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-light">
                             {{ $order->created_at->format('d.m.Y H:i') }}

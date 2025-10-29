@@ -77,9 +77,9 @@
                         <input type="checkbox" name="terms" id="terms" required class="mt-0.5 rounded border-gray-300 text-primary-500 focus:ring-primary-500 flex-shrink-0">
                         <span class="ml-3 text-sm text-gray-700 font-light">
                             Souhlasím s 
-                            <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">obchodními podmínkami</a>
+                            <a href="{{ route('terms-of-service') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium">obchodními podmínkami</a>
                             a
-                            <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">zásadami ochrany osobních údajů</a>
+                            <a href="{{ route('privacy-policy') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium">zásadami ochrany osobních údajů</a>
                         </span>
                     </label>
                 </div>

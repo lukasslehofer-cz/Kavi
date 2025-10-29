@@ -361,9 +361,8 @@
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-light">
             <p>© {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.</p>
             <div class="flex gap-6">
-              <a href="#" class="hover:text-gray-900 transition-colors duration-200">Obchodní podmínky</a>
-              <a href="#" class="hover:text-gray-900 transition-colors duration-200">Ochrana osobních údajů</a>
-              <a href="#" class="hover:text-gray-900 transition-colors duration-200">Cookies</a>
+            <a href="{{ route('terms-of-service') }}" class="hover:text-gray-900 transition-colors duration-200">Obchodní podmínky</a>
+            <a href="{{ route('privacy-policy') }}" class="hover:text-gray-900 transition-colors duration-200">Ochrana osobních údajů</a>              
             </div>
           </div>
         </div>

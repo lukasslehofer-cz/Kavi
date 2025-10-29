@@ -28,7 +28,18 @@ class DashboardController extends Controller
         $activeSubscriptions = $user->activeSubscriptions()->get();
         $activeSubscription = $activeSubscriptions->first(); // For backward compatibility
 
-        return view('dashboard.index', compact('orders', 'activeSubscription', 'activeSubscriptions'));
+        // Get unpaid subscriptions for alert
+        $unpaidSubscriptions = $user->subscriptions()
+            ->where('status', 'unpaid')
+            ->get();
+
+        // Get unpaid orders for alert
+        $unpaidOrders = Order::where('user_id', $user->id)
+            ->where('payment_status', 'unpaid')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('dashboard.index', compact('orders', 'activeSubscription', 'activeSubscriptions', 'unpaidSubscriptions', 'unpaidOrders'));
     }
 
     public function orders()
@@ -52,12 +63,12 @@ class DashboardController extends Controller
     public function subscription()
     {
         $subscriptions = auth()->user()->subscriptions()
-            ->whereIn('status', ['active', 'paused', 'cancelled'])
+            ->whereIn('status', ['active', 'unpaid', 'paused', 'cancelled'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->filter(function ($subscription) {
-                // Always show active and paused
-                if (in_array($subscription->status, ['active', 'paused'])) {
+                // Always show active, unpaid and paused
+                if (in_array($subscription->status, ['active', 'unpaid', 'paused'])) {
                     return true;
                 }
                 

@@ -115,8 +115,8 @@
                 <a href="{{ route('roasteries.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
                     Naše pražírny
                 </a>
-                <a href="#" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
-                    O nás
+                <a href="{{ route('how-it-works') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
+                    Jak to funguje
                 </a>
                 
                 <!-- Mobile CTA Button -->
@@ -255,10 +255,10 @@
           <div>
             <h3 class="text-gray-900 font-semibold text-sm mb-4">Informace</h3>
             <nav class="space-y-2.5">
+              <a href="{{ route('how-it-works') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">Jak to funguje</a>
               <a href="#" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">O nás</a>
-              <a href="#" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">FAQ</a>
+              <a href="{{ route('how-it-works') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">FAQ</a>
               <a href="#" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">Blog</a>
-              <a href="#" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">Doprava</a>
             </nav>
           </div>
 
@@ -307,9 +307,8 @@
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-light">
             <p>© {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.</p>
             <div class="flex gap-6">
-              <a href="#" class="hover:text-gray-900 transition-colors duration-200">Obchodní podmínky</a>
-              <a href="#" class="hover:text-gray-900 transition-colors duration-200">Ochrana osobních údajů</a>
-              <a href="#" class="hover:text-gray-900 transition-colors duration-200">Cookies</a>
+              <a href="{{ route('terms-of-service') }}" class="hover:text-gray-900 transition-colors duration-200">Obchodní podmínky</a>
+              <a href="{{ route('privacy-policy') }}" class="hover:text-gray-900 transition-colors duration-200">Ochrana osobních údajů</a>              
             </div>
           </div>
         </div>

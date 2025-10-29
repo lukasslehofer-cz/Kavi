@@ -49,13 +49,22 @@ class StripeService
         $customerId = $this->getOrCreateCustomer($order->user);
 
         $lineItems = $order->items->map(function ($item) {
+            $productData = [
+                'name' => $item->product_name,
+            ];
+            
+            // Add image only if it exists and convert to absolute URL
+            if ($item->product_image) {
+                $imageUrl = str_starts_with($item->product_image, 'http') 
+                    ? $item->product_image 
+                    : asset($item->product_image);
+                $productData['images'] = [$imageUrl];
+            }
+            
             return [
                 'price_data' => [
                     'currency' => 'czk',
-                    'product_data' => [
-                        'name' => $item->product_name,
-                        'images' => $item->product_image ? [$item->product_image] : [],
-                    ],
+                    'product_data' => $productData,
                     'unit_amount' => (int)($item->price * 100),
                 ],
                 'quantity' => $item->quantity,
@@ -96,7 +105,10 @@ class StripeService
         ?User $user, 
         array $configuration, 
         float $price,
-        array $shippingAddress
+        array $shippingAddress,
+        ?\App\Models\Coupon $coupon = null,
+        float $discount = 0,
+        ?int $discountMonths = null
     ): StripeSession {
         // Prepare metadata for subscription (includes Packeta and delivery_notes)
         $subscriptionMetadata = [
@@ -116,6 +128,15 @@ class StripeService
             'packeta_point_address' => $shippingAddress['packeta_point_address'] ?? null,
             'delivery_notes' => $shippingAddress['delivery_notes'] ?? null,
         ];
+        
+        // Add coupon info to metadata if present
+        if ($coupon) {
+            $subscriptionMetadata['coupon_id'] = $coupon->id;
+            $subscriptionMetadata['coupon_code'] = $coupon->code;
+            $subscriptionMetadata['discount_amount'] = $discount;
+            $subscriptionMetadata['discount_months_total'] = $discountMonths;
+            $subscriptionMetadata['discount_months_remaining'] = $discountMonths;
+        }
 
         // Get base product ID for all subscriptions
         $productId = $this->getOrCreateBaseSubscriptionProduct();
@@ -283,6 +304,55 @@ class StripeService
      */
     public function handlePaymentSuccess(array $session): void
     {
+        // Handle manual invoice payment for subscription
+        if (isset($session['metadata']['type']) && $session['metadata']['type'] === 'manual_invoice_payment') {
+            $subscriptionId = $session['metadata']['subscription_id'] ?? null;
+            $invoiceId = $session['metadata']['invoice_id'] ?? null;
+            
+            if ($subscriptionId) {
+                $subscription = Subscription::find($subscriptionId);
+                
+                if ($subscription) {
+                    // If there's a real Stripe invoice, try to pay it
+                    if ($invoiceId && $invoiceId !== 'manual_payment' && !str_starts_with($invoiceId, 'in_test_')) {
+                        try {
+                            $invoice = \Stripe\Invoice::retrieve($invoiceId);
+                            if ($invoice->status !== 'paid') {
+                                $invoice->pay();
+                            }
+                            \Log::info('Stripe invoice paid after manual payment', [
+                                'subscription_id' => $subscription->id,
+                                'invoice_id' => $invoiceId,
+                            ]);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to pay Stripe invoice after manual payment', [
+                                'subscription_id' => $subscription->id,
+                                'invoice_id' => $invoiceId,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+                    
+                    // Clear unpaid status and restore subscription
+                    $subscription->update([
+                        'status' => 'active',
+                        'payment_failure_count' => 0,
+                        'last_payment_failure_at' => null,
+                        'last_payment_failure_reason' => null,
+                        'pending_invoice_id' => null,
+                        'pending_invoice_amount' => null,
+                    ]);
+                    
+                    \Log::info('Manual invoice payment successful - subscription restored', [
+                        'subscription_id' => $subscription->id,
+                        'invoice_id' => $invoiceId ?? 'manual_payment',
+                    ]);
+                }
+            }
+            return;
+        }
+        
+        // Handle regular order payment
         if (isset($session['metadata']['order_id'])) {
             $order = Order::find($session['metadata']['order_id']);
             if ($order) {
@@ -403,6 +473,15 @@ class StripeService
                 if (isset($subscriptionData['metadata']['delivery_notes'])) {
                     $subscriptionRecord['delivery_notes'] = $subscriptionData['metadata']['delivery_notes'];
                 }
+                
+                // Add coupon info if available
+                if (isset($subscriptionData['metadata']['coupon_id'])) {
+                    $subscriptionRecord['coupon_id'] = $subscriptionData['metadata']['coupon_id'];
+                    $subscriptionRecord['coupon_code'] = $subscriptionData['metadata']['coupon_code'] ?? null;
+                    $subscriptionRecord['discount_amount'] = $subscriptionData['metadata']['discount_amount'] ?? 0;
+                    $subscriptionRecord['discount_months_total'] = $subscriptionData['metadata']['discount_months_total'] ?? null;
+                    $subscriptionRecord['discount_months_remaining'] = $subscriptionData['metadata']['discount_months_remaining'] ?? null;
+                }
             }
 
             \Log::info('Creating subscription record', $subscriptionRecord);
@@ -487,13 +566,13 @@ class StripeService
             $hasPauseCollection = isset($subscriptionData['pause_collection']) && !empty($subscriptionData['pause_collection']);
             $hasCancelAtPeriodEnd = isset($subscriptionData['cancel_at_period_end']) && $subscriptionData['cancel_at_period_end'] === true;
 
-            $mappedStatus = match($stripeStatus) {
-                'canceled' => 'cancelled',
-                'unpaid' => 'paused',
-                'active' => 'active',
-                'past_due' => 'active',
-                default => 'active',
-            };
+        $mappedStatus = match($stripeStatus) {
+            'canceled' => 'cancelled',
+            'unpaid' => 'unpaid',
+            'past_due' => 'unpaid',
+            'active' => 'active',
+            default => 'active',
+        };
 
             // If Stripe has pause_collection enabled, we treat it as paused locally
             if ($hasPauseCollection) {
@@ -553,12 +632,17 @@ class StripeService
             $subscription = Subscription::where('stripe_subscription_id', $subscriptionId)->first();
             
             if ($subscription) {
-                // Update subscription
+                // Update subscription and clear payment failure tracking
                 $subscription->update([
                     'status' => 'active',
                     'next_billing_date' => isset($invoiceData['period_end']) 
                         ? \Carbon\Carbon::createFromTimestamp($invoiceData['period_end'])
                         : $subscription->next_billing_date,
+                    'payment_failure_count' => 0,
+                    'last_payment_failure_at' => null,
+                    'last_payment_failure_reason' => null,
+                    'pending_invoice_id' => null,
+                    'pending_invoice_amount' => null,
                 ]);
 
                 // Create payment record
@@ -577,6 +661,68 @@ class StripeService
                         ? \Carbon\Carbon::createFromTimestamp($invoiceData['period_end'])
                         : null,
                 ]);
+
+                // Handle coupon discount countdown
+                if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                    $couponService = app(\App\Services\CouponService::class);
+                    
+                    // Zaznamenat použití kupónu pro tuto platbu
+                    $couponService->recordUsage(
+                        $subscription->coupon,
+                        $subscription->user,
+                        'subscription',
+                        $subscription->discount_amount,
+                        null,
+                        $subscription
+                    );
+                    
+                    // Snížit počet zbývajících měsíců slevy
+                    $couponService->decrementSubscriptionDiscountMonth($subscription);
+                    
+                    // Pokud skončily měsíce se slevou, aktualizovat Stripe subscription s novou cenou
+                    if ($subscription->fresh()->discount_months_remaining === 0) {
+                        try {
+                            $newPrice = $subscription->configured_price ?? $subscription->plan?->price ?? 0;
+                            
+                            // Získat aktuální Stripe subscription
+                            $stripeSubscription = \Stripe\Subscription::retrieve($subscription->stripe_subscription_id);
+                            
+                            // Vytvořit nový Price objekt s plnou cenou
+                            $productId = $this->getOrCreateBaseSubscriptionProduct();
+                            $newStripePrice = \Stripe\Price::create([
+                                'currency' => 'czk',
+                                'product' => $productId,
+                                'recurring' => [
+                                    'interval' => 'month',
+                                    'interval_count' => $subscription->frequency_months ?? 1,
+                                ],
+                                'unit_amount' => (int)($newPrice * 100),
+                            ]);
+                            
+                            // Aktualizovat subscription s novou cenou
+                            \Stripe\Subscription::update($subscription->stripe_subscription_id, [
+                                'items' => [
+                                    [
+                                        'id' => $stripeSubscription->items->data[0]->id,
+                                        'price' => $newStripePrice->id,
+                                    ],
+                                ],
+                                'proration_behavior' => 'none', // Bez proration
+                            ]);
+                            
+                            \Log::info('Stripe subscription price updated after coupon expiry', [
+                                'subscription_id' => $subscription->id,
+                                'old_price' => $newPrice - $subscription->discount_amount,
+                                'new_price' => $newPrice,
+                            ]);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to update Stripe subscription price after coupon expiry', [
+                                'subscription_id' => $subscription->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+                }
 
                 // Create invoice in Fakturoid
                 try {
@@ -602,6 +748,70 @@ class StripeService
     }
 
     /**
+     * Handle failed order payment (one-time payment)
+     */
+    public function handleOrderPaymentFailed(array $paymentIntentData): void
+    {
+        $paymentIntentId = $paymentIntentData['id'] ?? null;
+        
+        if (!$paymentIntentId) {
+            return;
+        }
+        
+        // Find order by payment intent ID
+        $order = Order::where('stripe_payment_intent_id', $paymentIntentId)->first();
+        
+        if ($order) {
+            // Extract failure reason
+            $failureReason = null;
+            if (isset($paymentIntentData['last_payment_error'])) {
+                $failureReason = $paymentIntentData['last_payment_error']['message'] ?? 
+                                $paymentIntentData['last_payment_error']['code'] ?? 
+                                'Unknown error';
+            }
+            
+            // Update order with failure information
+            $order->update([
+                'payment_status' => 'unpaid',
+                'payment_failure_count' => $order->payment_failure_count + 1,
+                'last_payment_failure_at' => now(),
+                'last_payment_failure_reason' => $failureReason,
+                'pending_payment_intent_id' => $paymentIntentId,
+            ]);
+            
+            \Log::warning('Order payment failed', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'payment_intent_id' => $paymentIntentId,
+                'failure_count' => $order->payment_failure_count,
+                'reason' => $failureReason,
+            ]);
+            
+            // Send notification email to customer
+            try {
+                $email = $order->shipping_address['email'] ?? $order->user?->email;
+                
+                if ($email) {
+                    \Mail::to($email)->send(new \App\Mail\OrderPaymentFailed($order, $failureReason));
+                    \Log::info('Order payment failure email sent', [
+                        'order_id' => $order->id,
+                        'email' => $email,
+                    ]);
+                } else {
+                    \Log::warning('No email found for order payment failure notification', [
+                        'order_id' => $order->id
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send order payment failure email', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
      * Handle failed invoice payment
      */
     public function handleInvoicePaymentFailed(array $invoiceData): void
@@ -612,15 +822,189 @@ class StripeService
             $subscription = Subscription::where('stripe_subscription_id', $subscriptionId)->first();
             
             if ($subscription) {
-                // TODO: Send notification email to customer
-                // Consider pausing subscription after multiple failures
+                // Extract failure reason
+                $failureReason = null;
+                if (isset($invoiceData['last_payment_error'])) {
+                    $failureReason = $invoiceData['last_payment_error']['message'] ?? 
+                                    $invoiceData['last_payment_error']['code'] ?? 
+                                    'Unknown error';
+                }
+                
+                // Update subscription with failure information
+                $subscription->update([
+                    'status' => 'unpaid',
+                    'payment_failure_count' => $subscription->payment_failure_count + 1,
+                    'last_payment_failure_at' => now(),
+                    'last_payment_failure_reason' => $failureReason,
+                    'pending_invoice_id' => $invoiceData['id'] ?? null,
+                    'pending_invoice_amount' => isset($invoiceData['amount_due']) ? ($invoiceData['amount_due'] / 100) : null,
+                ]);
                 
                 \Log::warning('Invoice payment failed for subscription', [
                     'subscription_id' => $subscription->id,
                     'stripe_subscription_id' => $subscriptionId,
                     'invoice_id' => $invoiceData['id'] ?? null,
+                    'failure_count' => $subscription->payment_failure_count,
+                    'reason' => $failureReason,
                 ]);
+                
+                // Send notification email to customer
+                try {
+                    $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
+                    
+                    if ($email) {
+                        \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentFailed($subscription, $failureReason));
+                        \Log::info('Payment failure email sent', [
+                            'subscription_id' => $subscription->id,
+                            'email' => $email,
+                        ]);
+                    } else {
+                        \Log::warning('No email found for payment failure notification', [
+                            'subscription_id' => $subscription->id
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send payment failure email', [
+                        'subscription_id' => $subscription->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
+        }
+    }
+
+    /**
+     * Create checkout session for manual order payment
+     */
+    public function createOrderPaymentSession(Order $order): ?string
+    {
+        if ($order->payment_status === 'paid') {
+            \Log::info('Order already paid', [
+                'order_id' => $order->id
+            ]);
+            return null;
+        }
+
+        try {
+            // Create a checkout session for the order
+            $session = $this->createOrderCheckoutSession($order);
+
+            \Log::info('Manual order payment checkout session created', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'session_id' => $session->id,
+                'amount' => $order->total,
+            ]);
+
+            return $session->url;
+        } catch (\Exception $e) {
+            \Log::error('Failed to create order payment session', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Create checkout session for manual invoice payment
+     */
+    public function createInvoicePaymentSession(Subscription $subscription): ?string
+    {
+        if (!$subscription->pending_invoice_amount) {
+            \Log::warning('No pending invoice amount for subscription', [
+                'subscription_id' => $subscription->id
+            ]);
+            return null;
+        }
+
+        try {
+            $customerId = $this->getOrCreateCustomer($subscription->user);
+            
+            // Check if we have a real Stripe invoice (not a test one)
+            $hasRealInvoice = $subscription->pending_invoice_id && 
+                             !str_starts_with($subscription->pending_invoice_id, 'in_test_');
+            
+            if ($hasRealInvoice) {
+                // Try to retrieve the invoice from Stripe
+                try {
+                    $invoice = \Stripe\Invoice::retrieve($subscription->pending_invoice_id);
+                    
+                    // Check if invoice is still unpaid
+                    if ($invoice->status === 'paid') {
+                        \Log::info('Invoice already paid', [
+                            'invoice_id' => $subscription->pending_invoice_id,
+                            'subscription_id' => $subscription->id,
+                        ]);
+                        
+                        // Clear the unpaid status
+                        $subscription->update([
+                            'status' => 'active',
+                            'payment_failure_count' => 0,
+                            'pending_invoice_id' => null,
+                            'pending_invoice_amount' => null,
+                        ]);
+                        
+                        return null;
+                    }
+                    
+                    $currency = $invoice->currency;
+                    $amount = $invoice->amount_due;
+                } catch (\Exception $e) {
+                    \Log::warning('Could not retrieve invoice from Stripe, creating generic payment', [
+                        'invoice_id' => $subscription->pending_invoice_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $hasRealInvoice = false;
+                }
+            }
+            
+            // If no real invoice, create a generic one-time payment
+            if (!$hasRealInvoice) {
+                $currency = 'czk';
+                $amount = (int)($subscription->pending_invoice_amount * 100); // Convert to cents
+            }
+
+            // Create a checkout session for payment
+            $session = StripeSession::create([
+                'customer' => $customerId,
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => $currency,
+                        'product_data' => [
+                            'name' => 'Platba předplatného - ' . ($subscription->subscription_number ?? '#' . $subscription->id),
+                            'description' => 'Neuhrazená platba za kávové předplatné',
+                        ],
+                        'unit_amount' => $amount,
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => route('dashboard.subscription') . '?payment=success',
+                'cancel_url' => route('dashboard.subscription') . '?payment=cancelled',
+                'metadata' => [
+                    'subscription_id' => $subscription->id,
+                    'invoice_id' => $subscription->pending_invoice_id ?? 'manual_payment',
+                    'type' => 'manual_invoice_payment',
+                ],
+            ]);
+
+            \Log::info('Manual payment checkout session created', [
+                'subscription_id' => $subscription->id,
+                'invoice_id' => $subscription->pending_invoice_id ?? 'manual_payment',
+                'session_id' => $session->id,
+                'amount' => $amount / 100,
+            ]);
+
+            return $session->url;
+        } catch (\Exception $e) {
+            \Log::error('Failed to create invoice payment session', [
+                'subscription_id' => $subscription->id,
+                'invoice_id' => $subscription->pending_invoice_id,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
         }
     }
 

@@ -79,6 +79,19 @@
                             @endif
                         </span>
                     </div>
+                    
+                    @if($order->discount_amount > 0 && $order->coupon)
+                    <div class="flex justify-between items-center py-2 bg-green-50 -mx-4 px-4 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            <span class="font-medium text-green-700">Sleva {{ $order->coupon_code }}:</span>
+                        </div>
+                        <span class="font-bold text-green-600">-{{ number_format($order->discount_amount, 0, ',', ' ') }} Kč</span>
+                    </div>
+                    @endif
+                    
                     <div class="flex justify-between items-center text-gray-700">
                         <span class="font-light">DPH (21%):</span>
                         <span class="font-medium">{{ number_format($order->tax, 2, ',', ' ') }} Kč</span>

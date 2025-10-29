@@ -11,24 +11,28 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
         <div class="bg-white rounded-lg p-4 text-center shadow-sm border border-gray-200">
             <p class="text-3xl font-bold text-gray-900">{{ $stats['total'] }}</p>
             <p class="text-sm text-gray-600 mt-1">Celkem</p>
         </div>
-        <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 text-center shadow-sm border border-amber-200">
+        <div class="bg-red-50 rounded-lg p-4 text-center shadow-sm border-2 border-red-300 {{ ($stats['unpaid'] ?? 0) > 0 ? 'ring-2 ring-red-500 ring-offset-2' : '' }}">
+            <p class="text-3xl font-bold text-red-700">{{ $stats['unpaid'] ?? 0 }}</p>
+            <p class="text-sm text-red-600 mt-1 font-semibold">⚠️ Neuhrazeno</p>
+        </div>
+        <div class="bg-amber-50 rounded-lg p-4 text-center shadow-sm border border-amber-200">
             <p class="text-3xl font-bold text-amber-700">{{ $stats['pending'] }}</p>
             <p class="text-sm text-amber-600 mt-1">Čeká</p>
         </div>
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 text-center shadow-sm border border-blue-200">
+        <div class="bg-blue-50 rounded-lg p-4 text-center shadow-sm border border-blue-200">
             <p class="text-3xl font-bold text-blue-700">{{ $stats['processing'] }}</p>
             <p class="text-sm text-blue-600 mt-1">Zpracovává se</p>
         </div>
-        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 text-center shadow-sm border border-purple-200">
+        <div class="bg-purple-50 rounded-lg p-4 text-center shadow-sm border border-purple-200">
             <p class="text-3xl font-bold text-purple-700">{{ $stats['shipped'] }}</p>
             <p class="text-sm text-purple-600 mt-1">Odesláno</p>
         </div>
-        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 text-center shadow-sm border border-green-200">
+        <div class="bg-green-50 rounded-lg p-4 text-center shadow-sm border border-green-200">
             <p class="text-3xl font-bold text-green-700">{{ $stats['delivered'] }}</p>
             <p class="text-sm text-green-600 mt-1">Doručeno</p>
         </div>
@@ -90,7 +94,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($orders as $order)
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 transition-colors {{ $order->payment_status === 'unpaid' ? 'bg-red-50 border-l-4 border-red-500' : '' }}">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="font-mono text-sm font-medium text-gray-900">{{ $order->order_number }}</span>
                         </td>
@@ -121,6 +125,15 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($order->payment_status === 'paid')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Zaplaceno</span>
+                            @elseif($order->payment_status === 'unpaid')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300">
+                                ⚠️ Neuhrazeno
+                            </span>
+                            @if($order->payment_failure_count > 0)
+                            <div class="text-xs text-red-700 mt-1">
+                                Pokusů: {{ $order->payment_failure_count }}
+                            </div>
+                            @endif
                             @elseif($order->payment_status === 'pending')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Čeká</span>
                             @else

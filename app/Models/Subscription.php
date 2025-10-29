@@ -13,8 +13,18 @@ class Subscription extends Model
         'subscription_number',
         'user_id',
         'subscription_plan_id',
+        'coupon_id',
+        'coupon_code',
+        'discount_amount',
+        'discount_months_remaining',
+        'discount_months_total',
         'stripe_subscription_id',
         'status',
+        'payment_failure_count',
+        'last_payment_failure_at',
+        'last_payment_failure_reason',
+        'pending_invoice_id',
+        'pending_invoice_amount',
         'starts_at',
         'next_billing_date',
         'last_shipment_date',
@@ -42,10 +52,13 @@ class Subscription extends Model
         'last_shipment_date' => 'date',
         'ends_at' => 'date',
         'paused_until_date' => 'date',
+        'last_payment_failure_at' => 'datetime',
         'packeta_sent_at' => 'datetime',
         'configuration' => 'array',
         'shipping_address' => 'array',
         'configured_price' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'pending_invoice_amount' => 'decimal:2',
     ];
 
     public function user()
@@ -68,6 +81,11 @@ class Subscription extends Model
         return $this->hasMany(SubscriptionPayment::class)->orderBy('paid_at', 'desc');
     }
 
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
@@ -81,6 +99,16 @@ class Subscription extends Model
     public function isPaused(): bool
     {
         return $this->status === 'paused';
+    }
+
+    public function isUnpaid(): bool
+    {
+        return $this->status === 'unpaid';
+    }
+
+    public function hasPaymentIssue(): bool
+    {
+        return $this->isUnpaid() || $this->payment_failure_count > 0;
     }
 
     public function cancel()
@@ -127,7 +155,7 @@ class Subscription extends Model
      */
     public static function generateSubscriptionNumber(): string
     {
-        return 'SUB-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+        return 'KVS-'. date('Y') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
     }
 
     /**

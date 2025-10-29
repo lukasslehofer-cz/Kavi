@@ -36,7 +36,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
                     <?php $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 transition-colors <?php echo e($order->payment_status === 'unpaid' ? 'bg-red-50 border-l-4 border-red-500' : ''); ?>">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
                             #<?php echo e($order->id); ?>
 
@@ -46,7 +46,11 @@
 
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <?php if($order->status === 'completed'): ?>
+                            <?php if($order->payment_status === 'unpaid'): ?>
+                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-red-100 text-red-800 border border-red-300">
+                                    ⚠️ Neuhrazeno
+                                </span>
+                            <?php elseif($order->status === 'completed'): ?>
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
                                     Dokončeno
                                 </span>
@@ -77,7 +81,15 @@
                             <?php echo e(number_format($order->total, 2, ',', ' ')); ?> Kč
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="<?php echo e(route('dashboard.order.detail', $order)); ?>" class="text-primary-600 hover:text-primary-700 font-medium">
+                            <?php if($order->payment_status === 'unpaid'): ?>
+                            <form method="POST" action="<?php echo e(route('order.pay', $order)); ?>" class="inline">
+                                <?php echo csrf_field(); ?>
+                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-full transition-colors text-xs">
+                                    Zaplatit
+                                </button>
+                            </form>
+                            <?php endif; ?>
+                            <a href="<?php echo e(route('dashboard.order.detail', $order)); ?>" class="text-primary-600 hover:text-primary-700 font-medium <?php echo e($order->payment_status === 'unpaid' ? 'ml-2' : ''); ?>">
                                 Detail →
                             </a>
                         </td>

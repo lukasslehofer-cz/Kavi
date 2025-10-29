@@ -4,6 +4,34 @@
 
 @section('content')
 <div class="space-y-6">
+    <!-- Success Messages -->
+    @if(request('payment') === 'success')
+    <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
+        <div class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="text-base font-bold text-green-900 mb-1">Platba byla úspěšná!</h3>
+                <p class="text-sm text-green-800">Vaše předplatné bylo obnoveno a bude normálně pokračovat.</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if(request('payment') === 'cancelled')
+    <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6">
+        <div class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="text-base font-bold text-yellow-900 mb-1">Platba byla zrušena</h3>
+                <p class="text-sm text-yellow-800">Platbu můžete zkusit znovu kdykoli.</p>
+            </div>
+        </div>
+    </div>
+    @endif
     <!-- Page Header -->
     <div class="bg-white rounded-2xl border border-gray-200 p-6">
         <h1 class="text-xl font-bold text-gray-900">Správa předplatných</h1>
@@ -20,7 +48,7 @@
                         <h2 class="text-xl font-bold text-gray-900 mb-1">{{ $subscription->plan->name }}</h2>
                         <p class="text-gray-600 font-light">{{ $subscription->plan->description }}</p>
                     @else
-                        <h2 class="text-xl font-bold text-gray-900 mb-1">Kávové předplatné #{{ $subscription->id }}</h2>
+                        <h2 class="text-xl font-bold text-gray-900 mb-1">Kávové předplatné {{ $subscription->subscription_number ?? '#' . $subscription->id }}</h2>
                         <p class="text-gray-600 font-light">Váš vlastní konfigurace</p>
                     @endif
                     
@@ -29,6 +57,13 @@
                             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
                                 <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
                                 Aktivní
+                            </span>
+                        @elseif($subscription->status === 'unpaid')
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-200">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                Neuhrazená platba
                             </span>
                         @elseif($subscription->status === 'paused')
                             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
@@ -285,6 +320,54 @@
                         </div>
                         @endif
                     </div>
+
+                    <!-- Payment Issue Warning -->
+                    @if($subscription->status === 'unpaid')
+                    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="flex-1">
+                                <h4 class="text-base font-bold text-red-900 mb-2">Neuhrazená platba</h4>
+                                <p class="text-sm text-red-800 mb-3">
+                                    Poslední platba za vaše předplatné se nezdařila. 
+                                    @if($subscription->last_payment_failure_at)
+                                        <span class="block mt-1">
+                                            Datum selhání: {{ $subscription->last_payment_failure_at->format('d.m.Y H:i') }}
+                                        </span>
+                                    @endif
+                                    @if($subscription->last_payment_failure_reason)
+                                        <span class="block mt-1">
+                                            Důvod: {{ $subscription->last_payment_failure_reason }}
+                                        </span>
+                                    @endif
+                                </p>
+                                <p class="text-sm text-red-800 mb-4">
+                                    <strong>Než neuhradíte platbu, neobdržíte další kávový box.</strong>
+                                    Po uhrazení se předplatné automaticky obnoví.
+                                </p>
+                                @if($subscription->pending_invoice_amount)
+                                <div class="bg-white rounded-lg p-4 mb-4 border border-red-200">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-700">Částka k úhradě:</span>
+                                        <span class="text-xl font-bold text-red-600">{{ number_format($subscription->pending_invoice_amount, 0, ',', ' ') }} Kč</span>
+                                    </div>
+                                </div>
+                                @endif
+                                <form method="POST" action="{{ route('dashboard.subscription.pay', $subscription) }}">
+                                    @csrf
+                                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded-full transition-colors">
+                                        Zaplatit nyní
+                                    </button>
+                                </form>
+                                <p class="text-xs text-gray-600 mt-3 text-center">
+                                    Bezpečná platba kartou přes Stripe
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- Actions -->
                     <div>

@@ -257,7 +257,7 @@
                     @forelse($recentSubscriptions as $subscription)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="font-mono text-sm font-medium text-gray-900">#{{ $subscription->id }}</span>
+                            <span class="font-mono text-sm font-medium text-gray-900">{{ $subscription->subscription_number ?? '#' . $subscription->id }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="text-sm text-gray-900">{{ $subscription->user->name ?? 'Host' }}</span>

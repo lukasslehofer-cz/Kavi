@@ -256,7 +256,7 @@
                     <?php $__empty_1 = true; $__currentLoopData = $recentSubscriptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $subscription): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="font-mono text-sm font-medium text-gray-900">#<?php echo e($subscription->id); ?></span>
+                            <span class="font-mono text-sm font-medium text-gray-900"><?php echo e($subscription->subscription_number ?? '#' . $subscription->id); ?></span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="text-sm text-gray-900"><?php echo e($subscription->user->name ?? 'Host'); ?></span>

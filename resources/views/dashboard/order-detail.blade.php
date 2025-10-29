@@ -12,7 +12,7 @@
             </svg>
             Zpět na objednávky
         </a>
-        <h1 class="text-xl font-bold text-gray-900 mt-2">Detail objednávky #{{ $order->id }}</h1>
+        <h1 class="text-xl font-bold text-gray-900 mt-2">Detail objednávky {{ $order->order_number ?? '#' . $order->id }}</h1>
         <p class="mt-2 text-gray-600 font-light">Vytvořeno: {{ $order->created_at->format('d.m.Y H:i') }}</p>
     </div>
 

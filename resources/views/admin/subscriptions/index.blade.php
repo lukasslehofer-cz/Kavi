@@ -20,7 +20,7 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
         <div class="bg-white rounded-lg p-4 text-center shadow-sm border border-gray-200">
             <p class="text-3xl font-bold text-gray-900">{{ $stats['total'] }}</p>
             <p class="text-sm text-gray-600 mt-1">Celkem</p>
@@ -28,6 +28,10 @@
         <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 text-center shadow-sm border border-green-200">
             <p class="text-3xl font-bold text-green-700">{{ $stats['active'] }}</p>
             <p class="text-sm text-green-600 mt-1">Aktivní</p>
+        </div>
+        <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 text-center shadow-sm border-2 border-red-300 {{ ($stats['unpaid'] ?? 0) > 0 ? 'ring-2 ring-red-500 ring-offset-2' : '' }}">
+            <p class="text-3xl font-bold text-red-700">{{ $stats['unpaid'] ?? 0 }}</p>
+            <p class="text-sm text-red-600 mt-1 font-semibold">⚠️ Neuhrazeno</p>
         </div>
         <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 text-center shadow-sm border border-amber-200">
             <p class="text-3xl font-bold text-amber-700">{{ $stats['pending'] }}</p>
@@ -41,9 +45,9 @@
             <p class="text-3xl font-bold text-orange-700">{{ $stats['past_due'] }}</p>
             <p class="text-sm text-orange-600 mt-1">Po splatnosti</p>
         </div>
-        <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 text-center shadow-sm border border-red-200">
-            <p class="text-3xl font-bold text-red-700">{{ $stats['canceled'] }}</p>
-            <p class="text-sm text-red-600 mt-1">Zrušeno</p>
+        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 text-center shadow-sm border border-gray-200">
+            <p class="text-3xl font-bold text-gray-700">{{ $stats['canceled'] }}</p>
+            <p class="text-sm text-gray-600 mt-1">Zrušeno</p>
         </div>
     </div>
 
@@ -66,6 +70,7 @@
                 <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Všechny</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktivní</option>
+                    <option value="unpaid" {{ request('status') === 'unpaid' ? 'selected' : '' }}>⚠️ Neuhrazeno</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Čeká</option>
                     <option value="trialing" {{ request('status') === 'trialing' ? 'selected' : '' }}>Zkušební</option>
                     <option value="past_due" {{ request('status') === 'past_due' ? 'selected' : '' }}>Po splatnosti</option>
@@ -104,9 +109,9 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($subscriptions as $subscription)
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 transition-colors {{ $subscription->status === 'unpaid' ? 'bg-red-50 border-l-4 border-red-500' : '' }}">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="font-mono text-sm font-medium text-gray-900">#{{ $subscription->id }}</span>
+                            <span class="font-mono text-sm font-medium text-gray-900">{{ $subscription->subscription_number ?? '#' . $subscription->id }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm">
@@ -149,6 +154,15 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($subscription->status === 'active')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Aktivní</span>
+                            @elseif($subscription->status === 'unpaid')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300">
+                                ⚠️ Neuhrazeno
+                            </span>
+                            @if($subscription->payment_failure_count > 0)
+                            <div class="text-xs text-red-700 mt-1">
+                                Pokusů: {{ $subscription->payment_failure_count }}
+                            </div>
+                            @endif
                             @elseif($subscription->status === 'pending')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Čeká</span>
                             @elseif($subscription->status === 'trialing')
@@ -156,7 +170,7 @@
                             @elseif($subscription->status === 'past_due')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Po splatnosti</span>
                             @elseif($subscription->status === 'canceled')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Zrušeno</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Zrušeno</span>
                             @else
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ $subscription->status }}</span>
                             @endif

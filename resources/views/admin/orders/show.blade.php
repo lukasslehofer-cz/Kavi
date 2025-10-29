@@ -15,6 +15,37 @@
         </a>
     </div>
 
+    <!-- Payment Failure Warning -->
+    @if($order->payment_status === 'unpaid')
+    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-red-900 mb-2">Problém s platbou objednávky</h3>
+                <div class="space-y-2 text-sm text-red-800">
+                    <p><span class="font-semibold">Částka k úhradě:</span> {{ number_format($order->total, 0, ',', ' ') }} Kč</p>
+                    @if($order->payment_failure_count > 0)
+                    <p><span class="font-semibold">Počet neúspěšných pokusů:</span> {{ $order->payment_failure_count }}×</p>
+                    @endif
+                    @if($order->last_payment_failure_at)
+                    <p><span class="font-semibold">Poslední pokus:</span> {{ $order->last_payment_failure_at->format('d.m.Y H:i') }}</p>
+                    @endif
+                    @if($order->last_payment_failure_reason)
+                    <p><span class="font-semibold">Důvod:</span> {{ $order->last_payment_failure_reason }}</p>
+                    @endif
+                </div>
+                <p class="mt-3 text-sm text-gray-700">
+                    Zákazník byl emailem informován o problému a může zaplatit manuálně ve svém dashboardu.
+                </p>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Order Details -->
         <div class="lg:col-span-2 space-y-6">
@@ -73,6 +104,16 @@
                                     {{ number_format($order->shipping, 0, ',', ' ') }} Kč
                                 </td>
                             </tr>
+                            @if($order->discount_amount > 0 && $order->coupon)
+                            <tr class="bg-green-50">
+                                <td colspan="3" class="px-6 py-4 text-right font-medium text-green-700">
+                                    Sleva ({{ $order->coupon_code }}):
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap font-bold text-green-700">
+                                    -{{ number_format($order->discount_amount, 0, ',', ' ') }} Kč
+                                </td>
+                            </tr>
+                            @endif
                             <tr>
                                 <td colspan="3" class="px-6 py-4 text-right font-medium text-gray-900">
                                     DPH (21%):

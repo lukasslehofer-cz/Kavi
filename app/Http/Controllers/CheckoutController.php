@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmation;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Services\CouponService;
 use App\Services\FakturoidService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,10 @@ use Illuminate\Support\Facades\Mail;
 class CheckoutController extends Controller
 {
     // No auth middleware - supports guest checkout
+
+    public function __construct(private CouponService $couponService)
+    {
+    }
 
     public function index()
     {
@@ -40,13 +46,57 @@ class CheckoutController extends Controller
         }
 
         $shipping = $subtotal >= 1000 ? 0 : 99; // Free shipping over 1000 CZK
-        $totalWithVat = $subtotal + $shipping;
         
-        // Calculate VAT (all prices include 21% VAT)
-        $totalWithoutVat = round($totalWithVat / 1.21, 2);
-        $vat = round($totalWithVat - $totalWithoutVat, 2);
+        // Odebrat kupón pokud je požadováno
+        if (request()->has('remove_coupon')) {
+            $this->couponService->clearCouponFromStorage();
+            return redirect()->route('checkout.index');
+        }
+        
+        // Zpracovat kupón z query parametru (pokud byl zadán v formuláři)
+        if (request()->has('coupon_code') && request('coupon_code')) {
+            $couponCode = strtoupper(trim(request('coupon_code')));
+            session(['coupon_code' => $couponCode]);
+        }
+        
+        // Zkusit načíst kupón ze session nebo cookie
+        $couponCode = $this->couponService->getCouponFromStorage();
+        $appliedCoupon = null;
+        $discount = 0;
+        $errorMessage = null;
+        
+        if ($couponCode) {
+            $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'order', $subtotal);
+            
+            if ($result['valid']) {
+                $appliedCoupon = $result['coupon'];
+                $couponResult = $this->couponService->applyToOrder($appliedCoupon, $subtotal, $shipping);
+                
+                $discount = $couponResult['discount'];
+                $shipping = $couponResult['shipping'];
+                $totalWithVat = $couponResult['total'];
+                $totalWithoutVat = $couponResult['total_without_vat'];
+                $vat = $couponResult['vat'];
+            } else {
+                // Kupón není platný, vymazat ho a zobrazit chybu
+                $errorMessage = $result['message'];
+                $this->couponService->clearCouponFromStorage();
+            }
+        }
+        
+        if (!$appliedCoupon) {
+            // Bez kupónu - standardní výpočet
+            $totalWithVat = $subtotal + $shipping;
+            $totalWithoutVat = round($totalWithVat / 1.21, 2);
+            $vat = round($totalWithVat - $totalWithoutVat, 2);
+        }
+        
+        // Pokud je chyba, uložit do session pro zobrazení
+        if ($errorMessage) {
+            session()->flash('coupon_error', $errorMessage);
+        }
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'totalWithVat', 'totalWithoutVat', 'vat'));
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'totalWithVat', 'totalWithoutVat', 'vat', 'appliedCoupon', 'discount'));
     }
 
     public function store(Request $request)
@@ -63,6 +113,7 @@ class CheckoutController extends Controller
             'packeta_point_name' => 'required|string',
             'packeta_point_address' => 'nullable|string',
             'payment_method' => 'required|in:card,transfer',
+            'coupon_code' => 'nullable|string',
         ]);
 
         // Check for existing user if guest checkout
@@ -103,15 +154,43 @@ class CheckoutController extends Controller
             }
 
             $shipping = $subtotal >= 1000 ? 0 : 99;
-            $totalWithVat = $subtotal + $shipping;
             
-            // Calculate VAT (all prices include 21% VAT)
-            $totalWithoutVat = round($totalWithVat / 1.21, 2);
-            $tax = round($totalWithVat - $totalWithoutVat, 2);
+            // Zpracování kupónu
+            $coupon = null;
+            $discount = 0;
+            $couponCode = $request->coupon_code ?? $this->couponService->getCouponFromStorage();
+            
+            if ($couponCode) {
+                $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'order', $subtotal);
+                
+                if ($result['valid']) {
+                    $coupon = $result['coupon'];
+                    $couponResult = $this->couponService->applyToOrder($coupon, $subtotal, $shipping);
+                    
+                    $discount = $couponResult['discount'];
+                    $shipping = $couponResult['shipping'];
+                    $totalWithVat = $couponResult['total'];
+                    $totalWithoutVat = $couponResult['total_without_vat'];
+                    $tax = $couponResult['vat'];
+                } else {
+                    // Kupón není platný, pokračovat bez něj
+                    $totalWithVat = $subtotal + $shipping;
+                    $totalWithoutVat = round($totalWithVat / 1.21, 2);
+                    $tax = round($totalWithVat - $totalWithoutVat, 2);
+                }
+            } else {
+                // Bez kupónu
+                $totalWithVat = $subtotal + $shipping;
+                $totalWithoutVat = round($totalWithVat / 1.21, 2);
+                $tax = round($totalWithVat - $totalWithoutVat, 2);
+            }
 
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => auth()->id() ?? null,
+                'coupon_id' => $coupon?->id,
+                'coupon_code' => $coupon?->code,
+                'discount_amount' => $discount,
                 'subtotal' => $subtotal,
                 'shipping' => $shipping,
                 'tax' => $tax,
@@ -161,6 +240,20 @@ class CheckoutController extends Controller
 
                 // Decrease stock
                 $item['product']->decrement('stock', $item['quantity']);
+            }
+
+            // Zaznamenat použití kupónu
+            if ($coupon) {
+                $this->couponService->recordUsage(
+                    $coupon,
+                    auth()->user(),
+                    'order',
+                    $discount,
+                    $order
+                );
+                
+                // Vymazat kupón z cookie/session
+                $this->couponService->clearCouponFromStorage();
             }
 
             DB::commit();
@@ -217,7 +310,7 @@ class CheckoutController extends Controller
                 \Log::error('Failed to send order confirmation email: ' . $e->getMessage());
             }
 
-            // Clear cart
+            // Clear cart and coupon only after successful order creation
             session()->forget('cart');
 
             if ($request->payment_method === 'card') {
@@ -229,7 +322,13 @@ class CheckoutController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Při vytváření objednávky došlo k chybě. Zkuste to prosím znovu.');
+            \Log::error('Order creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()
+                ->withInput()
+                ->with('error', 'Při vytváření objednávky došlo k chybě: ' . $e->getMessage());
         }
     }
 
@@ -247,6 +346,39 @@ class CheckoutController extends Controller
         }
 
         return view('checkout.confirmation', compact('order'));
+    }
+
+    /**
+     * Create payment session for unpaid order
+     */
+    public function payOrder(Order $order)
+    {
+        // Check if order belongs to authenticated user
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Nemáte oprávnění k této akci.');
+        }
+
+        // Check if order has unpaid status
+        if ($order->payment_status !== 'unpaid') {
+            return back()->with('error', 'Tato objednávka není v neuhrazeném stavu.');
+        }
+
+        try {
+            $checkoutUrl = $this->stripeService->createOrderPaymentSession($order);
+            
+            if (!$checkoutUrl) {
+                return back()->with('error', 'Nelze vytvořit platební session. Kontaktujte prosím podporu.');
+            }
+
+            return redirect($checkoutUrl);
+        } catch (\Exception $e) {
+            \Log::error('Failed to create payment session for order', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Nastala chyba při vytváření platby. Zkuste to prosím později.');
+        }
     }
 }
 

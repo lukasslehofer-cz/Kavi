@@ -38,6 +38,7 @@ class SubscriptionController extends Controller
         $stats = [
             'total' => Subscription::count(),
             'active' => Subscription::where('status', 'active')->count(),
+            'unpaid' => Subscription::where('status', 'unpaid')->count(),
             'pending' => Subscription::where('status', 'pending')->count(),
             'trialing' => Subscription::where('status', 'trialing')->count(),
             'past_due' => Subscription::where('status', 'past_due')->count(),
@@ -63,7 +64,7 @@ class SubscriptionController extends Controller
     public function update(Request $request, Subscription $subscription)
     {
         $request->validate([
-            'status' => 'required|in:active,pending,trialing,past_due,canceled',
+            'status' => 'required|in:active,unpaid,paused,pending,trialing,past_due,canceled,cancelled',
         ]);
 
         $subscription->update([

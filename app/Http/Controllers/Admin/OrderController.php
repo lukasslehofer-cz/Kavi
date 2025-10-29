@@ -36,6 +36,7 @@ class OrderController extends Controller
 
         $stats = [
             'total' => Order::count(),
+            'unpaid' => Order::where('payment_status', 'unpaid')->count(),
             'pending' => Order::where('status', 'pending')->count(),
             'processing' => Order::where('status', 'processing')->count(),
             'shipped' => Order::where('status', 'shipped')->count(),

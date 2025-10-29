@@ -106,6 +106,67 @@
                         </div>
                     </div>
                     
+                    @if($subscription->discount_amount > 0 && $subscription->coupon)
+                    @php
+                    // Calculate original price without discount
+                    $originalPrice = $subscription->configured_price + $subscription->discount_amount;
+                    
+                    // Calculate when discount ends
+                    $discountEndsAt = $nextPaymentDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);
+                    
+                    // Calculate when full price starts
+                    $fullPriceStartsAt = $discountEndsAt->copy()->addMonths($subscription->frequency_months);
+                    @endphp
+                    
+                    <!-- Coupon Discount Info -->
+                    <div class="mt-6 pt-6 border-t-2 border-green-200">
+                        <div class="bg-green-50 p-5 rounded-xl border border-green-200">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-green-900 mb-1 text-lg">Sleva {{ $subscription->coupon_code }} aktivována!</div>
+                                    <div class="text-sm text-green-700 font-medium">
+                                        Sleva {{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč
+                                        @if($subscription->discount_months_total)
+                                            po dobu {{ $subscription->discount_months_remaining }} {{ $subscription->discount_months_remaining == 1 ? 'platby' : ($subscription->discount_months_remaining < 5 ? 'plateb' : 'plateb') }}
+                                        @else
+                                            permanentně
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg">
+                                    <span class="text-gray-700">Aktuální cena se slevou:</span>
+                                    <span class="font-bold text-green-700">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                
+                                @if($subscription->discount_months_total)
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg">
+                                    <span class="text-gray-700">Sleva platí do:</span>
+                                    <span class="font-bold text-gray-900">{{ $discountEndsAt->format('j. n. Y') }}</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg">
+                                    <span class="text-gray-700">Od:</span>
+                                    <span class="font-bold text-gray-900">{{ $fullPriceStartsAt->format('j. n. Y') }}</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg border-2 border-gray-300">
+                                    <span class="text-gray-700">Plná cena od {{ $fullPriceStartsAt->format('j. n.') }}:</span>
+                                    <span class="font-bold text-gray-900 text-lg">{{ number_format($originalPrice, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                    
                     <!-- Shipping and Payment Dates -->
                     <div class="mt-6 pt-6 border-t border-gray-200 space-y-4">
                         <div class="flex items-start gap-3">

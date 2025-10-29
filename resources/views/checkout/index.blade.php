@@ -408,18 +408,60 @@
                     @endforeach
                 </div>
 
+                <!-- Coupon Section -->
+                <div class="mb-6 pb-6 border-b border-gray-200">
+                    @if(session('coupon_error'))
+                        <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-3">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm text-red-800">{{ session('coupon_error') }}</span>
+                            </div>
+                        </div>
+                    @endif
+                    
+                    @if($appliedCoupon ?? null)
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-sm font-medium text-green-800">Kupón aplikován</span>
+                                </div>
+                                <a href="{{ route('checkout.index', ['remove_coupon' => 1]) }}" class="text-xs text-red-600 hover:text-red-800 hover:underline">
+                                    Odebrat
+                                </a>
+                            </div>
+                            <p class="text-sm text-green-700 font-mono font-bold">{{ $appliedCoupon->code }}</p>
+                            <p class="text-xs text-green-600 mt-1">{{ $appliedCoupon->getOrderDiscountDescription() }}</p>
+                        </div>
+                    @else
+                        <details class="group" {{ request()->has('coupon_code') ? 'open' : '' }}>
+                            <summary class="flex items-center justify-between cursor-pointer p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                                <span class="text-sm font-medium text-gray-700">Mám slevový kupón</span>
+                                <svg class="w-5 h-5 text-gray-600 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </summary>
+                            <form method="GET" action="{{ route('checkout.index') }}" class="mt-3">
+                                <div class="flex gap-2">
+                                    <input type="text" name="coupon_code" placeholder="SLEVOVYKOD" 
+                                        class="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-primary-500 focus:border-primary-500 uppercase text-sm"
+                                        value="{{ request('coupon_code') }}">
+                                    <button type="submit" class="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
+                                        Použít
+                                    </button>
+                                </div>
+                            </form>
+                        </details>
+                    @endif
+                </div>
+
                 <!-- Price Summary - Minimal -->
                 <dl class="space-y-3 mb-6">
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <dt class="text-gray-600 text-sm font-light">Mezisoučet (bez DPH):</dt>
-                        <dd class="font-bold text-gray-900">{{ number_format($totalWithoutVat, 2, ',', ' ') }} Kč</dd>
-                    </div>
-                    
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <dt class="text-gray-600 text-sm font-light">DPH (21%):</dt>
-                        <dd class="font-bold text-gray-900">{{ number_format($vat, 2, ',', ' ') }} Kč</dd>
-                    </div>
-                    
+                    <!-- Doprava (first) -->
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
                         <dt class="text-gray-600 text-sm font-light">Doprava:</dt>
                         <dd class="font-bold">
@@ -429,13 +471,42 @@
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                                 Zdarma
+                                @if($appliedCoupon && $appliedCoupon->free_shipping)
+                                <span class="text-xs">(kupón)</span>
+                                @endif
                             </span>
                             @else
                             <span class="text-gray-900">{{ number_format($shipping, 0, ',', ' ') }} Kč</span>
                             @endif
                         </dd>
                     </div>
+                    
+                    <!-- Coupon discount (prominently displayed) -->
+                    @if(($discount ?? 0) > 0)
+                    <div class="flex justify-between items-center py-3 border-b-2 border-green-200 bg-green-50 -mx-6 px-6">
+                        <dt class="text-green-700 font-semibold flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            <span>Sleva {{ $appliedCoupon->code ?? 'kupón' }}:</span>
+                        </dt>
+                        <dd class="font-bold text-green-600 text-lg">-{{ number_format($discount, 0, ',', ' ') }} Kč</dd>
+                    </div>
+                    @endif
+                    
+                    <!-- Subtotal without VAT -->
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <dt class="text-gray-600 text-sm font-light">Mezisoučet (bez DPH):</dt>
+                        <dd class="font-bold text-gray-900">{{ number_format($totalWithoutVat, 2, ',', ' ') }} Kč</dd>
+                    </div>
+                    
+                    <!-- VAT -->
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <dt class="text-gray-600 text-sm font-light">DPH (21%):</dt>
+                        <dd class="font-bold text-gray-900">{{ number_format($vat, 2, ',', ' ') }} Kč</dd>
+                    </div>
 
+                    <!-- Total -->
                     <div class="border-t border-gray-200 pt-4 mt-2">
                         <div class="flex justify-between items-center">
                             <dt class="font-bold text-gray-900 text-lg">Celkem:</dt>
@@ -460,8 +531,8 @@
                 <div class="flex items-start mb-4 p-3 bg-gray-50 rounded-xl">
                     <input type="checkbox" id="terms" required form="checkout-form" class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mr-2.5 mt-0.5 flex-shrink-0">
                     <label for="terms" class="text-xs text-gray-600 font-light">
-                        Souhlasím s <a href="#" class="text-primary-600 hover:text-primary-700 font-medium underline">obchodními podmínkami</a> 
-                        a <a href="#" class="text-primary-600 hover:text-primary-700 font-medium underline">zásadami ochrany osobních údajů</a>
+                        Souhlasím s <a href="{{ route('terms-of-service') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium underline">obchodními podmínkami</a> 
+                        a <a href="{{ route('privacy-policy') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium underline">zásadami ochrany osobních údajů</a>
                     </label>
                 </div>
 

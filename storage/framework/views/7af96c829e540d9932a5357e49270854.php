@@ -8,6 +8,127 @@
         <p class="text-base text-gray-600 font-light">Jsme rádi, že vás opět vidíme, <span class="text-primary-600 font-medium"><?php echo e(auth()->user()->name); ?></span></p>
     </div>
 
+    <!-- Unpaid Subscriptions Alert -->
+    <?php if($unpaidSubscriptions->isNotEmpty()): ?>
+    <div class="bg-red-50 rounded-2xl border-2 border-red-200 p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-red-900 mb-2">
+                    Problém s platbou <?php echo e($unpaidSubscriptions->count() > 1 ? 'předplatných' : 'předplatného'); ?>
+
+                </h3>
+                <p class="text-red-800 mb-4">
+                    <?php echo e($unpaidSubscriptions->count() > 1 
+                        ? 'U několika vašich předplatných selhala platba. Neobdržíte další kávové boxy, dokud nebude platba uhrazena.' 
+                        : 'Platba za vaše předplatné se nezdařila. Neobdržíte další kávový box, dokud nebude platba uhrazena.'); ?>
+
+                </p>
+                
+                <?php $__currentLoopData = $unpaidSubscriptions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unpaidSub): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="bg-white rounded-xl border border-red-200 p-4 mb-3">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="text-gray-900 font-bold text-base mb-2">
+                                Předplatné #<?php echo e($unpaidSub->id); ?>
+
+                                <?php if($unpaidSub->subscription_number): ?>
+                                    <span class="text-sm font-normal text-gray-600">(<?php echo e($unpaidSub->subscription_number); ?>)</span>
+                                <?php endif; ?>
+                            </div>
+                            <?php if($unpaidSub->pending_invoice_amount): ?>
+                            <div class="text-gray-700 text-sm mb-1">
+                                <span class="text-gray-600">Částka k úhradě:</span> 
+                                <span class="font-bold text-red-600"><?php echo e(number_format($unpaidSub->pending_invoice_amount, 0, ',', ' ')); ?> Kč</span>
+                            </div>
+                            <?php endif; ?>
+                            <?php if($unpaidSub->last_payment_failure_reason): ?>
+                            <div class="text-gray-600 text-xs">
+                                <span class="font-medium">Důvod:</span> <?php echo e($unpaidSub->last_payment_failure_reason); ?>
+
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <form method="POST" action="<?php echo e(route('dashboard.subscription.pay', $unpaidSub)); ?>">
+                            <?php echo csrf_field(); ?>
+                            <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-full transition-colors">
+                                Zaplatit nyní
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                
+                <div class="text-sm text-gray-600 mt-3">
+                    Bezpečná platba kartou přes Stripe
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Unpaid Orders Alert -->
+    <?php if($unpaidOrders->isNotEmpty()): ?>
+    <div class="bg-red-50 rounded-2xl border-2 border-red-200 p-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-red-900 mb-2">
+                    Problém s platbou <?php echo e($unpaidOrders->count() > 1 ? 'objednávek' : 'objednávky'); ?>
+
+                </h3>
+                <p class="text-red-800 mb-4">
+                    <?php echo e($unpaidOrders->count() > 1 
+                        ? 'U několika vašich objednávek selhala platba. Objednávky nebudou zpracovány, dokud nebude platba uhrazena.' 
+                        : 'Platba za vaši objednávku se nezdařila. Objednávka nebude zpracována, dokud nebude platba uhrazena.'); ?>
+
+                </p>
+                
+                <?php $__currentLoopData = $unpaidOrders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unpaidOrder): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="bg-white rounded-xl border border-red-200 p-4 mb-3">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="text-gray-900 font-bold text-base mb-2">
+                                Objednávka <?php echo e($unpaidOrder->order_number); ?>
+
+                            </div>
+                            <div class="text-gray-700 text-sm mb-1">
+                                <span class="text-gray-600">Částka k úhradě:</span> 
+                                <span class="font-bold text-red-600"><?php echo e(number_format($unpaidOrder->total, 0, ',', ' ')); ?> Kč</span>
+                            </div>
+                            <?php if($unpaidOrder->last_payment_failure_reason): ?>
+                            <div class="text-gray-600 text-xs">
+                                <span class="font-medium">Důvod:</span> <?php echo e($unpaidOrder->last_payment_failure_reason); ?>
+
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <form method="POST" action="<?php echo e(route('order.pay', $unpaidOrder)); ?>">
+                            <?php echo csrf_field(); ?>
+                            <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-full transition-colors">
+                                Zaplatit nyní
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                
+                <div class="text-sm text-gray-600 mt-3">
+                    Bezpečná platba kartou přes Stripe
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Active Subscription -->
     <?php if($activeSubscription): ?>
     <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
@@ -163,7 +284,7 @@
                     <?php $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            #<?php echo e($order->id); ?>
+                            <?php echo e($order->order_number ?? '#' . $order->id); ?>
 
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-light">

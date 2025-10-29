@@ -38,15 +38,19 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
                     @foreach($orders as $order)
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 transition-colors {{ $order->payment_status === 'unpaid' ? 'bg-red-50 border-l-4 border-red-500' : '' }}">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                            #{{ $order->id }}
+                            {{ $order->order_number ?? '#' . $order->id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-light">
                             {{ $order->created_at->format('d.m.Y H:i') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($order->status === 'completed')
+                            @if($order->payment_status === 'unpaid')
+                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-red-100 text-red-800 border border-red-300">
+                                    ⚠️ Neuhrazeno
+                                </span>
+                            @elseif($order->status === 'completed')
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
                                     Dokončeno
                                 </span>
@@ -75,7 +79,15 @@
                             {{ number_format($order->total, 2, ',', ' ') }} Kč
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{{ route('dashboard.order.detail', $order) }}" class="text-primary-600 hover:text-primary-700 font-medium">
+                            @if($order->payment_status === 'unpaid')
+                            <form method="POST" action="{{ route('order.pay', $order) }}" class="inline">
+                                @csrf
+                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-full transition-colors text-xs">
+                                    Zaplatit
+                                </button>
+                            </form>
+                            @endif
+                            <a href="{{ route('dashboard.order.detail', $order) }}" class="text-primary-600 hover:text-primary-700 font-medium {{ $order->payment_status === 'unpaid' ? 'ml-2' : '' }}">
                                 Detail →
                             </a>
                         </td>

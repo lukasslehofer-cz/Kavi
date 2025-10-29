@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SubscriptionConfirmation;
+use App\Models\Coupon;
 use App\Models\Subscription;
 use App\Models\SubscriptionConfig;
 use App\Models\SubscriptionPlan;
+use App\Services\CouponService;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,8 +15,10 @@ use Illuminate\Support\Facades\Mail;
 
 class SubscriptionController extends Controller
 {
-    public function __construct(private StripeService $stripeService)
-    {
+    public function __construct(
+        private StripeService $stripeService,
+        private CouponService $couponService
+    ) {
     }
 
     public function index()
@@ -213,10 +217,51 @@ class SubscriptionController extends Controller
                 ->with('error', 'Konfigurace předplatného nenalezena. Prosím nakonfigurujte si předplatné znovu.');
         }
 
+        // Odebrat kupón pokud je požadováno
+        if (request()->has('remove_coupon')) {
+            $this->couponService->clearCouponFromStorage();
+            return redirect()->route('subscriptions.checkout');
+        }
+
+        // Zpracovat kupón z query parametru (pokud byl zadán v formuláři)
+        if (request()->has('coupon_code') && request('coupon_code')) {
+            $couponCode = strtoupper(trim(request('coupon_code')));
+            session(['coupon_code' => $couponCode]);
+        }
+
+        // Zkusit načíst kupón ze session nebo cookie
+        $couponCode = $this->couponService->getCouponFromStorage();
+        $appliedCoupon = null;
+        $discount = 0;
+        $errorMessage = null;
+        
+        if ($couponCode) {
+            $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'subscription', $price);
+            
+            if ($result['valid']) {
+                $appliedCoupon = $result['coupon'];
+                $couponResult = $this->couponService->applyToSubscription($appliedCoupon, $price);
+                
+                $discount = $couponResult['discount'];
+                $price = $couponResult['price'];
+                $priceWithoutVat = $couponResult['price_without_vat'];
+                $vat = $couponResult['vat'];
+            } else {
+                // Kupón není platný, vymazat ho a zobrazit chybu
+                $errorMessage = $result['message'];
+                $this->couponService->clearCouponFromStorage();
+            }
+        }
+
         // Get shipping date info
         $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
+        
+        // Pokud je chyba, uložit do session pro zobrazení
+        if ($errorMessage) {
+            session()->flash('coupon_error', $errorMessage);
+        }
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo'));
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount'));
     }
 
     /**
@@ -245,9 +290,29 @@ class SubscriptionController extends Controller
             'packeta_point_address' => 'nullable|string',
             'payment_method' => 'required|in:card,transfer',
             'delivery_notes' => 'nullable|string|max:500',
+            'coupon_code' => 'nullable|string',
         ]);
 
         try {
+            // Zpracování kupónu
+            $coupon = null;
+            $discount = 0;
+            $discountMonths = null;
+            $couponCode = $validated['coupon_code'] ?? $this->couponService->getCouponFromStorage();
+            
+            if ($couponCode) {
+                $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'subscription', $price);
+                
+                if ($result['valid']) {
+                    $coupon = $result['coupon'];
+                    $couponResult = $this->couponService->applyToSubscription($coupon, $price);
+                    
+                    $discount = $couponResult['discount'];
+                    $price = $couponResult['price']; // Aktualizovat cenu se slevou
+                    $discountMonths = $couponResult['months']; // null = neomezeně
+                }
+            }
+            
             // Check for existing user if guest checkout
             if (!auth()->check()) {
                 $existingUser = \App\Models\User::where('email', $validated['email'])->first();
@@ -319,7 +384,10 @@ class SubscriptionController extends Controller
                     auth()->user(),
                     $configuration,
                     $price,
-                    $shippingAddress
+                    $shippingAddress,
+                    $coupon,
+                    $discount,
+                    $discountMonths
                 );
 
                 // Redirect to Stripe Checkout
@@ -339,6 +407,11 @@ class SubscriptionController extends Controller
                     'subscription_number' => Subscription::generateSubscriptionNumber(),
                     'user_id' => auth()->id() ?? null,
                     'subscription_plan_id' => null, // Custom configuration, no plan
+                    'coupon_id' => $coupon?->id,
+                    'coupon_code' => $coupon?->code,
+                    'discount_amount' => $discount,
+                    'discount_months_remaining' => $discountMonths,
+                    'discount_months_total' => $discountMonths,
                     'configuration' => $configuration,
                     'configured_price' => $price,
                     'frequency_months' => $configuration['frequency'],
@@ -360,6 +433,21 @@ class SubscriptionController extends Controller
                     'packeta_point_address' => $validated['packeta_point_address'],
                     'delivery_notes' => $validated['delivery_notes'] ?? null,
                 ]);
+
+                // Zaznamenat použití kupónu
+                if ($coupon) {
+                    $this->couponService->recordUsage(
+                        $coupon,
+                        auth()->user(),
+                        'subscription',
+                        $discount,
+                        null,
+                        $subscription
+                    );
+                    
+                    // Vymazat kupón z cookie/session
+                    $this->couponService->clearCouponFromStorage();
+                }
 
                 DB::commit();
                 
@@ -418,6 +506,39 @@ class SubscriptionController extends Controller
         }
 
         return view('subscriptions.confirmation', compact('subscription'));
+    }
+
+    /**
+     * Create payment session for unpaid subscription invoice
+     */
+    public function payInvoice(Subscription $subscription)
+    {
+        // Check if subscription belongs to authenticated user
+        if ($subscription->user_id !== auth()->id()) {
+            abort(403, 'Nemáte oprávnění k této akci.');
+        }
+
+        // Check if subscription has unpaid status and pending invoice
+        if ($subscription->status !== 'unpaid' || !$subscription->pending_invoice_id) {
+            return back()->with('error', 'Toto předplatné nemá neuhrazenou fakturu.');
+        }
+
+        try {
+            $checkoutUrl = $this->stripeService->createInvoicePaymentSession($subscription);
+            
+            if (!$checkoutUrl) {
+                return back()->with('error', 'Nelze vytvořit platební session. Kontaktujte prosím podporu.');
+            }
+
+            return redirect($checkoutUrl);
+        } catch (\Exception $e) {
+            \Log::error('Failed to create payment session for subscription invoice', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Nastala chyba při vytváření platby. Zkuste to prosím později.');
+        }
     }
 }
 
