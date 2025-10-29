@@ -1,8 +1,6 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Nastavení konfiguratoru'); ?>
 
-@section('title', 'Nastavení konfiguratoru')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="p-6">
     <!-- Header -->
     <div class="mb-8">
@@ -10,55 +8,59 @@
         <p class="text-gray-600 mt-1">Upravte parametry pro konfigurátor kávového předplatného a harmonogram rozesílek</p>
     </div>
 
-    @if(session('success'))
+    <?php if(session('success')): ?>
     <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-        {{ session('success') }}
-    </div>
-    @endif
+        <?php echo e(session('success')); ?>
 
-    @if(session('info'))
-    <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
-        {{ session('info') }}
     </div>
-    @endif
+    <?php endif; ?>
+
+    <?php if(session('info')): ?>
+    <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
+        <?php echo e(session('info')); ?>
+
+    </div>
+    <?php endif; ?>
 
     <!-- Configurator Settings -->
     <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Nastavení cen a parametrů</h2>
         
-        <form action="{{ route('admin.subscription-config.update') }}" method="POST">
-            @csrf
+        <form action="<?php echo e(route('admin.subscription-config.update')); ?>" method="POST">
+            <?php echo csrf_field(); ?>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($configs as $index => $config)
+                <?php $__currentLoopData = $configs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $config): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <label class="block text-sm font-bold text-gray-900 mb-1">
-                        {{ $config->label }}
+                        <?php echo e($config->label); ?>
+
                     </label>
                     
-                    @if($config->description)
-                    <p class="text-xs text-gray-600 mb-3">{{ $config->description }}</p>
-                    @endif
+                    <?php if($config->description): ?>
+                    <p class="text-xs text-gray-600 mb-3"><?php echo e($config->description); ?></p>
+                    <?php endif; ?>
                     
                     <div class="flex items-center gap-2">
-                        @if($config->type === 'boolean')
+                        <?php if($config->type === 'boolean'): ?>
                         <label class="flex items-center cursor-pointer">
                             <input 
                                 type="checkbox" 
-                                name="configs[{{ $index }}][value]" 
+                                name="configs[<?php echo e($index); ?>][value]" 
                                 value="1"
-                                {{ $config->value ? 'checked' : '' }}
+                                <?php echo e($config->value ? 'checked' : ''); ?>
+
                                 class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             >
                             <span class="ml-2 text-sm text-gray-700 font-medium">Zapnuto</span>
                         </label>
-                        @elseif($config->type === 'decimal')
+                        <?php elseif($config->type === 'decimal'): ?>
                         <div class="relative flex-1">
                             <input 
                                 type="number" 
                                 step="0.01"
-                                name="configs[{{ $index }}][value]" 
-                                value="{{ $config->value }}"
+                                name="configs[<?php echo e($index); ?>][value]" 
+                                value="<?php echo e($config->value); ?>"
                                 required
                                 class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                             >
@@ -66,28 +68,28 @@
                                 Kč
                             </span>
                         </div>
-                        @elseif($config->type === 'integer')
+                        <?php elseif($config->type === 'integer'): ?>
                         <input 
                             type="number" 
-                            name="configs[{{ $index }}][value]" 
-                            value="{{ $config->value }}"
+                            name="configs[<?php echo e($index); ?>][value]" 
+                            value="<?php echo e($config->value); ?>"
                             required
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                         >
-                        @else
+                        <?php else: ?>
                         <input 
                             type="text" 
-                            name="configs[{{ $index }}][value]" 
-                            value="{{ $config->value }}"
+                            name="configs[<?php echo e($index); ?>][value]" 
+                            value="<?php echo e($config->value); ?>"
                             required
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                         >
-                        @endif
+                        <?php endif; ?>
                         
-                        <input type="hidden" name="configs[{{ $index }}][key]" value="{{ $config->key }}">
+                        <input type="hidden" name="configs[<?php echo e($index); ?>][key]" value="<?php echo e($config->key); ?>">
                     </div>
                 </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
             
             <div class="mt-6 flex items-center justify-end">
@@ -105,10 +107,11 @@
                 <h2 class="text-xl font-bold text-gray-900">Harmonogram rozesílek</h2>
                 <p class="text-sm text-gray-600 mt-1">Upravte datumy plateb a rozesílek, nastavte promo obrázek pro danou rozesílku</p>
             </div>
-            <form action="{{ route('admin.subscription-config.create-next-year') }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('admin.subscription-config.create-next-year')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                    Vytvořit rok {{ now()->year + 2 }}
+                    Vytvořit rok <?php echo e(now()->year + 2); ?>
+
                 </button>
             </form>
         </div>
@@ -119,51 +122,53 @@
                 <button 
                     type="button"
                     class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600"
-                    data-year="{{ $currentYear }}"
-                    onclick="switchYear({{ $currentYear }})"
+                    data-year="<?php echo e($currentYear); ?>"
+                    onclick="switchYear(<?php echo e($currentYear); ?>)"
                 >
-                    Rok {{ $currentYear }}
+                    Rok <?php echo e($currentYear); ?>
+
                 </button>
                 <button 
                     type="button"
                     class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
-                    data-year="{{ $nextYear }}"
-                    onclick="switchYear({{ $nextYear }})"
+                    data-year="<?php echo e($nextYear); ?>"
+                    onclick="switchYear(<?php echo e($nextYear); ?>)"
                 >
-                    Rok {{ $nextYear }}
+                    Rok <?php echo e($nextYear); ?>
+
                 </button>
-                @foreach($previousYears as $prevYear)
+                <?php $__currentLoopData = $previousYears; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prevYear): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <button 
                     type="button"
                     class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
-                    data-year="{{ $prevYear }}"
-                    onclick="switchYear({{ $prevYear }})"
+                    data-year="<?php echo e($prevYear); ?>"
+                    onclick="switchYear(<?php echo e($prevYear); ?>)"
                 >
-                    Rok {{ $prevYear }} (archiv)
+                    Rok <?php echo e($prevYear); ?> (archiv)
                 </button>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </nav>
         </div>
 
-        <form action="{{ route('admin.subscription-config.update-schedule') }}" method="POST" id="schedule-form" enctype="multipart/form-data">
-            @csrf
+        <form action="<?php echo e(route('admin.subscription-config.update-schedule')); ?>" method="POST" id="schedule-form" enctype="multipart/form-data">
+            <?php echo csrf_field(); ?>
             
             <!-- Current Year Schedule -->
-            <div id="schedule-{{ $currentYear }}" class="schedule-year-content">
-                @include('admin.subscription-config._schedule-table', ['schedules' => $currentYearSchedules, 'year' => $currentYear, 'coffeeProducts' => $coffeeProducts])
+            <div id="schedule-<?php echo e($currentYear); ?>" class="schedule-year-content">
+                <?php echo $__env->make('admin.subscription-config._schedule-table', ['schedules' => $currentYearSchedules, 'year' => $currentYear, 'coffeeProducts' => $coffeeProducts], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
 
             <!-- Next Year Schedule -->
-            <div id="schedule-{{ $nextYear }}" class="schedule-year-content hidden">
-                @include('admin.subscription-config._schedule-table', ['schedules' => $nextYearSchedules, 'year' => $nextYear, 'coffeeProducts' => $coffeeProducts])
+            <div id="schedule-<?php echo e($nextYear); ?>" class="schedule-year-content hidden">
+                <?php echo $__env->make('admin.subscription-config._schedule-table', ['schedules' => $nextYearSchedules, 'year' => $nextYear, 'coffeeProducts' => $coffeeProducts], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
             </div>
 
             <!-- Previous Years (will be loaded via AJAX) -->
-            @foreach($previousYears as $prevYear)
-            <div id="schedule-{{ $prevYear }}" class="schedule-year-content hidden">
+            <?php $__currentLoopData = $previousYears; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prevYear): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div id="schedule-<?php echo e($prevYear); ?>" class="schedule-year-content hidden">
                 <div class="text-center py-8 text-gray-500">Načítám...</div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             
             <div class="mt-8 flex items-center justify-end">
                 <button type="submit" class="px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
@@ -202,7 +207,7 @@
 </div>
 
 <script>
-let currentYear = {{ $currentYear }};
+let currentYear = <?php echo e($currentYear); ?>;
 
 function switchYear(year) {
     // Hide all schedule contents
@@ -232,17 +237,17 @@ function switchYear(year) {
     currentYear = year;
     
     // Load previous year data via AJAX if needed
-    @foreach($previousYears as $prevYear)
-    if (year === {{ $prevYear }} && !content.dataset.loaded) {
-        loadYearSchedules({{ $prevYear }});
+    <?php $__currentLoopData = $previousYears; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prevYear): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    if (year === <?php echo e($prevYear); ?> && !content.dataset.loaded) {
+        loadYearSchedules(<?php echo e($prevYear); ?>);
     }
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 }
 
 function loadYearSchedules(year) {
     const content = document.getElementById(`schedule-${year}`);
     
-    fetch(`{{ route('admin.subscription-config.year-schedules', ['year' => '__YEAR__']) }}`.replace('__YEAR__', year))
+    fetch(`<?php echo e(route('admin.subscription-config.year-schedules', ['year' => '__YEAR__'])); ?>`.replace('__YEAR__', year))
         .then(response => response.json())
         .then(data => {
             // Render schedules (simplified - you might want to use a template)
@@ -260,10 +265,10 @@ function deletePromoImage(scheduleId, monthName) {
         return;
     }
     
-    fetch(`{{ route('admin.subscription-config.delete-promo-image', ['schedule' => '__ID__']) }}`.replace('__ID__', scheduleId), {
+    fetch(`<?php echo e(route('admin.subscription-config.delete-promo-image', ['schedule' => '__ID__'])); ?>`.replace('__ID__', scheduleId), {
         method: 'DELETE',
         headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
@@ -282,7 +287,9 @@ function deletePromoImage(scheduleId, monthName) {
     });
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
 
 
 
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /var/www/html/resources/views/admin/subscription-config/index.blade.php ENDPATH**/ ?>

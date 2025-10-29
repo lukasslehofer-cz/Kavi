@@ -137,20 +137,101 @@ class SubscriptionHelper
      */
     public static function shouldShipInNextBatch($subscription, Carbon $targetShipDate): bool
     {
-        if ($subscription->status !== 'active') {
+        // If paused, allow shipping only when there's a PAID period covering target date (already paid box)
+        if ($subscription->status === 'paused') {
+            $hasPaidCover = self::hasPaidCoverageForDate($subscription, $targetShipDate);
+
+            if (!$hasPaidCover) {
+                return false;
+            }
+        } elseif ($subscription->status !== 'active') {
             return false;
         }
 
         $nextShipment = self::calculateNextShipmentDate($subscription);
-        
         if (!$nextShipment) {
             return false;
         }
 
-        // Check if the calculated next shipment matches the target date
         return $nextShipment->format('Y-m-d') === $targetShipDate->format('Y-m-d');
     }
 
+    /**
+     * Check if a given date is covered by any PAID subscription payment period
+     */
+    public static function hasPaidCoverageForDate($subscription, Carbon $date): bool
+    {
+        // Initial shipment coverage: if customer just subscribed and hasn't received any shipment yet,
+        // the first scheduled shipment (per configurator rules) is considered covered by the initial payment
+        if (self::isInitialShipmentCovered($subscription, $date)) {
+            return true;
+        }
+
+        return $subscription->payments()
+            ->where('status', 'paid')
+            ->whereDate('period_start', '<=', $date->toDateString())
+            ->whereDate('period_end', '>=', $date->toDateString())
+            ->exists();
+    }
+
+    /**
+     * Detect if the given date is the initial shipment that is implicitly covered by the activation payment.
+     * This applies when no shipment has been sent yet and the date equals the first scheduled shipment date.
+     */
+    public static function isInitialShipmentCovered($subscription, Carbon $date): bool
+    {
+        // No shipment sent yet
+        if ($subscription->last_shipment_date) {
+            return false;
+        }
+
+        // First scheduled shipment for this subscription
+        $firstScheduled = self::calculateNextShipmentDate($subscription);
+        if (!$firstScheduled) {
+            return false;
+        }
+
+        return $firstScheduled->isSameDay($date);
+    }
+
+    /**
+     * Get the first unpaid shipment date starting from the next scheduled shipment
+     * Skips all shipment dates that are within any paid coverage period
+     */
+    public static function getFirstUnpaidShipmentDate($subscription): Carbon
+    {
+        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+        $candidate = self::calculateNextShipmentDate($subscription) ?? self::getNextShippingDate();
+
+        // Iterate through cadence until we find a date not covered by a paid period
+        $guard = 0;
+        while ($guard < 24) { // prevent infinite loops
+            if (!self::hasPaidCoverageForDate($subscription, $candidate)) {
+                return $candidate->copy()->startOfDay();
+            }
+            $candidate = $candidate->copy()->addMonths($frequencyMonths);
+            $guard++;
+        }
+
+        // Fallback (should not happen)
+        return $candidate->copy()->startOfDay();
+    }
+
+    /**
+     * Get the next shipment date after a given date, aligned to subscription cadence
+     */
+    public static function getNextShipmentAfterDate($subscription, Carbon $date): Carbon
+    {
+        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+        $candidate = $date->copy()->addMonths($frequencyMonths);
+
+        $nextSchedule = ShipmentSchedule::getForMonth($candidate->year, $candidate->month);
+        if ($nextSchedule) {
+            return $nextSchedule->shipment_date->copy()->startOfDay();
+        }
+
+        return $candidate->day(20)->startOfDay();
+    }
     /**
      * Get formatted shipping date info for display
      */

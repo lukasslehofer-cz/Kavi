@@ -17,6 +17,7 @@ class ShipmentSchedule extends Model
         'shipment_date',
         'coffee_product_id',
         'roastery_name',
+        'promo_image',
         'notes',
     ];
 

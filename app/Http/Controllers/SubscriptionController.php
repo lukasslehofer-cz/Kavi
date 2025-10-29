@@ -39,7 +39,15 @@ class SubscriptionController extends Controller
             ->take(6)
             ->get();
 
-        return view('subscriptions.index', compact('plans', 'subscriptionPricing', 'shippingInfo', 'coffeesOfMonth'));
+        // Get promo image for current/next month
+        $currentSchedule = \App\Models\ShipmentSchedule::getForMonth(now()->year, now()->month);
+        $nextSchedule = \App\Models\ShipmentSchedule::getNextShipment();
+        
+        // Use next schedule if current month is past, otherwise use current
+        $activeSchedule = $currentSchedule && !$currentSchedule->isPast() ? $currentSchedule : $nextSchedule;
+        $promoImage = $activeSchedule?->promo_image ?? 'images/kavi-november-25.jpg';
+
+        return view('subscriptions.index', compact('plans', 'subscriptionPricing', 'shippingInfo', 'coffeesOfMonth', 'promoImage'));
     }
 
     public function show(SubscriptionPlan $plan)

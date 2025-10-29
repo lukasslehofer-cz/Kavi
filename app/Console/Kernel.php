@@ -26,6 +26,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('auth:cleanup-login-tokens')
             ->dailyAt('03:00')
             ->timezone('Europe/Prague');
+
+        // Resume subscriptions whose pause ended (daily at 4:00 AM)
+        $schedule->command('subscriptions:resume-paused')
+            ->dailyAt('04:00')
+            ->timezone('Europe/Prague');
     }
 
     /**

@@ -51,7 +51,26 @@ class DashboardController extends Controller
 
     public function subscription()
     {
-        $subscriptions = auth()->user()->activeSubscriptions()->get();
+        $subscriptions = auth()->user()->subscriptions()
+            ->whereIn('status', ['active', 'paused', 'cancelled'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->filter(function ($subscription) {
+                // Always show active and paused
+                if (in_array($subscription->status, ['active', 'paused'])) {
+                    return true;
+                }
+                
+                // For cancelled, show only if there's a paid shipment still pending
+                if ($subscription->status === 'cancelled') {
+                    $nextShipment = \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($subscription);
+                    if ($nextShipment && $nextShipment->isFuture()) {
+                        return \App\Helpers\SubscriptionHelper::hasPaidCoverageForDate($subscription, $nextShipment);
+                    }
+                }
+                
+                return false;
+            });
 
         if ($subscriptions->isEmpty()) {
             return redirect()->route('subscriptions.index')
@@ -199,5 +218,128 @@ class DashboardController extends Controller
                 'Content-Type' => 'application/pdf',
             ]
         );
+    }
+
+    /**
+     * Pause a subscription for N iterations
+     */
+    public function pauseSubscription(Request $request)
+    {
+        $validated = $request->validate([
+            'subscription_id' => ['required', 'exists:subscriptions,id'],
+            'iterations' => ['required', 'integer', 'min:1', 'max:3'],
+        ]);
+
+        $subscription = Subscription::where('id', $validated['subscription_id'])
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // Apply pause locally
+        $subscription->pauseFor((int)$validated['iterations'], 'user_request');
+
+        // Pause in Stripe (no billing during pause)
+        try {
+            app(\App\Services\StripeService::class)->pauseSubscription($subscription);
+        } catch (\Exception $e) {
+            \Log::error('Failed to pause Stripe subscription', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Send email notification
+        try {
+            $email = $subscription->shipping_address['email'] ?? null;
+            if (!$email && $subscription->user) {
+                $email = $subscription->user->email;
+            }
+            if ($email) {
+                \Mail::to($email)->send(new \App\Mail\SubscriptionPaused($subscription, 'user_request'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send SubscriptionPaused email', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return redirect()->route('dashboard.subscription')
+            ->with('success', 'Předplatné bylo pozastaveno.');
+    }
+
+    /**
+     * Resume a paused subscription (user-triggered)
+     */
+    public function resumeSubscription(Request $request)
+    {
+        $validated = $request->validate([
+            'subscription_id' => ['required', 'exists:subscriptions,id'],
+        ]);
+
+        $subscription = Subscription::where('id', $validated['subscription_id'])
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // Resume in Stripe first
+        try {
+            app(\App\Services\StripeService::class)->resumeSubscription($subscription);
+        } catch (\Exception $e) {
+            \Log::error('Failed to resume Stripe subscription', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Resume locally
+        $subscription->resume();
+
+        return redirect()->route('dashboard.subscription')
+            ->with('success', 'Předplatné bylo obnoveno.');
+    }
+
+    /**
+     * Cancel a subscription (user-triggered)
+     */
+    public function cancelSubscription(Request $request)
+    {
+        $validated = $request->validate([
+            'subscription_id' => ['required', 'exists:subscriptions,id'],
+        ]);
+
+        $subscription = Subscription::where('id', $validated['subscription_id'])
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // Cancel in Stripe first (cancel_at_period_end)
+        try {
+            app(\App\Services\StripeService::class)->cancelSubscription($subscription);
+        } catch (\Exception $e) {
+            \Log::error('Failed to cancel Stripe subscription', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Cancel locally
+        $subscription->cancel();
+
+        // Send cancellation email
+        try {
+            $email = $subscription->shipping_address['email'] ?? null;
+            if (!$email && $subscription->user) {
+                $email = $subscription->user->email;
+            }
+            if ($email) {
+                \Mail::to($email)->send(new \App\Mail\SubscriptionCancelled($subscription));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send SubscriptionCancelled email', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return redirect()->route('dashboard.subscription')
+            ->with('success', 'Předplatné bylo zrušeno.');
     }
 }

@@ -40,7 +40,7 @@
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="Kavi Coffee" class="logo">
+                            <img src="<?php echo e(url('images/kavi-logo-white.png')); ?>" alt="Kavi Coffee" class="logo">
                         </td>
                     </tr>
                     <tr>
@@ -56,24 +56,24 @@
                             
                             <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
                                 <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">Předplatné</div>
-                                <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $subscription->subscription_number }}</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #111827;"><?php echo e($subscription->subscription_number); ?></div>
                             </div>
                             
-                            @if($subscription->paused_until_date)
+                            <?php if($subscription->paused_until_date): ?>
                             <div class="info-box" style="background-color: #eef2ff !important; border: 1px solid #c7d2fe !important; border-left: 4px solid #6366f1 !important;" bgcolor="#eef2ff">
                                 <h3 class="info-title" style="color: #3730a3;">🗓 Pauza aktivní do</h3>
                                 <p class="info-text" style="color: #3730a3;">
-                                    Pauza je nastavena do <strong>{{ $subscription->paused_until_date->format('d.m.Y') }}</strong>.
-                                    @if($subscription->paused_iterations && $subscription->frequency_months)
+                                    Pauza je nastavena do <strong><?php echo e($subscription->paused_until_date->format('d.m.Y')); ?></strong>.
+                                    <?php if($subscription->paused_iterations && $subscription->frequency_months): ?>
                                         <br>
-                                        Celkem <strong>{{ $subscription->paused_iterations * $subscription->frequency_months }}</strong> měsíců ({{ $subscription->paused_iterations }} rozesíl{{ $subscription->paused_iterations === 1 ? 'ka' : ($subscription->paused_iterations < 5 ? 'ky' : 'ek') }}).
-                                    @endif
+                                        Celkem <strong><?php echo e($subscription->paused_iterations * $subscription->frequency_months); ?></strong> měsíců (<?php echo e($subscription->paused_iterations); ?> rozesíl<?php echo e($subscription->paused_iterations === 1 ? 'ka' : ($subscription->paused_iterations < 5 ? 'ky' : 'ek')); ?>).
+                                    <?php endif; ?>
                                 </p>
                             </div>
-                            @endif
+                            <?php endif; ?>
 
                             <!-- Reason -->
-                            @if($reason === 'payment_failed')
+                            <?php if($reason === 'payment_failed'): ?>
                             <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
                                 <h3 class="info-title" style="color: #92400e;">💳 Důvod pozastavení</h3>
                                 <p class="info-text" style="color: #78350f;">
@@ -82,7 +82,7 @@
                                     Nebyli jsme schopni zpracovat platbu a uplynula lhůta pro opravu platebních údajů.
                                 </p>
                             </div>
-                            @else
+                            <?php else: ?>
                             <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
                                 <h3 class="info-title" style="color: #1e40af;">✓ Důvod pozastavení</h3>
                                 <p class="info-text" style="color: #1e3a8a;">
@@ -91,7 +91,7 @@
                                     Během pauzy nebudete dostávat žádné kávové boxy ani vám nebudou účtovány platby.
                                 </p>
                             </div>
-                            @endif
+                            <?php endif; ?>
                             
                             <!-- What happens now -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
@@ -108,7 +108,7 @@
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
                                 <h3 class="info-title" style="color: #065f46;">🔄 Jak obnovit předplatné?</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    @if($reason === 'payment_failed')
+                                    <?php if($reason === 'payment_failed'): ?>
                                     <strong>1. Aktualizujte platební údaje</strong><br>
                                     Přihlaste se do svého účtu a zadejte platnou kartu.<br><br>
                                     
@@ -117,16 +117,16 @@
                                     
                                     <strong>3. První box odešleme</strong><br>
                                     Po obnovení ihned začneme připravovat váš box!
-                                    @else
+                                    <?php else: ?>
                                     Kdykoli se můžete vrátit a předplatné znovu aktivovat v sekci "Moje předplatné".<br><br>
                                     
                                     Po obnovení vám přijde první box podle vašeho zvoleneného intervalu.
-                                    @endif
+                                    <?php endif; ?>
                                 </p>
                             </div>
                             
                             <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('dashboard.subscription') }}" class="button">
+                                <a href="<?php echo e(route('dashboard.subscription')); ?>" class="button">
                                     Spravovat předplatné
                                 </a>
                             </div>
@@ -149,12 +149,12 @@
                                 Prémiová káva s předplatným
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link">Domů</a>
-                                <a href="{{ route('products.index') }}" class="footer-link">Obchod</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link">Moje předplatné</a>
+                                <a href="<?php echo e(route('home')); ?>" class="footer-link">Domů</a>
+                                <a href="<?php echo e(route('products.index')); ?>" class="footer-link">Obchod</a>
+                                <a href="<?php echo e(route('dashboard.subscription')); ?>" class="footer-link">Moje předplatné</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.
+                                © <?php echo e(date('Y')); ?> Kavi Coffee. Všechna práva vyhrazena.
                             </p>
                         </td>
                     </tr>
@@ -166,3 +166,4 @@
 </body>
 </html>
 
+<?php /**PATH /var/www/html/resources/views/emails/subscription-paused.blade.php ENDPATH**/ ?>

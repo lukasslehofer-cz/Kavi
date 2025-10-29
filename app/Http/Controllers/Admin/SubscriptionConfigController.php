@@ -69,27 +69,65 @@ class SubscriptionConfigController extends Controller
      */
     public function updateSchedule(Request $request)
     {
-        $validated = $request->validate([
-            'schedules' => 'required|array',
-            'schedules.*.id' => 'required|exists:shipment_schedules,id',
-            'schedules.*.billing_date' => 'required|date',
-            'schedules.*.shipment_date' => 'required|date',
-            'schedules.*.coffee_product_id' => 'nullable|exists:products,id',
-            'schedules.*.roastery_name' => 'nullable|string|max:255',
-            'schedules.*.notes' => 'nullable|string',
+        // Debug: Log request info
+        \Log::info('Update schedule request', [
+            'has_promo_images' => $request->hasFile('promo_images'),
+            'all_files' => $request->allFiles(),
+            'schedules_keys' => array_keys($request->input('schedules', [])),
         ]);
-
-        foreach ($validated['schedules'] as $scheduleData) {
+        
+        // Get all schedules data from request
+        $schedulesData = $request->input('schedules', []);
+        
+        foreach ($schedulesData as $index => $scheduleData) {
+            // Skip if no ID
+            if (!isset($scheduleData['id'])) {
+                continue;
+            }
+            
             $schedule = ShipmentSchedule::find($scheduleData['id']);
             
             if ($schedule && !$schedule->isPast()) {
-                $schedule->update([
+                $updateData = [
                     'billing_date' => $scheduleData['billing_date'],
                     'shipment_date' => $scheduleData['shipment_date'],
-                    'coffee_product_id' => $scheduleData['coffee_product_id'],
-                    'roastery_name' => $scheduleData['roastery_name'],
-                    'notes' => $scheduleData['notes'],
-                ]);
+                    'notes' => $scheduleData['notes'] ?? null,
+                ];
+
+                $schedule->update($updateData);
+            }
+        }
+        
+        // Handle promo image uploads separately (indexed by schedule ID)
+        if ($request->hasFile('promo_images')) {
+            $promoImages = $request->file('promo_images');
+            
+            \Log::info('Processing promo images', [
+                'count' => count($promoImages),
+                'schedule_ids' => array_keys($promoImages),
+            ]);
+            
+            foreach ($promoImages as $scheduleId => $file) {
+                $schedule = ShipmentSchedule::find($scheduleId);
+                
+                if ($schedule && !$schedule->isPast() && $file->isValid()) {
+                    \Log::info("Processing file for schedule {$scheduleId}", [
+                        'month' => $schedule->month,
+                        'name' => $file->getClientOriginalName(),
+                        'size' => $file->getSize(),
+                    ]);
+                    
+                    $path = $file->store('promo-images', 'public');
+                    
+                    // Delete old image if exists
+                    if ($schedule->promo_image && \Storage::disk('public')->exists($schedule->promo_image)) {
+                        \Storage::disk('public')->delete($schedule->promo_image);
+                    }
+                    
+                    $schedule->update(['promo_image' => $path]);
+                    
+                    \Log::info("File stored at: {$path}");
+                }
             }
         }
 
@@ -136,5 +174,29 @@ class SubscriptionConfigController extends Controller
         
         return redirect()->route('admin.subscription-config.index')
             ->with('success', "Harmonogram pro rok {$nextYear} byl úspěšně vytvořen.");
+    }
+
+    /**
+     * Delete promo image from schedule
+     */
+    public function deletePromoImage(ShipmentSchedule $schedule)
+    {
+        if ($schedule->isPast()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nelze smazat obrázek z minulé rozesílky.'
+            ], 403);
+        }
+
+        if ($schedule->promo_image && \Storage::disk('public')->exists($schedule->promo_image)) {
+            \Storage::disk('public')->delete($schedule->promo_image);
+        }
+
+        $schedule->update(['promo_image' => null]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Promo obrázek byl úspěšně smazán.'
+        ]);
     }
 }

@@ -75,6 +75,9 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::get('/objednavka/{order}', [DashboardController::class, 'orderDetail'])->name('order.detail');
     Route::get('/objednavka/{order}/faktura', [DashboardController::class, 'downloadInvoice'])->name('order.invoice');
     Route::get('/predplatne', [DashboardController::class, 'subscription'])->name('subscription');
+    Route::post('/predplatne/pause', [DashboardController::class, 'pauseSubscription'])->name('subscription.pause');
+    Route::post('/predplatne/resume', [DashboardController::class, 'resumeSubscription'])->name('subscription.resume');
+    Route::post('/predplatne/cancel', [DashboardController::class, 'cancelSubscription'])->name('subscription.cancel');
     Route::get('/predplatne/platba/{payment}/faktura', [DashboardController::class, 'downloadSubscriptionInvoice'])->name('subscription.payment.invoice');
     Route::post('/predplatne/update-packeta', [DashboardController::class, 'updatePacketaPoint'])->name('subscription.update-packeta');
     Route::get('/notifikace', [DashboardController::class, 'notifications'])->name('notifications');
@@ -96,6 +99,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/konfigurator-nastaveni/harmonogram', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'updateSchedule'])->name('subscription-config.update-schedule');
     Route::post('/konfigurator-nastaveni/vytvorit-dalsi-rok', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'createNextYearSchedules'])->name('subscription-config.create-next-year');
     Route::get('/konfigurator-nastaveni/rok/{year}', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'getYearSchedules'])->name('subscription-config.year-schedules');
+    Route::delete('/konfigurator-nastaveni/promo-image/{schedule}', [\App\Http\Controllers\Admin\SubscriptionConfigController::class, 'deletePromoImage'])->name('subscription-config.delete-promo-image');
     
     // Orders
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show', 'update', 'destroy']);

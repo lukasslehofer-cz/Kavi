@@ -483,22 +483,46 @@ class StripeService
         $subscription = Subscription::where('stripe_subscription_id', $subscriptionData['id'])->first();
 
         if ($subscription) {
-            $status = match($subscriptionData['status']) {
-                'active' => 'active',
+            $stripeStatus = $subscriptionData['status'] ?? null;
+            $hasPauseCollection = isset($subscriptionData['pause_collection']) && !empty($subscriptionData['pause_collection']);
+            $hasCancelAtPeriodEnd = isset($subscriptionData['cancel_at_period_end']) && $subscriptionData['cancel_at_period_end'] === true;
+
+            $mappedStatus = match($stripeStatus) {
                 'canceled' => 'cancelled',
-                'past_due' => 'active', // Keep active but we should notify
                 'unpaid' => 'paused',
-                default => $subscription->status,
+                'active' => 'active',
+                'past_due' => 'active',
+                default => 'active',
             };
 
+            // If Stripe has pause_collection enabled, we treat it as paused locally
+            if ($hasPauseCollection) {
+                $mappedStatus = 'paused';
+            }
+
+            // If Stripe has cancel_at_period_end enabled, treat as cancelled
+            if ($hasCancelAtPeriodEnd) {
+                $mappedStatus = 'cancelled';
+            }
+
+            // Do not override a locally paused subscription back to active
+            if ($subscription->status === 'paused' && $mappedStatus === 'active') {
+                $mappedStatus = 'paused';
+            }
+
+            // Do not override a locally cancelled subscription back to active
+            if ($subscription->status === 'cancelled' && $mappedStatus === 'active') {
+                $mappedStatus = 'cancelled';
+            }
+
             $subscription->update([
-                'status' => $status,
-                'next_billing_date' => isset($subscriptionData['current_period_end']) 
+                'status' => $mappedStatus,
+                'next_billing_date' => isset($subscriptionData['current_period_end'])
                     ? \Carbon\Carbon::createFromTimestamp($subscriptionData['current_period_end'])
-                    : null,
-                'ends_at' => isset($subscriptionData['canceled_at']) 
+                    : $subscription->next_billing_date,
+                'ends_at' => isset($subscriptionData['canceled_at'])
                     ? \Carbon\Carbon::createFromTimestamp($subscriptionData['canceled_at'])
-                    : null,
+                    : $subscription->ends_at,
             ]);
         }
     }
@@ -601,16 +625,79 @@ class StripeService
     }
 
     /**
-     * Cancel subscription
+     * Cancel subscription in Stripe (at period end)
      */
     public function cancelSubscription(Subscription $subscription): void
     {
-        if ($subscription->stripe_subscription_id) {
-            $stripeSubscription = StripeSubscription::retrieve($subscription->stripe_subscription_id);
-            $stripeSubscription->cancel();
+        if (!$subscription->stripe_subscription_id) {
+            return;
         }
 
-        $subscription->cancel();
+        try {
+            StripeSubscription::update($subscription->stripe_subscription_id, [
+                'cancel_at_period_end' => true,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Stripe cancelSubscription failed', [
+                'stripe_subscription_id' => $subscription->stripe_subscription_id,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Pause subscription billing in Stripe
+     */
+    public function pauseSubscription(Subscription $subscription): void
+    {
+        if (!$subscription->stripe_subscription_id) {
+            return;
+        }
+
+        try {
+            StripeSubscription::update($subscription->stripe_subscription_id, [
+                'pause_collection' => [
+                    // don't invoice during pause
+                    'behavior' => 'void',
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Stripe pauseSubscription failed', [
+                'stripe_subscription_id' => $subscription->stripe_subscription_id,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Resume subscription billing in Stripe
+     */
+    public function resumeSubscription(Subscription $subscription): void
+    {
+        if (!$subscription->stripe_subscription_id) {
+            return;
+        }
+
+        try {
+            StripeSubscription::update($subscription->stripe_subscription_id, [
+                'pause_collection' => '', // clear pause
+            ]);
+        } catch (\Exception $e) {
+            // Some Stripe libraries require null instead of empty string
+            try {
+                StripeSubscription::update($subscription->stripe_subscription_id, [
+                    'pause_collection' => null,
+                ]);
+            } catch (\Exception $e2) {
+                \Log::error('Stripe resumeSubscription failed', [
+                    'stripe_subscription_id' => $subscription->stripe_subscription_id,
+                    'error' => $e2->getMessage(),
+                ]);
+                throw $e2;
+            }
+        }
     }
 }
 

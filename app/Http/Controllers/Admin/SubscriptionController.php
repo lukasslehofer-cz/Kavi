@@ -103,9 +103,9 @@ class SubscriptionController extends Controller
             ? \Carbon\Carbon::parse($request->date)
             : \App\Helpers\SubscriptionHelper::getNextShippingDate();
 
-        // Get all active subscriptions
+        // Get all subscriptions eligible for shipping consideration
         $allSubscriptions = Subscription::with(['user', 'plan'])
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'paused'])
             ->get();
 
         // Filter subscriptions that should ship on target date OR were already sent on target date

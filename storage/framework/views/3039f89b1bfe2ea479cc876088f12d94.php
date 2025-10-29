@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Kávové předplatné - Kavi Coffee'); ?>
 
-@section('title', 'Kávové předplatné - Kavi Coffee')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <!-- Hero Header Section - Minimal -->
 <div class="relative bg-gray-100 py-12 md:py-16 overflow-hidden">
   <!-- Subtle Organic Shapes -->
@@ -67,26 +65,26 @@
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
     <!-- Error Messages -->
-    @if($errors->any())
+    <?php if($errors->any()): ?>
     <div class="mb-6">
       <div class="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg">
         <p class="font-bold mb-2">⚠️ Chyba při zpracování konfigurace:</p>
         <ul class="list-disc list-inside space-y-1">
-          @foreach($errors->all() as $error)
-          <li>{{ $error }}</li>
-          @endforeach
+          <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <li><?php echo e($error); ?></li>
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </ul>
       </div>
     </div>
-    @endif
+    <?php endif; ?>
 
-    @if(session('error'))
+    <?php if(session('error')): ?>
     <div class="mb-6">
       <div class="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg">
-        <p class="font-bold">⚠️ {{ session('error') }}</p>
+        <p class="font-bold">⚠️ <?php echo e(session('error')); ?></p>
       </div>
     </div>
-    @endif
+    <?php endif; ?>
 
     <!-- 2-Column Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
@@ -96,13 +94,13 @@
         <div class="lg:sticky lg:top-24">
           <!-- Product Photo -->
           <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 mb-6">
-            @php
+            <?php
               // Check if promo image is from storage or public directory
               $imageSrc = str_starts_with($promoImage, 'promo-images/') 
                   ? asset('storage/' . $promoImage) 
                   : asset($promoImage);
-            @endphp
-            <img src="{{ $imageSrc }}" 
+            ?>
+            <img src="<?php echo e($imageSrc); ?>" 
                  alt="Kávový box" 
                  class="w-full h-full object-cover">
           </div>
@@ -113,30 +111,30 @@
               <svg class="w-5 h-5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
               </svg>
-              <h3 class="text-sm font-bold text-gray-900">Pražírny na {{ \Carbon\Carbon::now()->locale('cs')->translatedFormat('F') }}</h3>
+              <h3 class="text-sm font-bold text-gray-900">Pražírny na <?php echo e(\Carbon\Carbon::now()->locale('cs')->translatedFormat('F')); ?></h3>
             </div>
             
-            @if($coffeesOfMonth && $coffeesOfMonth->count() > 0)
-              @php
+            <?php if($coffeesOfMonth && $coffeesOfMonth->count() > 0): ?>
+              <?php
                 $roasteries = $coffeesOfMonth->pluck('roastery')->unique('id')->filter();
-              @endphp
+              ?>
               
-              @if($roasteries->count() > 0)
+              <?php if($roasteries->count() > 0): ?>
                 <div class="space-y-2 mb-4">
-                  @foreach($roasteries as $roastery)
+                  <?php $__currentLoopData = $roasteries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $roastery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="flex items-center gap-2">
-                      <span class="text-lg">{{ $roastery->country_flag }}</span>
+                      <span class="text-lg"><?php echo e($roastery->country_flag); ?></span>
                       <div class="flex-1">
-                        <span class="text-sm text-gray-700 font-medium">{{ $roastery->name }}</span>
-                        <span class="text-xs text-gray-500 font-light ml-1">{{ $roastery->city ? $roastery->city . ', ' : '' }}{{ $roastery->country }}</span>
+                        <span class="text-sm text-gray-700 font-medium"><?php echo e($roastery->name); ?></span>
+                        <span class="text-xs text-gray-500 font-light ml-1"><?php echo e($roastery->city ? $roastery->city . ', ' : ''); ?><?php echo e($roastery->country); ?></span>
                       </div>
                     </div>
-                  @endforeach
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
-              @endif
-            @endif
+              <?php endif; ?>
+            <?php endif; ?>
             
-            <a href="{{ route('monthly-feature.index') }}" 
+            <a href="<?php echo e(route('monthly-feature.index')); ?>" 
                class="block w-full py-2.5 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm text-center">
               Zobrazit detailní informace
             </a>
@@ -146,8 +144,8 @@
 
       <!-- RIGHT COLUMN - Form -->
       <div class="lg:col-span-7">
-        <form method="POST" action="{{ route('subscriptions.configure.checkout') }}">
-          @csrf
+        <form method="POST" action="<?php echo e(route('subscriptions.configure.checkout')); ?>">
+          <?php echo csrf_field(); ?>
           
           <!-- Hidden inputy pro mix rozdělení -->
           <input type="hidden" name="mix[espresso]" id="mix-espresso-value" value="0">
@@ -180,7 +178,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                   <div class="text-right">
-                    <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span>
+                    <span class="text-2xl font-bold text-gray-900"><?php echo e(number_format($subscriptionPricing['2'], 0, ',', ' ')); ?></span>
                     <span class="text-sm text-gray-500 ml-1">Kč</span>
                   </div>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
@@ -205,7 +203,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                   <div class="text-right">
-                    <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span>
+                    <span class="text-2xl font-bold text-gray-900"><?php echo e(number_format($subscriptionPricing['3'], 0, ',', ' ')); ?></span>
                     <span class="text-sm text-gray-500 ml-1">Kč</span>
                   </div>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
@@ -230,7 +228,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                   <div class="text-right">
-                    <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span>
+                    <span class="text-2xl font-bold text-gray-900"><?php echo e(number_format($subscriptionPricing['4'], 0, ',', ' ')); ?></span>
                     <span class="text-sm text-gray-500 ml-1">Kč</span>
                   </div>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
@@ -495,7 +493,7 @@
             </div>
             <div>
               <h3 class="font-bold text-lg text-gray-900 mb-2">Termín následující rozesílky</h3>
-              <p class="text-sm text-gray-900 font-medium mb-2">{{ $shippingInfo['cutoff_message'] }}</p>
+              <p class="text-sm text-gray-900 font-medium mb-2"><?php echo e($shippingInfo['cutoff_message']); ?></p>
               <p class="text-sm text-gray-600 font-light">
                 Rozesílka kávy probíhá vždy <strong>20. dne v měsíci</strong>. 
                 Objednávky uzavíráme <strong>15. dne v měsíci o půlnoci</strong>.
@@ -511,7 +509,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const pricing = @json($subscriptionPricing);
+    const pricing = <?php echo json_encode($subscriptionPricing, 15, 512) ?>;
     
     let selectedAmount = null;
     let selectedType = null;
@@ -734,4 +732,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /var/www/html/resources/views/subscriptions/index.blade.php ENDPATH**/ ?>

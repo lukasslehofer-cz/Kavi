@@ -23,6 +23,9 @@ class Subscription extends Model
         'configuration',
         'configured_price',
         'frequency_months',
+        'paused_iterations',
+        'paused_until_date',
+        'pause_reason',
         'shipping_address',
         'payment_method',
         'packeta_point_id',
@@ -38,6 +41,7 @@ class Subscription extends Model
         'next_billing_date' => 'date',
         'last_shipment_date' => 'date',
         'ends_at' => 'date',
+        'paused_until_date' => 'date',
         'packeta_sent_at' => 'datetime',
         'configuration' => 'array',
         'shipping_address' => 'array',
@@ -94,7 +98,12 @@ class Subscription extends Model
 
     public function resume()
     {
-        $this->update(['status' => 'active']);
+        $this->update([
+            'status' => 'active',
+            'paused_iterations' => null,
+            'paused_until_date' => null,
+            'pause_reason' => null,
+        ]);
     }
 
     /**
@@ -119,6 +128,45 @@ class Subscription extends Model
     public static function generateSubscriptionNumber(): string
     {
         return 'SUB-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Calculate pause end date based on iterations and subscription frequency
+     */
+    public function calculatePauseEndDate(int $iterations): \Carbon\Carbon
+    {
+        $frequencyMonths = max(1, (int)($this->frequency_months ?? 1));
+
+        // Start pause from the first UNPAID shipment date
+        $firstUnpaid = \App\Helpers\SubscriptionHelper::getFirstUnpaidShipmentDate($this);
+
+        // Pause covers 'iterations' shipment dates, end date is the date of the last paused shipment
+        $pausedUntil = $firstUnpaid->copy()->addMonths(($iterations - 1) * $frequencyMonths);
+
+        return $pausedUntil->endOfDay();
+    }
+
+    /**
+     * Pause for N iterations with reason
+     */
+    public function pauseFor(int $iterations, string $reason = 'user_request'): void
+    {
+        $endDate = $this->calculatePauseEndDate($iterations);
+
+        $this->update([
+            'status' => 'paused',
+            'paused_iterations' => $iterations,
+            'paused_until_date' => $endDate,
+            'pause_reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Whether the subscription can be resumed (end date has passed)
+     */
+    public function canResume(): bool
+    {
+        return $this->status === 'paused' && $this->paused_until_date && $this->paused_until_date->isPast();
     }
 }
 
