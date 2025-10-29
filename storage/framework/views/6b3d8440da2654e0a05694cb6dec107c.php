@@ -207,7 +207,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="Kavi Coffee" class="logo">
+                            <img src="<?php echo e(url('images/kavi-logo-white.png')); ?>" alt="Kavi Coffee" class="logo">
                         </td>
                     </tr>
                     
@@ -222,10 +222,10 @@
                                 <h3 style="font-size: 18px; font-weight: 600; color: #1e40af; margin: 0 0 12px 0;">💳 Informace o platbě</h3>
                                 <p style="font-size: 16px; color: #1e3a8a; line-height: 1.6; margin: 8px 0;">
                                     <strong>Datum platby:</strong><br>
-                                    <span style="font-size: 20px; font-weight: 700;">{{ $subscription->next_billing_date->format('j. n. Y') }}</span>
+                                    <span style="font-size: 20px; font-weight: 700;"><?php echo e($subscription->next_billing_date->format('j. n. Y')); ?></span>
                                 </p>
                                 <p style="font-size: 16px; color: #1e3a8a; margin: 12px 0 0 0;">
-                                    <strong>Částka:</strong> <span style="font-size: 20px; font-weight: 700; color: #e6305a;">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                    <strong>Částka:</strong> <span style="font-size: 20px; font-weight: 700; color: #e6305a;"><?php echo e(number_format($subscription->configured_price, 0, ',', ' ')); ?> Kč</span>
                                 </p>
                             </div>
                             
@@ -233,28 +233,28 @@
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
                                 <h3 class="info-title">📦 Vaše předplatné</h3>
                                 <p class="info-text">
-                                    <strong>Číslo předplatného:</strong> {{ $subscription->subscription_number }}<br>
+                                    <strong>Číslo předplatného:</strong> <?php echo e($subscription->subscription_number); ?><br>
                                     <strong>Typ kávy:</strong> 
-                                    @if($subscription->configuration['type'] === 'espresso')
+                                    <?php if($subscription->configuration['type'] === 'espresso'): ?>
                                         Espresso
-                                    @elseif($subscription->configuration['type'] === 'filter')
+                                    <?php elseif($subscription->configuration['type'] === 'filter'): ?>
                                         Filter
-                                    @else
-                                        Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× Filter)
-                                    @endif
-                                    @if($subscription->configuration['isDecaf'] ?? false)
+                                    <?php else: ?>
+                                        Mix (<?php echo e($subscription->configuration['mix']['espresso'] ?? 0); ?>× Espresso, <?php echo e($subscription->configuration['mix']['filter'] ?? 0); ?>× Filter)
+                                    <?php endif; ?>
+                                    <?php if($subscription->configuration['isDecaf'] ?? false): ?>
                                         • Decaf
-                                    @endif
+                                    <?php endif; ?>
                                     <br>
-                                    <strong>Množství:</strong> {{ $subscription->configuration['amount'] }}× balení po 250g<br>
+                                    <strong>Množství:</strong> <?php echo e($subscription->configuration['amount']); ?>× balení po 250g<br>
                                     <strong>Frekvence:</strong> 
-                                    @if($subscription->frequency_months == 1)
+                                    <?php if($subscription->frequency_months == 1): ?>
                                         Každý měsíc
-                                    @elseif($subscription->frequency_months == 2)
+                                    <?php elseif($subscription->frequency_months == 2): ?>
                                         Každé 2 měsíce
-                                    @else
+                                    <?php else: ?>
                                         Každé 3 měsíce
-                                    @endif
+                                    <?php endif; ?>
                                 </p>
                             </div>
                             
@@ -262,7 +262,7 @@
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
                                 <h3 class="info-title" style="color: #065f46;">✓ Co se stane dále?</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    1. <strong>{{ $subscription->next_billing_date->format('j. n. Y') }}</strong> - Automatická platba<br>
+                                    1. <strong><?php echo e($subscription->next_billing_date->format('j. n. Y')); ?></strong> - Automatická platba<br>
                                     2. Pražení vaší kávy na míru<br>
                                     3. Expedice k vašemu výdejnímu místu<br>
                                     4. Čerstvá káva přímo k vám!
@@ -271,7 +271,7 @@
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('dashboard.subscription') }}" class="button">
+                                <a href="<?php echo e(route('dashboard.subscription')); ?>" class="button">
                                     Spravovat předplatné
                                 </a>
                             </div>
@@ -301,12 +301,12 @@
                                 Prémiová káva s předplatným
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">Domů</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">Obchod</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link" style="color: #e6305a;">Moje předplatné</a>
+                                <a href="<?php echo e(route('home')); ?>" class="footer-link" style="color: #e6305a;">Domů</a>
+                                <a href="<?php echo e(route('products.index')); ?>" class="footer-link" style="color: #e6305a;">Obchod</a>
+                                <a href="<?php echo e(route('dashboard.subscription')); ?>" class="footer-link" style="color: #e6305a;">Moje předplatné</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.
+                                © <?php echo e(date('Y')); ?> Kavi Coffee. Všechna práva vyhrazena.
                             </p>
                         </td>
                     </tr>
@@ -323,3 +323,4 @@
 </body>
 </html>
 
+<?php /**PATH /Users/lukas/Kavi/resources/views/emails/upcoming-payment-reminder.blade.php ENDPATH**/ ?>

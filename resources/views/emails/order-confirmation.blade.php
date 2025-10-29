@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <meta name="supported-color-schemes" content="light">
     <title>Potvrzení objednávky</title>
     <style>
         /* Reset styles */
@@ -192,6 +194,7 @@
         /* Shipping info */
         .info-box {
             background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 20px;
             margin: 24px 0;
@@ -292,6 +295,40 @@
                 padding: 24px !important;
             }
         }
+        
+        /* Force light mode - prevent auto color inversion */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a !important;
+            }
+            .email-container {
+                background-color: #ffffff !important;
+                border: 1px solid #d1d5db !important;
+            }
+            .info-box, .order-items {
+                background-color: #f9fafb !important;
+                border: 1px solid #d1d5db !important;
+            }
+            h1, .info-title, .section-title, .item-name {
+                color: #111827 !important;
+            }
+            .subtitle, .info-text, .item-details {
+                color: #4b5563 !important;
+            }
+            .header {
+                background-color: #111827 !important;
+            }
+        }
+        
+        /* Prevent Gmail/Outlook.com dark mode auto-inversion */
+        [data-ogsc] .email-container {
+            background-color: #ffffff !important;
+            border: 1px solid #d1d5db !important;
+        }
+        [data-ogsc] .info-box, [data-ogsc] .order-items {
+            background-color: #f9fafb !important;
+            border: 1px solid #d1d5db !important;
+        }
     </style>
 </head>
 <body>
@@ -299,12 +336,17 @@
         <tr>
             <td align="center">
                 <!-- Main Container -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <!--[if mso]>
+                <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600">
+                <tr>
+                <td>
+                <![endif]-->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-black.png') }}" alt="Kavi Coffee" class="logo" style="filter: invert(1) brightness(2);">
+                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="Kavi Coffee" class="logo">
                         </td>
                     </tr>
                     
@@ -313,10 +355,8 @@
                         <td class="content">
                             <!-- Success Icon -->
                             <div style="text-align: center; margin-bottom: 24px;">
-                                <div style="width: 64px; height: 64px; background-color: #10b981; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center;">
-                                    <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#ffffff" style="stroke-width: 3;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
+                                <div style="width: 64px; height: 64px; background-color: #10b981 !important; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; line-height: 64px;">
+                                    ✓
                                 </div>
                             </div>
                             
@@ -370,7 +410,7 @@
                             </div>
                             
                             <!-- Shipping Info -->
-                            <div class="info-box">
+                            <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
                                 <h3 class="info-title">📦 Doručení</h3>
                                 @if(isset($order->shipping_address['packeta_point_name']))
                                 <p class="info-text"><strong>Výdejní místo:</strong></p>
@@ -382,7 +422,7 @@
                             </div>
                             
                             <!-- Billing Info -->
-                            <div class="info-box">
+                            <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
                                 <h3 class="info-title">📋 Fakturační údaje</h3>
                                 <p class="info-text"><strong>{{ $order->shipping_address['name'] }}</strong></p>
                                 <p class="info-text">{{ $order->shipping_address['billing_address'] }}</p>
@@ -395,14 +435,14 @@
                             
                             <!-- Payment Status -->
                             @if($order->payment_status === 'paid')
-                            <div class="info-box" style="background-color: #d1fae5; border-left: 4px solid #10b981;">
+                            <div class="info-box" style="background-color: #d1fae5 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#d1fae5">
                                 <h3 class="info-title" style="color: #065f46;">💳 Platba</h3>
                                 <p class="info-text" style="color: #047857;">
                                     Platba byla úspěšně přijata.
                                 </p>
                             </div>
                             @else
-                            <div class="info-box" style="background-color: #fef3c7; border-left: 4px solid #f59e0b;">
+                            <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
                                 <h3 class="info-title" style="color: #92400e;">💳 Platba</h3>
                                 <p class="info-text" style="color: #78350f;">
                                     Platba zatím nebyla dokončena. Dokončete prosím platbu pro zpracování objednávky.
@@ -466,6 +506,11 @@
                     </tr>
                     
                 </table>
+                <!--[if mso]>
+                </td>
+                </tr>
+                </table>
+                <![endif]-->
             </td>
         </tr>
     </table>

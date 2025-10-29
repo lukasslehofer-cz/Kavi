@@ -255,3 +255,4 @@ Na confirmation stránce nabídnout:
 
 **Implementováno:** 29. října 2025  
 **Status:** ✅ Hotovo a funkční
+

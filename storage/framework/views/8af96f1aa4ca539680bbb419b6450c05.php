@@ -52,13 +52,6 @@
 
                 <!-- Right Side Actions -->
                 <div class="flex items-center gap-3">
-                    <!-- CTA Button - Desktop -->
-                    <a href="<?php echo e(route('subscriptions.index')); ?>" class="hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm px-5 py-2 rounded-full transition-all duration-200">
-                        <span>Vybrat předplatné</span>
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </a>
 
                     <!-- User Account -->
                     <?php if(auth()->guard()->check()): ?>
@@ -84,6 +77,14 @@
 
                         </span>
                         <?php endif; ?>
+                    </a>
+                    
+                    <!-- CTA Button - Desktop -->
+                    <a href="<?php echo e(route('subscriptions.index')); ?>" class="hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm px-5 py-2 rounded-full transition-all duration-200">
+                        <span>Vybrat předplatné</span>
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
                     </a>
 
                     <!-- Mobile Menu Button -->

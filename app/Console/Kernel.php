@@ -17,6 +17,11 @@ class Kernel extends ConsoleKernel
             ->dailyAt('09:00')
             ->timezone('Europe/Prague');
 
+        // Send order review requests 7 days after delivery (daily at 10:00 AM)
+        $schedule->command('orders:send-review-requests')
+            ->dailyAt('10:00')
+            ->timezone('Europe/Prague');
+
         // Clean up expired login tokens (daily at 3:00 AM)
         $schedule->command('auth:cleanup-login-tokens')
             ->dailyAt('03:00')

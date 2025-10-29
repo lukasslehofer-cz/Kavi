@@ -30,6 +30,9 @@ class Order extends Model
         'paid_at',
         'shipped_at',
         'delivered_at',
+        'packeta_packet_id',
+        'packeta_tracking_url',
+        'packeta_sent_at',
     ];
 
     protected $casts = [
@@ -42,6 +45,7 @@ class Order extends Model
         'paid_at' => 'datetime',
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'packeta_sent_at' => 'datetime',
     ];
 
     public function user()

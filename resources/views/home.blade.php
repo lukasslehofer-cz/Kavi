@@ -44,7 +44,7 @@
                         Objevte tu nejlepší kávu z celé Evropy
                     </h1>
                     <p class="text-xl md:text-2xl text-white/90 leading-relaxed font-light">
-                        Prémiová káva s měsíčním předplatným.<br/>
+                        Prémiová káva s pravidelným předplatným.<br/>
                         Čerstvě pražená, pečlivě vybraná.
                     </p>
                 </div>
