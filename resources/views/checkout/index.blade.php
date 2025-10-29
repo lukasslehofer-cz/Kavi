@@ -40,6 +40,34 @@
                         <h2 class="text-xl font-bold text-gray-900">Kontaktní údaje</h2>
                     </div>
                     
+                    @guest
+                    <!-- Login option for guests - Minimal -->
+                    <div class="mb-6 bg-blue-50 p-5 rounded-xl border border-blue-200">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0 mr-3">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-medium text-gray-900 mb-1.5">Máte již účet?</h3>
+                                <p class="text-sm text-gray-600 mb-3 font-light">Přihlaste se pro rychlejší dokončení objednávky nebo vám pošleme přihlašovací odkaz.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="inline-block bg-white hover:bg-gray-50 text-blue-600 font-medium px-5 py-2 rounded-full border border-blue-200 hover:border-blue-300 transition-all text-sm">
+                                        Přihlásit se
+                                    </a>
+                                    <button type="button" onclick="showMagicLinkModal()" class="inline-flex items-center gap-1 bg-white hover:bg-gray-50 text-gray-700 font-medium px-5 py-2 rounded-full border border-gray-200 hover:border-gray-300 transition-all text-sm">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Poslat přihlašovací odkaz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endguest
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="md:col-span-2">
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
@@ -77,20 +105,23 @@
 
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                                Telefon <span class="text-red-500">*</span>
+                                Telefon @guest<span class="text-gray-500">(volitelné)</span>@else<span class="text-red-500">*</span>@endguest
                             </label>
                             <input 
                                 type="tel" 
                                 id="phone" 
                                 name="phone" 
                                 value="{{ old('phone', auth()->user()->phone ?? '') }}" 
-                                required
+                                @auth required @endauth
                                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="+420 123 456 789"
                             >
                             @error('phone')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                            @guest
+                            <p class="text-xs text-gray-600 mt-1">Telefon pomůže doručovací službě při řešení případných problémů.</p>
+                            @endguest
                         </div>
                     </div>
                 </div>
@@ -423,8 +454,58 @@
     </div>
 </div>
 
+<!-- Magic Link Modal -->
+<div id="magic-link-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-gray-900">Poslat přihlašovací odkaz</h3>
+            <button onclick="closeMagicLinkModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <p class="text-gray-600 mb-4">Zadejte váš email a my vám pošleme přihlašovací odkaz.</p>
+        <form method="POST" action="{{ route('magic-link.send') }}" id="checkout-magic-link-form">
+            @csrf
+            <input type="hidden" name="redirect" value="{{ route('checkout.index') }}">
+            <div class="mb-4">
+                <label for="magic-link-email-input" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="magic-link-email-input" name="email" required
+                       class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                       placeholder="vas@email.cz">
+            </div>
+            <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all">
+                Poslat přihlašovací odkaz
+            </button>
+        </form>
+    </div>
+</div>
+
 <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
 <script>
+function showMagicLinkModal() {
+    document.getElementById('magic-link-modal').classList.remove('hidden');
+}
+
+function closeMagicLinkModal() {
+    document.getElementById('magic-link-modal').classList.add('hidden');
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeMagicLinkModal();
+    }
+});
+
+// Close modal on background click
+document.getElementById('magic-link-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeMagicLinkModal();
+    }
+});
+
 // Add form id to the form element
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form[action="{{ route('checkout.store') }}"]');

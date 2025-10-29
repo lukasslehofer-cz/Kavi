@@ -105,33 +105,28 @@ class FakturoidService
             }
 
             // Prepare invoice lines from order items
-            // E-shop prices include VAT, but Fakturoid expects unit_price WITHOUT VAT
-            // So we need to calculate: price_without_vat = price_with_vat / (1 + vat_rate/100)
+            // E-shop prices include VAT, use vat_price_mode=with_vat
+            // With this mode, unit_price should contain the price WITH VAT
+            // Fakturoid will calculate the base price and VAT from it
             $vatRate = 21; // DPH 21%
-            $vatMultiplier = 1 + ($vatRate / 100); // 1.21
             
-            $lines = $order->items->map(function ($item) use ($vatRate, $vatMultiplier) {
-                // Calculate price without VAT
-                $priceWithoutVat = round($item->price / $vatMultiplier, 2);
-                
+            $lines = $order->items->map(function ($item) use ($vatRate) {
                 return [
                     'name' => $item->product_name,
                     'quantity' => (string)$item->quantity,
                     'unit_name' => 'ks',
-                    'unit_price' => (string)$priceWithoutVat,
+                    'unit_price' => (string)$item->price, // Price WITH VAT when vat_price_mode=with_vat
                     'vat_rate' => (string)$vatRate,
                 ];
             })->toArray();
 
             // Add shipping as a line item if applicable
             if ($order->shipping > 0) {
-                $shippingWithoutVat = round($order->shipping / $vatMultiplier, 2);
-                
                 $lines[] = [
                     'name' => 'Doprava',
                     'quantity' => '1',
                     'unit_name' => 'ks',
-                    'unit_price' => (string)$shippingWithoutVat,
+                    'unit_price' => (string)$order->shipping, // Price WITH VAT
                     'vat_rate' => (string)$vatRate,
                 ];
             }
@@ -145,6 +140,7 @@ class FakturoidService
                 'taxable_fulfillment_due' => now()->format('Y-m-d'),
                 'due' => 14, // Splatnost 14 dní
                 'payment_method' => 'card', // Karta
+                'vat_price_mode' => 'with_vat', // Prices include VAT, Fakturoid calculates base price
                 'lines' => $lines,
                 'note' => 'Objednávka z e-shopu Kavi',
             ];
@@ -548,11 +544,10 @@ class FakturoidService
                 return null;
             }
 
-            // Calculate prices without VAT (subscription prices include VAT)
+            // Subscription prices include VAT, use vat_price_mode=with_vat
+            // With this mode, unit_price should contain the price WITH VAT
+            // Fakturoid will calculate the base price and VAT from it
             $vatRate = 21;
-            $vatMultiplier = 1 + ($vatRate / 100); // 1.21
-            
-            $totalWithoutVat = round($payment->amount / $vatMultiplier, 2);
             
             // Create single line for subscription
             $lines = [[
@@ -561,7 +556,7 @@ class FakturoidService
                     : ''),
                 'quantity' => '1',
                 'unit_name' => 'ks',
-                'unit_price' => (string)$totalWithoutVat,
+                'unit_price' => (string)$payment->amount, // Price WITH VAT when vat_price_mode=with_vat
                 'vat_rate' => (string)$vatRate,
             ]];
 
@@ -574,6 +569,7 @@ class FakturoidService
                 'taxable_fulfillment_due' => $payment->paid_at->format('Y-m-d'),
                 'due' => 0, // Already paid
                 'payment_method' => 'card',
+                'vat_price_mode' => 'with_vat', // Prices include VAT, Fakturoid calculates base price
                 'lines' => $lines,
                 'note' => 'Platba za předplatné',
             ];

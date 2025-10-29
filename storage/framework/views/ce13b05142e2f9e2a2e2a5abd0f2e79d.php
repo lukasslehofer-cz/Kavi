@@ -218,7 +218,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="<?php echo e(asset('images/kavi-logo-black.png')); ?>" alt="Kavi Coffee" class="logo" style="filter: invert(1) brightness(2);">
+                            <img src="<?php echo e(url('images/kavi-logo-black.png')); ?>" alt="Kavi Coffee" class="logo" style="filter: invert(1) brightness(2);">
                         </td>
                     </tr>
                     

@@ -13,10 +13,7 @@ use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // No auth middleware - supports guest checkout
 
     public function index()
     {
@@ -57,7 +54,7 @@ class CheckoutController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'phone' => 'required|string',
+            'phone' => auth()->check() ? 'required|string|max:20' : 'nullable|string|max:20',
             'billing_address' => 'required|string',
             'billing_city' => 'required|string',
             'billing_postal_code' => 'required|string',
@@ -66,6 +63,17 @@ class CheckoutController extends Controller
             'packeta_point_address' => 'nullable|string',
             'payment_method' => 'required|in:card,transfer',
         ]);
+
+        // Check for existing user if guest checkout
+        if (!auth()->check()) {
+            $existingUser = \App\Models\User::where('email', $request->email)->first();
+            
+            if ($existingUser) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Účet s tímto emailem již existuje. Prosím přihlaste se nebo použijte jiný email.');
+            }
+        }
 
         $cart = session()->get('cart', []);
 
@@ -102,7 +110,7 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
-                'user_id' => auth()->id(),
+                'user_id' => auth()->id() ?? null,
                 'subtotal' => $subtotal,
                 'shipping' => $shipping,
                 'tax' => $tax,
@@ -125,16 +133,18 @@ class CheckoutController extends Controller
                 'customer_notes' => $request->notes,
             ]);
 
-            // Save contact info, billing address and Packeta pickup point to user for future use
-            auth()->user()->update([
-                'phone' => $request->phone,
-                'address' => $request->billing_address,
-                'city' => $request->billing_city,
-                'postal_code' => $request->billing_postal_code,
-                'packeta_point_id' => $request->packeta_point_id,
-                'packeta_point_name' => $request->packeta_point_name,
-                'packeta_point_address' => $request->packeta_point_address,
-            ]);
+            // Save contact info, billing address and Packeta pickup point to user for future use (if authenticated)
+            if (auth()->check()) {
+                auth()->user()->update([
+                    'phone' => $request->phone ?? auth()->user()->phone,
+                    'address' => $request->billing_address,
+                    'city' => $request->billing_city,
+                    'postal_code' => $request->billing_postal_code,
+                    'packeta_point_id' => $request->packeta_point_id,
+                    'packeta_point_name' => $request->packeta_point_name,
+                    'packeta_point_address' => $request->packeta_point_address,
+                ]);
+            }
 
             foreach ($orderItems as $item) {
                 OrderItem::create([
@@ -152,6 +162,38 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // Create user account for guest orders
+            if (!auth()->check()) {
+                try {
+                    $existingUser = \App\Models\User::where('email', $request->email)->first();
+                    
+                    if (!$existingUser) {
+                        $newUser = \App\Models\User::create([
+                            'name' => $request->name,
+                            'email' => $request->email,
+                            'password' => \Hash::make(\Str::random(32)), // Random password
+                            'phone' => $request->phone ?? null,
+                            'address' => $request->billing_address,
+                            'city' => $request->billing_city,
+                            'postal_code' => $request->billing_postal_code,
+                            'packeta_point_id' => $request->packeta_point_id,
+                            'packeta_point_name' => $request->packeta_point_name,
+                            'packeta_point_address' => $request->packeta_point_address,
+                        ]);
+                        
+                        // Link order to the new user
+                        $order->update(['user_id' => $newUser->id]);
+                        
+                        \Log::info('Created user account for guest order', [
+                            'user_id' => $newUser->id,
+                            'order_id' => $order->id
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create user account for guest order: ' . $e->getMessage());
+                }
+            }
 
             // Generate invoice from Fakturoid (must happen BEFORE sending email)
             try {
@@ -190,7 +232,14 @@ class CheckoutController extends Controller
 
     public function confirmation(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
+        // If user is authenticated, check if order belongs to them
+        if (auth()->check() && $order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // If user is not authenticated, allow access to guest orders (user_id is null)
+        // In production, you might want to add a token-based verification here
+        if (!auth()->check() && $order->user_id !== null) {
             abort(403);
         }
 

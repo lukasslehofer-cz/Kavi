@@ -342,8 +342,11 @@ class StripeService
             return;
         }
 
-        if (!$userId) {
-            \Log::warning('No user_id in subscription metadata, cannot create subscription', [
+        // Support guest subscriptions (no user_id)
+        $guestEmail = $subscriptionData['metadata']['guest_email'] ?? null;
+        
+        if (!$userId && !$guestEmail) {
+            \Log::warning('No user_id or guest_email in subscription metadata, cannot create subscription', [
                 'stripe_subscription_id' => $subscriptionData['id'],
                 'customer' => $subscriptionData['customer'] ?? null,
             ]);
@@ -406,12 +409,58 @@ class StripeService
             $subscription = Subscription::create($subscriptionRecord);
             \Log::info('Subscription created successfully', ['id' => $subscription->id]);
             
+            // Create user account for guest subscriptions
+            if (!$userId && $guestEmail) {
+                try {
+                    $name = $subscription->shipping_address['name'] ?? 'Zákazník';
+                    
+                    // Check if user already exists (shouldn't, but just in case)
+                    $existingUser = User::where('email', $guestEmail)->first();
+                    
+                    if (!$existingUser) {
+                        $newUser = User::create([
+                            'name' => $name,
+                            'email' => $guestEmail,
+                            'password' => \Hash::make(\Str::random(32)), // Random password
+                            'phone' => $subscription->shipping_address['phone'] ?? null,
+                            'address' => $subscription->shipping_address['billing_address'] ?? null,
+                            'city' => $subscription->shipping_address['billing_city'] ?? null,
+                            'postal_code' => $subscription->shipping_address['billing_postal_code'] ?? null,
+                            'packeta_point_id' => $subscription->packeta_point_id ?? null,
+                            'packeta_point_name' => $subscription->packeta_point_name ?? null,
+                            'packeta_point_address' => $subscription->packeta_point_address ?? null,
+                        ]);
+                        
+                        // Link subscription to the new user
+                        $subscription->update(['user_id' => $newUser->id]);
+                        
+                        \Log::info('Created user account for guest subscription', [
+                            'user_id' => $newUser->id,
+                            'subscription_id' => $subscription->id
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create user account for guest subscription: ' . $e->getMessage());
+                }
+            }
+            
             // Send subscription confirmation email
             try {
-                $email = $subscription->shipping_address['email'] ?? $subscription->user->email ?? null;
+                // Get email from shipping address or user (support guest subscriptions)
+                $email = $subscription->shipping_address['email'] ?? null;
+                if (!$email && $subscription->user) {
+                    $email = $subscription->user->email;
+                }
+                
                 if ($email) {
                     \Mail::to($email)->send(new \App\Mail\SubscriptionConfirmation($subscription));
-                    \Log::info('Subscription confirmation email sent', ['subscription_id' => $subscription->id]);
+                    \Log::info('Subscription confirmation email sent', [
+                        'subscription_id' => $subscription->id,
+                        'email' => $email,
+                        'is_guest' => $subscription->user_id === null
+                    ]);
+                } else {
+                    \Log::warning('No email found for subscription confirmation', ['subscription_id' => $subscription->id]);
                 }
             } catch (\Exception $e) {
                 \Log::error('Failed to send subscription confirmation email: ' . $e->getMessage());

@@ -304,15 +304,25 @@
                         </div>
                         <div>
                             <div class="font-medium text-gray-900 mb-1">Správa předplatného</div>
+                            <?php if(auth()->guard()->check()): ?>
                             <div class="text-sm text-gray-600 font-light">V dashboardu můžete kdykoli upravit nebo zrušit předplatné</div>
+                            <?php else: ?>
+                            <div class="text-sm text-gray-600 font-light">Pro správu předplatného si vytvořte účet - link jsme vám poslali na email</div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-3">
+                    <?php if(auth()->guard()->check()): ?>
                     <a href="<?php echo e(route('dashboard.subscription')); ?>" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
                         Zobrazit předplatné
                     </a>
+                    <?php else: ?>
+                    <a href="<?php echo e(route('login')); ?>" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                        Přihlásit se / Vytvořit účet
+                    </a>
+                    <?php endif; ?>
                     
                     <a href="<?php echo e(route('home')); ?>" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
                         Zpět na homepage

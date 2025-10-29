@@ -13,8 +13,13 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
+        // Store redirect URL in session if provided
+        if ($request->has('redirect')) {
+            session(['url.intended' => $request->input('redirect')]);
+        }
+        
         return view('auth.login');
     }
 

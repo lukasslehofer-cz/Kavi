@@ -464,3 +464,462 @@
 [2025-10-29 00:37:52] local.INFO: Fakturoid invoice created for subscription payment {"payment_id":4,"subscription_id":8} 
 [2025-10-29 00:38:27] local.INFO: Stripe webhook received {"type":"invoice_payment.paid","id":"evt_1SNMT9K28RZARKowgHYLZtxM"} 
 [2025-10-29 00:38:27] local.INFO: Unhandled webhook event type: invoice_payment.paid  
+[2025-10-29 01:22:30] local.ERROR: SQLSTATE[HY000] [2002] Operation not permitted (Connection: mysql, SQL: select table_name as `name`, (data_length + index_length) as `size`, table_comment as `comment`, engine as `engine`, table_collation as `collation` from information_schema.tables where table_schema = 'kavi' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED') order by table_name) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 2002): SQLSTATE[HY000] [2002] Operation not permitted (Connection: mysql, SQL: select table_name as `name`, (data_length + index_length) as `size`, table_comment as `comment`, engine as `engine`, table_collation as `collation` from information_schema.tables where table_schema = 'kavi' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED') order by table_name) at /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php:829)
+[stacktrace]
+#0 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate\\Database\\Connection->runQueryCallback('select table_na...', Array, Object(Closure))
+#1 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(414): Illuminate\\Database\\Connection->run('select table_na...', Array, Object(Closure))
+#2 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(401): Illuminate\\Database\\Connection->select('select table_na...', Array, false)
+#3 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Schema/MySqlBuilder.php(41): Illuminate\\Database\\Connection->selectFromWriteConnection('select table_na...')
+#4 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php(165): Illuminate\\Database\\Schema\\MySqlBuilder->getTables(false)
+#5 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Migrations/DatabaseMigrationRepository.php(184): Illuminate\\Database\\Schema\\Builder->hasTable('migrations')
+#6 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(727): Illuminate\\Database\\Migrations\\DatabaseMigrationRepository->repositoryExists()
+#7 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(140): Illuminate\\Database\\Migrations\\Migrator->repositoryExists()
+#8 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Support/helpers.php(261): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->{closure:Illuminate\\Database\\Console\\Migrations\\MigrateCommand::repositoryExists():140}(1)
+#9 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(140): retry(1, Object(Closure), 0, Object(Closure))
+#10 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(116): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->repositoryExists()
+#11 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(84): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->prepareDatabase()
+#12 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(641): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->{closure:Illuminate\\Database\\Console\\Migrations\\MigrateCommand::handle():83}()
+#13 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(83): Illuminate\\Database\\Migrations\\Migrator->usingConnection(NULL, Object(Closure))
+#14 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->handle()
+#15 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/Util.php(41): Illuminate\\Container\\BoundMethod::{closure:Illuminate\\Container\\BoundMethod::call():35}()
+#16 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#17 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#18 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#19 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate\\Container\\Container->call(Array)
+#20 /Users/lukas/Kavi/vendor/symfony/console/Command/Command.php(326): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#21 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#22 /Users/lukas/Kavi/vendor/symfony/console/Application.php(1096): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#23 /Users/lukas/Kavi/vendor/symfony/console/Application.php(324): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Migrations\\MigrateCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#24 /Users/lukas/Kavi/vendor/symfony/console/Application.php(175): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#25 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(201): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#26 /Users/lukas/Kavi/artisan(24): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#27 {main}
+
+[previous exception] [object] (PDOException(code: 2002): SQLSTATE[HY000] [2002] Operation not permitted at /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:65)
+[stacktrace]
+#0 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(65): PDO->__construct('mysql:host=127....', 'kavi', Object(SensitiveParameterValue), Array)
+#1 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(44): Illuminate\\Database\\Connectors\\Connector->createPdoConnection('mysql:host=127....', 'kavi', 'secret', Array)
+#2 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\\Database\\Connectors\\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\\Database\\Connectors\\MySqlConnector->connect(Array)
+#4 [internal function]: Illuminate\\Database\\Connectors\\ConnectionFactory->{closure:Illuminate\\Database\\Connectors\\ConnectionFactory::createPdoResolverWithHosts():179}()
+#5 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(1339): call_user_func(Object(Closure))
+#6 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(528): Illuminate\\Database\\Connection->getPdo()
+#7 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(423): Illuminate\\Database\\Connection->getPdoForSelect(false)
+#8 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(816): Illuminate\\Database\\Connection->{closure:Illuminate\\Database\\Connection::select():414}('select table_na...', Array)
+#9 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate\\Database\\Connection->runQueryCallback('select table_na...', Array, Object(Closure))
+#10 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(414): Illuminate\\Database\\Connection->run('select table_na...', Array, Object(Closure))
+#11 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(401): Illuminate\\Database\\Connection->select('select table_na...', Array, false)
+#12 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Schema/MySqlBuilder.php(41): Illuminate\\Database\\Connection->selectFromWriteConnection('select table_na...')
+#13 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php(165): Illuminate\\Database\\Schema\\MySqlBuilder->getTables(false)
+#14 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Migrations/DatabaseMigrationRepository.php(184): Illuminate\\Database\\Schema\\Builder->hasTable('migrations')
+#15 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(727): Illuminate\\Database\\Migrations\\DatabaseMigrationRepository->repositoryExists()
+#16 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(140): Illuminate\\Database\\Migrations\\Migrator->repositoryExists()
+#17 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Support/helpers.php(261): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->{closure:Illuminate\\Database\\Console\\Migrations\\MigrateCommand::repositoryExists():140}(1)
+#18 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(140): retry(1, Object(Closure), 0, Object(Closure))
+#19 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(116): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->repositoryExists()
+#20 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(84): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->prepareDatabase()
+#21 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(641): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->{closure:Illuminate\\Database\\Console\\Migrations\\MigrateCommand::handle():83}()
+#22 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php(83): Illuminate\\Database\\Migrations\\Migrator->usingConnection(NULL, Object(Closure))
+#23 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate\\Database\\Console\\Migrations\\MigrateCommand->handle()
+#24 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/Util.php(41): Illuminate\\Container\\BoundMethod::{closure:Illuminate\\Container\\BoundMethod::call():35}()
+#25 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#26 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#27 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#28 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate\\Container\\Container->call(Array)
+#29 /Users/lukas/Kavi/vendor/symfony/console/Command/Command.php(326): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#30 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#31 /Users/lukas/Kavi/vendor/symfony/console/Application.php(1096): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#32 /Users/lukas/Kavi/vendor/symfony/console/Application.php(324): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Migrations\\MigrateCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#33 /Users/lukas/Kavi/vendor/symfony/console/Application.php(175): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#34 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(201): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#35 /Users/lukas/Kavi/artisan(24): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#36 {main}
+"} 
+[2025-10-29 01:28:16] local.INFO: === FORMULÁŘ ODESLÁN ===  
+[2025-10-29 01:28:16] local.INFO: URL: http://localhost/predplatne/konfigurator/checkout  
+[2025-10-29 01:28:16] local.INFO: Method: POST  
+[2025-10-29 01:28:16] local.INFO: Raw POST data: {"_token":"GRvbq9NqM2njQZmkRtl5JjscfipUtYbuS0w434fB","mix":{"espresso":"0","filter":"0"},"amount":"3","type":"filter","frequency":"1"} 
+[2025-10-29 01:28:16] local.INFO: Headers: {"cookie":["XSRF-TOKEN=eyJpdiI6Ik5SMEZiYkJTVXJ6RzlraDlMMVRaVFE9PSIsInZhbHVlIjoiWWIxM2dDRlgydGJKeVlMdEhhRkIwK3orK1l5NStJejVsVW9HNm5ZL1dJTXI0TUlPdU54RlRFTjl0V2VaN3lYcitTdFVFSm9pVWFrTlRMRFZNNk1OcFlRRGJTaGlUUFArbm15VkxyR1V2VGhsVmRZbkFBa1RiYS81bjRsSTFjVjIiLCJtYWMiOiJiZmI5NDBhMTRhYzFiMDBkN2Y5NzllZmUwYTkxNzYyNTU4NmYxN2NlMDJjMjQwYWVjMTI3YzVmMzdmYzM3ZDg5IiwidGFnIjoiIn0%3D; kavi_coffee_session=eyJpdiI6Ikk5L0NHQVVUS3N3ZEpVTkxEQ0NGTWc9PSIsInZhbHVlIjoiTEdSaGh4UndVZlpoMkhLT25pRkcvdWxnMTlLOUZPUHpCNExiMXl0Vi9vZkE5cGVQMzFlTVZ3bUxDWFRsd1NFZEpqL2UzTTZ0NHMyT1BGeXZja0tDMlhENnlEcnIwOGFYaHBWTE5kcjB6VU5mdWVvaHp5N2E1MU5IUml2VEpDQ1UiLCJtYWMiOiJiODVmN2RkMTgwZjVhZGFjMTlkMWY2NTJmMzgxNzI2MDBlMjMxNzMyNDY2NmI2YmU3NWJmMGVlZWVhYWQ1ZTBmIiwidGFnIjoiIn0%3D"],"accept-language":["cs-CZ,cs;q=0.9,en;q=0.8"],"accept-encoding":["gzip, deflate, br, zstd"],"referer":["http://localhost/predplatne"],"sec-fetch-dest":["document"],"sec-fetch-user":["?1"],"sec-fetch-mode":["navigate"],"sec-fetch-site":["same-origin"],"accept":["text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"],"user-agent":["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"],"upgrade-insecure-requests":["1"],"content-type":["application/x-www-form-urlencoded"],"origin":["http://localhost"],"sec-ch-ua-platform":["\"macOS\""],"sec-ch-ua-mobile":["?0"],"sec-ch-ua":["\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\""],"cache-control":["max-age=0"],"content-length":["118"],"connection":["keep-alive"],"host":["localhost"]} 
+[2025-10-29 01:28:16] local.INFO: Cookies: {"XSRF-TOKEN":"GRvbq9NqM2njQZmkRtl5JjscfipUtYbuS0w434fB","kavi_coffee_session":"eiJsTkB6GgPDntTPbzgcbP530grI3PsNduk8D903"} 
+[2025-10-29 01:28:16] local.INFO: Validation passed successfully {"validated":{"amount":"3","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false}} 
+[2025-10-29 01:28:16] local.INFO: Configuration stored in session. Redirecting to checkout. {"config":{"amount":"3","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false},"price":1100.0,"price_without_vat":909.09,"vat":190.91} 
+[2025-10-29 01:34:08] local.INFO: Stripe webhook received {"type":"checkout.session.completed","id":"evt_1SNNL2K28RZARKowQyf4TEL3"} 
+[2025-10-29 01:34:08] local.INFO: Stripe webhook received {"type":"charge.succeeded","id":"evt_3SNNKzK28RZARKow0T5I7h2m"} 
+[2025-10-29 01:34:08] local.INFO: Unhandled webhook event type: charge.succeeded  
+[2025-10-29 01:34:08] local.INFO: Stripe webhook received {"type":"payment_method.attached","id":"evt_1SNNL2K28RZARKow3LhXb8xf"} 
+[2025-10-29 01:34:08] local.INFO: Unhandled webhook event type: payment_method.attached  
+[2025-10-29 01:34:09] local.INFO: Stripe webhook received {"type":"customer.updated","id":"evt_1SNNL2K28RZARKowAD0bNRBK"} 
+[2025-10-29 01:34:09] local.INFO: Stripe webhook received {"type":"customer.created","id":"evt_1SNNL2K28RZARKowT0PPdQww"} 
+[2025-10-29 01:34:09] local.INFO: Unhandled webhook event type: customer.created  
+[2025-10-29 01:34:09] local.INFO: Unhandled webhook event type: customer.updated  
+[2025-10-29 01:34:09] local.INFO: Stripe webhook received {"type":"customer.subscription.created","id":"evt_1SNNL3K28RZARKowxkVivV4U"} 
+[2025-10-29 01:34:09] local.INFO: handleSubscriptionCreated called {"subscription_id":"sub_1SNNKyK28RZARKowFNOifdXz","metadata":{"packeta_point_name":"Z-BOX Praha 6, Dejvice, Pod Paťankou 2743/1b","packeta_point_address":"Pod Paťankou 2743/1b, 160 00 Praha","shipping_address":"{\"name\":\"Luk\\u00e1\\u0161 \\u0160lehofer\",\"email\":\"lukas.slehofer@gmail.com\",\"phone\":null,\"billing_address\":\"Amforov\\u00e1 9\",\"billing_city\":\"Praha 5\",\"billing_postal_code\":\"15500\",\"country\":\"CZ\"}","configured_price":"1100","guest_email":"lukas.slehofer@gmail.com","configuration":"{\"amount\":\"3\",\"type\":\"filter\",\"mix\":{\"espresso\":\"0\",\"filter\":\"0\"},\"frequency\":\"1\",\"isDecaf\":false}","packeta_point_id":"34198"},"customer":"cus_TK1NNuVziwTLgP"} 
+[2025-10-29 01:34:09] local.INFO: Parsed metadata {"user_id":null,"plan_id":null,"configuration":{"amount":"3","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false}} 
+[2025-10-29 01:34:09] local.WARNING: No user_id in subscription metadata, cannot create subscription {"stripe_subscription_id":"sub_1SNNKyK28RZARKowFNOifdXz","customer":"cus_TK1NNuVziwTLgP"} 
+[2025-10-29 01:34:09] local.INFO: Stripe webhook received {"type":"customer.subscription.updated","id":"evt_1SNNL3K28RZARKow6gidbkbv"} 
+[2025-10-29 01:34:09] local.INFO: Stripe webhook received {"type":"payment_intent.succeeded","id":"evt_3SNNKzK28RZARKow0Ydf2qgG"} 
+[2025-10-29 01:34:09] local.INFO: Unhandled webhook event type: payment_intent.succeeded  
+[2025-10-29 01:34:09] local.INFO: Stripe webhook received {"type":"payment_intent.created","id":"evt_3SNNKzK28RZARKow0r7LskTe"} 
+[2025-10-29 01:34:09] local.INFO: Unhandled webhook event type: payment_intent.created  
+[2025-10-29 01:34:09] local.INFO: Stripe webhook received {"type":"invoice.created","id":"evt_1SNNL3K28RZARKowHGzMJ6cr"} 
+[2025-10-29 01:34:09] local.INFO: Unhandled webhook event type: invoice.created  
+[2025-10-29 01:34:09] local.INFO: Stripe webhook received {"type":"invoice.finalized","id":"evt_1SNNL3K28RZARKowLHBcRHFw"} 
+[2025-10-29 01:34:09] local.INFO: Unhandled webhook event type: invoice.finalized  
+[2025-10-29 01:34:10] local.INFO: Stripe webhook received {"type":"invoice.paid","id":"evt_1SNNL3K28RZARKowxuZ4jgA6"} 
+[2025-10-29 01:34:10] local.INFO: Unhandled webhook event type: invoice.paid  
+[2025-10-29 01:34:10] local.INFO: Stripe webhook received {"type":"invoice.updated","id":"evt_1SNNL3K28RZARKowfesxU3Jt"} 
+[2025-10-29 01:34:10] local.INFO: Unhandled webhook event type: invoice.updated  
+[2025-10-29 01:34:10] local.INFO: Stripe webhook received {"type":"invoice.payment_succeeded","id":"evt_1SNNL3K28RZARKow6n8974Wc"} 
+[2025-10-29 01:34:50] local.INFO: Stripe webhook received {"type":"invoice_payment.paid","id":"evt_1SNNLiK28RZARKow0rPaQZI3"} 
+[2025-10-29 01:34:50] local.INFO: Unhandled webhook event type: invoice_payment.paid  
+[2025-10-29 01:39:31] local.INFO: === FORMULÁŘ ODESLÁN ===  
+[2025-10-29 01:39:31] local.INFO: URL: http://localhost/predplatne/konfigurator/checkout  
+[2025-10-29 01:39:31] local.INFO: Method: POST  
+[2025-10-29 01:39:31] local.INFO: Raw POST data: {"_token":"GRvbq9NqM2njQZmkRtl5JjscfipUtYbuS0w434fB","mix":{"espresso":"0","filter":"0"},"amount":"4","type":"filter","frequency":"1"} 
+[2025-10-29 01:39:31] local.INFO: Headers: {"cookie":["XSRF-TOKEN=eyJpdiI6IjM2cHlUekpVOUxjd050SnR6L2pFdVE9PSIsInZhbHVlIjoiQ0hpMUtrWlhCeTdNUWJjZ2J3OXFVNS9MTnFFWWhGdWp2U3hZdUR6dDhpWUJVTk5lMklmbmdvRXlNblVJK3NJSHV3L2xLdElGOWdDdjZHTjF1eWFsdHl3NGltV0tlVUl2STB6NkR5Z2lZbDMrQnZUTmlpY3dhb2hMUjN4YWhHa3IiLCJtYWMiOiJhNzJhYmJjZThkZTIwYWU1MmZjZTY5NmIzZmFjYzYwYzJlNjZiZjY0YzRhM2E5MTVlZWVhOWNhODZlZmE0OGRlIiwidGFnIjoiIn0%3D; kavi_coffee_session=eyJpdiI6IkYxeFU5ekNWK1ArdkpLNzJSN2g2Wmc9PSIsInZhbHVlIjoiYjRPbDIzS25YNm9PTXlLNTAzTnV1ZjRsWFFwMzdmOUV6OFBkZ2NKb1NScjQvVzBMTmt5K2pIUENSMFRzc1VaTkZhdkYrRlhYM1JzbjZsMWEzM0plc0RJOVQ2bWo3RnJGamw5WGZsREdhQjR3Uk4wUDNSeXcrOVFnblNzYWlTb1ciLCJtYWMiOiJiMDQ4ZDQ4ZjdmNzg2ZTAxZTM5MjEyOWY5MWUxNTM3NDBjZWNmYWE0NWNmOTc3N2FiYjc2ZGEyNjAxZjRlZWVlIiwidGFnIjoiIn0%3D"],"accept-language":["cs-CZ,cs;q=0.9,en;q=0.8"],"accept-encoding":["gzip, deflate, br, zstd"],"referer":["http://localhost/predplatne"],"sec-fetch-dest":["document"],"sec-fetch-user":["?1"],"sec-fetch-mode":["navigate"],"sec-fetch-site":["same-origin"],"accept":["text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"],"user-agent":["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"],"upgrade-insecure-requests":["1"],"content-type":["application/x-www-form-urlencoded"],"origin":["http://localhost"],"sec-ch-ua-platform":["\"macOS\""],"sec-ch-ua-mobile":["?0"],"sec-ch-ua":["\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\""],"cache-control":["max-age=0"],"content-length":["118"],"connection":["keep-alive"],"host":["localhost"]} 
+[2025-10-29 01:39:31] local.INFO: Cookies: {"XSRF-TOKEN":"GRvbq9NqM2njQZmkRtl5JjscfipUtYbuS0w434fB","kavi_coffee_session":"eiJsTkB6GgPDntTPbzgcbP530grI3PsNduk8D903"} 
+[2025-10-29 01:39:31] local.INFO: Validation passed successfully {"validated":{"amount":"4","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false}} 
+[2025-10-29 01:39:31] local.INFO: Configuration stored in session. Redirecting to checkout. {"config":{"amount":"4","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false},"price":1350.0,"price_without_vat":1115.7,"vat":234.3} 
+[2025-10-29 01:40:39] local.INFO: Stripe webhook received {"type":"checkout.session.completed","id":"evt_1SNNRKK28RZARKow5BYi1Vtx"} 
+[2025-10-29 01:40:39] local.INFO: Stripe webhook received {"type":"charge.succeeded","id":"evt_3SNNRHK28RZARKow0ojFwVuH"} 
+[2025-10-29 01:40:39] local.INFO: Stripe webhook received {"type":"payment_method.attached","id":"evt_1SNNRKK28RZARKowjPMOmi2f"} 
+[2025-10-29 01:40:39] local.INFO: Unhandled webhook event type: charge.succeeded  
+[2025-10-29 01:40:39] local.INFO: Unhandled webhook event type: payment_method.attached  
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"customer.updated","id":"evt_1SNNRLK28RZARKowwuThoMV3"} 
+[2025-10-29 01:40:40] local.INFO: Unhandled webhook event type: customer.updated  
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"customer.created","id":"evt_1SNNRLK28RZARKowk8WO5GVw"} 
+[2025-10-29 01:40:40] local.INFO: Unhandled webhook event type: customer.created  
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"customer.subscription.created","id":"evt_1SNNRLK28RZARKowLWdIv5ro"} 
+[2025-10-29 01:40:40] local.INFO: handleSubscriptionCreated called {"subscription_id":"sub_1SNNRHK28RZARKowqTkqOcCI","metadata":{"packeta_point_name":"Z-BOX Praha 6, Dejvice, Pod Paťankou 2743/1b","packeta_point_address":"Pod Paťankou 2743/1b, 160 00 Praha","shipping_address":"{\"name\":\"Luk\\u00e1\\u0161 \\u0160lehofer\",\"email\":\"lukas.slehofer@gmail.com\",\"phone\":\"+420777110957\",\"billing_address\":\"Amforov\\u00e1 9\",\"billing_city\":\"Praha 5\",\"billing_postal_code\":\"15500\",\"country\":\"CZ\"}","configured_price":"1350","guest_email":"lukas.slehofer@gmail.com","configuration":"{\"amount\":\"4\",\"type\":\"filter\",\"mix\":{\"espresso\":\"0\",\"filter\":\"0\"},\"frequency\":\"1\",\"isDecaf\":false}","packeta_point_id":"34198"},"customer":"cus_TK1UN87WTefbI4"} 
+[2025-10-29 01:40:40] local.INFO: Parsed metadata {"user_id":null,"plan_id":null,"configuration":{"amount":"4","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false}} 
+[2025-10-29 01:40:40] local.INFO: Creating subscription record {"subscription_number":"SUB-0002","user_id":null,"stripe_subscription_id":"sub_1SNNRHK28RZARKowqTkqOcCI","status":"active","starts_at":"2025-10-29 01:40:40","next_billing_date":"2025-12-15 01:40:40","configuration":{"amount":"4","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false},"configured_price":"1350","frequency_months":"1","shipping_address":{"name":"Lukáš Šlehofer","email":"lukas.slehofer@gmail.com","phone":"+420777110957","billing_address":"Amforová 9","billing_city":"Praha 5","billing_postal_code":"15500","country":"CZ"},"packeta_point_id":"34198","packeta_point_name":"Z-BOX Praha 6, Dejvice, Pod Paťankou 2743/1b","packeta_point_address":"Pod Paťankou 2743/1b, 160 00 Praha"} 
+[2025-10-29 01:40:40] local.INFO: Subscription created successfully {"id":9} 
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"customer.subscription.updated","id":"evt_1SNNRLK28RZARKowgW3LmwI8"} 
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"payment_intent.succeeded","id":"evt_3SNNRHK28RZARKow0GXVePyB"} 
+[2025-10-29 01:40:40] local.INFO: Unhandled webhook event type: payment_intent.succeeded  
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"invoice.created","id":"evt_1SNNRLK28RZARKowwyVLncnh"} 
+[2025-10-29 01:40:40] local.INFO: Unhandled webhook event type: invoice.created  
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"invoice.finalized","id":"evt_1SNNRLK28RZARKowXFiOevAL"} 
+[2025-10-29 01:40:40] local.INFO: Unhandled webhook event type: invoice.finalized  
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"invoice.updated","id":"evt_1SNNRLK28RZARKowknabUmjk"} 
+[2025-10-29 01:40:40] local.INFO: Unhandled webhook event type: invoice.updated  
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"invoice.paid","id":"evt_1SNNRMK28RZARKowP8OFVSsk"} 
+[2025-10-29 01:40:40] local.INFO: Unhandled webhook event type: invoice.paid  
+[2025-10-29 01:40:40] local.INFO: Stripe webhook received {"type":"invoice.payment_succeeded","id":"evt_1SNNRMK28RZARKowYj1LdwoZ"} 
+[2025-10-29 01:40:41] local.INFO: Stripe webhook received {"type":"payment_intent.created","id":"evt_3SNNRHK28RZARKow0RJYp2na"} 
+[2025-10-29 01:40:41] local.INFO: Unhandled webhook event type: payment_intent.created  
+[2025-10-29 01:40:41] local.INFO: Search returned subjects but none with matching email {"searched_email":"lukas.slehofer@gmail.com","results_count":40} 
+[2025-10-29 01:40:41] local.INFO: Fakturoid subject created {"subject_id":28669452,"name":"Lukáš Šlehofer"} 
+[2025-10-29 01:40:41] local.INFO: Fakturoid invoice created for subscription {"subscription_id":9,"payment_id":5,"invoice_id":52162819,"invoice_number":"K250051"} 
+[2025-10-29 01:40:42] local.INFO: Subscription confirmation email sent {"subscription_id":9,"email":"lukas.slehofer@gmail.com","is_guest":true} 
+[2025-10-29 01:40:42] local.INFO: Fakturoid subscription invoice marked as paid {"invoice_id":52162819} 
+[2025-10-29 01:40:42] local.INFO: Fakturoid subscription invoice PDF downloaded {"payment_id":5,"invoice_id":52162819,"filename":"invoices/subscription_9_payment_5_invoice_52162819.pdf"} 
+[2025-10-29 01:40:42] local.INFO: Fakturoid invoice created for subscription payment {"payment_id":5,"subscription_id":9} 
+[2025-10-29 01:41:13] local.INFO: Stripe webhook received {"type":"invoice_payment.paid","id":"evt_1SNNRsK28RZARKowNsgfosWn"} 
+[2025-10-29 01:41:13] local.INFO: Unhandled webhook event type: invoice_payment.paid  
+[2025-10-29 01:49:16] local.INFO: === FORMULÁŘ ODESLÁN ===  
+[2025-10-29 01:49:16] local.INFO: URL: http://localhost/predplatne/konfigurator/checkout  
+[2025-10-29 01:49:16] local.INFO: Method: POST  
+[2025-10-29 01:49:16] local.INFO: Raw POST data: {"_token":"GRvbq9NqM2njQZmkRtl5JjscfipUtYbuS0w434fB","mix":{"espresso":"3","filter":"1"},"amount":"4","type":"mix","isDecaf":"1","frequency":"1"} 
+[2025-10-29 01:49:16] local.INFO: Headers: {"cookie":["XSRF-TOKEN=eyJpdiI6IkJ3NkRHUUxkNXJtNDNXSktwTTQxRmc9PSIsInZhbHVlIjoielh4TUJFQjFGSXltUlpybFlvL1VXTlVPWmtWeDZCZnJSZzUwbk5XZ2lUQzVPbE1vNXA4SUJBZlRLYU9vMGMzM0tZV041RHhreG9NRXBwU21KM0FrWTk2QW5qb1J0Ym5EbWhvdzQ2Y1ZpZTdMNXhHK2pwanlwOHNxY2dnNHRsdDgiLCJtYWMiOiI4NTdiYWUxNDdhZTc1ZmY1NmQ5NWEzODQyZGJkMDBlNjg5YzQ2MjcyYjdjNzEzOTAwZGU2ZGNmZWJiZWU1NmMyIiwidGFnIjoiIn0%3D; kavi_coffee_session=eyJpdiI6IlBtUDhDeHNhUEV4ZncxNWxzSWhRRUE9PSIsInZhbHVlIjoiQTlKUkVXV2l2Q3BiSy9rLyt6MFVnWmpUR0lDbFAwVE96ZzVTVExWMHRFRHc2bFBveXVQNGVLUVNaSzFTaTU5aFMyejVCSGovZVRjMmVYbEtmNXk3U1BLWG5va0tONWJmb2Q0WGpSYXNIYTdLaGRLd0ZUWHkweWljQmc2T3pqbGkiLCJtYWMiOiI1Mzg3Y2MzNmRkNTkzYzg4MjY0YzhkM2ViNTQzMzUzZGMxMjA0MGNkZDkwODZiNjAxN2E5NGRjYmU4OGIzZDc1IiwidGFnIjoiIn0%3D"],"accept-language":["cs-CZ,cs;q=0.9,en;q=0.8"],"accept-encoding":["gzip, deflate, br, zstd"],"referer":["http://localhost/predplatne"],"sec-fetch-dest":["document"],"sec-fetch-user":["?1"],"sec-fetch-mode":["navigate"],"sec-fetch-site":["same-origin"],"accept":["text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"],"user-agent":["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"],"upgrade-insecure-requests":["1"],"content-type":["application/x-www-form-urlencoded"],"origin":["http://localhost"],"sec-ch-ua-platform":["\"macOS\""],"sec-ch-ua-mobile":["?0"],"sec-ch-ua":["\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\""],"cache-control":["max-age=0"],"content-length":["125"],"connection":["keep-alive"],"host":["localhost"]} 
+[2025-10-29 01:49:16] local.INFO: Cookies: {"XSRF-TOKEN":"GRvbq9NqM2njQZmkRtl5JjscfipUtYbuS0w434fB","kavi_coffee_session":"eiJsTkB6GgPDntTPbzgcbP530grI3PsNduk8D903"} 
+[2025-10-29 01:49:16] local.INFO: Validation passed successfully {"validated":{"amount":"4","type":"mix","isDecaf":true,"mix":{"espresso":"3","filter":"1"},"frequency":"1"}} 
+[2025-10-29 01:49:16] local.INFO: Configuration stored in session. Redirecting to checkout. {"config":{"amount":"4","type":"mix","isDecaf":true,"mix":{"espresso":"3","filter":"1"},"frequency":"1"},"price":1450.0,"price_without_vat":1198.35,"vat":251.65} 
+[2025-10-29 01:50:09] local.INFO: Stripe webhook received {"type":"payment_method.attached","id":"evt_1SNNaXK28RZARKowM7GMAPNW"} 
+[2025-10-29 01:50:09] local.INFO: Unhandled webhook event type: payment_method.attached  
+[2025-10-29 01:50:09] local.INFO: Stripe webhook received {"type":"charge.succeeded","id":"evt_3SNNaTK28RZARKow0cdOInho"} 
+[2025-10-29 01:50:09] local.INFO: Unhandled webhook event type: charge.succeeded  
+[2025-10-29 01:50:09] local.INFO: Stripe webhook received {"type":"checkout.session.completed","id":"evt_1SNNaXK28RZARKowOwLohQM9"} 
+[2025-10-29 01:50:09] local.INFO: Stripe webhook received {"type":"customer.created","id":"evt_1SNNaXK28RZARKow0fnqbf06"} 
+[2025-10-29 01:50:09] local.INFO: Unhandled webhook event type: customer.created  
+[2025-10-29 01:50:09] local.INFO: Stripe webhook received {"type":"customer.updated","id":"evt_1SNNaXK28RZARKowcP30HC4e"} 
+[2025-10-29 01:50:09] local.INFO: Unhandled webhook event type: customer.updated  
+[2025-10-29 01:50:09] local.INFO: Stripe webhook received {"type":"customer.subscription.updated","id":"evt_1SNNaXK28RZARKowUd8px5mw"} 
+[2025-10-29 01:50:09] local.INFO: Stripe webhook received {"type":"customer.subscription.created","id":"evt_1SNNaXK28RZARKowlqJAKCP0"} 
+[2025-10-29 01:50:09] local.INFO: handleSubscriptionCreated called {"subscription_id":"sub_1SNNaSK28RZARKowMYXLUZ2j","metadata":{"packeta_point_id":"34198","packeta_point_address":"Pod Paťankou 2743/1b, 160 00 Praha","shipping_address":"{\"name\":\"Luk\\u00e1\\u0161 \\u0160lehofer\",\"email\":\"lukas.slehofer@gmail.com\",\"phone\":\"+420777110957\",\"billing_address\":\"Amforov\\u00e1 9\",\"billing_city\":\"Praha 5\",\"billing_postal_code\":\"15500\",\"country\":\"CZ\"}","configuration":"{\"amount\":\"4\",\"type\":\"mix\",\"isDecaf\":true,\"mix\":{\"espresso\":\"3\",\"filter\":\"1\"},\"frequency\":\"1\"}","configured_price":"1450","guest_email":"lukas.slehofer@gmail.com","packeta_point_name":"Z-BOX Praha 6, Dejvice, Pod Paťankou 2743/1b"},"customer":"cus_TK1dVeGVHrwgqa"} 
+[2025-10-29 01:50:09] local.INFO: Parsed metadata {"user_id":null,"plan_id":null,"configuration":{"amount":"4","type":"mix","isDecaf":true,"mix":{"espresso":"3","filter":"1"},"frequency":"1"}} 
+[2025-10-29 01:50:09] local.INFO: Creating subscription record {"subscription_number":"SUB-0003","user_id":null,"stripe_subscription_id":"sub_1SNNaSK28RZARKowMYXLUZ2j","status":"active","starts_at":"2025-10-29 01:50:09","next_billing_date":"2025-12-15 01:50:09","configuration":{"amount":"4","type":"mix","isDecaf":true,"mix":{"espresso":"3","filter":"1"},"frequency":"1"},"configured_price":"1450","frequency_months":"1","shipping_address":{"name":"Lukáš Šlehofer","email":"lukas.slehofer@gmail.com","phone":"+420777110957","billing_address":"Amforová 9","billing_city":"Praha 5","billing_postal_code":"15500","country":"CZ"},"packeta_point_id":"34198","packeta_point_name":"Z-BOX Praha 6, Dejvice, Pod Paťankou 2743/1b","packeta_point_address":"Pod Paťankou 2743/1b, 160 00 Praha"} 
+[2025-10-29 01:50:09] local.INFO: Subscription created successfully {"id":10} 
+[2025-10-29 01:50:10] local.INFO: Stripe webhook received {"type":"payment_intent.succeeded","id":"evt_3SNNaTK28RZARKow0TRU4mFG"} 
+[2025-10-29 01:50:10] local.INFO: Unhandled webhook event type: payment_intent.succeeded  
+[2025-10-29 01:50:10] local.INFO: Stripe webhook received {"type":"payment_intent.created","id":"evt_3SNNaTK28RZARKow0N2sF6sY"} 
+[2025-10-29 01:50:10] local.INFO: Unhandled webhook event type: payment_intent.created  
+[2025-10-29 01:50:10] local.INFO: Stripe webhook received {"type":"invoice.created","id":"evt_1SNNaXK28RZARKowMtfYolZ3"} 
+[2025-10-29 01:50:10] local.INFO: Unhandled webhook event type: invoice.created  
+[2025-10-29 01:50:10] local.INFO: Stripe webhook received {"type":"invoice.finalized","id":"evt_1SNNaYK28RZARKowCJ8ikAEj"} 
+[2025-10-29 01:50:10] local.INFO: Unhandled webhook event type: invoice.finalized  
+[2025-10-29 01:50:10] local.INFO: Stripe webhook received {"type":"invoice.updated","id":"evt_1SNNaYK28RZARKowSyRlZGs4"} 
+[2025-10-29 01:50:10] local.INFO: Unhandled webhook event type: invoice.updated  
+[2025-10-29 01:50:10] local.INFO: Stripe webhook received {"type":"invoice.paid","id":"evt_1SNNaYK28RZARKowacKmc4Gr"} 
+[2025-10-29 01:50:10] local.INFO: Unhandled webhook event type: invoice.paid  
+[2025-10-29 01:50:10] local.INFO: Stripe webhook received {"type":"invoice.payment_succeeded","id":"evt_1SNNaYK28RZARKow0z6zeSnP"} 
+[2025-10-29 01:50:11] local.INFO: Search returned subjects but none with matching email {"searched_email":"lukas.slehofer@gmail.com","results_count":40} 
+[2025-10-29 01:50:11] local.INFO: Fakturoid subject created {"subject_id":28669472,"name":"Lukáš Šlehofer"} 
+[2025-10-29 01:50:12] local.INFO: Fakturoid invoice created for subscription {"subscription_id":10,"payment_id":6,"invoice_id":52162843,"invoice_number":"K250052"} 
+[2025-10-29 01:50:12] local.INFO: Subscription confirmation email sent {"subscription_id":10,"email":"lukas.slehofer@gmail.com","is_guest":true} 
+[2025-10-29 01:50:12] local.INFO: Fakturoid subscription invoice marked as paid {"invoice_id":52162843} 
+[2025-10-29 01:50:13] local.INFO: Fakturoid subscription invoice PDF downloaded {"payment_id":6,"invoice_id":52162843,"filename":"invoices/subscription_10_payment_6_invoice_52162843.pdf"} 
+[2025-10-29 01:50:13] local.INFO: Fakturoid invoice created for subscription payment {"payment_id":6,"subscription_id":10} 
+[2025-10-29 01:50:54] local.INFO: Stripe webhook received {"type":"invoice_payment.paid","id":"evt_1SNNbGK28RZARKowKqGZO46f"} 
+[2025-10-29 01:50:54] local.INFO: Unhandled webhook event type: invoice_payment.paid  
+[2025-10-29 01:54:05] local.ERROR: Writing to /Users/lukas/.config/psysh/psysh_history is not allowed. {"exception":"[object] (ErrorException(code: 0): Writing to /Users/lukas/.config/psysh/psysh_history is not allowed. at /Users/lukas/Kavi/vendor/psy/psysh/src/ConfigPaths.php:355)
+[stacktrace]
+#0 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(255): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(1024, 'Writing to /Use...', '/Users/lukas/Ka...', 355)
+#1 [internal function]: Illuminate\\Foundation\\Bootstrap\\HandleExceptions->{closure:Illuminate\\Foundation\\Bootstrap\\HandleExceptions::forwardsTo():254}(1024, 'Writing to /Use...', '/Users/lukas/Ka...', 355)
+#2 /Users/lukas/Kavi/vendor/psy/psysh/src/ConfigPaths.php(355): trigger_error('Writing to /Use...', 1024)
+#3 /Users/lukas/Kavi/vendor/psy/psysh/src/Configuration.php(670): Psy\\ConfigPaths::touchFileWithMkdir('/Users/lukas/.c...')
+#4 /Users/lukas/Kavi/vendor/psy/psysh/src/Configuration.php(693): Psy\\Configuration->setHistoryFile('/Users/lukas/.c...')
+#5 /Users/lukas/Kavi/vendor/psy/psysh/src/Configuration.php(838): Psy\\Configuration->getHistoryFile()
+#6 /Users/lukas/Kavi/vendor/psy/psysh/src/Shell.php(96): Psy\\Configuration->getReadline()
+#7 /Users/lukas/Kavi/vendor/laravel/tinker/src/Console/TinkerCommand.php(59): Psy\\Shell->__construct(Object(Psy\\Configuration))
+#8 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Laravel\\Tinker\\Console\\TinkerCommand->handle()
+#9 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/Util.php(41): Illuminate\\Container\\BoundMethod::{closure:Illuminate\\Container\\BoundMethod::call():35}()
+#10 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#11 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#12 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Container/Container.php(662): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#13 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Console/Command.php(211): Illuminate\\Container\\Container->call(Array)
+#14 /Users/lukas/Kavi/vendor/symfony/console/Command/Command.php(326): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#15 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Console/Command.php(180): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#16 /Users/lukas/Kavi/vendor/symfony/console/Application.php(1096): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#17 /Users/lukas/Kavi/vendor/symfony/console/Application.php(324): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 /Users/lukas/Kavi/vendor/symfony/console/Application.php(175): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#19 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(201): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#20 /Users/lukas/Kavi/artisan(24): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#21 {main}
+"} 
+[2025-10-29 01:54:14] local.ERROR: Uncaught PDOException: SQLSTATE[HY000] [2002] Operation not permitted in /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:65
+Stack trace:
+#0 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(65): PDO->__construct('mysql:host=127....', 'kavi', Object(SensitiveParameterValue), Array)
+#1 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(44): Illuminate\Database\Connectors\Connector->createPdoConnection('mysql:host=127....', 'kavi', 'secret', Array)
+#2 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\Database\Connectors\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\Database\Connectors\MySqlConnector->connect(Array)
+#4 [internal function]: Illuminate\Database\Connectors\ConnectionFactory->{closure:Illuminate\Database\Connectors\ConnectionFactory::createPdoResolverWithHosts():179}()
+#5 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(1339): call_user_func(Object(Closure))
+#6 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(1375): Illuminate\Database\Connection->getPdo()
+#7 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(528): Illuminate\Database\Connection->getReadPdo()
+#8 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(423): Illuminate\Database\Connection->getPdoForSelect(true)
+#9 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(816): Illuminate\Database\Connection->{closure:Illuminate\Database\Connection::select():414}('select exists(s...', Array)
+#10 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate\Database\Connection->runQueryCallback('select exists(s...', Array, Object(Closure))
+#11 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(414): Illuminate\Database\Connection->run('select exists(s...', Array, Object(Closure))
+#12 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3255): Illuminate\Database\Connection->select('select exists(s...', Array, true)
+#13 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1982): Illuminate\Database\Query\Builder->exists()
+#14 Command line code(1): Illuminate\Database\Eloquent\Builder->__call('exists', Array)
+#15 {main}
+
+Next Illuminate\Database\QueryException: SQLSTATE[HY000] [2002] Operation not permitted (Connection: mysql, SQL: select exists(select * from `users` where `email` = lukas.slehofer@gmail.com) as `exists`) in /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php:829
+Stack trace:
+#0 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate\Database\Connection->runQueryCallback('select exists(s...', Array, Object(Closure))
+#1 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(414): Illuminate\Database\Connection->run('select exists(s...', Array, Object(Closure))
+#2 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3255): Illuminate\Database\Connection->select('select exists(s...', Array, true)
+#3 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1982): Illuminate\Database\Query\Builder->exists()
+#4 Command line code(1): Illuminate\Database\Eloquent\Builder->__call('exists', Array)
+#5 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught PDOException: SQLSTATE[HY000] [2002] Operation not permitted in /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:65
+Stack trace:
+#0 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(65): PDO->__construct('mysql:host=127....', 'kavi', Object(SensitiveParameterValue), Array)
+#1 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(44): Illuminate\\Database\\Connectors\\Connector->createPdoConnection('mysql:host=127....', 'kavi', 'secret', Array)
+#2 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\\Database\\Connectors\\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\\Database\\Connectors\\MySqlConnector->connect(Array)
+#4 [internal function]: Illuminate\\Database\\Connectors\\ConnectionFactory->{closure:Illuminate\\Database\\Connectors\\ConnectionFactory::createPdoResolverWithHosts():179}()
+#5 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(1339): call_user_func(Object(Closure))
+#6 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(1375): Illuminate\\Database\\Connection->getPdo()
+#7 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(528): Illuminate\\Database\\Connection->getReadPdo()
+#8 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(423): Illuminate\\Database\\Connection->getPdoForSelect(true)
+#9 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(816): Illuminate\\Database\\Connection->{closure:Illuminate\\Database\\Connection::select():414}('select exists(s...', Array)
+#10 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate\\Database\\Connection->runQueryCallback('select exists(s...', Array, Object(Closure))
+#11 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(414): Illuminate\\Database\\Connection->run('select exists(s...', Array, Object(Closure))
+#12 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3255): Illuminate\\Database\\Connection->select('select exists(s...', Array, true)
+#13 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1982): Illuminate\\Database\\Query\\Builder->exists()
+#14 Command line code(1): Illuminate\\Database\\Eloquent\\Builder->__call('exists', Array)
+#15 {main}
+
+Next Illuminate\\Database\\QueryException: SQLSTATE[HY000] [2002] Operation not permitted (Connection: mysql, SQL: select exists(select * from `users` where `email` = lukas.slehofer@gmail.com) as `exists`) in /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php:829
+Stack trace:
+#0 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate\\Database\\Connection->runQueryCallback('select exists(s...', Array, Object(Closure))
+#1 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php(414): Illuminate\\Database\\Connection->run('select exists(s...', Array, Object(Closure))
+#2 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3255): Illuminate\\Database\\Connection->select('select exists(s...', Array, true)
+#3 /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1982): Illuminate\\Database\\Query\\Builder->exists()
+#4 Command line code(1): Illuminate\\Database\\Eloquent\\Builder->__call('exists', Array)
+#5 {main}
+  thrown at /Users/lukas/Kavi/vendor/laravel/framework/src/Illuminate/Database/Connection.php:829)
+[stacktrace]
+#0 {main}
+"} 
+[2025-10-29 01:56:10] local.INFO: === FORMULÁŘ ODESLÁN ===  
+[2025-10-29 01:56:10] local.INFO: URL: http://localhost/predplatne/konfigurator/checkout  
+[2025-10-29 01:56:10] local.INFO: Method: POST  
+[2025-10-29 01:56:10] local.INFO: Raw POST data: {"_token":"GRvbq9NqM2njQZmkRtl5JjscfipUtYbuS0w434fB","mix":{"espresso":"0","filter":"0"},"amount":"3","type":"filter","isDecaf":"1","frequency":"3"} 
+[2025-10-29 01:56:10] local.INFO: Headers: {"cookie":["XSRF-TOKEN=eyJpdiI6IkFrY1VGcWxIUG1NekhTYVkrRmZreGc9PSIsInZhbHVlIjoiRzVIeTBnRnpxYjRDOEQ5bGVPTUg2eHV1N0QxZTdmMTdEbk9XSEMvT0p3S3FTaEFoYm9NM1RRVEtlc21zWi9QNkF5RTJldjlOWWxvM0FrRSs1OUJKRzBVRmtaUzl1b3VNRGtaVEdUVGh6VnM1NnkwVHBwdDZhUlU0TW1BSm92WTMiLCJtYWMiOiIyZmI1ODRkNGU2OTdlYmJjMTVmZGYzMWMzM2M5YmY1MDIwMDcxM2NmMTI3M2I1N2EwODQ4NzVlZmRkNDY3NDM3IiwidGFnIjoiIn0%3D; kavi_coffee_session=eyJpdiI6IjNibjRLeGYzTld3dm9HUG4vMGcrV3c9PSIsInZhbHVlIjoiT2U4MzBodHRwb1ZIMWhiUXVyTzI2MTh4WFRxdktJaitFdTFDVGh2SS9OcStLTlJKcUZFQzc2aForVDdOWkM4MjRBMHUvQ3cwWmFCQVZ3WFBFOWFIYlVuaU85dGhXbmdoWFJhOW9SNXhNUVFkSUFHZ2VURm1jNDI2bDBEU296VTgiLCJtYWMiOiJlNmUzMzFjOGQ1NmU1MWVhODQzNjc2NzQ4MTM3MWI1NzRlOGZmYWU3ZTMyMmZlMzhmYmI4Yzk4YmYzN2Y2MDJiIiwidGFnIjoiIn0%3D"],"accept-language":["cs-CZ,cs;q=0.9,en;q=0.8"],"accept-encoding":["gzip, deflate, br, zstd"],"referer":["http://localhost/predplatne"],"sec-fetch-dest":["document"],"sec-fetch-user":["?1"],"sec-fetch-mode":["navigate"],"sec-fetch-site":["same-origin"],"accept":["text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"],"user-agent":["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"],"upgrade-insecure-requests":["1"],"content-type":["application/x-www-form-urlencoded"],"origin":["http://localhost"],"sec-ch-ua-platform":["\"macOS\""],"sec-ch-ua-mobile":["?0"],"sec-ch-ua":["\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\""],"cache-control":["max-age=0"],"content-length":["128"],"connection":["keep-alive"],"host":["localhost"]} 
+[2025-10-29 01:56:10] local.INFO: Cookies: {"XSRF-TOKEN":"GRvbq9NqM2njQZmkRtl5JjscfipUtYbuS0w434fB","kavi_coffee_session":"eiJsTkB6GgPDntTPbzgcbP530grI3PsNduk8D903"} 
+[2025-10-29 01:56:10] local.INFO: Validation passed successfully {"validated":{"amount":"3","type":"filter","isDecaf":true,"mix":{"espresso":"0","filter":"0"},"frequency":"3"}} 
+[2025-10-29 01:56:10] local.INFO: Configuration stored in session. Redirecting to checkout. {"config":{"amount":"3","type":"filter","isDecaf":true,"mix":{"espresso":"0","filter":"0"},"frequency":"3"},"price":1200.0,"price_without_vat":991.74,"vat":208.26} 
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"charge.succeeded","id":"evt_3SNNhIK28RZARKow1PPY6Ixt"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: charge.succeeded  
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"checkout.session.completed","id":"evt_1SNNhLK28RZARKowNZUltgIu"} 
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"payment_method.attached","id":"evt_1SNNhLK28RZARKowA928RSgW"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: payment_method.attached  
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"customer.created","id":"evt_1SNNhLK28RZARKow2dOKT42H"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: customer.created  
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"customer.updated","id":"evt_1SNNhMK28RZARKowH2bj1xw4"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: customer.updated  
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"customer.subscription.created","id":"evt_1SNNhMK28RZARKowEBASbzOr"} 
+[2025-10-29 01:57:12] local.INFO: handleSubscriptionCreated called {"subscription_id":"sub_1SNNhIK28RZARKow6hLoduuO","metadata":{"packeta_point_id":"34198","packeta_point_address":"Pod Paťankou 2743/1b, 160 00 Praha","shipping_address":"{\"name\":\"Luk\\u00e1\\u0161 \\u0160lehofer\",\"email\":\"lukas.slehofer@gmail.com\",\"phone\":\"+420777110957\",\"billing_address\":\"Amforov\\u00e1 9\",\"billing_city\":\"Praha 5\",\"billing_postal_code\":\"15500\",\"country\":\"CZ\"}","guest_email":"lukas.slehofer@gmail.com","configuration":"{\"amount\":\"3\",\"type\":\"filter\",\"isDecaf\":true,\"mix\":{\"espresso\":\"0\",\"filter\":\"0\"},\"frequency\":\"3\"}","configured_price":"1200","packeta_point_name":"Z-BOX Praha 6, Dejvice, Pod Paťankou 2743/1b"},"customer":"cus_TK1kldMehVP4KW"} 
+[2025-10-29 01:57:12] local.INFO: Parsed metadata {"user_id":null,"plan_id":null,"configuration":{"amount":"3","type":"filter","isDecaf":true,"mix":{"espresso":"0","filter":"0"},"frequency":"3"}} 
+[2025-10-29 01:57:12] local.INFO: Creating subscription record {"subscription_number":"SUB-0004","user_id":null,"stripe_subscription_id":"sub_1SNNhIK28RZARKow6hLoduuO","status":"active","starts_at":"2025-10-29 01:57:12","next_billing_date":"2026-02-15 01:57:12","configuration":{"amount":"3","type":"filter","isDecaf":true,"mix":{"espresso":"0","filter":"0"},"frequency":"3"},"configured_price":"1200","frequency_months":"3","shipping_address":{"name":"Lukáš Šlehofer","email":"lukas.slehofer@gmail.com","phone":"+420777110957","billing_address":"Amforová 9","billing_city":"Praha 5","billing_postal_code":"15500","country":"CZ"},"packeta_point_id":"34198","packeta_point_name":"Z-BOX Praha 6, Dejvice, Pod Paťankou 2743/1b","packeta_point_address":"Pod Paťankou 2743/1b, 160 00 Praha"} 
+[2025-10-29 01:57:12] local.INFO: Subscription created successfully {"id":11} 
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"customer.subscription.updated","id":"evt_1SNNhMK28RZARKowAPaylu2d"} 
+[2025-10-29 01:57:12] local.INFO: Created user account for guest subscription {"user_id":5,"subscription_id":11} 
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"payment_intent.succeeded","id":"evt_3SNNhIK28RZARKow1GcMXK1g"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: payment_intent.succeeded  
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"payment_intent.created","id":"evt_3SNNhIK28RZARKow1nn596rp"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: payment_intent.created  
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"invoice.finalized","id":"evt_1SNNhMK28RZARKowZ2EpAsPB"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: invoice.finalized  
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"invoice.created","id":"evt_1SNNhMK28RZARKowxMpK1IKV"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: invoice.created  
+[2025-10-29 01:57:12] local.INFO: Stripe webhook received {"type":"invoice.updated","id":"evt_1SNNhMK28RZARKowYdqE5le9"} 
+[2025-10-29 01:57:12] local.INFO: Unhandled webhook event type: invoice.updated  
+[2025-10-29 01:57:13] local.INFO: Stripe webhook received {"type":"invoice.paid","id":"evt_1SNNhMK28RZARKowyOMJRt9b"} 
+[2025-10-29 01:57:13] local.INFO: Unhandled webhook event type: invoice.paid  
+[2025-10-29 01:57:13] local.INFO: Stripe webhook received {"type":"invoice.payment_succeeded","id":"evt_1SNNhMK28RZARKowwREkXtkA"} 
+[2025-10-29 01:57:14] local.INFO: Search returned subjects but none with matching email {"searched_email":"lukas.slehofer@gmail.com","results_count":40} 
+[2025-10-29 01:57:14] local.INFO: Fakturoid subject created {"subject_id":28669478,"name":"Lukáš Šlehofer"} 
+[2025-10-29 01:57:14] local.INFO: Fakturoid invoice created for subscription {"subscription_id":11,"payment_id":7,"invoice_id":52162854,"invoice_number":"K250053"} 
+[2025-10-29 01:57:15] local.INFO: Subscription confirmation email sent {"subscription_id":11,"email":"lukas.slehofer@gmail.com","is_guest":false} 
+[2025-10-29 01:57:15] local.INFO: Fakturoid subscription invoice marked as paid {"invoice_id":52162854} 
+[2025-10-29 01:57:16] local.INFO: Fakturoid subscription invoice PDF downloaded {"payment_id":7,"invoice_id":52162854,"filename":"invoices/subscription_11_payment_7_invoice_52162854.pdf"} 
+[2025-10-29 01:57:16] local.INFO: Fakturoid invoice created for subscription payment {"payment_id":7,"subscription_id":11} 
+[2025-10-29 01:57:17] local.INFO: Stripe webhook received {"type":"invoice_payment.paid","id":"evt_1SNNhRK28RZARKowNW4jfaY8"} 
+[2025-10-29 01:57:17] local.INFO: Unhandled webhook event type: invoice_payment.paid  
+[2025-10-29 01:57:30] local.ERROR: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'kavi.login_tokens' doesn't exist (Connection: mysql, SQL: insert into `login_tokens` (`email`, `token`, `expires_at`, `created_at`) values (lukas.slehofer@gmail.com, 4f7d658414fc12c0b6e6918d8e73185e9932bc552d99814ff818d6ae2188ff8a, 2025-10-29 02:12:30, 2025-10-29 01:57:30)) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 42S02): SQLSTATE[42S02]: Base table or view not found: 1146 Table 'kavi.login_tokens' doesn't exist (Connection: mysql, SQL: insert into `login_tokens` (`email`, `token`, `expires_at`, `created_at`) values (lukas.slehofer@gmail.com, 4f7d658414fc12c0b6e6918d8e73185e9932bc552d99814ff818d6ae2188ff8a, 2025-10-29 02:12:30, 2025-10-29 01:57:30)) at /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php:829)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate\\Database\\Connection->runQueryCallback('insert into `lo...', Array, Object(Closure))
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(34): Illuminate\\Database\\Connection->run('insert into `lo...', Array, Object(Closure))
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3498): Illuminate\\Database\\MySqlConnection->insert('insert into `lo...', Array)
+#3 /var/www/html/app/Http/Controllers/Auth/MagicLinkController.php(41): Illuminate\\Database\\Query\\Builder->insert(Array)
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App\\Http\\Controllers\\Auth\\MagicLinkController->sendLink(Object(Illuminate\\Http\\Request))
+#5 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate\\Routing\\Controller->callAction('sendLink', Array)
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(259): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\Auth\\MagicLinkController), 'sendLink')
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(205): Illuminate\\Routing\\Route->runController()
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(806): Illuminate\\Routing\\Route->run()
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php(78): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(49): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(121): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(64): Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest(Object(Illuminate\\Http\\Request), Object(Illuminate\\Session\\Store), Object(Closure))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Session\\Middleware\\StartSession->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(37): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(67): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Cookie\\Middleware\\EncryptCookies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(805): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(784): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(748): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(737): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(40): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(99): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(49): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(39): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#47 /var/www/html/public/index.php(33): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#48 {main}
+
+[previous exception] [object] (PDOException(code: 42S02): SQLSTATE[42S02]: Base table or view not found: 1146 Table 'kavi.login_tokens' doesn't exist at /var/www/html/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:39)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(39): PDO->prepare('insert into `lo...')
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(816): Illuminate\\Database\\MySqlConnection->Illuminate\\Database\\{closure}('insert into `lo...', Array)
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate\\Database\\Connection->runQueryCallback('insert into `lo...', Array, Object(Closure))
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(34): Illuminate\\Database\\Connection->run('insert into `lo...', Array, Object(Closure))
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3498): Illuminate\\Database\\MySqlConnection->insert('insert into `lo...', Array)
+#5 /var/www/html/app/Http/Controllers/Auth/MagicLinkController.php(41): Illuminate\\Database\\Query\\Builder->insert(Array)
+#6 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App\\Http\\Controllers\\Auth\\MagicLinkController->sendLink(Object(Illuminate\\Http\\Request))
+#7 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate\\Routing\\Controller->callAction('sendLink', Array)
+#8 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(259): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\Auth\\MagicLinkController), 'sendLink')
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(205): Illuminate\\Routing\\Route->runController()
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(806): Illuminate\\Routing\\Route->run()
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php(78): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(49): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(121): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(64): Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest(Object(Illuminate\\Http\\Request), Object(Illuminate\\Session\\Store), Object(Closure))
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Session\\Middleware\\StartSession->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(37): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(67): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Cookie\\Middleware\\EncryptCookies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(805): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(784): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(748): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(737): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(40): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(99): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(49): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(39): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#49 /var/www/html/public/index.php(33): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#50 {main}
+"} 
+[2025-10-29 09:13:05] local.INFO: Using cached Fakturoid subject ID from user {"user_id":1,"subject_id":28669028} 
+[2025-10-29 09:13:06] local.INFO: Fakturoid subject updated {"subject_id":28669028,"name":"Jan Novotný"} 
+[2025-10-29 09:13:06] local.ERROR: Fakturoid invoice creation failed {"subscription_id":1,"payment_id":8,"status":422,"body":"{\"errors\":{\"lines.unit_price\":[\"je povinná položka\",\"není číslo\"]}}"} 
+[2025-10-29 09:13:50] local.INFO: Using cached Fakturoid subject ID from user {"user_id":1,"subject_id":28669028} 
+[2025-10-29 09:13:51] local.INFO: Fakturoid subject updated {"subject_id":28669028,"name":"Jan Novotný"} 
+[2025-10-29 09:13:51] local.INFO: Fakturoid invoice created for subscription {"subscription_id":1,"payment_id":9,"invoice_id":52167374,"invoice_number":"K250054"} 
+[2025-10-29 09:13:52] local.INFO: Fakturoid subscription invoice marked as paid {"invoice_id":52167374} 
+[2025-10-29 09:13:53] local.INFO: Fakturoid subscription invoice PDF downloaded {"payment_id":9,"invoice_id":52167374,"filename":"invoices/subscription_1_payment_9_invoice_52167374.pdf"} 
+[2025-10-29 09:15:09] local.INFO: Using cached Fakturoid subject ID from user {"user_id":1,"subject_id":28669028} 
+[2025-10-29 09:15:09] local.INFO: Fakturoid subject updated {"subject_id":28669028,"name":"Jan Novotný"} 
+[2025-10-29 09:15:09] local.INFO: Fakturoid invoice created for subscription {"subscription_id":1,"payment_id":10,"invoice_id":52167428,"invoice_number":"K250055"} 
+[2025-10-29 09:15:10] local.INFO: Fakturoid subscription invoice marked as paid {"invoice_id":52167428} 
+[2025-10-29 09:15:10] local.INFO: Fakturoid subscription invoice PDF downloaded {"payment_id":10,"invoice_id":52167428,"filename":"invoices/subscription_1_payment_10_invoice_52167428.pdf"} 
+[2025-10-29 09:17:29] local.INFO: Using cached Fakturoid subject ID from user {"user_id":1,"subject_id":28669028} 
+[2025-10-29 09:17:29] local.INFO: Fakturoid subject updated {"subject_id":28669028,"name":"Jan Novotný"} 
+[2025-10-29 09:17:30] local.INFO: Fakturoid invoice created for subscription {"subscription_id":1,"payment_id":11,"invoice_id":52167519,"invoice_number":"K250056"} 
+[2025-10-29 09:17:30] local.INFO: Fakturoid subscription invoice marked as paid {"invoice_id":52167519} 
+[2025-10-29 09:17:30] local.INFO: Fakturoid subscription invoice PDF downloaded {"payment_id":11,"invoice_id":52167519,"filename":"invoices/subscription_1_payment_11_invoice_52167519.pdf"} 
+[2025-10-29 09:20:21] local.INFO: === FORMULÁŘ ODESLÁN ===  
+[2025-10-29 09:20:21] local.INFO: URL: http://localhost/predplatne/konfigurator/checkout  
+[2025-10-29 09:20:21] local.INFO: Method: POST  
+[2025-10-29 09:20:21] local.INFO: Raw POST data: {"_token":"eOIBI7GFAuKSqCZF6tZPC67dKM2q5wy2HOH1uiY5","mix":{"espresso":"0","filter":"0"},"amount":"2","type":"filter","frequency":"1"} 
+[2025-10-29 09:20:21] local.INFO: Headers: {"connection":["keep-alive"],"cookie":["XSRF-TOKEN=eyJpdiI6Ink0bGFoVGRXTWwvODhaSDlDcGNJUVE9PSIsInZhbHVlIjoiYm8yM2hBR0ZTODZJOExyZmN0QnNqcU1KWXMwbVBCdUI0R0tXSWFiL3ZHaWE3QS90NzZ5dEV6cVQ1ZWdmMmN3ZHFZci9iRXlwZ2lZclZpWjlxOWUzMjFlbUorQWhzSTM0bWVCRHpBKytVbnI4a3kwTFlFcGhqajJwbjBkV2E4UkkiLCJtYWMiOiJiNjlhZjZhZGE4NjcxNzM0YTNhNDQyNjZkOGU1ZGQyNzgzODY5Y2E2MjFjM2Y0NzZmMTczYmIzZjViM2RkZjI4IiwidGFnIjoiIn0%3D; kavi_coffee_session=eyJpdiI6Im1wb25iUjJmK0ZJeGpkRjF6S0lCVEE9PSIsInZhbHVlIjoiSWYyd1hpVlBLdUZzZ3lYZ09qM2lHOTVYdHJmV1J3TjJyZXJTeUhsOUVtMDY5N3JIc3JwZnAyY2RqQ0g2QlpOSW9tNFFIL0xKaWR0bjB3dlI0Wlg4YTdyT0psS1RIdkV6cVlvTWFLK2RkeXE3VzVJbW05b1lHM09ENXlvcUJVcUwiLCJtYWMiOiJkNjQxMDljYzE2YTJhN2JkZjQ2Y2RkNGY0NGJlOWIxNTEwOWRiM2UwNjVkM2RhMWJmNzM1YTUwMzdiOTRhNjJkIiwidGFnIjoiIn0%3D; remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d=eyJpdiI6Ii84YWFWdEdqRWgvbThVZHNtSzdHdkE9PSIsInZhbHVlIjoibW95R1JTZmtoK21QWlVVYXBBR0JGbHNvdGhObUxpRGxTSndLVStyc2FldkZubzNBdEI5Wm1nMnhLemFOUzBOcTlMWkhueTZrblUvQmN1bnVWekNKVmFYeHhMelp0dUY3ZitGZzYrY0hscFdHeVJyb1UzUUtReDltZDRIdjMxLzQxVWYxTGhsR2pJTDJScVBtTGttbzVRPT0iLCJtYWMiOiI5NzUyYjI1OWVlZDc2MjQ2OGUwNWE5OWRjY2VhNWMyMjljYWE4MjA1ZDNlZDQ5MjgxOTZiZGU0OTY2ZTY1NGFmIiwidGFnIjoiIn0%3D"],"accept-encoding":["gzip, deflate"],"priority":["u=0, i"],"accept-language":["cs-CZ,cs;q=0.9"],"content-length":["118"],"sec-fetch-dest":["document"],"referer":["http://localhost/predplatne"],"user-agent":["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15"],"sec-fetch-mode":["navigate"],"upgrade-insecure-requests":["1"],"sec-fetch-site":["same-origin"],"origin":["http://localhost"],"content-type":["application/x-www-form-urlencoded"],"accept":["text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"],"host":["localhost"]} 
+[2025-10-29 09:20:21] local.INFO: Cookies: {"XSRF-TOKEN":"eOIBI7GFAuKSqCZF6tZPC67dKM2q5wy2HOH1uiY5","kavi_coffee_session":"ysihux6pq87otoDQ3SN5AzK3kEK0hijGIm18xm9X","remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d":null} 
+[2025-10-29 09:20:21] local.INFO: Validation passed successfully {"validated":{"amount":"2","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false}} 
+[2025-10-29 09:20:21] local.INFO: Configuration stored in session. Redirecting to checkout. {"config":{"amount":"2","type":"filter","mix":{"espresso":"0","filter":"0"},"frequency":"1","isDecaf":false},"price":850.0,"price_without_vat":702.48,"vat":147.52} 

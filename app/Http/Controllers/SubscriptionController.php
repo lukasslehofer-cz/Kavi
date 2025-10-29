@@ -153,12 +153,23 @@ class SubscriptionController extends Controller
     {
         // Handle successful return from Stripe
         if ($request->has('success') && $request->success == 1) {
-            // Get the latest subscription for this user
+            // Get the latest subscription for this user or guest
             $subscription = null;
+            
             if (auth()->check()) {
+                // For authenticated users, find by user_id
                 $subscription = Subscription::where('user_id', auth()->id())
                     ->latest()
                     ->first();
+            } else {
+                // For guests, try to find by session email from shipping address
+                $guestEmail = session('guest_subscription_email');
+                if ($guestEmail) {
+                    $subscription = Subscription::whereNull('user_id')
+                        ->whereRaw("JSON_EXTRACT(shipping_address, '$.email') = ?", [$guestEmail])
+                        ->latest()
+                        ->first();
+                }
             }
             
             // Clear subscription session data
@@ -170,9 +181,12 @@ class SubscriptionController extends Controller
                 'subscription_shipping_address',
                 'subscription_packeta',
                 'subscription_delivery_notes',
+                'guest_subscription_email',
+                'guest_subscription_name',
+                'guest_subscription_phone',
             ]);
 
-            // Redirect to confirmation page with subscription
+            // Redirect to confirmation page (for both authenticated and guest users)
             if ($subscription) {
                 return redirect()->route('subscriptions.confirmation', $subscription);
             } else {
@@ -383,7 +397,13 @@ class SubscriptionController extends Controller
      */
     public function confirmation(Subscription $subscription)
     {
-        if ($subscription->user_id !== auth()->id()) {
+        // If user is authenticated, check if subscription belongs to them
+        if (auth()->check() && $subscription->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // If user is not authenticated, only allow access to guest subscriptions (user_id is null)
+        if (!auth()->check() && $subscription->user_id !== null) {
             abort(403);
         }
 

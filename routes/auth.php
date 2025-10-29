@@ -13,3 +13,7 @@ Route::post('/odhlaseni', [LoginController::class, 'logout'])->name('logout');
 Route::get('/registrace', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/registrace', [RegisterController::class, 'register']);
 
+// Magic Link Routes
+Route::post('/magic-link/send', [\App\Http\Controllers\Auth\MagicLinkController::class, 'sendLink'])->name('magic-link.send');
+Route::get('/magic-link/verify/{token}', [\App\Http\Controllers\Auth\MagicLinkController::class, 'verify'])->name('magic-link.verify');
+

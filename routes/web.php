@@ -41,7 +41,7 @@ Route::get('/predplatne', [SubscriptionController::class, 'index'])->name('subsc
 Route::post('/predplatne/konfigurator/checkout', [SubscriptionController::class, 'configureCheckout'])->name('subscriptions.configure.checkout');
 Route::get('/predplatne/pokladna', [SubscriptionController::class, 'checkout'])->name('subscriptions.checkout');
 Route::post('/predplatne/pokladna', [SubscriptionController::class, 'processCheckout'])->name('subscriptions.checkout.process');
-Route::get('/predplatne/{subscription}/potvrzeni', [SubscriptionController::class, 'confirmation'])->middleware('auth')->name('subscriptions.confirmation');
+Route::get('/predplatne/{subscription}/potvrzeni', [SubscriptionController::class, 'confirmation'])->name('subscriptions.confirmation');
 
 // Subscription plans (keep this route last as it catches everything)
 Route::get('/predplatne/{plan}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
@@ -54,15 +54,13 @@ Route::patch('/kosik/aktualizovat/{product}', [CartController::class, 'update'])
 Route::delete('/kosik/odebrat/{product}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/kosik/vyprazdnit', [CartController::class, 'clear'])->name('cart.clear');
 
-// Checkout - requires auth
-Route::middleware('auth')->group(function () {
-    Route::get('/pokladna', [CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('/pokladna', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::get('/objednavka/{order}/potvrzeni', [CheckoutController::class, 'confirmation'])->name('order.confirmation');
-    
-    // Payment routes
-    Route::get('/platba/karta/{order}', [PaymentController::class, 'cardPayment'])->name('payment.card');
-});
+// Checkout - now supports guest checkout
+Route::get('/pokladna', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/pokladna', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/objednavka/{order}/potvrzeni', [CheckoutController::class, 'confirmation'])->name('order.confirmation');
+
+// Payment routes
+Route::get('/platba/karta/{order}', [PaymentController::class, 'cardPayment'])->name('payment.card');
 
 // Stripe webhook - public endpoint (no auth, no CSRF)
 Route::post('/webhook/stripe', [PaymentController::class, 'webhook'])->name('stripe.webhook');
