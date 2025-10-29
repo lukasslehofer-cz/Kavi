@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\NewsletterSubscriber;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Models\SubscriptionConfig;
@@ -487,6 +488,23 @@ class StripeService
             \Log::info('Creating subscription record', $subscriptionRecord);
             $subscription = Subscription::create($subscriptionRecord);
             \Log::info('Subscription created successfully', ['id' => $subscription->id]);
+            
+            // Add customer email to newsletter
+            try {
+                $email = $subscription->shipping_address['email'] ?? null;
+                if ($email) {
+                    NewsletterSubscriber::firstOrCreate(
+                        ['email' => $email],
+                        [
+                            'source' => 'customer',
+                            'user_id' => $subscription->user_id,
+                        ]
+                    );
+                    \Log::info('Added subscription email to newsletter', ['email' => $email]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to add subscription email to newsletter: ' . $e->getMessage());
+            }
             
             // Create user account for guest subscriptions
             if (!$userId && $guestEmail) {

@@ -293,12 +293,21 @@
           <div class="max-w-xl mx-auto text-center">
             <h3 class="text-xl font-semibold text-gray-900 mb-2">Přihlaste se k odběru novinek</h3>
             <p class="text-gray-600 mb-6 text-sm font-light">Získejte slevu 10% na první objednávku a buďte první, kdo se dozví o nových kávách</p>
-            <form class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
-              <input type="email" placeholder="Váš e-mail" class="flex-1 px-5 py-2.5 rounded-full bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:ring-1 focus:ring-gray-300 transition-all text-sm">
+            <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+              @csrf
+              <input 
+                type="email" 
+                name="email" 
+                id="newsletter-email"
+                placeholder="Váš e-mail" 
+                required
+                class="flex-1 px-5 py-2.5 rounded-full bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:ring-1 focus:ring-gray-300 transition-all text-sm"
+              >
               <button type="submit" class="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-full transition-all duration-200 whitespace-nowrap text-sm">
                 Odebírat
               </button>
             </form>
+            <div id="newsletter-message" class="mt-4 text-sm hidden"></div>
           </div>
         </div>
 
@@ -333,6 +342,65 @@
                     } else {
                         mobileMenu.style.display = 'none';
                     }
+                });
+            }
+
+            // Newsletter form
+            const newsletterForm = document.getElementById('newsletter-form');
+            const newsletterMessage = document.getElementById('newsletter-message');
+            const newsletterEmail = document.getElementById('newsletter-email');
+
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(newsletterForm);
+                    const submitButton = newsletterForm.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.textContent;
+
+                    // Disable button and show loading state
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Odesílám...';
+
+                    fetch('{{ route("newsletter.subscribe") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: formData.get('email')
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        newsletterMessage.classList.remove('hidden');
+                        
+                        if (data.success) {
+                            newsletterMessage.className = 'mt-4 text-sm p-3 rounded-lg bg-green-100 text-green-800 border border-green-200';
+                            newsletterMessage.textContent = data.message;
+                            newsletterEmail.value = '';
+                        } else {
+                            newsletterMessage.className = 'mt-4 text-sm p-3 rounded-lg bg-red-100 text-red-800 border border-red-200';
+                            newsletterMessage.textContent = data.message;
+                        }
+
+                        // Hide message after 5 seconds
+                        setTimeout(() => {
+                            newsletterMessage.classList.add('hidden');
+                        }, 5000);
+                    })
+                    .catch(error => {
+                        newsletterMessage.classList.remove('hidden');
+                        newsletterMessage.className = 'mt-4 text-sm p-3 rounded-lg bg-red-100 text-red-800 border border-red-200';
+                        newsletterMessage.textContent = 'Došlo k chybě. Zkuste to prosím znovu.';
+                    })
+                    .finally(() => {
+                        // Re-enable button
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                    });
                 });
             }
         });

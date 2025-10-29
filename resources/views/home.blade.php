@@ -66,7 +66,7 @@
                 </div>
             </div>
         </div>
-    </div>
+      </div>
 
     <!-- Organic Wave Divider -->
     <div class="absolute bottom-[-1px] left-0 right-0">
@@ -309,7 +309,7 @@
       <!-- plan - start - POPULAR -->
       <div class="group relative flex flex-col bg-white rounded-3xl p-10 border-2 border-primary-500 transition-all duration-200">
         <!-- Popular Badge -->
-        <div class="absolute inset-x-0 -top-3 flex justify-center">
+          <div class="absolute inset-x-0 -top-3 flex justify-center">
           <span class="px-4 py-1 bg-primary-500 rounded-full text-xs font-medium text-white">
             Nejoblíbenější
           </span>
@@ -548,65 +548,289 @@
   </div>
 </div>
 
-<!-- Coffee Origins Section - Minimal -->
+<!-- Coffee of the Month Teaser -->
+@if($roasteriesOfMonth->count() > 0 || $coffeesOfMonth->count() > 0)
+@php
+  $displayMonth = now()->day >= 16 ? now()->addMonth() : now();
+  $monthName = $displayMonth->locale('cs')->isoFormat('MMMM');
+  $monthNameCapitalized = mb_convert_case($monthName, MB_CASE_TITLE, "UTF-8");
+@endphp
+
 <div class="relative bg-white py-24 sm:py-24 lg:py-32">
-  <!-- Organic shape decoration -->
-  <div class="absolute bottom-0 right-0 w-96 h-96 bg-gray-100 rounded-full translate-x-1/3 translate-y-1/3" style="z-index: 10;"></div>
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+    
+    <!-- Section Header -->
+    <div class="mb-16 text-center">
+      <div class="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full mb-6">
+        <svg class="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+        <span class="text-sm font-medium text-gray-700">{{ $displayMonth->locale('cs')->isoFormat('MMMM YYYY') }}</span>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Káva měsíce</h2>
+      <p class="text-xl text-gray-600 font-light max-w-2xl mx-auto">Každý měsíc přinášíme výběr káv od vybraných pražíren</p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-16">
+      
+      <!-- Left Side: Roasteries - Zigzag Layout -->
+      @if($roasteriesOfMonth->count() > 0)
+      <div class="flex flex-col justify-between h-[400px]">
+        @foreach($roasteriesOfMonth as $index => $roastery)
+        @php
+          // Zigzag pattern: 1st and 3rd offset right, 2nd stays left
+          $offsetClass = ($index % 2 === 0) ? 'ml-16' : 'ml-0';
+          // Middle roastery (index 1) reversed layout
+          $flexDirection = ($index === 1) ? 'flex-row-reverse' : '';
+          // Text alignment for middle roastery
+          $textAlign = ($index === 1) ? 'text-right' : '';
+          $flexJustify = ($index === 1) ? 'justify-end' : '';
+        @endphp
+        
+        <div class="flex items-center gap-6 {{ $offsetClass }} {{ $flexDirection }}">
+          <!-- Roastery Image - Clean -->
+          <div class="relative w-28 h-28 flex-shrink-0 rounded-2xl overflow-hidden">
+            @if($roastery->image)
+            <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->name }}" class="w-full h-full object-cover" />
+            @else
+            <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+              <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z"/>
+              </svg>
+            </div>
+            @endif
+          </div>
+
+          <!-- Roastery Info -->
+          <div class="flex-1 min-w-0 {{ $textAlign }}">
+            <div class="flex items-center gap-3 mb-2 {{ $flexJustify }}">
+              @if($index === 1 && $roastery->country_flag)
+              <span class="text-3xl flex-shrink-0">{{ $roastery->country_flag }}</span>
+              @endif
+              <h3 class="text-3xl font-bold text-gray-900">{{ $roastery->name }}</h3>
+              @if($index !== 1 && $roastery->country_flag)
+              <span class="text-3xl flex-shrink-0">{{ $roastery->country_flag }}</span>
+              @endif
+            </div>
+            <p class="text-sm text-gray-600 font-light">
+              @if($roastery->city && $roastery->country)
+                {{ $roastery->city }}, {{ $roastery->country }}
+              @elseif($roastery->city)
+                {{ $roastery->city }}
+              @elseif($roastery->country)
+                {{ $roastery->country }}
+              @endif
+            </p>
+          </div>
+        </div>
+        @endforeach
+      </div>
+      @endif
+
+      <!-- Right Side: Coffee Grid -->
+      @if($coffeesOfMonth->count() > 0)
+      @php
+        // Shuffle coffees randomly
+        $shuffledCoffees = $coffeesOfMonth->shuffle();
+        $coffeeCount = $shuffledCoffees->count();
+      @endphp
+      
+      <div class="relative h-[400px]">
+        @if($coffeeCount >= 6)
+          <!-- Grid 3x2 for 6+ photos -->
+          <div class="grid grid-cols-3 grid-rows-2 gap-3 h-full">
+            @foreach($shuffledCoffees->take(6) as $coffee)
+            <div class="relative rounded-2xl overflow-hidden bg-gray-100">
+              @if($coffee->image)
+              <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-full object-cover" />
+              @else
+              <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <svg class="w-12 h-12 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
+                </svg>
+              </div>
+              @endif
+            </div>
+            @endforeach
+          </div>
+        @else
+          <!-- Layout for less than 6: one large (2x2) + 2 small (1x1 stacked) -->
+          <div class="grid grid-cols-3 grid-rows-2 gap-3 h-full">
+            <!-- Large photo (2x2) -->
+            @if($shuffledCoffees->count() > 0)
+            <div class="col-span-2 row-span-2 relative rounded-2xl overflow-hidden bg-gray-100">
+              @if($shuffledCoffees[0]->image)
+              <img src="{{ asset($shuffledCoffees[0]->image) }}" alt="{{ $shuffledCoffees[0]->name }}" class="w-full h-full object-cover" />
+              @else
+              <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <svg class="w-16 h-16 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
+                </svg>
+              </div>
+              @endif
+            </div>
+            @endif
+            
+            <!-- Small photo 1 (1x1) -->
+            @if($shuffledCoffees->count() > 1)
+            <div class="relative rounded-2xl overflow-hidden bg-gray-100">
+              @if($shuffledCoffees[1]->image)
+              <img src="{{ asset($shuffledCoffees[1]->image) }}" alt="{{ $shuffledCoffees[1]->name }}" class="w-full h-full object-cover" />
+              @else
+              <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <svg class="w-12 h-12 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
+                </svg>
+              </div>
+              @endif
+            </div>
+            @endif
+            
+            <!-- Small photo 2 (1x1) -->
+            @if($shuffledCoffees->count() > 2)
+            <div class="relative rounded-2xl overflow-hidden bg-gray-100">
+              @if($shuffledCoffees[2]->image)
+              <img src="{{ asset($shuffledCoffees[2]->image) }}" alt="{{ $shuffledCoffees[2]->name }}" class="w-full h-full object-cover" />
+              @else
+              <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <svg class="w-12 h-12 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
+                </svg>
+              </div>
+              @endif
+            </div>
+            @endif
+          </div>
+        @endif
+      </div>
+      @endif
+    </div>
+
+    <!-- CTA Button -->
+    <div class="mt-16 text-center">
+      <a href="{{ route('monthly-feature.index') }}" class="group inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
+        <span>Prozkoumat kávy na {{ $monthNameCapitalized }}</span>
+        <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+      </a>
+    </div>
+
+  </div>
+</div>
+@endif
+
+<!-- How It Works Section - 4 Steps with Arrows -->
+<div class="relative bg-gray-100 py-24 sm:py-24 lg:py-32 overflow-hidden">
+  <!-- Wave Divider Top -->
+  <div class="absolute top-[-1px] left-0 right-0 bg-white">
+    <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+      <path d="M0 80L60 75C120 70 240 60 360 55C480 50 600 50 720 53.3C840 56.7 960 63.3 1080 65C1200 66.7 1320 63.3 1380 61.7L1440 60V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="#f3f4f6"/>
+    </svg>
+  </div>
 
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <div class="grid lg:grid-cols-2 gap-16 items-center">
-      <!-- Image Side - Clean -->
-      <div class="relative h-[500px] rounded-3xl overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&q=80&fit=crop&w=1200" alt="Káva pozadí" class="h-full w-full object-cover" />
-      </div>
+    <!-- Section Header -->
+    <div class="mb-16 text-center">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Jak to funguje</h2>
+      <p class="text-xl text-gray-600 font-light max-w-2xl mx-auto">Čtyři jednoduché kroky k perfektní kávě</p>
+    </div>
 
-      <!-- Content Side -->
-      <div class="space-y-8">
-        <div>
-          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-            Objevte svět prémiové kávy
-          </h2>
-          <p class="text-xl text-gray-600 leading-relaxed font-light mb-8">
-            Káva, která vás nadchne. Importujeme pouze nejkvalitnější zrna z etických plantáží po celém světě.
-          </p>
+    <!-- Steps Grid with Arrows -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
+      
+      <!-- Step 1 -->
+      <div class="relative">
+        <div class="text-center">
+          <!-- Number Circle -->
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-500 text-white text-2xl font-bold mb-6">
+            1
+          </div>
+          
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Vyberte si plán</h3>
+          
+          <!-- Description -->
+          <p class="text-gray-600 font-light leading-relaxed">Zvolte množství kávy a frekvenci dodání podle vašich potřeb</p>
         </div>
-
-        <!-- Stats - Minimal -->
-        <div class="grid grid-cols-3 gap-6">
-          <div>
-            <div class="text-4xl font-bold text-gray-900 mb-1">12+</div>
-            <div class="text-sm text-gray-600 font-light">Zemí původu</div>
-          </div>
-          <div>
-            <div class="text-4xl font-bold text-gray-900 mb-1">50+</div>
-            <div class="text-sm text-gray-600 font-light">Druhů kávy</div>
-          </div>
-          <div>
-            <div class="text-4xl font-bold text-gray-900 mb-1">15+</div>
-            <div class="text-sm text-gray-600 font-light">Pražíren</div>
-          </div>
-        </div>
-
-        <div class="flex gap-4 pt-4">
-          <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
-            <span>Začít předplatné</span>
-            <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-
-          <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
-            <span>Prozkoumat kávy</span>
-          </a>
+        
+        <!-- Arrow - Hidden on mobile, visible on large screens between items -->
+        <div class="hidden lg:block absolute top-8 -right-4 text-gray-400">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
         </div>
       </div>
+
+      <!-- Step 2 -->
+      <div class="relative">
+        <div class="text-center">
+          <!-- Number Circle -->
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-500 text-white text-2xl font-bold mb-6">
+            2
+          </div>
+          
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Personalizujte</h3>
+          
+          <!-- Description -->
+          <p class="text-gray-600 font-light leading-relaxed">Vyberte typ kávy, způsob přípravy a doručovací adresu</p>
+        </div>
+        
+        <!-- Arrow -->
+        <div class="hidden lg:block absolute top-8 -right-4 text-gray-400">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="relative">
+        <div class="text-center">
+          <!-- Number Circle -->
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-500 text-white text-2xl font-bold mb-6">
+            3
+          </div>
+          
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Přijměte dodávku</h3>
+          
+          <!-- Description -->
+          <p class="text-gray-600 font-light leading-relaxed">Čerstvě praženou kávu doručíme přímo k vám domů</p>
+        </div>
+        
+        <!-- Arrow -->
+        <div class="hidden lg:block absolute top-8 -right-4 text-gray-400">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="relative">
+        <div class="text-center">
+          <!-- Number Circle -->
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-500 text-white text-2xl font-bold mb-6">
+            4
+          </div>
+          
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Vychutnejte si</h3>
+          
+          <!-- Description -->
+          <p class="text-gray-600 font-light leading-relaxed">Užijte si prémiovou kávu a těšte se na další měsíc</p>
+        </div>
+      </div>
+
     </div>
   </div>
   
-  <!-- Wave Divider -->
-  <div class="absolute bottom-[-1px] left-0 right-0">
+  <!-- Wave Divider Bottom -->
+  <div class="absolute bottom-[-1px] left-0 right-0 bg-gray-100">
     <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-      <path d="M0 80L60 74C120 68 240 56 360 50C480 44 600 44 720 48C840 52 960 60 1080 64C1200 68 1320 68 1380 68L1440 68V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="white"/>
+      <path d="M0 80L60 75C120 70 240 60 360 55C480 50 600 50 720 53.3C840 56.7 960 63.3 1080 65C1200 66.7 1320 63.3 1380 61.7L1440 60V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="white"/>
     </svg>
   </div>
 </div>
@@ -813,3 +1037,4 @@
 </div>
 
 @endsection
+

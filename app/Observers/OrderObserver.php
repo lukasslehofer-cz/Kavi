@@ -4,11 +4,31 @@ namespace App\Observers;
 
 use App\Mail\OrderDelivered;
 use App\Mail\OrderShipped;
+use App\Models\NewsletterSubscriber;
 use App\Models\Order;
 use Illuminate\Support\Facades\Mail;
 
 class OrderObserver
 {
+    /**
+     * Handle the Order "created" event.
+     */
+    public function created(Order $order): void
+    {
+        // Add customer email to newsletter if not already subscribed
+        $email = $order->shipping_address['email'] ?? $order->user?->email ?? null;
+        
+        if ($email) {
+            NewsletterSubscriber::firstOrCreate(
+                ['email' => $email],
+                [
+                    'source' => 'customer',
+                    'user_id' => $order->user_id,
+                ]
+            );
+        }
+    }
+
     /**
      * Handle the Order "updated" event.
      */

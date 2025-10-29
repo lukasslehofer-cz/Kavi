@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubscriptionController;
@@ -32,6 +33,9 @@ Route::get('/code/{code}', [CouponController::class, 'activateFromLink'])->name(
 
 // Coupon validation (AJAX)
 Route::post('/kupony/validovat', [CouponController::class, 'validateCoupon'])->name('coupon.validate');
+
+// Newsletter subscription (AJAX)
+Route::post('/newsletter/prihlasit', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 // Products
 Route::get('/produkty', [ProductController::class, 'index'])->name('products.index');
@@ -126,6 +130,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Coupons
     Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
     Route::get('/coupons/{coupon}/stats', [\App\Http\Controllers\Admin\CouponController::class, 'stats'])->name('coupons.stats');
+    
+    // Newsletter
+    Route::get('/newsletter', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'index'])->name('newsletter.index');
+    Route::delete('/newsletter/{subscriber}', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'destroy'])->name('newsletter.destroy');
+    Route::post('/newsletter/sync-customers', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'syncCustomers'])->name('newsletter.sync-customers');
+    Route::get('/newsletter/export', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'export'])->name('newsletter.export');
 });
 
 // Auth routes (Laravel Breeze/Jetstream or custom implementation)
