@@ -139,7 +139,7 @@
                     @enderror
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="city" class="block text-sm font-medium text-gray-900 mb-2">Město</label>
                         <input type="text" 
@@ -167,6 +167,50 @@
                                class="input @error('postal_code') border-red-500 @enderror"
                                placeholder="123 45">
                         @error('postal_code')
+                        <p class="text-red-600 text-sm mt-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            {{ $message }}
+                        </p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-gray-900 mb-2">Země</label>
+                        <select id="country" 
+                                name="country" 
+                                class="input @error('country') border-red-500 @enderror">
+                            <option value="">Vyberte zemi</option>
+                            <option value="AT" {{ old('country', auth()->user()->country ?? '') == 'AT' ? 'selected' : '' }}>Rakousko</option>
+                            <option value="BE" {{ old('country', auth()->user()->country ?? '') == 'BE' ? 'selected' : '' }}>Belgie</option>
+                            <option value="BG" {{ old('country', auth()->user()->country ?? '') == 'BG' ? 'selected' : '' }}>Bulharsko</option>
+                            <option value="HR" {{ old('country', auth()->user()->country ?? '') == 'HR' ? 'selected' : '' }}>Chorvatsko</option>
+                            <option value="CY" {{ old('country', auth()->user()->country ?? '') == 'CY' ? 'selected' : '' }}>Kypr</option>
+                            <option value="CZ" {{ old('country', auth()->user()->country ?? 'CZ') == 'CZ' ? 'selected' : '' }}>Česká republika</option>
+                            <option value="DK" {{ old('country', auth()->user()->country ?? '') == 'DK' ? 'selected' : '' }}>Dánsko</option>
+                            <option value="EE" {{ old('country', auth()->user()->country ?? '') == 'EE' ? 'selected' : '' }}>Estonsko</option>
+                            <option value="FI" {{ old('country', auth()->user()->country ?? '') == 'FI' ? 'selected' : '' }}>Finsko</option>
+                            <option value="FR" {{ old('country', auth()->user()->country ?? '') == 'FR' ? 'selected' : '' }}>Francie</option>
+                            <option value="DE" {{ old('country', auth()->user()->country ?? '') == 'DE' ? 'selected' : '' }}>Německo</option>
+                            <option value="GR" {{ old('country', auth()->user()->country ?? '') == 'GR' ? 'selected' : '' }}>Řecko</option>
+                            <option value="HU" {{ old('country', auth()->user()->country ?? '') == 'HU' ? 'selected' : '' }}>Maďarsko</option>
+                            <option value="IE" {{ old('country', auth()->user()->country ?? '') == 'IE' ? 'selected' : '' }}>Irsko</option>
+                            <option value="IT" {{ old('country', auth()->user()->country ?? '') == 'IT' ? 'selected' : '' }}>Itálie</option>
+                            <option value="LV" {{ old('country', auth()->user()->country ?? '') == 'LV' ? 'selected' : '' }}>Lotyšsko</option>
+                            <option value="LT" {{ old('country', auth()->user()->country ?? '') == 'LT' ? 'selected' : '' }}>Litva</option>
+                            <option value="LU" {{ old('country', auth()->user()->country ?? '') == 'LU' ? 'selected' : '' }}>Lucembursko</option>
+                            <option value="MT" {{ old('country', auth()->user()->country ?? '') == 'MT' ? 'selected' : '' }}>Malta</option>
+                            <option value="NL" {{ old('country', auth()->user()->country ?? '') == 'NL' ? 'selected' : '' }}>Nizozemsko</option>
+                            <option value="PL" {{ old('country', auth()->user()->country ?? '') == 'PL' ? 'selected' : '' }}>Polsko</option>
+                            <option value="PT" {{ old('country', auth()->user()->country ?? '') == 'PT' ? 'selected' : '' }}>Portugalsko</option>
+                            <option value="RO" {{ old('country', auth()->user()->country ?? '') == 'RO' ? 'selected' : '' }}>Rumunsko</option>
+                            <option value="SK" {{ old('country', auth()->user()->country ?? '') == 'SK' ? 'selected' : '' }}>Slovensko</option>
+                            <option value="SI" {{ old('country', auth()->user()->country ?? '') == 'SI' ? 'selected' : '' }}>Slovinsko</option>
+                            <option value="ES" {{ old('country', auth()->user()->country ?? '') == 'ES' ? 'selected' : '' }}>Španělsko</option>
+                            <option value="SE" {{ old('country', auth()->user()->country ?? '') == 'SE' ? 'selected' : '' }}>Švédsko</option>
+                        </select>
+                        @error('country')
                         <p class="text-red-600 text-sm mt-2 flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>

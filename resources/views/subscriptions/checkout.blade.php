@@ -149,7 +149,7 @@
                             @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label for="billing_city" class="block text-sm font-medium text-gray-700 mb-2">
                                     Město <span class="text-red-500">*</span>
@@ -182,6 +182,50 @@
                                     placeholder="123 45"
                                 >
                                 @error('billing_postal_code')
+                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="billing_country" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Země <span class="text-red-500">*</span>
+                                </label>
+                                <select 
+                                    id="billing_country" 
+                                    name="billing_country" 
+                                    required
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                >
+                                    <option value="">Vyberte zemi</option>
+                                    <option value="AT" {{ old('billing_country', auth()->user()->country ?? '') == 'AT' ? 'selected' : '' }}>Rakousko</option>
+                                    <option value="BE" {{ old('billing_country', auth()->user()->country ?? '') == 'BE' ? 'selected' : '' }}>Belgie</option>
+                                    <option value="BG" {{ old('billing_country', auth()->user()->country ?? '') == 'BG' ? 'selected' : '' }}>Bulharsko</option>
+                                    <option value="HR" {{ old('billing_country', auth()->user()->country ?? '') == 'HR' ? 'selected' : '' }}>Chorvatsko</option>
+                                    <option value="CY" {{ old('billing_country', auth()->user()->country ?? '') == 'CY' ? 'selected' : '' }}>Kypr</option>
+                                    <option value="CZ" {{ old('billing_country', auth()->user()->country ?? 'CZ') == 'CZ' ? 'selected' : '' }}>Česká republika</option>
+                                    <option value="DK" {{ old('billing_country', auth()->user()->country ?? '') == 'DK' ? 'selected' : '' }}>Dánsko</option>
+                                    <option value="EE" {{ old('billing_country', auth()->user()->country ?? '') == 'EE' ? 'selected' : '' }}>Estonsko</option>
+                                    <option value="FI" {{ old('billing_country', auth()->user()->country ?? '') == 'FI' ? 'selected' : '' }}>Finsko</option>
+                                    <option value="FR" {{ old('billing_country', auth()->user()->country ?? '') == 'FR' ? 'selected' : '' }}>Francie</option>
+                                    <option value="DE" {{ old('billing_country', auth()->user()->country ?? '') == 'DE' ? 'selected' : '' }}>Německo</option>
+                                    <option value="GR" {{ old('billing_country', auth()->user()->country ?? '') == 'GR' ? 'selected' : '' }}>Řecko</option>
+                                    <option value="HU" {{ old('billing_country', auth()->user()->country ?? '') == 'HU' ? 'selected' : '' }}>Maďarsko</option>
+                                    <option value="IE" {{ old('billing_country', auth()->user()->country ?? '') == 'IE' ? 'selected' : '' }}>Irsko</option>
+                                    <option value="IT" {{ old('billing_country', auth()->user()->country ?? '') == 'IT' ? 'selected' : '' }}>Itálie</option>
+                                    <option value="LV" {{ old('billing_country', auth()->user()->country ?? '') == 'LV' ? 'selected' : '' }}>Lotyšsko</option>
+                                    <option value="LT" {{ old('billing_country', auth()->user()->country ?? '') == 'LT' ? 'selected' : '' }}>Litva</option>
+                                    <option value="LU" {{ old('billing_country', auth()->user()->country ?? '') == 'LU' ? 'selected' : '' }}>Lucembursko</option>
+                                    <option value="MT" {{ old('billing_country', auth()->user()->country ?? '') == 'MT' ? 'selected' : '' }}>Malta</option>
+                                    <option value="NL" {{ old('billing_country', auth()->user()->country ?? '') == 'NL' ? 'selected' : '' }}>Nizozemsko</option>
+                                    <option value="PL" {{ old('billing_country', auth()->user()->country ?? '') == 'PL' ? 'selected' : '' }}>Polsko</option>
+                                    <option value="PT" {{ old('billing_country', auth()->user()->country ?? '') == 'PT' ? 'selected' : '' }}>Portugalsko</option>
+                                    <option value="RO" {{ old('billing_country', auth()->user()->country ?? '') == 'RO' ? 'selected' : '' }}>Rumunsko</option>
+                                    <option value="SK" {{ old('billing_country', auth()->user()->country ?? '') == 'SK' ? 'selected' : '' }}>Slovensko</option>
+                                    <option value="SI" {{ old('billing_country', auth()->user()->country ?? '') == 'SI' ? 'selected' : '' }}>Slovinsko</option>
+                                    <option value="ES" {{ old('billing_country', auth()->user()->country ?? '') == 'ES' ? 'selected' : '' }}>Španělsko</option>
+                                    <option value="SE" {{ old('billing_country', auth()->user()->country ?? '') == 'SE' ? 'selected' : '' }}>Švédsko</option>
+                                </select>
+                                @error('billing_country')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>

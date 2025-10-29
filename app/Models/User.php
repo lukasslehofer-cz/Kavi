@@ -61,5 +61,13 @@ class User extends Authenticatable
             ->where('status', 'active')
             ->orderBy('created_at', 'desc');
     }
+
+    /**
+     * Send the password reset notification.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }
 

@@ -113,6 +113,7 @@ class DashboardController extends Controller
             'address' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['nullable', 'string', 'max:20'],
+            'country' => ['nullable', 'string', 'size:2'],
             'packeta_point_id' => ['nullable', 'string'],
             'packeta_point_name' => ['nullable', 'string'],
             'packeta_point_address' => ['nullable', 'string'],
