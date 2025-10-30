@@ -42,6 +42,8 @@ class Subscription extends Model
         'packeta_point_id',
         'packeta_point_name',
         'packeta_point_address',
+        'carrier_id',
+        'carrier_pickup_point',
         'packeta_packet_id',
         'packeta_shipment_status',
         'packeta_sent_at',

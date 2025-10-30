@@ -197,6 +197,7 @@
                         <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" onchange="this.form.submit()">
                             <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Čeká</option>
                             <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Zpracovává se</option>
+                            <option value="submitted" {{ $order->status === 'submitted' ? 'selected' : '' }}>Podáno</option>
                             <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Odesláno</option>
                             <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Doručeno</option>
                             <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Zrušeno</option>
@@ -210,6 +211,13 @@
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Čeká</span>
                     @elseif($order->status === 'processing')
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Zpracovává se</span>
+                    @elseif($order->status === 'submitted')
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Podáno
+                    </span>
                     @elseif($order->status === 'shipped')
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Odesláno</span>
                     @elseif($order->status === 'delivered')
@@ -218,6 +226,25 @@
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Zrušeno</span>
                     @endif
                 </div>
+
+                @if($order->packeta_shipment_status === 'submitted' && $order->packeta_packet_id)
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z"/>
+                            </svg>
+                            <span class="text-sm font-semibold text-green-900">Packeta zásilka</span>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            <p><span class="font-medium text-green-900">ID zásilky:</span> <span class="font-mono text-green-800">{{ $order->packeta_packet_id }}</span></p>
+                            @if($order->packeta_sent_at)
+                            <p><span class="font-medium text-green-900">Podáno:</span> <span class="text-green-800">{{ $order->packeta_sent_at->format('d.m.Y H:i') }}</span></p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Customer Info -->

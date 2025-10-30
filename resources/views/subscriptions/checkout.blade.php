@@ -249,6 +249,8 @@
                         <input type="hidden" id="packeta_point_id" name="packeta_point_id" value="{{ old('packeta_point_id', auth()->user()->packeta_point_id ?? '') }}">
                         <input type="hidden" id="packeta_point_name" name="packeta_point_name" value="{{ old('packeta_point_name', auth()->user()->packeta_point_name ?? '') }}">
                         <input type="hidden" id="packeta_point_address" name="packeta_point_address" value="{{ old('packeta_point_address', auth()->user()->packeta_point_address ?? '') }}">
+                        <input type="hidden" id="carrier_id" name="carrier_id" value="{{ old('carrier_id') }}">
+                        <input type="hidden" id="carrier_pickup_point" name="carrier_pickup_point" value="{{ old('carrier_pickup_point') }}">
 
                         <!-- Packeta selection display -->
                         <div id="packeta-selection">
@@ -637,6 +639,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('packeta_point_id').value = '';
         document.getElementById('packeta_point_name').value = '';
         document.getElementById('packeta_point_address').value = '';
+        document.getElementById('carrier_id').value = '';
+        document.getElementById('carrier_pickup_point').value = '';
         
         // Reset Packeta UI to initial state
         const selectionDiv = document.getElementById('packeta-selection');
@@ -707,6 +711,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Fill hidden fields with selected point data
                 document.getElementById('packeta_point_id').value = point.id;
                 document.getElementById('packeta_point_name').value = point.name;
+                
+                // Store carrier ID and carrierPickupPointId for Carriers PUDOs (international)
+                if (point.carrierId) {
+                    document.getElementById('carrier_id').value = point.carrierId;
+                }
+                if (point.carrierPickupPointId) {
+                    document.getElementById('carrier_pickup_point').value = point.carrierPickupPointId;
+                }
                 
                 // Format address
                 let address = point.street;

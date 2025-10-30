@@ -366,6 +366,8 @@ class SubscriptionController extends Controller
             'packeta_point_id' => 'required|string',
             'packeta_point_name' => 'required|string',
             'packeta_point_address' => 'nullable|string',
+            'carrier_id' => 'nullable|string',
+            'carrier_pickup_point' => 'nullable|string',
             'payment_method' => 'required|in:card,transfer',
             'delivery_notes' => 'nullable|string|max:500',
             'coupon_code' => 'nullable|string',
@@ -438,6 +440,8 @@ class SubscriptionController extends Controller
                     'packeta_point_id' => $validated['packeta_point_id'],
                     'packeta_point_name' => $validated['packeta_point_name'],
                     'packeta_point_address' => $validated['packeta_point_address'],
+                    'carrier_id' => $validated['carrier_id'] ?? null,
+                    'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
                 ],
                 'subscription_delivery_notes' => $validated['delivery_notes'] ?? null,
             ]);
@@ -452,9 +456,12 @@ class SubscriptionController extends Controller
                     'billing_address' => $validated['billing_address'],
                     'billing_city' => $validated['billing_city'],
                     'billing_postal_code' => $validated['billing_postal_code'],
+                    'billing_country' => $validated['billing_country'],
                     'packeta_point_id' => $validated['packeta_point_id'],
                     'packeta_point_name' => $validated['packeta_point_name'],
                     'packeta_point_address' => $validated['packeta_point_address'],
+                    'carrier_id' => $validated['carrier_id'] ?? null,
+                    'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
                     'delivery_notes' => $validated['delivery_notes'] ?? null,
                 ];
 
@@ -503,12 +510,14 @@ class SubscriptionController extends Controller
                         'billing_address' => $validated['billing_address'],
                         'billing_city' => $validated['billing_city'],
                         'billing_postal_code' => $validated['billing_postal_code'],
-                        'country' => 'CZ',
+                        'country' => $validated['billing_country'],
                     ],
                     'payment_method' => 'transfer',
                     'packeta_point_id' => $validated['packeta_point_id'],
                     'packeta_point_name' => $validated['packeta_point_name'],
                     'packeta_point_address' => $validated['packeta_point_address'],
+                    'carrier_id' => $validated['carrier_id'] ?? null,
+                    'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
                     'delivery_notes' => $validated['delivery_notes'] ?? null,
                 ]);
 

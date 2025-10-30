@@ -58,10 +58,43 @@ class PacketaService
             $packetAttributes->addChild('surname', $data['surname'] ?? '');
             $packetAttributes->addChild('email', $data['email']);
             $packetAttributes->addChild('phone', $data['phone']);
-            $packetAttributes->addChild('addressId', $data['packeta_point_id']);
+            
+            // Determine routing based on country - CZ uses addressId only, others use addressId + carrierPickupPoint
+            $country = strtoupper($data['country'] ?? 'CZ');
+            $isCarrierPudo = ($country !== 'CZ');
+            
+            if ($isCarrierPudo) {
+                // Carriers PUDOs (international) - use addressId (carrier ID) + carrierPickupPoint (point code)
+                // addressId = ID of the carrier (e.g. 106 for DHL, 3060 for InPost)
+                // carrierPickupPoint = code of the pickup point (e.g. "BIA10M" or numeric ID)
+                $carrierId = $data['carrier_id'] ?? $this->getCarrierIdFromCountry($country);
+                $carrierPickupPoint = $data['carrier_pickup_point'] ?? $data['packeta_point_id'];
+                
+                $packetAttributes->addChild('addressId', $carrierId);
+                $packetAttributes->addChild('carrierPickupPoint', $carrierPickupPoint);
+                
+                Log::info('Using Carriers PUDO structure', [
+                    'country' => $country,
+                    'addressId' => $carrierId,
+                    'carrierPickupPoint' => $carrierPickupPoint,
+                ]);
+            } else {
+                // Packeta PUDOs (CZ) - standard addressId only
+                $packetAttributes->addChild('addressId', $data['packeta_point_id']);
+                
+                Log::info('Using Packeta PUDO structure (CZ)', [
+                    'country' => $country,
+                    'addressId' => $data['packeta_point_id'],
+                ]);
+            }
+            
             $packetAttributes->addChild('value', number_format($data['value'], 2, '.', ''));
             $packetAttributes->addChild('weight', number_format($data['weight'], 2, '.', ''));
             $packetAttributes->addChild('eshop', $this->senderId);
+            
+            // Currency - required for international shipments
+            $currency = $data['currency'] ?? 'CZK';
+            $packetAttributes->addChild('currencyCode', $currency);
             
             if (!empty($data['cod'])) {
                 $packetAttributes->addChild('cod', number_format($data['cod'], 2, '.', ''));
@@ -70,12 +103,20 @@ class PacketaService
             if (!empty($data['note'])) {
                 $packetAttributes->addChild('note', $data['note']);
             }
+            
+            // Adult content flag (for international shipments with coffee/alcohol)
+            if (!empty($data['adult_content'])) {
+                $packetAttributes->addChild('adultContent', '1');
+            }
 
             $xmlString = $xml->asXML();
 
             Log::info('Packeta API Request', [
                 'url' => $this->apiUrl,
                 'xml' => $xmlString,
+                'is_carrier_pudo' => $isCarrierPudo,
+                'point_id' => $data['packeta_point_id'],
+                'country' => $data['country'] ?? 'N/A',
                 'api_password_length' => strlen($this->apiPassword),
                 'api_password_start' => substr($this->apiPassword, 0, 8) . '...',
             ]);
@@ -131,26 +172,17 @@ class PacketaService
     }
 
     /**
-     * Get pickup point details by ID
+     * Get pickup point details by ID from v4 API
+     * Note: This method may return large datasets and should be used with caution
      *
      * @param string $pointId
      * @return array|null
      */
     public function getPickupPoint(string $pointId): ?array
     {
-        try {
-            $response = Http::withBasicAuth($this->apiKey, $this->apiPassword)
-                ->get("{$this->apiUrl}/branch-detail/{$pointId}");
-
-            if ($response->successful()) {
-                return $response->json();
-            }
-
-            return null;
-        } catch (\Exception $e) {
-            Log::error('Packeta Service Exception: ' . $e->getMessage());
-            return null;
-        }
+        // Disabled due to memory issues - API returns too much data
+        // Instead, we rely on country-based carrier ID mapping
+        return null;
     }
 
     /**
@@ -251,6 +283,9 @@ class PacketaService
 
     /**
      * Get all pickup points for a specific carrier
+     * 
+     * DEPRECATED: This method can cause memory issues with large carrier networks.
+     * Use Packeta Widget on frontend instead for pickup point selection.
      *
      * @param string $carrierId Carrier ID (e.g. 'zpoint', '131', etc.)
      * @param string $countryCode Country code
@@ -258,25 +293,9 @@ class PacketaService
      */
     public function getPickupPointsForCarrier(string $carrierId, string $countryCode): array
     {
-        try {
-            $response = Http::get("https://www.zasilkovna.cz/api/v4/{$this->apiKey}/branch.json", [
-                'country' => strtoupper($countryCode),
-                'carrier' => $carrierId,
-            ]);
-
-            if ($response->successful()) {
-                return $response->json();
-            }
-
-            return [];
-        } catch (\Exception $e) {
-            Log::error('Packeta Pickup Points API Error', [
-                'carrier' => $carrierId,
-                'country' => $countryCode,
-                'message' => $e->getMessage(),
-            ]);
-            return [];
-        }
+        // Disabled due to potential memory issues with large API responses
+        // Use Packeta Widget on frontend for pickup point selection instead
+        return [];
     }
 
     /**
@@ -311,6 +330,48 @@ class PacketaService
                 ['id' => '4162', 'name' => 'Packeta Rumunsko'],
             ],
         ];
+    }
+
+    /**
+     * Determine if pickup point is a Carrier PUDO (international) or Packeta PUDO (CZ)
+     * 
+     * @param string $pointId
+     * @return bool
+     */
+    private function isCarrierPickupPoint(string $pointId): bool
+    {
+        // Packeta CZ points typically have lower IDs (under 100000)
+        // Carrier points (international) have higher IDs (usually 6+ digits)
+        // This is a heuristic - ideally we'd check against the carrier/country data
+        
+        if (!is_numeric($pointId)) {
+            return true; // Non-numeric IDs are typically carrier points
+        }
+        
+        $numericId = (int)$pointId;
+        
+        // CZ Packeta points are typically below 100000
+        return $numericId > 100000;
+    }
+
+    /**
+     * Get carrier ID based on country code
+     * 
+     * @param string $countryCode
+     * @return string
+     */
+    private function getCarrierIdFromCountry(string $countryCode): string
+    {
+        $carrierMap = [
+            'SK' => '131',      // Packeta Slovakia
+            'PL' => '3060',     // InPost Poland
+            'HU' => '4159',     // Packeta Hungary
+            'DE' => '106',      // DHL Paketshop Germany
+            'AT' => '4161',     // Post Austria
+            'RO' => '4162',     // Packeta Romania
+        ];
+
+        return $carrierMap[strtoupper($countryCode)] ?? '131';
     }
 }
 

@@ -160,11 +160,13 @@ class StripeService
                 'billing_address' => $shippingAddress['billing_address'],
                 'billing_city' => $shippingAddress['billing_city'],
                 'billing_postal_code' => $shippingAddress['billing_postal_code'],
-                'country' => 'CZ',
+                'country' => $shippingAddress['billing_country'] ?? 'CZ',
             ]),
             'packeta_point_id' => $shippingAddress['packeta_point_id'],
             'packeta_point_name' => $shippingAddress['packeta_point_name'],
             'packeta_point_address' => $shippingAddress['packeta_point_address'] ?? null,
+            'carrier_id' => $shippingAddress['carrier_id'] ?? null,
+            'carrier_pickup_point' => $shippingAddress['carrier_pickup_point'] ?? null,
             'delivery_notes' => $shippingAddress['delivery_notes'] ?? null,
         ];
         
@@ -532,6 +534,8 @@ class StripeService
                     $subscriptionRecord['packeta_point_id'] = $subscriptionData['metadata']['packeta_point_id'];
                     $subscriptionRecord['packeta_point_name'] = $subscriptionData['metadata']['packeta_point_name'] ?? null;
                     $subscriptionRecord['packeta_point_address'] = $subscriptionData['metadata']['packeta_point_address'] ?? null;
+                    $subscriptionRecord['carrier_id'] = $subscriptionData['metadata']['carrier_id'] ?? null;
+                    $subscriptionRecord['carrier_pickup_point'] = $subscriptionData['metadata']['carrier_pickup_point'] ?? null;
                 }
                 
                 // Add delivery notes if available

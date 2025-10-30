@@ -42,6 +42,10 @@ class Order extends Model
         'packeta_packet_id',
         'packeta_tracking_url',
         'packeta_sent_at',
+        'packeta_point_id',
+        'packeta_point_name',
+        'packeta_point_address',
+        'packeta_shipment_status',
     ];
 
     protected $casts = [
@@ -89,6 +93,14 @@ class Order extends Model
         $this->update([
             'payment_status' => 'paid',
             'paid_at' => now(),
+        ]);
+    }
+
+    public function markAsSubmitted()
+    {
+        $this->update([
+            'status' => 'submitted',
+            'packeta_shipment_status' => 'submitted',
         ]);
     }
 

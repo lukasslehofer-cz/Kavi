@@ -271,6 +271,8 @@ class CheckoutController extends Controller
                     'packeta_point_id' => $request->packeta_point_id,
                     'packeta_point_name' => $request->packeta_point_name,
                     'packeta_point_address' => $request->packeta_point_address,
+                    'carrier_id' => $request->carrier_id,
+                    'carrier_pickup_point' => $request->carrier_pickup_point,
                 ],
                 'customer_notes' => $request->notes,
             ]);

@@ -190,16 +190,46 @@ class SubscriptionController extends Controller
             $name = $shippingAddress['name'] ?? $subscription->user->name ?? '';
             $nameParts = explode(' ', $name, 2);
             
+            // Determine currency based on shipping country
+            $shippingCountry = $shippingAddress['country'] ?? $subscription->user->country ?? 'CZ';
+            $currency = $this->getCurrencyForCountry($shippingCountry);
+            
+            // Format phone number - remove spaces and ensure it has country code
+            $phone = $shippingAddress['phone'] ?? $subscription->user->phone ?? '';
+            $phone = preg_replace('/\s+/', '', $phone); // Remove spaces
+            if (!empty($phone) && !str_starts_with($phone, '+')) {
+                // Add country code if missing
+                $phone = $this->addCountryCodeToPhone($phone, $shippingCountry);
+            }
+            
+            // Convert value to target currency if needed
+            $value = $subscription->configured_price ?? 500;
+            if ($currency !== 'CZK') {
+                // Simple conversion: CZK to EUR (~25:1), CZK to USD (~23:1)
+                $value = match($currency) {
+                    'EUR' => round($value / 25, 2),
+                    'USD' => round($value / 23, 2),
+                    default => $value
+                };
+                // Cap at reasonable insurance value for international shipments
+                $value = min($value, 100);
+            }
+            
             $packetData = [
                 'name' => $nameParts[0] ?? $name,
                 'surname' => $nameParts[1] ?? '',
                 'email' => $shippingAddress['email'] ?? $subscription->user->email ?? '',
-                'phone' => $shippingAddress['phone'] ?? $subscription->user->phone ?? '',
+                'phone' => $phone,
                 'packeta_point_id' => $subscription->packeta_point_id,
-                'value' => $subscription->configured_price ?? 500,
+                'carrier_id' => $subscription->carrier_id ?? null,
+                'carrier_pickup_point' => $subscription->carrier_pickup_point ?? null,
+                'value' => $value,
                 'weight' => $weight,
                 'order_number' => 'SUB-' . $subscription->id,
                 'note' => $subscription->delivery_notes ?? null,
+                'currency' => $currency,
+                'country' => $shippingCountry,
+                'adult_content' => false, // Set to true if selling alcohol/tobacco
             ];
 
             try {
@@ -259,5 +289,52 @@ class SubscriptionController extends Controller
 
         return redirect()->route('admin.subscriptions.shipments')
             ->with('success', $message);
+    }
+
+    /**
+     * Get currency code for a given country
+     */
+    private function getCurrencyForCountry(string $countryCode): string
+    {
+        $currencyMap = [
+            'CZ' => 'CZK',
+            'SK' => 'EUR',
+            'PL' => 'PLN',
+            'HU' => 'HUF',
+            'RO' => 'RON',
+            'AT' => 'EUR',
+            'DE' => 'EUR',
+            'SI' => 'EUR',
+            'HR' => 'EUR',
+            'BG' => 'BGN',
+        ];
+
+        return $currencyMap[strtoupper($countryCode)] ?? 'EUR';
+    }
+
+    /**
+     * Add country code to phone number if missing
+     */
+    private function addCountryCodeToPhone(string $phone, string $countryCode): string
+    {
+        $countryCodeMap = [
+            'CZ' => '+420',
+            'SK' => '+421',
+            'PL' => '+48',
+            'HU' => '+36',
+            'RO' => '+40',
+            'AT' => '+43',
+            'DE' => '+49',
+            'SI' => '+386',
+            'HR' => '+385',
+            'BG' => '+359',
+        ];
+
+        $prefix = $countryCodeMap[strtoupper($countryCode)] ?? '+420';
+        
+        // Remove leading zero if present
+        $phone = ltrim($phone, '0');
+        
+        return $prefix . $phone;
     }
 }
