@@ -51,6 +51,9 @@ stripe.tar.gz
 # Deployment
 deploy.log
 
+# Documentation
+/documentation
+
 # Uploaded images (user content)
 /public/images/products/*
 !/public/images/products/.gitkeep
