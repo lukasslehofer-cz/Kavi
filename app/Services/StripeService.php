@@ -583,6 +583,7 @@ class StripeService
                             'name' => $name,
                             'email' => $guestEmail,
                             'password' => \Hash::make(\Str::random(32)), // Random password
+                            'password_set_by_user' => false, // User didn't set this password
                             'phone' => $subscription->shipping_address['phone'] ?? null,
                             'address' => $subscription->shipping_address['billing_address'] ?? null,
                             'city' => $subscription->shipping_address['billing_city'] ?? null,

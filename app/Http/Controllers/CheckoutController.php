@@ -268,6 +268,7 @@ class CheckoutController extends Controller
                             'name' => $request->name,
                             'email' => $request->email,
                             'password' => \Hash::make(\Str::random(32)), // Random password
+                            'password_set_by_user' => false, // User didn't set this password
                             'phone' => $request->phone ?? null,
                             'address' => $request->billing_address,
                             'city' => $request->billing_city,

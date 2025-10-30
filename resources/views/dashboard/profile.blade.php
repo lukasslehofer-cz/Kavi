@@ -439,36 +439,71 @@
         </div>
     </div>
 
-    <!-- Change Password -->
+    <!-- Change/Set Password -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Změna hesla</h2>
+            <h2 class="text-xl font-bold text-gray-900">
+                @if(!auth()->user()->password_set_by_user)
+                    Nastavit heslo
+                @else
+                    Změna hesla
+                @endif
+            </h2>
+            @if(!auth()->user()->password_set_by_user)
+                <p class="text-sm text-gray-600 mt-1 font-light">Nastavte si vlastní heslo pro přihlášení</p>
+            @endif
         </div>
         <div class="p-6">
+            @if(!auth()->user()->password_set_by_user)
+                <!-- INFO: User hasn't set password yet (using magic link or auto-created account) -->
+                <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6">
+                    <div class="flex items-start">
+                        <svg class="h-5 w-5 text-blue-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <p class="text-sm text-blue-800 font-medium mb-1">Přihlašujete se přes magic link</p>
+                            <p class="text-xs text-blue-700 font-light">
+                                Zatím nemáte nastavené vlastní heslo. Můžete si ho nastavit zde, nebo pokračovat v používání magic linku pro přihlášení.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('dashboard.password.update') }}" class="space-y-6">
                 @csrf
                 @method('PUT')
 
-                <div>
-                    <label for="current_password" class="block text-sm font-medium text-gray-900 mb-2">Současné heslo</label>
-                    <input type="password" 
-                           id="current_password" 
-                           name="current_password" 
-                           class="input @error('current_password') border-red-500 @enderror"
-                           required>
-                    @error('current_password')
-                    <p class="text-red-600 text-sm mt-2 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        {{ $message }}
-                    </p>
-                    @enderror
-                </div>
+                @if(auth()->user()->password_set_by_user)
+                    <!-- Show current password field only if user has set password before -->
+                    <div>
+                        <label for="current_password" class="block text-sm font-medium text-gray-900 mb-2">Současné heslo</label>
+                        <input type="password" 
+                               id="current_password" 
+                               name="current_password" 
+                               class="input @error('current_password') border-red-500 @enderror"
+                               required>
+                        @error('current_password')
+                        <p class="text-red-600 text-sm mt-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            {{ $message }}
+                        </p>
+                        @enderror
+                    </div>
+                @endif
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-900 mb-2">Nové heslo</label>
+                        <label for="password" class="block text-sm font-medium text-gray-900 mb-2">
+                            @if(!auth()->user()->password_set_by_user)
+                                Nové heslo
+                            @else
+                                Nové heslo
+                            @endif
+                        </label>
                         <input type="password" 
                                id="password" 
                                name="password" 
@@ -485,7 +520,7 @@
                     </div>
 
                     <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-900 mb-2">Potvrdit nové heslo</label>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-900 mb-2">Potvrdit heslo</label>
                         <input type="password" 
                                id="password_confirmation" 
                                name="password_confirmation" 
@@ -514,7 +549,11 @@
                         <svg class="w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
-                        Změnit heslo
+                        @if(!auth()->user()->password_set_by_user)
+                            Nastavit heslo
+                        @else
+                            Změnit heslo
+                        @endif
                     </button>
                 </div>
             </form>

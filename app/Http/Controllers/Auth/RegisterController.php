@@ -32,6 +32,7 @@ class RegisterController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'password_set_by_user' => true, // User explicitly set this password
         ]);
 
         Auth::login($user);

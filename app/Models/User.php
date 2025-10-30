@@ -14,6 +14,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_set_by_user',
         'phone',
         'address',
         'city',
@@ -35,6 +36,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'password_set_by_user' => 'boolean',
         'is_admin' => 'boolean',
         'deleted_at' => 'datetime',
         'anonymized_at' => 'datetime',

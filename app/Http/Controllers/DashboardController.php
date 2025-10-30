@@ -169,13 +169,26 @@ class DashboardController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ]);
+        $user = auth()->user();
+        
+        // Different validation based on whether user has set their password before
+        if ($user->password_set_by_user) {
+            // User has set password before - require current password
+            $validated = $request->validate([
+                'current_password' => ['required', 'current_password'],
+                'password' => ['required', 'confirmed', Password::min(8)],
+            ]);
+        } else {
+            // User hasn't set password yet (has random password) - no current password needed
+            $validated = $request->validate([
+                'password' => ['required', 'confirmed', Password::min(8)],
+            ]);
+        }
 
-        auth()->user()->update([
+        // Update password and mark as user-set
+        $user->update([
             'password' => Hash::make($validated['password']),
+            'password_set_by_user' => true,
         ]);
 
         return redirect()->route('dashboard.profile')
