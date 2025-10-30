@@ -91,8 +91,14 @@ echo -e "${GREEN}✓ Composer dependencies nainstalované${NC}"
 # 5. NPM BUILD
 echo -e "${YELLOW}🎨 Builduji frontend assets...${NC}"
 if command -v npm &> /dev/null; then
-    npm install --production --no-audit --no-fund 2>&1 | tail -3
-    npm run build 2>&1 | tail -5
+    # Instalujeme i dev dependencies (potřebné pro build)
+    npm install --no-audit --no-fund 2>&1 | tail -3
+    echo -e "${BLUE}   → Running npm run build...${NC}"
+    npm run build 2>&1 | grep -E "(vite|build|✓|chunks)" | tail -10
+    
+    # Po buildu smažeme dev dependencies pro úsporu místa
+    npm prune --omit=dev 2>/dev/null || true
+    
     echo -e "${GREEN}✓ Frontend build dokončen${NC}"
 else
     echo -e "${RED}⚠  npm není nainstalován (přeskakuji build)${NC}"
