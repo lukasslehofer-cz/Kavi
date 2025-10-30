@@ -178,45 +178,97 @@ class SubscriptionController extends Controller
     {
         // Handle successful return from Stripe
         if ($request->has('success') && $request->success == 1) {
-            // Get the latest subscription for this user or guest
+            $sessionId = $request->get('session_id');
             $subscription = null;
             
-            if (auth()->check()) {
-                // For authenticated users, find by user_id
-                $subscription = Subscription::where('user_id', auth()->id())
-                    ->latest()
-                    ->first();
-            } else {
-                // For guests, try to find by session email from shipping address
-                $guestEmail = session('guest_subscription_email');
-                if ($guestEmail) {
-                    $subscription = Subscription::whereNull('user_id')
-                        ->whereRaw("JSON_EXTRACT(shipping_address, '$.email') = ?", [$guestEmail])
-                        ->latest()
-                        ->first();
+            // Try to find subscription by Stripe session_id (most reliable)
+            if ($sessionId) {
+                $subscription = Subscription::where('stripe_session_id', $sessionId)->first();
+                
+                if ($subscription) {
+                    \Log::info('Found subscription by session_id', [
+                        'session_id' => $sessionId,
+                        'subscription_id' => $subscription->id,
+                    ]);
                 }
             }
             
-            // Clear subscription session data
-            session()->forget([
-                'subscription_configuration', 
-                'subscription_price',
-                'subscription_price_without_vat',
-                'subscription_vat',
-                'subscription_shipping_address',
-                'subscription_packeta',
-                'subscription_delivery_notes',
-                'guest_subscription_email',
-                'guest_subscription_name',
-                'guest_subscription_phone',
-            ]);
+            // Fallback: find by user_id or email if session_id didn't work
+            if (!$subscription) {
+                if (auth()->check()) {
+                    // For authenticated users, find by user_id
+                    $subscription = Subscription::where('user_id', auth()->id())
+                        ->latest()
+                        ->first();
+                } else {
+                    // For guests, try to find by session email
+                    $guestEmail = session('guest_subscription_email');
+                    if ($guestEmail) {
+                        $subscription = Subscription::whereJsonContains('shipping_address->email', $guestEmail)
+                            ->latest()
+                            ->first();
+                    }
+                }
+                
+                if ($subscription) {
+                    \Log::info('Found subscription by fallback method', [
+                        'subscription_id' => $subscription->id,
+                        'method' => auth()->check() ? 'user_id' : 'email',
+                    ]);
+                }
+            }
 
-            // Redirect to confirmation page (for both authenticated and guest users)
+            // If subscription found, redirect to confirmation
             if ($subscription) {
+                // Store subscription ID in session for secure auto-login
+                if (!auth()->check()) {
+                    session(['pending_subscription_' . $subscription->id => true]);
+                }
+                
+                // Auto-login guest user if not already authenticated
+                // SECURITY: Only auto-login if this session just created/accessed the subscription
+                if (!auth()->check() && $subscription->user_id) {
+                    if (session()->has('pending_subscription_' . $subscription->id)) {
+                        $user = \App\Models\User::find($subscription->user_id);
+                        if ($user) {
+                            auth()->login($user);
+                            \Log::info('Auto-logged in user after subscription payment', [
+                                'user_id' => $user->id,
+                                'subscription_id' => $subscription->id,
+                            ]);
+                        }
+                    } else {
+                        \Log::warning('Auto-login blocked - no session verification for subscription', [
+                            'subscription_id' => $subscription->id,
+                            'user_id' => $subscription->user_id,
+                        ]);
+                    }
+                }
+                
+                // Clear subscription session data (but keep guest email for confirmation page authorization)
+                session()->forget([
+                    'subscription_configuration', 
+                    'subscription_price',
+                    'subscription_price_without_vat',
+                    'subscription_vat',
+                    'subscription_shipping_address',
+                    'subscription_packeta',
+                    'subscription_delivery_notes',
+                    'guest_subscription_name',
+                    'guest_subscription_phone',
+                ]);
+                
                 return redirect()->route('subscriptions.confirmation', $subscription);
             } else {
+                // Subscription not found yet (race condition) - show processing message
+                \Log::warning('Subscription not found after payment', [
+                    'session_id' => $sessionId,
+                    'user_id' => auth()->id(),
+                    'guest_email' => session('guest_subscription_email'),
+                ]);
+                
                 return redirect()->route('subscriptions.index')
-                    ->with('success', 'Děkujeme za objednávku! Brzy vám zašleme potvrzení na email.');
+                    ->with('success', 'Děkujeme za objednávku! Zpracováváme vaši platbu a brzy vám zašleme potvrzení na email.');
             }
         }
 
@@ -464,6 +516,11 @@ class SubscriptionController extends Controller
 
                 DB::commit();
                 
+                // Store subscription ID in session for secure access (bank transfer only)
+                if (!auth()->check()) {
+                    session(['pending_subscription_' . $subscription->id => true]);
+                }
+                
                 // Send subscription confirmation email
                 try {
                     Mail::to($validated['email'])->send(new SubscriptionConfirmation($subscription));
@@ -508,14 +565,55 @@ class SubscriptionController extends Controller
      */
     public function confirmation(Subscription $subscription)
     {
+        // Auto-login guest user if not already authenticated
+        // SECURITY: Only auto-login if this session has pending_subscription flag
+        if (!auth()->check() && $subscription->user_id) {
+            if (session()->has('pending_subscription_' . $subscription->id)) {
+                $user = \App\Models\User::find($subscription->user_id);
+                if ($user) {
+                    auth()->login($user);
+                    // Clear the pending session after successful login
+                    session()->forget('pending_subscription_' . $subscription->id);
+                    
+                    \Log::info('Auto-logged in user for subscription confirmation', [
+                        'user_id' => $user->id,
+                        'subscription_id' => $subscription->id,
+                    ]);
+                }
+            } else {
+                \Log::warning('Auto-login blocked - no session verification for subscription confirmation', [
+                    'subscription_id' => $subscription->id,
+                    'user_id' => $subscription->user_id,
+                ]);
+            }
+        }
+        
         // If user is authenticated, check if subscription belongs to them
         if (auth()->check() && $subscription->user_id !== auth()->id()) {
             abort(403);
         }
 
-        // If user is not authenticated, only allow access to guest subscriptions (user_id is null)
-        if (!auth()->check() && $subscription->user_id !== null) {
-            abort(403);
+        // If user is not authenticated, verify they have access via session data
+        if (!auth()->check()) {
+            // Allow access if:
+            // 1. Subscription has no user_id (original guest subscription)
+            // 2. OR guest email in session matches subscription email
+            // 3. OR pending_subscription flag exists (just cleared by auto-login attempt)
+            $guestEmail = session('guest_subscription_email');
+            $subscriptionEmail = $subscription->shipping_address['email'] ?? null;
+            
+            $hasAccess = $subscription->user_id === null || 
+                         ($guestEmail && $subscriptionEmail && $guestEmail === $subscriptionEmail);
+            
+            if (!$hasAccess) {
+                \Log::warning('Unauthorized access attempt to subscription confirmation', [
+                    'subscription_id' => $subscription->id,
+                    'subscription_user_id' => $subscription->user_id,
+                    'subscription_email' => $subscriptionEmail,
+                    'session_email' => $guestEmail,
+                ]);
+                abort(403, 'Nemáte oprávnění zobrazit tuto stránku. Prosím přihlaste se.');
+            }
         }
 
         return view('subscriptions.confirmation', compact('subscription'));

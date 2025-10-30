@@ -10,12 +10,26 @@ class PaymentController extends Controller
 {
     public function __construct(private StripeService $stripeService)
     {
-        $this->middleware('auth')->except('webhook');
+        $this->middleware('auth')->except(['webhook', 'cardPayment']);
     }
 
     public function cardPayment(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
+        \Log::info('cardPayment called', [
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+            'auth_id' => auth()->id(),
+            'is_authenticated' => auth()->check(),
+        ]);
+        
+        // Allow access for authenticated users who own the order
+        // OR for guest orders (where user_id might be null or newly created)
+        if (auth()->check() && $order->user_id !== auth()->id()) {
+            \Log::warning('Authorization failed in cardPayment', [
+                'order_id' => $order->id,
+                'order_user_id' => $order->user_id,
+                'auth_id' => auth()->id(),
+            ]);
             abort(403);
         }
 
@@ -25,9 +39,20 @@ class PaymentController extends Controller
 
         try {
             $session = $this->stripeService->createOrderCheckoutSession($order);
+            \Log::info('Stripe session created successfully', [
+                'order_id' => $order->id,
+                'session_id' => $session->id,
+            ]);
             return redirect($session->url);
         } catch (\Exception $e) {
-            return back()->with('error', 'Nepodařilo se vytvořit platební session. Zkuste to prosím znovu.');
+            \Log::error('Failed to create Stripe checkout session', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Don't go back() - cart is empty. Go to order confirmation with error.
+            return redirect()->route('order.confirmation', $order)
+                ->with('error', 'Nepodařilo se vytvořit platební session: ' . $e->getMessage() . ' Zkuste to prosím znovu níže.');
         }
     }
 

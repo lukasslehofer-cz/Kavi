@@ -47,6 +47,27 @@ class StripeService
      */
     public function createOrderCheckoutSession(Order $order): StripeSession
     {
+        \Log::info('createOrderCheckoutSession called', [
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+            'payment_status' => $order->payment_status,
+        ]);
+        
+        // Load user and items relationships
+        $order->load(['user', 'items']);
+        
+        \Log::info('Order relationships loaded', [
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+            'user_exists' => $order->user !== null,
+            'items_count' => $order->items->count(),
+        ]);
+        
+        if (!$order->user) {
+            \Log::error('Order has no user', ['order_id' => $order->id]);
+            throw new \Exception('Objednávka nemá přiřazeného uživatele.');
+        }
+        
         $customerId = $this->getOrCreateCustomer($order->user);
 
         $lineItems = $order->items->map(function ($item) {
@@ -54,12 +75,29 @@ class StripeService
                 'name' => $item->product_name,
             ];
             
-            // Add image only if it exists and convert to absolute URL
-            if ($item->product_image) {
-                $imageUrl = str_starts_with($item->product_image, 'http') 
-                    ? $item->product_image 
-                    : asset($item->product_image);
-                $productData['images'] = [$imageUrl];
+            // Add image only if it exists and is valid
+            if ($item->product_image && !empty(trim($item->product_image))) {
+                try {
+                    $imageUrl = str_starts_with($item->product_image, 'http') 
+                        ? $item->product_image 
+                        : url($item->product_image); // Use url() instead of asset()
+                    
+                    // Validate URL format
+                    if (filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+                        $productData['images'] = [$imageUrl];
+                    } else {
+                        \Log::warning('Invalid product image URL', [
+                            'product_name' => $item->product_name,
+                            'image_path' => $item->product_image,
+                            'generated_url' => $imageUrl,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to generate product image URL', [
+                        'product_name' => $item->product_name,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
             
             return [
@@ -92,7 +130,7 @@ class StripeService
             'line_items' => $lineItems,
             'mode' => 'payment',
             'success_url' => route('order.confirmation', $order) . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('cart.index'),
+            'cancel_url' => route('order.confirmation', $order) . '?cancelled=1',
             'metadata' => [
                 'order_id' => $order->id,
             ],
@@ -301,10 +339,26 @@ class StripeService
     }
 
     /**
-     * Handle successful payment webhook
+     * Handle successful payment webhook (checkout.session.completed)
      */
     public function handlePaymentSuccess(array $session): void
     {
+        // Handle subscription checkout - store session_id for later use
+        if (isset($session['mode']) && $session['mode'] === 'subscription' && isset($session['subscription'])) {
+            $stripeSubscriptionId = $session['subscription'];
+            $sessionId = $session['id'];
+            
+            // Store session_id in cache for 10 minutes (enough time for subscription.created webhook)
+            \Cache::put("stripe_session_{$stripeSubscriptionId}", $sessionId, now()->addMinutes(10));
+            
+            \Log::info('Stored session_id for subscription in cache', [
+                'stripe_subscription_id' => $stripeSubscriptionId,
+                'session_id' => $sessionId,
+            ]);
+            
+            return;
+        }
+        
         // Handle manual invoice payment for subscription
         if (isset($session['metadata']['type']) && $session['metadata']['type'] === 'manual_invoice_payment') {
             $subscriptionId = $session['metadata']['subscription_id'] ?? null;
@@ -440,10 +494,20 @@ class StripeService
             
             $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($frequencyMonths);
             
+            // Retrieve session_id from cache (stored by checkout.session.completed webhook)
+            $sessionId = \Cache::get("stripe_session_{$subscriptionData['id']}");
+            if ($sessionId) {
+                \Log::info('Retrieved session_id from cache', [
+                    'stripe_subscription_id' => $subscriptionData['id'],
+                    'session_id' => $sessionId,
+                ]);
+            }
+            
             $subscriptionRecord = [
                 'subscription_number' => Subscription::generateSubscriptionNumber(),
                 'user_id' => $userId,
                 'stripe_subscription_id' => $subscriptionData['id'],
+                'stripe_session_id' => $sessionId,
                 'status' => 'active',
                 'starts_at' => $subscriptionStartDate,
                 'next_billing_date' => $nextBillingDate,

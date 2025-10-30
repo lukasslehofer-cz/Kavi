@@ -3,6 +3,38 @@
 @section('title', 'Potvrzení objednávky - Kavi Coffee')
 
 @section('content')
+@if($cancelled ?? false)
+<!-- Cancelled Payment Header -->
+<div class="relative bg-yellow-50 py-16 border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="mb-6">
+            <div class="w-20 h-20 mx-auto rounded-full bg-yellow-500 flex items-center justify-center">
+                <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Platba nebyla dokončena</h1>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-4 font-light">
+            Vaše objednávka byla vytvořena, ale platba zatím nebyla provedena.
+        </p>
+        <p class="text-base text-gray-600 font-light mb-6">
+            Číslo objednávky: <span class="font-medium text-gray-900">#{{ $order->order_number ?? $order->id }}</span>
+        </p>
+        <div class="flex items-center justify-center gap-4">
+            <a href="{{ route('payment.card', $order) }}" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all">
+                <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                Zkusit zaplatit znovu
+            </a>
+            <a href="{{ route('home') }}" class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-medium rounded-full hover:bg-gray-50 border border-gray-300 transition-all">
+                Zpět na hlavní stránku
+            </a>
+        </div>
+    </div>
+</div>
+@else
 <!-- Success Hero Header -->
 <div class="relative bg-green-50 py-16 border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -18,10 +50,11 @@
             Vaše objednávka byla úspěšně vytvořena a brzy ji začneme zpracovávat.
         </p>
         <p class="text-base text-gray-600 font-light">
-            Číslo objednávky: <span class="font-medium text-gray-900">#{{ $order->id }}</span>
+            Číslo objednávky: <span class="font-medium text-gray-900">#{{ $order->order_number ?? $order->id }}</span>
         </p>
     </div>
 </div>
+@endif
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -287,6 +320,25 @@
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         <span class="font-medium">Platba proběhla úspěšně</span>
+                    </div>
+                </div>
+                @else
+                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-yellow-700">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="font-medium">Objednávka ještě není zaplacená</span>
+                        </div>
+                        @if($order->payment_method === 'card')
+                        <a href="{{ route('payment.card', $order) }}" class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white font-medium rounded-full hover:bg-yellow-700 transition-all text-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                            Zaplatit kartou
+                        </a>
+                        @endif
                     </div>
                 </div>
                 @endif

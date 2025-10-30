@@ -281,7 +281,13 @@ class CheckoutController extends Controller
                         // Link order to the new user
                         $order->update(['user_id' => $newUser->id]);
                         
-                        \Log::info('Created user account for guest order', [
+                        // Store order ID in session for secure auto-login
+                        session(['pending_order_' . $order->id => true]);
+                        
+                        // Auto-login the new user for seamless checkout experience
+                        auth()->login($newUser);
+                        
+                        \Log::info('Created user account for guest order and logged in', [
                             'user_id' => $newUser->id,
                             'order_id' => $order->id
                         ]);
@@ -314,6 +320,12 @@ class CheckoutController extends Controller
             session()->forget('cart');
 
             if ($request->payment_method === 'card') {
+                \Log::info('Redirecting to payment.card', [
+                    'order_id' => $order->id,
+                    'user_id' => $order->user_id,
+                    'is_authenticated' => auth()->check(),
+                    'auth_user_id' => auth()->id(),
+                ]);
                 return redirect()->route('payment.card', $order);
             }
 
@@ -334,18 +346,47 @@ class CheckoutController extends Controller
 
     public function confirmation(Order $order)
     {
+        // Auto-login guest user if not already authenticated
+        // SECURITY: Only auto-login if this session created the order
+        if (!auth()->check() && $order->user_id) {
+            if (session()->has('pending_order_' . $order->id)) {
+                $user = \App\Models\User::find($order->user_id);
+                if ($user) {
+                    auth()->login($user);
+                    // Clear the pending session after successful login
+                    session()->forget('pending_order_' . $order->id);
+                    
+                    \Log::info('Auto-logged in user for order confirmation', [
+                        'user_id' => $user->id,
+                        'order_id' => $order->id,
+                    ]);
+                }
+            } else {
+                \Log::warning('Auto-login blocked - no session verification', [
+                    'order_id' => $order->id,
+                    'user_id' => $order->user_id,
+                ]);
+            }
+        }
+        
         // If user is authenticated, check if order belongs to them
         if (auth()->check() && $order->user_id !== auth()->id()) {
             abort(403);
         }
 
-        // If user is not authenticated, allow access to guest orders (user_id is null)
-        // In production, you might want to add a token-based verification here
-        if (!auth()->check() && $order->user_id !== null) {
-            abort(403);
+        // If user is not authenticated, verify they have access
+        if (!auth()->check()) {
+            // For guest orders without user_id, allow access
+            // In production, you might want to add a token-based verification here
+            if ($order->user_id !== null) {
+                abort(403, 'Nemáte oprávnění zobrazit tuto stránku. Prosím přihlaste se.');
+            }
         }
 
-        return view('checkout.confirmation', compact('order'));
+        // Check if payment was cancelled
+        $cancelled = request()->get('cancelled', false);
+        
+        return view('checkout.confirmation', compact('order', 'cancelled'));
     }
 
     /**
