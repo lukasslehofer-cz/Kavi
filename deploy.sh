@@ -26,6 +26,12 @@ echo -e "${NC}"
 
 cd $PROJECT_PATH || exit 1
 
+# 0. PŘÍPRAVA - Vyčistit bootstrap cache
+echo -e "${YELLOW}🧹 Příprava prostředí...${NC}"
+rm -f bootstrap/cache/services.php 2>/dev/null || true
+rm -f bootstrap/cache/packages.php 2>/dev/null || true
+echo -e "${GREEN}✓ Bootstrap cache vyčištěn${NC}"
+
 # 1. MAINTENANCE MODE
 echo -e "${YELLOW}🔧 Zapínám maintenance mode...${NC}"
 php artisan down --render="errors::503" --retry=60 2>/dev/null || true
