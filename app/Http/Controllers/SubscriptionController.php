@@ -37,11 +37,11 @@ class SubscriptionController extends Controller
         // Get shipping date info
         $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
 
-        // Get coffees of the month for next shipment
-        $coffeesOfMonth = \App\Models\Product::coffeeOfMonth()
-            ->orderBy('sort_order')
-            ->take(6)
-            ->get();
+        // Get roasteries of the month (same as homepage)
+        $roasteriesOfMonth = \App\Models\Roastery::getRoasteriesOfMonth();
+        
+        // Get coffees of the month for next shipment - use correct method with month logic
+        $coffeesOfMonth = \App\Models\Product::getCoffeesOfMonth();
 
         // Get promo image for current/next month
         $currentSchedule = \App\Models\ShipmentSchedule::getForMonth(now()->year, now()->month);
@@ -50,8 +50,21 @@ class SubscriptionController extends Controller
         // Use next schedule if current month is past, otherwise use current
         $activeSchedule = $currentSchedule && !$currentSchedule->isPast() ? $currentSchedule : $nextSchedule;
         $promoImage = $activeSchedule?->promo_image ?? 'images/kavi-november-25.jpg';
+        
+        // Calculate display month and year (16th is the cutoff)
+        $today = now();
+        $displayMonth = $today->day >= 16 ? $today->copy()->addMonth() : $today->copy();
+        
+        // Get month name in nominative case
+        $months = [
+            1 => 'Leden', 2 => 'Únor', 3 => 'Březen', 4 => 'Duben',
+            5 => 'Květen', 6 => 'Červen', 7 => 'Červenec', 8 => 'Srpen',
+            9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec'
+        ];
+        $monthName = $months[$displayMonth->month];
+        $displayYear = $displayMonth->year;
 
-        return view('subscriptions.index', compact('plans', 'subscriptionPricing', 'shippingInfo', 'coffeesOfMonth', 'promoImage'));
+        return view('subscriptions.index', compact('plans', 'subscriptionPricing', 'shippingInfo', 'roasteriesOfMonth', 'coffeesOfMonth', 'promoImage', 'monthName', 'displayYear'));
     }
 
     public function show(SubscriptionPlan $plan)

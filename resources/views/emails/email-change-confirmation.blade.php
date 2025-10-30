@@ -13,7 +13,7 @@
         body { margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f3f4f6 !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
         .email-container { max-width: 600px; margin: 0 auto; }
         .header { background-color: #111827 !important; padding: 32px; text-align: center; }
-        .logo { max-width: 180px; height: auto; }
+        .logo { max-width: 150px; height: auto; }
         .content { padding: 40px 32px; background-color: #ffffff !important; }
         h1 { font-size: 28px; font-weight: 700; color: #111827; margin: 0 0 16px 0; line-height: 1.3; }
         .subtitle { font-size: 16px; color: #6b7280; margin: 0 0 32px 0; font-weight: 300; }

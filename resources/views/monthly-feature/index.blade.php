@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Káva měsíce ' . ucfirst($monthName))
+@section('title', 'Káva měsíce ' . $monthNameWithYear)
 
 @section('content')
 <!-- Hero Header Section - Minimal -->
@@ -23,7 +23,7 @@
 
             <!-- Clean Heading -->
             <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-                Káva měsíce {{ ucfirst($monthName) }}
+                Káva měsíce {{ $monthNameWithYear }}
             </h1>
             
             <p class="mx-auto max-w-2xl text-lg text-gray-600 font-light">
@@ -143,7 +143,7 @@
             <div class="border-t border-gray-100 pt-16">
                 <div class="text-center mb-10">
                     <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
-                        Kávy měsíce {{ ucfirst($monthName) }}
+                        Kávy měsíce {{ $monthNameWithYear }}
                     </h2>
                     <p class="text-base text-gray-600 font-light">
                         Tyto výběrové kávy jsou součástí našeho aktuálního předplatného
@@ -234,7 +234,7 @@
 
                                 <div class="absolute top-4 left-4">
                                     <span class="bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-full">
-                                        Káva měsíce {{ ucfirst($monthName) }}
+                                        Káva měsíce {{ $monthNameWithYear }}
                                     </span>
                                 </div>
                             </div>
@@ -344,7 +344,7 @@
                     Káva měsíce připravujeme
                 </h2>
                 <p class="text-lg text-gray-600 mb-8 font-light">
-                    Právě vybíráme výjimečné kávy pro měsíc {{ ucfirst($monthName) }}. Brzy vás překvapíme!
+                    Právě vybíráme výjimečné kávy pro měsíc {{ $monthNameWithYear }}. Brzy vás překvapíme!
                 </p>
                 <a href="{{ route('subscriptions.index') }}" 
                    class="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all duration-200">

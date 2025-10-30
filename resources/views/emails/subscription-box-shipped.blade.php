@@ -40,7 +40,7 @@
             text-align: center;
         }
         .logo {
-            max-width: 180px;
+            max-width: 150px;
             height: auto;
         }
         .content {

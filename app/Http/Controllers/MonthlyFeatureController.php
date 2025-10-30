@@ -25,7 +25,16 @@ class MonthlyFeatureController extends Controller
         }
         
         $targetMonth = $displayMonth->format('Y-m');
-        $monthName = $displayMonth->locale('cs')->isoFormat('MMMM YYYY');
+        
+        // Get month name in nominative case (Říjen, not října)
+        $months = [
+            1 => 'Leden', 2 => 'Únor', 3 => 'Březen', 4 => 'Duben',
+            5 => 'Květen', 6 => 'Červen', 7 => 'Červenec', 8 => 'Srpen',
+            9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec'
+        ];
+        $monthName = $months[$displayMonth->month];
+        $displayYear = $displayMonth->year;
+        $monthNameWithYear = $monthName . ' ' . $displayYear;
         
         // Get roasteries of the month
         $roasteries = Roastery::getRoasteriesOfMonth();
@@ -38,7 +47,7 @@ class MonthlyFeatureController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('monthly-feature.index', compact('roasteries', 'coffees', 'monthName'));
+        return view('monthly-feature.index', compact('roasteries', 'coffees', 'monthName', 'displayYear', 'monthNameWithYear'));
     }
 }
 

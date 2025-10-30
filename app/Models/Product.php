@@ -102,8 +102,10 @@ class Product extends Model
             $targetMonth = $today->format('Y-m');
         }
         
-        return self::where('is_coffee_of_month', true)
+        return self::with('roastery')
+            ->where('is_coffee_of_month', true)
             ->where('coffee_of_month_date', $targetMonth)
+            ->orderBy('sort_order')
             ->get();
     }
 

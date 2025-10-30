@@ -3,6 +3,7 @@
 @section('title', 'Kavi Coffee - Prémiová káva s předplatným')
 
 @section('content')
+<div class="overflow-hidden">
 
 <!-- Hero Section - Clean with Strong Visual -->
 <div class="relative h-[90vh] min-h-[600px] max-h-[900px] overflow-hidden bg-gray-50">
@@ -552,8 +553,14 @@
 @if($roasteriesOfMonth->count() > 0 || $coffeesOfMonth->count() > 0)
 @php
   $displayMonth = now()->day >= 16 ? now()->addMonth() : now();
-  $monthName = $displayMonth->locale('cs')->isoFormat('MMMM');
-  $monthNameCapitalized = mb_convert_case($monthName, MB_CASE_TITLE, "UTF-8");
+  // Get month name in nominative case (Říjen, not října)
+  $monthsNominative = [
+    1 => 'Leden', 2 => 'Únor', 3 => 'Březen', 4 => 'Duben',
+    5 => 'Květen', 6 => 'Červen', 7 => 'Červenec', 8 => 'Srpen',
+    9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec'
+  ];
+  $monthName = $monthsNominative[$displayMonth->month];
+  $displayYear = $displayMonth->year;
 @endphp
 
 <div class="relative bg-white py-24 sm:py-24 lg:py-32">
@@ -565,7 +572,7 @@
         <svg class="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
-        <span class="text-sm font-medium text-gray-700">{{ $displayMonth->locale('cs')->isoFormat('MMMM YYYY') }}</span>
+        <span class="text-sm font-medium text-gray-700">{{ $monthName }} {{ $displayYear }}</span>
       </div>
       <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Káva měsíce</h2>
       <p class="text-xl text-gray-600 font-light max-w-2xl mx-auto">Každý měsíc přinášíme výběr káv od vybraných pražíren</p>
@@ -578,8 +585,8 @@
       <div class="flex flex-col justify-between h-[400px]">
         @foreach($roasteriesOfMonth as $index => $roastery)
         @php
-          // Zigzag pattern: 1st and 3rd offset right, 2nd stays left
-          $offsetClass = ($index % 2 === 0) ? 'ml-16' : 'ml-0';
+          // Zigzag pattern: 1st and 3rd offset right, 2nd stays left (only on desktop)
+          $offsetClass = ($index % 2 === 0) ? 'lg:ml-16' : 'ml-0';
           // Middle roastery (index 1) reversed layout
           $flexDirection = ($index === 1) ? 'flex-row-reverse' : '';
           // Text alignment for middle roastery
@@ -635,12 +642,12 @@
         $coffeeCount = $shuffledCoffees->count();
       @endphp
       
-      <div class="relative h-[400px]">
+      <div class="relative lg:h-[400px]">
         @if($coffeeCount >= 6)
           <!-- Grid 3x2 for 6+ photos -->
-          <div class="grid grid-cols-3 grid-rows-2 gap-3 h-full">
+          <div class="grid grid-cols-3 gap-3">
             @foreach($shuffledCoffees->take(6) as $coffee)
-            <div class="relative rounded-2xl overflow-hidden bg-gray-100">
+            <div class="relative aspect-square rounded-2xl overflow-hidden bg-gray-100">
               @if($coffee->image)
               <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-full object-cover" />
               @else
@@ -655,10 +662,10 @@
           </div>
         @else
           <!-- Layout for less than 6: one large (2x2) + 2 small (1x1 stacked) -->
-          <div class="grid grid-cols-3 grid-rows-2 gap-3 h-full">
+          <div class="grid grid-cols-3 gap-3 auto-rows-fr">
             <!-- Large photo (2x2) -->
             @if($shuffledCoffees->count() > 0)
-            <div class="col-span-2 row-span-2 relative rounded-2xl overflow-hidden bg-gray-100">
+            <div class="col-span-2 row-span-2 relative aspect-square rounded-2xl overflow-hidden bg-gray-100">
               @if($shuffledCoffees[0]->image)
               <img src="{{ asset($shuffledCoffees[0]->image) }}" alt="{{ $shuffledCoffees[0]->name }}" class="w-full h-full object-cover" />
               @else
@@ -673,7 +680,7 @@
             
             <!-- Small photo 1 (1x1) -->
             @if($shuffledCoffees->count() > 1)
-            <div class="relative rounded-2xl overflow-hidden bg-gray-100">
+            <div class="relative aspect-square rounded-2xl overflow-hidden bg-gray-100">
               @if($shuffledCoffees[1]->image)
               <img src="{{ asset($shuffledCoffees[1]->image) }}" alt="{{ $shuffledCoffees[1]->name }}" class="w-full h-full object-cover" />
               @else
@@ -688,7 +695,7 @@
             
             <!-- Small photo 2 (1x1) -->
             @if($shuffledCoffees->count() > 2)
-            <div class="relative rounded-2xl overflow-hidden bg-gray-100">
+            <div class="relative aspect-square rounded-2xl overflow-hidden bg-gray-100">
               @if($shuffledCoffees[2]->image)
               <img src="{{ asset($shuffledCoffees[2]->image) }}" alt="{{ $shuffledCoffees[2]->name }}" class="w-full h-full object-cover" />
               @else
@@ -709,7 +716,7 @@
     <!-- CTA Button -->
     <div class="mt-16 text-center">
       <a href="{{ route('monthly-feature.index') }}" class="group inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
-        <span>Prozkoumat kávy na {{ $monthNameCapitalized }}</span>
+        <span>Prozkoumat kávy na {{ $monthName }}</span>
         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
@@ -1036,5 +1043,6 @@
   </div>
 </div>
 
+</div>
 @endsection
 
