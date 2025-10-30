@@ -88,6 +88,7 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::get('/profil', [DashboardController::class, 'profile'])->name('profile');
     Route::put('/profil', [DashboardController::class, 'updateProfile'])->name('profile.update');
     Route::put('/heslo', [DashboardController::class, 'updatePassword'])->name('password.update');
+    Route::delete('/profil/smazat-ucet', [DashboardController::class, 'deleteAccount'])->name('profile.delete');
     Route::get('/platebni-metody/spravovat', [DashboardController::class, 'managePaymentMethods'])->name('payment-methods.manage');
     Route::get('/objednavky', [DashboardController::class, 'orders'])->name('orders');
     Route::get('/objednavka/{order}', [DashboardController::class, 'orderDetail'])->name('order.detail');

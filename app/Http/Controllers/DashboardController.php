@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Subscription;
+use App\Services\AccountDeletionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
 class DashboardController extends Controller
@@ -383,6 +386,101 @@ class DashboardController extends Controller
             
             return redirect()->route('dashboard.profile')
                 ->with('error', 'Nepodařilo se otevřít správu platebních metod. Zkuste to prosím později.');
+        }
+    }
+
+    /**
+     * Delete user account
+     */
+    public function deleteAccount(Request $request)
+    {
+        // Validate input
+        $validator = \Validator::make($request->all(), [
+            'password' => ['required', 'current_password'],
+            'confirmation' => ['required', 'accepted'],
+        ], [
+            'password.current_password' => 'Zadané heslo není správné.',
+            'confirmation.accepted' => 'Musíte potvrdit smazání účtu.',
+        ]);
+
+        // If validation fails and this is AJAX, return JSON
+        if ($validator->fails()) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+            return redirect()->route('dashboard.profile')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $user = auth()->user();
+
+        // Check if account can be deleted
+        $deletionService = app(AccountDeletionService::class);
+        $canDelete = $deletionService->canDeleteAccount($user);
+
+        if (!$canDelete['can_delete']) {
+            $errorMessage = 'Účet nelze smazat: ' . implode(' ', $canDelete['reasons']);
+            
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage,
+                ], 400);
+            }
+            
+            return redirect()->route('dashboard.profile')
+                ->with('error', $errorMessage);
+        }
+
+        try {
+            // Log out user first
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            // Delete account
+            $deletionService->deleteAccount($user);
+
+            // Return JSON for AJAX requests
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Váš účet byl úspěšně smazán. Na zadaný email jsme vám poslali potvrzení.',
+                    'redirect' => route('home'),
+                ]);
+            }
+
+            return redirect()->route('home')
+                ->with('success', 'Váš účet byl úspěšně smazán. Na zadaný email jsme vám poslali potvrzení.');
+        } catch (\Exception $e) {
+            \Log::error('Account deletion failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $errorMessage = 'Při mazání účtu došlo k chybě. ' . 
+                (!auth()->check() ? 'Kontaktujte nás prosím na info@kavi.cz' : 'Zkuste to prosím později nebo nás kontaktujte.');
+
+            // Return JSON for AJAX requests
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage,
+                ], 500);
+            }
+
+            // If user was already logged out, redirect to home
+            if (!auth()->check()) {
+                return redirect()->route('home')
+                    ->with('error', 'Při mazání účtu došlo k chybě. Kontaktujte nás prosím na info@kavi.cz');
+            }
+
+            return redirect()->route('dashboard.profile')
+                ->with('error', 'Při mazání účtu došlo k chybě. Zkuste to prosím později nebo nás kontaktujte.');
         }
     }
 }

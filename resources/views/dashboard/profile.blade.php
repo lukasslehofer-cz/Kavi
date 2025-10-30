@@ -580,11 +580,200 @@
                     </p>
                 </div>
                 <button type="button" 
-                        onclick="alert('Tato funkce bude implementována později')"
+                        onclick="openDeleteAccountModal()"
                         class="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-full transition-all duration-200">
                     Smazat účet
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div id="deleteAccountModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-red-50 p-6 border-b border-red-200">
+            <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-red-800">Smazání účtu</h3>
+                        <p class="text-sm text-red-700 font-light">Tato akce je nevratná</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeDeleteAccountModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <!-- Warning Message -->
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <div>
+                        <h4 class="text-red-800 font-bold mb-1">POZOR: Smazání účtu je nevratné</h4>
+                        <p class="text-red-700 text-sm font-light">
+                            Po potvrzení nebude možné tuto akci vzít zpět.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What will happen -->
+            <div class="space-y-6 mb-6">
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-3 flex items-center">
+                        <svg class="w-5 h-5 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Co bude smazáno:
+                    </h4>
+                    <ul class="space-y-2 text-gray-600 ml-7">
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2">✗</span>
+                            <span class="font-light">Všechna vaše osobní data (jméno, email, telefon, adresa)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2">✗</span>
+                            <span class="font-light">Přihlašovací údaje - už se nebudete moci přihlásit</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2">✗</span>
+                            <span class="font-light">Všechny uložené platební metody</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2">✗</span>
+                            <span class="font-light">Všechna aktivní předplatná budou zrušena</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2">✗</span>
+                            <span class="font-light">Nezaplacené objednávky budou smazány</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-3 flex items-center">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Co zachováme (zákonná povinnost):
+                    </h4>
+                    <ul class="space-y-2 text-gray-600 ml-7">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2">✓</span>
+                            <span class="font-light">Faktury a historii plateb (10 let dle zákona o účetnictví)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2">✓</span>
+                            <span class="font-light">Anonymizovaná data o doručených objednávkách</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2">✓</span>
+                            <span class="font-light">Historie předplatných (anonymizovaná)</span>
+                        </li>
+                    </ul>
+                    <p class="text-sm text-gray-500 mt-2 ml-7 font-light italic">
+                        Všechny zachované údaje jsou plně anonymizované.
+                    </p>
+                </div>
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                    <h4 class="font-bold text-yellow-800 mb-2 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        Nelze smazat účet pokud:
+                    </h4>
+                    <ul class="space-y-1 text-yellow-800 text-sm ml-7">
+                        <li class="font-light">• Máte aktivní nebo pozastavená předplatná</li>
+                        <li class="font-light">• Máte nezaplacené objednávky</li>
+                        <li class="font-light">• Máte zaplacené objednávky, které ještě nebyly doručeny</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Confirmation Form -->
+            <form method="POST" action="{{ route('dashboard.profile.delete') }}" id="deleteAccountForm">
+                @csrf
+                @method('DELETE')
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="delete_password" class="block text-sm font-medium text-gray-900 mb-2">
+                            Zadejte své heslo pro potvrzení
+                        </label>
+                        <input type="password" 
+                               id="delete_password" 
+                               name="password" 
+                               class="input w-full"
+                               placeholder="Vaše heslo"
+                               required>
+                        <p id="delete_password_error" class="text-red-600 text-sm mt-2 hidden flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span id="delete_password_error_text"></span>
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-start">
+                            <input type="checkbox" 
+                                   id="delete_confirmation" 
+                                   name="confirmation" 
+                                   value="1"
+                                   class="mt-1 w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                                   required>
+                            <label for="delete_confirmation" class="ml-3 text-sm text-gray-700">
+                                Potvrzuji, že jsem si vědom/a důsledků a chci <strong>trvale smazat</strong> svůj účet.
+                            </label>
+                        </div>
+                        <p id="delete_confirmation_error" class="text-red-600 text-sm mt-2 ml-7 hidden flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span id="delete_confirmation_error_text"></span>
+                        </p>
+                    </div>
+
+                    <!-- General error message -->
+                    <div id="delete_general_error" class="bg-red-50 border-l-4 border-red-500 p-4 rounded hidden">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <p id="delete_general_error_text" class="text-red-700 text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+                    <button type="button" 
+                            onclick="closeDeleteAccountModal()"
+                            class="px-6 py-2.5 border border-gray-300 rounded-full font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200">
+                        Zrušit
+                    </button>
+                    <button type="submit" 
+                            id="delete_submit_btn"
+                            class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-full transition-all duration-200 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span id="delete_submit_text">Ano, smazat můj účet</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -653,6 +842,147 @@ document.addEventListener('DOMContentLoaded', function() {
     if (selectBtn) {
         selectBtn.addEventListener('click', openPacketaWidget);
     }
+
+    // Delete Account Modal Functions
+    window.openDeleteAccountModal = function() {
+        const modal = document.getElementById('deleteAccountModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        
+        // Clear any previous errors
+        clearDeleteAccountErrors();
+    };
+
+    window.closeDeleteAccountModal = function() {
+        const modal = document.getElementById('deleteAccountModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+        
+        // Reset form and errors
+        document.getElementById('deleteAccountForm').reset();
+        clearDeleteAccountErrors();
+    };
+
+    function clearDeleteAccountErrors() {
+        // Clear all error messages
+        document.getElementById('delete_password_error').classList.add('hidden');
+        document.getElementById('delete_confirmation_error').classList.add('hidden');
+        document.getElementById('delete_general_error').classList.add('hidden');
+        
+        // Remove error styling from inputs
+        document.getElementById('delete_password').classList.remove('border-red-500');
+        document.getElementById('delete_confirmation').classList.remove('border-red-500');
+    }
+
+    function showDeleteAccountError(field, message) {
+        if (field === 'password') {
+            const errorEl = document.getElementById('delete_password_error');
+            const errorText = document.getElementById('delete_password_error_text');
+            const inputEl = document.getElementById('delete_password');
+            
+            errorText.textContent = message;
+            errorEl.classList.remove('hidden');
+            inputEl.classList.add('border-red-500');
+            inputEl.focus();
+        } else if (field === 'confirmation') {
+            const errorEl = document.getElementById('delete_confirmation_error');
+            const errorText = document.getElementById('delete_confirmation_error_text');
+            
+            errorText.textContent = message;
+            errorEl.classList.remove('hidden');
+        } else {
+            // General error
+            const errorEl = document.getElementById('delete_general_error');
+            const errorText = document.getElementById('delete_general_error_text');
+            
+            errorText.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+    }
+
+    // Handle form submission with AJAX
+    document.getElementById('deleteAccountForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Clear previous errors
+        clearDeleteAccountErrors();
+        
+        // Disable submit button
+        const submitBtn = document.getElementById('delete_submit_btn');
+        const submitText = document.getElementById('delete_submit_text');
+        const originalText = submitText.textContent;
+        
+        submitBtn.disabled = true;
+        submitText.textContent = 'Mazání...';
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        // Get form data
+        const formData = new FormData(this);
+        
+        // Send AJAX request
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Success - redirect to home
+                window.location.href = data.redirect || '{{ route("home") }}';
+            } else {
+                // Show errors
+                if (data.errors) {
+                    // Laravel validation errors
+                    if (data.errors.password) {
+                        showDeleteAccountError('password', data.errors.password[0]);
+                    }
+                    if (data.errors.confirmation) {
+                        showDeleteAccountError('confirmation', data.errors.confirmation[0]);
+                    }
+                } else if (data.message) {
+                    // General error message
+                    showDeleteAccountError('general', data.message);
+                }
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitText.textContent = originalText;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showDeleteAccountError('general', 'Došlo k chybě při mazání účtu. Zkuste to prosím znovu.');
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitText.textContent = originalText;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        });
+    });
+
+    // Close modal on background click
+    document.getElementById('deleteAccountModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteAccountModal();
+        }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('deleteAccountModal');
+            if (!modal.classList.contains('hidden')) {
+                closeDeleteAccountModal();
+            }
+        }
+    });
 });
 </script>
 @endsection
