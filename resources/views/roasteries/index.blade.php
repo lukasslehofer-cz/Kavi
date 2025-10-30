@@ -8,7 +8,7 @@
   <!-- Subtle Organic Shapes -->
   <div class="absolute inset-0 overflow-hidden">
     <div class="absolute -top-32 -right-32 w-96 h-96 bg-primary-100 rounded-full"></div>
-    <div class="absolute -bottom-32 -left-32 w-[36rem] h-[36rem] bg-primary-50 rounded-full"></div>
+    <div class="absolute -bottom-32 -left-32 w-[36rem] h-[36rem] bg-primary-50 rounded-full hidden md:block"></div>
   </div>
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">

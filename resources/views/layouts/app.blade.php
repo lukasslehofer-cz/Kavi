@@ -189,7 +189,7 @@
     @endif
 
     <!-- Main Content -->
-    <main class="flex-grow">
+    <main class="flex-grow overflow-hidden">
         @yield('content')
     </main>
 
