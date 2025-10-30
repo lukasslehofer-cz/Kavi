@@ -112,7 +112,7 @@ SHOW DATABASES;
 CREATE DATABASE kavi_new CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Vytvoř nového uživatele (POUŽIJ SILNÉ HESLO!)
-CREATE USER 'kavi_user'@'localhost' IDENTIFIED BY 'TvojeS1lneHesl0!2024';
+CREATE USER 'kavi_user'@'localhost' IDENTIFIED BY '4XO3Z5lk@uwOhBQLrkz/IRl';
 
 -- Dej oprávnění JEN k této databázi
 GRANT ALL PRIVILEGES ON kavi_new.* TO 'kavi_user'@'localhost';
