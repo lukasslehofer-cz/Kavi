@@ -38,6 +38,103 @@
         </div>
     </div>
 
+    <!-- Coffee Usage Statistics -->
+    @if(!empty($coffeeUsage))
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Spotřeba káv pro rozesílku {{ $targetDate->format('d.m.Y') }}
+        </h2>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-900">Káva</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-900">Pražírna</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-900">Sloty</th>
+                        <th class="px-4 py-3 text-right font-semibold text-gray-900">Rezervováno</th>
+                        <th class="px-4 py-3 text-right font-semibold text-gray-900">Zbývá</th>
+                        <th class="px-4 py-3 text-center font-semibold text-gray-900">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach($coffeeUsage as $usage)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900">{{ $usage['product_name'] }}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-600">{{ $usage['roastery_name'] }}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-wrap gap-1">
+                                @foreach($usage['slots'] as $slot)
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                        {{ $slot }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <span class="font-semibold text-blue-600">{{ $usage['reserved'] }}</span>
+                            <span class="text-gray-600"> ks</span>
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <span class="font-semibold {{ $usage['stock'] <= 0 ? 'text-red-600' : ($usage['stock'] < 10 ? 'text-orange-600' : 'text-green-600') }}">
+                                {{ $usage['stock'] }}
+                            </span>
+                            <span class="text-gray-600"> ks</span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            @if($usage['status'] === 'ok')
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    OK
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    NEDOSTATEK
+                                </span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        
+        @if(empty($coffeeUsage))
+        <div class="text-center py-8 text-gray-500">
+            <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            </svg>
+            <p class="text-lg font-medium">Žádné rezervace káv</p>
+            <p class="text-sm mt-1">Pro tuto rozesílku zatím nejsou nakonfigurované sloty káv nebo nejsou žádná aktivní předplatná.</p>
+        </div>
+        @endif
+    </div>
+    @elseif(isset($schedule) && !$schedule->hasCoffeeSlotsConfigured())
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-6">
+        <div class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="font-bold text-yellow-900 text-lg mb-1">Sloty káv nejsou nakonfigurované</h3>
+                <p class="text-yellow-800 text-sm">Pro tuto rozesílku zatím nejsou vyplněné sloty káv měsíce. Přejděte do <a href="{{ route('admin.subscription-config.index') }}" class="underline font-medium">konfigurace harmonogramu</a> a nastavte kávy pro jednotlivé sloty (E1, E2, E3, F1, F2, F3, D).</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Date Selector -->
     <div class="bg-white rounded-xl p-6 mb-6 shadow-sm border border-gray-200">
         <form action="{{ route('admin.subscriptions.shipments') }}" method="GET" class="flex items-end gap-4">

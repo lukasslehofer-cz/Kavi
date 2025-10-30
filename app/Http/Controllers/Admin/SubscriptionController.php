@@ -133,7 +133,21 @@ class SubscriptionController extends Controller
             'quarterly' => $subscriptions->where('frequency_months', 3)->count(),
         ];
 
-        return view('admin.subscriptions.shipments', compact('subscriptions', 'targetDate', 'stats'));
+        // Get coffee usage statistics
+        $coffeeUsage = [];
+        $schedule = \App\Models\ShipmentSchedule::where('shipment_date', $targetDate->format('Y-m-d'))->first();
+        
+        if (!$schedule) {
+            // Find schedule by month if exact date not found
+            $schedule = \App\Models\ShipmentSchedule::getForMonth($targetDate->year, $targetDate->month);
+        }
+        
+        if ($schedule && $schedule->hasCoffeeSlotsConfigured()) {
+            $reservationService = app(\App\Services\StockReservationService::class);
+            $coffeeUsage = $reservationService->getCoffeeUsageStats($schedule);
+        }
+
+        return view('admin.subscriptions.shipments', compact('subscriptions', 'targetDate', 'stats', 'coffeeUsage', 'schedule'));
     }
 
     /**

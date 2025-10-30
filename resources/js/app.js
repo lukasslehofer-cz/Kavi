@@ -50,6 +50,15 @@ function initSubscriptionConfigurator() {
 
     console.log('Initializing subscription configurator...');
 
+    // Availability state (loaded from API)
+    let availability = {
+        loaded: false,
+        espresso: true,
+        filter: true,
+        decaf: true,
+        mix: true
+    };
+
     // Configuration state
     const config = {
         amount: null,
@@ -63,6 +72,178 @@ function initSubscriptionConfigurator() {
         frequency: null,
         frequencyText: null
     };
+
+    // Load availability from API
+    function loadAvailability() {
+        fetch('/api/subscription-availability')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Availability loaded:', data);
+                availability.loaded = true;
+                availability.espresso = data.espresso;
+                availability.filter = data.filter;
+                availability.decaf = data.decaf;
+                availability.mix = data.mix;
+                
+                // Update UI based on availability
+                updateAvailabilityUI();
+            })
+            .catch(error => {
+                console.error('Failed to load availability:', error);
+                // Keep all available on error
+                availability.loaded = true;
+            });
+    }
+
+    // Update UI based on availability
+    function updateAvailabilityUI() {
+        console.log('Updating UI with availability:', availability);
+        
+        // Find radio buttons by their actual name/value attributes
+        const espressoRadio = document.querySelector('input[name="type"][value="espresso"]');
+        const filterRadio = document.querySelector('input[name="type"][value="filter"]');
+        const mixRadio = document.querySelector('input[name="type"][value="mix"]');
+        
+        // Get parent label elements
+        const espressoLabel = espressoRadio?.closest('label.group');
+        const filterLabel = filterRadio?.closest('label.group');
+        const mixLabel = mixRadio?.closest('label.group');
+        
+        // Find all decaf checkboxes (there are 3 - one for each type)
+        const decafCheckboxes = document.querySelectorAll('input[name="isDecaf"]');
+
+        // Handle Espresso availability
+        if (!availability.espresso && espressoLabel) {
+            console.log('Disabling espresso option');
+            espressoLabel.classList.add('cursor-not-allowed');
+            espressoLabel.style.pointerEvents = 'none';
+            espressoLabel.style.position = 'relative';
+            espressoLabel.style.backgroundColor = '#f3f4f6'; // gray-100
+            
+            // Add grayscale filter for content
+            const contentDivs = espressoLabel.querySelectorAll('div:not(.sold-out-label)');
+            contentDivs.forEach(div => {
+                div.style.opacity = '0.5';
+            });
+            
+            // Disable the radio button
+            if (espressoRadio) {
+                espressoRadio.disabled = true;
+                if (espressoRadio.checked) {
+                    espressoRadio.checked = false;
+                    config.type = null;
+                }
+            }
+            
+            // Add sold out badge if not already present
+            if (!espressoLabel.querySelector('.sold-out-label')) {
+                const badge = document.createElement('div');
+                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
+                badge.style.opacity = '1'; // Ensure full opacity
+                badge.textContent = 'Tento měsíc vyprodáno';
+                espressoLabel.appendChild(badge);
+            }
+        }
+
+        // Handle Filter availability
+        if (!availability.filter && filterLabel) {
+            console.log('Disabling filter option');
+            filterLabel.classList.add('cursor-not-allowed');
+            filterLabel.style.pointerEvents = 'none';
+            filterLabel.style.position = 'relative';
+            filterLabel.style.backgroundColor = '#f3f4f6'; // gray-100
+            
+            // Add grayscale filter for content
+            const contentDivs = filterLabel.querySelectorAll('div:not(.sold-out-label)');
+            contentDivs.forEach(div => {
+                div.style.opacity = '0.5';
+            });
+            
+            // Disable the radio button
+            if (filterRadio) {
+                filterRadio.disabled = true;
+                if (filterRadio.checked) {
+                    filterRadio.checked = false;
+                    config.type = null;
+                }
+            }
+            
+            // Add sold out badge if not already present
+            if (!filterLabel.querySelector('.sold-out-label')) {
+                const badge = document.createElement('div');
+                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
+                badge.style.opacity = '1'; // Ensure full opacity
+                badge.textContent = 'Tento měsíc vyprodáno';
+                filterLabel.appendChild(badge);
+            }
+        }
+
+        // Handle Mix availability
+        if (!availability.mix && mixLabel) {
+            console.log('Disabling mix option');
+            mixLabel.classList.add('cursor-not-allowed');
+            mixLabel.style.pointerEvents = 'none';
+            mixLabel.style.position = 'relative';
+            mixLabel.style.backgroundColor = '#f3f4f6'; // gray-100
+            
+            // Add grayscale filter for content
+            const contentDivs = mixLabel.querySelectorAll('div:not(.sold-out-label)');
+            contentDivs.forEach(div => {
+                div.style.opacity = '0.5';
+            });
+            
+            // Disable the radio button
+            if (mixRadio) {
+                mixRadio.disabled = true;
+                if (mixRadio.checked) {
+                    mixRadio.checked = false;
+                    config.type = null;
+                }
+            }
+            
+            // Add sold out badge if not already present
+            if (!mixLabel.querySelector('.sold-out-label')) {
+                const badge = document.createElement('div');
+                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
+                badge.style.opacity = '1'; // Ensure full opacity
+                badge.textContent = 'Tento měsíc vyprodáno';
+                mixLabel.appendChild(badge);
+            }
+        }
+
+        // Handle Decaf availability - disable ALL decaf checkboxes
+        if (!availability.decaf && decafCheckboxes.length > 0) {
+            console.log('Disabling decaf options, found checkboxes:', decafCheckboxes.length);
+            decafCheckboxes.forEach((checkbox) => {
+                // Find the parent label container for this checkbox
+                const decafContainer = checkbox.closest('label');
+                
+                if (decafContainer) {
+                    decafContainer.classList.add('opacity-50', 'cursor-not-allowed');
+                    decafContainer.style.pointerEvents = 'none';
+                }
+                
+                // Disable and uncheck the checkbox
+                checkbox.disabled = true;
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    config.isDecaf = false;
+                }
+                
+                // Add note if not already present (only once, after the parent type options container)
+                const typeOptionsContainer = checkbox.closest('.space-y-3');
+                if (typeOptionsContainer && !typeOptionsContainer.querySelector('.decaf-unavailable-note')) {
+                    const note = document.createElement('div');
+                    note.className = 'decaf-unavailable-note mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700';
+                    note.innerHTML = '<strong>Upozornění:</strong> Decaf káva tento měsíc není k dispozici';
+                    typeOptionsContainer.appendChild(note);
+                }
+            });
+        }
+    }
+
+    // Load availability on init
+    loadAvailability();
 
     // Load pricing from data attribute
     const configuratorElement = document.getElementById('subscription-configurator');

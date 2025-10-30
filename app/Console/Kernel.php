@@ -31,6 +31,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('subscriptions:resume-paused')
             ->dailyAt('04:00')
             ->timezone('Europe/Prague');
+
+        // Update stock reservations on 16th of each month (at midnight)
+        $schedule->command('stock:update-reservations')
+            ->monthlyOn(16, '00:00')
+            ->timezone('Europe/Prague');
     }
 
     /**

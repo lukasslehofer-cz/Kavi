@@ -66,8 +66,44 @@ class SubscriptionController extends Controller
         ];
         $monthName = $months[$displayMonth->month];
         $displayYear = $displayMonth->year;
+        
+        // Check availability for displaying sold out message
+        $availability = [
+            'espresso' => true,
+            'filter' => true,
+            'decaf' => true,
+            'mix' => true,
+            'allSoldOut' => false,
+        ];
+        
+        $nextShipmentDate = \App\Helpers\SubscriptionHelper::getNextShippingDate();
+        $schedule = \App\Models\ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
+        
+        if ($schedule && $schedule->hasCoffeeSlotsConfigured()) {
+            $reservationService = app(\App\Services\StockReservationService::class);
+            $availability = $reservationService->checkTypeAvailability($schedule);
+            
+            // Check if both espresso and filter are sold out
+            $availability['allSoldOut'] = !$availability['espresso'] && !$availability['filter'];
+        }
+        
+        // Calculate next available month (after 16th of next month)
+        $nextAvailableDate = now()->addMonth()->day(16);
+        $nextAvailableMonthName = $months[$nextAvailableDate->month];
 
-        return view('subscriptions.index', compact('plans', 'subscriptionPricing', 'shippingInfo', 'roasteriesOfMonth', 'coffeesOfMonth', 'promoImage', 'monthName', 'displayYear'));
+        return view('subscriptions.index', compact(
+            'plans', 
+            'subscriptionPricing', 
+            'shippingInfo', 
+            'roasteriesOfMonth', 
+            'coffeesOfMonth', 
+            'promoImage', 
+            'monthName', 
+            'displayYear',
+            'availability',
+            'nextAvailableMonthName',
+            'nextAvailableDate'
+        ));
     }
 
     public function show(SubscriptionPlan $plan)
@@ -139,6 +175,52 @@ class SubscriptionController extends Controller
             
             if ($mixTotal != $validated['amount']) {
                 return back()->withErrors(['mix' => 'Celkový počet balení v mixu musí být ' . $validated['amount']]);
+            }
+        }
+
+        // Check stock availability for selected type
+        $nextShipmentDate = \App\Helpers\SubscriptionHelper::getNextShippingDate();
+        $schedule = \App\Models\ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
+        
+        if ($schedule && $schedule->hasCoffeeSlotsConfigured()) {
+            $reservationService = app(\App\Services\StockReservationService::class);
+            $availability = $reservationService->checkTypeAvailability($schedule);
+            
+            // Check if selected type is available
+            $typeAvailable = false;
+            $errorMessage = '';
+            
+            if ($validated['type'] === 'espresso') {
+                if (!$availability['espresso']) {
+                    $errorMessage = 'Omlouváme se, ale espresso káva je pro tento měsíc již vyprodána. Zkuste prosím filtrovanou kávu nebo se vraťte po 16. dni příštího měsíce.';
+                } else {
+                    $typeAvailable = true;
+                }
+            } elseif ($validated['type'] === 'filter') {
+                if (!$availability['filter']) {
+                    $errorMessage = 'Omlouváme se, ale filtrovaná káva je pro tento měsíc již vyprodána. Zkuste prosím espresso kávu nebo se vraťte po 16. dni příštího měsíce.';
+                } else {
+                    $typeAvailable = true;
+                }
+            } elseif ($validated['type'] === 'mix') {
+                if (!$availability['mix']) {
+                    $errorMessage = 'Omlouváme se, ale kombinace káv není pro tento měsíc k dispozici kvůli nedostatku zásob. Zkuste prosím jen espresso nebo jen filtr, nebo se vraťte po 16. dni příštího měsíce.';
+                } else {
+                    $typeAvailable = true;
+                }
+            }
+            
+            // Check decaf availability if requested
+            if ($validated['isDecaf'] && $typeAvailable) {
+                if (!$availability['decaf']) {
+                    $errorMessage = 'Omlouváme se, ale bezkofeinová káva je pro tento měsíc již vyprodána. Zkuste prosím objednávku bez decaf možnosti.';
+                    $typeAvailable = false;
+                }
+            }
+            
+            if (!$typeAvailable) {
+                return redirect()->route('subscriptions.index')
+                    ->with('error', $errorMessage);
             }
         }
 

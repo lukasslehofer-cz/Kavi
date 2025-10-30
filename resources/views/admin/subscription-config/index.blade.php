@@ -145,32 +145,22 @@
             </nav>
         </div>
 
-        <form action="{{ route('admin.subscription-config.update-schedule') }}" method="POST" id="schedule-form" enctype="multipart/form-data">
-            @csrf
-            
-            <!-- Current Year Schedule -->
-            <div id="schedule-{{ $currentYear }}" class="schedule-year-content">
-                @include('admin.subscription-config._schedule-table', ['schedules' => $currentYearSchedules, 'year' => $currentYear, 'coffeeProducts' => $coffeeProducts])
-            </div>
+        <!-- Current Year Schedule -->
+        <div id="schedule-{{ $currentYear }}" class="schedule-year-content">
+            @include('admin.subscription-config._schedule-table', ['schedules' => $currentYearSchedules, 'year' => $currentYear, 'coffeeProducts' => $coffeeProducts])
+        </div>
 
-            <!-- Next Year Schedule -->
-            <div id="schedule-{{ $nextYear }}" class="schedule-year-content hidden">
-                @include('admin.subscription-config._schedule-table', ['schedules' => $nextYearSchedules, 'year' => $nextYear, 'coffeeProducts' => $coffeeProducts])
-            </div>
+        <!-- Next Year Schedule -->
+        <div id="schedule-{{ $nextYear }}" class="schedule-year-content hidden">
+            @include('admin.subscription-config._schedule-table', ['schedules' => $nextYearSchedules, 'year' => $nextYear, 'coffeeProducts' => $coffeeProducts])
+        </div>
 
-            <!-- Previous Years (will be loaded via AJAX) -->
-            @foreach($previousYears as $prevYear)
-            <div id="schedule-{{ $prevYear }}" class="schedule-year-content hidden">
-                <div class="text-center py-8 text-gray-500">Načítám...</div>
-            </div>
-            @endforeach
-            
-            <div class="mt-8 flex items-center justify-end">
-                <button type="submit" class="px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
-                    Uložit harmonogram
-                </button>
-            </div>
-        </form>
+        <!-- Previous Years (will be loaded via AJAX) -->
+        @foreach($previousYears as $prevYear)
+        <div id="schedule-{{ $prevYear }}" class="schedule-year-content hidden">
+            <div class="text-center py-8 text-gray-500">Načítám...</div>
+        </div>
+        @endforeach
     </div>
 
     <!-- Info Panel -->

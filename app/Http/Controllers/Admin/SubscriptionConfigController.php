@@ -79,22 +79,71 @@ class SubscriptionConfigController extends Controller
         // Get all schedules data from request
         $schedulesData = $request->input('schedules', []);
         
+        \Log::info('Processing schedules', [
+            'count' => count($schedulesData),
+            'first_schedule' => $schedulesData[0] ?? null,
+        ]);
+        
         foreach ($schedulesData as $index => $scheduleData) {
+            \Log::info('Processing schedule at index ' . $index, [
+                'has_id' => isset($scheduleData['id']),
+                'id' => $scheduleData['id'] ?? 'missing',
+                'data' => $scheduleData,
+            ]);
+            
             // Skip if no ID
             if (!isset($scheduleData['id'])) {
+                \Log::warning('Skipping schedule without ID at index ' . $index);
                 continue;
             }
             
             $schedule = ShipmentSchedule::find($scheduleData['id']);
             
             if ($schedule && !$schedule->isPast()) {
+                // Helper function to convert empty string to null
+                $toNullIfEmpty = function($value) {
+                    return empty($value) ? null : $value;
+                };
+                
                 $updateData = [
                     'billing_date' => $scheduleData['billing_date'],
                     'shipment_date' => $scheduleData['shipment_date'],
-                    'notes' => $scheduleData['notes'] ?? null,
+                    'notes' => $toNullIfEmpty($scheduleData['notes'] ?? null),
+                    // Coffee slots - convert empty strings to null
+                    'coffee_slot_e1' => $toNullIfEmpty($scheduleData['coffee_slot_e1'] ?? null),
+                    'coffee_slot_e2' => $toNullIfEmpty($scheduleData['coffee_slot_e2'] ?? null),
+                    'coffee_slot_e3' => $toNullIfEmpty($scheduleData['coffee_slot_e3'] ?? null),
+                    'coffee_slot_f1' => $toNullIfEmpty($scheduleData['coffee_slot_f1'] ?? null),
+                    'coffee_slot_f2' => $toNullIfEmpty($scheduleData['coffee_slot_f2'] ?? null),
+                    'coffee_slot_f3' => $toNullIfEmpty($scheduleData['coffee_slot_f3'] ?? null),
+                    'coffee_slot_d' => $toNullIfEmpty($scheduleData['coffee_slot_d'] ?? null),
                 ];
 
                 $schedule->update($updateData);
+                
+                // Update stock reservations only if coffee slots were changed and are configured
+                $slotsChanged = $schedule->wasChanged([
+                    'coffee_slot_e1', 'coffee_slot_e2', 'coffee_slot_e3',
+                    'coffee_slot_f1', 'coffee_slot_f2', 'coffee_slot_f3', 'coffee_slot_d'
+                ]);
+                
+                if ($slotsChanged && $schedule->hasCoffeeSlotsConfigured()) {
+                    try {
+                        $reservationService = app(\App\Services\StockReservationService::class);
+                        $reservationService->updateReservationsForSchedule($schedule);
+                        
+                        \Log::info('Stock reservations updated after slot change', [
+                            'schedule_id' => $schedule->id,
+                            'month' => $schedule->month,
+                            'year' => $schedule->year,
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to update reservations after slot change', [
+                            'schedule_id' => $schedule->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
             }
         }
         
@@ -174,6 +223,79 @@ class SubscriptionConfigController extends Controller
         
         return redirect()->route('admin.subscription-config.index')
             ->with('success', "Harmonogram pro rok {$nextYear} byl úspěšně vytvořen.");
+    }
+
+    /**
+     * Update single schedule
+     */
+    public function updateSingleSchedule(Request $request, ShipmentSchedule $schedule)
+    {
+        if ($schedule->isPast()) {
+            return redirect()->route('admin.subscription-config.index')
+                ->with('error', 'Nelze editovat minulou rozesílku.');
+        }
+
+        $validated = $request->validate([
+            'billing_date' => 'required|date',
+            'shipment_date' => 'required|date',
+            'notes' => 'nullable|string',
+            'coffee_slot_e1' => 'nullable|exists:products,id',
+            'coffee_slot_e2' => 'nullable|exists:products,id',
+            'coffee_slot_e3' => 'nullable|exists:products,id',
+            'coffee_slot_f1' => 'nullable|exists:products,id',
+            'coffee_slot_f2' => 'nullable|exists:products,id',
+            'coffee_slot_f3' => 'nullable|exists:products,id',
+            'coffee_slot_d' => 'nullable|exists:products,id',
+        ]);
+
+        // Convert empty strings to null
+        foreach (['coffee_slot_e1', 'coffee_slot_e2', 'coffee_slot_e3', 'coffee_slot_f1', 'coffee_slot_f2', 'coffee_slot_f3', 'coffee_slot_d', 'notes'] as $field) {
+            if (isset($validated[$field]) && empty($validated[$field])) {
+                $validated[$field] = null;
+            }
+        }
+
+        // Handle promo image upload
+        if ($request->hasFile('promo_image') && $request->file('promo_image')->isValid()) {
+            $file = $request->file('promo_image');
+            $path = $file->store('promo-images', 'public');
+            
+            // Delete old image if exists
+            if ($schedule->promo_image && \Storage::disk('public')->exists($schedule->promo_image)) {
+                \Storage::disk('public')->delete($schedule->promo_image);
+            }
+            
+            $validated['promo_image'] = $path;
+        }
+
+        $schedule->update($validated);
+
+        // Update stock reservations if coffee slots changed and are configured
+        $slotsChanged = $schedule->wasChanged([
+            'coffee_slot_e1', 'coffee_slot_e2', 'coffee_slot_e3',
+            'coffee_slot_f1', 'coffee_slot_f2', 'coffee_slot_f3', 'coffee_slot_d'
+        ]);
+
+        if ($slotsChanged && $schedule->hasCoffeeSlotsConfigured()) {
+            try {
+                $reservationService = app(\App\Services\StockReservationService::class);
+                $reservationService->updateReservationsForSchedule($schedule);
+                
+                \Log::info('Stock reservations updated after single schedule update', [
+                    'schedule_id' => $schedule->id,
+                    'month' => $schedule->month,
+                    'year' => $schedule->year,
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Failed to update reservations after single schedule update', [
+                    'schedule_id' => $schedule->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.subscription-config.index')
+            ->with('success', "Rozesílka pro {$schedule->month_name} {$schedule->year} byla úspěšně aktualizována.");
     }
 
     /**

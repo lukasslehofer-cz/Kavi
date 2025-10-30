@@ -140,7 +140,49 @@
 
       <!-- RIGHT COLUMN - Form -->
       <div class="lg:col-span-7">
-        <form method="POST" action="{{ route('subscriptions.configure.checkout') }}">
+        @if($availability['allSoldOut'])
+        <!-- Sold Out Message -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
+          <div class="mb-6">
+            <svg class="w-20 h-20 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            </svg>
+          </div>
+          
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            Omlouváme se, tento měsíc jsou naše kávy vyprodané
+          </h2>
+          
+          <p class="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+            Děkujeme za velký zájem! Všechny naše kávy pro tento měsíc jsou bohužel již rozebrané.
+          </p>
+          
+          <div class="bg-primary-50 border border-primary-200 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
+            <p class="text-base text-gray-900 font-medium mb-2">
+              📅 Nové kávy budou k dispozici od <strong>{{ $nextAvailableDate->format('d.m.Y') }}</strong>
+            </p>
+            <p class="text-sm text-gray-600">
+              ({{ $nextAvailableMonthName }} {{ $nextAvailableDate->year }})
+            </p>
+          </div>
+          
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ route('products.index') }}" 
+               class="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200">
+              <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              Prohlédnout jednorázové produkty
+            </a>
+            
+            <a href="{{ route('home') }}" 
+               class="inline-flex items-center justify-center px-6 py-3 bg-white text-gray-900 font-medium rounded-full border border-gray-300 hover:bg-gray-50 transition-all duration-200">
+              Zpět na hlavní stránku
+            </a>
+          </div>
+        </div>
+        @else
+        <form id="subscription-configurator" method="POST" action="{{ route('subscriptions.configure.checkout') }}">
           @csrf
           
           <!-- Hidden inputy pro mix rozdělení -->
@@ -476,6 +518,7 @@
             </div>
           </div>
         </form>
+        @endif
 
         <!-- Shipping Date Info -->
         <div class="mt-8 p-6 bg-gray-100 rounded-xl border border-gray-200">
