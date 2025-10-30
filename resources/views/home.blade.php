@@ -148,7 +148,7 @@
       <!-- Image Side - Clean -->
       <div class="relative order-2 lg:order-1">
         <div class="relative h-[500px] rounded-3xl overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&q=80&fit=crop&w=800" loading="lazy" alt="Kávová zrna" class="h-full w-full object-cover" />
+          <img src="/images/kavi-box.jpg" loading="lazy" alt="KAVI box" class="h-full w-full object-cover" />
         </div>
         
         <!-- Floating stat card -->
