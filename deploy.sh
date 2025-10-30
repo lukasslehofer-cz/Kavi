@@ -17,7 +17,15 @@ php artisan down || true
 # Git pull (pokud používáš Git)
 if [ -d ".git" ]; then
     echo "📥 Pulling latest changes from Git..."
+    # Stash lokální změny (pokud existují) a pull
+    git stash --include-untracked || true
     git pull origin main
+    # Obnovíme jen nahrané obrázky (pokud byly stashnuté)
+    if git stash list | grep -q "stash@{0}"; then
+        git checkout stash@{0} -- public/images/products/ 2>/dev/null || true
+        git checkout stash@{0} -- public/images/roasteries/ 2>/dev/null || true
+        git stash drop || true
+    fi
 fi
 
 # Update Composer závislostí

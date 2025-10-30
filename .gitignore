@@ -50,3 +50,9 @@ stripe.tar.gz
 
 # Deployment
 deploy.log
+
+# Uploaded images (user content)
+/public/images/products/*
+!/public/images/products/.gitkeep
+/public/images/roasteries/*
+!/public/images/roasteries/.gitkeep
