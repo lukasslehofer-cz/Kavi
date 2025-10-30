@@ -1,79 +1,172 @@
 #!/bin/bash
-
-# Deployment script pro Kavi Laravel aplikaci
-# Použití: ./deploy.sh
-
 set -e
 
-echo "🚀 Starting Kavi deployment..."
+# Barvy
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+NC='\033[0m'
 
-# Změň na adresář projektu
-cd /var/www/new.kavi.cz
+# Konfigurace
+PROJECT_PATH="/var/www/new.kavi.cz"
+DO_BACKUP="${1:-no}"  # Záloha pouze pokud spustíte: bash deploy.sh backup
 
-# Zapnutí maintenance mode
-echo "📦 Enabling maintenance mode..."
-php artisan down || true
+# Banner
+echo -e "${PURPLE}"
+cat << "EOF"
+╔═══════════════════════════════════════════╗
+║                                           ║
+║           ☕ Kavi Deployment              ║
+║                                           ║
+╚═══════════════════════════════════════════╝
+EOF
+echo -e "${NC}"
 
-# Git pull (pokud používáš Git)
+cd $PROJECT_PATH || exit 1
+
+# 1. MAINTENANCE MODE
+echo -e "${YELLOW}🔧 Zapínám maintenance mode...${NC}"
+php artisan down --render="errors::503" --retry=60 2>/dev/null || true
+echo -e "${GREEN}✓ Maintenance mode aktivní${NC}"
+
+# 2. ZÁLOHA (VOLITELNÁ)
+if [ "$DO_BACKUP" = "backup" ]; then
+    echo -e "${YELLOW}📦 Vytvářím zálohu...${NC}"
+    BACKUP_DIR="$PROJECT_PATH/backups"
+    mkdir -p $BACKUP_DIR
+    DATE=$(date +%Y%m%d_%H%M%S)
+    tar -czf "$BACKUP_DIR/kavi_$DATE.tar.gz" \
+        --exclude='vendor' \
+        --exclude='node_modules' \
+        --exclude='storage/logs/*' \
+        --exclude='storage/framework/cache/*' \
+        --exclude='storage/framework/sessions/*' \
+        --exclude='storage/framework/views/*' \
+        --exclude='backups' \
+        --exclude='public/build' \
+        . 2>/dev/null || true
+    echo -e "${GREEN}✓ Záloha: kavi_$DATE.tar.gz${NC}"
+    
+    # Smazat staré zálohy (>7 dní)
+    find $BACKUP_DIR -name "kavi_*.tar.gz" -mtime +7 -delete 2>/dev/null || true
+else
+    echo -e "${YELLOW}⏭  Záloha přeskočena (pro zálohu: bash deploy.sh backup)${NC}"
+fi
+
+# 3. GIT PULL
+echo -e "${YELLOW}📥 Stahuji změny z GitHubu...${NC}"
 if [ -d ".git" ]; then
-    echo "📥 Pulling latest changes from Git..."
-    # Stash lokální změny (pokud existují) a pull
-    git stash --include-untracked || true
-    git pull origin main
-    # Obnovíme jen nahrané obrázky (pokud byly stashnuté)
+    # Stash lokální změny (nahrané obrázky)
+    git stash --include-untracked 2>/dev/null || true
+    
+    # Pull změn
+    git fetch --prune origin
+    git reset --hard origin/main
+    
+    # Obnovíme nahrané obrázky
     if git stash list | grep -q "stash@{0}"; then
         git checkout stash@{0} -- public/images/products/ 2>/dev/null || true
         git checkout stash@{0} -- public/images/roasteries/ 2>/dev/null || true
-        git stash drop || true
+        git stash drop 2>/dev/null || true
+    fi
+    
+    echo -e "${GREEN}✓ Změny staženy (nahrané obrázky zachovány)${NC}"
+else
+    echo -e "${RED}⚠  Git není inicializován (přeskakuji pull)${NC}"
+fi
+
+# 4. COMPOSER
+echo -e "${YELLOW}📚 Instaluji PHP dependencies...${NC}"
+composer install --optimize-autoloader --no-dev --no-interaction 2>&1 | tail -5
+echo -e "${GREEN}✓ Composer dependencies nainstalované${NC}"
+
+# 5. NPM BUILD
+echo -e "${YELLOW}🎨 Builduji frontend assets...${NC}"
+if command -v npm &> /dev/null; then
+    npm install --production --no-audit --no-fund 2>&1 | tail -3
+    npm run build 2>&1 | tail -5
+    echo -e "${GREEN}✓ Frontend build dokončen${NC}"
+else
+    echo -e "${RED}⚠  npm není nainstalován (přeskakuji build)${NC}"
+fi
+
+# 6. MIGRACE
+echo -e "${YELLOW}🗄️  Spouštím databázové migrace...${NC}"
+php artisan migrate --force 2>&1 | tail -5
+echo -e "${GREEN}✓ Migrace dokončeny${NC}"
+
+# 7. CACHE CLEAR
+echo -e "${YELLOW}🧹 Čistím cache...${NC}"
+php artisan config:clear > /dev/null 2>&1
+php artisan cache:clear > /dev/null 2>&1
+php artisan view:clear > /dev/null 2>&1
+php artisan route:clear > /dev/null 2>&1
+echo -e "${GREEN}✓ Cache vyčištěna${NC}"
+
+# 8. CACHE REBUILD
+echo -e "${YELLOW}⚡ Rebuilduji cache...${NC}"
+php artisan config:cache > /dev/null 2>&1
+php artisan route:cache > /dev/null 2>&1
+php artisan view:cache > /dev/null 2>&1
+echo -e "${GREEN}✓ Cache obnovena${NC}"
+
+# 9. OPTIMALIZACE
+echo -e "${YELLOW}⚡ Optimalizuji aplikaci...${NC}"
+php artisan optimize > /dev/null 2>&1
+echo -e "${GREEN}✓ Optimalizace dokončena${NC}"
+
+# 10. STORAGE LINK
+echo -e "${YELLOW}🔗 Kontroluji storage link...${NC}"
+php artisan storage:link > /dev/null 2>&1 || true
+echo -e "${GREEN}✓ Storage link zkontrolován${NC}"
+
+# 11. OPRÁVNĚNÍ
+echo -e "${YELLOW}🔒 Nastavuji oprávnění...${NC}"
+chown -R www-data:www-data $PROJECT_PATH 2>/dev/null || true
+chmod -R 755 $PROJECT_PATH 2>/dev/null || true
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+chmod 600 .env 2>/dev/null || true
+echo -e "${GREEN}✓ Oprávnění nastavena${NC}"
+
+# 12. ČIŠTĚNÍ STARÝCH ZÁLOH
+if [ "$DO_BACKUP" = "backup" ]; then
+    echo -e "${YELLOW}🧹 Čistím staré zálohy (>7 dní)...${NC}"
+    if [ -n "${BACKUP_DIR}" ] && [ -d "${BACKUP_DIR}" ]; then
+        find "${BACKUP_DIR}" -name "kavi_*.tar.gz" -mtime +7 -delete 2>/dev/null || true
+        BACKUP_COUNT=$(ls -1 "${BACKUP_DIR}"/kavi_*.tar.gz 2>/dev/null | wc -l)
+        echo -e "${GREEN}✓ Zálohy: $BACKUP_COUNT souborů${NC}"
     fi
 fi
 
-# Update Composer závislostí
-echo "📚 Installing/updating Composer dependencies..."
-composer install --optimize-autoloader --no-dev
-
-# NPM build
-echo "🎨 Building frontend assets..."
-npm install --production
-npm run build
-
-# Migrace databáze
-echo "🗄️  Running database migrations..."
-php artisan migrate --force
-
-# Clear & recache
-echo "🧹 Clearing and recaching..."
-php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
-php artisan route:clear
-
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Optimalizace
-echo "⚡ Optimizing application..."
-php artisan optimize
-
-# Nastavení oprávnění
-echo "🔐 Setting permissions..."
-chown -R www-data:www-data /var/www/new.kavi.cz
-chmod -R 755 /var/www/new.kavi.cz
-chmod -R 775 /var/www/new.kavi.cz/storage
-chmod -R 775 /var/www/new.kavi.cz/bootstrap/cache
-
-# Vypnutí maintenance mode
-echo "✅ Disabling maintenance mode..."
+# 13. MAINTENANCE MODE OFF
+echo -e "${YELLOW}✅ Vypínám maintenance mode...${NC}"
 php artisan up
+echo -e "${GREEN}✓ Web je opět online${NC}"
 
+# SHRNUTÍ
 echo ""
-echo "🎉 Deployment complete!"
-echo "🌐 Site: https://new.kavi.cz"
+echo -e "${GREEN}╔═══════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║                                           ║${NC}"
+echo -e "${GREEN}║     ✅  Deployment dokončen úspěšně!      ║${NC}"
+echo -e "${GREEN}║                                           ║${NC}"
+echo -e "${GREEN}╚═══════════════════════════════════════════╝${NC}"
 echo ""
-echo "Don't forget to:"
-echo "  - Check logs: tail -f storage/logs/laravel.log"
-echo "  - Test the application thoroughly"
-echo "  - Monitor server resources"
+echo -e "${BLUE}📊 Statistiky:${NC}"
+if [ -d ".git" ]; then
+    LAST_COMMIT=$(git log -1 --pretty=format:'%h - %s' 2>/dev/null)
+    LAST_AUTHOR=$(git log -1 --pretty=format:'%an (%ar)' 2>/dev/null)
+    echo -e "   ${PURPLE}Commit:${NC} $LAST_COMMIT"
+    echo -e "   ${PURPLE}Autor:${NC} $LAST_AUTHOR"
+fi
+echo -e "   ${PURPLE}PHP:${NC} $(php -v 2>/dev/null | head -n 1 | cut -d' ' -f1-2)"
+echo -e "   ${PURPLE}Node:${NC} $(node -v 2>/dev/null || echo 'N/A')"
+echo -e "   ${PURPLE}Čas:${NC} $(date +'%Y-%m-%d %H:%M:%S')"
 echo ""
-
+echo -e "${BLUE}🌐 Aplikace:${NC} ${GREEN}https://new.kavi.cz${NC}"
+echo -e "${BLUE}🛠️  Admin:${NC} ${GREEN}https://new.kavi.cz/admin${NC}"
+echo -e "${BLUE}📝 Logy:${NC} tail -f $PROJECT_PATH/storage/logs/laravel.log"
+echo ""
+echo -e "${YELLOW}💡 Tip:${NC} Pro deployment se zálohou použij: ${PURPLE}bash deploy.sh backup${NC}"
+echo ""
