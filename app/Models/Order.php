@@ -18,6 +18,8 @@ class Order extends Model
         'discount_amount',
         'subtotal',
         'shipping',
+        'shipping_rate_id',
+        'shipping_country',
         'tax',
         'total',
         'status',
@@ -75,6 +77,11 @@ class Order extends Model
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    public function shippingRate()
+    {
+        return $this->belongsTo(ShippingRate::class);
     }
 
     public function markAsPaid()

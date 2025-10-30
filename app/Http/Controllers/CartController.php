@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Services\ShippingService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
+    public function __construct(private ShippingService $shippingService)
+    {
+    }
+
     public function index()
     {
         $cart = session()->get('cart', []);
@@ -25,7 +30,25 @@ class CartController extends Controller
             }
         }
 
-        return view('cart.index', compact('cartItems', 'total'));
+        // Calculate shipping if user country is known
+        $shipping = null;
+        $shippingMessage = null;
+        $freeShippingThreshold = null;
+        $remainingForFreeShipping = null;
+        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
+        
+        if ($userCountry) {
+            $shipping = $this->shippingService->calculateShippingCost($userCountry, $total, false);
+            $remainingForFreeShipping = $this->shippingService->getRemainingForFreeShipping($userCountry, $total);
+            
+            // Get threshold for display
+            $rate = \App\Models\ShippingRate::getForCountry($userCountry);
+            $freeShippingThreshold = $rate?->free_shipping_threshold_czk;
+        } else {
+            $shippingMessage = 'Cena dopravy bude vypočítána v pokladně po zadání adresy';
+        }
+
+        return view('cart.index', compact('cartItems', 'total', 'shipping', 'shippingMessage', 'freeShippingThreshold', 'remainingForFreeShipping'));
     }
 
     public function add(Request $request, Product $product)

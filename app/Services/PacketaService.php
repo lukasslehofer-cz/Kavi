@@ -200,6 +200,118 @@ class PacketaService
 
         return implode(', ', $parts);
     }
+
+    /**
+     * Get available carriers (PUDOs) for a country
+     * Documentation: https://docs.packeta.com/docs/pudo-delivery/carriers-pudos
+     *
+     * @param string $countryCode ISO 3166-1 alpha-2 country code (e.g. 'CZ', 'SK')
+     * @return array Array of available carriers with their details
+     */
+    public function getCarriersForCountry(string $countryCode): array
+    {
+        try {
+            // Packeta v4 API endpoint for branches
+            $response = Http::get("https://www.zasilkovna.cz/api/v4/{$this->apiKey}/branch.json", [
+                'country' => strtoupper($countryCode),
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                
+                // Group carriers by ID
+                $carriers = [];
+                if (isset($data['carriers'])) {
+                    foreach ($data['carriers'] as $carrier) {
+                        $carriers[$carrier['id']] = [
+                            'id' => $carrier['id'],
+                            'name' => $carrier['name'] ?? '',
+                            'country' => $carrier['country'] ?? $countryCode,
+                        ];
+                    }
+                }
+                
+                return array_values($carriers);
+            }
+
+            Log::warning('Packeta PUDOs API request failed', [
+                'country' => $countryCode,
+                'status' => $response->status(),
+            ]);
+            
+            return [];
+        } catch (\Exception $e) {
+            Log::error('Packeta PUDOs API Error', [
+                'country' => $countryCode,
+                'message' => $e->getMessage(),
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Get all pickup points for a specific carrier
+     *
+     * @param string $carrierId Carrier ID (e.g. 'zpoint', '131', etc.)
+     * @param string $countryCode Country code
+     * @return array Array of pickup points
+     */
+    public function getPickupPointsForCarrier(string $carrierId, string $countryCode): array
+    {
+        try {
+            $response = Http::get("https://www.zasilkovna.cz/api/v4/{$this->apiKey}/branch.json", [
+                'country' => strtoupper($countryCode),
+                'carrier' => $carrierId,
+            ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            return [];
+        } catch (\Exception $e) {
+            Log::error('Packeta Pickup Points API Error', [
+                'carrier' => $carrierId,
+                'country' => $countryCode,
+                'message' => $e->getMessage(),
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Get default carriers for common countries
+     * These are fallback values if PUDOs API is not available
+     *
+     * @return array
+     */
+    public static function getDefaultCarriers(): array
+    {
+        return [
+            'CZ' => [
+                ['id' => 'zpoint', 'name' => 'Z-BOX'],
+                ['id' => 'packeta', 'name' => 'Zásilkovna'],
+            ],
+            'SK' => [
+                ['id' => '131', 'name' => 'Packeta Slovensko'],
+            ],
+            'PL' => [
+                ['id' => '3060', 'name' => 'InPost Paczkomaty'],
+            ],
+            'HU' => [
+                ['id' => '4159', 'name' => 'Packeta Maďarsko'],
+            ],
+            'DE' => [
+                ['id' => 'de-pp', 'name' => 'DHL Paketshop'],
+            ],
+            'AT' => [
+                ['id' => '4161', 'name' => 'Österreichische Post'],
+            ],
+            'RO' => [
+                ['id' => '4162', 'name' => 'Packeta Rumunsko'],
+            ],
+        ];
+    }
 }
 
 

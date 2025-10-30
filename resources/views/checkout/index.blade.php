@@ -465,19 +465,21 @@
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
                         <dt class="text-gray-600 text-sm font-light">Doprava:</dt>
                         <dd class="font-bold">
-                            @if($shipping == 0)
-                            <span class="text-green-600 flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                                Zdarma
-                                @if($appliedCoupon && $appliedCoupon->free_shipping)
-                                <span class="text-xs">(kupón)</span>
+                            <span id="shipping-cost">
+                                @if($shipping == 0)
+                                <span class="text-green-600 flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Zdarma
+                                    @if($appliedCoupon && $appliedCoupon->free_shipping)
+                                    <span class="text-xs">(kupón)</span>
+                                    @endif
+                                </span>
+                                @else
+                                <span class="text-gray-900">{{ number_format($shipping, 0, ',', ' ') }} Kč</span>
                                 @endif
                             </span>
-                            @else
-                            <span class="text-gray-900">{{ number_format($shipping, 0, ',', ' ') }} Kč</span>
-                            @endif
                         </dd>
                     </div>
                     
@@ -510,7 +512,7 @@
                     <div class="border-t border-gray-200 pt-4 mt-2">
                         <div class="flex justify-between items-center">
                             <dt class="font-bold text-gray-900 text-lg">Celkem:</dt>
-                            <dd class="text-3xl font-bold text-gray-900">
+                            <dd class="text-3xl font-bold text-gray-900" id="total-cost">
                                 {{ number_format($totalWithVat, 0, ',', ' ') }} Kč
                             </dd>
                         </div>
@@ -628,6 +630,90 @@ document.addEventListener('DOMContentLoaded', function() {
         form.id = 'checkout-form';
     }
 
+    // Dynamic shipping calculation
+    let currentPacketaCarrier = '{{ $packetaCarrierId ?? "" }}';
+    const subtotal = {{ $subtotal }};
+    const shippingCostElement = document.getElementById('shipping-cost');
+    const totalElement = document.getElementById('total-cost');
+    
+    document.getElementById('billing_country').addEventListener('change', function() {
+        const country = this.value;
+        
+        if (!country) {
+            return;
+        }
+        
+        // Clear Packeta selection when country changes
+        document.getElementById('packeta_point_id').value = '';
+        document.getElementById('packeta_point_name').value = '';
+        document.getElementById('packeta_point_address').value = '';
+        
+        // Reset Packeta UI to initial state
+        const selectionDiv = document.getElementById('packeta-selection');
+        const selectedPoint = document.getElementById('selected-point');
+        if (selectedPoint) {
+            selectionDiv.innerHTML = `
+                <button type="button" id="select-point-btn" class="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Vybrat výdejní místo
+                </button>
+            `;
+            // Re-attach event listener
+            document.getElementById('select-point-btn').addEventListener('click', openPacketaWidget);
+        }
+        
+        // Show loading state
+        if (shippingCostElement) {
+            shippingCostElement.textContent = 'Počítám...';
+        }
+        
+        // AJAX request to calculate shipping
+        fetch('{{ route("api.calculate-shipping") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                country: country,
+                subtotal: subtotal,
+                is_subscription: false
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.available) {
+                // Update shipping cost
+                if (shippingCostElement) {
+                    shippingCostElement.textContent = data.shipping_formatted;
+                }
+                
+                // Update total
+                if (totalElement) {
+                    const newTotal = subtotal + parseFloat(data.shipping);
+                    totalElement.textContent = new Intl.NumberFormat('cs-CZ').format(newTotal) + ' Kč';
+                }
+                
+                // Update Packeta carrier for widget
+                currentPacketaCarrier = data.packeta_carrier_id;
+            } else {
+                alert('Do vybrané země momentálně nedoručujeme.');
+                if (shippingCostElement) {
+                    shippingCostElement.textContent = '—';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error calculating shipping:', error);
+            if (shippingCostElement) {
+                shippingCostElement.textContent = 'Chyba';
+            }
+        });
+    });
+    
     // Packeta Widget Configuration
     const packetaApiKey = '{{ config("services.packeta.widget_key") }}';
     
@@ -635,6 +721,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!packetaApiKey) {
             alert('Packeta widget není správně nakonfigurován. Kontaktujte administrátora.');
             return;
+        }
+
+        const selectedCountry = document.getElementById('billing_country').value || 'cz';
+        const widgetOptions = {
+            country: selectedCountry.toLowerCase(),
+            language: 'cs',
+        };
+        
+        // Add vendor filter if carrier is set
+        if (currentPacketaCarrier) {
+            widgetOptions.vendors = [currentPacketaCarrier];
         }
 
         Packeta.Widget.pick(packetaApiKey, function(point) {
@@ -675,12 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Re-attach event listener to the new change button
                 document.getElementById('change-point-btn').addEventListener('click', openPacketaWidget);
             }
-        }, {
-            country: 'cz',
-            language: 'cs',
-            // Můžete zde přidat vendors pro omezení dopravců, např:
-            // vendors: ['packeta', 'zasilkovna'],
-        });
+        }, widgetOptions);
     }
 
     // Event listeners for opening widget

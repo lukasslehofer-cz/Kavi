@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Kavi Coffee - Prémiová káva s předplatným')</title>
+    <title>@yield('title', 'Kávové předplatné | Výběrová káva | KAVI.cz')</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -16,7 +16,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <div class="text-sm text-white font-light">
-                Doprava zdarma nad 1000 Kč
+                Naše listopadové kávy už na vás čekají!
             </div>
         </div>
     </div>
@@ -34,10 +34,10 @@
                 <!-- Desktop Navigation -->
                 <nav class="hidden lg:flex items-center gap-2">
                     <a href="{{ route('home') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
-                        Domů
+                        Úvod
                     </a>
                     <a href="{{ route('subscriptions.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
-                        Předplatné
+                        Kávové boxy
                     </a>
                     <a href="{{ route('monthly-feature.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         Káva měsíce
@@ -48,6 +48,13 @@
                     <a href="{{ route('roasteries.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         Naše pražírny
                     </a>
+                    @auth
+                    @if(auth()->user()->is_admin)
+                    <a href="{{ route('admin.dashboard') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
+                        <span>Admin</span>
+                    </a>
+                    @endif
+                    @endauth
                 </nav>
 
                 <!-- Right Side Actions -->
@@ -80,7 +87,7 @@
                     
                     <!-- CTA Button - Desktop -->
                     <a href="{{ route('subscriptions.index') }}" class="hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm px-5 py-2 rounded-full transition-all duration-200">
-                        <span>Vybrat předplatné</span>
+                        <span>Sestavte si box</span>
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
@@ -104,7 +111,7 @@
                     Domů
                 </a>
                 <a href="{{ route('subscriptions.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
-                    Předplatné
+                    Kávové boxy
                 </a>
                 <a href="{{ route('monthly-feature.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
                     Káva měsíce
@@ -122,7 +129,7 @@
                 <!-- Mobile CTA Button -->
                 <div class="pt-4">
                     <a href="{{ route('subscriptions.index') }}" class="flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
-                        <span>Vybrat předplatné</span>
+                        <span>Sestavte si box</span>
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>

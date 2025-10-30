@@ -156,29 +156,33 @@
                     <div class="flex justify-between items-center py-3 border-b border-gray-100">
                         <dt class="text-gray-600 font-light">Doprava:</dt>
                         <dd class="font-bold">
-                            @if($total >= 1000)
-                            <span class="text-green-600 flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                                Zdarma
-                            </span>
+                            @if($shipping !== null)
+                                @if($shipping == 0)
+                                    <span class="text-green-600 flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Zdarma
+                                    </span>
+                                @else
+                                    <span class="text-gray-900">{{ number_format($shipping, 0, ',', ' ') }} Kč</span>
+                                @endif
                             @else
-                            <span class="text-gray-900">99 Kč</span>
+                                <span class="text-gray-500 text-sm">{{ $shippingMessage ?? 'Bude dopočítána v pokladně' }}</span>
                             @endif
                         </dd>
                     </div>
 
-                    @if($total < 1000)
+                    @if($shipping !== null && $shipping > 0 && $remainingForFreeShipping !== null && $remainingForFreeShipping > 0)
                     <div class="bg-primary-50 border border-primary-200 rounded-xl p-3">
                         <p class="text-sm text-primary-700 font-medium flex items-start gap-2">
                             <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
-                            <span>Do dopravy zdarma vám chybí <strong>{{ number_format(1000 - $total, 0, ',', ' ') }} Kč</strong></span>
+                            <span>Do dopravy zdarma vám chybí <strong>{{ number_format($remainingForFreeShipping, 0, ',', ' ') }} Kč</strong></span>
                         </p>
                     </div>
-                    @else
+                    @elseif($shipping !== null && $shipping == 0)
                     <div class="bg-green-50 border border-green-200 rounded-xl p-3">
                         <p class="text-sm text-green-700 font-medium flex items-center gap-2">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -193,7 +197,11 @@
                         <div class="flex justify-between items-center">
                             <dt class="font-bold text-gray-900 text-lg">Celkem:</dt>
                             <dd class="text-3xl font-bold text-gray-900">
-                                {{ number_format($total >= 1000 ? $total : $total + 99, 0, ',', ' ') }} Kč
+                                @if($shipping !== null)
+                                    {{ number_format($total + $shipping, 0, ',', ' ') }} Kč
+                                @else
+                                    <span class="text-gray-500 text-base">Bude zobrazeno v pokladně</span>
+                                @endif
                             </dd>
                         </div>
                     </div>

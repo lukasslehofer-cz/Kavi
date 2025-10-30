@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kavi Coffee - Prémiová káva s předplatným')
+@section('title', 'Kávové předplatné | Výběrová káva | KAVI.cz')
 
 @section('content')
 <div class="overflow-hidden">
@@ -9,7 +9,7 @@
 <div class="relative h-[90vh] min-h-[600px] max-h-[900px] overflow-hidden bg-gray-50">
     <!-- Background Image/Video -->
     <div class="absolute inset-0">
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1920');"></div>
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/images/kavi-intro-video.jpg');"></div>
         
         <video 
             autoplay 
@@ -19,7 +19,7 @@
             webkit-playsinline
             class="absolute inset-0 w-full h-full object-cover"
         >
-            <source src="https://www.pexels.com/cs-cz/download/video/4794528/" type="video/mp4">
+            <source src="/images/kavi-intro-video.mp4" type="video/mp4">
         </video>
     </div>
     
@@ -36,7 +36,7 @@
                 <!-- Small Badge -->
                 <div class="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2">
                     <span class="w-2 h-2 rounded-full bg-primary-500"></span>
-                    <span class="text-sm font-medium text-gray-900">Čerstvě praženo každý týden</span>
+                    <span class="text-sm font-medium text-gray-900">Každý měsíc něco nového</span>
                 </div>
 
                 <!-- Heading - Clean Typography -->
@@ -46,7 +46,7 @@
                     </h1>
                     <p class="text-xl md:text-2xl text-white/90 leading-relaxed font-light">
                         Prémiová káva s pravidelným předplatným.<br/>
-                        Čerstvě pražená, pečlivě vybraná.
+                        Čerstvě pražená, pečlivě vybraná, doručená přímo k vám.
                     </p>
                 </div>
 
@@ -59,7 +59,7 @@
                         </svg>
                     </a>
                     <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full transition-all duration-200">
-                        <span>Prozkoumat kávy</span>
+                        <span>Kávový obchod</span>
                         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>

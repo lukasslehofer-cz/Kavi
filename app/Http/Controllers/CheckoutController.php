@@ -7,8 +7,10 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ShippingRate;
 use App\Services\CouponService;
 use App\Services\FakturoidService;
+use App\Services\ShippingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -17,8 +19,10 @@ class CheckoutController extends Controller
 {
     // No auth middleware - supports guest checkout
 
-    public function __construct(private CouponService $couponService)
-    {
+    public function __construct(
+        private CouponService $couponService,
+        private ShippingService $shippingService
+    ) {
     }
 
     public function index()
@@ -45,7 +49,15 @@ class CheckoutController extends Controller
             }
         }
 
-        $shipping = $subtotal >= 1000 ? 0 : 99; // Free shipping over 1000 CZK
+        // Calculate shipping dynamically based on user country
+        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
+        $shipping = 0; // Default
+        $packetaCarrierId = null;
+        
+        if ($userCountry) {
+            $shipping = $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
+            $packetaCarrierId = $this->shippingService->getPacketaCarrierForCountry($userCountry);
+        }
         
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
@@ -96,7 +108,52 @@ class CheckoutController extends Controller
             session()->flash('coupon_error', $errorMessage);
         }
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'totalWithVat', 'totalWithoutVat', 'vat', 'appliedCoupon', 'discount'));
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'totalWithVat', 'totalWithoutVat', 'vat', 'appliedCoupon', 'discount', 'packetaCarrierId'));
+    }
+
+    /**
+     * AJAX: Calculate shipping cost based on country
+     */
+    public function calculateShipping(Request $request)
+    {
+        $country = $request->input('country');
+        $subtotal = (float) $request->input('subtotal', 0);
+        $isSubscription = (bool) $request->input('is_subscription', false);
+        
+        if (!$country) {
+            return response()->json(['error' => 'Country is required'], 400);
+        }
+
+        // Calculate shipping
+        $shipping = $this->shippingService->calculateShippingCost($country, $subtotal, $isSubscription);
+        
+        // Get shipping rate details
+        $rate = ShippingRate::getForCountry($country);
+        
+        // Check if shipping is available
+        $available = $rate && $rate->enabled;
+        
+        if (!$available) {
+            return response()->json([
+                'error' => 'Shipping to this country is not available',
+                'available' => false,
+            ], 422);
+        }
+
+        // Calculate remaining for free shipping (only for orders, not subscriptions)
+        $remaining = null;
+        if (!$isSubscription) {
+            $remaining = $this->shippingService->getRemainingForFreeShipping($country, $subtotal);
+        }
+
+        return response()->json([
+            'shipping' => $shipping,
+            'shipping_formatted' => $this->shippingService->formatShippingCost($shipping),
+            'packeta_carrier_id' => $rate->packeta_carrier_id,
+            'packeta_carrier_name' => $rate->packeta_carrier_name,
+            'available' => true,
+            'free_shipping_remaining' => $remaining,
+        ]);
     }
 
     public function store(Request $request)
@@ -153,7 +210,10 @@ class CheckoutController extends Controller
                 }
             }
 
-            $shipping = $subtotal >= 1000 ? 0 : 99;
+            // Calculate shipping based on selected country
+            $shippingCountry = $request->billing_country;
+            $shipping = $this->shippingService->calculateShippingCost($shippingCountry, $subtotal, false);
+            $shippingRate = ShippingRate::getForCountry($shippingCountry);
             
             // Zpracování kupónu
             $coupon = null;
@@ -193,6 +253,8 @@ class CheckoutController extends Controller
                 'discount_amount' => $discount,
                 'subtotal' => $subtotal,
                 'shipping' => $shipping,
+                'shipping_rate_id' => $shippingRate?->id,
+                'shipping_country' => $shippingCountry,
                 'tax' => $tax,
                 'total' => $totalWithVat,
                 'status' => 'pending',

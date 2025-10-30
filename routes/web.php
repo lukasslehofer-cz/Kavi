@@ -72,6 +72,7 @@ Route::delete('/kosik/vyprazdnit', [CartController::class, 'clear'])->name('cart
 Route::get('/pokladna', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/pokladna', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/objednavka/{order}/potvrzeni', [CheckoutController::class, 'confirmation'])->name('order.confirmation');
+Route::post('/api/calculate-shipping', [CheckoutController::class, 'calculateShipping'])->name('api.calculate-shipping');
 
 // Order payment (requires auth)
 Route::post('/objednavka/{order}/zaplatit', [CheckoutController::class, 'payOrder'])->name('order.pay')->middleware('auth');
@@ -138,6 +139,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/newsletter/{subscriber}', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'destroy'])->name('newsletter.destroy');
     Route::post('/newsletter/sync-customers', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'syncCustomers'])->name('newsletter.sync-customers');
     Route::get('/newsletter/export', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'export'])->name('newsletter.export');
+    
+    // Shipping Rates
+    Route::get('/doprava', [\App\Http\Controllers\Admin\ShippingRateController::class, 'index'])->name('shipping.index');
+    Route::get('/doprava/{rate}/upravit', [\App\Http\Controllers\Admin\ShippingRateController::class, 'edit'])->name('shipping.edit');
+    Route::put('/doprava/{rate}', [\App\Http\Controllers\Admin\ShippingRateController::class, 'update'])->name('shipping.update');
+    Route::post('/doprava/get-carriers', [\App\Http\Controllers\Admin\ShippingRateController::class, 'getCarriers'])->name('shipping.get-carriers');
 });
 
 // Auth routes (Laravel Breeze/Jetstream or custom implementation)

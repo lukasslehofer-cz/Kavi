@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Mail\SubscriptionConfirmation;
 use App\Models\Coupon;
+use App\Models\ShippingRate;
 use App\Models\Subscription;
 use App\Models\SubscriptionConfig;
 use App\Models\SubscriptionPlan;
 use App\Services\CouponService;
+use App\Services\ShippingService;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +19,8 @@ class SubscriptionController extends Controller
 {
     public function __construct(
         private StripeService $stripeService,
-        private CouponService $couponService
+        private CouponService $couponService,
+        private ShippingService $shippingService
     ) {
     }
 
@@ -321,12 +324,22 @@ class SubscriptionController extends Controller
         // Get shipping date info
         $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
         
+        // Calculate shipping based on user country (if known)
+        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
+        $packetaCarrierId = null;
+        $shipping = 0;
+        
+        if ($userCountry) {
+            $packetaCarrierId = $this->shippingService->getPacketaCarrierForCountry($userCountry);
+            $shipping = $this->shippingService->calculateShippingCost($userCountry, $price, true); // true = is subscription
+        }
+        
         // Pokud je chyba, uložit do session pro zobrazení
         if ($errorMessage) {
             session()->flash('coupon_error', $errorMessage);
         }
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount'));
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'packetaCarrierId', 'shipping'));
     }
 
     /**
