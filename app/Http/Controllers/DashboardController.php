@@ -131,7 +131,16 @@ class DashboardController extends Controller
 
     public function profile()
     {
-        return view('dashboard.profile');
+        $user = auth()->user();
+        $paymentMethod = null;
+        
+        // Get payment method details if user has Stripe customer ID
+        if ($user->stripe_customer_id) {
+            $stripeService = app(\App\Services\StripeService::class);
+            $paymentMethod = $stripeService->getPaymentMethodDetails($user->stripe_customer_id);
+        }
+        
+        return view('dashboard.profile', compact('paymentMethod'));
     }
 
     public function updateProfile(Request $request)
@@ -352,5 +361,28 @@ class DashboardController extends Controller
 
         return redirect()->route('dashboard.subscription')
             ->with('success', 'Předplatné bylo zrušeno.');
+    }
+
+    /**
+     * Redirect user to Stripe Customer Portal for payment method management
+     */
+    public function managePaymentMethods()
+    {
+        try {
+            $stripeService = app(\App\Services\StripeService::class);
+            $returnUrl = route('dashboard.profile');
+            
+            $portalUrl = $stripeService->createCustomerPortalSession(auth()->user(), $returnUrl);
+            
+            return redirect($portalUrl);
+        } catch (\Exception $e) {
+            \Log::error('Failed to redirect to Customer Portal', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+            
+            return redirect()->route('dashboard.profile')
+                ->with('error', 'Nepodařilo se otevřít správu platebních metod. Zkuste to prosím později.');
+        }
     }
 }

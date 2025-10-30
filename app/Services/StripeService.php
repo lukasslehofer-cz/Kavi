@@ -1165,6 +1165,82 @@ class StripeService
             }
         }
     }
+
+    /**
+     * Get detailed payment method information for a customer
+     */
+    public function getPaymentMethodDetails(string $customerId): ?array
+    {
+        try {
+            $customer = StripeCustomer::retrieve($customerId);
+            
+            // Get default payment method ID
+            $paymentMethodId = $customer->invoice_settings->default_payment_method;
+            
+            // If no default, try to get the first payment method
+            if (!$paymentMethodId) {
+                $paymentMethods = \Stripe\PaymentMethod::all([
+                    'customer' => $customerId,
+                    'type' => 'card',
+                    'limit' => 1,
+                ]);
+                
+                if (count($paymentMethods->data) > 0) {
+                    $paymentMethodId = $paymentMethods->data[0]->id;
+                }
+            }
+            
+            if (!$paymentMethodId) {
+                return null;
+            }
+            
+            // Retrieve full payment method details
+            $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentMethodId);
+            
+            if ($paymentMethod->type === 'card') {
+                return [
+                    'id' => $paymentMethod->id,
+                    'type' => 'card',
+                    'brand' => $paymentMethod->card->brand, // visa, mastercard, etc.
+                    'last4' => $paymentMethod->card->last4,
+                    'exp_month' => $paymentMethod->card->exp_month,
+                    'exp_year' => $paymentMethod->card->exp_year,
+                ];
+            }
+            
+            return null;
+        } catch (\Exception $e) {
+            \Log::error('Failed to get payment method details', [
+                'customer_id' => $customerId,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Create Stripe Customer Portal session for managing payment methods
+     */
+    public function createCustomerPortalSession(User $user, string $returnUrl): string
+    {
+        $customerId = $this->getOrCreateCustomer($user);
+        
+        try {
+            $session = \Stripe\BillingPortal\Session::create([
+                'customer' => $customerId,
+                'return_url' => $returnUrl,
+            ]);
+            
+            return $session->url;
+        } catch (\Exception $e) {
+            \Log::error('Failed to create Customer Portal session', [
+                'user_id' => $user->id,
+                'customer_id' => $customerId,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
 }
 
 

@@ -4,6 +4,35 @@
 
 @section('content')
 <div class="space-y-6">
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+    <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
+        <div class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="text-base font-bold text-green-900 mb-1">Úspěch!</h3>
+                <p class="text-sm text-green-800">{{ session('success') }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-6">
+        <div class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <h3 class="text-base font-bold text-red-900 mb-1">Chyba</h3>
+                <p class="text-sm text-red-800">{{ session('error') }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Page Header -->
     <div class="bg-white rounded-2xl border border-gray-200 p-6">
         <div class="flex items-center gap-4">
@@ -107,6 +136,109 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Payment Methods -->
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div class="bg-gray-50 p-6 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">Platební metody</h2>
+            <p class="text-sm text-gray-600 mt-1 font-light">Správa vašich platebních karet pro předplatné</p>
+        </div>
+        <div class="p-6">
+            @if($paymentMethod)
+                <!-- Display current payment method -->
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl mb-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start gap-3 flex-1">
+                            <!-- Card brand icon -->
+                            <div class="w-12 h-12 rounded-lg bg-gray-900 flex items-center justify-center flex-shrink-0">
+                                @if(strtolower($paymentMethod['brand']) === 'visa')
+                                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4.5 7h15v10h-15z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                        <text x="6" y="14" font-size="6" font-weight="bold" fill="currentColor">VISA</text>
+                                    </svg>
+                                @elseif(strtolower($paymentMethod['brand']) === 'mastercard')
+                                    <svg class="w-8 h-8" viewBox="0 0 24 24">
+                                        <circle cx="9" cy="12" r="5" fill="#EB001B"/>
+                                        <circle cx="15" cy="12" r="5" fill="#F79E1B"/>
+                                        <path d="M12 8.5a5 5 0 00-3 1.5 5 5 0 003 7 5 5 0 003-7 5 5 0 00-3-1.5z" fill="#FF5F00"/>
+                                    </svg>
+                                @else
+                                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                    </svg>
+                                @endif
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-medium text-gray-900 text-base capitalize">{{ $paymentMethod['brand'] }}</span>
+                                    <span class="text-gray-600">••••</span>
+                                    <span class="font-medium text-gray-900">{{ $paymentMethod['last4'] }}</span>
+                                </div>
+                                <p class="text-sm text-gray-600">
+                                    Vyprší {{ str_pad($paymentMethod['exp_month'], 2, '0', STR_PAD_LEFT) }}/{{ $paymentMethod['exp_year'] }}
+                                </p>
+                                
+                                @php
+                                    $expDate = \Carbon\Carbon::create($paymentMethod['exp_year'], $paymentMethod['exp_month'], 1)->endOfMonth();
+                                    $daysUntilExpiry = now()->diffInDays($expDate, false);
+                                @endphp
+                                
+                                @if($daysUntilExpiry < 0)
+                                    <span class="inline-flex items-center gap-1 mt-2 px-2 py-1 text-xs font-medium text-red-700 bg-red-50 rounded-full">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Karta vypršela
+                                    </span>
+                                @elseif($daysUntilExpiry <= 30)
+                                    <span class="inline-flex items-center gap-1 mt-2 px-2 py-1 text-xs font-medium text-orange-700 bg-orange-50 rounded-full">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Brzy vyprší
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="{{ route('dashboard.payment-methods.manage') }}" 
+                   class="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                    Změnit platební metodu
+                </a>
+            @else
+                <!-- No payment method -->
+                <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-4">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-blue-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <p class="text-sm text-blue-800 font-medium mb-1">Zatím nemáte nastavenou žádnou platební metodu</p>
+                            <p class="text-xs text-blue-700">
+                                Při vytvoření předplatného nebo první platbě bude karta automaticky uložena pro budoucí použití.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                @if(auth()->user()->stripe_customer_id)
+                    <a href="{{ route('dashboard.payment-methods.manage') }}" 
+                       class="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Přidat platební metodu
+                    </a>
+                @endif
+            @endif
         </div>
     </div>
 
