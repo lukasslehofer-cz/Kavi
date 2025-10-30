@@ -7,12 +7,7 @@
     <div class="max-w-md w-full">
         <div class="bg-white rounded-2xl p-10 border border-gray-200">
             <!-- Header -->
-            <div class="text-center mb-8">
-                <div class="w-14 h-14 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
-                    </svg>
-                </div>
+            <div class="text-center mb-8">                
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">Vytvořte si účet</h2>
                 <p class="text-gray-600 font-light">Začněte svou kávovou cestu s námi</p>
             </div>

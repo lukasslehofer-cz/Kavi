@@ -8,11 +8,6 @@
         <div class="bg-white rounded-2xl p-10 border border-gray-200">
             <!-- Header -->
             <div class="text-center mb-8">
-                <div class="w-14 h-14 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
-                    </svg>
-                </div>
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">Vítejte zpět</h2>
                 <p class="text-gray-600 font-light">Přihlaste se ke svému účtu</p>
             </div>
@@ -55,7 +50,7 @@
                         <input type="checkbox" name="remember" class="rounded border-gray-300 text-primary-500 focus:ring-primary-500">
                         <span class="ml-2 text-sm text-gray-700 font-light">Zapamatovat si mě</span>
                     </label>
-                    <a href="#" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                    <a href="{{ route('password.request') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
                         Zapomenuté heslo?
                     </a>
                 </div>
