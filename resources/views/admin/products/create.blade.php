@@ -112,6 +112,99 @@
                 <p class="text-xs text-coffee-600 mt-1">Vyberte pražírnu, od které je káva</p>
             </div>
 
+            <!-- Coffee Attributes Section -->
+            <div class="bg-cream-50 border-2 border-cream-200 p-6 rounded-lg space-y-4">
+                <h3 class="text-lg font-semibold text-coffee-900 mb-4">Informace o kávě (volitelné)</h3>
+                
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Původ kávy</label>
+                    <input type="text" name="origin" value="{{ old('origin') }}" 
+                           placeholder="např. Etiopie, Keňa, Honduras..."
+                           class="input @error('origin') border-red-500 @enderror">
+                    @error('origin')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">Zadejte zemi nebo region původu kávy</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Nadmořská výška</label>
+                    <input type="text" name="altitude" value="{{ old('altitude') }}" 
+                           placeholder="např. 1200-1800 m n.m."
+                           class="input @error('altitude') border-red-500 @enderror">
+                    @error('altitude')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">Nadmořská výška pěstování v metrech</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Zpracování</label>
+                    <input type="text" name="processing" value="{{ old('processing') }}" 
+                           placeholder="např. Washed, Natural, Honey..."
+                           class="input @error('processing') border-red-500 @enderror">
+                    @error('processing')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">Způsob zpracování kávy</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Odrůda</label>
+                    <input type="text" name="variety" value="{{ old('variety') }}" 
+                           placeholder="např. Arabica, Bourbon, Caturra..."
+                           class="input @error('variety') border-red-500 @enderror">
+                    @error('variety')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">Odrůda kávovníku</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Chuťové tóny</label>
+                    <textarea name="flavor_notes" rows="3" 
+                              placeholder="např. citrus, čokoláda, karamel, oříšky..."
+                              class="input @error('flavor_notes') border-red-500 @enderror">{{ old('flavor_notes') }}</textarea>
+                    @error('flavor_notes')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">Popište chuťový profil kávy</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-cream-300">
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Hmotnost (g)</label>
+                        <input type="number" name="weight" value="{{ old('weight') }}" min="1" 
+                               placeholder="250"
+                               class="input @error('weight') border-red-500 @enderror">
+                        @error('weight')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-coffee-600 mt-1">Hmotnost balení v gramech</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Datum pražení</label>
+                        <input type="date" name="roast_date" value="{{ old('roast_date') }}" 
+                               class="input @error('roast_date') border-red-500 @enderror">
+                        @error('roast_date')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-coffee-600 mt-1">Kdy byla káva upražena</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sort Order -->
+            <div>
+                <label class="block text-sm font-medium text-coffee-900 mb-2">Pořadí řazení</label>
+                <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}" min="0" 
+                       class="input @error('sort_order') border-red-500 @enderror">
+                @error('sort_order')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-coffee-600 mt-1">Čím nižší číslo, tím výše se produkt zobrazí (0 = výchozí)</p>
+            </div>
 
             <div class="bg-primary-50 border-2 border-primary-200 p-6 rounded-lg">
                 <div class="flex items-start gap-3 mb-4">

@@ -486,7 +486,7 @@ class StripeService
             $subscriptionStartDate = now();
             $currentBillingCycleEnd = $subscriptionStartDate->day <= 15 
                 ? $subscriptionStartDate->copy()->setDay(15) 
-                : $subscriptionStartDate->copy()->addMonth()->setDay(15);
+                : $subscriptionStartDate->copy()->addMonthNoOverflow()->setDay(15);
             
             // Get frequency from configuration if available, otherwise default to 1 month
             $frequencyMonths = 1;

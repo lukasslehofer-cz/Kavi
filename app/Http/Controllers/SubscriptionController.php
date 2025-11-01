@@ -56,7 +56,7 @@ class SubscriptionController extends Controller
         
         // Calculate display month and year (16th is the cutoff)
         $today = now();
-        $displayMonth = $today->day >= 16 ? $today->copy()->addMonth() : $today->copy();
+        $displayMonth = $today->day >= 16 ? $today->copy()->addMonthNoOverflow() : $today->copy();
         
         // Get month name in nominative case
         $months = [
@@ -88,7 +88,7 @@ class SubscriptionController extends Controller
         }
         
         // Calculate next available month (after 16th of next month)
-        $nextAvailableDate = now()->addMonth()->day(16);
+        $nextAvailableDate = now()->addMonthNoOverflow()->day(16);
         $nextAvailableMonthName = $months[$nextAvailableDate->month];
 
         return view('subscriptions.index', compact(
@@ -567,7 +567,7 @@ class SubscriptionController extends Controller
                 // Billing cycle: 16th of one month to 15th of next month
                 $currentBillingCycleEnd = now()->day <= 15 
                     ? now()->copy()->setDay(15) 
-                    : now()->copy()->addMonth()->setDay(15);
+                    : now()->copy()->addMonthNoOverflow()->setDay(15);
                 $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($configuration['frequency']);
 
                 $subscription = Subscription::create([

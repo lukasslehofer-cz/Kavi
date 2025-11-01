@@ -97,7 +97,7 @@ class Product extends Model
         
         // If today is 16th or later, show next month's coffees
         if ($currentDay >= 16) {
-            $targetMonth = $today->copy()->addMonth()->format('Y-m');
+            $targetMonth = $today->copy()->addMonthNoOverflow()->format('Y-m');
         } else {
             $targetMonth = $today->format('Y-m');
         }

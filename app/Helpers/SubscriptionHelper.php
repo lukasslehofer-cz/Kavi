@@ -27,7 +27,7 @@ class SubscriptionHelper
         
         if ($dayOfMonth >= 16) {
             // Order is for next period
-            return Carbon::now()->addMonth()->day(20)->startOfDay();
+            return Carbon::now()->addMonthNoOverflow()->day(20)->startOfDay();
         } else {
             // Order is for current period
             return Carbon::now()->day(20)->startOfDay();
@@ -53,7 +53,7 @@ class SubscriptionHelper
         }
         
         // Get next month's schedule
-        $nextMonth = $today->copy()->addMonth();
+        $nextMonth = $today->copy()->addMonthNoOverflow();
         $nextSchedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
         
         if ($nextSchedule) {
@@ -65,7 +65,7 @@ class SubscriptionHelper
         
         if ($dayOfMonth >= 16) {
             // Next cycle ends on 15th of next month
-            return Carbon::now()->addMonth()->day(15)->startOfDay();
+            return Carbon::now()->addMonthNoOverflow()->day(15)->startOfDay();
         } else {
             // Current cycle ends on 15th of this month
             return Carbon::now()->day(15)->startOfDay();
@@ -105,7 +105,7 @@ class SubscriptionHelper
             }
             
             // Otherwise, get next month's schedule
-            $nextMonth = $createdAt->copy()->addMonth();
+            $nextMonth = $createdAt->copy()->addMonthNoOverflow();
             $nextSchedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
             
             if ($nextSchedule) {
@@ -114,7 +114,7 @@ class SubscriptionHelper
             
             // Fallback to old logic
             if ($createdAt->day >= 16) {
-                return Carbon::parse($createdAt)->addMonth()->day(20)->startOfDay();
+                return Carbon::parse($createdAt)->addMonthNoOverflow()->day(20)->startOfDay();
             } else {
                 return Carbon::parse($createdAt)->day(20)->startOfDay();
             }

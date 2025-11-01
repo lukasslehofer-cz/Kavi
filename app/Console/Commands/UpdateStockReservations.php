@@ -33,7 +33,7 @@ class UpdateStockReservations extends Command
         $today = now();
         if (!$this->option('force') && $today->day != 16) {
             $this->warn('Today is not the 16th of the month. Use --force to run anyway.');
-            $this->info('Next scheduled run: ' . $today->copy()->day(16)->addMonth()->format('Y-m-d'));
+            $this->info('Next scheduled run: ' . $today->copy()->day(16)->addMonthNoOverflow()->format('Y-m-d'));
             return Command::SUCCESS;
         }
 

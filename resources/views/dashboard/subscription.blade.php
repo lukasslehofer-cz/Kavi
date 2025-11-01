@@ -460,7 +460,7 @@
                                             // For initial payment, find the next shipment date (20th) after paid_at
                                             $shipmentDate = $payment->paid_at->copy();
                                             if ($shipmentDate->day >= 20) {
-                                                $shipmentDate->addMonth()->day(20);
+                                                $shipmentDate->addMonthNoOverflow()->day(20);
                                             } else {
                                                 $shipmentDate->day(20);
                                             }
@@ -468,7 +468,7 @@
                                             // For recurring payments, derive from period_end
                                             $shipmentDate = $payment->period_end ? $payment->period_end->copy() : $payment->paid_at->copy();
                                             if ($shipmentDate->day > 20) {
-                                                $shipmentDate->addMonth()->day(20);
+                                                $shipmentDate->addMonthNoOverflow()->day(20);
                                             } else {
                                                 $shipmentDate->day(20);
                                             }

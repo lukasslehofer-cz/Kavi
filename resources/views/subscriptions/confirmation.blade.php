@@ -54,7 +54,7 @@
                 $subscriptionDate = \Carbon\Carbon::parse($subscription->starts_at);
                 $currentBillingCycleEnd = $subscriptionDate->day <= 15 
                     ? $subscriptionDate->copy()->setDay(15) 
-                    : $subscriptionDate->copy()->addMonth()->setDay(15);
+                    : $subscriptionDate->copy()->addMonthNoOverflow()->setDay(15);
                 
                 // Next payment is frequency_months after current billing cycle end
                 $nextPaymentDate = $currentBillingCycleEnd->copy()->addMonths($subscription->frequency_months);

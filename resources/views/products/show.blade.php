@@ -179,21 +179,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </button>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <div class="flex items-center gap-2 bg-green-50 rounded-full px-3 py-2 border border-green-200">
-                        <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="text-xs font-medium text-green-800">Doprava zdarma</span>
-                    </div>
-                    <div class="flex items-center gap-2 bg-blue-50 rounded-full px-3 py-2 border border-blue-200">
-                        <svg class="w-4 h-4 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="text-xs font-medium text-blue-800">Čerstvé pražení</span>
-                    </div>
-                </div>
+
             </form>
             @else
             <div class="bg-red-50 border border-red-200 rounded-2xl text-red-700 px-5 py-4 mb-8 flex items-center gap-3">
@@ -233,22 +219,63 @@
                   </div>
                   <h3 class="text-xl font-bold text-gray-900">Specifikace</h3>
                 </div>
-                <dl class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                
+                @php
+                    $mainAttributes = ['origin' => 'Původ', 'altitude' => 'Nadmořská výška', 'processing' => 'Zpracování', 'variety' => 'Odrůda', 'flavor_notes' => 'Chuťové tóny'];
+                    $additionalInfo = ['weight' => 'Hmotnost', 'roast_date' => 'Datum pražení'];
+                @endphp
+                
+                <!-- Main Coffee Attributes -->
+                <dl class="grid grid-cols-1 gap-3 mb-4">
+                    @foreach($mainAttributes as $key => $label)
+                        @if(isset($product->attributes[$key]) && !empty($product->attributes[$key]))
+                        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
+                            <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">{{ $label }}</dt>
+                            <dd class="text-gray-900 font-semibold">{{ $product->attributes[$key] }}</dd>
+                        </div>
+                        @endif
+                    @endforeach
+                    
+                    <!-- Other attributes not in main or additional lists -->
                     @foreach($product->attributes as $key => $value)
-                    @if(!in_array($key, ['roaster', 'flavor_profile', 'preparation_methods']))
-                    <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
-                        <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">{{ str_replace('_', ' ', ucfirst($key)) }}</dt>
-                        <dd class="text-gray-900 font-semibold">
-                          @if(is_array($value))
-                            {{ implode(', ', $value) }}
-                          @else
-                            {{ $value }}
-                          @endif
-                        </dd>
-                    </div>
-                    @endif
+                        @if(!in_array($key, ['roaster', 'flavor_profile', 'preparation_methods', 'origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date']))
+                        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
+                            <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">{{ str_replace('_', ' ', ucfirst($key)) }}</dt>
+                            <dd class="text-gray-900 font-semibold">
+                              @if(is_array($value))
+                                {{ implode(', ', $value) }}
+                              @else
+                                {{ $value }}
+                              @endif
+                            </dd>
+                        </div>
+                        @endif
                     @endforeach
                 </dl>
+                
+                <!-- Additional Info Section -->
+                @if(isset($product->attributes['weight']) || isset($product->attributes['roast_date']))
+                <div class="pt-4 border-t border-gray-200">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Doplňkové informace</h4>
+                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        @if(isset($product->attributes['weight']) && !empty($product->attributes['weight']))
+                        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
+                            <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">Hmotnost</dt>
+                            <dd class="text-gray-900 font-semibold">{{ $product->attributes['weight'] }} g</dd>
+                        </div>
+                        @endif
+                        
+                        @if(isset($product->attributes['roast_date']) && !empty($product->attributes['roast_date']))
+                        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
+                            <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">Datum pražení</dt>
+                            <dd class="text-gray-900 font-semibold">
+                                {{ \Carbon\Carbon::parse($product->attributes['roast_date'])->format('d.m.Y') }}
+                            </dd>
+                        </div>
+                        @endif
+                    </dl>
+                </div>
+                @endif
             </div>
             @endif
         </div>

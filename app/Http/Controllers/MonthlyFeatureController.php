@@ -19,7 +19,7 @@ class MonthlyFeatureController extends Controller
         
         // If today is 16th or later, show next month
         if ($currentDay >= 16) {
-            $displayMonth = $today->copy()->addMonth();
+            $displayMonth = $today->copy()->addMonthNoOverflow();
         } else {
             $displayMonth = $today->copy();
         }

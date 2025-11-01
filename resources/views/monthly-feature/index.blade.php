@@ -18,16 +18,16 @@
                 <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
-                <span class="text-sm font-medium text-gray-900">Měsíční výběr</span>
+                <span class="text-sm font-medium text-gray-900">Prařírny a kávy měsíce</span>
             </div>
 
             <!-- Clean Heading -->
             <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-                Káva měsíce {{ $monthNameWithYear }}
+                {{ $monthNameWithYear }}
             </h1>
             
             <p class="mx-auto max-w-2xl text-lg text-gray-600 font-light">
-                Každý měsíc pro vás vybíráme výjimečné kávy od nejlepších evropských pražíren. Objevte tento měsíc s námi.
+                Každý měsíc pro vás vybíráme výjimečné kávy z nejlepších evropských pražíren. Co&nbsp;vás čeká tento měsíc?
             </p>
         </div>
     </div>
@@ -143,7 +143,7 @@
             <div class="border-t border-gray-100 pt-16">
                 <div class="text-center mb-10">
                     <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
-                        Kávy měsíce {{ $monthNameWithYear }}
+                        Kávy měsíce
                     </h2>
                     <p class="text-base text-gray-600 font-light">
                         Tyto výběrové kávy jsou součástí našeho aktuálního předplatného
@@ -262,9 +262,25 @@
                                 @if($coffee->attributes && is_array($coffee->attributes) && count($coffee->attributes) > 0)
                                 <div class="bg-gray-50 rounded-2xl p-6 mb-6">
                                     <h4 class="text-lg font-semibold text-gray-900 mb-4">Parametry kávy</h4>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    
+                                    @php
+                                        $mainAttributes = ['origin' => 'Původ', 'altitude' => 'Nadmořská výška', 'processing' => 'Zpracování', 'variety' => 'Odrůda', 'flavor_notes' => 'Chuťové tóny'];
+                                    @endphp
+                                    
+                                    <!-- Main Attributes -->
+                                    <div class="space-y-3 mb-4">
+                                        @foreach($mainAttributes as $key => $label)
+                                            @if(isset($coffee->attributes[$key]) && !empty($coffee->attributes[$key]))
+                                            <div>
+                                                <span class="text-sm text-gray-500 block">{{ $label }}</span>
+                                                <span class="text-base font-medium text-gray-900">{{ $coffee->attributes[$key] }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        
+                                        <!-- Other attributes -->
                                         @foreach($coffee->attributes as $key => $value)
-                                            @if($value && !is_array($value))
+                                            @if($value && !is_array($value) && !in_array($key, ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date']))
                                             <div>
                                                 <span class="text-sm text-gray-500 block">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
                                                 <span class="text-base font-medium text-gray-900">{{ $value }}</span>
@@ -272,6 +288,30 @@
                                             @endif
                                         @endforeach
                                     </div>
+                                    
+                                    <!-- Additional Info -->
+                                    @if(isset($coffee->attributes['weight']) || isset($coffee->attributes['roast_date']))
+                                    <div class="pt-4 border-t border-gray-200">
+                                        <h5 class="text-sm font-semibold text-gray-700 mb-3">Doplňkové informace</h5>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            @if(isset($coffee->attributes['weight']) && !empty($coffee->attributes['weight']))
+                                            <div>
+                                                <span class="text-sm text-gray-500 block">Hmotnost</span>
+                                                <span class="text-base font-medium text-gray-900">{{ $coffee->attributes['weight'] }} g</span>
+                                            </div>
+                                            @endif
+                                            
+                                            @if(isset($coffee->attributes['roast_date']) && !empty($coffee->attributes['roast_date']))
+                                            <div>
+                                                <span class="text-sm text-gray-500 block">Datum pražení</span>
+                                                <span class="text-base font-medium text-gray-900">
+                                                    {{ \Carbon\Carbon::parse($coffee->attributes['roast_date'])->format('d.m.Y') }}
+                                                </span>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endif
                                 </div>
                                 @endif
 
@@ -318,10 +358,10 @@
                     
                     <div class="relative">
                         <h2 class="text-3xl md:text-4xl font-bold mb-3 text-gray-900 tracking-tight">
-                            Chcete kávy měsíce pravidelně?
+                            Chcete dostávat podobné kávy pravidelně?
                         </h2>
                         <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto font-light">
-                            Přihlaste se k našemu předplatnému a získejte výběrové kávy od nejlepších pražíren přímo domů
+                            Přihlaste se k našemu předplatnému a box s vybranými kávovými speciály na vás bude pravidelně čekat ve výdejním místě.
                         </p>
                         <a href="{{ route('subscriptions.index') }}" 
                            class="inline-flex items-center gap-2 px-8 py-3 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all">

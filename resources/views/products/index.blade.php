@@ -18,7 +18,7 @@
         <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
-        <span class="text-sm font-medium text-gray-900">Prémiový obchod</span>
+        <span class="text-sm font-medium text-gray-900">Výběrová káva a doplňky</span>
       </div>
 
       <!-- Clean Heading -->

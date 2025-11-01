@@ -34,7 +34,7 @@ class HomeController extends Controller
         $today = now();
         $currentDay = $today->day;
         $targetMonth = ($currentDay >= 16) 
-            ? $today->copy()->addMonth()->format('Y-m')
+            ? $today->copy()->addMonthNoOverflow()->format('Y-m')
             : $today->format('Y-m');
         
         $coffeesOfMonth = Product::with('roastery')

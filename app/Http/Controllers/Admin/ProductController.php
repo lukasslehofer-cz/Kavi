@@ -53,6 +53,15 @@ class ProductController extends Controller
             'is_featured' => 'boolean',
             'is_coffee_of_month' => 'boolean',
             'coffee_of_month_date' => 'nullable|string|regex:/^\d{4}-\d{2}$/',
+            'sort_order' => 'nullable|integer|min:0',
+            // Attributes for coffee products
+            'origin' => 'nullable|string|max:255',
+            'altitude' => 'nullable|string|max:255',
+            'processing' => 'nullable|string|max:255',
+            'variety' => 'nullable|string|max:255',
+            'flavor_notes' => 'nullable|string|max:1000',
+            'weight' => 'nullable|integer|min:1',
+            'roast_date' => 'nullable|date',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -67,6 +76,37 @@ class ProductController extends Controller
             $validated['price'] = $validated['price'] ?? 0;
             $validated['stock'] = $validated['stock'] ?? 0;
         }
+
+        // Build attributes array
+        $attributes = [];
+        if (!empty($validated['origin'])) {
+            $attributes['origin'] = $validated['origin'];
+        }
+        if (!empty($validated['altitude'])) {
+            $attributes['altitude'] = $validated['altitude'];
+        }
+        if (!empty($validated['processing'])) {
+            $attributes['processing'] = $validated['processing'];
+        }
+        if (!empty($validated['variety'])) {
+            $attributes['variety'] = $validated['variety'];
+        }
+        if (!empty($validated['flavor_notes'])) {
+            $attributes['flavor_notes'] = $validated['flavor_notes'];
+        }
+        if (!empty($validated['weight'])) {
+            $attributes['weight'] = $validated['weight'];
+        }
+        if (!empty($validated['roast_date'])) {
+            $attributes['roast_date'] = $validated['roast_date'];
+        }
+        
+        if (!empty($attributes)) {
+            $validated['attributes'] = $attributes;
+        }
+        
+        // Remove individual attribute fields as they're now in the attributes array
+        unset($validated['origin'], $validated['altitude'], $validated['processing'], $validated['variety'], $validated['flavor_notes'], $validated['weight'], $validated['roast_date']);
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -112,6 +152,15 @@ class ProductController extends Controller
             'is_featured' => 'boolean',
             'is_coffee_of_month' => 'boolean',
             'coffee_of_month_date' => 'nullable|string|regex:/^\d{4}-\d{2}$/',
+            'sort_order' => 'nullable|integer|min:0',
+            // Attributes for coffee products
+            'origin' => 'nullable|string|max:255',
+            'altitude' => 'nullable|string|max:255',
+            'processing' => 'nullable|string|max:255',
+            'variety' => 'nullable|string|max:255',
+            'flavor_notes' => 'nullable|string|max:1000',
+            'weight' => 'nullable|integer|min:1',
+            'roast_date' => 'nullable|date',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -126,6 +175,37 @@ class ProductController extends Controller
             $validated['price'] = $validated['price'] ?? 0;
             $validated['stock'] = $validated['stock'] ?? 0;
         }
+
+        // Build attributes array
+        $attributes = [];
+        if (!empty($validated['origin'])) {
+            $attributes['origin'] = $validated['origin'];
+        }
+        if (!empty($validated['altitude'])) {
+            $attributes['altitude'] = $validated['altitude'];
+        }
+        if (!empty($validated['processing'])) {
+            $attributes['processing'] = $validated['processing'];
+        }
+        if (!empty($validated['variety'])) {
+            $attributes['variety'] = $validated['variety'];
+        }
+        if (!empty($validated['flavor_notes'])) {
+            $attributes['flavor_notes'] = $validated['flavor_notes'];
+        }
+        if (!empty($validated['weight'])) {
+            $attributes['weight'] = $validated['weight'];
+        }
+        if (!empty($validated['roast_date'])) {
+            $attributes['roast_date'] = $validated['roast_date'];
+        }
+        
+        if (!empty($attributes)) {
+            $validated['attributes'] = $attributes;
+        }
+        
+        // Remove individual attribute fields as they're now in the attributes array
+        unset($validated['origin'], $validated['altitude'], $validated['processing'], $validated['variety'], $validated['flavor_notes'], $validated['weight'], $validated['roast_date']);
 
         // Handle image upload
         if ($request->hasFile('image')) {

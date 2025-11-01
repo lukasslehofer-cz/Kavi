@@ -85,8 +85,8 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header - Minimal -->
     <div class="mb-20 max-w-2xl">
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Proč si vybrat Kavi?</h2>
-      <p class="text-xl text-gray-600 font-light">Víme, co dělá kávu výjimečnou.</p>
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Proč si vybrat KAVI?</h2>
+      <p class="text-xl text-gray-600 font-light">Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.</p>
     </div>
 
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
@@ -99,7 +99,7 @@
         </div>
 
         <h3 class="mb-3 text-2xl font-semibold text-gray-900">Čerstvá káva</h3>
-        <p class="text-gray-600 leading-relaxed font-light">Praženo na objednávku, maximálně 7 dní před expedicí. Vždy čerstvá, vždy výjimečná.</p>
+        <p class="text-gray-600 leading-relaxed font-light">Každá pražírna nám dodává čerstvě praženou kávu do vašich kávových boxů.</p>
       </div>
       <!-- feature - end -->
 
@@ -111,8 +111,8 @@
           </svg>
         </div>
 
-        <h3 class="mb-3 text-2xl font-semibold text-gray-900">Prémiová kvalita</h3>
-        <p class="text-gray-600 leading-relaxed font-light">100% Arabica z ověřených plantáží. Každá šarže kávy prochází pečlivou kontrolou kvality.</p>        
+        <h3 class="mb-3 text-2xl font-semibold text-gray-900">Výjimečné chutě</h3>
+        <p class="text-gray-600 leading-relaxed font-light">Žádné nudné a monotonní kávy. Každý měsíc objevíte nové chutě z různých koutů světa.</p>        
       </div>
       <!-- feature - end -->
 
@@ -125,7 +125,7 @@
         </div>
 
         <h3 class="mb-3 text-2xl font-semibold text-gray-900">Doprava zdarma</h3>
-        <p class="text-gray-600 leading-relaxed font-light">Doprava zdarma při objednávce nad 1000 Kč. Káva dorazí přímo k vašim dveřím.</p>
+        <p class="text-gray-600 leading-relaxed font-light">Doprava zdarma pro všechna předplatná. Ať už si vyberete jakoukoluv velikost boxu.</p>
       </div>
       <!-- feature - end -->
     </div>
@@ -189,8 +189,8 @@
               </svg>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900 mb-1">Měsíční překvapení</h3>
-              <p class="text-gray-600 font-light">Každý měsíc nové druhy kávy z různých koutů světa</p>
+              <h3 class="font-semibold text-gray-900 mb-1">Nikde v ČR nekoupíte</h3>
+              <p class="text-gray-600 font-light">Dodáváme vám kávu z pražíren, které nejsou dostupné v ČR.</p>
             </div>
           </div>
 
@@ -201,8 +201,8 @@
               </svg>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900 mb-1">Praženo čerstvě</h3>
-              <p class="text-gray-600 font-light">Maximálně 7 dní před expedicí k vám domů</p>
+              <h3 class="font-semibold text-gray-900 mb-1">Bezkonkurenční cena</h3>
+              <p class="text-gray-600 font-light">Kávy v našich boxech jsou výhodnější než kdekoliv jinde.</p>
             </div>
           </div>
 
@@ -214,7 +214,7 @@
             </div>
             <div>
               <h3 class="font-semibold text-gray-900 mb-1">Flexibilní předplatné</h3>
-              <p class="text-gray-600 font-light">Přizpůsobte množství a frekvenci podle svých potřeb</p>
+              <p class="text-gray-600 font-light">Přizpůsobte množství a frekvenci podle svých potřeb.</p>
             </div>
           </div>
         </div>
@@ -257,7 +257,7 @@
       <div class="group flex flex-col bg-white rounded-3xl p-10 border border-gray-200 hover:border-gray-300 transition-all duration-200">
         <div class="mb-8">
           <div class="mb-6">
-            <span class="text-sm font-medium text-gray-500 mb-2 block">Starter</span>
+            <span class="text-sm font-medium text-gray-500 mb-2 block">M Box</span>
             <div class="text-5xl font-bold text-gray-900">500g</div>
           </div>
 
@@ -300,7 +300,7 @@
             <span class="text-lg text-gray-500 font-light">Kč/box</span>
           </div>
 
-          <a href="{{ route('subscriptions.index') }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
+          <a href="{{ route('subscriptions.index', ['plan' => 2]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
             Vybrat plán
           </a>
         </div>
@@ -318,7 +318,7 @@
 
         <div class="mb-8 pt-2">
           <div class="mb-6">
-            <span class="text-sm font-medium text-primary-500 mb-2 block">Popular</span>
+            <span class="text-sm font-medium text-primary-500 mb-2 block">L Box</span>
             <div class="text-5xl font-bold text-gray-900">750g</div>
           </div>
 
@@ -368,7 +368,7 @@
             <span class="text-lg text-gray-500 font-light">Kč/box</span>
           </div>
 
-          <a href="{{ route('subscriptions.index') }}" class="group/btn flex items-center justify-center gap-2 w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
+          <a href="{{ route('subscriptions.index', ['plan' => 3]) }}" class="group/btn flex items-center justify-center gap-2 w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
             <span>Vybrat plán</span>
             <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -382,7 +382,7 @@
       <div class="group flex flex-col bg-white rounded-3xl p-10 border border-gray-200 hover:border-gray-300 transition-all duration-200">
         <div class="mb-8">
           <div class="mb-6">
-            <span class="text-sm font-medium text-gray-500 mb-2 block">Premium</span>
+            <span class="text-sm font-medium text-gray-500 mb-2 block">XL Box</span>
             <div class="text-5xl font-bold text-gray-900">1000g</div>
           </div>
 
@@ -432,7 +432,7 @@
             <span class="text-lg text-gray-500 font-light">Kč/box</span>
           </div>
 
-          <a href="{{ route('subscriptions.index') }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
+          <a href="{{ route('subscriptions.index', ['plan' => 4]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
             Vybrat plán
           </a>
         </div>
@@ -460,7 +460,7 @@
     <!-- Section Header - Minimal -->
     <div class="mb-20 max-w-2xl">
       <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Co říkají naši zákazníci</h2>
-      <p class="text-xl text-gray-600 font-light">Přidejte se k tisícům spokojených milovníků kávy</p>
+      <p class="text-xl text-gray-600 font-light">Přidejte se k řadě spokojených milovníků kávy</p>
     </div>
 
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
@@ -552,12 +552,12 @@
 <!-- Coffee of the Month Teaser -->
 @if($roasteriesOfMonth->count() > 0 || $coffeesOfMonth->count() > 0)
 @php
-  $displayMonth = now()->day >= 16 ? now()->addMonth() : now();
+  $displayMonth = now()->day >= 16 ? now()->addMonthNoOverflow() : now();
   // Get month name in nominative case (Říjen, not října)
   $monthsNominative = [
-    1 => 'Leden', 2 => 'Únor', 3 => 'Březen', 4 => 'Duben',
-    5 => 'Květen', 6 => 'Červen', 7 => 'Červenec', 8 => 'Srpen',
-    9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec'
+    1 => 'leden', 2 => 'únor', 3 => 'březen', 4 => 'duben',
+    5 => 'květen', 6 => 'červen', 7 => 'červenec', 8 => 'srpen',
+    9 => 'září', 10 => 'říjen', 11 => 'listopad', 12 => 'prosinec'
   ];
   $monthName = $monthsNominative[$displayMonth->month];
   $displayYear = $displayMonth->year;
@@ -572,7 +572,7 @@
         <svg class="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
-        <span class="text-sm font-medium text-gray-700">{{ $monthName }} {{ $displayYear }}</span>
+        <span class="text-sm font-medium text-gray-700" style="text-transform: capitalize;">{{ $monthName }} {{ $displayYear }}</span>
       </div>
       <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Káva měsíce</h2>
       <p class="text-xl text-gray-600 font-light max-w-2xl mx-auto">Každý měsíc přinášíme výběr káv od vybraných pražíren</p>
@@ -827,7 +827,7 @@
           <h3 class="text-xl font-bold text-gray-900 mb-3">Vychutnejte si</h3>
           
           <!-- Description -->
-          <p class="text-gray-600 font-light leading-relaxed">Užijte si prémiovou kávu a těšte se na další měsíc</p>
+          <p class="text-gray-600 font-light leading-relaxed">Užijte si prémiovou kávu a těšte se na další kávový box</p>
         </div>
       </div>
 
@@ -962,26 +962,26 @@
             Káva s pozitivním dopadem
           </h2>
           <p class="text-xl text-gray-600 leading-relaxed font-light mb-8">
-            Každé balení kávy z Kavi podporuje udržitelný rozvoj kávových komunit. Spolupracujeme pouze s pražírnami, které nakupují přímo od farmářů za férové ceny.
+            V KAVI věříme, že výběrová káva může měnit svět. Z každého kávového boxu proto věnujeme 5 Kč organizaci <a href="https://water.org" target="_blank" class="text-primary-500 hover:text-primary-600 underline">Water.org</a>, která zajišťuje přístup k čisté vodě v rozvojových zemích. <b>Každý box tak poskytne jednomu člověku vodu na půl roku</b. Když si vychutnáváte naši kávu, pomáháte zároveň lidem po celém světě získat to nejzákladnější – bezpečnou vodu.
           </p>
         </div>
 
         <!-- Stats - Minimal -->
         <div class="grid grid-cols-2 gap-8">
           <div>
-            <div class="text-4xl font-bold text-gray-900 mb-1">500+</div>
-            <div class="text-sm text-gray-600 font-light">Podpořených farmářů</div>
+            <div class="text-4xl font-bold text-gray-900 mb-1">6 měsíců</div>
+            <div class="text-sm text-gray-600 font-light">vody za jeden box</div>
           </div>
           <div>
-            <div class="text-4xl font-bold text-gray-900 mb-1">100%</div>
-            <div class="text-sm text-gray-600 font-light">Férový obchod</div>
+            <div class="text-4xl font-bold text-gray-900 mb-1">Water.org</div>
+            <div class="text-sm text-gray-600 font-light">darujeme napřímo</div>
           </div>
         </div>
       </div>
 
       <!-- Image Side -->
       <div class="relative h-[500px] rounded-3xl overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1523805009345-7448845a9e53?auto=format&q=80&fit=crop&crop=center&w=1000&h=800" loading="lazy" alt="Africká káva" class="h-full w-full object-cover object-center" />
+        <img src="/images/water-org.jpg" loading="lazy" alt="Water.org" class="h-full w-full object-cover object-center" />
       </div>
     </div>
   </div>
@@ -1024,21 +1024,7 @@
         </a>
       </div>
 
-      <!-- Trust Indicators -->
-      <div class="mt-16 grid grid-cols-3 gap-8 w-full max-w-xl">
-        <div class="text-center">
-          <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">14 dní</div>
-          <div class="text-xs text-gray-500 font-light">Vrácení peněz</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">100%</div>
-          <div class="text-xs text-gray-500 font-light">Spokojenost</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">24/7</div>
-          <div class="text-xs text-gray-500 font-light">Podpora</div>
-        </div>
-      </div>
+      
     </div>
   </div>
 </div>

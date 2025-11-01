@@ -328,7 +328,7 @@ class StockReservationService
         }
 
         // Get next month's schedule
-        $nextMonth = $today->copy()->addMonth();
+        $nextMonth = $today->copy()->addMonthNoOverflow();
         $nextSchedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
         
         if ($nextSchedule) {
