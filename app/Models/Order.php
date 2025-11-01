@@ -13,6 +13,9 @@ class Order extends Model
         'order_number',
         'user_id',
         'subscription_id',
+        'shipment_schedule_id',
+        'shipped_with_subscription',
+        'subscription_addon_slots_used',
         'coupon_id',
         'coupon_code',
         'discount_amount',
@@ -56,6 +59,7 @@ class Order extends Model
         'discount_amount' => 'decimal:2',
         'shipping_address' => 'array',
         'billing_address' => 'array',
+        'shipped_with_subscription' => 'boolean',
         'paid_at' => 'datetime',
         'last_payment_failure_at' => 'datetime',
         'shipped_at' => 'datetime',
@@ -86,6 +90,11 @@ class Order extends Model
     public function shippingRate()
     {
         return $this->belongsTo(ShippingRate::class);
+    }
+
+    public function shipmentSchedule()
+    {
+        return $this->belongsTo(ShipmentSchedule::class);
     }
 
     public function markAsPaid()

@@ -11,6 +11,7 @@ use App\Models\ShippingRate;
 use App\Services\CouponService;
 use App\Services\FakturoidService;
 use App\Services\ShippingService;
+use App\Services\SubscriptionAddonService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -21,7 +22,8 @@ class CheckoutController extends Controller
 
     public function __construct(
         private CouponService $couponService,
-        private ShippingService $shippingService
+        private ShippingService $shippingService,
+        private SubscriptionAddonService $addonService
     ) {
     }
 
@@ -50,14 +52,9 @@ class CheckoutController extends Controller
         }
 
         // Calculate shipping dynamically based on user country
-        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
-        $shipping = 0; // Default
-        $packetaCarrierId = null;
-        
-        if ($userCountry) {
-            $shipping = $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
-            $packetaCarrierId = $this->shippingService->getPacketaCarrierForCountry($userCountry);
-        }
+        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : 'CZ'; // Default to Czech Republic for guests
+        $shipping = $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
+        $packetaCarrierId = $this->shippingService->getPacketaCarrierForCountry($userCountry);
         
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
@@ -108,7 +105,54 @@ class CheckoutController extends Controller
             session()->flash('coupon_error', $errorMessage);
         }
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'totalWithVat', 'totalWithoutVat', 'vat', 'appliedCoupon', 'discount', 'packetaCarrierId'));
+        // Zkontrolovat dostupnost volby "s předplatným"
+        $canShipWithSubscription = false;
+        $subscriptionShipmentInfo = [];
+        $availableSubscriptions = [];
+
+        if (auth()->check()) {
+            $cartQuantity = array_sum($cart);
+            
+            // Získat všechna aktivní předplatná s dostupnými sloty
+            $allSlots = $this->addonService->getAllAvailableSlots(auth()->user());
+            
+            if (!empty($allSlots)) {
+                $canShipWithSubscription = true;
+                
+                foreach ($allSlots as $slots) {
+                    $availableSubscriptions[] = [
+                        'subscription' => $slots['subscription'],
+                        'available_slots' => $slots['available'],
+                        'used_slots' => $slots['used'],
+                        'max_slots' => $slots['max'],
+                        'can_add_cart' => $slots['available'] >= $cartQuantity,
+                        'next_shipment_date' => $slots['next_shipment']->shipment_date,
+                        'next_shipment_formatted' => $slots['next_shipment']->shipment_date->format('d.m.Y'),
+                    ];
+                }
+                
+                // Pro zpětnou kompatibilitu - pokud je jen jedno předplatné
+                if (count($availableSubscriptions) === 1) {
+                    $subscriptionShipmentInfo = $availableSubscriptions[0];
+                    $subscriptionShipmentInfo['cart_quantity'] = $cartQuantity;
+                }
+            }
+        }
+
+        return view('checkout.index', compact(
+            'cartItems', 
+            'subtotal', 
+            'shipping', 
+            'totalWithVat', 
+            'totalWithoutVat', 
+            'vat', 
+            'appliedCoupon', 
+            'discount', 
+            'packetaCarrierId',
+            'canShipWithSubscription',
+            'subscriptionShipmentInfo',
+            'availableSubscriptions'
+        ));
     }
 
     /**
@@ -158,7 +202,8 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        // Dynamická validace - Packeta data jsou required pouze pokud se neposílá s předplatným
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => auth()->check() ? 'required|string|max:20' : 'nullable|string|max:20',
@@ -166,12 +211,20 @@ class CheckoutController extends Controller
             'billing_city' => 'required|string',
             'billing_postal_code' => 'required|string',
             'billing_country' => 'required|string|size:2',
-            'packeta_point_id' => 'required|string',
-            'packeta_point_name' => 'required|string',
-            'packeta_point_address' => 'nullable|string',
             'payment_method' => 'required|in:card,transfer',
             'coupon_code' => 'nullable|string',
-        ]);
+            'ship_with_subscription' => 'nullable|boolean',
+            'selected_subscription_id' => 'nullable|exists:subscriptions,id',
+        ];
+
+        // Packeta fields are required only if NOT shipping with subscription
+        if (!$request->ship_with_subscription) {
+            $rules['packeta_point_id'] = 'required|string';
+            $rules['packeta_point_name'] = 'required|string';
+            $rules['packeta_point_address'] = 'nullable|string';
+        }
+
+        $request->validate($rules);
 
         // Check for existing user if guest checkout
         if (!auth()->check()) {
@@ -210,9 +263,36 @@ class CheckoutController extends Controller
                 }
             }
 
-            // Calculate shipping based on selected country
+            // Zpracování volby "odeslat s předplatným"
+            $shipWithSubscription = false;
+            $selectedSubscription = null;
+            $shipmentSchedule = null;
+            
+            if ($request->ship_with_subscription && auth()->check()) {
+                $cartQuantity = array_sum($cart);
+                
+                // Pokud je vybrané konkrétní předplatné
+                if ($request->selected_subscription_id) {
+                    $selectedSubscription = auth()->user()->activeSubscriptions()
+                        ->where('id', $request->selected_subscription_id)
+                        ->first();
+                }
+                
+                // Validace možnosti přidat zboží
+                if ($selectedSubscription && $this->addonService->canAddItems(auth()->user(), $cartQuantity, $selectedSubscription)) {
+                    $slots = $this->addonService->getAvailableSlots(auth()->user(), $selectedSubscription);
+                    $shipmentSchedule = $slots['next_shipment'];
+                    $shipWithSubscription = true;
+                } else {
+                    return back()
+                        ->withInput()
+                        ->with('error', 'Překročili jste limit doplňkového zboží nebo předplatné není dostupné.');
+                }
+            }
+
+            // Calculate shipping based on selected country or subscription addon
             $shippingCountry = $request->billing_country;
-            $shipping = $this->shippingService->calculateShippingCost($shippingCountry, $subtotal, false);
+            $shipping = $shipWithSubscription ? 0 : $this->shippingService->calculateShippingCost($shippingCountry, $subtotal, false);
             $shippingRate = ShippingRate::getForCountry($shippingCountry);
             
             // Zpracování kupónu
@@ -229,9 +309,19 @@ class CheckoutController extends Controller
                     
                     $discount = $couponResult['discount'];
                     $shipping = $couponResult['shipping'];
-                    $totalWithVat = $couponResult['total'];
-                    $totalWithoutVat = $couponResult['total_without_vat'];
-                    $tax = $couponResult['vat'];
+                    
+                    // CRITICAL: Pokud je addon objednávka, doprava MUSÍ být vždy 0
+                    if ($shipWithSubscription) {
+                        $shipping = 0;
+                        // Přepočítat celkovou cenu bez dopravy
+                        $totalWithVat = ($subtotal - $discount) + $shipping;
+                        $totalWithoutVat = round($totalWithVat / 1.21, 2);
+                        $tax = round($totalWithVat - $totalWithoutVat, 2);
+                    } else {
+                        $totalWithVat = $couponResult['total'];
+                        $totalWithoutVat = $couponResult['total_without_vat'];
+                        $tax = $couponResult['vat'];
+                    }
                 } else {
                     // Kupón není platný, pokračovat bez něj
                     $totalWithVat = $subtotal + $shipping;
@@ -245,7 +335,22 @@ class CheckoutController extends Controller
                 $tax = round($totalWithVat - $totalWithoutVat, 2);
             }
 
-            $order = Order::create([
+            // Pokud se posílá s předplatným, použít Packeta údaje z předplatného
+            $packetaPointId = $request->packeta_point_id;
+            $packetaPointName = $request->packeta_point_name;
+            $packetaPointAddress = $request->packeta_point_address;
+            $carrierId = $request->carrier_id;
+            $carrierPickupPoint = $request->carrier_pickup_point;
+
+            if ($shipWithSubscription && $selectedSubscription) {
+                $packetaPointId = $selectedSubscription->packeta_point_id;
+                $packetaPointName = $selectedSubscription->packeta_point_name;
+                $packetaPointAddress = $selectedSubscription->packeta_point_address;
+                $carrierId = $selectedSubscription->carrier_id;
+                $carrierPickupPoint = $selectedSubscription->carrier_pickup_point;
+            }
+
+            $orderData = [
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => auth()->id() ?? null,
                 'coupon_id' => $coupon?->id,
@@ -268,14 +373,24 @@ class CheckoutController extends Controller
                     'billing_city' => $request->billing_city,
                     'billing_postal_code' => $request->billing_postal_code,
                     'billing_country' => $request->billing_country,
-                    'packeta_point_id' => $request->packeta_point_id,
-                    'packeta_point_name' => $request->packeta_point_name,
-                    'packeta_point_address' => $request->packeta_point_address,
-                    'carrier_id' => $request->carrier_id,
-                    'carrier_pickup_point' => $request->carrier_pickup_point,
+                    'packeta_point_id' => $packetaPointId,
+                    'packeta_point_name' => $packetaPointName,
+                    'packeta_point_address' => $packetaPointAddress,
+                    'carrier_id' => $carrierId,
+                    'carrier_pickup_point' => $carrierPickupPoint,
                 ],
                 'customer_notes' => $request->notes,
-            ]);
+            ];
+
+            // Pokud je to addon objednávka, přidat subscription údaje
+            if ($shipWithSubscription) {
+                $orderData['subscription_id'] = $selectedSubscription->id;
+                $orderData['shipment_schedule_id'] = $shipmentSchedule->id;
+                $orderData['shipped_with_subscription'] = true;
+                $orderData['subscription_addon_slots_used'] = array_sum($cart);
+            }
+
+            $order = Order::create($orderData);
 
             // Save contact info, billing address and Packeta pickup point to user for future use (if authenticated)
             if (auth()->check()) {
@@ -409,7 +524,7 @@ class CheckoutController extends Controller
         }
     }
 
-    public function confirmation(Order $order)
+    public function confirmation(Order $order, Request $request)
     {
         // Auto-login guest user if not already authenticated
         // SECURITY: Only auto-login if this session created the order
@@ -445,6 +560,40 @@ class CheckoutController extends Controller
             // In production, you might want to add a token-based verification here
             if ($order->user_id !== null) {
                 abort(403, 'Nemáte oprávnění zobrazit tuto stránku. Prosím přihlaste se.');
+            }
+        }
+
+        // Synchronously verify payment status if returning from Stripe
+        $sessionId = $request->get('session_id');
+        if ($sessionId && $order->payment_status !== 'paid') {
+            try {
+                \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+                $session = \Stripe\Checkout\Session::retrieve($sessionId);
+                
+                if ($session->payment_status === 'paid' && isset($session->metadata['order_id']) && $session->metadata['order_id'] == $order->id) {
+                    // Payment was successful, update order immediately
+                    $order->update([
+                        'payment_status' => 'paid',
+                        'status' => 'processing',
+                        'stripe_payment_intent_id' => $session->payment_intent ?? null,
+                        'paid_at' => now(),
+                    ]);
+                    
+                    \Log::info('Order payment status updated synchronously', [
+                        'order_id' => $order->id,
+                        'session_id' => $sessionId,
+                    ]);
+                    
+                    // Reload order to get updated status
+                    $order->refresh();
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to verify Stripe session synchronously', [
+                    'order_id' => $order->id,
+                    'session_id' => $sessionId,
+                    'error' => $e->getMessage(),
+                ]);
+                // Continue anyway - webhook will handle it
             }
         }
 

@@ -92,6 +92,26 @@
                             </a>
                         </td>
                     </tr>
+                    @if($order->shipped_with_subscription)
+                    <tr class="bg-purple-50">
+                        <td colspan="6" class="px-6 py-3">
+                            <div class="flex items-center gap-2 text-sm">
+                                <svg class="w-5 h-5 text-purple-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                                <span class="text-purple-800 font-medium">
+                                    Bude odesláno s předplatným
+                                    @if($order->shipmentSchedule)
+                                        • Plánované doručení: <strong>{{ $order->shipmentSchedule->shipment_date->format('d.m.Y') }}</strong>
+                                    @endif
+                                    @if($order->subscription)
+                                        • <a href="{{ route('dashboard.subscription', $order->subscription) }}" class="underline hover:text-purple-900">{{ $order->subscription->subscription_number ?? 'Předplatné #' . $order->subscription->id }}</a>
+                                    @endif
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    @endif
                     @endforeach
                 </tbody>
             </table>

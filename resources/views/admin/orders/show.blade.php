@@ -46,6 +46,56 @@
     </div>
     @endif
 
+    <!-- Subscription Addon Notice -->
+    @if($order->shipped_with_subscription)
+    <div class="bg-gradient-to-r from-purple-50 to-purple-100 border-2 border-purple-300 rounded-xl p-6 mb-6">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <div class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-purple-900 mb-2">
+                    📦 Doplňkové zboží k předplatnému
+                </h3>
+                <div class="space-y-2 text-sm text-purple-800">
+                    <p>
+                        <span class="font-semibold">Tato objednávka bude odeslána společně s předplatným zákazníka.</span>
+                    </p>
+                    @if($order->subscription)
+                    <p>
+                        <span class="font-medium">Předplatné:</span> 
+                        <a href="{{ route('admin.subscriptions.show', $order->subscription) }}" 
+                           class="font-bold underline hover:text-purple-900">
+                            {{ $order->subscription->subscription_number ?? '#' . $order->subscription->id }}
+                        </a>
+                    </p>
+                    @endif
+                    @if($order->shipmentSchedule)
+                    <p>
+                        <span class="font-medium">Plánovaná rozesílka:</span> 
+                        <strong>{{ $order->shipmentSchedule->shipment_date->format('d.m.Y') }}</strong>
+                    </p>
+                    @endif
+                    <p>
+                        <span class="font-medium">Počet slotů využito:</span> 
+                        <strong>{{ $order->subscription_addon_slots_used }} / 3</strong>
+                    </p>
+                </div>
+                <div class="mt-3 inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-purple-200">
+                    <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="text-sm font-medium text-gray-900">Doprava zdarma</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Order Details -->
         <div class="lg:col-span-2 space-y-6">

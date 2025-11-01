@@ -122,6 +122,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Číslo</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zákazník</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Celkem</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doprava</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stav</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platba</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum</th>
@@ -147,6 +148,23 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="text-sm font-bold text-gray-900">{{ number_format($order->total, 0, ',', ' ') }} Kč</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($order->shipped_with_subscription)
+                                <div class="flex flex-col gap-1">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        📦 S předplatným
+                                    </span>
+                                    @if($order->subscription)
+                                        <a href="{{ route('admin.subscriptions.show', $order->subscription) }}" 
+                                           class="text-xs text-purple-600 hover:underline">
+                                            {{ $order->subscription->subscription_number ?? '#' . $order->subscription->id }}
+                                        </a>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="text-sm text-gray-600">Standardní</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($order->status === 'pending')
@@ -202,7 +220,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                        <td colspan="9" class="px-6 py-12 text-center text-gray-500">
                             <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>

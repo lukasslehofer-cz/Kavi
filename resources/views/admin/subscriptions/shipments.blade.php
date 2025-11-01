@@ -261,12 +261,41 @@
                             </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            @if($subscription->last_shipment_date)
-                            {{ $subscription->last_shipment_date->format('d.m.Y') }}
-                            @else
-                            <span class="text-gray-500 italic">První dodávka</span>
-                            @endif
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            <div class="flex flex-col gap-1">
+                                @if($subscription->last_shipment_date)
+                                <span>{{ $subscription->last_shipment_date->format('d.m.Y') }}</span>
+                                @else
+                                <span class="text-gray-500 italic">První dodávka</span>
+                                @endif
+                                
+                                @php
+                                    $addonOrders = $subscription->user->orders()
+                                        ->where('shipment_schedule_id', $schedule?->id ?? null)
+                                        ->where('shipped_with_subscription', true)
+                                        ->where('subscription_id', $subscription->id)
+                                        ->get();
+                                @endphp
+                                
+                                @if($addonOrders->isNotEmpty())
+                                <div class="mt-2 bg-purple-50 border border-purple-200 rounded-lg px-2 py-1.5">
+                                    <div class="flex items-center gap-1 text-xs font-medium text-purple-800">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Doplňkové zboží ({{ $addonOrders->sum('subscription_addon_slots_used') }} ks)
+                                    </div>
+                                    <div class="text-xs text-purple-700 mt-1">
+                                        @foreach($addonOrders as $addonOrder)
+                                            <a href="{{ route('admin.orders.show', $addonOrder) }}" 
+                                               class="text-purple-600 hover:underline font-medium">
+                                                {{ $addonOrder->order_number }}
+                                            </a>{{ !$loop->last ? ', ' : '' }}
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <a href="{{ route('admin.subscriptions.show', $subscription) }}" class="text-blue-600 hover:text-blue-800 font-medium">

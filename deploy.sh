@@ -109,6 +109,17 @@ echo -e "${YELLOW}🗄️  Spouštím databázové migrace...${NC}"
 php artisan migrate --force 2>&1 | tail -5
 echo -e "${GREEN}✓ Migrace dokončeny${NC}"
 
+# 6.5 SEEDERS (pouze pokud je tabulka prázdná)
+echo -e "${YELLOW}🌱 Kontroluji shipping rates...${NC}"
+SHIPPING_COUNT=$(php artisan tinker --execute="echo \App\Models\ShippingRate::count();" 2>/dev/null | tail -1)
+if [ "$SHIPPING_COUNT" = "0" ] || [ -z "$SHIPPING_COUNT" ]; then
+    echo -e "${YELLOW}   → Naplňuji shipping rates...${NC}"
+    php artisan db:seed --class=ShippingRateSeeder --force 2>&1 | tail -3
+    echo -e "${GREEN}✓ Shipping rates naplněny${NC}"
+else
+    echo -e "${GREEN}✓ Shipping rates již existují ($SHIPPING_COUNT zemí)${NC}"
+fi
+
 # 7. CACHE CLEAR
 echo -e "${YELLOW}🧹 Čistím cache...${NC}"
 php artisan config:clear > /dev/null 2>&1

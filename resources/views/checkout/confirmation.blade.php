@@ -60,6 +60,40 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Order Details -->
         <div class="lg:col-span-2 space-y-6">
+            <!-- Subscription Addon Notice -->
+            @if($order->shipped_with_subscription)
+            <div class="bg-gradient-to-r from-purple-50 to-purple-100 border-2 border-purple-300 rounded-2xl p-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-purple-900 mb-2">
+                            ✅ Objednávka bude odeslána s vaším předplatným
+                        </h3>
+                        <p class="text-purple-800 mb-3">
+                            Vaše zboží bude přidáno do příští rozesílky předplatného 
+                            @if($order->subscription)
+                                <a href="{{ route('dashboard.subscription', $order->subscription) }}" class="font-medium underline hover:text-purple-900">
+                                    {{ $order->subscription->subscription_number ?? '#' . $order->subscription->id }}
+                                </a>
+                            @endif
+                            a doručeno společně dne 
+                            <strong>{{ $order->shipmentSchedule ? $order->shipmentSchedule->shipment_date->format('d.m.Y') : 'dle plánu rozesílky' }}</strong>.
+                        </p>
+                        <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-purple-200">
+                            <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="text-sm font-medium text-gray-900">Doprava zdarma 🎉</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Order Items -->
             <div class="bg-white rounded-2xl p-8 border border-gray-200">
                 <div class="flex items-center gap-3 mb-6">

@@ -96,6 +96,14 @@ class ShipmentSchedule extends Model
     }
 
     /**
+     * Orders that will be shipped with this subscription shipment (addon items)
+     */
+    public function addonOrders()
+    {
+        return $this->hasMany(Order::class)->where('shipped_with_subscription', true);
+    }
+
+    /**
      * Get all coffee slots as an array
      */
     public function getCoffeeSlotsArray(): array
