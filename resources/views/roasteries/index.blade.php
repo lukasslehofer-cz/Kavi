@@ -145,8 +145,14 @@
             <a href="{{ $roastery->website_url }}" target="_blank" rel="noopener noreferrer"
                class="inline-flex items-center justify-center w-10 h-10 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
                title="Web pražírny">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 512 512">
+                <circle cx="256" cy="256" r="232" fill="none" stroke="currentColor" stroke-width="48"/>
+                <line x1="256" y1="24" x2="256" y2="488" stroke="currentColor" stroke-width="32"/>
+                <line x1="24" y1="256" x2="488" y2="256" stroke="currentColor" stroke-width="32"/>
+                <ellipse cx="256" cy="256" rx="120" ry="232" fill="none" stroke="currentColor" stroke-width="32"/>
+                <line x1="88" y1="136" x2="424" y2="136" stroke="currentColor" stroke-width="32"/>
+                <line x1="64" y1="256" x2="448" y2="256" stroke="currentColor" stroke-width="32"/>
+                <line x1="88" y1="376" x2="424" y2="376" stroke="currentColor" stroke-width="32"/>
               </svg>
             </a>
             @endif
