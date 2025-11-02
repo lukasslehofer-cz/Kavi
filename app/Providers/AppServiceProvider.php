@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Subscription;
 use App\Observers\OrderObserver;
+use App\Observers\ProductObserver;
 use App\Observers\SubscriptionStockObserver;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Order::observe(OrderObserver::class);
+        Product::observe(ProductObserver::class);
         Subscription::observe(SubscriptionStockObserver::class);
     }
 }

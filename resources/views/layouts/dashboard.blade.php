@@ -9,17 +9,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen flex flex-col bg-gray-50">
-    <!-- Top Announcement Banner -->
-    <div class="bg-gray-900">
-        <div class="flex items-center justify-center gap-2 px-4 py-2.5">
-            <svg class="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <div class="text-sm text-white font-light">
-                Doprava zdarma nad 1000 Kč
-            </div>
-        </div>
-    </div>
 
     <!-- Modern Navigation Header -->
     <header class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-gray-200/50">
