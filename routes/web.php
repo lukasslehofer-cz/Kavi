@@ -59,7 +59,7 @@ Route::get('/predplatne/{subscription}/potvrzeni', [SubscriptionController::clas
 
 // Subscription plans (keep this route last as it catches everything)
 Route::get('/predplatne/{plan}', [SubscriptionController::class, 'show'])->name('subscriptions.show');
-Route::post('/predplatne/{plan}/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
+Route::post('/predplatne/{plan}/registrovat', [SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
 
 // Cart
 Route::get('/kosik', [CartController::class, 'index'])->name('cart.index');

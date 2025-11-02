@@ -427,7 +427,14 @@ class SubscriptionController extends Controller
             session()->flash('coupon_error', $errorMessage);
         }
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'packetaCarrierId', 'shipping'));
+        // Get available countries for shipping
+        $availableCountries = ShippingRate::where('enabled', true)
+            ->orderBy('country_name')
+            ->get()
+            ->pluck('country_name', 'country_code')
+            ->toArray();
+
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'packetaCarrierId', 'shipping', 'availableCountries'));
     }
 
     /**

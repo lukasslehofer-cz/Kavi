@@ -168,6 +168,13 @@ class CheckoutController extends Controller
             }
         }
 
+        // Get available countries for shipping
+        $availableCountries = ShippingRate::where('enabled', true)
+            ->orderBy('country_name')
+            ->get()
+            ->pluck('country_name', 'country_code')
+            ->toArray();
+
         return view('checkout.index', compact(
             'cartItems', 
             'subtotal', 
@@ -180,7 +187,8 @@ class CheckoutController extends Controller
             'packetaCarrierId',
             'canShipWithSubscription',
             'subscriptionShipmentInfo',
-            'availableSubscriptions'
+            'availableSubscriptions',
+            'availableCountries'
         ));
     }
 
