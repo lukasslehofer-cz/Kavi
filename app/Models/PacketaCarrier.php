@@ -73,10 +73,45 @@ class PacketaCarrier extends Model
             ->sorted()
             ->get()
             ->map(fn($carrier) => [
-                'id' => $carrier->carrier_id,
+                'id' => $carrier->id,  // Database ID for form submission
+                'carrier_id' => $carrier->carrier_id,  // Packeta carrier ID for reference
                 'name' => $carrier->name,
                 'country' => $carrier->country_code,
             ])
             ->toArray();
+    }
+
+    /**
+     * Check if this is Packeta's own network (not external carrier)
+     */
+    public function isPacketaOwn(): bool
+    {
+        return in_array($this->carrier_id, ['packeta', 'zpoint']) || $this->carrier_id === strtolower($this->country_code);
+    }
+
+    /**
+     * Get the widget vendor object for this carrier
+     * Returns the correct format for Packeta Widget v6 vendors parameter
+     */
+    public function getWidgetVendorObject(): array
+    {
+        // Packeta own network: use country + group format
+        if ($this->carrier_id === 'zpoint') {
+            // Z-BOX: group = "zbox"
+            return [
+                'country' => strtolower($this->country_code),
+                'group' => 'zbox',
+            ];
+        } elseif ($this->carrier_id === 'packeta' || $this->carrier_id === strtolower($this->country_code)) {
+            // Packeta PP: only country (group is empty for zpoint)
+            return [
+                'country' => strtolower($this->country_code),
+            ];
+        }
+        
+        // External carrier: use carrierId
+        return [
+            'carrierId' => $this->carrier_id,
+        ];
     }
 }

@@ -1018,6 +1018,9 @@ document.getElementById('magic-link-modal').addEventListener('click', function(e
     }
 });
 
+// Packeta widget vendors configuration - MUST be global for widget access
+let currentPacketaVendors = @json($packetaVendors ?? []);
+
 // Add form id to the form element
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form[action="{{ route('checkout.store') }}"]');
@@ -1026,7 +1029,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dynamic shipping calculation
-    let currentPacketaCarriers = @json($packetaCarrierIds ?? []);
     const subtotal = {{ $subtotal }};
     const shippingCostElement = document.getElementById('shipping-cost');
     const totalElement = document.getElementById('total-cost');
@@ -1094,8 +1096,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     totalElement.textContent = new Intl.NumberFormat('cs-CZ').format(newTotal) + ' Kč';
                 }
                 
-                // Update Packeta carriers for widget
-                currentPacketaCarriers = data.packeta_carrier_ids || [];
+                // Update Packeta vendors for widget
+                currentPacketaVendors = data.packeta_vendors || [];
             } else {
                 alert('Do vybrané země momentálně nedoručujeme.');
                 if (shippingCostElement) {
@@ -1126,9 +1128,12 @@ document.addEventListener('DOMContentLoaded', function() {
             language: 'cs',
         };
         
-        // Add vendor filter if carriers are set (supports multiple carriers)
-        if (currentPacketaCarriers && currentPacketaCarriers.length > 0) {
-            widgetOptions.vendors = currentPacketaCarriers;
+        // Add vendor filter if vendors are set (supports multiple carriers and Packeta own network)
+        if (currentPacketaVendors && currentPacketaVendors.length > 0) {
+            // Packeta Widget v6 requires 'vendors' as array of vendor objects
+            // Objects are already properly formatted by backend (carrierId for external, country+group for Packeta)
+            widgetOptions.vendors = currentPacketaVendors;
+            console.log('Widget vendors filter:', widgetOptions.vendors);
         }
 
         Packeta.Widget.pick(packetaApiKey, function(point) {

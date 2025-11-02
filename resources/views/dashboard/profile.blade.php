@@ -249,9 +249,14 @@
             <p class="text-sm text-gray-600 mt-1 font-light">Tato adresa bude předvyplněná při objednávkách</p>
         </div>
         <div class="p-6">
-            <form method="POST" action="{{ route('dashboard.profile.update') }}" class="space-y-6">
+            <form method="POST" action="{{ route('dashboard.profile.update') }}" class="space-y-6" id="billing-address-form">
                 @csrf
                 @method('PUT')
+                
+                <!-- Hidden fields to pass validation -->
+                <input type="hidden" name="name" value="{{ auth()->user()->name }}">
+                <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+                <input type="hidden" name="phone" value="{{ auth()->user()->phone ?? '' }}">
 
                 <div>
                     <label for="address" class="block text-sm font-medium text-gray-900 mb-2">Ulice a číslo popisné</label>
@@ -375,6 +380,15 @@
             <form method="POST" action="{{ route('dashboard.profile.update') }}" id="packeta-form" class="space-y-6">
                 @csrf
                 @method('PUT')
+                
+                <!-- Hidden fields to pass validation -->
+                <input type="hidden" name="name" value="{{ auth()->user()->name }}">
+                <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+                <input type="hidden" name="phone" value="{{ auth()->user()->phone ?? '' }}">
+                <input type="hidden" name="address" value="{{ auth()->user()->address ?? '' }}">
+                <input type="hidden" name="city" value="{{ auth()->user()->city ?? '' }}">
+                <input type="hidden" name="postal_code" value="{{ auth()->user()->postal_code ?? '' }}">
+                <input type="hidden" name="country" value="{{ auth()->user()->country ?? '' }}">
 
                 <!-- Hidden fields for Packeta data -->
                 <input type="hidden" id="packeta_point_id" name="packeta_point_id" value="{{ old('packeta_point_id', auth()->user()->packeta_point_id ?? '') }}">
@@ -819,14 +833,65 @@
 
 <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
 <script>
+// Packeta widget vendors configuration - MUST be global for widget access
+let currentPacketaVendors = @json($packetaVendors ?? []);
+
 document.addEventListener('DOMContentLoaded', function() {
     // Packeta Widget Configuration
     const packetaApiKey = '{{ config("services.packeta.widget_key") }}';
+    
+    // Handle country change in billing address form - update vendors for widget
+    const countrySelect = document.getElementById('country');
+    if (countrySelect) {
+        countrySelect.addEventListener('change', function() {
+            const newCountry = this.value;
+            
+            // Fetch new vendors for selected country
+            if (newCountry) {
+                fetch('{{ route("api.calculate-shipping") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        country: newCountry,
+                        subtotal: 0, // Not relevant for vendor lookup
+                        is_subscription: false
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.available && data.packeta_vendors) {
+                        currentPacketaVendors = data.packeta_vendors;
+                        console.log('Updated vendors for country ' + newCountry + ':', currentPacketaVendors);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching vendors:', error);
+                });
+            }
+        });
+    }
     
     function openPacketaWidget() {
         if (!packetaApiKey) {
             alert('Packeta widget není správně nakonfigurován. Kontaktujte administrátora.');
             return;
+        }
+        
+        const userCountry = '{{ auth()->user()->country ?? "cz" }}';
+        const widgetOptions = {
+            country: userCountry.toLowerCase(),
+            language: 'cs',
+        };
+        
+        // Add vendor filter if vendors are set (supports multiple carriers and Packeta own network)
+        if (currentPacketaVendors && currentPacketaVendors.length > 0) {
+            // Packeta Widget v6 requires 'vendors' as array of vendor objects
+            // Objects are already properly formatted by backend (carrierId for external, country+group for Packeta)
+            widgetOptions.vendors = currentPacketaVendors;
+            console.log('Dashboard widget vendors filter:', widgetOptions.vendors);
         }
 
         Packeta.Widget.pick(packetaApiKey, function(point) {
@@ -841,6 +906,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     address += ', ' + (point.zip ? point.zip + ' ' : '') + point.city;
                 }
                 document.getElementById('packeta_point_address').value = address;
+                
+                console.log('Selected Packeta point:', {
+                    id: point.id,
+                    name: point.name,
+                    address: address
+                });
 
                 // Update UI to show selected point
                 const selectionDiv = document.getElementById('packeta-selection');
@@ -870,10 +941,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Re-attach event listener to the new button
                 document.getElementById('select-point-btn').addEventListener('click', openPacketaWidget);
             }
-        }, {
-            country: 'cz',
-            language: 'cs',
-        });
+        }, widgetOptions);
     }
 
     // Event listener for opening widget

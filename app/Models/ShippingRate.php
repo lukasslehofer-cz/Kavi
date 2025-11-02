@@ -139,11 +139,23 @@ class ShippingRate extends Model
     }
 
     /**
-     * Get array of carrier IDs for Packeta widget
+     * Get array of carrier IDs for Packeta widget (legacy method)
+     * @deprecated Use getPacketaWidgetVendors() instead
      */
     public function getPacketaCarrierIds(): array
     {
         return $this->packetaCarriers->pluck('carrier_id')->toArray();
+    }
+
+    /**
+     * Get array of vendor objects for Packeta Widget v6
+     * Returns properly formatted vendor objects for both Packeta own network and external carriers
+     */
+    public function getPacketaWidgetVendors(): array
+    {
+        return $this->packetaCarriers->map(function ($carrier) {
+            return $carrier->getWidgetVendorObject();
+        })->toArray();
     }
 
     /**

@@ -83,7 +83,7 @@ class CheckoutController extends Controller
         // Calculate shipping dynamically based on user country
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : 'CZ'; // Default to Czech Republic for guests
         $shipping = $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
-        $packetaCarrierIds = $this->shippingService->getPacketaCarriersForCountry($userCountry);
+        $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry);
         
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
@@ -184,7 +184,7 @@ class CheckoutController extends Controller
             'vat', 
             'appliedCoupon', 
             'discount', 
-            'packetaCarrierIds',
+            'packetaVendors',
             'canShipWithSubscription',
             'subscriptionShipmentInfo',
             'availableSubscriptions',
@@ -230,7 +230,7 @@ class CheckoutController extends Controller
         return response()->json([
             'shipping' => $shipping,
             'shipping_formatted' => $this->shippingService->formatShippingCost($shipping),
-            'packeta_carrier_ids' => $rate->getPacketaCarrierIds(),
+            'packeta_vendors' => $rate->getPacketaWidgetVendors(),
             'packeta_carrier_names' => $rate->getPacketaCarrierNames(),
             'available' => true,
             'free_shipping_remaining' => $remaining,

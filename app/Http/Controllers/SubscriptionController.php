@@ -414,11 +414,11 @@ class SubscriptionController extends Controller
         
         // Calculate shipping based on user country (if known)
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
-        $packetaCarrierId = null;
+        $packetaVendors = [];
         $shipping = 0;
         
         if ($userCountry) {
-            $packetaCarrierId = $this->shippingService->getPacketaCarrierForCountry($userCountry);
+            $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry);
             $shipping = $this->shippingService->calculateShippingCost($userCountry, $price, true); // true = is subscription
         }
         
@@ -434,7 +434,7 @@ class SubscriptionController extends Controller
             ->pluck('country_name', 'country_code')
             ->toArray();
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'packetaCarrierId', 'shipping', 'availableCountries'));
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'packetaVendors', 'shipping', 'availableCountries'));
     }
 
     /**

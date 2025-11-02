@@ -149,7 +149,13 @@ class DashboardController extends Controller
             $paymentMethod = $stripeService->getPaymentMethodDetails($user->stripe_customer_id);
         }
         
-        return view('dashboard.profile', compact('paymentMethod'));
+        // Get Packeta widget vendors for user's country
+        $shippingService = app(\App\Services\ShippingService::class);
+        $packetaVendors = $user->country 
+            ? $shippingService->getPacketaWidgetVendorsForCountry($user->country) 
+            : [];
+        
+        return view('dashboard.profile', compact('paymentMethod', 'packetaVendors'));
     }
 
     public function updateProfile(Request $request)
@@ -167,7 +173,11 @@ class DashboardController extends Controller
             'packeta_point_address' => ['nullable', 'string'],
         ]);
 
-        auth()->user()->update($validated);
+        $user = auth()->user();
+        $user->update($validated);
+        
+        // Refresh the user instance to ensure we have latest data
+        $user->refresh();
 
         return redirect()->route('dashboard.profile')
             ->with('success', 'Profil byl úspěšně aktualizován.');

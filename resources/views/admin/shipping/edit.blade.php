@@ -222,7 +222,7 @@
                                         >
                                         <div class="flex-1">
                                             <span class="text-sm font-medium text-gray-900">{{ $carrier['name'] }}</span>
-                                            <span class="text-xs text-gray-500 ml-2">(ID: {{ $carrier['id'] }})</span>
+                                            <span class="text-xs text-gray-500 ml-2">(Packeta ID: {{ $carrier['carrier_id'] ?? $carrier['id'] }})</span>
                                         </div>
                                     </label>
                                 @endforeach

@@ -603,7 +603,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Dynamic shipping calculation for subscriptions
-    let currentPacketaCarrier = '{{ $packetaCarrierId ?? "" }}';
+    let currentPacketaVendors = @json($packetaVendors ?? []);
     const subscriptionPrice = {{ $price }};
     
     document.getElementById('billing_country').addEventListener('change', function() {
@@ -653,8 +653,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.available) {
-                // Update Packeta carrier for widget
-                currentPacketaCarrier = data.packeta_carrier_id;
+                // Update Packeta vendors for widget
+                currentPacketaVendors = data.packeta_vendors || [];
             } else {
                 alert('Do vybrané země momentálně nedoručujeme předplatné.');
             }
@@ -679,9 +679,12 @@ document.addEventListener('DOMContentLoaded', function() {
             language: 'cs',
         };
         
-        // Add vendor filter if carrier is set
-        if (currentPacketaCarrier) {
-            widgetOptions.vendors = [currentPacketaCarrier];
+        // Add vendor filter if vendors are set (supports multiple carriers and Packeta own network)
+        if (currentPacketaVendors && currentPacketaVendors.length > 0) {
+            // Packeta Widget v6 requires 'vendors' as array of vendor objects
+            // Objects are already properly formatted by backend (carrierId for external, country+group for Packeta)
+            widgetOptions.vendors = currentPacketaVendors;
+            console.log('Subscription widget vendors filter:', widgetOptions.vendors);
         }
 
         Packeta.Widget.pick(packetaApiKey, function(point) {

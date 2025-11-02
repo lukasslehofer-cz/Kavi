@@ -75,7 +75,7 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-600">S dopravcem</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $rates->whereNotNull('packeta_carrier_id')->count() }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $rates->filter(fn($r) => $r->packetaCarriers->count() > 0)->count() }}</p>
                 </div>
             </div>
         </div>
@@ -169,10 +169,21 @@
                                 <span class="text-gray-400">—</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @if($rate->packeta_carrier_id)
-                                <div class="text-sm text-gray-900">{{ $rate->packeta_carrier_name }}</div>
-                                <div class="text-xs text-gray-500 font-mono">{{ $rate->packeta_carrier_id }}</div>
+                        <td class="px-6 py-4">
+                            @if($rate->packetaCarriers->count() > 0)
+                                <div class="text-sm text-gray-900 font-medium mb-1">
+                                    {{ $rate->packetaCarriers->count() }} {{ $rate->packetaCarriers->count() === 1 ? 'dopravce' : ($rate->packetaCarriers->count() < 5 ? 'dopravci' : 'dopravců') }}
+                                </div>
+                                <div class="text-xs text-gray-500 space-y-0.5 max-w-xs">
+                                    @foreach($rate->packetaCarriers->take(3) as $carrier)
+                                        <div class="truncate">
+                                            {{ $carrier->name }} <span class="font-mono text-gray-400">({{ $carrier->carrier_id }})</span>
+                                        </div>
+                                    @endforeach
+                                    @if($rate->packetaCarriers->count() > 3)
+                                        <div class="text-gray-400 italic">+ {{ $rate->packetaCarriers->count() - 3 }} dalších...</div>
+                                    @endif
+                                </div>
                             @else
                                 <span class="text-xs text-gray-400">Nenastaveno</span>
                             @endif
