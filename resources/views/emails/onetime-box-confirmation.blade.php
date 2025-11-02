@@ -25,7 +25,6 @@
             text-decoration: none; 
         }
         
-        /* Base styles */
         body {
             margin: 0;
             padding: 0;
@@ -34,14 +33,12 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
         
-        /* Container */
         .email-container {
             max-width: 600px;
             margin: 0 auto;
             background-color: #ffffff;
         }
         
-        /* Header */
         .header {
             background-color: #111827;
             padding: 32px 40px;
@@ -53,7 +50,6 @@
             height: auto;
         }
         
-        /* Content */
         .content {
             padding: 40px;
             color: #374151;
@@ -67,7 +63,7 @@
             margin: 0 auto 24px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-center;
         }
         
         h1 {
@@ -85,113 +81,6 @@
             font-weight: 300;
         }
         
-        .order-number {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 24px 0;
-            text-align: center;
-        }
-        
-        .order-number-label {
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-        
-        .order-number-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #111827;
-        }
-        
-        /* Order items */
-        .order-items {
-            background-color: #f9fafb;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 24px 0;
-        }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111827;
-            margin: 0 0 16px 0;
-        }
-        
-        .item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .item:last-child {
-            border-bottom: none;
-        }
-        
-        .item-name {
-            font-weight: 500;
-            color: #111827;
-            margin-bottom: 4px;
-        }
-        
-        .item-details {
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 300;
-        }
-        
-        .item-price {
-            font-weight: 700;
-            color: #111827;
-            white-space: nowrap;
-            margin-left: 16px;
-        }
-        
-        /* Totals */
-        .totals {
-            margin: 24px 0;
-            padding-top: 16px;
-        }
-        
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            font-size: 14px;
-        }
-        
-        .total-row.highlight {
-            padding-top: 16px;
-            border-top: 2px solid #e5e7eb;
-            margin-top: 8px;
-        }
-        
-        .total-label {
-            color: #6b7280;
-            font-weight: 300;
-        }
-        
-        .total-value {
-            font-weight: 700;
-            color: #111827;
-        }
-        
-        .total-row.highlight .total-label {
-            font-weight: 700;
-            color: #111827;
-            font-size: 16px;
-        }
-        
-        .total-row.highlight .total-value {
-            font-size: 24px;
-        }
-        
-        /* Shipping info */
         .info-box {
             background-color: #f3f4f6;
             border: 1px solid #e5e7eb;
@@ -214,7 +103,43 @@
             margin: 4px 0;
         }
         
-        /* Button */
+        .config-box {
+            background-color: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .config-item:last-child {
+            border-bottom: none;
+        }
+        
+        .config-label {
+            color: #6b7280;
+            font-weight: 300;
+            font-size: 14px;
+        }
+        
+        .config-value {
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .highlight-box {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        
         .button {
             display: inline-block;
             background-color: #e6305a;
@@ -232,7 +157,6 @@
             background-color: #d12a51;
         }
         
-        /* Footer */
         .footer {
             background-color: #f9fafb;
             padding: 32px 40px;
@@ -257,7 +181,6 @@
             margin: 0 8px;
         }
         
-        /* Trust badges */
         .trust-badges {
             margin: 24px 0;
             text-align: center;
@@ -270,14 +193,6 @@
             color: #059669;
         }
         
-        .badge svg {
-            width: 16px;
-            height: 16px;
-            vertical-align: middle;
-            margin-right: 4px;
-        }
-        
-        /* Responsive */
         @media only screen and (max-width: 600px) {
             .content {
                 padding: 24px !important;
@@ -305,14 +220,14 @@
                 background-color: #ffffff !important;
                 border: 1px solid #d1d5db !important;
             }
-            .info-box, .order-items {
+            .info-box, .config-box {
                 background-color: #f9fafb !important;
                 border: 1px solid #d1d5db !important;
             }
-            h1, .info-title, .section-title, .item-name {
+            h1, .info-title, .config-value {
                 color: #111827 !important;
             }
-            .subtitle, .info-text, .item-details {
+            .subtitle, .info-text, .config-label {
                 color: #4b5563 !important;
             }
             .header {
@@ -325,7 +240,7 @@
             background-color: #ffffff !important;
             border: 1px solid #d1d5db !important;
         }
-        [data-ogsc] .info-box, [data-ogsc] .order-items {
+        [data-ogsc] .info-box, [data-ogsc] .config-box {
             background-color: #f9fafb !important;
             border: 1px solid #d1d5db !important;
         }
@@ -335,7 +250,6 @@
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 20px 0;">
         <tr>
             <td align="center">
-                <!-- Main Container -->
                 <!--[if mso]>
                 <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600">
                 <tr>
@@ -360,99 +274,126 @@
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">Děkujeme za vaši objednávku!</h1>
-                            <p class="subtitle" style="text-align: center;">Vaše objednávka byla úspěšně přijata a bude brzy expedována.</p>
+                            <h1 style="text-align: center;">Děkujeme za objednávku! ☕</h1>
+                            <p class="subtitle" style="text-align: center;">Vaše objednávka jednorázového kávového boxu byla přijata.</p>
                             
                             <!-- Order Number -->
-                            <div class="order-number">
-                                <div class="order-number-label">Číslo objednávky</div>
-                                <div class="order-number-value">{{ $order->order_number }}</div>
+                            <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
+                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">Číslo objednávky</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $subscription->subscription_number }}</div>
                             </div>
                             
-                            <!-- Order Items -->
-                            <div class="order-items">
-                                <h2 class="section-title">Obsah objednávky</h2>
-                                @foreach($order->items as $item)
-                                <div class="item">
-                                    <div style="flex: 1;">
-                                        <div class="item-name">{{ $item->product_name }}</div>
-                                        <div class="item-details">{{ $item->quantity }}× {{ number_format($item->price, 0, ',', ' ') }} Kč</div>
+                            <!-- One-time Info Box -->
+                            <div class="highlight-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
+                                <div style="display: flex; align-items: start; gap: 12px;">
+                                    <div style="font-size: 24px; line-height: 1;">⭐</div>
+                                    <div>
+                                        <h3 class="info-title" style="color: #92400e; margin-bottom: 8px;">Jednorázový nákup bez předplatného</h3>
+                                        <p class="info-text" style="color: #78350f;">
+                                            Tento box vám doručíme jednorázově. <strong>Žádné další platby ani dodávky neproběhnou.</strong> Nemusíte nic rušit ani odhlašovat.
+                                        </p>
                                     </div>
-                                    <div class="item-price">{{ number_format($item->total, 0, ',', ' ') }} Kč</div>
                                 </div>
-                                @endforeach
                             </div>
                             
-                            <!-- Totals -->
-                            <div class="totals">
-                                <div class="total-row">
-                                    <span class="total-label">Mezisoučet (bez DPH):</span>
-                                    <span class="total-value">{{ number_format($order->subtotal / 1.21, 2, ',', ' ') }} Kč</span>
-                                </div>
-                                <div class="total-row">
-                                    <span class="total-label">DPH (21%):</span>
-                                    <span class="total-value">{{ number_format($order->tax, 2, ',', ' ') }} Kč</span>
-                                </div>
-                                <div class="total-row">
-                                    <span class="total-label">Doprava:</span>
-                                    <span class="total-value">
-                                        @if($order->shipping == 0)
-                                        <span style="color: #059669;">Zdarma</span>
+                            <!-- Box Configuration -->
+                            <div class="config-box" style="background-color: #f9fafb !important; border: 1px solid #e5e7eb !important;" bgcolor="#f9fafb">
+                                <h2 class="info-title">📦 Váš kávový box</h2>
+                                
+                                <div class="config-item">
+                                    <span class="config-label">Typ kávy:</span>
+                                    <span class="config-value">
+                                        @if($subscription->configuration['type'] === 'espresso')
+                                            Espresso
+                                        @elseif($subscription->configuration['type'] === 'filter')
+                                            Filter
                                         @else
-                                        {{ number_format($order->shipping, 0, ',', ' ') }} Kč
+                                            Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× Filter)
+                                        @endif
+                                        @if($subscription->configuration['isDecaf'] ?? false)
+                                            <span style="color: #059669;"> • Decaf</span>
                                         @endif
                                     </span>
                                 </div>
-                                <div class="total-row highlight">
-                                    <span class="total-label">Celkem:</span>
-                                    <span class="total-value">{{ number_format($order->total, 0, ',', ' ') }} Kč</span>
+                                
+                                <div class="config-item">
+                                    <span class="config-label">Množství:</span>
+                                    <span class="config-value">{{ $subscription->configuration['amount'] }}× balení po 250g</span>
+                                </div>
+                                
+                                <div class="config-item">
+                                    <span class="config-label">Celková cena:</span>
+                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
                                 </div>
                             </div>
                             
-                            <!-- Shipping Info -->
+                            <!-- Shipment Date -->
+                            @php
+                                $shipmentDate = \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($subscription);
+                            @endphp
+                            <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
+                                <h3 class="info-title" style="color: #1e40af;">📅 Doručení</h3>
+                                <p class="info-text" style="color: #1e3a8a;">
+                                    <strong>Váš kávový box vám dorazí:</strong><br>
+                                    {{ $shipmentDate ? $shipmentDate->format('j. n. Y') : 'Brzy' }}
+                                </p>
+                                <p class="info-text" style="color: #1e3a8a; margin-top: 8px; font-size: 13px;">
+                                    Rozesílka probíhá vždy 20. den v měsíci
+                                </p>
+                            </div>
+                            
+                            <!-- Delivery Info -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">📦 Doručení</h3>
-                                @if(isset($order->shipping_address['packeta_point_name']))
-                                <p class="info-text"><strong>Výdejní místo:</strong></p>
-                                <p class="info-text">{{ $order->shipping_address['packeta_point_name'] }}</p>
-                                @if(isset($order->shipping_address['packeta_point_address']))
-                                <p class="info-text" style="color: #6b7280;">{{ $order->shipping_address['packeta_point_address'] }}</p>
+                                <h3 class="info-title">📦 Výdejní místo</h3>
+                                @if(isset($subscription->packeta_point_name))
+                                <p class="info-text"><strong>{{ $subscription->packeta_point_name }}</strong></p>
+                                @if(isset($subscription->packeta_point_address))
+                                <p class="info-text" style="color: #6b7280;">{{ $subscription->packeta_point_address }}</p>
                                 @endif
+                                @endif
+                                
+                                @if($subscription->delivery_notes)
+                                <p class="info-text" style="margin-top: 12px;">
+                                    <strong>Poznámka:</strong><br>
+                                    {{ $subscription->delivery_notes }}
+                                </p>
                                 @endif
                             </div>
                             
                             <!-- Billing Info -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
                                 <h3 class="info-title">📋 Fakturační údaje</h3>
-                                <p class="info-text"><strong>{{ $order->shipping_address['name'] }}</strong></p>
-                                <p class="info-text">{{ $order->shipping_address['billing_address'] }}</p>
-                                <p class="info-text">{{ $order->shipping_address['billing_postal_code'] }} {{ $order->shipping_address['billing_city'] }}</p>
+                                <p class="info-text"><strong>{{ $subscription->shipping_address['name'] }}</strong></p>
+                                <p class="info-text">{{ $subscription->shipping_address['billing_address'] }}</p>
+                                <p class="info-text">{{ $subscription->shipping_address['billing_postal_code'] }} {{ $subscription->shipping_address['billing_city'] }}</p>
                                 <p class="info-text" style="margin-top: 8px;">
-                                    <strong>Email:</strong> {{ $order->shipping_address['email'] }}<br>
-                                    <strong>Telefon:</strong> {{ $order->shipping_address['phone'] }}
+                                    <strong>Email:</strong> {{ $subscription->shipping_address['email'] }}
+                                    @if(isset($subscription->shipping_address['phone']))
+                                    <br><strong>Telefon:</strong> {{ $subscription->shipping_address['phone'] }}
+                                    @endif
                                 </p>
                             </div>
                             
                             <!-- Payment Status -->
-                            @if($order->payment_status === 'paid')
+                            @if($subscription->status === 'active')
                             <div class="info-box" style="background-color: #d1fae5 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#d1fae5">
-                                <h3 class="info-title" style="color: #065f46;">💳 Platba</h3>
+                                <h3 class="info-title" style="color: #065f46;">✓ Platba proběhla úspěšně</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    Platba byla úspěšně přijata.
+                                    Váš kávový box je připraven k odeslání v nejbližším termínu rozesílky.
                                 </p>
                             </div>
                             @else
                             <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e;">💳 Platba</h3>
+                                <h3 class="info-title" style="color: #92400e;">⏳ Čekáme na platbu</h3>
                                 <p class="info-text" style="color: #78350f;">
-                                    Platba zatím nebyla dokončena. Dokončete prosím platbu pro zpracování objednávky.
+                                    Vaše objednávka čeká na potvrzení platby. Po přijetí platby vás budeme informovat emailem.
                                 </p>
                             </div>
                             @endif
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('dashboard.order.detail', $order->id) }}" class="button">
+                                <a href="{{ route('dashboard.subscription') }}" class="button">
                                     Zobrazit detail objednávky
                                 </a>
                             </div>
@@ -463,17 +404,17 @@
                                     ✓ Čerstvě pražená káva
                                 </div>
                                 <div class="badge">
-                                    ✓ Doprava do 3 dnů
+                                    ✓ Jednorázový nákup
                                 </div>
                                 <div class="badge">
-                                    ✓ Zákaznická podpora 24/7
+                                    ✓ Žádné závazky
                                 </div>
                             </div>
                             
                             <!-- Additional Info -->
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
-                                Pokud máte jakékoliv dotazy ohledně vaší objednávky, neváhejte nás kontaktovat na 
-                                <a href="mailto:info@kavi.cz" style="color: #e6305a; text-decoration: none;">info@kavi.cz</a>                                 
+                                Pokud máte jakékoliv dotazy k vaší objednávce, kontaktujte nás na 
+                                <a href="mailto:info@kavi.cz" style="color: #e6305a; text-decoration: none;">info@kavi.cz</a>
                             </p>
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
@@ -488,19 +429,19 @@
                         <td class="footer">
                             <p class="footer-text">
                                 <strong style="color: #111827;">KAVI.cz</strong><br>
-                                Prémiová káva s předplatným
+                                Prémiová čerstvě pražená káva
                             </p>
                             <div class="footer-links">
                                 <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">Domů</a>
                                 <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">Obchod</a>
-                                <a href="{{ route('dashboard.index') }}" class="footer-link" style="color: #e6305a;">Můj účet</a>
+                                <a href="{{ route('dashboard.subscription') }}" class="footer-link" style="color: #e6305a;">Můj účet</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
                                 © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
                             </p>
                             <p class="footer-text" style="font-size: 12px;">
-                                Tento e-mail byl odeslán na adresu {{ $order->shipping_address['email'] }}<br>
-                                protože jste si vytvořili objednávku na našem e-shopu.
+                                Tento e-mail byl odeslán na adresu {{ $subscription->shipping_address['email'] }}<br>
+                                protože jste si objednali kávový box na našem e-shopu.
                             </p>
                         </td>
                     </tr>

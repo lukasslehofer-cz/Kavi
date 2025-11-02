@@ -138,6 +138,65 @@ class StripeService
     }
 
     /**
+     * Create one-time payment checkout session for a subscription box
+     */
+    public function createOneTimeBoxCheckoutSession(
+        Subscription $subscription,
+        float $price,
+        array $shippingAddress
+    ): StripeSession
+    {
+        $subscription->load('user');
+        
+        if (!$subscription->user) {
+            throw new \Exception('Subscription nemá přiřazeného uživatele.');
+        }
+        
+        $customerId = $this->getOrCreateCustomer($subscription->user);
+        
+        // Build product description
+        $config = is_string($subscription->configuration) 
+            ? json_decode($subscription->configuration, true) 
+            : $subscription->configuration;
+        
+        $boxSize = ['2' => 'M Box (2× 250g)', '3' => 'L Box (3× 250g)', '4' => 'XL Box (4× 250g)'];
+        $boxType = ['espresso' => 'Espresso', 'filter' => 'Filtr', 'mix' => 'Mix'];
+        
+        $productName = ($boxSize[$config['amount']] ?? 'Box') . ' - ' . ($boxType[$config['type']] ?? 'Káva');
+        if ($config['isDecaf'] ?? false) {
+            $productName .= ' + Decaf';
+        }
+        $productName .= ' (Jednorázově)';
+        
+        $lineItems = [
+            [
+                'price_data' => [
+                    'currency' => 'czk',
+                    'product_data' => [
+                        'name' => $productName,
+                        'description' => 'Jednorázový kávový box bez předplatného',
+                    ],
+                    'unit_amount' => (int)($price * 100),
+                ],
+                'quantity' => 1,
+            ],
+        ];
+        
+        return StripeSession::create([
+            'customer' => $customerId,
+            'payment_method_types' => ['card'],
+            'line_items' => $lineItems,
+            'mode' => 'payment',
+            'success_url' => route('dashboard.subscription') . '?payment=success',
+            'cancel_url' => route('subscriptions.index') . '?payment=cancelled',
+            'metadata' => [
+                'subscription_id' => $subscription->id,
+                'is_one_time_box' => 'true',
+            ],
+        ]);
+    }
+
+    /**
      * Create checkout session for custom configured subscription
      */
     public function createConfiguredSubscriptionCheckoutSession(
@@ -403,6 +462,36 @@ class StripeService
                     \Log::info('Manual invoice payment successful - subscription restored', [
                         'subscription_id' => $subscription->id,
                         'invoice_id' => $invoiceId ?? 'manual_payment',
+                    ]);
+                }
+            }
+            return;
+        }
+        
+        // Handle one-time box payment
+        if (isset($session['metadata']['is_one_time_box']) && $session['metadata']['is_one_time_box'] === 'true') {
+            $subscriptionId = $session['metadata']['subscription_id'] ?? null;
+            
+            if ($subscriptionId) {
+                $subscription = Subscription::find($subscriptionId);
+                
+                if ($subscription && $subscription->frequency_months == 0) {
+                    // Activate one-time box subscription
+                    $subscription->update([
+                        'status' => 'active',
+                        'starts_at' => now(),
+                    ]);
+                    
+                    // Send confirmation email (one-time box specific template)
+                    try {
+                        \Mail::to($subscription->user->email)->send(new \App\Mail\OneTimeBoxConfirmation($subscription));
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send one-time box confirmation email: ' . $e->getMessage());
+                    }
+                    
+                    \Log::info('One-time box payment successful', [
+                        'subscription_id' => $subscription->id,
+                        'subscription_number' => $subscription->subscription_number,
                     ]);
                 }
             }

@@ -137,6 +137,42 @@ class SubscriptionHelper
      */
     public static function shouldShipInNextBatch($subscription, Carbon $targetShipDate): bool
     {
+        // Special handling for one-time boxes (frequency_months = 0)
+        if ($subscription->frequency_months == 0) {
+            // One-time boxes ship only once
+            // Include if: active/pending + not yet shipped
+            if (!in_array($subscription->status, ['active', 'pending'])) {
+                return false;
+            }
+            
+            // If already shipped, don't include
+            if ($subscription->last_shipment_date) {
+                return false;
+            }
+            
+            // Calculate when it should ship (next shipping date after creation)
+            $createdAt = Carbon::parse($subscription->starts_at ?? $subscription->created_at);
+            $schedule = ShipmentSchedule::getForMonth($createdAt->year, $createdAt->month);
+            
+            // If created after cutoff (15th), ship next month
+            if ($createdAt->day > 15) {
+                $nextMonth = $createdAt->copy()->addMonthNoOverflow();
+                $schedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
+            }
+            
+            if ($schedule) {
+                return $schedule->shipment_date->format('Y-m-d') === $targetShipDate->format('Y-m-d');
+            }
+            
+            // Fallback to 20th of appropriate month
+            $shipDate = $createdAt->day > 15 
+                ? $createdAt->copy()->addMonthNoOverflow()->day(20)
+                : $createdAt->copy()->day(20);
+            
+            return $shipDate->format('Y-m-d') === $targetShipDate->format('Y-m-d');
+        }
+        
+        // Regular subscription logic
         // If paused, allow shipping only when there's a PAID period covering target date (already paid box)
         if ($subscription->status === 'paused') {
             $hasPaidCover = self::hasPaidCoverageForDate($subscription, $targetShipDate);

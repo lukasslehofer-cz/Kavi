@@ -29,7 +29,7 @@ class OrderDelivered extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Vaše objednávka ' . $this->order->order_number . ' čeká na vyzvednutí - Kavi Coffee',
+            subject: 'Vaše objednávka ' . $this->order->order_number . ' čeká na vyzvednutí - KAVI.cz',
         );
     }
 

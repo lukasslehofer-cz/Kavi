@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Předplatné - Kavi Coffee')
+@section('title', 'Předplatné - KAVI.cz')
 
 @section('content')
 <div class="space-y-6">
@@ -47,6 +47,17 @@
                     @if($subscription->plan)
                         <h2 class="text-xl font-bold text-gray-900 mb-1">{{ $subscription->plan->name }}</h2>
                         <p class="text-gray-600 font-light">{{ $subscription->plan->description }}</p>
+                    @elseif($subscription->frequency_months == 0)
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl font-bold text-gray-900 mb-1">Jednorázový kávový box</h2>
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-600 text-white text-xs font-bold rounded-full">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <span>Bez předplatného</span>
+                            </span>
+                        </div>
+                        <p class="text-gray-600 font-light">{{ $subscription->subscription_number ?? '#' . $subscription->id }}</p>
                     @else
                         <h2 class="text-xl font-bold text-gray-900 mb-1">Kávové předplatné {{ $subscription->subscription_number ?? '#' . $subscription->id }}</h2>
                         <p class="text-gray-600 font-light">Váš vlastní konfigurace</p>
@@ -57,6 +68,20 @@
                             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
                                 <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
                                 Aktivní
+                            </span>
+                        @elseif($subscription->status === 'pending')
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                Čeká na platbu
+                            </span>
+                        @elseif($subscription->status === 'completed')
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                Dokončeno
                             </span>
                         @elseif($subscription->status === 'unpaid')
                             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-200">
@@ -88,7 +113,9 @@
                         {{ number_format($subscription->configured_price ?? $subscription->plan->price, 0, ',', ' ') }} Kč
                     </div>
                     <div class="text-sm text-gray-600 font-light mt-1">
-                        @if($subscription->frequency_months)
+                        @if($subscription->frequency_months === 0)
+                            jednorázově
+                        @elseif($subscription->frequency_months)
                             / {{ $subscription->frequency_months == 1 ? 'měsíc' : ($subscription->frequency_months . ' měsíce') }}
                         @else
                             / {{ $subscription->plan->billing_period === 'monthly' ? 'měsíc' : 'rok' }}
@@ -107,14 +134,45 @@
                     <div>
                         <h3 class="text-lg font-medium text-gray-900 mb-3">Důležité datumy</h3>
                         <div class="space-y-2 text-sm">
-                            @if($subscription->starts_at || $subscription->current_period_start)
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Začátek období:</span>
-                                <span class="font-medium">{{ ($subscription->starts_at ?? \Carbon\Carbon::parse($subscription->current_period_start))->format('d.m.Y') }}</span>
-                            </div>
-                            @endif
-                            
-                            @php
+                            @if($subscription->frequency_months == 0)
+                                <!-- One-time box dates -->
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Datum objednávky:</span>
+                                    <span class="font-medium">{{ $subscription->created_at->format('d.m.Y') }}</span>
+                                </div>
+                                @if($subscription->last_shipment_date)
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Odesláno:</span>
+                                    <span class="font-medium text-green-600">{{ $subscription->last_shipment_date->format('d.m.Y') }}</span>
+                                </div>
+                                @elseif($subscription->status === 'active' || $subscription->status === 'pending')
+                                @php
+                                    $oneTimeShipment = \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($subscription);
+                                @endphp
+                                @if($oneTimeShipment)
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Plánovaná rozesílka:</span>
+                                    <span class="font-medium text-blue-600">{{ $oneTimeShipment->format('d.m.Y') }}</span>
+                                </div>
+                                <div class="text-xs text-gray-500 text-right mt-1">Rozesílka probíhá vždy 20. v měsíci</div>
+                                @endif
+                                @endif
+                                
+                                <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg mt-3">
+                                    <p class="text-xs text-blue-800">
+                                        ℹ️ Toto je <strong>jednorázový nákup</strong> bez předplatného. Po odeslání bude objednávka automaticky uzavřena.
+                                    </p>
+                                </div>
+                            @else
+                                <!-- Regular subscription dates -->
+                                @if($subscription->starts_at || $subscription->current_period_start)
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Začátek období:</span>
+                                    <span class="font-medium">{{ ($subscription->starts_at ?? \Carbon\Carbon::parse($subscription->current_period_start))->format('d.m.Y') }}</span>
+                                </div>
+                                @endif
+                                
+                                @php
                                 $nextShipment = $subscription->next_shipment_date;
                                 $lastPrePause = null;
                                 $postPause = null;
@@ -188,6 +246,7 @@
                             </div>
                             <div class="text-xs text-gray-500 text-right mt-1">Rozesílka probíhá vždy 20. v měsíci</div>
                             @endif
+                            @endif {{-- End of else for regular subscription dates --}}
                         </div>
                     </div>
 
@@ -370,6 +429,8 @@
                     @endif
 
                     <!-- Actions -->
+                    @if($subscription->frequency_months != 0)
+                    {{-- Only show actions for regular subscriptions, not one-time boxes --}}
                     <div>
                         <h3 class="text-lg font-medium text-gray-900 mb-3">Akce</h3>
                         <div class="space-y-2">
@@ -405,6 +466,7 @@
                             @endif
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>

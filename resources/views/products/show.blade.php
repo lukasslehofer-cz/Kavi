@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $product->name . ' - Kavi Coffee')
+@section('title', $product->name . ' - KAVI.cz')
 
 @section('content')
 <!-- Minimal Breadcrumb -->

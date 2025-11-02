@@ -66,13 +66,19 @@ class DashboardController extends Controller
     public function subscription()
     {
         $subscriptions = auth()->user()->subscriptions()
-            ->whereIn('status', ['active', 'unpaid', 'paused', 'cancelled'])
+            ->whereIn('status', ['active', 'unpaid', 'paused', 'pending', 'cancelled', 'completed'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->filter(function ($subscription) {
-                // Always show active, unpaid and paused
-                if (in_array($subscription->status, ['active', 'unpaid', 'paused'])) {
+                // Always show active, unpaid, paused, and pending (for one-time boxes awaiting payment)
+                if (in_array($subscription->status, ['active', 'unpaid', 'paused', 'pending'])) {
                     return true;
+                }
+                
+                // Show completed one-time boxes (recent history)
+                if ($subscription->status === 'completed' && $subscription->frequency_months == 0) {
+                    // Show completed one-time boxes from last 3 months
+                    return $subscription->created_at->isAfter(now()->subMonths(3));
                 }
                 
                 // For cancelled, show only if there's a paid shipment still pending

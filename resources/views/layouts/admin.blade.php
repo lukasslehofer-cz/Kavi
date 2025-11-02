@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin Panel - Kavi Coffee')</title>
+    <title>@yield('title', 'Admin Panel - KAVI.cz')</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -19,7 +19,7 @@
                 <!-- Logo -->
                 <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
-                        <img src="/images/kavi-logo-black.png" alt="Kavi Coffee" class="h-8 w-auto">
+                        <img src="/images/kavi-logo-black.png" alt="KAVI.cz" class="h-8 w-auto">
                         <span class="text-sm font-semibold text-gray-600">Admin</span>
                     </a>
                     <button id="sidebar-close" class="lg:hidden text-gray-500 hover:text-gray-700">

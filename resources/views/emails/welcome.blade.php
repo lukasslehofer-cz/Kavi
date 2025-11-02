@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>Vítejte v Kavi Coffee</title>
+    <title>Vítejte v KAVI.cz</title>
     <style>
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -40,7 +40,7 @@
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="Kavi Coffee" class="logo">
+                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
                         </td>
                     </tr>
                     <tr>
@@ -51,14 +51,14 @@
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">Vítejte v Kavi Coffee! ☕</h1>
+                            <h1 style="text-align: center;">Vítejte v KAVI.cz! ☕</h1>
                             <p class="subtitle" style="text-align: center;">Jsme rádi, že jste se k nám přidali. Připravili jsme pro vás několik tipů na začátek.</p>
                             
                             <!-- Welcome message -->
                             <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
                                 <h3 class="info-title" style="color: #1e40af;">🎉 Ahoj, {{ $user->name }}!</h3>
                                 <p class="info-text" style="color: #1e3a8a;">
-                                    Vítejte v komunitě milovníků kávy! V Kavi Coffee věříme, že dobrá káva dokáže rozjasnit každý den. Těšíme se, že společně objevíme ty nejlepší chutě z celého světa.
+                                    Vítejte v komunitě milovníků kávy! V KAVI.cz věříme, že dobrá káva dokáže rozjasnit každý den. Těšíme se, že společně objevíme ty nejlepší chutě z celého světa.
                                 </p>
                             </div>
                             
@@ -130,14 +130,14 @@
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px;">
                                 S láskou k dobré kávě,<br>
-                                <strong style="color: #111827;">Tým Kavi Coffee</strong>
+                                <strong style="color: #111827;">Tým KAVI.cz</strong>
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">Kavi Coffee</strong><br>
+                                <strong style="color: #111827;">KAVI.cz</strong><br>
                                 Prémiová káva s předplatným
                             </p>
                             <div class="footer-links">
@@ -146,7 +146,7 @@
                                 <a href="{{ route('subscriptions.index') }}" class="footer-link">Předplatné</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.
+                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
                             </p>
                         </td>
                     </tr>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Zapomenuté heslo - Kavi Coffee')
+@section('title', 'Zapomenuté heslo - KAVI.cz')
 
 @section('content')
 <div class="min-h-[calc(100vh-20rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">

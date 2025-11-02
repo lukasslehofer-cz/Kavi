@@ -201,7 +201,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="Kavi Coffee" class="logo">
+                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
                         </td>
                     </tr>
                     
@@ -254,7 +254,7 @@
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
                                 <h3 class="info-title" style="color: #065f46;">💙 Děkujeme</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    <strong>Děkujeme, že jste byli součástí Kavi Coffee komunity!</strong>
+                                    <strong>Děkujeme, že jste byli součástí KAVI.cz komunity!</strong>
                                 </p>
                                 <p class="info-text" style="color: #047857; margin-top: 12px;">
                                     Pokud si to někdy rozmyslíte, budeme rádi, když se k nám znovu vrátíte. 
@@ -275,13 +275,13 @@
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="{{ route('home') }}" class="button">
-                                    Přejít na Kavi Coffee
+                                    Přejít na KAVI.cz
                                 </a>
                             </div>
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300; text-align: center;">
                                 S pozdravem,<br>
-                                <strong style="color: #111827;">Tým Kavi Coffee</strong>
+                                <strong style="color: #111827;">Tým KAVI.cz</strong>
                             </p>
                         </td>
                     </tr>
@@ -290,7 +290,7 @@
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">Kavi Coffee</strong><br>
+                                <strong style="color: #111827;">KAVI.cz</strong><br>
                                 Prémiová káva s předplatným
                             </p>
                             <div class="footer-links">
@@ -299,7 +299,7 @@
                                 <a href="{{ route('subscriptions.index') }}" class="footer-link">Předplatné</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.
+                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
                             </p>
                             <p class="footer-text" style="font-size: 12px;">
                                 Tento e-mail byl odeslán jako potvrzení smazání vašeho účtu.

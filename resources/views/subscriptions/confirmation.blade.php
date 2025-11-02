@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Potvrzení předplatného - Kavi Coffee')
+@section('title', 'Potvrzení předplatného - KAVI.cz')
 
 @section('content')
 <!-- Success Hero Header -->

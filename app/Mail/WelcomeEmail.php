@@ -20,7 +20,7 @@ class WelcomeEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Vítejte v Kavi Coffee! ☕ Začněte svou kávovou cestu',
+            subject: 'Vítejte v KAVI.cz! ☕ Začněte svou kávovou cestu',
         );
     }
 

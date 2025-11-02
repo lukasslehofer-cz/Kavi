@@ -22,7 +22,7 @@ class EmailChangeConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Potvrďte změnu emailové adresy - Kavi Coffee',
+            subject: 'Potvrďte změnu emailové adresy - KAVI.cz',
         );
     }
 

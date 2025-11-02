@@ -182,7 +182,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-black.png') }}" alt="Kavi Coffee" class="logo" style="filter: invert(1) brightness(2);">
+                            <img src="{{ url('images/kavi-logo-black.png') }}" alt="KAVI.cz" class="logo" style="filter: invert(1) brightness(2);">
                         </td>
                     </tr>
                     
@@ -199,7 +199,7 @@
                             </div>
                             
                             <h1 style="text-align: center;">Přihlašovací odkaz</h1>
-                            <p class="subtitle" style="text-align: center;">Obdrželi jste tento email, protože byl požadován přihlašovací odkaz pro váš účet na Kavi Coffee.</p>
+                            <p class="subtitle" style="text-align: center;">Obdrželi jste tento email, protože byl požadován přihlašovací odkaz pro váš účet na KAVI.cz.</p>
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
@@ -246,7 +246,7 @@
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
                                 S pozdravem,<br>
-                                <strong style="color: #111827;">Tým Kavi Coffee</strong>
+                                <strong style="color: #111827;">Tým KAVI.cz</strong>
                             </p>
                         </td>
                     </tr>
@@ -255,7 +255,7 @@
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">Kavi Coffee</strong><br>
+                                <strong style="color: #111827;">KAVI.cz</strong><br>
                                 Prémiová káva s předplatným
                             </p>
                             <div class="footer-links">
@@ -264,11 +264,11 @@
                                 <a href="{{ route('dashboard.index') }}" class="footer-link" style="color: #e6305a;">Můj účet</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.
+                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
                             </p>
                             <p class="footer-text" style="font-size: 12px;">
                                 Tento e-mail byl odeslán, protože jste si vyžádali přihlašovací odkaz<br>
-                                pro svůj účet na Kavi Coffee.
+                                pro svůj účet na KAVI.cz.
                             </p>
                         </td>
                     </tr>

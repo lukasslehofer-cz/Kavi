@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'O nás - Jak vzniklo KAVI | Kavi Coffee')
+@section('title', 'O nás - Jak vzniklo KAVI | KAVI.cz')
 
 @section('content')
 

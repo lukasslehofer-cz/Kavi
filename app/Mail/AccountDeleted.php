@@ -28,7 +28,7 @@ class AccountDeleted extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Váš účet byl úspěšně smazán - Kavi Coffee',
+            subject: 'Váš účet byl úspěšně smazán - KAVI.cz',
         );
     }
 

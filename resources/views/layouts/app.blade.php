@@ -28,7 +28,7 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group" aria-label="logo">
-                    <img src="/images/kavi-logo-black.png" alt="Kavi Coffee" class="h-10 w-auto transform group-hover:scale-105 transition-transform duration-200">
+                    <img src="/images/kavi-logo-black.png" alt="KAVI.cz" class="h-10 w-auto transform group-hover:scale-105 transition-transform duration-200">
                 </a>
 
                 <!-- Desktop Navigation -->

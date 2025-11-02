@@ -105,8 +105,9 @@ class SubscriptionController extends Controller
             : \App\Helpers\SubscriptionHelper::getNextShippingDate();
 
         // Get all subscriptions eligible for shipping consideration
+        // Include 'pending' for one-time boxes that are paid but not yet active
         $allSubscriptions = Subscription::with(['user', 'plan'])
-            ->whereIn('status', ['active', 'paused'])
+            ->whereIn('status', ['active', 'paused', 'pending'])
             ->get();
 
         // Filter subscriptions that should ship on target date OR were already sent on target date
@@ -128,6 +129,7 @@ class SubscriptionController extends Controller
         // Group by frequency for stats
         $stats = [
             'total' => $subscriptions->count(),
+            'one_time' => $subscriptions->where('frequency_months', 0)->count(),
             'monthly' => $subscriptions->where('frequency_months', 1)->count(),
             'bimonthly' => $subscriptions->where('frequency_months', 2)->count(),
             'quarterly' => $subscriptions->where('frequency_months', 3)->count(),
@@ -253,12 +255,20 @@ class SubscriptionController extends Controller
                 if ($result && isset($result['id'])) {
                     // Update subscription with Packeta data
                     // Use target date for last_shipment_date to keep proper shipping schedule
-                    $subscription->update([
+                    $updateData = [
                         'packeta_packet_id' => $result['id'],
                         'packeta_shipment_status' => 'sent',
                         'packeta_sent_at' => now(),
                         'last_shipment_date' => $targetDate,
-                    ]);
+                    ];
+                    
+                    // For one-time boxes, mark as completed after shipping
+                    if ($subscription->frequency_months == 0) {
+                        $updateData['status'] = 'completed';
+                        $updateData['canceled_at'] = now();
+                    }
+                    
+                    $subscription->update($updateData);
 
                     $successCount++;
                     Log::info("Zásilka odeslána do Packety", [

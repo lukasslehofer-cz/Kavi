@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Potvrzení objednávky - Kavi Coffee')
+@section('title', 'Potvrzení objednávky - KAVI.cz')
 
 @section('content')
 @if($cancelled ?? false)

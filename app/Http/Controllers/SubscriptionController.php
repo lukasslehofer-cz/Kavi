@@ -743,93 +743,37 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Process one-time box order as a regular Order
+     * Process one-time box order as a Subscription (for admin shipments integration)
      */
     private function processOneTimeBoxOrder(Request $request, array $validated, array $configuration, float $price, float $discount, $coupon)
     {
         DB::beginTransaction();
 
         try {
-            // Build box description for order
-            $boxSize = ['2' => 'M Box (2x 250g)', '3' => 'L Box (3x 250g)', '4' => 'XL Box (4x 250g)'];
-            $boxType = ['espresso' => 'Espresso', 'filter' => 'Filtr', 'mix' => 'Mix'];
-            $boxDescription = $boxSize[$configuration['amount']] . ' - ' . $boxType[$configuration['type']];
-            if ($configuration['isDecaf']) {
-                $boxDescription .= ' + Decaf';
-            }
-
-            // Calculate final prices
-            $shipping = 0; // Free shipping for boxes
-            $subtotal = $price - $discount;
-            $totalWithVat = $subtotal + $shipping;
-            $totalWithoutVat = round($totalWithVat / 1.21, 2);
-            $tax = round($totalWithVat - $totalWithoutVat, 2);
-
-            // Create order
-            $order = \App\Models\Order::create([
-                'order_number' => \App\Models\Order::generateOrderNumber(),
-                'user_id' => auth()->id() ?? null,
-                'coupon_id' => $coupon?->id,
-                'coupon_code' => $coupon?->code,
-                'discount_amount' => $discount,
-                'subtotal' => $subtotal,
-                'shipping' => $shipping,
-                'shipping_country' => $validated['billing_country'],
-                'tax' => $tax,
-                'total' => $totalWithVat,
-                'status' => 'pending',
-                'payment_status' => 'pending',
-                'payment_method' => $validated['payment_method'],
-                'shipping_address' => [
-                    'name' => $validated['name'],
-                    'email' => $validated['email'],
-                    'phone' => $validated['phone'] ?? null,
-                    'billing_address' => $validated['billing_address'],
-                    'billing_city' => $validated['billing_city'],
-                    'billing_postal_code' => $validated['billing_postal_code'],
-                    'billing_country' => $validated['billing_country'],
-                    'packeta_point_id' => $validated['packeta_point_id'],
-                    'packeta_point_name' => $validated['packeta_point_name'],
-                    'packeta_point_address' => $validated['packeta_point_address'],
-                    'carrier_id' => $validated['carrier_id'] ?? null,
-                    'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
-                ],
-                'customer_notes' => $validated['delivery_notes'] ?? null,
-                'admin_notes' => json_encode([
-                    'box_configuration' => $configuration,
-                    'box_description' => $boxDescription,
-                    'is_one_time_box' => true,
-                ]),
-            ]);
-
-            // Create order item for the box
-            \App\Models\OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => null, // No specific product
-                'product_name' => $boxDescription,
-                'product_image' => 'images/kavi-november-25.jpg', // Default box image
-                'price' => $price,
-                'quantity' => 1,
-                'total' => $price,
-            ]);
-
-            // Record coupon usage
-            if ($coupon) {
-                $this->couponService->recordUsage(
-                    $coupon,
-                    auth()->user(),
-                    'order',
-                    $discount,
-                    $order
-                );
-                $this->couponService->clearCouponFromStorage();
-            }
-
-            DB::commit();
-
-            // Create user account for guest orders
-            if (!auth()->check()) {
-                try {
+            // Mark configuration as one-time
+            $configuration['is_one_time'] = true;
+            
+            // For one-time boxes, we create them as subscriptions with special handling
+            // This allows them to appear in admin shipments and use KVS- numbering
+            
+            // Calculate next billing/shipment date - one-time boxes ship once then auto-cancel
+            $currentBillingCycleEnd = now()->day <= 15 
+                ? now()->copy()->setDay(15) 
+                : now()->copy()->addMonthNoOverflow()->setDay(15);
+            
+            // For card payments, create subscription first then redirect to Stripe payment
+            if ($validated['payment_method'] === 'card') {
+                // Create user if not authenticated
+                if (!auth()->check()) {
+                    // Check if user already exists
+                    $existingUser = \App\Models\User::where('email', $validated['email'])->first();
+                    
+                    if ($existingUser) {
+                        return back()
+                            ->withInput()
+                            ->with('error', 'Účet s tímto emailem již existuje. Prosím přihlaste se.');
+                    }
+                    
                     $newUser = \App\Models\User::create([
                         'name' => $validated['name'],
                         'email' => $validated['email'],
@@ -845,17 +789,153 @@ class SubscriptionController extends Controller
                         'packeta_point_address' => $validated['packeta_point_address'],
                     ]);
                     
-                    $order->update(['user_id' => $newUser->id]);
-                    session(['pending_order_' . $order->id => true]);
                     auth()->login($newUser);
                     
-                    \Log::info('Created user account for one-time box order', [
+                    \Log::info('Created user account for one-time box with card payment', [
                         'user_id' => $newUser->id,
-                        'order_id' => $order->id
                     ]);
-                } catch (\Exception $e) {
-                    \Log::error('Failed to create user account: ' . $e->getMessage());
                 }
+                
+                // Create subscription with pending status
+                $subscription = Subscription::create([
+                    'subscription_number' => Subscription::generateSubscriptionNumber(),
+                    'user_id' => auth()->id() ?? null,
+                    'subscription_plan_id' => null,
+                    'coupon_id' => $coupon?->id,
+                    'coupon_code' => $coupon?->code,
+                    'discount_amount' => $discount,
+                    'discount_months_remaining' => null,
+                    'discount_months_total' => null,
+                    'configuration' => $configuration,
+                    'configured_price' => $price,
+                    'frequency_months' => 0, // 0 = one-time
+                    'status' => 'pending',
+                    'starts_at' => now(),
+                    'next_billing_date' => null, // No next billing for one-time
+                    'shipping_address' => [
+                        'name' => $validated['name'],
+                        'email' => $validated['email'],
+                        'phone' => $validated['phone'] ?? null,
+                        'billing_address' => $validated['billing_address'],
+                        'billing_city' => $validated['billing_city'],
+                        'billing_postal_code' => $validated['billing_postal_code'],
+                        'country' => $validated['billing_country'],
+                    ],
+                    'payment_method' => 'card',
+                    'packeta_point_id' => $validated['packeta_point_id'],
+                    'packeta_point_name' => $validated['packeta_point_name'],
+                    'packeta_point_address' => $validated['packeta_point_address'],
+                    'carrier_id' => $validated['carrier_id'] ?? null,
+                    'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
+                    'delivery_notes' => $validated['delivery_notes'] ?? null,
+                ]);
+
+                // Record coupon usage
+                if ($coupon) {
+                    $this->couponService->recordUsage(
+                        $coupon,
+                        auth()->user(),
+                        'subscription',
+                        $discount,
+                        null,
+                        $subscription
+                    );
+                    $this->couponService->clearCouponFromStorage();
+                }
+
+                DB::commit();
+
+                // Clear session
+                session()->forget([
+                    'subscription_configuration',
+                    'subscription_price',
+                    'subscription_price_without_vat',
+                    'subscription_vat',
+                ]);
+
+                // Create Stripe one-time payment session
+                $shippingAddress = [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'] ?? null,
+                    'billing_address' => $validated['billing_address'],
+                    'billing_city' => $validated['billing_city'],
+                    'billing_postal_code' => $validated['billing_postal_code'],
+                    'billing_country' => $validated['billing_country'],
+                ];
+
+                $session = $this->stripeService->createOneTimeBoxCheckoutSession(
+                    $subscription,
+                    $price,
+                    $shippingAddress
+                );
+
+                return redirect($session->url);
+            }
+            
+            // For bank transfer, create subscription directly as pending
+            $subscription = Subscription::create([
+                'subscription_number' => Subscription::generateSubscriptionNumber(),
+                'user_id' => auth()->id() ?? null,
+                'subscription_plan_id' => null,
+                'coupon_id' => $coupon?->id,
+                'coupon_code' => $coupon?->code,
+                'discount_amount' => $discount,
+                'discount_months_remaining' => null,
+                'discount_months_total' => null,
+                'configuration' => $configuration,
+                'configured_price' => $price,
+                'frequency_months' => 0, // 0 = one-time
+                'status' => 'pending',
+                'starts_at' => now(),
+                'next_billing_date' => null, // No next billing for one-time
+                'shipping_address' => [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'] ?? null,
+                    'billing_address' => $validated['billing_address'],
+                    'billing_city' => $validated['billing_city'],
+                    'billing_postal_code' => $validated['billing_postal_code'],
+                    'country' => $validated['billing_country'],
+                ],
+                'payment_method' => 'transfer',
+                'packeta_point_id' => $validated['packeta_point_id'],
+                'packeta_point_name' => $validated['packeta_point_name'],
+                'packeta_point_address' => $validated['packeta_point_address'],
+                'carrier_id' => $validated['carrier_id'] ?? null,
+                'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
+                'delivery_notes' => $validated['delivery_notes'] ?? null,
+            ]);
+
+            // Record coupon usage
+            if ($coupon) {
+                $this->couponService->recordUsage(
+                    $coupon,
+                    auth()->user(),
+                    'subscription',
+                    $discount,
+                    null,
+                    $subscription
+                );
+                $this->couponService->clearCouponFromStorage();
+            }
+
+            DB::commit();
+            
+            // Store subscription ID in session for secure access
+            if (!auth()->check()) {
+                session(['pending_subscription_' . $subscription->id => true]);
+            }
+            
+            // Send confirmation email (different templates for one-time vs subscription)
+            try {
+                if ($subscription->frequency_months == 0) {
+                    Mail::to($validated['email'])->send(new \App\Mail\OneTimeBoxConfirmation($subscription));
+                } else {
+                    Mail::to($validated['email'])->send(new \App\Mail\SubscriptionConfirmation($subscription));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send confirmation email: ' . $e->getMessage());
             }
 
             // Clear session
@@ -866,13 +946,13 @@ class SubscriptionController extends Controller
                 'subscription_vat',
             ]);
 
-            // Redirect to payment or confirmation
-            if ($validated['payment_method'] === 'card') {
-                return redirect()->route('payment.card', $order);
+            if (auth()->check()) {
+                return redirect()->route('dashboard.subscription')
+                    ->with('success', 'Objednávka jednorázového boxu byla vytvořena! Po přijetí platby bude zpracována.');
+            } else {
+                return redirect()->route('subscriptions.confirmation', $subscription)
+                    ->with('success', 'Děkujeme za objednávku! Na email ' . $validated['email'] . ' vám zašleme platební údaje.');
             }
-
-            return redirect()->route('order.confirmation', $order)
-                ->with('success', 'Objednávka byla úspěšně vytvořena!');
 
         } catch (\Exception $e) {
             DB::rollBack();

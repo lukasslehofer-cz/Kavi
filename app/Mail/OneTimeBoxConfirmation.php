@@ -2,25 +2,25 @@
 
 namespace App\Mail;
 
-use App\Models\Order;
+use App\Models\Subscription;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderReviewRequest extends Mailable
+class OneTimeBoxConfirmation extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $order;
+    public $subscription;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Order $order)
+    public function __construct(Subscription $subscription)
     {
-        $this->order = $order;
+        $this->subscription = $subscription;
     }
 
     /**
@@ -29,7 +29,7 @@ class OrderReviewRequest extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Jak se vám líbila káva? - KAVI.cz',
+            subject: 'Potvrzení objednávky ' . ($this->subscription->subscription_number ?? '') . ' - KAVI.cz',
         );
     }
 
@@ -39,7 +39,7 @@ class OrderReviewRequest extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.order-review-request',
+            view: 'emails.onetime-box-confirmation',
         );
     }
 
@@ -53,5 +53,4 @@ class OrderReviewRequest extends Mailable
         return [];
     }
 }
-
 

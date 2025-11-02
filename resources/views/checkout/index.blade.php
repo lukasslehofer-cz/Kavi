@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Pokladna - Kavi Coffee')
+@section('title', 'Pokladna - KAVI.cz')
 
 @section('content')
 <!-- Hero Header - Minimal -->

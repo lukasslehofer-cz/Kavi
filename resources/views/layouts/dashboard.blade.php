@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard - Kavi Coffee')</title>
+    <title>@yield('title', 'Dashboard - KAVI.cz')</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -27,7 +27,7 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group" aria-label="logo">
-                    <img src="/images/kavi-logo-black.png" alt="Kavi Coffee" class="h-10 w-auto transform group-hover:scale-105 transition-transform duration-200">
+                    <img src="/images/kavi-logo-black.png" alt="KAVI.cz" class="h-10 w-auto transform group-hover:scale-105 transition-transform duration-200">
                 </a>
 
                 <!-- Desktop Navigation -->
@@ -347,7 +347,7 @@
         <!-- Bottom Bar -->
         <div class="border-t border-gray-100 py-6">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-light">
-            <p>© {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.</p>
+            <p>© {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.</p>
             <div class="flex gap-6">
             <a href="{{ route('terms-of-service') }}" class="hover:text-gray-900 transition-colors duration-200">Obchodní podmínky</a>
             <a href="{{ route('privacy-policy') }}" class="hover:text-gray-900 transition-colors duration-200">Ochrana osobních údajů</a>              

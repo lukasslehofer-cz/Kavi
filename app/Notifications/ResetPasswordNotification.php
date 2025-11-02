@@ -22,7 +22,7 @@ class ResetPasswordNotification extends BaseResetPassword
         }
 
         return (new MailMessage)
-            ->subject('Reset hesla - Kavi Coffee')
+            ->subject('Reset hesla - KAVI.cz')
             ->view('emails.reset-password', [
                 'url' => $url,
                 'user' => $notifiable,

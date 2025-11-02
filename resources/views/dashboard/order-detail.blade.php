@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Detail objednávky - Kavi Coffee')
+@section('title', 'Detail objednávky - KAVI.cz')
 
 @section('content')
 <div class="space-y-6">

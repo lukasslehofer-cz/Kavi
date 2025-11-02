@@ -20,7 +20,7 @@ class SubscriptionCancelled extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Předplatné zrušeno - Budeme se těšit na viděnou! - Kavi Coffee',
+            subject: 'Předplatné zrušeno - Budeme se těšit na viděnou! - KAVI.cz',
         );
     }
 

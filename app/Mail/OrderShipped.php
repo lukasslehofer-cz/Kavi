@@ -29,7 +29,7 @@ class OrderShipped extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Vaše objednávka ' . $this->order->order_number . ' byla odeslána - Kavi Coffee',
+            subject: 'Vaše objednávka ' . $this->order->order_number . ' byla odeslána - KAVI.cz',
         );
     }
 

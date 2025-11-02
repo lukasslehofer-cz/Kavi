@@ -21,7 +21,7 @@ class SubscriptionPaused extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Předplatné pozastaveno - ' . ($this->subscription->subscription_number ?? 'Kavi Coffee'),
+            subject: 'Předplatné pozastaveno - ' . ($this->subscription->subscription_number ?? 'KAVI.cz'),
         );
     }
 

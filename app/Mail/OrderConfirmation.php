@@ -29,7 +29,7 @@ class OrderConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Potvrzení objednávky ' . $this->order->order_number . ' - Kavi Coffee',
+            subject: 'Potvrzení objednávky ' . $this->order->order_number . ' - KAVI.cz',
         );
     }
 

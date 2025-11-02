@@ -158,7 +158,23 @@ class Subscription extends Model
      */
     public static function generateSubscriptionNumber(): string
     {
-        return 'KVS-'. date('Y') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+        $year = date('Y');
+        $prefix = 'KVS-' . $year . '-';
+        
+        // Get the highest number for today
+        $lastSubscription = static::where('subscription_number', 'like', $prefix . '%')
+            ->orderBy('subscription_number', 'desc')
+            ->first();
+        
+        if ($lastSubscription) {
+            // Extract the number from the last subscription number
+            $lastNumber = (int) str_replace($prefix, '', $lastSubscription->subscription_number);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**

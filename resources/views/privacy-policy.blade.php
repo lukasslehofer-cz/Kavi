@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Zásady ochrany osobních údajů - Kavi Coffee')
+@section('title', 'Zásady ochrany osobních údajů - KAVI.cz')
 
 @section('content')
 

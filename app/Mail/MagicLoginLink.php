@@ -30,7 +30,7 @@ class MagicLoginLink extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Přihlašovací odkaz - Kavi Coffee',
+            subject: 'Přihlašovací odkaz - KAVI.cz',
         );
     }
 

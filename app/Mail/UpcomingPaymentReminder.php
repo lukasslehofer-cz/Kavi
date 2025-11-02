@@ -29,7 +29,7 @@ class UpcomingPaymentReminder extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Připomínka platby předplatného - Kavi Coffee',
+            subject: 'Připomínka platby předplatného - KAVI.cz',
         );
     }
 

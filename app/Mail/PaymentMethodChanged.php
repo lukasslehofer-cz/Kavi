@@ -22,7 +22,7 @@ class PaymentMethodChanged extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Platební metoda byla změněna - Kavi Coffee',
+            subject: 'Platební metoda byla změněna - KAVI.cz',
         );
     }
 

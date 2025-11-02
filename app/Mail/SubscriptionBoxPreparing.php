@@ -20,7 +20,7 @@ class SubscriptionBoxPreparing extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Připravujeme váš kávový box ☕ - ' . ($this->subscription->subscription_number ?? 'Kavi Coffee'),
+            subject: 'Připravujeme váš kávový box ☕ - ' . ($this->subscription->subscription_number ?? 'KAVI.cz'),
         );
     }
 

@@ -205,7 +205,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="Kavi Coffee" class="logo">
+                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
                         </td>
                     </tr>
                     
@@ -313,7 +313,7 @@
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px;">
                                 S láskou k dobré kávě,<br>
-                                <strong style="color: #111827;">Tým Kavi Coffee</strong>
+                                <strong style="color: #111827;">Tým KAVI.cz</strong>
                             </p>
                         </td>
                     </tr>
@@ -322,7 +322,7 @@
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">Kavi Coffee</strong><br>
+                                <strong style="color: #111827;">KAVI.cz</strong><br>
                                 Prémiová káva s předplatným
                             </p>
                             <div class="footer-links">
@@ -331,7 +331,7 @@
                                 <a href="{{ route('dashboard.subscription') }}" class="footer-link">Moje předplatné</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} Kavi Coffee. Všechna práva vyhrazena.
+                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
                             </p>
                             <p class="footer-text" style="font-size: 12px; margin-top: 8px; color: #9ca3af;">
                                 Tento e-mail byl odeslán na adresu {{ $subscription->shipping_address['email'] }}<br>

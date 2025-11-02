@@ -21,7 +21,7 @@ class OrderPaymentFailed extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Problém s platbou objednávky - ' . ($this->order->order_number ?? 'Kavi Coffee'),
+            subject: 'Problém s platbou objednávky - ' . ($this->order->order_number ?? 'KAVI.cz'),
         );
     }
 

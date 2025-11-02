@@ -16,13 +16,17 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div class="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-sm">
             <div class="relative z-10">
                 <p class="text-4xl font-bold">{{ $stats['total'] }}</p>
                 <p class="text-sm text-white/80 mt-1">Celkem k rozeslání</p>
             </div>
             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <p class="text-3xl font-bold text-gray-900">{{ $stats['one_time'] ?? 0 }}</p>
+            <p class="text-sm text-gray-600 mt-1">Jednorázově</p>
         </div>
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <p class="text-3xl font-bold text-gray-900">{{ $stats['monthly'] }}</p>
@@ -226,7 +230,14 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            @if($subscription->frequency_months == 1)
+                            @if($subscription->frequency_months == 0)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                Jednorázově
+                            </span>
+                            @elseif($subscription->frequency_months == 1)
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Měsíční</span>
                             @elseif($subscription->frequency_months == 2)
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">2 měsíce</span>
