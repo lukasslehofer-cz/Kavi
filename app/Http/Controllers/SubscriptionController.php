@@ -149,7 +149,7 @@ class SubscriptionController extends Controller
                 'mix' => 'nullable|array',
                 'mix.espresso' => 'nullable|integer|min:0',
                 'mix.filter' => 'nullable|integer|min:0',
-                'frequency' => 'required|integer|in:1,2,3',
+                'frequency' => 'required|integer|in:0,1,2,3',  // 0 = jednorázově
             ]);
             
             // Convert isDecaf to boolean
@@ -233,6 +233,11 @@ class SubscriptionController extends Controller
             $totalPriceWithVat += 100; // +100 Kč za decaf variantu
         }
         
+        // Add one-time box surcharge if selected
+        if ($validated['frequency'] == 0) {
+            $totalPriceWithVat += 100; // +100 Kč za jednorázový box
+        }
+        
         // Calculate VAT (all prices include 21% VAT)
         $priceWithoutVat = round($totalPriceWithVat / 1.21, 2);
         $vat = round($totalPriceWithVat - $priceWithoutVat, 2);
@@ -249,10 +254,11 @@ class SubscriptionController extends Controller
             'config' => $validated,
             'price' => $totalPriceWithVat,
             'price_without_vat' => $priceWithoutVat,
-            'vat' => $vat
+            'vat' => $vat,
+            'is_one_time' => $validated['frequency'] == 0
         ]);
 
-        // Proceed to checkout (accessible for everyone now)
+        // Proceed to checkout (same for subscription and one-time)
         return redirect()->route('subscriptions.checkout');
     }
 
@@ -507,6 +513,12 @@ class SubscriptionController extends Controller
                 ]);
             }
 
+            // Check if this is a one-time box order (frequency = 0)
+            if ($configuration['frequency'] == 0) {
+                // Handle one-time box as a regular order
+                return $this->processOneTimeBoxOrder($request, $validated, $configuration, $price, $discount, $coupon);
+            }
+
             // Store shipping address and delivery notes in session for webhook
             session([
                 'subscription_shipping_address' => [
@@ -721,6 +733,151 @@ class SubscriptionController extends Controller
         }
 
         return view('subscriptions.confirmation', compact('subscription'));
+    }
+
+    /**
+     * Process one-time box order as a regular Order
+     */
+    private function processOneTimeBoxOrder(Request $request, array $validated, array $configuration, float $price, float $discount, $coupon)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Build box description for order
+            $boxSize = ['2' => 'M Box (2x 250g)', '3' => 'L Box (3x 250g)', '4' => 'XL Box (4x 250g)'];
+            $boxType = ['espresso' => 'Espresso', 'filter' => 'Filtr', 'mix' => 'Mix'];
+            $boxDescription = $boxSize[$configuration['amount']] . ' - ' . $boxType[$configuration['type']];
+            if ($configuration['isDecaf']) {
+                $boxDescription .= ' + Decaf';
+            }
+
+            // Calculate final prices
+            $shipping = 0; // Free shipping for boxes
+            $subtotal = $price - $discount;
+            $totalWithVat = $subtotal + $shipping;
+            $totalWithoutVat = round($totalWithVat / 1.21, 2);
+            $tax = round($totalWithVat - $totalWithoutVat, 2);
+
+            // Create order
+            $order = \App\Models\Order::create([
+                'order_number' => \App\Models\Order::generateOrderNumber(),
+                'user_id' => auth()->id() ?? null,
+                'coupon_id' => $coupon?->id,
+                'coupon_code' => $coupon?->code,
+                'discount_amount' => $discount,
+                'subtotal' => $subtotal,
+                'shipping' => $shipping,
+                'shipping_country' => $validated['billing_country'],
+                'tax' => $tax,
+                'total' => $totalWithVat,
+                'status' => 'pending',
+                'payment_status' => 'pending',
+                'payment_method' => $validated['payment_method'],
+                'shipping_address' => [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'] ?? null,
+                    'billing_address' => $validated['billing_address'],
+                    'billing_city' => $validated['billing_city'],
+                    'billing_postal_code' => $validated['billing_postal_code'],
+                    'billing_country' => $validated['billing_country'],
+                    'packeta_point_id' => $validated['packeta_point_id'],
+                    'packeta_point_name' => $validated['packeta_point_name'],
+                    'packeta_point_address' => $validated['packeta_point_address'],
+                    'carrier_id' => $validated['carrier_id'] ?? null,
+                    'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
+                ],
+                'customer_notes' => $validated['delivery_notes'] ?? null,
+                'admin_notes' => json_encode([
+                    'box_configuration' => $configuration,
+                    'box_description' => $boxDescription,
+                    'is_one_time_box' => true,
+                ]),
+            ]);
+
+            // Create order item for the box
+            \App\Models\OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => null, // No specific product
+                'product_name' => $boxDescription,
+                'product_image' => 'images/kavi-november-25.jpg', // Default box image
+                'price' => $price,
+                'quantity' => 1,
+                'total' => $price,
+            ]);
+
+            // Record coupon usage
+            if ($coupon) {
+                $this->couponService->recordUsage(
+                    $coupon,
+                    auth()->user(),
+                    'order',
+                    $discount,
+                    $order
+                );
+                $this->couponService->clearCouponFromStorage();
+            }
+
+            DB::commit();
+
+            // Create user account for guest orders
+            if (!auth()->check()) {
+                try {
+                    $newUser = \App\Models\User::create([
+                        'name' => $validated['name'],
+                        'email' => $validated['email'],
+                        'password' => \Hash::make(\Str::random(32)),
+                        'password_set_by_user' => false,
+                        'phone' => $validated['phone'] ?? null,
+                        'address' => $validated['billing_address'],
+                        'city' => $validated['billing_city'],
+                        'postal_code' => $validated['billing_postal_code'],
+                        'country' => $validated['billing_country'],
+                        'packeta_point_id' => $validated['packeta_point_id'],
+                        'packeta_point_name' => $validated['packeta_point_name'],
+                        'packeta_point_address' => $validated['packeta_point_address'],
+                    ]);
+                    
+                    $order->update(['user_id' => $newUser->id]);
+                    session(['pending_order_' . $order->id => true]);
+                    auth()->login($newUser);
+                    
+                    \Log::info('Created user account for one-time box order', [
+                        'user_id' => $newUser->id,
+                        'order_id' => $order->id
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create user account: ' . $e->getMessage());
+                }
+            }
+
+            // Clear session
+            session()->forget([
+                'subscription_configuration',
+                'subscription_price',
+                'subscription_price_without_vat',
+                'subscription_vat',
+            ]);
+
+            // Redirect to payment or confirmation
+            if ($validated['payment_method'] === 'card') {
+                return redirect()->route('payment.card', $order);
+            }
+
+            return redirect()->route('order.confirmation', $order)
+                ->with('success', 'Objednávka byla úspěšně vytvořena!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('One-time box order failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            
+            return back()
+                ->withInput()
+                ->with('error', 'Nastala chyba při vytváření objednávky. Zkuste to prosím znovu.');
+        }
     }
 
     /**

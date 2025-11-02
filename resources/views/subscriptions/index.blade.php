@@ -304,7 +304,7 @@
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">+ Decaf</span>
+                    <span class="font-medium text-gray-700">+ Decaf (+100 Kč)</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -326,7 +326,7 @@
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">+ Decaf</span>
+                    <span class="font-medium text-gray-700">+ Decaf (+100 Kč)</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -348,7 +348,7 @@
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">+ Decaf</span>
+                    <span class="font-medium text-gray-700">+ Decaf (+100 Kč)</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -463,12 +463,39 @@
                   </svg>
                 </div>
               </label>
+
+              <!-- Jednorázově (bez předplatného) -->
+              <label class="group flex items-center justify-between p-4 rounded-xl border border-gray-200 hover:border-gray-300 has-[:checked]:border-primary-500 cursor-pointer transition-all bg-white">
+                <input type="radio" name="frequency" value="0" class="hidden" required>
+                <div class="flex items-center gap-4 flex-1">
+                  <div class="flex-shrink-0">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xl font-bold text-gray-900">Jednorázově</span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-600 text-white text-xs font-bold rounded-full">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <span>Zkuste to</span>
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-500 font-light">Bez předplatného</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700">+100 Kč</span>
+                  <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
+                    <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+              </label>
             </div>
           </div>
 
           <!-- Shrnutí a Submit -->
           <div class="p-6 bg-gray-100 rounded-2xl border border-gray-200">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Shrnutí předplatného</h3>
+            <h3 id="summary-title" class="text-xl font-bold text-gray-900 mb-4">Shrnutí objednávky</h3>
             
             <div class="space-y-2 mb-6">
               <div class="flex justify-between text-sm">
@@ -483,12 +510,16 @@
                 <span class="text-gray-600">Frekvence:</span>
                 <span class="font-medium text-gray-900" id="summary-frequency">-</span>
               </div>
+              <div id="onetime-surcharge" class="hidden flex justify-between text-sm">
+                <span class="text-gray-600">Příplatek jednorázový:</span>
+                <span class="font-medium text-gray-900">+100 Kč</span>
+              </div>
               <div class="flex justify-between items-center pt-4 border-t border-gray-200">
                 <span class="text-lg font-bold text-gray-900">Celková cena:</span>
                 <div class="text-right">
                   <span class="text-3xl font-bold text-gray-900" id="summary-price">-</span>
                   <span class="text-sm text-gray-500 ml-1">Kč</span>
-                  <p class="text-xs text-gray-500 mt-1">při každé dodávce</p>
+                  <p id="summary-price-note" class="text-xs text-gray-500 mt-1">při každé dodávce</p>
                 </div>
               </div>
             </div>
@@ -767,16 +798,38 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Frekvence
         const frequencies = {
+            0: 'Jednorázově (bez předplatného)',
             1: 'Každý měsíc',
             2: 'Jednou za 2 měsíce',
             3: 'Jednou za 3 měsíce'
         };
         document.getElementById('summary-frequency').textContent = frequencies[selectedFrequency] || '-';
         
+        // Dynamicky změnit nadpis a texty podle typu objednávky
+        const summaryTitle = document.getElementById('summary-title');
+        const summaryPriceNote = document.getElementById('summary-price-note');
+        const onetimeSurcharge = document.getElementById('onetime-surcharge');
+        
+        if (selectedFrequency === 0) {
+            // Jednorázová objednávka
+            summaryTitle.textContent = 'Shrnutí objednávky';
+            summaryPriceNote.textContent = 'jednorázově';
+            onetimeSurcharge.classList.remove('hidden');
+        } else {
+            // Předplatné
+            summaryTitle.textContent = 'Shrnutí předplatného';
+            summaryPriceNote.textContent = 'při každé dodávce';
+            onetimeSurcharge.classList.add('hidden');
+        }
+        
         // Cena
         if (selectedAmount) {
             let price = pricing[selectedAmount] || 0;
             if (isDecaf) {
+                price += 100;
+            }
+            // Přidat příplatek +100 Kč pro jednorázový box
+            if (selectedFrequency === 0) {
                 price += 100;
             }
             document.getElementById('summary-price').textContent = price.toLocaleString('cs-CZ');
@@ -786,7 +839,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Povolit tlačítko submit
         const submitButton = document.getElementById('submit-button');
-        if (selectedAmount && selectedType && selectedFrequency) {
+        // Kontrola: selectedFrequency může být 0 (jednorázově), takže musíme kontrolovat !== null
+        if (selectedAmount && selectedType && selectedFrequency !== null) {
             submitButton.disabled = false;
         } else {
             submitButton.disabled = true;
