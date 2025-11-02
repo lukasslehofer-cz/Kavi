@@ -249,7 +249,7 @@
     <!-- Section Header - Minimal -->
     <div class="mb-20 max-w-2xl mx-auto text-center">
       <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Vyberte si ideální kávový box</h2>
-      <p class="text-xl text-gray-600 font-light">Flexibilní plány přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.</p>
+      <p class="text-xl text-gray-600 font-light">Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.</p>
     </div>
 
     <div class="mb-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -257,11 +257,11 @@
       <div class="group flex flex-col bg-white rounded-3xl p-10 border border-gray-200 hover:border-gray-300 transition-all duration-200">
         <div class="mb-8">
           <div class="mb-6">
-            <span class="text-sm font-medium text-gray-500 mb-2 block">M Box</span>
-            <div class="text-5xl font-bold text-gray-900">500g</div>
+            <span class="text-xl font-medium text-gray-500 mb-2 block">500g</span>
+            <div class="text-5xl font-bold text-gray-900">M Box</div>
           </div>
 
-          <p class="text-gray-600 mb-8 leading-relaxed font-light">Ideální pro jednotlivce nebo páry, které si chtějí vychutnat kvalitní kávu</p>
+          <p class="text-gray-600 mb-8 leading-relaxed font-light">Ideální pro jednotlivce nebo domácnosti s&nbsp;menší spotřebou kávy</p>
 
           <div class="space-y-3">
             <div class="flex gap-3 items-center">
@@ -275,7 +275,7 @@
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">2 druhy prémiové kávy</span>
+              <span class="text-gray-700 font-light">2 druhy výběrové kávy</span>
             </div>
 
             <div class="flex gap-3 items-center">
@@ -289,7 +289,7 @@
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Zrušení kdykoliv</span>
+              <span class="text-gray-700 font-light">Zrušení nebo přestávka kdykoliv</span>
             </div>
           </div>
         </div>
@@ -301,7 +301,7 @@
           </div>
 
           <a href="{{ route('subscriptions.index', ['plan' => 2]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
-            Vybrat plán
+            Vybrat M Box
           </a>
         </div>
       </div>
@@ -318,11 +318,11 @@
 
         <div class="mb-8 pt-2">
           <div class="mb-6">
-            <span class="text-sm font-medium text-primary-500 mb-2 block">L Box</span>
-            <div class="text-5xl font-bold text-gray-900">750g</div>
+            <span class="text-xl font-medium text-primary-500 mb-2 block">750g</span>
+            <div class="text-5xl font-bold text-gray-900">L Box</div>
           </div>
 
-          <p class="text-gray-600 mb-8 leading-relaxed font-light">Nejpopulárnější volba pro pravidelné milovníky kávy</p>
+          <p class="text-gray-600 mb-8 leading-relaxed font-light">Nejpopulárnější volba pro milovníky výběrové kávy</p>
 
           <div class="space-y-3">
             <div class="flex gap-3 items-center">
@@ -336,7 +336,7 @@
               <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">3 druhy prémiové kávy</span>
+              <span class="text-gray-700 font-light">3 druhy výběrové kávy</span>
             </div>
 
             <div class="flex gap-3 items-center">
@@ -350,15 +350,9 @@
               <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Zrušení kdykoliv</span>
+              <span class="text-gray-700 font-light">Zrušení nebo přestávka kdykoliv</span>
             </div>
-
-            <div class="flex gap-3 items-center">
-              <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="text-gray-700 font-light">Prioritní podpora</span>
-            </div>
+            
           </div>
         </div>
 
@@ -369,7 +363,7 @@
           </div>
 
           <a href="{{ route('subscriptions.index', ['plan' => 3]) }}" class="group/btn flex items-center justify-center gap-2 w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
-            <span>Vybrat plán</span>
+            <span>Vybrat L Box</span>
             <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
@@ -382,8 +376,8 @@
       <div class="group flex flex-col bg-white rounded-3xl p-10 border border-gray-200 hover:border-gray-300 transition-all duration-200">
         <div class="mb-8">
           <div class="mb-6">
-            <span class="text-sm font-medium text-gray-500 mb-2 block">XL Box</span>
-            <div class="text-5xl font-bold text-gray-900">1000g</div>
+            <span class="text-xl font-medium text-gray-500 mb-2 block">1000 g</span>
+            <div class="text-5xl font-bold text-gray-900">XL Box</div>
           </div>
 
           <p class="text-gray-600 mb-8 leading-relaxed font-light">Pro kávové nadšence a větší domácnosti</p>
@@ -400,7 +394,7 @@
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">4 druhy prémiové kávy</span>
+              <span class="text-gray-700 font-light">3 druhy výběrové kávy</span>
             </div>
 
             <div class="flex gap-3 items-center">
@@ -414,14 +408,7 @@
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Zrušení kdykoliv</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span class="text-gray-700 font-light">VIP podpora</span>
+              <span class="text-gray-700 font-light">Zrušení nebo přestávka kdykoliv</span>
             </div>
           </div>
         </div>
@@ -433,7 +420,7 @@
           </div>
 
           <a href="{{ route('subscriptions.index', ['plan' => 4]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
-            Vybrat plán
+            Vybrat XL Box
           </a>
         </div>
       </div>
@@ -474,7 +461,7 @@
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
           </div>
-          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"Nejlepší káva, kterou jsem kdy měla! Pravidelné dodávky znamenají, že nikdy nedojdu a kvalita je vždy konzistentní."</p>
+          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"Jsem členem KAVI předplatného už skoro rok a každá jedna zásilka kávy byla skvělá!"</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -482,8 +469,8 @@
             <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Jana Nováková" class="h-full w-full object-cover object-center" />
           </div>
           <div>
-            <div class="font-semibold text-gray-900">Jana Nováková</div>
-            <p class="text-sm text-gray-500 font-light">Zákaznice 2+ roky</p>
+            <div class="font-semibold text-gray-900">Eva V.</div>
+            <p class="text-sm text-gray-500 font-light">Zákaznice 1 rok</p>
           </div>
         </div>
       </div>
@@ -504,11 +491,11 @@
 
         <div class="flex items-center gap-3">
           <div class="h-12 w-12 overflow-hidden rounded-full">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Petr Dvořák" class="h-full w-full object-cover object-center" />
+            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Petr Dvořák" class="h-full w-full object-cover object-center" />
           </div>
           <div>
-            <div class="font-semibold text-gray-900">Petr Dvořák</div>
-            <p class="text-sm text-gray-500 font-light">Zákazník 1+ rok</p>
+            <div class="font-semibold text-gray-900">Petr D.</div>
+            <p class="text-sm text-gray-500 font-light">Zákazník 6 měsíců</p>
           </div>
         </div>
       </div>
@@ -524,7 +511,7 @@
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
           </div>
-          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"Konečně káva, která chutná jako z kavárny! Čerstvost je znát a výběr různých druhů je skvělý."</p>
+          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"Miluju ochutnávat kávy z Evropských pražíren! Čerstvost kávy a výběr jsou skvělé."</p>
         </div>
 
         <div class="flex items-center gap-3">
@@ -532,7 +519,7 @@
             <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Marie Horáková" class="h-full w-full object-cover object-center" />
           </div>
           <div>
-            <div class="font-semibold text-gray-900">Marie Horáková</div>
+            <div class="font-semibold text-gray-900">Marie H.</div>
             <p class="text-sm text-gray-500 font-light">Zákaznice 6+ měsíců</p>
           </div>
         </div>
@@ -801,10 +788,10 @@
           </div>
           
           <!-- Title -->
-          <h3 class="text-xl font-bold text-gray-900 mb-3">Přijměte dodávku</h3>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Vyzvedněte si box</h3>
           
           <!-- Description -->
-          <p class="text-gray-600 font-light leading-relaxed">Čerstvě praženou kávu doručíme přímo k vám domů</p>
+          <p class="text-gray-600 font-light leading-relaxed">Čerstvě praženou kávu doručíme na vámi vybrané místo</p>
         </div>
         
         <!-- Arrow -->
@@ -827,7 +814,7 @@
           <h3 class="text-xl font-bold text-gray-900 mb-3">Vychutnejte si</h3>
           
           <!-- Description -->
-          <p class="text-gray-600 font-light leading-relaxed">Užijte si prémiovou kávu a těšte se na další kávový box</p>
+          <p class="text-gray-600 font-light leading-relaxed">Užijte si skvělou výběrovou kávu a těšte se na další kávový box</p>
         </div>
       </div>
 

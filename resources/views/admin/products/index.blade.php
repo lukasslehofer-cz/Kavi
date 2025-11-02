@@ -55,8 +55,8 @@
                                     $categoryLabels = [
                                         'espresso' => 'Espresso',
                                         'filter' => 'Filtr',
+                                        'decaf' => 'Bezkofeinová',
                                         'accessories' => 'Příslušenství',
-                                        'merch' => 'Merch',
                                     ];
                                     $categories = is_array($product->category) ? $product->category : [$product->category];
                                 @endphp

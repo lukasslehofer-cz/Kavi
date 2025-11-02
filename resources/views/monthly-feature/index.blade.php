@@ -175,6 +175,8 @@
                                         <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500 text-white">Espresso</span>
                                         @elseif($cat === 'filter')
                                         <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500 text-white">Filtr</span>
+                                        @elseif($cat === 'decaf')
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-500 text-white">Decaf</span>
                                         @endif
                                     @endforeach
                                 @endif

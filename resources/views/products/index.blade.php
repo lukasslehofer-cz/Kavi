@@ -94,8 +94,8 @@
               $categoryLabels = [
                 'espresso' => ['label' => 'Espresso', 'color' => 'bg-amber-500'],
                 'filter' => ['label' => 'Filtr', 'color' => 'bg-blue-500'],
+                'decaf' => ['label' => 'Bezkofeinová', 'color' => 'bg-green-500'],
                 'accessories' => ['label' => 'Příslušenství', 'color' => 'bg-purple-500'],
-                'merch' => ['label' => 'Merch', 'color' => 'bg-green-500'],
               ];
               
               if (is_array($product->category) && !empty($product->category)) {

@@ -50,8 +50,8 @@
           $categoryLabels = [
             'espresso' => ['label' => 'Espresso', 'color' => 'bg-gray-900'],
             'filter' => ['label' => 'Filtr', 'color' => 'bg-gray-900'],
+            'decaf' => ['label' => 'Bezkofeinová', 'color' => 'bg-gray-900'],
             'accessories' => ['label' => 'Příslušenství', 'color' => 'bg-gray-900'],
-            'merch' => ['label' => 'Merch', 'color' => 'bg-gray-900'],
           ];
           if (is_array($product->category) && !empty($product->category)) {
             foreach ($product->category as $cat) {

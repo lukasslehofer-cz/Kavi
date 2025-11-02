@@ -5,6 +5,16 @@ export default {
     "./resources/**/*.js",
     "./resources/**/*.vue",
   ],
+  safelist: [
+    'pt-8',
+    'pt-12',
+    'pt-16',
+    'pb-20',
+    'pb-28',
+    'lg:pt-12',
+    'lg:pt-16',
+    'lg:pb-28',
+  ],
   theme: {
     extend: {
       colors: {

@@ -28,8 +28,8 @@ class ProductController extends Controller
         $categories = [
             'espresso' => 'Espresso káva',
             'filter' => 'Filtrovaná káva',
-            'accessories' => 'Příslušenství',
-            'merch' => 'Merch'
+            'decaf' => 'Bezkofeinová káva',
+            'accessories' => 'Příslušenství'
         ];
         
         $roasteries = \App\Models\Roastery::orderBy('name')->get();
@@ -46,7 +46,7 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'categories' => 'required|array',
-            'categories.*' => 'in:espresso,filter,accessories,merch',
+            'categories.*' => 'in:espresso,filter,decaf,accessories',
             'roastery_id' => 'nullable|exists:roasteries,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
@@ -127,8 +127,8 @@ class ProductController extends Controller
         $categories = [
             'espresso' => 'Espresso káva',
             'filter' => 'Filtrovaná káva',
-            'accessories' => 'Příslušenství',
-            'merch' => 'Merch'
+            'decaf' => 'Bezkofeinová káva',
+            'accessories' => 'Příslušenství'
         ];
         
         $roasteries = \App\Models\Roastery::orderBy('name')->get();
@@ -145,7 +145,7 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'categories' => 'required|array',
-            'categories.*' => 'in:espresso,filter,accessories,merch',
+            'categories.*' => 'in:espresso,filter,decaf,accessories',
             'roastery_id' => 'nullable|exists:roasteries,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',

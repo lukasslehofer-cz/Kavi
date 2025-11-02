@@ -27,8 +27,8 @@ class ProductController extends Controller
         $categories = [
             'espresso' => 'Espresso káva',
             'filter' => 'Filtrovaná káva',
-            'accessories' => 'Příslušenství',
-            'merch' => 'Merch'
+            'decaf' => 'Bezkofeinová káva',
+            'accessories' => 'Příslušenství'
         ];
 
         return view('products.index', compact('products', 'categories'));

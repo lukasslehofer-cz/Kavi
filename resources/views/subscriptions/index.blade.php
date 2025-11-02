@@ -791,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (isDecaf) {
-                typeText += ' + 1x decaf';
+                typeText += ' (1x decaf) +100 Kč';
             }
         }
         document.getElementById('summary-type').textContent = typeText;

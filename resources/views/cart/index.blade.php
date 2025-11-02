@@ -36,16 +36,16 @@
                 </svg>
             </div>
             <h2 class="text-3xl font-bold text-gray-900 mb-4 tracking-tight">Váš košík je prázdný</h2>
-            <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto font-light">Objevte naši nabídku prémiových káv a vyberte si tu pravou pro vás.</p>
+            <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto font-light">Objevte naši nabídku výběrových káv a vyberte si tu pravou pro vás.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('products.index') }}" class="inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
-                    <span>Procházet kávy</span>
+                <a href="{{ route('subscriptions.index') }}" class="inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
+                    <span>Sestavte si box</span>
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
-                <a href="{{ route('subscriptions.index') }}" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                    Zobrazit předplatné
+                <a href="{{ route('products.index') }}" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
+                    Zobrazit obchod
                 </a>
             </div>
         </div>

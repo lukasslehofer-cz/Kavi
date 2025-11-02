@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\RoasteryController as AdminRoasteryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/jak-to-funguje', 'how-it-works')->name('how-it-works');
+Route::view('/o-nas', 'about')->name('about');
+Route::view('/kontakt', 'contact')->name('contact');
 Route::view('/ochrana-osobnich-udaju', 'privacy-policy')->name('privacy-policy');
 Route::view('/obchodni-podminky', 'terms-of-service')->name('terms-of-service');
 
@@ -36,6 +39,9 @@ Route::post('/kupony/validovat', [CouponController::class, 'validateCoupon'])->n
 
 // Newsletter subscription (AJAX)
 Route::post('/newsletter/prihlasit', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
+// Contact form submission
+Route::post('/kontakt/odeslat', [ContactController::class, 'send'])->name('contact.send');
 
 // Products
 Route::get('/produkty', [ProductController::class, 'index'])->name('products.index');

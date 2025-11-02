@@ -301,13 +301,13 @@ class TestDataSeeder extends Seeder
                 'is_active' => true,
             ],
 
-            // Merch
+            // Accessories (dříve Merch)
             [
                 'name' => 'Kavi tričko',
                 'slug' => 'kavi-tricko',
                 'description' => 'Bavlněné tričko s logem Kavi.',
                 'price' => 390,
-                'category' => 'merch',
+                'category' => 'accessories',
                 'type' => null,
                 'weight' => 200,
                 'roastery_id' => null,
@@ -319,7 +319,7 @@ class TestDataSeeder extends Seeder
                 'slug' => 'kavi-hrnek',
                 'description' => 'Keramický hrnek pro domácí použití.',
                 'price' => 290,
-                'category' => 'merch',
+                'category' => 'accessories',
                 'type' => null,
                 'weight' => 400,
                 'roastery_id' => null,

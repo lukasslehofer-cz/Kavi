@@ -260,9 +260,7 @@ class SubscriptionHelper
             'next_billing_date' => $nextBilling,
             'cycle_end' => $nextBilling->endOfDay(), // For backward compatibility
             'is_after_cutoff' => $isAfterCutoff,
-            'cutoff_message' => $isAfterCutoff 
-                ? 'První dodávka bude odeslána ' . $nextShipping->format('d.m.Y')
-                : 'První dodávka bude odeslána ' . $nextShipping->format('d.m.Y') . ' (do ' . $nextBilling->format('d.m.') . ' lze upravit)',
+            'cutoff_message' => 'První kávový box bude odeslán ' . $nextShipping->format('d.m.Y'),
         ];
     }
 }
