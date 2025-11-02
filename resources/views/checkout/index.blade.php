@@ -1026,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dynamic shipping calculation
-    let currentPacketaCarrier = '{{ $packetaCarrierId ?? "" }}';
+    let currentPacketaCarriers = @json($packetaCarrierIds ?? []);
     const subtotal = {{ $subtotal }};
     const shippingCostElement = document.getElementById('shipping-cost');
     const totalElement = document.getElementById('total-cost');
@@ -1094,8 +1094,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     totalElement.textContent = new Intl.NumberFormat('cs-CZ').format(newTotal) + ' Kč';
                 }
                 
-                // Update Packeta carrier for widget
-                currentPacketaCarrier = data.packeta_carrier_id;
+                // Update Packeta carriers for widget
+                currentPacketaCarriers = data.packeta_carrier_ids || [];
             } else {
                 alert('Do vybrané země momentálně nedoručujeme.');
                 if (shippingCostElement) {
@@ -1126,9 +1126,9 @@ document.addEventListener('DOMContentLoaded', function() {
             language: 'cs',
         };
         
-        // Add vendor filter if carrier is set
-        if (currentPacketaCarrier) {
-            widgetOptions.vendors = [currentPacketaCarrier];
+        // Add vendor filter if carriers are set (supports multiple carriers)
+        if (currentPacketaCarriers && currentPacketaCarriers.length > 0) {
+            widgetOptions.vendors = currentPacketaCarriers;
         }
 
         Packeta.Widget.pick(packetaApiKey, function(point) {

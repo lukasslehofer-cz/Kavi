@@ -83,7 +83,7 @@ class CheckoutController extends Controller
         // Calculate shipping dynamically based on user country
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : 'CZ'; // Default to Czech Republic for guests
         $shipping = $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
-        $packetaCarrierId = $this->shippingService->getPacketaCarrierForCountry($userCountry);
+        $packetaCarrierIds = $this->shippingService->getPacketaCarriersForCountry($userCountry);
         
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
@@ -184,7 +184,7 @@ class CheckoutController extends Controller
             'vat', 
             'appliedCoupon', 
             'discount', 
-            'packetaCarrierId',
+            'packetaCarrierIds',
             'canShipWithSubscription',
             'subscriptionShipmentInfo',
             'availableSubscriptions',
@@ -230,8 +230,8 @@ class CheckoutController extends Controller
         return response()->json([
             'shipping' => $shipping,
             'shipping_formatted' => $this->shippingService->formatShippingCost($shipping),
-            'packeta_carrier_id' => $rate->packeta_carrier_id,
-            'packeta_carrier_name' => $rate->packeta_carrier_name,
+            'packeta_carrier_ids' => $rate->getPacketaCarrierIds(),
+            'packeta_carrier_names' => $rate->getPacketaCarrierNames(),
             'available' => true,
             'free_shipping_remaining' => $remaining,
         ]);
@@ -243,7 +243,7 @@ class CheckoutController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'phone' => auth()->check() ? 'required|string|max:20' : 'nullable|string|max:20',
+            'phone' => ['required', 'string', 'max:20', 'regex:/^[\+]?[0-9\s\-\(\)]{9,20}$/'],
             'billing_address' => 'required|string',
             'billing_city' => 'required|string',
             'billing_postal_code' => 'required|string',
@@ -468,7 +468,7 @@ class CheckoutController extends Controller
             // Save contact info, billing address and Packeta pickup point to user for future use (if authenticated)
             if (auth()->check()) {
                 auth()->user()->update([
-                    'phone' => $request->phone ?? auth()->user()->phone,
+                    'phone' => $request->phone,
                     'address' => $request->billing_address,
                     'city' => $request->billing_city,
                     'postal_code' => $request->billing_postal_code,
@@ -521,7 +521,7 @@ class CheckoutController extends Controller
                             'email' => $request->email,
                             'password' => \Hash::make(\Str::random(32)), // Random password
                             'password_set_by_user' => false, // User didn't set this password
-                            'phone' => $request->phone ?? null,
+                            'phone' => $request->phone,
                             'address' => $request->billing_address,
                             'city' => $request->billing_city,
                             'postal_code' => $request->billing_postal_code,

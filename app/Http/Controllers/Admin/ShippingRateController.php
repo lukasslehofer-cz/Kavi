@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\PacketaCarrier;
 use App\Models\ShippingRate;
 use App\Services\PacketaService;
 use Illuminate\Http\Request;
@@ -30,19 +31,9 @@ class ShippingRateController extends Controller
      */
     public function edit(ShippingRate $rate)
     {
-        // Get available carriers for this country from Packeta API
-        $carriers = $this->packetaService->getCarriersForCountry($rate->country_code);
-        
-        // If API fails, use default carriers
-        if (empty($carriers)) {
-            $defaultCarriers = PacketaService::getDefaultCarriers();
-            $carriers = $defaultCarriers[$rate->country_code] ?? [];
-            
-            // Sort default carriers alphabetically by name
-            usort($carriers, function($a, $b) {
-                return strcasecmp($a['name'], $b['name']);
-            });
-        }
+        // Get ALL carriers from database (not filtered by country)
+        // Admin can choose any carrier for any country
+        $carriers = PacketaCarrier::getAllActive();
         
         return view('admin.shipping.edit', compact('rate', 'carriers'));
     }
@@ -58,8 +49,8 @@ class ShippingRateController extends Controller
             'price_eur' => 'required|numeric|min:0',
             'applies_to_subscriptions' => 'required|boolean',
             'free_shipping_threshold_czk' => 'nullable|numeric|min:0',
-            'packeta_carrier_id' => 'nullable|string',
-            'packeta_carrier_name' => 'nullable|string',
+            'packeta_carrier_ids' => 'nullable|array',
+            'packeta_carrier_ids.*' => 'exists:packeta_carriers,id',
         ]);
 
         // Convert checkbox values
@@ -71,21 +62,31 @@ class ShippingRateController extends Controller
             $validated['free_shipping_threshold_czk'] = null;
         }
         
-        if (empty($validated['packeta_carrier_id'])) {
-            $validated['packeta_carrier_id'] = null;
-            $validated['packeta_carrier_name'] = null;
-        }
+        // Remove packeta_carrier_ids from validated data (it's handled separately)
+        $carrierIds = $validated['packeta_carrier_ids'] ?? [];
+        unset($validated['packeta_carrier_ids']);
 
         $rate->update($validated);
+
+        // Sync many-to-many relationship with carriers
+        // This will add new carriers, remove unselected ones, and keep existing ones
+        $rate->packetaCarriers()->sync($carrierIds);
 
         Log::info('Shipping rate updated', [
             'rate_id' => $rate->id,
             'country' => $rate->country_name,
+            'carriers_count' => count($carrierIds),
             'admin_id' => auth()->id(),
         ]);
 
+        $carrierCount = count($carrierIds);
+        $message = "Nastavení dopravy pro {$rate->country_name} bylo úspěšně aktualizováno.";
+        if ($carrierCount > 0) {
+            $message .= " Vybráno {$carrierCount} " . ($carrierCount === 1 ? 'dopravce' : ($carrierCount < 5 ? 'dopravci' : 'dopravců')) . ".";
+        }
+
         return redirect()->route('admin.shipping.index')
-            ->with('success', "Nastavení dopravy pro {$rate->country_name} bylo úspěšně aktualizováno.");
+            ->with('success', $message);
     }
 
     /**
@@ -93,24 +94,9 @@ class ShippingRateController extends Controller
      */
     public function getCarriers(Request $request)
     {
-        $countryCode = $request->input('country_code');
-        
-        if (!$countryCode) {
-            return response()->json(['error' => 'Country code is required'], 400);
-        }
-
-        $carriers = $this->packetaService->getCarriersForCountry($countryCode);
-        
-        // If API fails, use default carriers
-        if (empty($carriers)) {
-            $defaultCarriers = PacketaService::getDefaultCarriers();
-            $carriers = $defaultCarriers[$countryCode] ?? [];
-            
-            // Sort default carriers alphabetically by name
-            usort($carriers, function($a, $b) {
-                return strcasecmp($a['name'], $b['name']);
-            });
-        }
+        // Return ALL carriers (not filtered by country)
+        // Admin can choose any carrier for any country
+        $carriers = PacketaCarrier::getAllActive();
 
         return response()->json(['carriers' => $carriers]);
     }

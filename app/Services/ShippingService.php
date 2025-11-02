@@ -55,15 +55,24 @@ class ShippingService
     }
 
     /**
-     * Get Packeta carrier ID for a country
+     * Get Packeta carrier IDs for a country (multiple carriers supported)
      *
      * @param string $countryCode
-     * @return string|null
+     * @return array Array of carrier IDs for Packeta widget vendors parameter
+     */
+    public function getPacketaCarriersForCountry(string $countryCode): array
+    {
+        $rate = $this->getShippingRate($countryCode);
+        return $rate ? $rate->getPacketaCarrierIds() : [];
+    }
+
+    /**
+     * @deprecated Use getPacketaCarriersForCountry() instead - now supports multiple carriers
      */
     public function getPacketaCarrierForCountry(string $countryCode): ?string
     {
-        $rate = $this->getShippingRate($countryCode);
-        return $rate?->packeta_carrier_id;
+        $carriers = $this->getPacketaCarriersForCountry($countryCode);
+        return $carriers[0] ?? null; // Return first carrier for backward compatibility
     }
 
     /**

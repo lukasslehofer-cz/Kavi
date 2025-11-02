@@ -165,50 +165,91 @@
                 @enderror
             </div>
 
-            <!-- Packeta Carrier -->
+            <!-- Packeta Carriers (Multiple Selection) -->
             <div class="mb-6">
-                <h4 class="text-lg font-bold text-gray-900 mb-2">Dopravce Zásilkovna</h4>
-                <p class="text-sm text-gray-600 mb-4">Vyberte dopravce, který se zobrazí zákazníkům při výběru výdejního místa</p>
+                <h4 class="text-lg font-bold text-gray-900 mb-2">Dopravci Zásilkovna</h4>
+                <p class="text-sm text-gray-600 mb-4">
+                    Vyberte jednoho nebo více dopravců. Zákazníci uvidí výdejní místa všech vybraných dopravců.
+                    <span class="text-blue-600 font-medium">💡 Tip: Pro ČR můžete vybrat Z-BOX i Zásilkovna PP najednou!</span>
+                </p>
                 
                 <div>
-                    <label for="packeta_carrier_id" class="block text-sm font-medium text-gray-700 mb-2">
-                        Dopravce
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        Dostupní dopravci ({{ count($carriers) }})
                     </label>
-                    <select 
-                        id="packeta_carrier_id" 
-                        name="packeta_carrier_id"
-                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    >
-                        <option value="">-- Vyberte dopravce --</option>
-                        @foreach($carriers as $carrier)
-                            <option 
-                                value="{{ $carrier['id'] }}" 
-                                data-name="{{ $carrier['name'] }}"
-                                {{ old('packeta_carrier_id', $rate->packeta_carrier_id) == $carrier['id'] ? 'selected' : '' }}
+                    
+                    @php
+                        $selectedCarrierIds = old('packeta_carrier_ids', $rate->packetaCarriers->pluck('id')->toArray());
+                    @endphp
+                    
+                    @if(!empty($carriers))
+                        <!-- Search/Filter -->
+                        <div class="mb-3">
+                            <input 
+                                type="text" 
+                                id="carrier-search" 
+                                placeholder="🔍 Hledat dopravce..." 
+                                class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                             >
-                                {{ $carrier['name'] }} ({{ $carrier['id'] }})
-                            </option>
-                        @endforeach
-                    </select>
-                    <input type="hidden" id="packeta_carrier_name" name="packeta_carrier_name" value="{{ old('packeta_carrier_name', $rate->packeta_carrier_name) }}">
-                    @error('packeta_carrier_id')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        </div>
+                        
+                        <!-- Carriers List with Checkboxes -->
+                        <div class="border border-gray-200 rounded-xl max-h-96 overflow-y-auto bg-gray-50">
+                            <div id="carriers-list" class="divide-y divide-gray-200">
+                                @php
+                                    $currentCountry = null;
+                                @endphp
+                                @foreach($carriers as $carrier)
+                                    @php
+                                        $countryCode = substr($carrier['name'], 0, 2);
+                                        $isSelected = in_array($carrier['id'], $selectedCarrierIds);
+                                    @endphp
+                                    
+                                    @if($countryCode !== $currentCountry)
+                                        @php $currentCountry = $countryCode; @endphp
+                                        <div class="bg-blue-50 px-4 py-2 font-semibold text-sm text-blue-900 sticky top-0">
+                                            {{ $countryCode }} - {{ $carrier['country'] }}
+                                        </div>
+                                    @endif
+                                    
+                                    <label class="flex items-center gap-3 px-4 py-3 hover:bg-white cursor-pointer transition-colors carrier-item" data-carrier-name="{{ strtolower($carrier['name']) }}">
+                                        <input 
+                                            type="checkbox" 
+                                            name="packeta_carrier_ids[]" 
+                                            value="{{ $carrier['id'] }}"
+                                            {{ $isSelected ? 'checked' : '' }}
+                                            class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                        >
+                                        <div class="flex-1">
+                                            <span class="text-sm font-medium text-gray-900">{{ $carrier['name'] }}</span>
+                                            <span class="text-xs text-gray-500 ml-2">(ID: {{ $carrier['id'] }})</span>
+                                        </div>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        <p class="text-xs text-gray-500 mt-2">
+                            💡 Můžete vybrat více dopravců najednou. Widget zobrazí všechna jejich výdejní místa.
+                        </p>
+                    @else
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="flex-1">
+                                    <p class="text-sm text-yellow-800">Nejsou dostupní žádní dopravci.</p>
+                                    <p class="text-xs text-yellow-700 mt-1">Zkontrolujte, zda jsou dopravci načteni v databázi.</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    
+                    @error('packeta_carrier_ids')
+                        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                     @enderror
                 </div>
-
-                @if(empty($carriers))
-                <div class="mt-3 bg-yellow-50 border border-yellow-200 rounded-xl p-3">
-                    <div class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        <div class="flex-1">
-                            <p class="text-sm text-yellow-800">Pro tuto zemi nejsou dostupní žádní dopravci z Packeta API.</p>
-                            <p class="text-xs text-yellow-700 mt-1">Možná tato země není podporována Zásilkovnou nebo je třeba nakonfigurovat API klíč.</p>
-                        </div>
-                    </div>
-                </div>
-                @endif
             </div>
 
             <!-- Submit Buttons -->
@@ -234,12 +275,23 @@
 </div>
 
 <script>
-// Update carrier name when carrier is selected
-document.getElementById('packeta_carrier_id').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    const carrierName = selectedOption.getAttribute('data-name') || '';
-    document.getElementById('packeta_carrier_name').value = carrierName;
-});
+// Live search for carriers
+const searchInput = document.getElementById('carrier-search');
+if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const carrierItems = document.querySelectorAll('.carrier-item');
+        
+        carrierItems.forEach(item => {
+            const carrierName = item.getAttribute('data-carrier-name');
+            if (carrierName.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+}
 </script>
 @endsection
 

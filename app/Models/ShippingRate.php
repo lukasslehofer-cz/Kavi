@@ -123,5 +123,35 @@ class ShippingRate extends Model
     {
         return $this->hasMany(Subscription::class);
     }
+
+    /**
+     * Many-to-many relationship with Packeta carriers
+     * Allows selecting multiple carriers per shipping rate
+     */
+    public function packetaCarriers()
+    {
+        return $this->belongsToMany(
+            PacketaCarrier::class,
+            'shipping_rate_carriers',
+            'shipping_rate_id',
+            'packeta_carrier_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Get array of carrier IDs for Packeta widget
+     */
+    public function getPacketaCarrierIds(): array
+    {
+        return $this->packetaCarriers->pluck('carrier_id')->toArray();
+    }
+
+    /**
+     * Get comma-separated list of carrier names for display
+     */
+    public function getPacketaCarrierNames(): string
+    {
+        return $this->packetaCarriers->pluck('name')->join(', ');
+    }
 }
 

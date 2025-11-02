@@ -281,11 +281,14 @@
                                 @endif
                                 
                                 @php
-                                    $addonOrders = $subscription->user->orders()
-                                        ->where('shipment_schedule_id', $schedule?->id ?? null)
-                                        ->where('shipped_with_subscription', true)
-                                        ->where('subscription_id', $subscription->id)
-                                        ->get();
+                                    $addonOrders = collect();
+                                    if ($subscription->user) {
+                                        $addonOrders = $subscription->user->orders()
+                                            ->where('shipment_schedule_id', $schedule?->id ?? null)
+                                            ->where('shipped_with_subscription', true)
+                                            ->where('subscription_id', $subscription->id)
+                                            ->get();
+                                    }
                                 @endphp
                                 
                                 @if($addonOrders->isNotEmpty())

@@ -122,8 +122,9 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'phone' => [
+            'regex' => 'Telefonní číslo musí být platné (např. +420 123 456 789 nebo 123456789).',
+            'required' => 'Telefonní číslo je povinné.',
         ],
     ],
 
@@ -136,6 +137,7 @@ return [
     'attributes' => [
         'name' => 'jméno',
         'email' => 'e-mail',
+        'phone' => 'telefon',
         'password' => 'heslo',
         'password_confirmation' => 'potvrzení hesla',
         'token' => 'token',

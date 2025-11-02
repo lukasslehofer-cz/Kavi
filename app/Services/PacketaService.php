@@ -59,32 +59,34 @@ class PacketaService
             $packetAttributes->addChild('email', $data['email']);
             $packetAttributes->addChild('phone', $data['phone']);
             
-            // Determine routing based on country - CZ uses addressId only, others use addressId + carrierPickupPoint
+            // Determine routing based on carrier type
             $country = strtoupper($data['country'] ?? 'CZ');
-            $isCarrierPudo = ($country !== 'CZ');
+            $carrierId = $data['carrier_id'] ?? $this->getCarrierIdFromCountry($country);
             
-            if ($isCarrierPudo) {
-                // Carriers PUDOs (international) - use addressId (carrier ID) + carrierPickupPoint (point code)
-                // addressId = ID of the carrier (e.g. 106 for DHL, 3060 for InPost)
-                // carrierPickupPoint = code of the pickup point (e.g. "BIA10M" or numeric ID)
-                $carrierId = $data['carrier_id'] ?? $this->getCarrierIdFromCountry($country);
+            // Packeta own network carriers (use addressId only, no carrierPickupPoint)
+            $packetaOwnCarriers = ['packeta', 'zpoint', '131', '7987', '4159', '4162', '4163', '13'];
+            $isPacketaOwn = in_array($carrierId, $packetaOwnCarriers);
+            
+            if ($isPacketaOwn) {
+                // Packeta own network (CZ, SK, etc.) - use addressId only
+                $packetAttributes->addChild('addressId', $data['packeta_point_id']);
+                
+                Log::info('Using Packeta own network structure', [
+                    'country' => $country,
+                    'carrier_id' => $carrierId,
+                    'addressId' => $data['packeta_point_id'],
+                ]);
+            } else {
+                // External carriers (InPost, DHL, etc.) - use addressId (carrier ID) + carrierPickupPoint (point code)
                 $carrierPickupPoint = $data['carrier_pickup_point'] ?? $data['packeta_point_id'];
                 
                 $packetAttributes->addChild('addressId', $carrierId);
                 $packetAttributes->addChild('carrierPickupPoint', $carrierPickupPoint);
                 
-                Log::info('Using Carriers PUDO structure', [
+                Log::info('Using external carrier structure', [
                     'country' => $country,
-                    'addressId' => $carrierId,
+                    'carrier_id' => $carrierId,
                     'carrierPickupPoint' => $carrierPickupPoint,
-                ]);
-            } else {
-                // Packeta PUDOs (CZ) - standard addressId only
-                $packetAttributes->addChild('addressId', $data['packeta_point_id']);
-                
-                Log::info('Using Packeta PUDO structure (CZ)', [
-                    'country' => $country,
-                    'addressId' => $data['packeta_point_id'],
                 ]);
             }
             
@@ -114,7 +116,8 @@ class PacketaService
             Log::info('Packeta API Request', [
                 'url' => $this->apiUrl,
                 'xml' => $xmlString,
-                'is_carrier_pudo' => $isCarrierPudo,
+                'is_packeta_own' => $isPacketaOwn,
+                'is_external_carrier' => !$isPacketaOwn,
                 'point_id' => $data['packeta_point_id'],
                 'country' => $data['country'] ?? 'N/A',
                 'api_password_length' => strlen($this->apiPassword),
@@ -236,12 +239,26 @@ class PacketaService
     /**
      * Get available carriers (PUDOs) for a country
      * Documentation: https://docs.packeta.com/docs/pudo-delivery/carriers-pudos
+     * 
+     * NOTE: Due to large API responses causing timeouts and memory issues,
+     * this method is disabled and returns empty array to force use of default carriers.
      *
      * @param string $countryCode ISO 3166-1 alpha-2 country code (e.g. 'CZ', 'SK')
      * @return array Array of available carriers with their details
      */
     public function getCarriersForCountry(string $countryCode): array
     {
+        // DISABLED: Packeta v4 API returns too much data (20-30MB) causing timeouts and memory issues
+        // Using default carriers instead for better performance and reliability
+        
+        Log::info('Packeta carriers requested - using default carriers', [
+            'country' => $countryCode,
+            'reason' => 'API disabled due to large response size',
+        ]);
+        
+        return [];
+        
+        /* ORIGINAL CODE - DISABLED DUE TO API ISSUES
         try {
             // Packeta v4 API endpoint for branches
             $response = Http::timeout(5)->get("https://www.zasilkovna.cz/api/v4/{$this->apiKey}/branch.json", [
@@ -293,6 +310,7 @@ class PacketaService
             ]);
             return [];
         }
+        */
     }
 
     /**

@@ -453,7 +453,7 @@ class SubscriptionController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'phone' => auth()->check() ? 'required|string|max:20' : 'nullable|string|max:20',
+            'phone' => ['required', 'string', 'max:20', 'regex:/^[\+]?[0-9\s\-\(\)]{9,20}$/'],
             'billing_address' => 'required|string|max:255',
             'billing_city' => 'required|string|max:100',
             'billing_postal_code' => 'required|string|max:20',
@@ -502,14 +502,14 @@ class SubscriptionController extends Controller
                 session([
                     'guest_subscription_email' => $validated['email'],
                     'guest_subscription_name' => $validated['name'],
-                    'guest_subscription_phone' => $validated['phone'] ?? null,
+                    'guest_subscription_phone' => $validated['phone'],
                 ]);
             }
 
             // Save contact info, billing address and Packeta pickup point to user for future use (if authenticated)
             if (auth()->check()) {
                 auth()->user()->update([
-                    'phone' => $validated['phone'] ?? auth()->user()->phone,
+                    'phone' => $validated['phone'],
                     'address' => $validated['billing_address'],
                     'city' => $validated['billing_city'],
                     'postal_code' => $validated['billing_postal_code'],
@@ -531,7 +531,7 @@ class SubscriptionController extends Controller
                 'subscription_shipping_address' => [
                     'name' => $validated['name'],
                     'email' => $validated['email'],
-                    'phone' => $validated['phone'] ?? null,
+                    'phone' => $validated['phone'],
                     'billing_address' => $validated['billing_address'],
                     'billing_city' => $validated['billing_city'],
                     'billing_postal_code' => $validated['billing_postal_code'],
@@ -553,7 +553,7 @@ class SubscriptionController extends Controller
                 $shippingAddress = [
                     'name' => $validated['name'],
                     'email' => $validated['email'],
-                    'phone' => $validated['phone'] ?? null,
+                    'phone' => $validated['phone'],
                     'billing_address' => $validated['billing_address'],
                     'billing_city' => $validated['billing_city'],
                     'billing_postal_code' => $validated['billing_postal_code'],
@@ -607,7 +607,7 @@ class SubscriptionController extends Controller
                     'shipping_address' => [
                         'name' => $validated['name'],
                         'email' => $validated['email'],
-                        'phone' => $validated['phone'] ?? null,
+                        'phone' => $validated['phone'],
                         'billing_address' => $validated['billing_address'],
                         'billing_city' => $validated['billing_city'],
                         'billing_postal_code' => $validated['billing_postal_code'],
@@ -779,7 +779,7 @@ class SubscriptionController extends Controller
                         'email' => $validated['email'],
                         'password' => \Hash::make(\Str::random(32)),
                         'password_set_by_user' => false,
-                        'phone' => $validated['phone'] ?? null,
+                        'phone' => $validated['phone'],
                         'address' => $validated['billing_address'],
                         'city' => $validated['billing_city'],
                         'postal_code' => $validated['billing_postal_code'],
@@ -815,7 +815,7 @@ class SubscriptionController extends Controller
                     'shipping_address' => [
                         'name' => $validated['name'],
                         'email' => $validated['email'],
-                        'phone' => $validated['phone'] ?? null,
+                        'phone' => $validated['phone'],
                         'billing_address' => $validated['billing_address'],
                         'billing_city' => $validated['billing_city'],
                         'billing_postal_code' => $validated['billing_postal_code'],
@@ -857,7 +857,7 @@ class SubscriptionController extends Controller
                 $shippingAddress = [
                     'name' => $validated['name'],
                     'email' => $validated['email'],
-                    'phone' => $validated['phone'] ?? null,
+                    'phone' => $validated['phone'],
                     'billing_address' => $validated['billing_address'],
                     'billing_city' => $validated['billing_city'],
                     'billing_postal_code' => $validated['billing_postal_code'],
@@ -892,7 +892,7 @@ class SubscriptionController extends Controller
                 'shipping_address' => [
                     'name' => $validated['name'],
                     'email' => $validated['email'],
-                    'phone' => $validated['phone'] ?? null,
+                    'phone' => $validated['phone'],
                     'billing_address' => $validated['billing_address'],
                     'billing_city' => $validated['billing_city'],
                     'billing_postal_code' => $validated['billing_postal_code'],
