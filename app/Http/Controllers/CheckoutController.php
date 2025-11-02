@@ -27,8 +27,37 @@ class CheckoutController extends Controller
     ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Handle return from cancelled payment - restore cart from order
+        if ($request->has('order_id')) {
+            $orderId = $request->get('order_id');
+            $order = Order::find($orderId);
+            
+            if ($order && $order->payment_status === 'pending') {
+                // Restore cart from order backup (stored in admin_notes)
+                try {
+                    $adminNotes = json_decode($order->admin_notes, true);
+                    if (isset($adminNotes['cart_backup'])) {
+                        session(['cart' => $adminNotes['cart_backup']]);
+                        
+                        \Log::info('Cart restored from cancelled order', [
+                            'order_id' => $order->id,
+                            'cart' => $adminNotes['cart_backup']
+                        ]);
+                        
+                        // Show message that they can try payment again
+                        session()->flash('info', 'Platba byla zrušena. Můžete pokračovat v objednávce nebo upravit košík.');
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to restore cart from order', [
+                        'order_id' => $orderId,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
+        
         $cart = session()->get('cart', []);
 
         if (empty($cart)) {
@@ -247,6 +276,41 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
+            // Check if there's a recent pending order for this user with same cart
+            // This prevents duplicate orders when user returns from cancelled payment
+            $existingPendingOrder = null;
+            if (auth()->check()) {
+                $existingPendingOrder = Order::where('user_id', auth()->id())
+                    ->where('payment_status', 'pending')
+                    ->where('created_at', '>=', now()->subHours(2)) // Only within last 2 hours
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                
+                if ($existingPendingOrder) {
+                    // Check if cart matches (stored in admin_notes)
+                    $adminNotes = json_decode($existingPendingOrder->admin_notes, true);
+                    $savedCart = $adminNotes['cart_backup'] ?? [];
+                    
+                    // If cart matches, reuse this order
+                    if ($savedCart === $cart) {
+                        \Log::info('Reusing existing pending order', [
+                            'order_id' => $existingPendingOrder->id,
+                            'order_number' => $existingPendingOrder->order_number,
+                        ]);
+                        
+                        DB::commit();
+                        
+                        // Proceed to payment
+                        if ($request->payment_method === 'card') {
+                            return redirect()->route('payment.card', $existingPendingOrder);
+                        }
+                        
+                        return redirect()->route('order.confirmation', $existingPendingOrder)
+                            ->with('success', 'Objednávka byla úspěšně vytvořena!');
+                    }
+                }
+            }
+            
             $subtotal = 0;
             $orderItems = [];
 
@@ -379,7 +443,8 @@ class CheckoutController extends Controller
                     'carrier_id' => $carrierId,
                     'carrier_pickup_point' => $carrierPickupPoint,
                 ],
-                'customer_notes' => $request->notes,
+                'customer_notes' => $request->notes, // User's actual notes from form
+                'admin_notes' => null, // Will be set after order creation with cart backup
             ];
 
             // Pokud je to addon objednávka, přidat subscription údaje
@@ -477,27 +542,15 @@ class CheckoutController extends Controller
                 }
             }
 
-            // Generate invoice from Fakturoid (must happen BEFORE sending email)
-            try {
-                $fakturoidService = app(FakturoidService::class);
-                $fakturoidService->processInvoiceForOrder($order);
-                // Refresh order to get updated invoice_pdf_path
-                $order->refresh();
-            } catch (\Exception $e) {
-                // Log error but don't fail the order
-                \Log::error('Failed to generate Fakturoid invoice: ' . $e->getMessage());
-            }
+            // Store cart in order's admin_notes (internal use only) for potential restoration if payment fails
+            $order->update([
+                'admin_notes' => json_encode(['cart_backup' => $cart]),
+                'customer_notes' => $request->notes, // Preserve user's actual notes
+            ]);
 
-            // Send order confirmation email (with invoice attachment if available)
-            try {
-                Mail::to($request->email)->send(new OrderConfirmation($order));
-            } catch (\Exception $e) {
-                // Log error but don't fail the order
-                \Log::error('Failed to send order confirmation email: ' . $e->getMessage());
-            }
-
-            // Clear cart and coupon only after successful order creation
-            session()->forget('cart');
+            // DO NOT clear cart yet - wait for successful payment
+            // DO NOT send email yet - wait for successful payment
+            // DO NOT create invoice yet - wait for successful payment
 
             if ($request->payment_method === 'card') {
                 \Log::info('Redirecting to payment.card', [
@@ -586,6 +639,43 @@ class CheckoutController extends Controller
                     
                     // Reload order to get updated status
                     $order->refresh();
+                    
+                    // Create invoice in Fakturoid immediately after payment
+                    try {
+                        $fakturoidService = app(FakturoidService::class);
+                        $fakturoidService->processInvoiceForOrder($order);
+                        // Refresh order to get updated invoice_pdf_path
+                        $order->refresh();
+                        
+                        \Log::info('Fakturoid invoice created synchronously', [
+                            'order_id' => $order->id,
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to create Fakturoid invoice synchronously', [
+                            'order_id' => $order->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        // Continue anyway - webhook will retry
+                    }
+                    
+                    // Send order confirmation email immediately after payment
+                    try {
+                        $email = $order->shipping_address['email'] ?? $order->user?->email;
+                        if ($email) {
+                            Mail::to($email)->send(new OrderConfirmation($order));
+                            
+                            \Log::info('Order confirmation email sent synchronously', [
+                                'order_id' => $order->id,
+                                'email' => $email,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send order confirmation email synchronously', [
+                            'order_id' => $order->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        // Continue anyway - webhook will retry
+                    }
                 }
             } catch (\Exception $e) {
                 \Log::error('Failed to verify Stripe session synchronously', [
@@ -599,6 +689,14 @@ class CheckoutController extends Controller
 
         // Check if payment was cancelled
         $cancelled = request()->get('cancelled', false);
+        
+        // Clear cart only after successful payment (not if cancelled)
+        if (!$cancelled && $order->payment_status === 'paid') {
+            session()->forget('cart');
+            \Log::info('Cart cleared after successful payment', [
+                'order_id' => $order->id
+            ]);
+        }
         
         return view('checkout.confirmation', compact('order', 'cancelled'));
     }

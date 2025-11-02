@@ -141,7 +141,25 @@ class Order extends Model
 
     public static function generateOrderNumber(): string
     {
-        return 'KV-' . date('Y') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+        $maxAttempts = 10;
+        $attempt = 0;
+        
+        do {
+            $count = static::whereDate('created_at', today())->count() + 1 + $attempt;
+            $orderNumber = 'KV-' . date('Y') . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+            
+            // Check if this number already exists
+            $exists = static::where('order_number', $orderNumber)->exists();
+            
+            if (!$exists) {
+                return $orderNumber;
+            }
+            
+            $attempt++;
+        } while ($attempt < $maxAttempts);
+        
+        // Fallback: use microtime for uniqueness
+        return 'KV-' . date('Y') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT) . '-' . substr(microtime(true) * 10000, -4);
     }
 }
 

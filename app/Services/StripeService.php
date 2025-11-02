@@ -130,7 +130,7 @@ class StripeService
             'line_items' => $lineItems,
             'mode' => 'payment',
             'success_url' => route('order.confirmation', $order) . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('order.confirmation', $order) . '?cancelled=1',
+            'cancel_url' => route('checkout.index') . '?order_id=' . $order->id,
             'metadata' => [
                 'order_id' => $order->id,
             ],
@@ -420,17 +420,37 @@ class StripeService
                     'paid_at' => now(),
                 ]);
 
-                // Create invoice in Fakturoid and download PDF
-                try {
-                    $fakturoidService = app(\App\Services\FakturoidService::class);
-                    $fakturoidService->processInvoiceForOrder($order);
-                } catch (\Exception $e) {
-                    \Log::error('Failed to create Fakturoid invoice after payment', [
+                // Create invoice in Fakturoid ONLY if not already created (backup for webhook)
+                if (!$order->fakturoid_invoice_id) {
+                    try {
+                        $fakturoidService = app(\App\Services\FakturoidService::class);
+                        $fakturoidService->processInvoiceForOrder($order);
+                        // Refresh order to get updated invoice_pdf_path
+                        $order->refresh();
+                        
+                        \Log::info('Fakturoid invoice created via webhook', [
+                            'order_id' => $order->id,
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to create Fakturoid invoice after payment', [
+                            'order_id' => $order->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        // Don't fail the webhook if Fakturoid fails
+                    }
+                } else {
+                    \Log::info('Fakturoid invoice already exists, skipping webhook creation', [
                         'order_id' => $order->id,
-                        'error' => $e->getMessage(),
+                        'invoice_id' => $order->fakturoid_invoice_id,
                     ]);
-                    // Don't fail the webhook if Fakturoid fails
                 }
+                
+                // Note: Email is sent synchronously in confirmation page for immediate delivery
+                // Webhook serves as backup only - we don't send duplicate emails
+                \Log::info('Order payment completed via webhook', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                ]);
             }
         }
     }
