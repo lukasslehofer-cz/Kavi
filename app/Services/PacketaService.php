@@ -244,7 +244,7 @@ class PacketaService
     {
         try {
             // Packeta v4 API endpoint for branches
-            $response = Http::get("https://www.zasilkovna.cz/api/v4/{$this->apiKey}/branch.json", [
+            $response = Http::timeout(5)->get("https://www.zasilkovna.cz/api/v4/{$this->apiKey}/branch.json", [
                 'country' => strtoupper($countryCode),
             ]);
 
@@ -255,15 +255,29 @@ class PacketaService
                 $carriers = [];
                 if (isset($data['carriers'])) {
                     foreach ($data['carriers'] as $carrier) {
+                        $carrierName = $carrier['name'] ?? '';
+                        
+                        // Filter out Home Delivery (HD) carriers - we only deliver to pick-up points and boxes
+                        if (stripos($carrierName, ' HD') !== false || 
+                            stripos($carrierName, 'Home Delivery') !== false ||
+                            stripos($carrierName, 'domů') !== false) {
+                            continue;
+                        }
+                        
                         $carriers[$carrier['id']] = [
                             'id' => $carrier['id'],
-                            'name' => $carrier['name'] ?? '',
+                            'name' => $carrierName,
                             'country' => $carrier['country'] ?? $countryCode,
                         ];
                     }
                 }
                 
-                return array_values($carriers);
+                // Sort carriers alphabetically by name
+                usort($carriers, function($a, $b) {
+                    return strcasecmp($a['name'], $b['name']);
+                });
+                
+                return $carriers;
             }
 
             Log::warning('Packeta PUDOs API request failed', [
@@ -301,6 +315,7 @@ class PacketaService
     /**
      * Get default carriers for common countries
      * These are fallback values if PUDOs API is not available
+     * NOTE: Only pick-up points and boxes, NO home delivery (HD) carriers
      *
      * @return array
      */
@@ -308,26 +323,32 @@ class PacketaService
     {
         return [
             'CZ' => [
+                ['id' => 'packeta', 'name' => 'Packeta PP'],
                 ['id' => 'zpoint', 'name' => 'Z-BOX'],
-                ['id' => 'packeta', 'name' => 'Zásilkovna'],
             ],
             'SK' => [
-                ['id' => '131', 'name' => 'Packeta Slovensko'],
+                ['id' => '131', 'name' => 'Packeta PP'],
+                ['id' => '7987', 'name' => 'Packeta Z-Point PP'],
             ],
             'PL' => [
                 ['id' => '3060', 'name' => 'InPost Paczkomaty'],
+                ['id' => '8571', 'name' => 'Packeta PP'],
             ],
             'HU' => [
-                ['id' => '4159', 'name' => 'Packeta Maďarsko'],
+                ['id' => '4159', 'name' => 'Packeta PP'],
+                ['id' => '4161', 'name' => 'Hungarian Post Box'],
             ],
             'DE' => [
-                ['id' => 'de-pp', 'name' => 'DHL Paketshop'],
+                ['id' => '3294', 'name' => 'DHL Paketshop'],
+                ['id' => '10779', 'name' => 'Hermes Paketshop'],
             ],
             'AT' => [
                 ['id' => '4161', 'name' => 'Österreichische Post'],
+                ['id' => '13', 'name' => 'Packeta PP'],
             ],
             'RO' => [
-                ['id' => '4162', 'name' => 'Packeta Rumunsko'],
+                ['id' => '4162', 'name' => 'Packeta PP'],
+                ['id' => '8794', 'name' => 'Sameday Box'],
             ],
         ];
     }

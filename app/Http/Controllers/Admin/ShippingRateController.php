@@ -37,6 +37,11 @@ class ShippingRateController extends Controller
         if (empty($carriers)) {
             $defaultCarriers = PacketaService::getDefaultCarriers();
             $carriers = $defaultCarriers[$rate->country_code] ?? [];
+            
+            // Sort default carriers alphabetically by name
+            usort($carriers, function($a, $b) {
+                return strcasecmp($a['name'], $b['name']);
+            });
         }
         
         return view('admin.shipping.edit', compact('rate', 'carriers'));
@@ -100,6 +105,11 @@ class ShippingRateController extends Controller
         if (empty($carriers)) {
             $defaultCarriers = PacketaService::getDefaultCarriers();
             $carriers = $defaultCarriers[$countryCode] ?? [];
+            
+            // Sort default carriers alphabetically by name
+            usort($carriers, function($a, $b) {
+                return strcasecmp($a['name'], $b['name']);
+            });
         }
 
         return response()->json(['carriers' => $carriers]);
