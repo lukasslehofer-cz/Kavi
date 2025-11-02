@@ -172,7 +172,7 @@
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
                         </td>
                     </tr>
                     <tr>

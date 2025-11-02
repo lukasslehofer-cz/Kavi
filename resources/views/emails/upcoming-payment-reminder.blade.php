@@ -207,7 +207,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
                         </td>
                     </tr>
                     

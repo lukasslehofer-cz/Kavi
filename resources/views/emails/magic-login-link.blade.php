@@ -182,7 +182,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ url('images/kavi-logo-black.png') }}" alt="KAVI.cz" class="logo" style="filter: invert(1) brightness(2);">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" style="filter: invert(1) brightness(2);">
                         </td>
                     </tr>
                     
