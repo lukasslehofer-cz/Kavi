@@ -102,7 +102,15 @@
           
           <!-- Coffee Count -->
           <div class="absolute left-3 top-3 bg-gray-900 text-white rounded-full px-2.5 py-1 text-xs font-medium">
-            {{ $roastery->products()->count() }} {{ $roastery->products()->count() == 1 ? 'káva' : 'káv' }}
+            @php
+              $coffeeCount = $roastery->products()->count();
+              $coffeeWord = match(true) {
+                $coffeeCount === 1 => 'káva',
+                $coffeeCount >= 2 && $coffeeCount <= 4 => 'kávy',
+                default => 'káv'
+              };
+            @endphp
+            {{ $coffeeCount }} {{ $coffeeWord }}
           </div>
         </a>
 
@@ -138,7 +146,7 @@
                class="inline-flex items-center justify-center w-10 h-10 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
                title="Web pražírny">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 919-9" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </a>
             @endif
