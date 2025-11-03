@@ -694,7 +694,7 @@
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
                             <p class="text-sm text-blue-700 font-light">
-                                Káva vám bude doručena na vybrané výdejní místo Zásilkovny
+                                Káva vám bude doručena na vybrané výdejní místo
                             </p>
                         </div>
                     </div>
@@ -715,11 +715,7 @@
                     <div class="p-4 border border-primary-400 bg-primary-50 rounded-xl">
                         <input type="hidden" name="payment_method" value="card">
                         <div class="flex items-start gap-3">
-                            <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
+                            
                             <div class="flex-1">
                                 <div class="font-bold text-gray-900 mb-1">Platební kartou</div>
                                 <div class="text-sm text-gray-600 mb-3 font-light">Po odeslání objednávky budete přesměrováni na bezpečnou platební bránu</div>
@@ -952,13 +948,13 @@
                         <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>14 dní na vrácení</span>
+                        <span>Ekologické balení</span>
                     </div>
                     <div class="flex items-center text-sm text-gray-600 font-light">
                         <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>Zákaznická podpora 24/7</span>
+                        <span>Káva z celé Evropy</span>
                     </div>
                 </div>
             </div>
