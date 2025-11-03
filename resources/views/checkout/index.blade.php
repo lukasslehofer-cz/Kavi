@@ -1134,6 +1134,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         Packeta.Widget.pick(packetaApiKey, function(point) {
             if (point) {
+                // DEBUG: Log complete point object from widget
+                console.log('=== PACKETA WIDGET RETURNED POINT ===');
+                console.log('Full point object:', point);
+                console.log('point.id:', point.id);
+                console.log('point.name:', point.name);
+                console.log('point.carrierId:', point.carrierId);
+                console.log('point.carrierPickupPointId:', point.carrierPickupPointId);
+                console.log('point.nameStreet:', point.nameStreet);
+                console.log('====================================');
+                
                 // Fill hidden fields with selected point data
                 document.getElementById('packeta_point_id').value = point.id;
                 document.getElementById('packeta_point_name').value = point.name;
@@ -1141,10 +1151,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Store carrier ID and carrierPickupPointId for Carriers PUDOs (international)
                 if (point.carrierId) {
                     document.getElementById('carrier_id').value = point.carrierId;
+                    console.log('✓ Saved carrier_id to hidden field:', point.carrierId);
+                } else {
+                    console.log('⚠ No carrierId in point object - field will be empty');
                 }
+                
                 if (point.carrierPickupPointId) {
                     document.getElementById('carrier_pickup_point').value = point.carrierPickupPointId;
+                    console.log('✓ Saved carrier_pickup_point to hidden field:', point.carrierPickupPointId);
+                } else {
+                    console.log('⚠ No carrierPickupPointId in point object - field will be empty');
                 }
+                
+                // Verify what's actually in the form
+                console.log('--- HIDDEN FIELDS CHECK ---');
+                console.log('Form carrier_id value:', document.getElementById('carrier_id').value);
+                console.log('Form carrier_pickup_point value:', document.getElementById('carrier_pickup_point').value);
+                console.log('---------------------------');
                 
                 // Format address
                 let address = point.street;

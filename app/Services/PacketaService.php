@@ -69,12 +69,21 @@ class PacketaService
             
             if ($isPacketaOwn) {
                 // Packeta own network (CZ, SK, etc.) - use addressId only
-                $packetAttributes->addChild('addressId', $data['packeta_point_id']);
+                // Widget v6 may return IDs with country prefix (e.g. "hu769"), but API expects just "769"
+                $pointId = $data['packeta_point_id'];
+                
+                // Remove country prefix if present (e.g. "hu769" -> "769", "cz123" -> "123")
+                if (preg_match('/^[a-z]{2}(\d+)$/i', $pointId, $matches)) {
+                    $pointId = $matches[1];
+                }
+                
+                $packetAttributes->addChild('addressId', $pointId);
                 
                 Log::info('Using Packeta own network structure', [
                     'country' => $country,
                     'carrier_id' => $carrierId,
-                    'addressId' => $data['packeta_point_id'],
+                    'original_point_id' => $data['packeta_point_id'],
+                    'cleaned_addressId' => $pointId,
                 ]);
             } else {
                 // External carriers (InPost, DHL, etc.) - use addressId (carrier ID) + carrierPickupPoint (point code)
@@ -401,16 +410,20 @@ class PacketaService
      */
     private function getCarrierIdFromCountry(string $countryCode): string
     {
+        // Fallback carrier IDs for each country - PICKUP POINTS ONLY (no HD!)
+        // These are used when widget doesn't provide carrierId (Packeta own network)
         $carrierMap = [
-            'SK' => '131',      // Packeta Slovakia
-            'PL' => '3060',     // InPost Poland
-            'HU' => '4159',     // Packeta Hungary
-            'DE' => '106',      // DHL Paketshop Germany
-            'AT' => '4161',     // Post Austria
-            'RO' => '4162',     // Packeta Romania
+            'CZ' => 'packeta',  // CZ Zásilkovna PP
+            'SK' => '131',      // SK Packeta PP
+            'PL' => '3060',     // PL InPost Paczkomaty Box
+            'HU' => '4539',     // HU Maďarská pošta PP (NOT 4159 which is HD!)
+            'DE' => '6828',     // DE Hermes PP
+            'AT' => '13',       // AT Packeta PP
+            'RO' => '4162',     // RO Packeta PP
+            'SI' => '4163',     // SI Packeta PP
         ];
 
-        return $carrierMap[strtoupper($countryCode)] ?? '131';
+        return $carrierMap[strtoupper($countryCode)] ?? 'packeta';
     }
 }
 

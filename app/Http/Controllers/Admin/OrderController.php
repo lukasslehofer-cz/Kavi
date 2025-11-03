@@ -68,17 +68,62 @@ class OrderController extends Controller
             'status' => 'required|in:pending,processing,submitted,shipped,delivered,cancelled',
         ]);
 
-        $order->update([
+        $updateData = [
             'status' => $request->status,
-        ]);
+        ];
 
-        // If status is delivered, mark payment as paid
-        if ($request->status === 'delivered' && $order->payment_status !== 'paid') {
-            $order->update(['payment_status' => 'paid']);
+        // Set shipped_at timestamp when status changes to shipped
+        if ($request->status === 'shipped' && $order->status !== 'shipped' && !$order->shipped_at) {
+            $updateData['shipped_at'] = now();
         }
+
+        // Set delivered_at timestamp when status changes to delivered
+        if ($request->status === 'delivered' && $order->status !== 'delivered' && !$order->delivered_at) {
+            $updateData['delivered_at'] = now();
+            
+            // Also mark payment as paid when delivered
+            if ($order->payment_status !== 'paid') {
+                $updateData['payment_status'] = 'paid';
+            }
+        }
+
+        $order->update($updateData);
 
         return redirect()->route('admin.orders.show', $order)
             ->with('success', 'Stav objednávky byl úspěšně aktualizován.');
+    }
+
+    /**
+     * Update the shipping address of an order
+     */
+    public function updateAddress(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:50',
+            'billing_address' => 'required|string|max:255',
+            'billing_city' => 'required|string|max:100',
+            'billing_postal_code' => 'required|string|max:20',
+            'country' => 'required|string|max:2',
+        ]);
+
+        // Get current shipping_address and update it
+        $shippingAddress = $order->shipping_address ?? [];
+        $shippingAddress['name'] = $validated['name'];
+        $shippingAddress['email'] = $validated['email'];
+        $shippingAddress['phone'] = $validated['phone'];
+        $shippingAddress['billing_address'] = $validated['billing_address'];
+        $shippingAddress['billing_city'] = $validated['billing_city'];
+        $shippingAddress['billing_postal_code'] = $validated['billing_postal_code'];
+        $shippingAddress['country'] = $validated['country'];
+
+        $order->update([
+            'shipping_address' => $shippingAddress,
+        ]);
+
+        return redirect()->route('admin.orders.show', $order)
+            ->with('success', 'Doručovací adresa byla úspěšně aktualizována.');
     }
 
     /**
@@ -195,15 +240,20 @@ class OrderController extends Controller
                 $result = $packetaService->createPacket($packetData);
 
                 if ($result && isset($result['id'])) {
+                    // Get tracking URL from Packeta
+                    $trackingUrl = $this->getPacketaTrackingUrl($result['id']);
+                    
                     // Update order with Packeta data
                     $order->update([
                         'packeta_packet_id' => $result['id'],
+                        'packeta_tracking_url' => $trackingUrl,
                         'packeta_shipment_status' => 'submitted',
                         'packeta_sent_at' => now(),
                         'packeta_point_id' => $packetaPointId,
                         'packeta_point_name' => $shippingAddress['packeta_point_name'] ?? null,
                         'packeta_point_address' => $shippingAddress['packeta_point_address'] ?? null,
                         'status' => 'submitted',
+                        'shipped_at' => now(), // Mark as shipped when sent to Packeta
                     ]);
 
                     $successCount++;
@@ -252,6 +302,15 @@ class OrderController extends Controller
 
         return redirect()->route('admin.orders.index')
             ->with('success', $message);
+    }
+
+    /**
+     * Get Packeta tracking URL for a packet
+     */
+    private function getPacketaTrackingUrl(string $packetId): string
+    {
+        // Packeta tracking URL format
+        return "https://tracking.packeta.com/cs/?id={$packetId}";
     }
 
     /**

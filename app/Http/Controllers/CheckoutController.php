@@ -672,6 +672,9 @@ class CheckoutController extends Controller
                         if ($email) {
                             Mail::to($email)->send(new OrderConfirmation($order));
                             
+                            // Mark email as sent
+                            $order->update(['confirmation_email_sent_at' => now()]);
+                            
                             \Log::info('Order confirmation email sent synchronously', [
                                 'order_id' => $order->id,
                                 'email' => $email,

@@ -585,8 +585,35 @@ class StripeService
                     ]);
                 }
                 
-                // Note: Email is sent synchronously in confirmation page for immediate delivery
-                // Webhook serves as backup only - we don't send duplicate emails
+                // Send confirmation email if not already sent
+                // This handles race condition where webhook arrives before user sees confirmation page
+                if (!$order->confirmation_email_sent_at) {
+                    try {
+                        $email = $order->shipping_address['email'] ?? $order->user?->email;
+                        if ($email) {
+                            \Mail::to($email)->send(new \App\Mail\OrderConfirmation($order));
+                            
+                            // Mark email as sent
+                            $order->update(['confirmation_email_sent_at' => now()]);
+                            
+                            \Log::info('Order confirmation email sent via webhook', [
+                                'order_id' => $order->id,
+                                'email' => $email,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send order confirmation email via webhook', [
+                            'order_id' => $order->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                } else {
+                    \Log::info('Order confirmation email already sent, skipping webhook email', [
+                        'order_id' => $order->id,
+                        'sent_at' => $order->confirmation_email_sent_at,
+                    ]);
+                }
+                
                 \Log::info('Order payment completed via webhook', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,

@@ -187,8 +187,15 @@
 
             <!-- Shipping Address -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Doručovací adresa</h3>
-                <div class="text-gray-700 space-y-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Doručovací adresa</h3>
+                    <button onclick="toggleEditShippingAddress()" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                        Upravit
+                    </button>
+                </div>
+                
+                <!-- Display Mode -->
+                <div id="shipping-address-display" class="text-gray-700 space-y-4">
                     <div>
                         <p class="font-medium">{{ $order->shipping_address['name'] ?? 'N/A' }}</p>
                         @if(!empty($order->shipping_address['email']))
@@ -221,7 +228,73 @@
                         <p>{{ $order->shipping_address['country'] ?? 'CZ' }}</p>
                     </div>
                 </div>
+                
+                <!-- Edit Mode -->
+                <form id="shipping-address-edit" action="{{ route('admin.orders.update-address', $order) }}" method="POST" class="hidden space-y-4">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Jméno</label>
+                        <input type="text" name="name" value="{{ $order->shipping_address['name'] ?? '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" value="{{ $order->shipping_address['email'] ?? '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                        <input type="text" name="phone" value="{{ $order->shipping_address['phone'] ?? '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    
+                    <div class="pt-3 border-t border-gray-200">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Fakturační adresa</p>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Ulice a číslo</label>
+                                <input type="text" name="billing_address" value="{{ $order->shipping_address['billing_address'] ?? '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">PSČ</label>
+                                    <input type="text" name="billing_postal_code" value="{{ $order->shipping_address['billing_postal_code'] ?? '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Město</label>
+                                    <input type="text" name="billing_city" value="{{ $order->shipping_address['billing_city'] ?? '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">Země</label>
+                                <input type="text" name="country" value="{{ $order->shipping_address['country'] ?? 'CZ' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 pt-3">
+                        <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+                            Uložit
+                        </button>
+                        <button type="button" onclick="toggleEditShippingAddress()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300">
+                            Zrušit
+                        </button>
+                    </div>
+                </form>
             </div>
+            
+            <script>
+            function toggleEditShippingAddress() {
+                const display = document.getElementById('shipping-address-display');
+                const edit = document.getElementById('shipping-address-edit');
+                display.classList.toggle('hidden');
+                edit.classList.toggle('hidden');
+            }
+            </script>
 
             <!-- Delivery Notes -->
             @if($order->customer_notes)
