@@ -361,39 +361,30 @@
 </div>
 
 <!-- CTA Section -->
-<div class="relative bg-gray-900 py-20 lg:py-28 overflow-hidden">
-    <!-- Organic Shape Decoration -->
-    <div class="absolute top-0 left-0 w-96 h-96 bg-primary-500 rounded-full blur-3xl opacity-10"></div>
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl opacity-10"></div>
+<div class="relative bg-gray-100 py-20 lg:py-24">
     
     <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-        <div class="mx-auto flex max-w-3xl flex-col items-center text-center">
-            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2 mb-8">
-                <svg class="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <span class="text-sm font-medium text-white">Potřebujete pomoc?</span>
-            </div>
-            
-            <h2 class="mb-6 text-3xl md:text-4xl font-bold text-white leading-tight">
+        <div class="mx-auto flex max-w-2xl flex-col items-center text-center">
+            <!-- Heading -->
+            <h2 class="mb-6 text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
                 Máte další otázky?
             </h2>
-            <p class="mb-10 text-lg text-gray-300 max-w-2xl leading-relaxed font-light">
+
+            <p class="mb-10 text-lg text-gray-600 max-w-xl leading-relaxed font-light">
                 Kontaktujte nás a my vám rádi odpovíme na všechny vaše dotazy ohledně předplatného nebo kávy.
             </p>
 
-            <div class="flex flex-col sm:flex-row gap-4">
-                <a href="mailto:info@kavi.cz" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-gray-900 font-medium px-8 py-4 rounded-full transition-all duration-200">
-                    <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="{{ route('contact') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
                     <span>Napište nám</span>
-                </a>
-                <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
-                    <span>Vybrat předplatné</span>
-                    <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
+                </a>
+
+                <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 transition-all duration-200">
+                    <span>Vybrat předplatné</span>
                 </a>
             </div>
         </div>
