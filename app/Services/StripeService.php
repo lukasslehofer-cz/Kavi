@@ -22,13 +22,38 @@ class StripeService
 
     /**
      * Create or get Stripe customer for user
+     * If customer was deleted on Stripe, creates a new one and updates DB
      */
     public function getOrCreateCustomer(User $user): string
     {
+        // Pokud má user stripe_customer_id, zkontroluj že stále existuje na Stripe
         if ($user->stripe_customer_id) {
-            return $user->stripe_customer_id;
+            try {
+                // Zkus načíst zákazníka ze Stripe
+                $customer = StripeCustomer::retrieve($user->stripe_customer_id);
+                
+                // Pokud existuje a není smazaný, vrať ho
+                if ($customer && !isset($customer->deleted)) {
+                    return $customer->id;
+                }
+                
+                // Zákazník byl smazán, pokračuj k vytvoření nového
+                \Log::warning('Stripe customer was deleted, creating new one', [
+                    'user_id' => $user->id,
+                    'old_customer_id' => $user->stripe_customer_id,
+                ]);
+                
+            } catch (\Stripe\Exception\InvalidRequestException $e) {
+                // Zákazník neexistuje (404), pokračuj k vytvoření nového
+                \Log::warning('Stripe customer not found, creating new one', [
+                    'user_id' => $user->id,
+                    'old_customer_id' => $user->stripe_customer_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
+        // Vytvoř nového zákazníka
         $customer = StripeCustomer::create([
             'email' => $user->email,
             'name' => $user->name,
@@ -37,7 +62,13 @@ class StripeService
             ],
         ]);
 
+        // Aktualizuj databázi s novým ID
         $user->update(['stripe_customer_id' => $customer->id]);
+        
+        \Log::info('Created new Stripe customer', [
+            'user_id' => $user->id,
+            'customer_id' => $customer->id,
+        ]);
 
         return $customer->id;
     }
@@ -378,7 +409,16 @@ class StripeService
         try {
             $customer = StripeCustomer::retrieve($customerId);
             
-            if ($customer->invoice_settings->default_payment_method) {
+            // Ošetři případ kdy customer neexistuje nebo je smazaný
+            if (!$customer || isset($customer->deleted)) {
+                \Log::warning('Customer not found or deleted in getCustomerDefaultPaymentMethod', [
+                    'customer_id' => $customerId,
+                ]);
+                return null;
+            }
+            
+            // Bezpečný přístup k invoice_settings
+            if ($customer->invoice_settings->default_payment_method ?? null) {
                 return $customer->invoice_settings->default_payment_method;
             }
 
@@ -394,7 +434,18 @@ class StripeService
             }
 
             return null;
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            // Zákazník neexistuje
+            \Log::warning('Customer not found in getCustomerDefaultPaymentMethod', [
+                'customer_id' => $customerId,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
         } catch (\Exception $e) {
+            \Log::error('Failed to get customer default payment method', [
+                'customer_id' => $customerId,
+                'error' => $e->getMessage(),
+            ]);
             return null;
         }
     }
@@ -1288,8 +1339,16 @@ class StripeService
         try {
             $customer = StripeCustomer::retrieve($customerId);
             
-            // Get default payment method ID
-            $paymentMethodId = $customer->invoice_settings->default_payment_method;
+            // Ošetři případ kdy customer neexistuje nebo je smazaný
+            if (!$customer || isset($customer->deleted)) {
+                \Log::warning('Customer not found or deleted in getPaymentMethodDetails', [
+                    'customer_id' => $customerId,
+                ]);
+                return null;
+            }
+            
+            // Bezpečný přístup k invoice_settings a default_payment_method
+            $paymentMethodId = $customer->invoice_settings->default_payment_method ?? null;
             
             // If no default, try to get the first payment method
             if (!$paymentMethodId) {
@@ -1322,6 +1381,13 @@ class StripeService
                 ];
             }
             
+            return null;
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            // Zákazník neexistuje
+            \Log::warning('Customer not found in getPaymentMethodDetails', [
+                'customer_id' => $customerId,
+                'error' => $e->getMessage(),
+            ]);
             return null;
         } catch (\Exception $e) {
             \Log::error('Failed to get payment method details', [
