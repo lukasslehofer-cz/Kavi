@@ -86,7 +86,7 @@
                     Jak funguje předplatné kávy?
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Předplatné si jednoduše nastavíte online – zvolíte typ boxu (espresso nebo filtr), vyberete si místo doručení a my se postaráme o zbytek. Každý měsíc vám automaticky dorazí čerstvý výběr káv na vámi zadané místo.
+                    Předplatné si jednoduše nastavíte online – zvolíte typ boxu (espresso, filtr nebo kombinace), rozhodnete se zda chcete přidat i bezkofeinovou kávu, vyberete si četnost dodávek a místo doručení a my se postaráme o zbytek. Káva vám automaticky dorazí pravidelně na vámi zadané místo.
                 </p>
             </div>
 
@@ -99,7 +99,7 @@
                     Kdy mi dorazí balíček s kávou?
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Objednávky pro daný měsíc končí vždy <strong class="text-gray-900 font-medium">15.</strong> Kávové boxy odesíláme v druhé polovině měsíce, nejpozději <strong class="text-gray-900 font-medium">28.</strong> Pokud si svůj první kávový box objednáte během 1.-15., první zásilka kávy vám přijde hned v nejbližší várce.
+                    Objednávky pro daný měsíc končí většinou <strong class="text-gray-900 font-medium">15.</strong> Kávové boxy odesíláme o pár dní později, nejčastěji <strong class="text-gray-900 font-medium">20.</strong> Pokud si svůj první kávový box objednáte do 15. dne měsíce, první zásilka kávy vám přijde hned v nejbližší várce.
                 </p>
             </div>
 
@@ -164,7 +164,7 @@
                     Posíláte i do zahraničí?
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Momentálně doručujeme pouze v rámci České republiky přes Zásilkovnu.
+                    Momentálně doručujeme pouze v rámci České republiky a Slovenskapřes Zásilkovnu.
                 </p>
             </div>
 
@@ -177,7 +177,7 @@
                     Je možné předplatné změnit či zrušit?
                 </h3>
                 <p class="text-white/90 leading-relaxed font-light">
-                    Pochopitelně! Naše předplatné můžete kdykoliv zrušit nebo pozastavit. Stejně tak upravíme doručovací adresu. Stačí nás kontaktovat prostřednictvím vašeho zákaznického účtu nebo e-mailu.
+                    Pochopitelně! Naše předplatné můžete kdykoliv zrušit nebo pozastavit. Stejně tak upravíme doručovací adresu nebo platební metodu. Veškeré změny můžete provést prostřednictvím vašeho zákaznického účtu.
                 </p>
             </div>
         </div>
@@ -213,7 +213,7 @@
                     Jaké druhy kávy zařazujete do předplatného?
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Vybíráme pouze tu <strong class="text-gray-900 font-medium">nejkvalitnější výběrovou kávu</strong> od těch nejzajímavějších pražíren z celé Evropy. Některé kupují kávu přímo od farmářů, jiné spolupracují s renomovanými dovozci. V současné době nenabízíme bezkofeinovou kávu ani kávu robusta.
+                    Vybíráme pouze tu <strong class="text-gray-900 font-medium">nejkvalitnější výběrovou kávu</strong> od těch nejzajímavějších pražíren z celé Evropy. Některé kupují kávu přímo od farmářů, jiné spolupracují s renomovanými dovozci.
                 </p>
             </div>
 
@@ -278,7 +278,7 @@
                     Jak čerstvá je káva, kterou dostanu?
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Káva je vždy <strong class="text-gray-900 font-medium">čerstvě pražená</strong> – odebíráme ji přímo z pražíren těsně před odesláním vašich balíčků.
+                    Káva je vždy <strong class="text-gray-900 font-medium">čerstvě pražená</strong> – odebíráme ji přímo z pražíren jen pár týdnů před odesláním vašich balíčků.
                 </p>
             </div>
 
@@ -304,7 +304,7 @@
                     Jak velká balení kávy dostanu?
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Standardně dodáváme <strong class="text-gray-900 font-medium">3 balení kávy po 250g</strong>. Ve výjimečných případech může být hmotnost sáčků odlišná, ale vždy v součtu minimálně 750g.
+                    Standardně dodáváme <strong class="text-gray-900 font-medium">balení kávy po 250g</strong>. Ve výjimečných případech může být hmotnost sáčků odlišná, ale vždy výměnou za skvělý chuťový zážitek.
                 </p>
             </div>
         </div>
@@ -316,7 +316,7 @@
     <div class="mx-auto max-w-screen-xl px-4 md:px-8">
         <div class="mb-16 max-w-2xl mx-auto text-center">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Proč zvolit Kavi?
+                Proč zvolit KAVI.cz?
             </h2>
             <p class="text-lg text-gray-600 font-light">
                 Výhody našeho kávového předplatného
