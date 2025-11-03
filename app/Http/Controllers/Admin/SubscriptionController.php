@@ -84,6 +84,49 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * Update the subscription shipping address
+     */
+    public function updateAddress(Request $request, Subscription $subscription)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'billing_address' => 'required|string|max:255',
+            'billing_city' => 'required|string|max:100',
+            'billing_postal_code' => 'required|string|max:20',
+            'country' => 'required|string|in:CZ,SK,PL,HU,AT,DE,RO,SI,HR,BG',
+        ]);
+
+        // Get current shipping address or create new array
+        $shippingAddress = is_string($subscription->shipping_address) 
+            ? json_decode($subscription->shipping_address, true) 
+            : ($subscription->shipping_address ?? []);
+
+        // Update address fields
+        $shippingAddress['name'] = $validated['name'];
+        $shippingAddress['email'] = $validated['email'];
+        $shippingAddress['phone'] = $validated['phone'];
+        $shippingAddress['billing_address'] = $validated['billing_address'];
+        $shippingAddress['billing_city'] = $validated['billing_city'];
+        $shippingAddress['billing_postal_code'] = $validated['billing_postal_code'];
+        $shippingAddress['country'] = $validated['country'];
+
+        // Update subscription
+        $subscription->update([
+            'shipping_address' => $shippingAddress,
+        ]);
+
+        Log::info('Subscription shipping address updated by admin', [
+            'subscription_id' => $subscription->id,
+            'admin_user_id' => auth()->id(),
+        ]);
+
+        return redirect()->route('admin.subscriptions.show', $subscription)
+            ->with('success', 'Dodací adresa byla úspěšně aktualizována.');
+    }
+
+    /**
      * Cancel the subscription
      */
     public function destroy(Subscription $subscription)
@@ -241,7 +284,7 @@ class SubscriptionController extends Controller
                 'carrier_pickup_point' => $subscription->carrier_pickup_point ?? null,
                 'value' => $value,
                 'weight' => $weight,
-                'order_number' => 'SUB-' . $subscription->id,
+                'order_number' => ($subscription->subscription_number ?? 'SUB-' . $subscription->id) . '-' . $targetDate->format('m'),
                 'note' => $subscription->delivery_notes ?? null,
                 'currency' => $currency,
                 'country' => $shippingCountry,
@@ -253,10 +296,14 @@ class SubscriptionController extends Controller
                 $result = $packetaService->createPacket($packetData);
 
                 if ($result && isset($result['id'])) {
+                    // Get tracking URL from Packeta
+                    $trackingUrl = $this->getPacketaTrackingUrl($result['id']);
+                    
                     // Update subscription with Packeta data
                     // Use target date for last_shipment_date to keep proper shipping schedule
                     $updateData = [
                         'packeta_packet_id' => $result['id'],
+                        'packeta_tracking_url' => $trackingUrl,
                         'packeta_shipment_status' => 'sent',
                         'packeta_sent_at' => now(),
                         'last_shipment_date' => $targetDate,
@@ -269,6 +316,28 @@ class SubscriptionController extends Controller
                     }
                     
                     $subscription->update($updateData);
+
+                    // Send subscription shipped email
+                    try {
+                        $email = $subscription->shipping_address['email'] ?? $subscription->user->email ?? null;
+                        if ($email) {
+                            \Mail::to($email)->send(new \App\Mail\SubscriptionBoxShipped($subscription));
+                            Log::info('Subscription shipped email sent', [
+                                'subscription_id' => $subscription->id,
+                                'email' => $email,
+                            ]);
+                        } else {
+                            Log::warning('No email found for subscription shipped notification', [
+                                'subscription_id' => $subscription->id
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Failed to send subscription shipped email', [
+                            'subscription_id' => $subscription->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        // Don't fail the whole process if email fails
+                    }
 
                     $successCount++;
                     Log::info("Zásilka odeslána do Packety", [
@@ -313,6 +382,88 @@ class SubscriptionController extends Controller
 
         return redirect()->route('admin.subscriptions.shipments')
             ->with('success', $message);
+    }
+
+    /**
+     * Send "Box Preparing" emails to selected subscriptions
+     */
+    public function sendPreparingEmails(Request $request)
+    {
+        $request->validate([
+            'subscription_ids' => 'required|array|min:1',
+            'subscription_ids.*' => 'exists:subscriptions,id',
+        ]);
+
+        $sentCount = 0;
+        $failedCount = 0;
+        $errors = [];
+
+        foreach ($request->subscription_ids as $subscriptionId) {
+            $subscription = Subscription::with('user')->find($subscriptionId);
+
+            if (!$subscription) {
+                $errors[] = "Předplatné #{$subscriptionId}: Nenalezeno";
+                $failedCount++;
+                continue;
+            }
+
+            try {
+                // Get email from shipping address or user
+                $email = $subscription->shipping_address['email'] ?? $subscription->user->email ?? null;
+                
+                if (!$email) {
+                    $errors[] = "Předplatné #{$subscription->id}: Chybí emailová adresa";
+                    $failedCount++;
+                    continue;
+                }
+
+                // Send "Box Preparing" email
+                \Mail::to($email)->send(new \App\Mail\SubscriptionBoxPreparing($subscription));
+                
+                Log::info('Subscription box preparing email sent', [
+                    'subscription_id' => $subscription->id,
+                    'email' => $email,
+                ]);
+
+                $sentCount++;
+            } catch (\Exception $e) {
+                $errors[] = "Předplatné #{$subscription->id}: " . $e->getMessage();
+                $failedCount++;
+                Log::error('Failed to send subscription box preparing email', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Prepare success message
+        $message = '';
+        if ($sentCount > 0) {
+            $message .= "Úspěšně odesláno {$sentCount} " . 
+                ($sentCount === 1 ? 'email' : ($sentCount < 5 ? 'emaily' : 'emailů')) . ". ";
+        }
+        if ($failedCount > 0) {
+            $message .= "{$failedCount} " . 
+                ($failedCount === 1 ? 'email selhal' : ($failedCount < 5 ? 'emaily selhaly' : 'emailů selhalo')) . ". ";
+        }
+
+        if ($failedCount > 0 && count($errors) > 0) {
+            return redirect()->route('admin.subscriptions.shipments')
+                ->with('warning', $message)
+                ->with('errors', $errors);
+        }
+
+        return redirect()->route('admin.subscriptions.shipments')
+            ->with('success', $message);
+    }
+
+    /**
+     * Get Packeta tracking URL from packet ID
+     */
+    private function getPacketaTrackingUrl(string $packetId): string
+    {
+        // Packeta tracking URL format
+        return "https://tracking.packeta.com/cs/?id={$packetId}";
     }
 
     /**

@@ -1448,6 +1448,138 @@ class StripeService
             throw $e;
         }
     }
+
+    /**
+     * Handle payment method attached event (modern Stripe API)
+     */
+    public function handlePaymentMethodAttached(array $paymentMethodData): void
+    {
+        try {
+            $customerId = $paymentMethodData['customer'] ?? null;
+            $paymentMethodId = $paymentMethodData['id'] ?? null;
+
+            if (!$customerId || !$paymentMethodId) {
+                \Log::warning('Payment method attached event missing required data', [
+                    'customer_id' => $customerId,
+                    'payment_method_id' => $paymentMethodId,
+                ]);
+                return;
+            }
+
+            // Find user by Stripe customer ID
+            $user = User::where('stripe_customer_id', $customerId)->first();
+
+            if (!$user) {
+                \Log::warning('User not found for payment method attached event', [
+                    'customer_id' => $customerId,
+                ]);
+                return;
+            }
+
+            // Get payment method details from Stripe
+            $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentMethodId);
+
+            if ($paymentMethod->type === 'card') {
+                $cardBrand = ucfirst($paymentMethod->card->brand);
+                $cardLast4 = $paymentMethod->card->last4;
+
+                // Send notification email
+                try {
+                    \Mail::to($user->email)->send(new \App\Mail\PaymentMethodChanged(
+                        $user,
+                        $cardLast4,
+                        $cardBrand
+                    ));
+
+                    \Log::info('Payment method changed email sent', [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                        'payment_method_id' => $paymentMethodId,
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send payment method changed email', [
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            \Log::info('Payment method attached processed', [
+                'user_id' => $user->id,
+                'customer_id' => $customerId,
+                'payment_method_id' => $paymentMethodId,
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Failed to process payment method attached event', [
+                'error' => $e->getMessage(),
+                'data' => $paymentMethodData,
+            ]);
+        }
+    }
+
+    /**
+     * Handle payment method/source updated event (legacy Stripe API)
+     */
+    public function handlePaymentMethodUpdated(array $sourceData): void
+    {
+        try {
+            $customerId = $sourceData['customer'] ?? null;
+
+            if (!$customerId) {
+                \Log::warning('Payment method updated event missing customer ID');
+                return;
+            }
+
+            // Find user by Stripe customer ID
+            $user = User::where('stripe_customer_id', $customerId)->first();
+
+            if (!$user) {
+                \Log::warning('User not found for payment method updated event', [
+                    'customer_id' => $customerId,
+                ]);
+                return;
+            }
+
+            // Get current payment method details
+            $paymentMethodDetails = $this->getPaymentMethodDetails($customerId);
+
+            if ($paymentMethodDetails && $paymentMethodDetails['type'] === 'card') {
+                $cardBrand = ucfirst($paymentMethodDetails['brand']);
+                $cardLast4 = $paymentMethodDetails['last4'];
+
+                // Send notification email
+                try {
+                    \Mail::to($user->email)->send(new \App\Mail\PaymentMethodChanged(
+                        $user,
+                        $cardLast4,
+                        $cardBrand
+                    ));
+
+                    \Log::info('Payment method changed email sent (legacy event)', [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send payment method changed email (legacy)', [
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            \Log::info('Payment method updated processed (legacy)', [
+                'user_id' => $user->id,
+                'customer_id' => $customerId,
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Failed to process payment method updated event', [
+                'error' => $e->getMessage(),
+                'data' => $sourceData,
+            ]);
+        }
+    }
 }
 
 

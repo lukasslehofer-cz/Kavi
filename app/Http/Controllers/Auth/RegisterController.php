@@ -37,6 +37,18 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
+        // Send welcome email
+        try {
+            \Mail::to($user->email)->send(new \App\Mail\WelcomeEmail($user));
+            \Log::info('Welcome email sent', ['user_id' => $user->id, 'email' => $user->email]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send welcome email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+            // Don't fail registration if email fails
+        }
+
         return redirect()->route('dashboard.index');
     }
 }

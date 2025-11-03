@@ -102,6 +102,15 @@ class PaymentController extends Controller
                     $this->stripeService->handleOrderPaymentFailed($eventData);
                     break;
 
+                case 'payment_method.attached':
+                    $this->stripeService->handlePaymentMethodAttached($eventData);
+                    break;
+
+                case 'customer.source.updated':
+                    // Legacy event for older Stripe integrations
+                    $this->stripeService->handlePaymentMethodUpdated($eventData);
+                    break;
+
                 default:
                     \Log::info('Unhandled webhook event type: ' . $event->type);
             }

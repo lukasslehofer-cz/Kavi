@@ -15,6 +15,47 @@
         </a>
     </div>
 
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+    <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-green-700 font-medium">{{ session('success') }}</p>
+        </div>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-red-700 font-medium">{{ session('error') }}</p>
+        </div>
+    </div>
+    @endif
+
+    @if($errors->any())
+    <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+        <div class="flex items-start">
+            <svg class="w-5 h-5 text-red-500 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <div class="flex-1">
+                <p class="text-red-700 font-medium mb-2">Chyba při zpracování:</p>
+                <ul class="list-disc list-inside text-red-600 text-sm space-y-1">
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
@@ -203,8 +244,14 @@
 
             <!-- Shipping & Packeta -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-200">
+                <div class="p-6 border-b border-gray-200 flex items-center justify-between">
                     <h2 class="font-display text-xl font-bold text-gray-900">Dodací údaje</h2>
+                    <button onclick="openEditAddressModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Upravit adresu
+                    </button>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -406,6 +453,130 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Address Modal -->
+<div id="editAddressModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-8 border w-full max-w-2xl shadow-lg rounded-xl bg-white">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">Upravit dodací adresu</h3>
+            <button onclick="closeEditAddressModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form action="{{ route('admin.subscriptions.update-address', $subscription) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            @php
+                $address = is_string($subscription->shipping_address) 
+                    ? json_decode($subscription->shipping_address, true) 
+                    : ($subscription->shipping_address ?? []);
+            @endphp
+
+            <div class="space-y-4">
+                <!-- Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Jméno a příjmení *</label>
+                    <input type="text" name="name" value="{{ $address['name'] ?? '' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <input type="email" name="email" value="{{ $address['email'] ?? $subscription->user->email ?? '' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Telefon *</label>
+                    <input type="tel" name="phone" value="{{ $address['phone'] ?? '' }}" required
+                           placeholder="+420 123 456 789"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- Billing Address -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Fakturační adresa *</label>
+                    <input type="text" name="billing_address" value="{{ $address['billing_address'] ?? $address['address'] ?? '' }}" required
+                           placeholder="Ulice a číslo popisné"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <!-- City and Postal Code -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Město *</label>
+                        <input type="text" name="billing_city" value="{{ $address['billing_city'] ?? $address['city'] ?? '' }}" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">PSČ *</label>
+                        <input type="text" name="billing_postal_code" value="{{ $address['billing_postal_code'] ?? $address['postal_code'] ?? '' }}" required
+                               placeholder="123 45"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <!-- Country -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Země *</label>
+                    <select name="country" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="CZ" {{ ($address['country'] ?? 'CZ') === 'CZ' ? 'selected' : '' }}>Česká republika</option>
+                        <option value="SK" {{ ($address['country'] ?? '') === 'SK' ? 'selected' : '' }}>Slovensko</option>
+                        <option value="PL" {{ ($address['country'] ?? '') === 'PL' ? 'selected' : '' }}>Polsko</option>
+                        <option value="HU" {{ ($address['country'] ?? '') === 'HU' ? 'selected' : '' }}>Maďarsko</option>
+                        <option value="AT" {{ ($address['country'] ?? '') === 'AT' ? 'selected' : '' }}>Rakousko</option>
+                        <option value="DE" {{ ($address['country'] ?? '') === 'DE' ? 'selected' : '' }}>Německo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-6 flex items-center justify-end gap-3">
+                <button type="button" onclick="closeEditAddressModal()"
+                        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                    Zrušit
+                </button>
+                <button type="submit"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Uložit změny
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditAddressModal() {
+    document.getElementById('editAddressModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEditAddressModal() {
+    document.getElementById('editAddressModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEditAddressModal();
+    }
+});
+
+// Close modal on background click
+document.getElementById('editAddressModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditAddressModal();
+    }
+});
+</script>
+
 @endsection
 
 
