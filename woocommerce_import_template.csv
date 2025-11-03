@@ -1,0 +1,5 @@
+wc_user_id,email,name,phone,address,city,postal_code,country,stripe_customer_id,wc_subscription_id,stripe_subscription_id,status,start_date,next_payment_date,price,frequency_months,delivery_notes,configuration
+123,jan.novak@example.com,Jan Novák,+420123456789,Hlavní 123,Praha,12000,CZ,cus_XXXXXXXXXX,456,sub_YYYYYYYYYY,active,2024-01-01,2025-12-15,899,1,Prosím zvonit před doručením,"{'frequency':1,'coffees':[]}"
+124,petra.svobodova@example.com,Petra Svobodová,+420987654321,Nová 45,Brno,60200,CZ,cus_XXXXXXXXXX,457,sub_YYYYYYYYYY,active,2024-02-15,2025-12-15,899,1,,"{'frequency':1,'coffees':[]}"
+
+

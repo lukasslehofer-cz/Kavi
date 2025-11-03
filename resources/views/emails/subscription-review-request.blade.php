@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>Jak se vám líbila káva?</title>
+    <title>Jak se vám líbí naše služby?</title>
     <style>
         /* Reset styles */
         body, table, td, a { 
@@ -96,31 +96,6 @@
             margin: 4px 0;
         }
         
-        /* Order items */
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .order-item:last-child {
-            border-bottom: none;
-        }
-        
-        .item-name {
-            font-weight: 600;
-            color: #111827;
-            font-size: 14px;
-        }
-        
-        .item-roastery {
-            font-size: 13px;
-            color: #6b7280;
-            margin-top: 2px;
-        }
-        
         .button {
             display: inline-block;
             background-color: #e6305a;
@@ -136,31 +111,6 @@
         
         .button:hover {
             background-color: #d12a51;
-        }
-        
-        .rating-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin: 24px 0;
-        }
-        
-        .star-button {
-            width: 48px;
-            height: 48px;
-            background-color: #fef3c7;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            font-size: 24px;
-            transition: all 0.2s;
-        }
-        
-        .star-button:hover {
-            background-color: #fde047;
-            transform: scale(1.1);
         }
         
         .footer {
@@ -204,12 +154,6 @@
             .footer {
                 padding: 24px !important;
             }
-            
-            .star-button {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
         }
         
         /* Force light mode - prevent auto color inversion */
@@ -225,10 +169,10 @@
                 background-color: #f9fafb !important;
                 border: 1px solid #d1d5db !important;
             }
-            h1, .info-title, .item-name {
+            h1, .info-title {
                 color: #111827 !important;
             }
-            .subtitle, .info-text, .item-roastery {
+            .subtitle, .info-text {
                 color: #4b5563 !important;
             }
             .header {
@@ -275,37 +219,40 @@
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">Jak se vám líbila káva? ⭐</h1>
-                            <p class="subtitle" style="text-align: center;">Vaše zpětná vazba nám pomáhá zlepšovat naši nabídku.</p>
+                            <h1 style="text-align: center;">Jak se vám líbí naše služby? ⭐</h1>
+                            <p class="subtitle" style="text-align: center;">Vaše zpětná vazba nám pomáhá zlepšovat naši nabídku kávy a služeb.</p>
                             
-                            <!-- Order Number -->
+                            <!-- Subscription Info -->
                             <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
-                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">Objednávka</div>
-                                <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $order->order_number }}</div>
+                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">Vaše předplatné</div>
+                                <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $subscription->subscription_number }}</div>
+                                @if($subscription->plan)
+                                <div style="font-size: 14px; color: #6b7280; margin-top: 4px;">{{ $subscription->plan->name }}</div>
+                                @endif
                             </div>
                             
-                            <!-- What was ordered -->
+                            <!-- What they've received -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">☕ Co jste ochutnali</h3>
-                                @foreach($order->items as $item)
-                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
-                                    <tr>
-                                        <td style="padding: 0; vertical-align: top;">
-                                            <div class="item-name" style="font-weight: 600; color: #111827; font-size: 14px;">{{ $item->product_name }}</div>
-                                            @if($item->product && $item->product->roastery)
-                                            <div class="item-roastery" style="font-size: 13px; color: #6b7280; margin-top: 2px;">{{ $item->product->roastery->name }}</div>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                </table>
-                                @endforeach
+                                <h3 class="info-title">📦 Co jste již obdrželi</h3>
+                                <p class="info-text" style="color: #111827;">
+                                    @if($deliveredOrdersCount > 0)
+                                        <strong>{{ $deliveredOrdersCount }} {{ $deliveredOrdersCount == 1 ? 'kávový box' : ($deliveredOrdersCount < 5 ? 'kávové boxy' : 'kávových boxů') }}</strong>
+                                    @else
+                                        Právě jste si vytvořili předplatné
+                                    @endif
+                                </p>
+                                @if($subscription->starts_at)
+                                <p class="info-text">
+                                    Členem jste od: <strong>{{ $subscription->starts_at->format('d.m.Y') }}</strong>
+                                </p>
+                                @endif
                             </div>
                             
                             <!-- Rating Request -->
                             <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #fbbf24 !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e; text-align: center;">Ohodnoťte svou zkušenost</h3>
+                                <h3 class="info-title" style="color: #92400e; text-align: center;">Ohodnoťte naše služby</h3>
                                 <p class="info-text" style="color: #78350f; text-align: center; margin-bottom: 16px;">
-                                    Jak byste ohodnotili kvalitu kávy a naše služby?
+                                    Jak byste ohodnotili kvalitu naší kávy, pravidelnost dodávek a celkové služby?
                                 </p>
                             </div>
                             
@@ -313,9 +260,9 @@
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
                                 <h3 class="info-title" style="color: #065f46;">💚 Proč je vaše hodnocení důležité</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    • Pomáháte ostatním kávovarům s výběrem<br>
-                                    • Dáváte nám vědět, co děláme dobře<br>
+                                    • Pomáháte ostatním zákazníkům s výběrem<br>
                                     • Inspirujete nás ke zlepšení<br>
+                                    • Podporujete českou kvalitní kávu<br>
                                     • Vaše hodnocení je transparentní a veřejné
                                 </p>
                             </div>
@@ -332,18 +279,18 @@
                             
                             <!-- Explore More -->
                             <div style="background-color: #f9fafb; border-radius: 12px; padding: 20px; margin: 32px 0; text-align: center;">
-                                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">Objevujte další kávy</h3>
+                                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">Prozkoumejte naši nabídku</h3>
                                 <p style="font-size: 14px; color: #6b7280; margin-bottom: 16px; font-weight: 300;">
-                                    Máme pro vás desítky dalších výběrových káv z českých pražíren
+                                    Máme pro vás desítky dalších výběrových káv
                                 </p>
                                 <a href="{{ route('products.index') }}" style="display: inline-block; background-color: #111827; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 9999px; font-weight: 600; font-size: 14px;">
-                                    Prohlédnout nabídku
+                                    Prohlédnout obchod
                                 </a>
                             </div>
                             
                             <!-- Additional Info -->
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
-                                Máte dotazy? Kontaktujte nás na 
+                                Máte dotazy nebo připomínky? Kontaktujte nás na 
                                 <a href="mailto:info@kavi.cz" style="color: #e6305a; text-decoration: none;">info@kavi.cz</a>
                             </p>
                             

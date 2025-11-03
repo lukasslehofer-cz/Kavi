@@ -43,6 +43,9 @@ Route::post('/newsletter/prihlasit', [NewsletterController::class, 'subscribe'])
 // Contact form submission
 Route::post('/kontakt/odeslat', [ContactController::class, 'send'])->name('contact.send');
 
+// Review tracking (redirect to Trustpilot)
+Route::get('/hodnoceni/{token}', [\App\Http\Controllers\ReviewRequestController::class, 'track'])->name('review.track');
+
 // Products
 Route::get('/produkty', [ProductController::class, 'index'])->name('products.index');
 Route::get('/produkt/{product}', [ProductController::class, 'show'])->name('products.show');

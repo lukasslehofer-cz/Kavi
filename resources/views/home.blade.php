@@ -445,9 +445,21 @@
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header - Minimal -->
-    <div class="mb-20 max-w-2xl">
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Co říkají naši zákazníci</h2>
-      <p class="text-xl text-gray-600 font-light">Přidejte se k řadě spokojených milovníků kávy</p>
+    <div class="mb-20">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 max-w-full">
+        <div class="max-w-2xl">
+          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Co říkají naši zákazníci</h2>
+          <p class="text-xl text-gray-600 font-light">Přidejte se k řadě spokojených milovníků kávy</p>
+        </div>
+        
+        <!-- TrustBox widget - Review Collector -->
+        <div class="w-full md:w-auto md:flex-shrink-0">
+          <div class="trustpilot-widget" data-locale="cs-CZ" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="69092043c7aae452ccbb5a2e" data-style-height="52px" data-style-width="100%" data-token="8f005bc4-b948-4d5e-84f8-7a589f14404d">
+            <a href="https://www.trustpilot.com/review/kavi.cz" target="_blank" rel="noopener">Trustpilot</a>
+          </div>
+        </div>
+        <!-- End TrustBox widget -->
+      </div>
     </div>
 
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">

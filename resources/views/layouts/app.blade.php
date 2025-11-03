@@ -7,6 +7,10 @@
     <title>@yield('title', 'Kávové předplatné | Výběrová káva | KAVI.cz')</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- TrustBox script -->
+    <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+    <!-- End TrustBox script -->
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Top Announcement Banner - Dark Minimal -->
