@@ -97,7 +97,7 @@
           <!-- Product Photo -->
           <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 mb-6">
             @php
-              // Check if promo image is from storage or public directory
+              // For backward compatibility: old images start with 'promo-images/' (storage), new ones with 'images/promo-images/' (public)
               $imageSrc = str_starts_with($promoImage, 'promo-images/') 
                   ? asset('storage/' . $promoImage) 
                   : asset($promoImage);

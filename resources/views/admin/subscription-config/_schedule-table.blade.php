@@ -135,16 +135,16 @@
                         
                         @if($isPast)
                             @if($schedule->promo_image)
-                                <img src="{{ asset('storage/' . $schedule->promo_image) }}" alt="Promo" class="w-full rounded border border-gray-300">
+                                <img src="{{ asset($schedule->promo_image) }}" alt="Promo" class="w-full rounded border border-gray-300">
                             @else
                                 <div class="text-gray-500">—</div>
                             @endif
                         @else
                             @if($schedule->promo_image)
                                 <div class="mb-3">
-                                    <img src="{{ asset('storage/' . $schedule->promo_image) }}" alt="Promo" class="w-full rounded border border-gray-300 mb-2">
+                                    <img src="{{ asset($schedule->promo_image) }}" alt="Promo" class="w-full rounded border border-gray-300 mb-2">
                                     <div class="flex gap-2">
-                                        <a href="{{ asset('storage/' . $schedule->promo_image) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
+                                        <a href="{{ asset($schedule->promo_image) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
                                             Zobrazit
                                         </a>
                                         <button 

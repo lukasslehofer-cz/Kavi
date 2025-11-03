@@ -59,3 +59,5 @@ deploy.log
 !/public/images/products/.gitkeep
 /public/images/roasteries/*
 !/public/images/roasteries/.gitkeep
+/public/images/promo-images/*
+!/public/images/promo-images/.gitkeep

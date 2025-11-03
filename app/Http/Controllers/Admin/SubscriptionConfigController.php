@@ -166,12 +166,15 @@ class SubscriptionConfigController extends Controller
                         'size' => $file->getSize(),
                     ]);
                     
-                    $path = $file->store('promo-images', 'public');
-                    
                     // Delete old image if exists
-                    if ($schedule->promo_image && \Storage::disk('public')->exists($schedule->promo_image)) {
-                        \Storage::disk('public')->delete($schedule->promo_image);
+                    if ($schedule->promo_image && file_exists(public_path($schedule->promo_image))) {
+                        unlink(public_path($schedule->promo_image));
                     }
+                    
+                    // Upload to public/images/promo-images (same as products)
+                    $filename = time() . '_' . $scheduleId . '_' . $file->getClientOriginalName();
+                    $file->move(public_path('images/promo-images'), $filename);
+                    $path = 'images/promo-images/' . $filename;
                     
                     $schedule->update(['promo_image' => $path]);
                     
@@ -258,14 +261,16 @@ class SubscriptionConfigController extends Controller
         // Handle promo image upload
         if ($request->hasFile('promo_image') && $request->file('promo_image')->isValid()) {
             $file = $request->file('promo_image');
-            $path = $file->store('promo-images', 'public');
             
             // Delete old image if exists
-            if ($schedule->promo_image && \Storage::disk('public')->exists($schedule->promo_image)) {
-                \Storage::disk('public')->delete($schedule->promo_image);
+            if ($schedule->promo_image && file_exists(public_path($schedule->promo_image))) {
+                unlink(public_path($schedule->promo_image));
             }
             
-            $validated['promo_image'] = $path;
+            // Upload to public/images/promo-images (same as products)
+            $filename = time() . '_' . $schedule->id . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/promo-images'), $filename);
+            $validated['promo_image'] = 'images/promo-images/' . $filename;
         }
 
         $schedule->update($validated);
@@ -310,8 +315,8 @@ class SubscriptionConfigController extends Controller
             ], 403);
         }
 
-        if ($schedule->promo_image && \Storage::disk('public')->exists($schedule->promo_image)) {
-            \Storage::disk('public')->delete($schedule->promo_image);
+        if ($schedule->promo_image && file_exists(public_path($schedule->promo_image))) {
+            unlink(public_path($schedule->promo_image));
         }
 
         $schedule->update(['promo_image' => null]);
