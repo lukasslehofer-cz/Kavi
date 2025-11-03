@@ -275,7 +275,7 @@
                                 <select 
                                     id="selected_subscription_id" 
                                     name="selected_subscription_id" 
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                                    class="w-full px-4 py-2.5 border border-purple-200 rounded-xl focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-all"
                                 >
                                     @foreach($availableSubscriptions as $subInfo)
                                     <option 
@@ -304,7 +304,7 @@
                             @endif
 
                             <!-- Slot indicator -->
-                            <div id="addon-slots-info">
+                            <div id="addon-slots-info" class="py-4">
                                 @php
                                     $firstSub = $availableSubscriptions[0];
                                     $cartQuantity = array_sum(session()->get('cart', []));
@@ -321,7 +321,7 @@
                                             @if($i < $firstSub['used_slots'])
                                                 <div class="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center text-white text-xs font-bold" title="Použitý slot">✓</div>
                                             @elseif($i < $firstSub['used_slots'] + $cartQuantity)
-                                                <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white text-xs font-bold" title="Košík">🛒</div>
+                                                <div class="w-10 h-10 border-2 border-purple-500 rounded-lg flex items-center justify-center text-white text-xs font-bold" title="Košík">🛒</div>
                                             @else
                                                 <div class="w-10 h-10 border-2 border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-xs" title="Volný slot">○</div>
                                             @endif
