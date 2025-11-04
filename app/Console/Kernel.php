@@ -12,10 +12,42 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        // ============================================
+        // SUBSCRIPTION BILLING (Custom Billing System)
+        // ============================================
+        
+        // Charge subscription payments (primary run at midnight)
+        $schedule->command('subscriptions:charge-payments')
+            ->dailyAt('00:00')
+            ->timezone('Europe/Prague')
+            ->withoutOverlapping(10) // Prevent concurrent runs
+            ->appendOutputTo(storage_path('logs/subscription-billing.log'));
+
+        // Backup billing run (in case midnight run failed)
+        $schedule->command('subscriptions:charge-payments')
+            ->dailyAt('06:00')
+            ->timezone('Europe/Prague')
+            ->withoutOverlapping(10)
+            ->when(function () {
+                // Only run if midnight run didn't complete successfully
+                $lastRun = \Cache::get('subscription_billing_cron_last_run');
+                return !$lastRun || $lastRun->isYesterday();
+            });
+
+        // Monitor billing system health (hourly during business hours)
+        $schedule->command('subscriptions:monitor-billing')
+            ->hourly()
+            ->between('08:00', '20:00')
+            ->timezone('Europe/Prague');
+
         // Send payment reminders 3 days before billing date (daily at 9:00 AM)
         $schedule->command('subscriptions:send-payment-reminders')
             ->dailyAt('09:00')
             ->timezone('Europe/Prague');
+
+        // ============================================
+        // OTHER SCHEDULED TASKS
+        // ============================================
 
         // Send Trustpilot review requests (daily at 10:00 AM)
         $schedule->command('reviews:send')

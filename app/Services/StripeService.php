@@ -229,6 +229,7 @@ class StripeService
 
     /**
      * Create checkout session for custom configured subscription
+     * CUSTOM BILLING: Uses one-time payment + saves card for future recurring payments
      */
     public function createConfiguredSubscriptionCheckoutSession(
         ?User $user, 
@@ -241,6 +242,7 @@ class StripeService
     ): StripeSession {
         // Prepare metadata for subscription (includes Packeta and delivery_notes)
         $subscriptionMetadata = [
+            'type' => 'custom_billing_subscription', // Mark as custom billing
             'configuration' => json_encode($configuration),
             'configured_price' => $price,
             'shipping_address' => json_encode([
@@ -272,41 +274,85 @@ class StripeService
         // Get base product ID for all subscriptions
         $productId = $this->getOrCreateBaseSubscriptionProduct();
 
-        // Create session with dynamic pricing (price_data instead of fixed price ID)
+        // Calculate next billing date (15th of month based on today)
+        $frequencyMonths = $configuration['frequency'] ?? 1;
+        $nextBillingDate = $this->calculateFirstBillingDate($frequencyMonths);
+        $subscriptionMetadata['next_billing_date'] = $nextBillingDate->toDateString();
+        $subscriptionMetadata['frequency_months'] = $frequencyMonths;
+
+        // Build product description
+        $boxSize = ['2' => 'M Box (2× 250g)', '3' => 'L Box (3× 250g)', '4' => 'XL Box (4× 250g)'];
+        $boxType = ['espresso' => 'Espresso', 'filter' => 'Filtr', 'mix' => 'Mix'];
+        $productName = ($boxSize[$configuration['amount']] ?? 'Box') . ' - ' . ($boxType[$configuration['type']] ?? 'Káva');
+        if ($configuration['isDecaf'] ?? false) {
+            $productName .= ' + Decaf';
+        }
+        $productName .= ' (První platba)';
+
+        // Create session with ONE-TIME payment + save payment method for future
         $sessionData = [
             'payment_method_types' => ['card'],
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'czk',
                     'product' => $productId,
-                    'recurring' => [
-                        'interval' => 'month',
-                        'interval_count' => $configuration['frequency'] ?? 1,
-                    ],
                     'unit_amount' => (int)($price * 100), // Convert to haléře
+                    'product_data' => [
+                        'name' => $productName,
+                        'description' => 'První platba předplatného (pokryje období do ' . $nextBillingDate->format('d.m.Y') . ')',
+                    ],
                 ],
                 'quantity' => 1,
             ]],
-            'mode' => 'subscription',
-            'success_url' => route('subscriptions.checkout') . '?session_id={CHECKOUT_SESSION_ID}&success=1',
-            'cancel_url' => route('subscriptions.checkout'),
-            // Metadata on subscription (this is what gets passed to webhook!)
-            'subscription_data' => [
+            'mode' => 'payment', // ONE-TIME payment, NOT subscription!
+            'payment_intent_data' => [
+                'setup_future_usage' => 'off_session', // Save card for future automated payments
                 'metadata' => $subscriptionMetadata,
             ],
+            'success_url' => route('subscriptions.checkout') . '?session_id={CHECKOUT_SESSION_ID}&success=1',
+            'cancel_url' => route('subscriptions.checkout'),
         ];
 
         // Add customer if user is authenticated
         if ($user) {
             $sessionData['customer'] = $this->getOrCreateCustomer($user);
-            $sessionData['subscription_data']['metadata']['user_id'] = $user->id;
+            $sessionData['payment_intent_data']['metadata']['user_id'] = $user->id;
         } else {
             // Guest checkout - use customer email
             $sessionData['customer_email'] = $shippingAddress['email'];
-            $sessionData['subscription_data']['metadata']['guest_email'] = $shippingAddress['email'];
+            $subscriptionMetadata['guest_email'] = $shippingAddress['email'];
         }
 
+        \Log::info('Creating custom billing subscription checkout', [
+            'user_id' => $user?->id,
+            'price' => $price,
+            'next_billing_date' => $nextBillingDate->toDateString(),
+            'frequency_months' => $frequencyMonths,
+        ]);
+
         return StripeSession::create($sessionData);
+    }
+
+    /**
+     * Calculate first billing date for custom billing subscriptions
+     * Uses ShipmentSchedule billing_date from admin konfigurator
+     * 
+     * Logic:
+     * - Find next billing_date after today from ShipmentSchedule
+     * - Apply frequency offset if > 1 month
+     * - Fallback to 15th of month if schedule missing
+     */
+    private function calculateFirstBillingDate(int $frequencyMonths): \Carbon\Carbon
+    {
+        $billingDate = \App\Models\ShipmentSchedule::getFirstBillingDateWithFrequency($frequencyMonths);
+        
+        \Log::info('Calculated first billing date from ShipmentSchedule', [
+            'frequency_months' => $frequencyMonths,
+            'billing_date' => $billingDate->toDateString(),
+            'today' => \Carbon\Carbon::now()->toDateString(),
+        ]);
+        
+        return $billingDate;
     }
 
     /**
@@ -455,6 +501,12 @@ class StripeService
      */
     public function handlePaymentSuccess(array $session): void
     {
+        // CUSTOM BILLING: Handle new subscription with custom billing cycle
+        if (isset($session['payment_intent']) && isset($session['metadata']['type']) && $session['metadata']['type'] === 'custom_billing_subscription') {
+            $this->handleCustomBillingSubscriptionPayment($session);
+            return;
+        }
+        
         // Handle subscription checkout - store session_id for later use
         if (isset($session['mode']) && $session['mode'] === 'subscription' && isset($session['subscription'])) {
             $stripeSubscriptionId = $session['subscription'];
@@ -823,6 +875,202 @@ class StripeService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'data' => $subscriptionRecord ?? [],
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Handle custom billing subscription payment (first payment)
+     * Creates subscription record in DB without Stripe subscription object
+     */
+    private function handleCustomBillingSubscriptionPayment(array $session): void
+    {
+        \Log::info('Handling custom billing subscription payment', [
+            'session_id' => $session['id'],
+            'payment_intent' => $session['payment_intent'],
+        ]);
+
+        try {
+            // Get payment intent to access metadata
+            $paymentIntent = \Stripe\PaymentIntent::retrieve($session['payment_intent']);
+            $metadata = $paymentIntent->metadata->toArray();
+
+            // Extract subscription data from metadata
+            $userId = $metadata['user_id'] ?? null;
+            $guestEmail = $metadata['guest_email'] ?? null;
+            $configuration = isset($metadata['configuration']) ? json_decode($metadata['configuration'], true) : null;
+            $shippingAddress = isset($metadata['shipping_address']) ? json_decode($metadata['shipping_address'], true) : null;
+
+            if (!$userId && !$guestEmail) {
+                throw new \Exception('No user_id or guest_email in payment intent metadata');
+            }
+
+            // Check for duplicate (idempotency)
+            $existingSubscription = Subscription::where('stripe_payment_intent_id', $paymentIntent->id)->first();
+            if ($existingSubscription) {
+                \Log::info('Subscription already exists for this payment intent', [
+                    'subscription_id' => $existingSubscription->id,
+                ]);
+                return;
+            }
+
+            // Build subscription record
+            $subscriptionRecord = [
+                'subscription_number' => Subscription::generateSubscriptionNumber(),
+                'user_id' => $userId,
+                'stripe_payment_intent_id' => $paymentIntent->id, // Store first payment intent
+                'stripe_session_id' => $session['id'],
+                'stripe_subscription_id' => null, // No Stripe subscription object!
+                'status' => 'active',
+                'starts_at' => now(),
+                'next_billing_date' => isset($metadata['next_billing_date']) 
+                    ? \Carbon\Carbon::parse($metadata['next_billing_date'])
+                    : now()->addMonth()->setDay(15),
+                'frequency_months' => $metadata['frequency_months'] ?? 1,
+                'configuration' => $configuration,
+                'configured_price' => $metadata['configured_price'] ?? null,
+                'shipping_address' => $shippingAddress,
+            ];
+
+            // Add Packeta data if available
+            if (isset($metadata['packeta_point_id'])) {
+                $subscriptionRecord['packeta_point_id'] = $metadata['packeta_point_id'];
+                $subscriptionRecord['packeta_point_name'] = $metadata['packeta_point_name'] ?? null;
+                $subscriptionRecord['packeta_point_address'] = $metadata['packeta_point_address'] ?? null;
+                $subscriptionRecord['carrier_id'] = $metadata['carrier_id'] ?? null;
+                $subscriptionRecord['carrier_pickup_point'] = $metadata['carrier_pickup_point'] ?? null;
+            }
+
+            // Add delivery notes if available
+            if (isset($metadata['delivery_notes'])) {
+                $subscriptionRecord['delivery_notes'] = $metadata['delivery_notes'];
+            }
+
+            // Add coupon info if available
+            if (isset($metadata['coupon_id'])) {
+                $subscriptionRecord['coupon_id'] = $metadata['coupon_id'];
+                $subscriptionRecord['coupon_code'] = $metadata['coupon_code'] ?? null;
+                $subscriptionRecord['discount_amount'] = $metadata['discount_amount'] ?? 0;
+                $subscriptionRecord['discount_months_total'] = $metadata['discount_months_total'] ?? null;
+                $subscriptionRecord['discount_months_remaining'] = $metadata['discount_months_remaining'] ?? null;
+            }
+
+            \Log::info('Creating custom billing subscription record', $subscriptionRecord);
+            $subscription = Subscription::create($subscriptionRecord);
+            \Log::info('Custom billing subscription created successfully', ['id' => $subscription->id]);
+
+            // Record the first payment
+            \App\Models\SubscriptionPayment::create([
+                'subscription_id' => $subscription->id,
+                'stripe_payment_intent_id' => $paymentIntent->id,
+                'amount' => $paymentIntent->amount / 100, // Convert from cents
+                'currency' => $paymentIntent->currency,
+                'status' => 'paid',
+                'paid_at' => now(),
+                'period_start' => now(),
+                'period_end' => $subscription->next_billing_date,
+            ]);
+
+            // Add customer email to newsletter
+            try {
+                $email = $shippingAddress['email'] ?? $guestEmail;
+                if ($email) {
+                    NewsletterSubscriber::firstOrCreate(
+                        ['email' => $email],
+                        [
+                            'source' => 'customer',
+                            'user_id' => $subscription->user_id,
+                        ]
+                    );
+                    \Log::info('Added subscription email to newsletter', ['email' => $email]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to add subscription email to newsletter: ' . $e->getMessage());
+            }
+
+            // Create user account for guest subscriptions
+            if (!$userId && $guestEmail) {
+                try {
+                    $name = $shippingAddress['name'] ?? 'Zákazník';
+                    
+                    // Check if user already exists
+                    $existingUser = User::where('email', $guestEmail)->first();
+                    
+                    if (!$existingUser) {
+                        $newUser = User::create([
+                            'name' => $name,
+                            'email' => $guestEmail,
+                            'password' => \Hash::make(\Str::random(32)),
+                            'password_set_by_user' => false,
+                            'phone' => $shippingAddress['phone'] ?? null,
+                            'address' => $shippingAddress['billing_address'] ?? null,
+                            'city' => $shippingAddress['billing_city'] ?? null,
+                            'postal_code' => $shippingAddress['billing_postal_code'] ?? null,
+                            'packeta_point_id' => $subscription->packeta_point_id ?? null,
+                            'packeta_point_name' => $subscription->packeta_point_name ?? null,
+                            'packeta_point_address' => $subscription->packeta_point_address ?? null,
+                        ]);
+                        
+                        // Update Stripe customer with user ID
+                        $customerId = $paymentIntent->customer;
+                        if ($customerId) {
+                            $newUser->update(['stripe_customer_id' => $customerId]);
+                        }
+                        
+                        // Link subscription to the new user
+                        $subscription->update(['user_id' => $newUser->id]);
+                        
+                        \Log::info('Created user account for guest custom billing subscription', [
+                            'user_id' => $newUser->id,
+                            'subscription_id' => $subscription->id
+                        ]);
+                    } else {
+                        // Link subscription to existing user
+                        $subscription->update(['user_id' => $existingUser->id]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create user account for guest subscription: ' . $e->getMessage());
+                }
+            }
+
+            // Send subscription confirmation email
+            try {
+                $email = $shippingAddress['email'] ?? $guestEmail;
+                if (!$email && $subscription->user) {
+                    $email = $subscription->user->email;
+                }
+                
+                if ($email) {
+                    \Mail::to($email)->send(new \App\Mail\SubscriptionConfirmation($subscription));
+                    \Log::info('Custom billing subscription confirmation email sent', [
+                        'subscription_id' => $subscription->id,
+                        'email' => $email,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send subscription confirmation email: ' . $e->getMessage());
+            }
+
+            // Create Fakturoid invoice for first payment
+            try {
+                $payment = $subscription->payments()->first();
+                if ($payment) {
+                    $fakturoidService = app(\App\Services\FakturoidService::class);
+                    $fakturoidService->processInvoiceForSubscriptionPayment($payment);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to create Fakturoid invoice for first payment', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Failed to create custom billing subscription', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'session_id' => $session['id'],
             ]);
             throw $e;
         }
@@ -1579,6 +1827,233 @@ class StripeService
                 'data' => $sourceData,
             ]);
         }
+    }
+
+    /**
+     * Charge subscription payment using saved payment method
+     * This is the core method for custom billing cycle management
+     * 
+     * @param Subscription $subscription The subscription to charge
+     * @return array ['success' => bool, 'payment_intent_id' => string|null, 'error' => string|null]
+     */
+    public function chargeSubscriptionPayment(Subscription $subscription): array
+    {
+        // Idempotency check - has this been charged today already?
+        if ($subscription->payments()->whereDate('paid_at', today())->exists()) {
+            \Log::warning('Subscription already charged today - skipping', [
+                'subscription_id' => $subscription->id,
+                'subscription_number' => $subscription->subscription_number,
+            ]);
+            return [
+                'success' => false,
+                'payment_intent_id' => null,
+                'error' => 'already_charged_today',
+            ];
+        }
+
+        try {
+            // Get user and customer
+            $user = $subscription->user;
+            if (!$user) {
+                throw new \Exception('Subscription has no user');
+            }
+
+            $customerId = $user->stripe_customer_id;
+            if (!$customerId) {
+                throw new \Exception('User has no Stripe customer ID');
+            }
+
+            // Get saved payment method
+            $paymentMethodId = $this->getCustomerDefaultPaymentMethod($customerId);
+            if (!$paymentMethodId) {
+                throw new \Exception('No payment method found for customer');
+            }
+
+            // Calculate amount (with coupon discount if applicable)
+            $amount = $subscription->configured_price ?? $subscription->plan?->price ?? 0;
+            if ($subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) {
+                $amount -= $subscription->discount_amount;
+            }
+
+            \Log::info('Attempting to charge subscription', [
+                'subscription_id' => $subscription->id,
+                'subscription_number' => $subscription->subscription_number,
+                'customer_id' => $customerId,
+                'payment_method_id' => $paymentMethodId,
+                'amount' => $amount,
+            ]);
+
+            // Create and confirm payment intent
+            $paymentIntent = \Stripe\PaymentIntent::create([
+                'amount' => (int)($amount * 100), // Convert to cents
+                'currency' => 'czk',
+                'customer' => $customerId,
+                'payment_method' => $paymentMethodId,
+                'confirm' => true,
+                'off_session' => true, // Important: tells Stripe this is automated
+                'description' => 'Kávové předplatné - ' . ($subscription->subscription_number ?? '#' . $subscription->id),
+                'metadata' => [
+                    'subscription_id' => $subscription->id,
+                    'subscription_number' => $subscription->subscription_number ?? '',
+                    'billing_date' => now()->toDateString(),
+                ],
+            ]);
+
+            // Check if payment succeeded
+            if ($paymentIntent->status === 'succeeded') {
+                // Record successful payment
+                $payment = \App\Models\SubscriptionPayment::create([
+                    'subscription_id' => $subscription->id,
+                    'stripe_payment_intent_id' => $paymentIntent->id,
+                    'amount' => $amount,
+                    'currency' => 'czk',
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'period_start' => $subscription->next_billing_date?->copy()->subMonths($subscription->frequency_months ?? 1),
+                    'period_end' => $subscription->next_billing_date,
+                ]);
+
+                // Update subscription
+                $frequencyMonths = $subscription->frequency_months ?? 1;
+                $nextBillingDate = $this->calculateNextBillingDate($subscription->next_billing_date, $frequencyMonths);
+
+                $subscription->update([
+                    'next_billing_date' => $nextBillingDate,
+                    'payment_failure_count' => 0,
+                    'last_payment_failure_at' => null,
+                    'last_payment_failure_reason' => null,
+                    'pending_invoice_id' => null,
+                    'pending_invoice_amount' => null,
+                ]);
+
+                // Handle coupon countdown
+                if ($subscription->discount_months_remaining > 0) {
+                    $subscription->decrement('discount_months_remaining');
+                }
+
+                // Create Fakturoid invoice
+                try {
+                    $fakturoidService = app(\App\Services\FakturoidService::class);
+                    $fakturoidService->processInvoiceForSubscriptionPayment($payment);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create Fakturoid invoice', [
+                        'payment_id' => $payment->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Don't fail the whole payment if Fakturoid fails
+                }
+
+                \Log::info('Subscription payment successful', [
+                    'subscription_id' => $subscription->id,
+                    'payment_id' => $payment->id,
+                    'payment_intent_id' => $paymentIntent->id,
+                    'next_billing_date' => $nextBillingDate->toDateString(),
+                ]);
+
+                return [
+                    'success' => true,
+                    'payment_intent_id' => $paymentIntent->id,
+                    'error' => null,
+                ];
+            } else {
+                // Payment requires action (3D Secure, etc.)
+                throw new \Exception('Payment requires additional action: ' . $paymentIntent->status);
+            }
+
+        } catch (\Stripe\Exception\CardException $e) {
+            // Card was declined
+            $errorMessage = $e->getMessage();
+            
+            \Log::error('Subscription payment card declined', [
+                'subscription_id' => $subscription->id,
+                'error' => $errorMessage,
+            ]);
+
+            $this->handleSubscriptionPaymentFailure($subscription, $errorMessage);
+
+            return [
+                'success' => false,
+                'payment_intent_id' => null,
+                'error' => $errorMessage,
+            ];
+
+        } catch (\Exception $e) {
+            // Other error
+            $errorMessage = $e->getMessage();
+            
+            \Log::error('Subscription payment failed', [
+                'subscription_id' => $subscription->id,
+                'error' => $errorMessage,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            $this->handleSubscriptionPaymentFailure($subscription, $errorMessage);
+
+            return [
+                'success' => false,
+                'payment_intent_id' => null,
+                'error' => $errorMessage,
+            ];
+        }
+    }
+
+    /**
+     * Handle subscription payment failure
+     */
+    private function handleSubscriptionPaymentFailure(Subscription $subscription, string $errorMessage): void
+    {
+        $failureCount = $subscription->payment_failure_count + 1;
+
+        $subscription->update([
+            'status' => 'unpaid',
+            'payment_failure_count' => $failureCount,
+            'last_payment_failure_at' => now(),
+            'last_payment_failure_reason' => $errorMessage,
+        ]);
+
+        // Send failure email
+        try {
+            $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
+            if ($email) {
+                \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentFailed($subscription, $errorMessage));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send payment failure email', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // If 3rd failure, pause subscription
+        if ($failureCount >= 3) {
+            $subscription->update(['status' => 'paused']);
+            
+            \Log::warning('Subscription paused after 3 payment failures', [
+                'subscription_id' => $subscription->id,
+            ]);
+        }
+    }
+
+    /**
+     * Calculate next billing date based on current date and frequency
+     * Uses ShipmentSchedule billing_date from admin konfigurator
+     * 
+     * This implements "Varianta A" (Frozen next_billing_date):
+     * - Current subscription's next_billing_date stays unchanged
+     * - NEXT billing date (after payment) uses CURRENT ShipmentSchedule
+     * - Allows admin to change future billing dates without affecting already planned payments
+     */
+    private function calculateNextBillingDate(\Carbon\Carbon $currentBillingDate, int $frequencyMonths): \Carbon\Carbon
+    {
+        $nextBillingDate = \App\Models\ShipmentSchedule::getBillingDateAfterMonths($currentBillingDate, $frequencyMonths);
+        
+        \Log::info('Calculated next billing date from ShipmentSchedule', [
+            'current_billing_date' => $currentBillingDate->toDateString(),
+            'frequency_months' => $frequencyMonths,
+            'next_billing_date' => $nextBillingDate->toDateString(),
+        ]);
+        
+        return $nextBillingDate;
     }
 }
 
