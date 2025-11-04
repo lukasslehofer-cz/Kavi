@@ -17,8 +17,8 @@ class Kernel extends ConsoleKernel
             ->dailyAt('09:00')
             ->timezone('Europe/Prague');
 
-        // Send order review requests 7 days after delivery (daily at 10:00 AM)
-        $schedule->command('orders:send-review-requests')
+        // Send Trustpilot review requests (daily at 10:00 AM)
+        $schedule->command('reviews:send')
             ->dailyAt('10:00')
             ->timezone('Europe/Prague');
 
