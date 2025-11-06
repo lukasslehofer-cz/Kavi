@@ -236,14 +236,20 @@ class SubscriptionController extends Controller
                 ? json_decode($subscription->shipping_address, true) 
                 : $subscription->shipping_address;
 
-            // Get configuration for weight calculation
+            // Get configuration for dimensions and weight
             $config = is_string($subscription->configuration) 
                 ? json_decode($subscription->configuration, true) 
                 : $subscription->configuration;
             
-            $amount = $config['amount'] ?? 1;
-            // Assume each package weighs approximately 0.25 kg
-            $weight = $amount * 0.25;
+            $amount = $config['amount'] ?? 2;
+            
+            // Load package dimensions and weight from SubscriptionConfig
+            $weight = \App\Models\SubscriptionConfig::get("package_{$amount}_weight", $amount * 0.25);
+            $packageSize = [
+                'length' => \App\Models\SubscriptionConfig::get("package_{$amount}_length", 30),
+                'width' => \App\Models\SubscriptionConfig::get("package_{$amount}_width", 20),
+                'height' => \App\Models\SubscriptionConfig::get("package_{$amount}_height", 10),
+            ];
 
             // Prepare data for Packeta
             $name = $shippingAddress['name'] ?? $subscription->user->name ?? '';
@@ -290,6 +296,7 @@ class SubscriptionController extends Controller
                 'carrier_pickup_point' => $carrierPickupPoint,
                 'value' => $value,
                 'weight' => $weight,
+                'size' => $packageSize, // Package dimensions
                 'order_number' => ($subscription->subscription_number ?? 'SUB-' . $subscription->id) . '-' . $targetDate->format('m'),
                 'note' => $subscription->delivery_notes ?? null,
                 'currency' => $currency,

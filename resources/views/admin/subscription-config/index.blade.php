@@ -22,6 +22,100 @@
     </div>
     @endif
 
+    <!-- Package Dimensions Settings -->
+    <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
+        <div class="mb-4">
+            <h2 class="text-xl font-bold text-gray-900">Rozměry a hmotnost balení</h2>
+            <p class="text-sm text-gray-600 mt-1">Nastavení rozměrů a hmotnosti pro jednotlivé velikosti boxů (vyžadováno pro odesílání přes externí dopravce)</p>
+        </div>
+        
+        <form action="{{ route('admin.subscription-config.update') }}" method="POST">
+            @csrf
+            
+            @php
+                $packageConfigs = $configs->filter(function($config) {
+                    return str_starts_with($config->key, 'package_');
+                });
+                
+                $otherConfigsIndexStart = $configs->count() - $packageConfigs->count();
+                
+                $sizes = [
+                    '2' => ['name' => 'M Box (2× 250g)', 'color' => 'blue'],
+                    '3' => ['name' => 'L Box (3× 250g)', 'color' => 'green'],
+                    '4' => ['name' => 'XL Box (4× 250g)', 'color' => 'purple'],
+                ];
+            @endphp
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                @foreach($sizes as $size => $info)
+                <div class="bg-{{ $info['color'] }}-50 rounded-lg p-5 border-2 border-{{ $info['color'] }}-200">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-10 h-10 bg-{{ $info['color'] }}-600 text-white rounded-lg flex items-center justify-center font-bold text-lg">
+                            {{ $size }}
+                        </div>
+                        <h3 class="text-base font-bold text-gray-900">{{ $info['name'] }}</h3>
+                    </div>
+                    
+                    @php
+                        $sizeConfigs = $packageConfigs->filter(function($config) use ($size) {
+                            return str_contains($config->key, "package_{$size}_");
+                        })->values();
+                    @endphp
+                    
+                    <div class="space-y-3">
+                        @foreach($sizeConfigs as $config)
+                        @php
+                            $configIndex = $configs->search(function($c) use ($config) {
+                                return $c->key === $config->key;
+                            });
+                            
+                            $unit = match(true) {
+                                str_contains($config->key, 'weight') => 'kg',
+                                default => 'cm'
+                            };
+                            
+                            $fieldLabel = match(true) {
+                                str_contains($config->key, 'length') => 'Délka',
+                                str_contains($config->key, 'width') => 'Šířka',
+                                str_contains($config->key, 'height') => 'Výška',
+                                str_contains($config->key, 'weight') => 'Hmotnost',
+                                default => $config->label
+                            };
+                        @endphp
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">
+                                {{ $fieldLabel }}
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    step="0.01"
+                                    name="configs[{{ $configIndex }}][value]" 
+                                    value="{{ $config->value }}"
+                                    required
+                                    class="w-full px-3 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-{{ $info['color'] }}-500 focus:border-transparent text-sm"
+                                >
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 text-xs font-medium">
+                                    {{ $unit }}
+                                </span>
+                                <input type="hidden" name="configs[{{ $configIndex }}][key]" value="{{ $config->key }}">
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            <div class="mt-6 flex items-center justify-end">
+                <button type="submit" class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
+                    Uložit rozměry balení
+                </button>
+            </div>
+        </form>
+    </div>
+
     <!-- Configurator Settings -->
     <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Nastavení cen a parametrů</h2>
@@ -29,8 +123,19 @@
         <form action="{{ route('admin.subscription-config.update') }}" method="POST">
             @csrf
             
+            @php
+                $nonPackageConfigs = $configs->filter(function($config) {
+                    return !str_starts_with($config->key, 'package_');
+                });
+            @endphp
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($configs as $index => $config)
+                @foreach($nonPackageConfigs as $config)
+                @php
+                    $configIndex = $configs->search(function($c) use ($config) {
+                        return $c->key === $config->key;
+                    });
+                @endphp
                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <label class="block text-sm font-bold text-gray-900 mb-1">
                         {{ $config->label }}
@@ -45,7 +150,7 @@
                         <label class="flex items-center cursor-pointer">
                             <input 
                                 type="checkbox" 
-                                name="configs[{{ $index }}][value]" 
+                                name="configs[{{ $configIndex }}][value]" 
                                 value="1"
                                 {{ $config->value ? 'checked' : '' }}
                                 class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
@@ -57,7 +162,7 @@
                             <input 
                                 type="number" 
                                 step="0.01"
-                                name="configs[{{ $index }}][value]" 
+                                name="configs[{{ $configIndex }}][value]" 
                                 value="{{ $config->value }}"
                                 required
                                 class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
@@ -69,7 +174,7 @@
                         @elseif($config->type === 'integer')
                         <input 
                             type="number" 
-                            name="configs[{{ $index }}][value]" 
+                            name="configs[{{ $configIndex }}][value]" 
                             value="{{ $config->value }}"
                             required
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
@@ -77,14 +182,14 @@
                         @else
                         <input 
                             type="text" 
-                            name="configs[{{ $index }}][value]" 
+                            name="configs[{{ $configIndex }}][value]" 
                             value="{{ $config->value }}"
                             required
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                         >
                         @endif
                         
-                        <input type="hidden" name="configs[{{ $index }}][key]" value="{{ $config->key }}">
+                        <input type="hidden" name="configs[{{ $configIndex }}][key]" value="{{ $config->key }}">
                     </div>
                 </div>
                 @endforeach

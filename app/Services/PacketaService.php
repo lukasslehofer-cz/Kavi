@@ -107,6 +107,36 @@ class PacketaService
             $currency = $data['currency'] ?? 'CZK';
             $packetAttributes->addChild('currencyCode', $currency);
             
+            // Package dimensions - required for external carriers
+            // Note: Packeta API requires dimensions in millimeters (mm)
+            if (isset($data['size']) && !empty($data['size'])) {
+                $sizeElement = $packetAttributes->addChild('size');
+                if (isset($data['size']['length'])) {
+                    // Convert cm to mm (multiply by 10)
+                    $lengthMm = $data['size']['length'] * 10;
+                    $sizeElement->addChild('length', number_format($lengthMm, 0, '.', ''));
+                }
+                if (isset($data['size']['width'])) {
+                    // Convert cm to mm (multiply by 10)
+                    $widthMm = $data['size']['width'] * 10;
+                    $sizeElement->addChild('width', number_format($widthMm, 0, '.', ''));
+                }
+                if (isset($data['size']['height'])) {
+                    // Convert cm to mm (multiply by 10)
+                    $heightMm = $data['size']['height'] * 10;
+                    $sizeElement->addChild('height', number_format($heightMm, 0, '.', ''));
+                }
+                
+                Log::info('Adding package dimensions', [
+                    'length_cm' => $data['size']['length'] ?? 'N/A',
+                    'width_cm' => $data['size']['width'] ?? 'N/A',
+                    'height_cm' => $data['size']['height'] ?? 'N/A',
+                    'length_mm' => isset($data['size']['length']) ? $data['size']['length'] * 10 : 'N/A',
+                    'width_mm' => isset($data['size']['width']) ? $data['size']['width'] * 10 : 'N/A',
+                    'height_mm' => isset($data['size']['height']) ? $data['size']['height'] * 10 : 'N/A',
+                ]);
+            }
+            
             if (!empty($data['cod'])) {
                 $packetAttributes->addChild('cod', number_format($data['cod'], 2, '.', ''));
             }

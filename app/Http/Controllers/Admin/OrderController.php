@@ -182,12 +182,30 @@ class OrderController extends Controller
 
             // Calculate total weight from order items
             $weight = 0;
+            $totalQuantity = 0;
             foreach ($order->items as $item) {
                 // Assume each product weighs approximately 0.25 kg
-                $weight += ($item->quantity ?? 1) * 0.25;
+                $itemQty = ($item->quantity ?? 1);
+                $weight += $itemQty * 0.25;
+                $totalQuantity += $itemQty;
             }
             // Minimum weight 0.1 kg
             $weight = max($weight, 0.1);
+            
+            // Determine package size based on total quantity
+            // Match to closest box size (2, 3, or 4 items)
+            $sizeCategory = match(true) {
+                $totalQuantity <= 2 => 2,
+                $totalQuantity == 3 => 3,
+                default => 4, // 4 or more items
+            };
+            
+            // Load package dimensions from SubscriptionConfig
+            $packageSize = [
+                'length' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_length", 30),
+                'width' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_width", 20),
+                'height' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_height", 10),
+            ];
 
             // Prepare customer name
             $name = $shippingAddress['name'] ?? $order->user->name ?? 'Zákazník';
@@ -228,6 +246,7 @@ class OrderController extends Controller
                 'carrier_pickup_point' => $shippingAddress['carrier_pickup_point'] ?? null,
                 'value' => $value,
                 'weight' => $weight,
+                'size' => $packageSize, // Package dimensions
                 'order_number' => $order->order_number,
                 'note' => $order->customer_notes ?? null,
                 'currency' => $currency,
