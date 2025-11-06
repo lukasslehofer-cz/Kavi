@@ -12,15 +12,42 @@
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/images/kavi-intro-video.jpg');"></div>
         
         <video 
+            id="hero-video"
             autoplay 
             loop 
             muted 
             playsinline
-            webkit-playsinline
+            preload="auto"
             class="absolute inset-0 w-full h-full object-cover"
         >
             <source src="/images/kavi-intro-video.mp4" type="video/mp4">
         </video>
+        
+        <script>
+            // iOS Safari autoplay fix
+            document.addEventListener('DOMContentLoaded', function() {
+                const video = document.getElementById('hero-video');
+                if (video) {
+                    // Set attributes again to ensure they're recognized
+                    video.setAttribute('playsinline', '');
+                    video.setAttribute('muted', '');
+                    video.muted = true;
+                    video.playsInline = true;
+                    
+                    // Try to play
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            // Auto-play was prevented, try again on user interaction
+                            console.log('Autoplay prevented:', error);
+                            document.body.addEventListener('touchstart', function() {
+                                video.play();
+                            }, { once: true });
+                        });
+                    }
+                }
+            });
+        </script>
     </div>
     
     <!-- Simple Dark Overlay -->
