@@ -129,14 +129,85 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Cancel the subscription
+     * Cancel the subscription (admin-triggered)
+     * Supports both standard cancellation (at period end) and immediate cancellation
      */
-    public function destroy(Subscription $subscription)
+    public function destroy(Request $request, Subscription $subscription)
     {
-        $subscription->update(['status' => 'canceled']);
+        // Validate cancellation type
+        $validated = $request->validate([
+            'cancel_type' => 'required|in:standard,immediate',
+        ]);
 
-        return redirect()->route('admin.subscriptions.index')
-            ->with('success', 'Předplatné bylo zrušeno.');
+        $cancelType = $validated['cancel_type'];
+
+        try {
+            if ($cancelType === 'immediate') {
+                // Immediate cancellation - cancel right now
+                $subscription->update([
+                    'status' => 'cancelled',
+                    'ends_at' => now(),
+                ]);
+
+                Log::info('Admin immediately cancelled subscription', [
+                    'subscription_id' => $subscription->id,
+                    'admin_user_id' => auth()->id(),
+                ]);
+
+                $emailSubject = 'okamžité zrušení';
+            } else {
+                // Standard cancellation - let it run until the end of paid period
+                // Use the model's cancel() method which sets status and ends_at
+                $subscription->cancel();
+
+                Log::info('Admin cancelled subscription at period end', [
+                    'subscription_id' => $subscription->id,
+                    'admin_user_id' => auth()->id(),
+                ]);
+
+                $emailSubject = 'standardní zrušení';
+            }
+
+            // Send cancellation email to the user
+            try {
+                $email = $subscription->shipping_address['email'] ?? null;
+                if (!$email && $subscription->user) {
+                    $email = $subscription->user->email;
+                }
+                
+                if ($email) {
+                    \Mail::to($email)->send(new \App\Mail\SubscriptionCancelled($subscription));
+                    
+                    Log::info('Cancellation email sent', [
+                        'subscription_id' => $subscription->id,
+                        'email' => $email,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to send SubscriptionCancelled email', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+                // Don't fail the cancellation if email fails
+            }
+
+            $successMessage = $cancelType === 'immediate' 
+                ? 'Předplatné bylo okamžitě zrušeno a uživatel byl informován emailem.'
+                : 'Předplatné bylo zrušeno. Doběhne zaplacené období a uživatel byl informován emailem.';
+
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('success', $successMessage);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to cancel subscription', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('error', 'Nepodařilo se zrušit předplatné. Zkuste to prosím znovu.');
+        }
     }
 
     /**

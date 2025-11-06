@@ -441,14 +441,10 @@
             @endif
 
             <!-- Cancel Subscription -->
-            @if($subscription->status !== 'canceled')
-            <form action="{{ route('admin.subscriptions.destroy', $subscription) }}" method="POST" onsubmit="return confirm('Opravdu chcete zrušit toto předplatné?')">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn w-full bg-red-600 text-white hover:bg-red-700">
-                    Zrušit předplatné
-                </button>
-            </form>
+            @if($subscription->status !== 'canceled' && $subscription->status !== 'cancelled')
+            <button type="button" onclick="openCancelModal()" class="btn w-full bg-red-600 text-white hover:bg-red-700 px-6 py-3 rounded-lg font-medium transition-colors">
+                Zrušit předplatné
+            </button>
             @endif
         </div>
     </div>
@@ -686,7 +682,165 @@ document.getElementById('editAddressModal')?.addEventListener('click', function(
         closeEditAddressModal();
     }
 });
+
+// Cancel Subscription Modal Functions
+function openCancelModal() {
+    document.getElementById('cancelModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCancelModal() {
+    document.getElementById('cancelModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    // Reset form
+    document.querySelectorAll('input[name="cancel_type"]').forEach(radio => {
+        radio.checked = false;
+    });
+    document.getElementById('cancelSubmitBtn').disabled = true;
+}
+
+function selectCancelType(type) {
+    // Update button state
+    document.getElementById('cancelSubmitBtn').disabled = false;
+    
+    // Update visual selection
+    document.querySelectorAll('.cancel-option').forEach(option => {
+        option.classList.remove('border-red-500', 'bg-red-50', 'ring-2', 'ring-red-500');
+        option.classList.add('border-gray-300');
+    });
+    
+    const selectedOption = document.querySelector(`input[value="${type}"]`).closest('.cancel-option');
+    selectedOption.classList.remove('border-gray-300');
+    selectedOption.classList.add('border-red-500', 'bg-red-50', 'ring-2', 'ring-red-500');
+}
+
+function submitCancelForm() {
+    const selectedType = document.querySelector('input[name="cancel_type"]:checked');
+    if (!selectedType) {
+        alert('Prosím vyberte typ zrušení.');
+        return;
+    }
+    
+    const type = selectedType.value;
+    const confirmMessage = type === 'immediate'
+        ? '⚠️ POZOR: Opravdu chcete OKAMŽITĚ zrušit toto předplatné?\n\nPředplatné bude zrušeno ihned a uživatel nedostane již žádné další boxy.\n\nPokračovat?'
+        : '⚠️ POZOR: Opravdu chcete zrušit toto předplatné?\n\nPředplatné doběhne do konce zaplaceného období a pak bude automaticky ukončeno. Uživatel dostane email s potvrzením.\n\nPokračovat?';
+    
+    if (confirm(confirmMessage)) {
+        document.getElementById('cancelForm').submit();
+    }
+}
+
+// Close modal on outside click
+document.getElementById('cancelModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCancelModal();
+    }
+});
 </script>
+
+<!-- Cancel Subscription Modal -->
+<div id="cancelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl border border-gray-200 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">Zrušit předplatné</h3>
+                    <p class="text-sm text-gray-600 mt-1">Vyberte způsob zrušení předplatného #{{ $subscription->subscription_number }}</p>
+                </div>
+                <button type="button" onclick="closeCancelModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <form id="cancelForm" action="{{ route('admin.subscriptions.destroy', $subscription) }}" method="POST" class="p-6">
+            @csrf
+            @method('DELETE')
+            
+            <div class="space-y-4 mb-6">
+                <!-- Standard Cancellation Option -->
+                <label class="cancel-option block border-2 border-gray-300 rounded-xl p-5 cursor-pointer hover:border-blue-300 transition-all">
+                    <div class="flex items-start gap-4">
+                        <input type="radio" name="cancel_type" value="standard" class="mt-1" onchange="selectCancelType('standard')">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <h4 class="text-lg font-semibold text-gray-900">Standardní zrušení (doporučeno)</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Předplatné doběhne do konce zaplaceného období. Uživatel dostane všechny zaplacené boxy a až poté bude předplatné automaticky ukončeno.
+                            </p>
+                            <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <p class="text-xs text-blue-800">
+                                    ✓ Férový přístup k zákazníkovi<br>
+                                    ✓ Uživatel dostane to, za co zaplatil<br>
+                                    ✓ Email s potvrzením bude automaticky odeslán
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Immediate Cancellation Option -->
+                <label class="cancel-option block border-2 border-gray-300 rounded-xl p-5 cursor-pointer hover:border-red-300 transition-all">
+                    <div class="flex items-start gap-4">
+                        <input type="radio" name="cancel_type" value="immediate" class="mt-1" onchange="selectCancelType('immediate')">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <h4 class="text-lg font-semibold text-gray-900">Okamžité zrušení</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Předplatné bude zrušeno <strong>okamžitě</strong> bez ohledu na zaplacené období. Použijte pouze ve výjimečných případech (problémy s uživatelem, refund, atd.).
+                            </p>
+                            <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p class="text-xs text-red-800">
+                                    ⚠️ Pouze pro výjimečné případy<br>
+                                    ⚠️ Uživatel přijde o zaplacené, ale nedodané boxy<br>
+                                    ⚠️ Zvažte vrácení peněz zákazníkovi
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Warning Box -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-yellow-400 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-yellow-800">
+                            Důležité upozornění
+                        </p>
+                        <p class="text-sm text-yellow-700 mt-1">
+                            Zrušení předplatného je nevratná operace. Uživatel bude automaticky informován emailem o zrušení.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                <button type="button" onclick="closeCancelModal()" class="px-6 py-2.5 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    Zrušit
+                </button>
+                <button type="button" id="cancelSubmitBtn" onclick="submitCancelForm()" disabled class="px-6 py-2.5 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    Potvrdit zrušení předplatného
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @endsection
 
