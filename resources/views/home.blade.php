@@ -11,6 +11,20 @@
     <div class="absolute inset-0">
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/images/kavi-intro-video.jpg');"></div>
         
+        <style>
+            /* Hide play button and video controls on iOS Safari */
+            #hero-video {
+                pointer-events: none;
+            }
+            #hero-video::-webkit-media-controls {
+                display: none !important;
+            }
+            #hero-video::-webkit-media-controls-start-playback-button {
+                display: none !important;
+                -webkit-appearance: none;
+            }
+        </style>
+        
         <video 
             id="hero-video"
             autoplay 
