@@ -243,13 +243,13 @@ class StripeService
         // Prepare metadata for subscription (includes Packeta and delivery_notes)
         // Store Packeta data in shipping_address JSON for consistency with Orders
         $shippingAddressData = [
-            'name' => $shippingAddress['name'],
-            'email' => $shippingAddress['email'],
-            'phone' => $shippingAddress['phone'] ?? null,
-            'billing_address' => $shippingAddress['billing_address'],
-            'billing_city' => $shippingAddress['billing_city'],
-            'billing_postal_code' => $shippingAddress['billing_postal_code'],
-            'country' => $shippingAddress['billing_country'] ?? 'CZ',
+                'name' => $shippingAddress['name'],
+                'email' => $shippingAddress['email'],
+                'phone' => $shippingAddress['phone'] ?? null,
+                'billing_address' => $shippingAddress['billing_address'],
+                'billing_city' => $shippingAddress['billing_city'],
+                'billing_postal_code' => $shippingAddress['billing_postal_code'],
+                'country' => $shippingAddress['billing_country'] ?? 'CZ',
             // Packeta data (consistent with Orders structure)
             'packeta_point_id' => $shippingAddress['packeta_point_id'],
             'packeta_point_name' => $shippingAddress['packeta_point_name'],
@@ -621,6 +621,15 @@ class StripeService
                     'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
                     'paid_at' => now(),
                 ]);
+
+                // Mark this checkout as completed in cache (to prevent payment method changed email)
+                if ($order->user && $order->user->stripe_customer_id) {
+                    \Cache::put("recent_checkout_{$order->user->stripe_customer_id}", true, now()->addMinutes(3));
+                    \Log::info('Marked recent checkout for order', [
+                        'order_id' => $order->id,
+                        'customer_id' => $order->user->stripe_customer_id,
+                    ]);
+                }
 
                 // Create invoice in Fakturoid ONLY if not already created (backup for webhook)
                 if (!$order->fakturoid_invoice_id) {
@@ -1073,6 +1082,17 @@ class StripeService
                 \Log::error('Failed to create Fakturoid invoice for first payment', [
                     'subscription_id' => $subscription->id,
                     'error' => $e->getMessage(),
+                ]);
+            }
+
+            // Mark this checkout as completed in cache
+            // This helps differentiate between new subscription payment methods vs. changed payment methods
+            $customerId = $paymentIntent->customer;
+            if ($customerId) {
+                \Cache::put("recent_checkout_{$customerId}", true, now()->addMinutes(3));
+                \Log::info('Marked recent checkout for customer', [
+                    'customer_id' => $customerId,
+                    'subscription_id' => $subscription->id,
                 ]);
             }
 
@@ -1734,6 +1754,44 @@ class StripeService
                 return;
             }
 
+            // Check if this payment method is from a recent checkout (last 3 minutes)
+            // If yes, don't send "payment method changed" email - user will get subscription confirmation instead
+            $recentCheckout = \Cache::get("recent_checkout_{$customerId}");
+            if ($recentCheckout) {
+                \Log::info('Skipping payment method changed email - recent checkout detected', [
+                    'user_id' => $user->id,
+                    'customer_id' => $customerId,
+                    'payment_method_id' => $paymentMethodId,
+                ]);
+                return;
+            }
+
+            // Also check if this is the first payment method for this customer
+            // (for backwards compatibility with older subscriptions)
+            try {
+                $paymentMethods = \Stripe\PaymentMethod::all([
+                    'customer' => $customerId,
+                    'type' => 'card',
+                    'limit' => 10,
+                ]);
+                
+                $activePaymentMethodCount = count($paymentMethods->data);
+                
+                // If this is the first or only payment method, skip the notification
+                if ($activePaymentMethodCount <= 1) {
+                    \Log::info('Skipping payment method changed email - first payment method for customer', [
+                        'user_id' => $user->id,
+                        'customer_id' => $customerId,
+                        'payment_method_id' => $paymentMethodId,
+                    ]);
+                    return;
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to check payment method count, proceeding with notification', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             // Get payment method details from Stripe
             $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentMethodId);
 
@@ -1741,7 +1799,9 @@ class StripeService
                 $cardBrand = ucfirst($paymentMethod->card->brand);
                 $cardLast4 = $paymentMethod->card->last4;
 
-                // Send notification email
+                // DISABLED: Email notification temporarily disabled
+                // TODO: Re-enable when we have better detection of payment method source (checkout vs. manual change)
+                /*
                 try {
                     \Mail::to($user->email)->send(new \App\Mail\PaymentMethodChanged(
                         $user,
@@ -1760,6 +1820,14 @@ class StripeService
                         'error' => $e->getMessage(),
                     ]);
                 }
+                */
+                
+                \Log::info('Payment method attached processed (email disabled)', [
+                    'user_id' => $user->id,
+                    'payment_method_id' => $paymentMethodId,
+                    'card_brand' => $cardBrand,
+                    'card_last4' => $cardLast4,
+                ]);
             }
 
             \Log::info('Payment method attached processed', [
@@ -1799,6 +1867,42 @@ class StripeService
                 return;
             }
 
+            // Check if this payment method is from a recent checkout (last 3 minutes)
+            // If yes, don't send "payment method changed" email - user will get subscription confirmation instead
+            $recentCheckout = \Cache::get("recent_checkout_{$customerId}");
+            if ($recentCheckout) {
+                \Log::info('Skipping payment method changed email (legacy) - recent checkout detected', [
+                    'user_id' => $user->id,
+                    'customer_id' => $customerId,
+                ]);
+                return;
+            }
+
+            // Also check if this is the first payment method for this customer
+            // (for backwards compatibility with older subscriptions)
+            try {
+                $paymentMethods = \Stripe\PaymentMethod::all([
+                    'customer' => $customerId,
+                    'type' => 'card',
+                    'limit' => 10,
+                ]);
+                
+                $activePaymentMethodCount = count($paymentMethods->data);
+                
+                // If this is the first or only payment method, skip the notification
+                if ($activePaymentMethodCount <= 1) {
+                    \Log::info('Skipping payment method changed email (legacy) - first payment method for customer', [
+                        'user_id' => $user->id,
+                        'customer_id' => $customerId,
+                    ]);
+                    return;
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to check payment method count (legacy), proceeding with notification', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             // Get current payment method details
             $paymentMethodDetails = $this->getPaymentMethodDetails($customerId);
 
@@ -1806,7 +1910,9 @@ class StripeService
                 $cardBrand = ucfirst($paymentMethodDetails['brand']);
                 $cardLast4 = $paymentMethodDetails['last4'];
 
-                // Send notification email
+                // DISABLED: Email notification temporarily disabled
+                // TODO: Re-enable when we have better detection of payment method source (checkout vs. manual change)
+                /*
                 try {
                     \Mail::to($user->email)->send(new \App\Mail\PaymentMethodChanged(
                         $user,
@@ -1824,6 +1930,13 @@ class StripeService
                         'error' => $e->getMessage(),
                     ]);
                 }
+                */
+                
+                \Log::info('Payment method updated processed (legacy, email disabled)', [
+                    'user_id' => $user->id,
+                    'card_brand' => $cardBrand,
+                    'card_last4' => $cardLast4,
+                ]);
             }
 
             \Log::info('Payment method updated processed (legacy)', [

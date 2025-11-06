@@ -86,6 +86,11 @@ class Subscription extends Model
         return $this->hasMany(SubscriptionPayment::class)->orderBy('paid_at', 'desc');
     }
 
+    public function shipments()
+    {
+        return $this->hasMany(SubscriptionShipment::class)->orderBy('shipment_date', 'desc');
+    }
+
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);

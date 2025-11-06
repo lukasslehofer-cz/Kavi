@@ -178,6 +178,8 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Konfigurace</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frekvence</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Výdejní místo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rozměry balíku</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faktura</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stav</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poslední dodávka</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akce</th>
@@ -250,6 +252,41 @@
                             <div class="text-sm">
                                 <div class="font-medium text-gray-900">{{ $subscription->packeta_point_name }}</div>
                                 <div class="text-xs text-gray-500">ID: {{ $subscription->packeta_point_id }}</div>
+                            </div>
+                            @else
+                            <span class="text-sm text-gray-500">-</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
+                            @php
+                                $shipment = $subscription->shipments->first();
+                            @endphp
+                            @if($shipment)
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-900">{{ $shipment->package_length }}×{{ $shipment->package_width }}×{{ $shipment->package_height }} cm</div>
+                                <div class="text-xs text-gray-500">{{ $shipment->package_weight }} kg</div>
+                                @if(!$shipment->isSent())
+                                <button type="button" onclick="openEditShipmentModal({{ $shipment->id }}, {{ $shipment->package_length }}, {{ $shipment->package_width }}, {{ $shipment->package_height }}, {{ $shipment->package_weight }}, '{{ addslashes($shipment->notes ?? '') }}')" class="text-xs text-blue-600 hover:text-blue-800 mt-1">
+                                    Upravit
+                                </button>
+                                @endif
+                            </div>
+                            @else
+                            <span class="text-sm text-gray-500">-</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($shipment && $shipment->payment)
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-900">{{ $shipment->payment->invoice_number ?? 'FID ' . $shipment->payment->fakturoid_invoice_id }}</div>
+                                @if($shipment->payment->paid_at)
+                                <div class="text-xs text-gray-500">Zaplaceno: {{ $shipment->payment->paid_at->format('d.m.Y') }}</div>
+                                @endif
+                                @if($shipment->payment->invoice_pdf_path)
+                                <a href="{{ Storage::url($shipment->payment->invoice_pdf_path) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
+                                    Stáhnout PDF
+                                </a>
+                                @endif
                             </div>
                             @else
                             <span class="text-sm text-gray-500">-</span>
@@ -374,7 +411,118 @@
     @endif
 </div>
 
+<!-- Edit Shipment Modal -->
+<div id="editShipmentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Upravit rozměry balíku</h3>
+                <button type="button" onclick="closeEditShipmentModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="editShipmentForm" class="space-y-4">
+                <input type="hidden" id="shipmentId" name="shipment_id">
+                
+                <div>
+                    <label for="package_length" class="block text-sm font-medium text-gray-700">Délka (cm)</label>
+                    <input type="number" step="0.01" id="package_length" name="package_length" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="package_width" class="block text-sm font-medium text-gray-700">Šířka (cm)</label>
+                    <input type="number" step="0.01" id="package_width" name="package_width" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="package_height" class="block text-sm font-medium text-gray-700">Výška (cm)</label>
+                    <input type="number" step="0.01" id="package_height" name="package_height" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="package_weight" class="block text-sm font-medium text-gray-700">Hmotnost (kg)</label>
+                    <input type="number" step="0.01" id="package_weight" name="package_weight" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="notes" class="block text-sm font-medium text-gray-700">Poznámka</label>
+                    <textarea id="notes" name="notes" rows="3"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+                
+                <div class="flex gap-2 mt-6">
+                    <button type="button" onclick="saveShipment()"
+                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Uložit
+                    </button>
+                    <button type="button" onclick="closeEditShipmentModal()"
+                            class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                        Zrušit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+function openEditShipmentModal(shipmentId, length, width, height, weight, notes) {
+    document.getElementById('shipmentId').value = shipmentId;
+    document.getElementById('package_length').value = length;
+    document.getElementById('package_width').value = width;
+    document.getElementById('package_height').value = height;
+    document.getElementById('package_weight').value = weight;
+    document.getElementById('notes').value = notes || '';
+    document.getElementById('editShipmentModal').classList.remove('hidden');
+}
+
+function closeEditShipmentModal() {
+    document.getElementById('editShipmentModal').classList.add('hidden');
+}
+
+async function saveShipment() {
+    const shipmentId = document.getElementById('shipmentId').value;
+    const formData = {
+        package_length: parseFloat(document.getElementById('package_length').value),
+        package_width: parseFloat(document.getElementById('package_width').value),
+        package_height: parseFloat(document.getElementById('package_height').value),
+        package_weight: parseFloat(document.getElementById('package_weight').value),
+        notes: document.getElementById('notes').value,
+    };
+    
+    try {
+        const response = await fetch(`/admin/subscription-shipments/${shipmentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.message);
+            closeEditShipmentModal();
+            location.reload(); // Refresh to show updated data
+        } else {
+            alert(data.message || 'Chyba při ukládání');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Nastala chyba při ukládání dat');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Select all checkbox functionality
     const selectAllCheckbox = document.getElementById('select-all');

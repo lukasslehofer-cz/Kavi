@@ -452,6 +452,117 @@
             @endif
         </div>
     </div>
+
+    <!-- Shipment History Section -->
+    @if($subscription->shipments->count() > 0)
+    <div class="mt-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                    </svg>
+                    Historie rozesílek ({{ $subscription->shipments->count() }})
+                </h2>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum rozesílky</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rozměry balíku</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Packeta tracking</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faktura</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poznámka</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach($subscription->shipments as $shipment)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $shipment->shipment_date->format('d.m.Y') }}</div>
+                                @if($shipment->sent_at)
+                                <div class="text-xs text-gray-500">Odesláno: {{ $shipment->sent_at->format('d.m.Y H:i') }}</div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($shipment->status === 'sent')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Odesláno
+                                </span>
+                                @elseif($shipment->status === 'delivered')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Doručeno
+                                </span>
+                                @elseif($shipment->status === 'cancelled')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    Zrušeno
+                                </span>
+                                @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    Čeká
+                                </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">
+                                    {{ $shipment->package_length }}×{{ $shipment->package_width }}×{{ $shipment->package_height }} cm
+                                </div>
+                                <div class="text-xs text-gray-500">{{ $shipment->package_weight }} kg</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($shipment->packeta_packet_id)
+                                <div class="text-sm">
+                                    <div class="font-medium text-gray-900">{{ $shipment->packeta_packet_id }}</div>
+                                    @if($shipment->packeta_tracking_url)
+                                    <a href="{{ $shipment->packeta_tracking_url }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
+                                        Sledovat zásilku
+                                    </a>
+                                    @endif
+                                </div>
+                                @else
+                                <span class="text-sm text-gray-500">-</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($shipment->payment)
+                                <div class="text-sm">
+                                    <div class="font-medium text-gray-900">{{ $shipment->payment->invoice_number ?? 'FID ' . $shipment->payment->fakturoid_invoice_id }}</div>
+                                    @if($shipment->payment->paid_at)
+                                    <div class="text-xs text-gray-500">{{ $shipment->payment->paid_at->format('d.m.Y') }}</div>
+                                    @endif
+                                    @if($shipment->payment->invoice_pdf_path)
+                                    <a href="{{ Storage::url($shipment->payment->invoice_pdf_path) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
+                                        Stáhnout PDF
+                                    </a>
+                                    @endif
+                                </div>
+                                @else
+                                <span class="text-sm text-gray-500">-</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($shipment->notes)
+                                <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ $shipment->notes }}">
+                                    {{ $shipment->notes }}
+                                </div>
+                                @else
+                                <span class="text-sm text-gray-500">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
 <!-- Edit Address Modal -->

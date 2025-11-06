@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('subscription_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subscription_id')->constrained()->onDelete('cascade');
-            $table->string('stripe_invoice_id')->unique();
+            $table->string('stripe_invoice_id')->nullable()->unique();
             $table->string('stripe_payment_intent_id')->nullable();
             $table->decimal('amount', 10, 2);
             $table->string('currency', 3)->default('czk');

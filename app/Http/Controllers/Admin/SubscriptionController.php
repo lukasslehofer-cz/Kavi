@@ -53,7 +53,9 @@ class SubscriptionController extends Controller
      */
     public function show(Subscription $subscription)
     {
-        $subscription->load(['user', 'plan']);
+        $subscription->load(['user', 'plan', 'shipments' => function($query) {
+            $query->with('payment')->orderBy('shipment_date', 'desc');
+        }]);
 
         return view('admin.subscriptions.show', compact('subscription'));
     }
@@ -169,6 +171,17 @@ class SubscriptionController extends Controller
             return false;
         });
 
+        // Create or get draft shipments for each subscription
+        foreach ($subscriptions as $subscription) {
+            $this->getOrCreateShipment($subscription, $targetDate);
+        }
+        
+        // Reload subscriptions with shipments relation
+        $subscriptionIds = $subscriptions->pluck('id');
+        $subscriptions = Subscription::with(['user', 'plan', 'shipments' => function($query) use ($targetDate) {
+            $query->forDate($targetDate)->with('payment');
+        }])->whereIn('id', $subscriptionIds)->get();
+
         // Group by frequency for stats
         $stats = [
             'total' => $subscriptions->count(),
@@ -196,6 +209,78 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * Get or create draft shipment for subscription on given date
+     */
+    private function getOrCreateShipment(Subscription $subscription, \Carbon\Carbon $shipmentDate): \App\Models\SubscriptionShipment
+    {
+        // Check if shipment already exists
+        $shipment = $subscription->shipments()
+            ->forDate($shipmentDate)
+            ->first();
+        
+        if ($shipment) {
+            // If shipment exists but doesn't have payment linked, try to link it
+            if (!$shipment->subscription_payment_id) {
+                $payment = $this->findPaymentForShipment($subscription, $shipmentDate);
+                if ($payment) {
+                    $shipment->update(['subscription_payment_id' => $payment->id]);
+                    \Log::info('Linked existing shipment to payment', [
+                        'shipment_id' => $shipment->id,
+                        'payment_id' => $payment->id,
+                    ]);
+                }
+            }
+            return $shipment;
+        }
+        
+        // Get default dimensions from config based on subscription configuration
+        $config = is_string($subscription->configuration) 
+            ? json_decode($subscription->configuration, true) 
+            : $subscription->configuration;
+        
+        $amount = $config['amount'] ?? 2;
+        
+        // Find corresponding payment for this shipment
+        $payment = $this->findPaymentForShipment($subscription, $shipmentDate);
+        
+        // Create new draft shipment with default values
+        return $subscription->shipments()->create([
+            'shipment_date' => $shipmentDate,
+            'subscription_payment_id' => $payment?->id,
+            'package_weight' => \App\Models\SubscriptionConfig::get("package_{$amount}_weight", $amount * 0.25),
+            'package_length' => \App\Models\SubscriptionConfig::get("package_{$amount}_length", 30),
+            'package_width' => \App\Models\SubscriptionConfig::get("package_{$amount}_width", 20),
+            'package_height' => \App\Models\SubscriptionConfig::get("package_{$amount}_height", 10),
+            'carrier_id' => $subscription->carrier_id,
+            'carrier_pickup_point' => $subscription->carrier_pickup_point,
+            'status' => 'pending',
+        ]);
+    }
+
+    /**
+     * Find payment for given shipment date
+     */
+    private function findPaymentForShipment(Subscription $subscription, \Carbon\Carbon $shipmentDate): ?\App\Models\SubscriptionPayment
+    {
+        // Look for payment where shipment_date falls within period_start and period_end
+        // or find the most recent payment before this shipment date
+        return $subscription->payments()
+            ->where('status', 'paid')
+            ->where(function($query) use ($shipmentDate) {
+                $query->where(function($q) use ($shipmentDate) {
+                    // Payment covers this date
+                    $q->whereDate('period_start', '<=', $shipmentDate)
+                      ->whereDate('period_end', '>=', $shipmentDate);
+                })->orWhere(function($q) use ($shipmentDate) {
+                    // Or find most recent payment before this date
+                    $q->whereDate('paid_at', '<=', $shipmentDate);
+                });
+            })
+            ->orderBy('paid_at', 'desc')
+            ->first();
+    }
+
+    /**
      * Send selected subscriptions to Packeta API
      */
     public function sendToPacketa(Request $request)
@@ -218,9 +303,12 @@ class SubscriptionController extends Controller
 
         foreach ($request->subscription_ids as $subscriptionId) {
             $subscription = Subscription::with('user')->find($subscriptionId);
+            
+            // Get or create shipment for this date
+            $shipment = $this->getOrCreateShipment($subscription, $targetDate);
 
             // Skip if already sent
-            if ($subscription->packeta_shipment_status === 'sent') {
+            if ($shipment->isSent()) {
                 continue;
             }
 
@@ -236,20 +324,9 @@ class SubscriptionController extends Controller
                 ? json_decode($subscription->shipping_address, true) 
                 : $subscription->shipping_address;
 
-            // Get configuration for dimensions and weight
-            $config = is_string($subscription->configuration) 
-                ? json_decode($subscription->configuration, true) 
-                : $subscription->configuration;
-            
-            $amount = $config['amount'] ?? 2;
-            
-            // Load package dimensions and weight from SubscriptionConfig
-            $weight = \App\Models\SubscriptionConfig::get("package_{$amount}_weight", $amount * 0.25);
-            $packageSize = [
-                'length' => \App\Models\SubscriptionConfig::get("package_{$amount}_length", 30),
-                'width' => \App\Models\SubscriptionConfig::get("package_{$amount}_width", 20),
-                'height' => \App\Models\SubscriptionConfig::get("package_{$amount}_height", 10),
-            ];
+            // Get dimensions and weight from shipment (can be customized per shipment)
+            $weight = $shipment->package_weight;
+            $packageSize = $shipment->getPackageDimensions();
 
             // Prepare data for Packeta
             $name = $shippingAddress['name'] ?? $subscription->user->name ?? '';
@@ -280,11 +357,10 @@ class SubscriptionController extends Controller
                 $value = min($value, 100);
             }
             
-            // Get Packeta data - prioritize shipping_address JSON (consistent with Orders)
-            // Fall back to direct columns for backward compatibility
+            // Get Packeta data - prioritize shipment data, then shipping_address JSON
             $packetaPointId = $shippingAddress['packeta_point_id'] ?? $subscription->packeta_point_id;
-            $carrierId = $shippingAddress['carrier_id'] ?? $subscription->carrier_id ?? null;
-            $carrierPickupPoint = $shippingAddress['carrier_pickup_point'] ?? $subscription->carrier_pickup_point ?? null;
+            $carrierId = $shipment->carrier_id ?? $shippingAddress['carrier_id'] ?? $subscription->carrier_id ?? null;
+            $carrierPickupPoint = $shipment->carrier_pickup_point ?? $shippingAddress['carrier_pickup_point'] ?? $subscription->carrier_pickup_point ?? null;
             
             $packetData = [
                 'name' => $nameParts[0] ?? $name,
@@ -296,9 +372,9 @@ class SubscriptionController extends Controller
                 'carrier_pickup_point' => $carrierPickupPoint,
                 'value' => $value,
                 'weight' => $weight,
-                'size' => $packageSize, // Package dimensions
+                'size' => $packageSize, // Package dimensions from shipment
                 'order_number' => ($subscription->subscription_number ?? 'SUB-' . $subscription->id) . '-' . $targetDate->format('m'),
-                'note' => $subscription->delivery_notes ?? null,
+                'note' => $shipment->notes ?? $subscription->delivery_notes ?? null,
                 'currency' => $currency,
                 'country' => $shippingCountry,
                 'adult_content' => false, // Set to true if selling alcohol/tobacco
@@ -312,23 +388,25 @@ class SubscriptionController extends Controller
                     // Get tracking URL from Packeta
                     $trackingUrl = $this->getPacketaTrackingUrl($result['id']);
                     
-                    // Update subscription with Packeta data
-                    // Use target date for last_shipment_date to keep proper shipping schedule
-                    $updateData = [
-                        'packeta_packet_id' => $result['id'],
+                    // Mark shipment as sent
+                    $shipment->markAsSent($result['id'], $trackingUrl);
+                    
+                    // Update subscription last_shipment_date
+                    $subscription->update([
+                        'last_shipment_date' => $targetDate,
+                        'packeta_packet_id' => $result['id'], // Keep for backward compatibility
                         'packeta_tracking_url' => $trackingUrl,
                         'packeta_shipment_status' => 'sent',
                         'packeta_sent_at' => now(),
-                        'last_shipment_date' => $targetDate,
-                    ];
+                    ]);
                     
                     // For one-time boxes, mark as completed after shipping
                     if ($subscription->frequency_months == 0) {
-                        $updateData['status'] = 'completed';
-                        $updateData['canceled_at'] = now();
+                        $subscription->update([
+                            'status' => 'completed',
+                            'canceled_at' => now(),
+                        ]);
                     }
-                    
-                    $subscription->update($updateData);
 
                     // Send subscription shipped email
                     try {
@@ -524,5 +602,92 @@ class SubscriptionController extends Controller
         $phone = ltrim($phone, '0');
         
         return $prefix . $phone;
+    }
+
+    /**
+     * Update shipment details (dimensions, weight, notes)
+     */
+    public function updateShipment(Request $request, \App\Models\SubscriptionShipment $shipment)
+    {
+        $validated = $request->validate([
+            'package_weight' => 'required|numeric|min:0.1|max:30',
+            'package_length' => 'required|numeric|min:1|max:200',
+            'package_width' => 'required|numeric|min:1|max:200',
+            'package_height' => 'required|numeric|min:1|max:200',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        // Only allow editing pending shipments
+        if (!$shipment->isPending()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lze editovat pouze nevyslanou rozesílku.',
+            ], 400);
+        }
+
+        $shipment->update($validated);
+
+        \Log::info('Shipment updated by admin', [
+            'shipment_id' => $shipment->id,
+            'subscription_id' => $shipment->subscription_id,
+            'admin_user_id' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rozměry balíku byly úspěšně aktualizovány.',
+            'shipment' => $shipment->fresh(),
+        ]);
+    }
+
+    /**
+     * Display history of sent shipments
+     */
+    public function shipmentsHistory(Request $request)
+    {
+        $query = \App\Models\SubscriptionShipment::with(['subscription.user', 'subscription.plan', 'payment'])
+            ->whereIn('status', ['sent', 'delivered'])
+            ->orderBy('sent_at', 'desc');
+
+        // Filter by month/year if provided
+        if ($request->has('month') && $request->has('year')) {
+            $year = $request->input('year');
+            $month = $request->input('month');
+            $query->whereYear('shipment_date', $year)
+                  ->whereMonth('shipment_date', $month);
+        }
+
+        // Search by subscription number or customer name
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->whereHas('subscription', function($q) use ($search) {
+                $q->where('subscription_number', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $shipments = $query->paginate(50);
+
+        // Get stats
+        $stats = [
+            'total' => $query->count(),
+            'this_month' => \App\Models\SubscriptionShipment::whereIn('status', ['sent', 'delivered'])
+                ->whereYear('shipment_date', now()->year)
+                ->whereMonth('shipment_date', now()->month)
+                ->count(),
+        ];
+
+        // Get available months for filter dropdown
+        $availableMonths = \App\Models\SubscriptionShipment::selectRaw('YEAR(shipment_date) as year, MONTH(shipment_date) as month')
+            ->whereIn('status', ['sent', 'delivered'])
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get();
+
+        return view('admin.subscriptions.shipments-history', compact('shipments', 'stats', 'availableMonths'));
     }
 }
