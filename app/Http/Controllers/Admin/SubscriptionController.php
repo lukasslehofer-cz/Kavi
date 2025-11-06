@@ -274,14 +274,20 @@ class SubscriptionController extends Controller
                 $value = min($value, 100);
             }
             
+            // Get Packeta data - prioritize shipping_address JSON (consistent with Orders)
+            // Fall back to direct columns for backward compatibility
+            $packetaPointId = $shippingAddress['packeta_point_id'] ?? $subscription->packeta_point_id;
+            $carrierId = $shippingAddress['carrier_id'] ?? $subscription->carrier_id ?? null;
+            $carrierPickupPoint = $shippingAddress['carrier_pickup_point'] ?? $subscription->carrier_pickup_point ?? null;
+            
             $packetData = [
                 'name' => $nameParts[0] ?? $name,
                 'surname' => $nameParts[1] ?? '',
                 'email' => $shippingAddress['email'] ?? $subscription->user->email ?? '',
                 'phone' => $phone,
-                'packeta_point_id' => $subscription->packeta_point_id,
-                'carrier_id' => $subscription->carrier_id ?? null,
-                'carrier_pickup_point' => $subscription->carrier_pickup_point ?? null,
+                'packeta_point_id' => $packetaPointId,
+                'carrier_id' => $carrierId,
+                'carrier_pickup_point' => $carrierPickupPoint,
                 'value' => $value,
                 'weight' => $weight,
                 'order_number' => ($subscription->subscription_number ?? 'SUB-' . $subscription->id) . '-' . $targetDate->format('m'),

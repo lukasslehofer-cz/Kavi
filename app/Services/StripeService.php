@@ -241,19 +241,29 @@ class StripeService
         ?int $discountMonths = null
     ): StripeSession {
         // Prepare metadata for subscription (includes Packeta and delivery_notes)
+        // Store Packeta data in shipping_address JSON for consistency with Orders
+        $shippingAddressData = [
+            'name' => $shippingAddress['name'],
+            'email' => $shippingAddress['email'],
+            'phone' => $shippingAddress['phone'] ?? null,
+            'billing_address' => $shippingAddress['billing_address'],
+            'billing_city' => $shippingAddress['billing_city'],
+            'billing_postal_code' => $shippingAddress['billing_postal_code'],
+            'country' => $shippingAddress['billing_country'] ?? 'CZ',
+            // Packeta data (consistent with Orders structure)
+            'packeta_point_id' => $shippingAddress['packeta_point_id'],
+            'packeta_point_name' => $shippingAddress['packeta_point_name'],
+            'packeta_point_address' => $shippingAddress['packeta_point_address'] ?? null,
+            'carrier_id' => $shippingAddress['carrier_id'] ?? null,
+            'carrier_pickup_point' => $shippingAddress['carrier_pickup_point'] ?? null,
+        ];
+        
         $subscriptionMetadata = [
             'type' => 'custom_billing_subscription', // Mark as custom billing
             'configuration' => json_encode($configuration),
             'configured_price' => $price,
-            'shipping_address' => json_encode([
-                'name' => $shippingAddress['name'],
-                'email' => $shippingAddress['email'],
-                'phone' => $shippingAddress['phone'] ?? null,
-                'billing_address' => $shippingAddress['billing_address'],
-                'billing_city' => $shippingAddress['billing_city'],
-                'billing_postal_code' => $shippingAddress['billing_postal_code'],
-                'country' => $shippingAddress['billing_country'] ?? 'CZ',
-            ]),
+            'shipping_address' => json_encode($shippingAddressData),
+            // Keep Packeta data as separate keys for backward compatibility
             'packeta_point_id' => $shippingAddress['packeta_point_id'],
             'packeta_point_name' => $shippingAddress['packeta_point_name'],
             'packeta_point_address' => $shippingAddress['packeta_point_address'] ?? null,
@@ -295,7 +305,6 @@ class StripeService
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'czk',
-                    'product' => $productId,
                     'unit_amount' => (int)($price * 100), // Convert to haléře
                     'product_data' => [
                         'name' => $productName,
@@ -305,9 +314,10 @@ class StripeService
                 'quantity' => 1,
             ]],
             'mode' => 'payment', // ONE-TIME payment, NOT subscription!
+            'metadata' => $subscriptionMetadata, // Metadata directly in session for webhook handling
             'payment_intent_data' => [
                 'setup_future_usage' => 'off_session', // Save card for future automated payments
-                'metadata' => $subscriptionMetadata,
+                'metadata' => $subscriptionMetadata, // Also in payment_intent for backup/redundancy
             ],
             'success_url' => route('subscriptions.checkout') . '?session_id={CHECKOUT_SESSION_ID}&success=1',
             'cancel_url' => route('subscriptions.checkout'),

@@ -20,6 +20,7 @@ class Subscription extends Model
         'discount_months_total',
         'stripe_subscription_id',
         'stripe_session_id',
+        'stripe_payment_intent_id',
         'status',
         'payment_failure_count',
         'last_payment_failure_at',
