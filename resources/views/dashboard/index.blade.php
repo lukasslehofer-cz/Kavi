@@ -195,7 +195,10 @@
                     </div>
                 </div>
 
-                @if($activeSubscription->next_billing_date || $activeSubscription->current_period_end)
+                @php
+                    $nextShipment = $activeSubscription->next_shipment_date;
+                @endphp
+                @if($nextShipment)
                 <div class="flex items-start gap-3">
                     <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
                         <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -203,10 +206,11 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600 font-medium mb-1">Další dodávka</p>
+                        <p class="text-sm text-gray-600 font-medium mb-1">Další rozesílka</p>
                         <p class="text-base font-bold text-gray-900">
-                            {{ ($activeSubscription->next_billing_date ?? \Carbon\Carbon::parse($activeSubscription->current_period_end))->format('d.m.Y') }}
+                            {{ $nextShipment->format('d.m.Y') }}
                         </p>
+                        <p class="text-xs text-gray-500 mt-0.5 font-light">Rozesílka probíhá vždy 20. v měsíci</p>
                     </div>
                 </div>
                 @endif

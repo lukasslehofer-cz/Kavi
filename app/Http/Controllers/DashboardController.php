@@ -81,12 +81,9 @@ class DashboardController extends Controller
                     return $subscription->created_at->isAfter(now()->subMonths(3));
                 }
                 
-                // For cancelled, show only if there's a paid shipment still pending
+                // For cancelled, always show (permanent display)
                 if ($subscription->status === 'cancelled') {
-                    $nextShipment = \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($subscription);
-                    if ($nextShipment && $nextShipment->isFuture()) {
-                        return \App\Helpers\SubscriptionHelper::hasPaidCoverageForDate($subscription, $nextShipment);
-                    }
+                    return true;
                 }
                 
                 return false;

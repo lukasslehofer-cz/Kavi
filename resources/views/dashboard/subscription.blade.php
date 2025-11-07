@@ -210,14 +210,26 @@
                                 <span class="text-gray-600">Datum zrušení:</span>
                                 <span class="font-medium text-red-700">{{ $subscription->ends_at ? $subscription->ends_at->format('d.m.Y') : '-' }}</span>
                             </div>
-                            @if($lastShipmentForCancelled)
+                            @if($subscription->last_shipment_date)
                             <div class="flex justify-between">
-                                <span class="text-gray-600">Poslední rozesílka:</span>
+                                <span class="text-gray-600">Poslední odeslání:</span>
+                                <span class="font-medium text-green-600">{{ $subscription->last_shipment_date->format('d.m.Y') }}</span>
+                            </div>
+                            @endif
+                            @if($lastShipmentForCancelled && $lastShipmentForCancelled->isFuture())
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Zbývající rozesílka:</span>
                                 <span class="font-medium text-blue-600">{{ $lastShipmentForCancelled->format('d.m.Y') }}</span>
                             </div>
                             <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg mt-2">
                                 <p class="text-xs text-blue-800">
-                                    ℹ️ Toto předplatné je zrušeno. Dostanete ještě poslední zaplacený box {{ $lastShipmentForCancelled->format('d.m.Y') }} a pak předplatné automaticky zmizí z dashboardu.
+                                    ℹ️ Toto předplatné je zrušeno. Dostanete ještě poslední zaplacený box {{ $lastShipmentForCancelled->format('d.m.Y') }}. Po odeslání již nebudou další zásilky odesílány.
+                                </p>
+                            </div>
+                            @else
+                            <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg mt-2">
+                                <p class="text-xs text-gray-700">
+                                    ℹ️ Toto předplatné bylo zrušeno a všechny zaplacené zásilky byly odeslány.
                                 </p>
                             </div>
                             @endif
