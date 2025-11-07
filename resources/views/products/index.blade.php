@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Hero Header Section - Minimal -->
-<div class="relative bg-gray-100 py-16 md:py-20 overflow-hidden">
+<div class="relative bg-gray-100 py-12 sm:py-16 md:py-20 overflow-hidden">
   <!-- Subtle Organic Shapes -->
   <div class="absolute inset-0 overflow-hidden">
     <div class="absolute -top-32 -right-32 w-96 h-96 bg-primary-100 rounded-full"></div>
@@ -22,11 +22,11 @@
       </div>
 
       <!-- Clean Heading -->
-      <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
+      <h1 class="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
         Objevte naši kávovou kolekci
       </h1>
       
-      <p class="mx-auto max-w-2xl text-lg text-gray-600 font-light">
+      <p class="mx-auto max-w-2xl text-base sm:text-lg text-gray-600 font-light">
         Pečlivě vybraná káva z nejlepších evropských pražíren. Čerstvá, kvalitní, výjimečná.
       </p>
     </div>
@@ -41,11 +41,11 @@
 </div>
 
 <!-- Main Content -->
-<div class="bg-white py-12 sm:py-16 lg:py-20">
+<div class="bg-white py-10 sm:py-12 md:py-16 lg:py-20">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
     <!-- Filters - Minimal -->
-    <div class="mb-10">
+    <div class="mb-8 sm:mb-10">
       <div class="flex flex-wrap justify-center gap-2">
         <a href="{{ route('products.index') }}" 
            class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 {{ !request('category') ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300' }}">
@@ -71,7 +71,7 @@
     </div>
     <!-- Filters - end -->
 
-    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       @forelse($products as $product)
       <!-- product - start -->
       <div class="group relative bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-200">
@@ -202,17 +202,17 @@
 </div>
 
 <!-- CTA Section - Minimal -->
-<div class="relative bg-gray-100 py-20 overflow-hidden">
+<div class="relative bg-gray-100 py-16 sm:py-20 overflow-hidden">
   <!-- Organic shape -->
   <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
 
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-2xl flex-col items-center text-center">
-      <h2 class="mb-4 text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+      <h2 class="mb-4 text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
         Chcete pravidelnou dodávku kávy?
       </h2>
       
-      <p class="text-lg text-gray-600 mb-8 max-w-xl font-light">
+      <p class="text-base sm:text-lg text-gray-600 mb-8 max-w-xl font-light">
         S naším předplatným ušetříte čas i peníze. Čerstvá káva přímo k vám domů, kdykoliv zrušitelné.
       </p>
 

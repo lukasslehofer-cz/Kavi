@@ -6,7 +6,7 @@
 <div class="overflow-hidden">
 
 <!-- Hero Section - Clean with Strong Visual -->
-<div class="relative h-[90vh] min-h-[600px] max-h-[900px] overflow-hidden bg-gray-50">
+<div class="relative h-[70vh] sm:h-[85vh] lg:h-[90vh] min-h-[500px] sm:min-h-[600px] max-h-[900px] overflow-hidden bg-gray-50">
     <!-- Background Image/Video -->
     <div class="absolute inset-0">
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/images/kavi-intro-video.jpg');"></div>
@@ -82,10 +82,10 @@
 
                 <!-- Heading - Clean Typography -->
                 <div class="space-y-6">
-                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white tracking-tight">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-white tracking-tight">
                         Objevte tu nejlepší kávu z celé Evropy
                     </h1>
-                    <p class="text-xl md:text-2xl text-white/90 leading-relaxed font-light">
+                    <p class="text-lg sm:text-xl md:text-2xl text-white/90 leading-relaxed font-light">
                         Prémiová káva s pravidelným předplatným.<br/>
                         Čerstvě pražená, pečlivě vybraná, doručená přímo k vám.
                     </p>
@@ -93,13 +93,13 @@
 
                 <!-- CTA Buttons - Minimal -->
                 <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                    <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-lg px-8 py-4 rounded-full transition-all duration-200">
+                    <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-lg px-8 py-5 rounded-full transition-all duration-200">
                         <span>Sestavte si vlastní box</span>
                         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </a>
-                    <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full transition-all duration-200">
+                    <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-5 rounded-full transition-all duration-200">
                         <span>Kávový obchod</span>
                         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -119,15 +119,15 @@
 </div>
 
 <!-- Features Section - Minimal & Clean -->
-<div class="relative bg-white py-24 sm:py-24 lg:py-32">
+<div class="relative bg-white py-16 sm:py-20 md:py-24 lg:py-32">
   <!-- Organic shape decoration -->
   <div class="absolute top-20 right-0 w-72 h-72 bg-primary-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-60"></div>
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header - Minimal -->
     <div class="mb-20 max-w-2xl">
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Proč si vybrat KAVI?</h2>
-      <p class="text-xl text-gray-600 font-light">Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.</p>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Proč si vybrat KAVI?</h2>
+      <p class="text-lg sm:text-xl text-gray-600 font-light">Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.</p>
     </div>
 
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
@@ -181,7 +181,7 @@
 </div>
 
 <!-- Love Your Coffee Section - Minimal with organic shapes -->
-<div class="relative bg-gray-100 py-24 sm:py-24 lg:py-32 overflow-hidden">
+<div class="relative bg-gray-100 py-16 sm:py-20 md:py-24 lg:py-32 overflow-hidden">
   <!-- Organic shape decorations -->
   <div class="absolute bottom-0 left-0 w-96 h-96 bg-primary-100/50 rounded-full -translate-x-1/3 translate-y-1/3"></div>
 
@@ -212,11 +212,11 @@
       <!-- Content Side -->
       <div class="space-y-8 order-1 lg:order-2">
         <div>
-          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
             Káva, kterou budete milovat
           </h2>
           
-          <p class="text-xl text-gray-600 leading-relaxed font-light mb-6">
+          <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-6">
             Pečlivě vybíráme nejkvalitnější kávu z ověřených pražíren. Každý měsíc objevte nové chutě přímo u vás doma.
           </p>
         </div>
@@ -282,15 +282,15 @@
 </div>
 
 <!-- Subscription Plans Section - Minimal & Clean -->
-<div class="relative bg-white py-24 sm:py-24 lg:py-32 overflow-hidden">
+<div class="relative bg-white py-16 sm:py-20 md:py-24 lg:py-32 overflow-hidden">
   <!-- Organic shape decoration -->
   <div class="absolute top-1/2 right-0 w-80 h-80 bg-gray-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
 
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header - Minimal -->
-    <div class="mb-20 max-w-2xl mx-auto text-center">
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Vyberte si ideální kávový box</h2>
-      <p class="text-xl text-gray-600 font-light">Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.</p>
+    <div class="mb-16 sm:mb-20 max-w-2xl mx-auto text-center">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Vyberte si ideální kávový box</h2>
+      <p class="text-lg sm:text-xl text-gray-600 font-light">Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.</p>
     </div>
 
     <div class="mb-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -480,17 +480,17 @@
 </div>
 
 <!-- Testimonials Section - Minimal -->
-<div class="relative bg-gray-50 py-24 sm:py-24 lg:py-32">
+<div class="relative bg-gray-50 py-16 sm:py-20 md:py-24 lg:py-32">
   <!-- Organic shape decoration -->
   <div class="absolute top-0 left-0 w-72 h-72 bg-primary-50 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header - Minimal -->
-    <div class="mb-20">
+    <div class="mb-16 sm:mb-20">
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 max-w-full">
         <div class="max-w-2xl">
-          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Co říkají naši zákazníci</h2>
-          <p class="text-xl text-gray-600 font-light">Přidejte se k řadě spokojených milovníků kávy</p>
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Co říkají naši zákazníci</h2>
+          <p class="text-lg sm:text-xl text-gray-600 font-light">Přidejte se k řadě spokojených milovníků kávy</p>
         </div>
         
         <!-- TrustBox widget - Review Collector -->
@@ -607,15 +607,15 @@
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
     
     <!-- Section Header -->
-    <div class="mb-16 text-center">
+    <div class="mb-12 sm:mb-16 text-center">
       <div class="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full mb-6">
         <svg class="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
         <span class="text-sm font-medium text-gray-700" style="text-transform: capitalize;">{{ $monthName }} {{ $displayYear }}</span>
       </div>
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Káva měsíce</h2>
-      <p class="text-xl text-gray-600 font-light max-w-2xl mx-auto">Každý měsíc přinášíme výběr káv od vybraných pražíren</p>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Káva měsíce</h2>
+      <p class="text-lg sm:text-xl text-gray-600 font-light max-w-2xl mx-auto">Každý měsíc přinášíme výběr káv od vybraných pražíren</p>
     </div>
 
     <div class="grid lg:grid-cols-2 gap-16">
@@ -685,7 +685,7 @@
       <div class="relative lg:h-[400px]">
         @if($coffeeCount >= 6)
           <!-- Grid 3x2 for 6+ photos -->
-          <div class="grid grid-cols-3 gap-3">
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
             @foreach($shuffledCoffees->take(6) as $coffee)
             <div class="relative aspect-square rounded-2xl overflow-hidden bg-gray-100">
               @if($coffee->image)
@@ -768,7 +768,7 @@
 @endif
 
 <!-- How It Works Section - 4 Steps with Arrows -->
-<div class="relative bg-gray-100 py-24 sm:py-24 lg:py-32 overflow-hidden">
+<div class="relative bg-gray-100 py-16 sm:py-20 md:py-24 lg:py-32 overflow-hidden">
   <!-- Wave Divider Top -->
   <div class="absolute top-[-1px] left-0 right-0 bg-white">
     <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
@@ -778,9 +778,9 @@
 
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
-    <div class="mb-16 text-center">
-      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Jak to funguje</h2>
-      <p class="text-xl text-gray-600 font-light max-w-2xl mx-auto">Čtyři jednoduché kroky k perfektní kávě</p>
+    <div class="mb-12 sm:mb-16 text-center">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Jak to funguje</h2>
+      <p class="text-lg sm:text-xl text-gray-600 font-light max-w-2xl mx-auto">Čtyři jednoduché kroky k perfektní kávě</p>
     </div>
 
     <!-- Steps Grid with Arrows -->
@@ -884,16 +884,16 @@
 
 <!-- Featured Products Section - Minimal -->
 @if($featuredProducts->count() > 0)
-<div class="relative bg-gray-50 py-24 sm:py-24 lg:py-32">
+<div class="relative bg-gray-50 py-16 sm:py-20 md:py-24 lg:py-32">
   <!-- Organic shape decoration -->
   <div class="absolute top-0 right-0 w-80 h-80 bg-primary-50 rounded-full translate-x-1/2 -translate-y-1/2"></div>
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header - Minimal -->
-    <div class="mb-16 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+    <div class="mb-12 sm:mb-16 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
       <div>
-        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">Naše kávy</h2>
-        <p class="text-xl text-gray-600 font-light">Ručně vybrané z nejlepších pražíren Evropy</p>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">Naše kávy</h2>
+        <p class="text-lg sm:text-xl text-gray-600 font-light">Ručně vybrané z nejlepších pražíren Evropy</p>
       </div>
       <a href="{{ route('products.index') }}" class="group inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
         <span>Zobrazit více</span>
@@ -903,7 +903,7 @@
       </a>
     </div>
 
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div class="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       @foreach($featuredProducts->take(4) as $product)
       <!-- product - start -->
       <div class="group">
@@ -989,19 +989,19 @@
 @endif
 
 <!-- Impact Section - Minimal -->
-<div class="relative bg-white py-24 sm:py-24 lg:py-32">
+<div class="relative bg-white py-16 sm:py-20 md:py-24 lg:py-32">
   <!-- Organic shape decoration -->
   <div class="absolute top-0 left-0 w-72 h-72 bg-primary-50 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <div class="grid lg:grid-cols-2 gap-16 items-center">
+    <div class="grid lg:grid-cols-2 gap-12 sm:gap-16 items-center">
       <!-- Content Side -->
-      <div class="space-y-8">
+      <div class="space-y-6 sm:space-y-8">
         <div>
-          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
             Káva s pozitivním dopadem
           </h2>
-          <p class="text-xl text-gray-600 leading-relaxed font-light mb-8">
+          <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-6 sm:mb-8">
             V KAVI věříme, že výběrová káva může měnit svět. Z každého kávového boxu proto věnujeme 5 Kč organizaci <a href="https://water.org" target="_blank" class="text-primary-500 hover:text-primary-600 underline">Water.org</a>, která zajišťuje přístup k čisté vodě v rozvojových zemích. <b>Každý box tak poskytne jednomu člověku vodu na půl roku</b. Když si vychutnáváte naši kávu, pomáháte zároveň lidem po celém světě získat to nejzákladnější – bezpečnou vodu.
           </p>
         </div>
@@ -1035,18 +1035,18 @@
 </div>
 
 <!-- Final CTA Section - Clean Minimal -->
-<div class="relative bg-gray-100 py-20 lg:py-24">
+<div class="relative bg-gray-100 py-16 sm:py-20 lg:py-24">
   <!-- Subtle organic shape decoration -->
   <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
 
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
+  <div class="relative mx-auto max-w-screen-xl px-3 sm:px-4 md:px-8">
     <div class="mx-auto flex max-w-2xl flex-col items-center text-center">
       <!-- Heading -->
-      <h2 class="mb-6 text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
+      <h2 class="mb-6 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
         Začněte svou kávovou cestu ještě dnes
       </h2>
 
-      <p class="mb-10 text-lg text-gray-600 max-w-xl leading-relaxed font-light">
+      <p class="mb-8 sm:mb-10 text-base sm:text-lg text-gray-600 max-w-xl leading-relaxed font-light">
         Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.
       </p>
 

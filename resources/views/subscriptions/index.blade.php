@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Hero Header Section - Minimal -->
-<div class="relative bg-gray-100 py-12 md:py-16 overflow-hidden">
+<div class="relative bg-gray-100 py-10 sm:py-12 md:py-16 overflow-hidden">
   <!-- Subtle Organic Shapes -->
   <div class="absolute inset-0 overflow-hidden">
     <div class="absolute -top-32 -right-32 w-96 h-96 bg-primary-100 rounded-full"></div>
@@ -22,11 +22,11 @@
       </div>
 
       <!-- Clean Heading -->
-      <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
+      <h1 class="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
         Sestavte si svůj kávový box
       </h1>
       
-      <p class="mx-auto max-w-2xl text-lg text-gray-600 font-light mb-8">
+      <p class="mx-auto max-w-2xl text-base sm:text-lg text-gray-600 font-light mb-8">
         Vyberte si množství, typ kávy a frekvenci dodání. Jednoduše a bez závazků.
       </p>
 
@@ -95,7 +95,7 @@
       <div class="lg:col-span-5">
         <div class="lg:sticky lg:top-24">
           <!-- Product Photo -->
-          <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 mb-6">
+          <div class="relative aspect-[4/3] sm:aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 mb-6">
             @php
               // For backward compatibility: old images start with 'promo-images/' (storage), new ones with 'images/promo-images/' (public)
               $imageSrc = str_starts_with($promoImage, 'promo-images/') 
@@ -368,14 +368,14 @@
                 <div class="flex flex-col p-4 bg-white rounded-lg border border-gray-200">
                   <span class="font-medium text-gray-900 mb-2 text-sm">Espresso</span>
                   <div class="flex items-center justify-center gap-3">
-                    <button type="button" id="mix-espresso-minus" class="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="button" id="mix-espresso-minus" class="w-10 h-10 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100 active:bg-gray-200 transition-colors">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                       </svg>
                     </button>
-                    <span class="w-8 text-center text-xl font-bold" id="mix-espresso-count">0</span>
-                    <button type="button" id="mix-espresso-plus" class="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="w-10 text-center text-xl font-bold" id="mix-espresso-count">0</span>
+                    <button type="button" id="mix-espresso-plus" class="w-10 h-10 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100 active:bg-gray-200 transition-colors">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                       </svg>
                     </button>
@@ -386,14 +386,14 @@
                 <div class="flex flex-col p-4 bg-white rounded-lg border border-gray-200">
                   <span class="font-medium text-gray-900 mb-2 text-sm">Filtr</span>
                   <div class="flex items-center justify-center gap-3">
-                    <button type="button" id="mix-filter-minus" class="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="button" id="mix-filter-minus" class="w-10 h-10 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100 active:bg-gray-200 transition-colors">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                       </svg>
                     </button>
-                    <span class="w-8 text-center text-xl font-bold" id="mix-filter-count">0</span>
-                    <button type="button" id="mix-filter-plus" class="w-8 h-8 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="w-10 text-center text-xl font-bold" id="mix-filter-count">0</span>
+                    <button type="button" id="mix-filter-plus" class="w-10 h-10 flex items-center justify-center rounded-md border border-gray-300 hover:bg-gray-100 active:bg-gray-200 transition-colors">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                       </svg>
                     </button>
@@ -494,8 +494,8 @@
           </div>
 
           <!-- Shrnutí a Submit -->
-          <div class="p-6 bg-gray-100 rounded-2xl border border-gray-200">
-            <h3 id="summary-title" class="text-xl font-bold text-gray-900 mb-4">Shrnutí objednávky</h3>
+          <div class="p-4 sm:p-6 bg-gray-100 rounded-2xl border border-gray-200">
+            <h3 id="summary-title" class="text-lg sm:text-xl font-bold text-gray-900 mb-4">Shrnutí objednávky</h3>
             
             <div class="space-y-2 mb-6">
               <div class="flex justify-between text-sm">
