@@ -40,8 +40,11 @@
             text-align: center;
         }
         .logo {
-            max-width: 150px;
-            height: auto;
+            max-width: 120px !important;
+            width: 120px !important;
+            height: auto !important;
+            display: block !important;
+            margin: 0 auto !important;
         }
         .content {
             padding: 40px 32px;
@@ -127,6 +130,10 @@
             .footer {
                 padding: 24px !important;
             }
+            .logo {
+                max-width: 100px !important;
+                width: 100px !important;
+            }
         }
         @media (prefers-color-scheme: dark) {
             body {
@@ -172,7 +179,7 @@
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     <tr>

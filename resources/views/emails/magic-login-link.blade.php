@@ -47,8 +47,11 @@
         }
         
         .logo {
-            max-width: 150px;
-            height: auto;
+            max-width: 120px !important;
+            width: 120px !important;
+            height: auto !important;
+            display: block !important;
+            margin: 0 auto !important;
         }
         
         /* Content */
@@ -169,6 +172,11 @@
             .footer {
                 padding: 24px !important;
             }
+            
+            .logo {
+                max-width: 100px !important;
+                width: 100px !important;
+            }
         }
     </style>
 </head>
@@ -182,7 +190,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" style="filter: invert(1) brightness(2);">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none; filter: invert(1) brightness(2);">
                         </td>
                     </tr>
                     

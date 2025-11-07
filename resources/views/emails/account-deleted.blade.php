@@ -34,8 +34,11 @@
         }
         
         .logo {
-            max-width: 150px;
-            height: auto;
+            max-width: 120px !important;
+            width: 120px !important;
+            height: auto !important;
+            display: block !important;
+            margin: 0 auto !important;
         }
         
         .content {
@@ -150,6 +153,11 @@
             .footer {
                 padding: 24px !important;
             }
+            
+            .logo {
+                max-width: 100px !important;
+                width: 100px !important;
+            }
         }
         
         /* Force light mode - prevent auto color inversion */
@@ -201,7 +209,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
