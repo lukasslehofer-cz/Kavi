@@ -2066,6 +2066,26 @@ class StripeService
                     // Don't fail the whole payment if Fakturoid fails
                 }
 
+                // Send success confirmation email
+                try {
+                    $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
+                    if ($email) {
+                        \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentSuccess($subscription, $payment));
+                        \Log::info('Subscription payment confirmation email sent', [
+                            'subscription_id' => $subscription->id,
+                            'payment_id' => $payment->id,
+                            'email' => $email,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send payment confirmation email', [
+                        'subscription_id' => $subscription->id,
+                        'payment_id' => $payment->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Don't fail the whole payment if email fails
+                }
+
                 \Log::info('Subscription payment successful', [
                     'subscription_id' => $subscription->id,
                     'payment_id' => $payment->id,
