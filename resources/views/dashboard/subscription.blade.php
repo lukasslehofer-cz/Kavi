@@ -525,6 +525,16 @@
                                     Obnovit předplatné
                                 </button>
                             </form>
+
+                            <form method="POST" action="{{ route('dashboard.subscription.cancel') }}">
+                                @csrf
+                                <input type="hidden" name="subscription_id" value="{{ $subscription->id }}">
+                                <button type="submit" 
+                                        class="w-full text-center px-4 py-2 text-sm border border-red-600 text-red-600 rounded-full hover:bg-red-50 transition font-medium" 
+                                        onclick="return confirm('⚠️ POZOR: Opravdu chcete zrušit toto předplatné?\n\nToto předplatné již nepůjde obnovit. Dostanete poslední zaplacený box a pak již nebudete dostávat další zásilky.\n\nPokračovat se zrušením?')">
+                                    Zrušit předplatné
+                                </button>
+                            </form>
                             @endif
                         </div>
                     </div>
