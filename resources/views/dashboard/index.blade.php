@@ -133,9 +133,9 @@
                 <div class="flex-1">
                     <h2 class="text-xl font-bold text-gray-900 mb-1">
                         @if($activeSubscriptions->count() > 1)
-                            Vaše aktivní předplatná ({{ $activeSubscriptions->count() }})
+                            Vaše předplatná ({{ $activeSubscriptions->count() }})
                         @else
-                            Vaše aktivní předplatné
+                            Vaše předplatné
                         @endif
                     </h2>
                     <p class="text-gray-600 font-light">
@@ -179,8 +179,16 @@
                         <p class="text-sm text-gray-600 font-medium mb-1">Stav</p>
                         @if($activeSubscription->status === 'active')
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
+                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
                                 Aktivní
+                            </span>
+                        @elseif($activeSubscription->status === 'paused')
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5"></span>
+                                Pozastaveno
+                                @if($activeSubscription->paused_until_date)
+                                    <span class="ml-1 text-yellow-700">do {{ $activeSubscription->paused_until_date->format('d.m.Y') }}</span>
+                                @endif
                             </span>
                         @elseif($activeSubscription->status === 'pending')
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">

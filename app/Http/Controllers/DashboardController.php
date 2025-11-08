@@ -27,8 +27,11 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Get all active subscriptions
-        $activeSubscriptions = $user->activeSubscriptions()->get();
+        // Get all active and paused subscriptions (visible subscriptions)
+        $activeSubscriptions = $user->subscriptions()
+            ->whereIn('status', ['active', 'paused'])
+            ->orderBy('created_at', 'desc')
+            ->get();
         $activeSubscription = $activeSubscriptions->first(); // For backward compatibility
 
         // Get unpaid subscriptions for alert

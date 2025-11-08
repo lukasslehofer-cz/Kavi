@@ -372,7 +372,7 @@
                                 @else
                                 <div class="flex justify-between">
                                     <span class="text-gray-700">Trvání:</span>
-                                    <span class="font-semibold text-green-700">Permanentní sleva</span>
+                                    <span class="font-semibold text-green-700">Stálá sleva</span>
                                 </div>
                                 @endif
                             </div>
@@ -383,7 +383,7 @@
                     <!-- Shipping Address -->
                     @if($subscription->shipping_address)
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-3">Dodací adresa</h3>
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Fakturační adresa</h3>
                         @php
                             $address = is_string($subscription->shipping_address) 
                                 ? json_decode($subscription->shipping_address, true) 
