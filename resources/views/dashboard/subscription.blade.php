@@ -332,6 +332,110 @@
                     </div>
                     @endif
 
+                    <!-- Active Discount Information -->
+                    @if($subscription->discount_amount > 0 && $subscription->coupon_id && $subscription->discount_months_remaining)
+                    @php
+                    // Calculate original price without discount
+                    $originalPrice = $subscription->configured_price + $subscription->discount_amount;
+                    
+                    // Get next billing date for calculations
+                    $nextBillingDate = $subscription->next_billing_date ?? now()->addMonths($subscription->frequency_months);
+                    
+                    // Calculate when discount ends (last payment with discount)
+                    $discountEndsAt = $nextBillingDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);
+                    
+                    // Calculate when full price starts (first payment without discount)
+                    $fullPriceStartsAt = $discountEndsAt->copy()->addMonths($subscription->frequency_months);
+                    @endphp
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Aktivní sleva</h3>
+                        <div class="bg-green-50 p-5 rounded-xl border-2 border-green-200">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-green-900 mb-1 text-base">Sleva {{ $subscription->coupon_code }} aktivována!</div>
+                                    <div class="text-sm text-green-800 font-medium">
+                                        Sleva {{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč po dobu {{ $subscription->discount_months_remaining }} {{ $subscription->discount_months_remaining == 1 ? 'platby' : ($subscription->discount_months_remaining < 5 ? 'plateb' : 'plateb') }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg border border-green-100">
+                                    <span class="text-gray-700 font-medium">Aktuální cena se slevou:</span>
+                                    <span class="font-bold text-green-700 text-base">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg border border-green-100">
+                                    <span class="text-gray-700">Sleva platí do:</span>
+                                    <span class="font-bold text-gray-900">{{ $discountEndsAt->format('j. n. Y') }}</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg border border-green-100">
+                                    <span class="text-gray-700">První platba plnou cenou:</span>
+                                    <span class="font-bold text-gray-900">{{ $fullPriceStartsAt->format('j. n. Y') }}</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between py-2 px-3 bg-amber-50 rounded-lg border-2 border-amber-300">
+                                    <span class="text-gray-900 font-medium">Plná cena od {{ $fullPriceStartsAt->format('j. n.') }}:</span>
+                                    <span class="font-bold text-gray-900 text-lg">{{ number_format($originalPrice, 0, ',', ' ') }} Kč</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 pt-3 border-t border-green-200">
+                                <p class="text-xs text-green-800">
+                                    💡 Po skončení slevového období bude předplatné automaticky pokračovat za plnou cenu. Můžete jej kdykoli zrušit nebo pozastavit.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @elseif($subscription->discount_amount > 0 && $subscription->coupon_id && !$subscription->discount_months_remaining)
+                    @php
+                    // Permanent discount (discount_months_remaining is null)
+                    $originalPrice = $subscription->configured_price + $subscription->discount_amount;
+                    @endphp
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Permanentní sleva</h3>
+                        <div class="bg-green-50 p-5 rounded-xl border-2 border-green-200">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-green-900 mb-1 text-base">Sleva {{ $subscription->coupon_code }} aktivována!</div>
+                                    <div class="text-sm text-green-800 font-medium">
+                                        Sleva {{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč permanentně
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg border border-green-100">
+                                    <span class="text-gray-700 font-medium">Vaše cena se slevou:</span>
+                                    <span class="font-bold text-green-700 text-base">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg border border-green-100">
+                                    <span class="text-gray-700">Standardní cena:</span>
+                                    <span class="text-gray-500 line-through">{{ number_format($originalPrice, 0, ',', ' ') }} Kč</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 pt-3 border-t border-green-200">
+                                <p class="text-xs text-green-800">
+                                    🎉 Gratulujeme! Máte permanentní slevu, která platí po celou dobu trvání předplatného.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Shipping Address -->
                     @if($subscription->shipping_address)
                     <div>

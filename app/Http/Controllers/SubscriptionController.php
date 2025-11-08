@@ -373,25 +373,21 @@ class SubscriptionController extends Controller
                 ->with('error', 'Konfigurace předplatného nenalezena. Prosím nakonfigurujte si předplatné znovu.');
         }
 
-        // Odebrat kupón pokud je požadováno
-        if (request()->has('remove_coupon')) {
-            $this->couponService->clearCouponFromStorage();
-            return redirect()->route('subscriptions.checkout');
-        }
-
-        // Zpracovat kupón z query parametru (pokud byl zadán v formuláři)
-        if (request()->has('coupon_code') && request('coupon_code')) {
-            $couponCode = strtoupper(trim(request('coupon_code')));
-            session(['coupon_code' => $couponCode]);
-        }
-
-        // Zkusit načíst kupón ze session nebo cookie
-        $couponCode = $this->couponService->getCouponFromStorage();
+        // Handle coupon from GET parameter only (simple, reliable)
         $appliedCoupon = null;
         $discount = 0;
         $errorMessage = null;
+        $originalPrice = $price;
         
-        if ($couponCode) {
+        // Odebrat kupón pokud je požadováno
+        if (request()->has('remove_coupon')) {
+            return redirect()->route('subscriptions.checkout');
+        }
+        
+        // Zpracovat kupón z query parametru
+        if (request()->has('coupon_code') && request('coupon_code')) {
+            $couponCode = strtoupper(trim(request('coupon_code')));
+            
             $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'subscription', $price);
             
             if ($result['valid']) {
@@ -402,10 +398,20 @@ class SubscriptionController extends Controller
                 $price = $couponResult['price'];
                 $priceWithoutVat = $couponResult['price_without_vat'];
                 $vat = $couponResult['vat'];
+                
+                \Log::info('Coupon validated in checkout view', [
+                    'coupon_code' => $couponCode,
+                    'original_price' => $originalPrice,
+                    'discount' => $discount,
+                    'final_price' => $price,
+                ]);
             } else {
-                // Kupón není platný, vymazat ho a zobrazit chybu
+                // Kupón není platný - zobrazit chybu
                 $errorMessage = $result['message'];
-                $this->couponService->clearCouponFromStorage();
+                \Log::warning('Invalid coupon in checkout', [
+                    'coupon_code' => $couponCode,
+                    'error' => $errorMessage,
+                ]);
             }
         }
 
@@ -465,15 +471,16 @@ class SubscriptionController extends Controller
             'carrier_pickup_point' => 'nullable|string',
             'payment_method' => 'required|in:card,transfer',
             'delivery_notes' => 'nullable|string|max:500',
-            'coupon_code' => 'nullable|string',
+            'coupon_code' => 'nullable|string', // Kupón z hidden input
         ]);
 
         try {
-            // Zpracování kupónu
+            // Zpracování kupónu - SINGLE SOURCE OF TRUTH: pouze z formuláře (POST)
             $coupon = null;
             $discount = 0;
             $discountMonths = null;
-            $couponCode = $validated['coupon_code'] ?? $this->couponService->getCouponFromStorage();
+            $originalPrice = $price; // Uchovat původní cenu pro log
+            $couponCode = !empty($validated['coupon_code']) ? $validated['coupon_code'] : null;
             
             if ($couponCode) {
                 $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'subscription', $price);
@@ -485,6 +492,19 @@ class SubscriptionController extends Controller
                     $discount = $couponResult['discount'];
                     $price = $couponResult['price']; // Aktualizovat cenu se slevou
                     $discountMonths = $couponResult['months']; // null = neomezeně
+                    
+                    \Log::info('Coupon applied successfully', [
+                        'coupon_code' => $couponCode,
+                        'original_price' => $originalPrice,
+                        'discount' => $discount,
+                        'final_price' => $price,
+                        'discount_months' => $discountMonths,
+                    ]);
+                } else {
+                    // Kupón není platný - vrátit chybu
+                    return back()
+                        ->withInput()
+                        ->with('error', 'Kupón "' . $couponCode . '" není platný: ' . $result['message']);
                 }
             }
             
@@ -524,6 +544,18 @@ class SubscriptionController extends Controller
             if ($configuration['frequency'] == 0) {
                 // Handle one-time box as a regular order
                 return $this->processOneTimeBoxOrder($request, $validated, $configuration, $price, $discount, $coupon);
+            }
+            
+            // BYPASS STRIPE FOR ZERO AMOUNT (100% discount)
+            if ($price <= 0) {
+                \Log::info('Zero price detected - bypassing Stripe and creating subscription directly', [
+                    'original_price' => $originalPrice,
+                    'discount' => $discount,
+                    'final_price' => $price,
+                    'coupon_code' => $couponCode,
+                ]);
+                
+                return $this->createFreeSubscription($validated, $configuration, $originalPrice, $discount, $coupon, $discountMonths);
             }
 
             // Store shipping address and delivery notes in session for webhook
@@ -964,6 +996,180 @@ class SubscriptionController extends Controller
             return back()
                 ->withInput()
                 ->with('error', 'Nastala chyba při vytváření objednávky. Zkuste to prosím znovu.');
+        }
+    }
+
+    /**
+     * Create subscription directly in DB for 100% discount (bypass Stripe)
+     */
+    private function createFreeSubscription(
+        array $validated,
+        array $configuration,
+        float $originalPrice,
+        float $discount,
+        ?\App\Models\Coupon $coupon,
+        ?int $discountMonths
+    ) {
+        DB::beginTransaction();
+        
+        try {
+            // Create or get user
+            $user = auth()->user();
+            
+            if (!$user) {
+                // Check if user exists
+                $existingUser = \App\Models\User::where('email', $validated['email'])->first();
+                
+                if ($existingUser) {
+                    return back()
+                        ->withInput()
+                        ->with('error', 'Účet s tímto emailem již existuje. Prosím přihlaste se.');
+                }
+                
+                // Create new user
+                $user = \App\Models\User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'password' => \Hash::make(\Str::random(32)),
+                    'password_set_by_user' => false,
+                    'phone' => $validated['phone'],
+                    'address' => $validated['billing_address'],
+                    'city' => $validated['billing_city'],
+                    'postal_code' => $validated['billing_postal_code'],
+                    'country' => $validated['billing_country'],
+                    'packeta_point_id' => $validated['packeta_point_id'],
+                    'packeta_point_name' => $validated['packeta_point_name'],
+                    'packeta_point_address' => $validated['packeta_point_address'],
+                ]);
+                
+                // Auto-login
+                auth()->login($user);
+                
+                \Log::info('Created user for free subscription', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                ]);
+            } else {
+                // Update existing user data
+                $user->update([
+                    'phone' => $validated['phone'],
+                    'address' => $validated['billing_address'],
+                    'city' => $validated['billing_city'],
+                    'postal_code' => $validated['billing_postal_code'],
+                    'country' => $validated['billing_country'],
+                    'packeta_point_id' => $validated['packeta_point_id'],
+                    'packeta_point_name' => $validated['packeta_point_name'],
+                    'packeta_point_address' => $validated['packeta_point_address'],
+                ]);
+            }
+            
+            // Calculate next billing date
+            $currentBillingCycleEnd = now()->day <= 15 
+                ? now()->copy()->setDay(15) 
+                : now()->copy()->addMonthNoOverflow()->setDay(15);
+            $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($configuration['frequency']);
+            
+            // Create subscription directly in DB
+            $subscription = Subscription::create([
+                'subscription_number' => Subscription::generateSubscriptionNumber(),
+                'user_id' => $user->id,
+                'subscription_plan_id' => null,
+                'coupon_id' => $coupon?->id,
+                'coupon_code' => $coupon?->code,
+                'discount_amount' => $discount,
+                'discount_months_remaining' => $discountMonths,
+                'discount_months_total' => $discountMonths,
+                'configuration' => $configuration,
+                'configured_price' => 0, // Free subscription (100% discount)
+                'frequency_months' => $configuration['frequency'],
+                'status' => 'active', // Immediately active
+                'starts_at' => now(),
+                'next_billing_date' => $nextBillingDate,
+                'shipping_address' => [
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'billing_address' => $validated['billing_address'],
+                    'billing_city' => $validated['billing_city'],
+                    'billing_postal_code' => $validated['billing_postal_code'],
+                    'country' => $validated['billing_country'],
+                ],
+                'payment_method' => 'free', // Mark as free
+                'packeta_point_id' => $validated['packeta_point_id'],
+                'packeta_point_name' => $validated['packeta_point_name'],
+                'packeta_point_address' => $validated['packeta_point_address'],
+                'carrier_id' => $validated['carrier_id'] ?? null,
+                'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
+                'delivery_notes' => $validated['delivery_notes'] ?? null,
+            ]);
+            
+            // Record coupon usage
+            if ($coupon) {
+                $this->couponService->recordUsage(
+                    $coupon,
+                    $user,
+                    'subscription',
+                    $discount,
+                    null,
+                    $subscription
+                );
+                
+                \Log::info('Coupon usage recorded for free subscription', [
+                    'coupon_id' => $coupon->id,
+                    'subscription_id' => $subscription->id,
+                ]);
+            }
+            
+            // Create initial payment record (amount = 0)
+            \App\Models\SubscriptionPayment::create([
+                'subscription_id' => $subscription->id,
+                'stripe_payment_intent_id' => null,
+                'amount' => 0,
+                'currency' => 'czk',
+                'status' => 'paid',
+                'paid_at' => now(),
+                'period_start' => now(),
+                'period_end' => $nextBillingDate,
+            ]);
+            
+            DB::commit();
+            
+            \Log::info('Free subscription created successfully', [
+                'subscription_id' => $subscription->id,
+                'user_id' => $user->id,
+                'original_price' => $originalPrice,
+                'discount' => $discount,
+            ]);
+            
+            // Send confirmation email
+            try {
+                Mail::to($validated['email'])->send(new \App\Mail\SubscriptionConfirmation($subscription));
+            } catch (\Exception $e) {
+                \Log::error('Failed to send free subscription confirmation email: ' . $e->getMessage());
+            }
+            
+            // Clear session
+            session()->forget([
+                'subscription_configuration',
+                'subscription_price',
+                'subscription_price_without_vat',
+                'subscription_vat',
+            ]);
+            
+            return redirect()->route('subscriptions.confirmation', $subscription)
+                ->with('success', 'Děkujeme! Vaše předplatné bylo aktivováno s 100% slevou.');
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            \Log::error('Failed to create free subscription', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            
+            return back()
+                ->withInput()
+                ->with('error', 'Nastala chyba při vytváření předplatného. Zkuste to prosím znovu.');
         }
     }
 

@@ -29,6 +29,9 @@
             <form action="{{ route('subscriptions.checkout.process') }}" method="POST" id="subscription-checkout-form" class="lg:pt-0">
                 @csrf
                 
+                <!-- Hidden input for coupon code -->
+                <input type="hidden" name="coupon_code" value="{{ $appliedCoupon ? $appliedCoupon->code : '' }}" id="coupon_code_input">
+                
                 <!-- Contact Information -->
                 <div class="bg-white rounded-2xl p-6 border border-gray-200">
                     <div class="flex items-center gap-3 mb-6">
@@ -446,7 +449,7 @@
                     @endif
                     
                     @if($appliedCoupon ?? null)
-                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-4" id="applied-coupon-display">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center gap-2">
                                     <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -454,7 +457,7 @@
                                     </svg>
                                     <span class="text-sm font-medium text-green-800">Kupón aplikován</span>
                                 </div>
-                                <a href="{{ route('subscriptions.checkout', ['remove_coupon' => 1]) }}" class="text-xs text-red-600 hover:text-red-800 hover:underline">
+                                <a href="{{ route('subscriptions.checkout', ['remove_coupon' => 1]) }}" class="text-xs text-red-600 hover:text-red-800 hover:underline" onclick="document.getElementById('coupon_code_input').value = '';">
                                     Odebrat
                                 </a>
                             </div>
@@ -482,6 +485,26 @@
                         </details>
                     @endif
                 </div>
+
+                <!-- 100% Discount Notice -->
+                @if($price <= 0 && ($discount ?? 0) > 0)
+                <div class="bg-green-50 border-2 border-green-300 rounded-xl p-5 mb-6">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-green-900 mb-1 text-base">🎉 100% sleva!</h3>
+                            <p class="text-sm text-green-800">
+                                Vaše předplatné je <strong>zcela zdarma</strong> díky kupónu {{ $appliedCoupon->code }}. 
+                                Po dokončení objednávky bude předplatné okamžitě aktivováno.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Price Summary -->
                 <dl class="space-y-3 mb-6">
