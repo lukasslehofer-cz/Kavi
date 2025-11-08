@@ -373,7 +373,7 @@
     <!-- Packeta Pickup Point -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Výdejní místo Zásilkovny</h2>
+            <h2 class="text-xl font-bold text-gray-900">Výdejní místo</h2>
             <p class="text-sm text-gray-600 mt-1 font-light">Nastavte si preferované výdejní místo pro vaše objednávky</p>
         </div>
         <div class="p-6">
