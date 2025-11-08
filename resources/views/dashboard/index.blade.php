@@ -234,7 +234,7 @@
                         </p>
                         @if($activeSubscription->status === 'paused' && $activeSubscription->paused_until_date)
                         <p class="text-xs text-yellow-600 mt-0.5 font-medium">
-                            Pauza do {{ $activeSubscription->paused_until_date->format('d.m.Y') }}
+                            <!-- Pauza do {{ $activeSubscription->paused_until_date->format('d.m.Y') }} -->
                         </p>
                         @else
                         <p class="text-xs text-gray-500 mt-0.5 font-light">Rozesílka probíhá vždy 20. v měsíci</p>
