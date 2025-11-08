@@ -204,7 +204,21 @@
                 </div>
 
                 @php
-                    $nextShipment = $activeSubscription->next_shipment_date;
+                    // Calculate appropriate shipment date based on subscription status
+                    $nextShipment = null;
+                    $shipmentLabel = 'Další rozesílka';
+                    
+                    if ($activeSubscription->status === 'paused' && $activeSubscription->paused_until_date) {
+                        // For paused subscriptions, show shipment after pause ends
+                        $nextShipment = \App\Helpers\SubscriptionHelper::getNextShipmentAfterDate(
+                            $activeSubscription,
+                            \Carbon\Carbon::parse($activeSubscription->paused_until_date)->startOfDay()
+                        );
+                        $shipmentLabel = 'Rozesílka po pauze';
+                    } else {
+                        // For active subscriptions, use normal next shipment date
+                        $nextShipment = $activeSubscription->next_shipment_date;
+                    }
                 @endphp
                 @if($nextShipment)
                 <div class="flex items-start gap-3">
@@ -214,11 +228,17 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600 font-medium mb-1">Další rozesílka</p>
+                        <p class="text-sm text-gray-600 font-medium mb-1">{{ $shipmentLabel }}</p>
                         <p class="text-base font-bold text-gray-900">
                             {{ $nextShipment->format('d.m.Y') }}
                         </p>
+                        @if($activeSubscription->status === 'paused' && $activeSubscription->paused_until_date)
+                        <p class="text-xs text-yellow-600 mt-0.5 font-medium">
+                            Pauza do {{ $activeSubscription->paused_until_date->format('d.m.Y') }}
+                        </p>
+                        @else
                         <p class="text-xs text-gray-500 mt-0.5 font-light">Rozesílka probíhá vždy 20. v měsíci</p>
+                        @endif
                     </div>
                 </div>
                 @endif
