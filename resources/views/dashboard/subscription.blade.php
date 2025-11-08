@@ -342,6 +342,8 @@
                     $nextBillingDate = $subscription->next_billing_date ?? now()->addMonths($subscription->frequency_months);
                     
                     // Calculate when discount ends (last payment with discount)
+                    // Note: discount_months_remaining already includes the first payment, so we subtract 1
+                    // Example: If discount_months_remaining = 2, we have 2 more payments with discount (next + one after)
                     $discountEndsAt = $nextBillingDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);
                     
                     // Calculate when full price starts (first payment without discount)

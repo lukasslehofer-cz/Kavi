@@ -1047,6 +1047,17 @@ class StripeService
                 'period_end' => $subscription->next_billing_date,
             ]);
             
+            // Decrement discount months for first payment (if applicable)
+            if ($subscription->discount_months_remaining > 0) {
+                $couponService = app(\App\Services\CouponService::class);
+                $couponService->decrementSubscriptionDiscountMonth($subscription);
+                
+                \Log::info('Decremented discount months after first payment', [
+                    'subscription_id' => $subscription->id,
+                    'discount_months_remaining' => $subscription->fresh()->discount_months_remaining,
+                ]);
+            }
+            
             // Record coupon usage if coupon was applied (only for newly created subscriptions)
             if (!$preCreatedSubscription && $subscription->coupon_id && $subscription->discount_amount > 0) {
                 try {
@@ -1306,21 +1317,17 @@ class StripeService
                 ]);
 
                 // Handle coupon discount countdown
-                if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                if ($subscription->coupon_id && $subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) {
                     $couponService = app(\App\Services\CouponService::class);
-                    
-                    // Zaznamenat použití kupónu pro tuto platbu
-                    $couponService->recordUsage(
-                        $subscription->coupon,
-                        $subscription->user,
-                        'subscription',
-                        $subscription->discount_amount,
-                        null,
-                        $subscription
-                    );
                     
                     // Snížit počet zbývajících měsíců slevy
                     $couponService->decrementSubscriptionDiscountMonth($subscription);
+                    
+                    \Log::info('Decremented discount months after recurring payment', [
+                        'subscription_id' => $subscription->id,
+                        'payment_id' => $payment->id,
+                        'discount_months_remaining' => $subscription->fresh()->discount_months_remaining,
+                    ]);
                     
                     // Pokud skončily měsíce se slevou, aktualizovat Stripe subscription s novou cenou
                     if ($subscription->fresh()->discount_months_remaining === 0) {
