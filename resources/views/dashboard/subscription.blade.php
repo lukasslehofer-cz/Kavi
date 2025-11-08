@@ -334,8 +334,7 @@
 
                     <!-- Active Discount Information -->
                     @if($subscription->discount_amount > 0 && $subscription->coupon_id)
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-3">Aktivní sleva</h3>
+                    <div>                        
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex items-center gap-2">
@@ -493,7 +492,9 @@
                     @if($subscription->frequency_months != 0)
                     {{-- Only show actions for regular subscriptions, not one-time boxes --}}
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-3">Akce</h3>
+                    @if($subscription->status === 'active' || $subscription->status === 'paused')
+                        <h3 class="text-lg font-medium text-gray-900 mb-3">Akce</h3>                    
+                    @endif
                         <div class="space-y-2">
                             @if($subscription->status === 'active')
                             @php
