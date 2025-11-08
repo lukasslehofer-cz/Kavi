@@ -394,6 +394,8 @@
                 <input type="hidden" id="packeta_point_id" name="packeta_point_id" value="{{ old('packeta_point_id', auth()->user()->packeta_point_id ?? '') }}">
                 <input type="hidden" id="packeta_point_name" name="packeta_point_name" value="{{ old('packeta_point_name', auth()->user()->packeta_point_name ?? '') }}">
                 <input type="hidden" id="packeta_point_address" name="packeta_point_address" value="{{ old('packeta_point_address', auth()->user()->packeta_point_address ?? '') }}">
+                <input type="hidden" id="carrier_id" name="carrier_id" value="{{ old('carrier_id', auth()->user()->carrier_id ?? '') }}">
+                <input type="hidden" id="carrier_pickup_point" name="carrier_pickup_point" value="{{ old('carrier_pickup_point', auth()->user()->carrier_pickup_point ?? '') }}">
 
                 <!-- Packeta selection display -->
                 <div id="packeta-selection">
@@ -907,10 +909,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 document.getElementById('packeta_point_address').value = address;
                 
+                // Store carrier information for external carriers (e.g. Alzabox, DPD Pickup)
+                if (point.carrierId) {
+                    document.getElementById('carrier_id').value = point.carrierId;
+                    document.getElementById('carrier_pickup_point').value = point.carrierPickupPointId || point.id;
+                } else {
+                    // Clear carrier fields for regular Z-POINT
+                    document.getElementById('carrier_id').value = '';
+                    document.getElementById('carrier_pickup_point').value = '';
+                }
+                
                 console.log('Selected Packeta point:', {
                     id: point.id,
                     name: point.name,
-                    address: address
+                    address: address,
+                    carrierId: point.carrierId || 'N/A (Z-POINT)',
+                    carrierPickupPointId: point.carrierPickupPointId || 'N/A'
                 });
 
                 // Update UI to show selected point

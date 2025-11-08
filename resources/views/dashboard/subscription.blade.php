@@ -684,6 +684,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     address += ', ' + (point.zip ? point.zip + ' ' : '') + point.city;
                 }
 
+                // Prepare data object with carrier information
+                const updateData = {
+                    subscription_id: subscriptionId,
+                    packeta_point_id: point.id,
+                    packeta_point_name: point.name,
+                    packeta_point_address: address,
+                    carrier_id: point.carrierId || null,
+                    carrier_pickup_point: point.carrierPickupPointId || point.id
+                };
+
+                console.log('Updating pickup point with carrier info:', updateData);
+
                 // Send update to server
                 fetch('{{ route("dashboard.subscription.update-packeta") }}', {
                     method: 'POST',
@@ -691,12 +703,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({
-                        subscription_id: subscriptionId,
-                        packeta_point_id: point.id,
-                        packeta_point_name: point.name,
-                        packeta_point_address: address
-                    })
+                    body: JSON.stringify(updateData)
                 })
                 .then(response => response.json())
                 .then(data => {

@@ -104,6 +104,8 @@ class DashboardController extends Controller
             'packeta_point_id' => 'required|string',
             'packeta_point_name' => 'required|string',
             'packeta_point_address' => 'nullable|string',
+            'carrier_id' => 'nullable|string',
+            'carrier_pickup_point' => 'nullable|string',
         ]);
 
         // Find the subscription and verify it belongs to the user
@@ -120,6 +122,8 @@ class DashboardController extends Controller
             'packeta_point_id' => $request->packeta_point_id,
             'packeta_point_name' => $request->packeta_point_name,
             'packeta_point_address' => $request->packeta_point_address,
+            'carrier_id' => $request->carrier_id,
+            'carrier_pickup_point' => $request->carrier_pickup_point,
         ]);
 
         // Also update user's default pickup point
@@ -127,6 +131,8 @@ class DashboardController extends Controller
             'packeta_point_id' => $request->packeta_point_id,
             'packeta_point_name' => $request->packeta_point_name,
             'packeta_point_address' => $request->packeta_point_address,
+            'carrier_id' => $request->carrier_id,
+            'carrier_pickup_point' => $request->carrier_pickup_point,
         ]);
 
         return response()->json([
@@ -168,6 +174,8 @@ class DashboardController extends Controller
             'packeta_point_id' => ['nullable', 'string'],
             'packeta_point_name' => ['nullable', 'string'],
             'packeta_point_address' => ['nullable', 'string'],
+            'carrier_id' => ['nullable', 'string'],
+            'carrier_pickup_point' => ['nullable', 'string'],
         ]);
 
         $user = auth()->user();
