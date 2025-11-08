@@ -126,6 +126,30 @@ class CouponService
         ?Order $order = null,
         ?Subscription $subscription = null
     ): CouponUsage {
+        // IDEMPOTENCE: Check if usage already exists
+        $existingUsage = null;
+        
+        if ($order) {
+            $existingUsage = CouponUsage::where('coupon_id', $coupon->id)
+                ->where('order_id', $order->id)
+                ->first();
+        } elseif ($subscription) {
+            $existingUsage = CouponUsage::where('coupon_id', $coupon->id)
+                ->where('subscription_id', $subscription->id)
+                ->first();
+        }
+        
+        if ($existingUsage) {
+            \Log::info('Coupon usage already recorded (idempotent)', [
+                'coupon_id' => $coupon->id,
+                'order_id' => $order?->id,
+                'subscription_id' => $subscription?->id,
+                'existing_usage_id' => $existingUsage->id,
+            ]);
+            
+            return $existingUsage;
+        }
+
         // Zvýšit počítadlo použití
         $coupon->incrementUsage();
 

@@ -815,6 +815,36 @@ class StripeService
             $subscription = Subscription::create($subscriptionRecord);
             \Log::info('Subscription created successfully', ['id' => $subscription->id]);
             
+            // Record coupon usage if coupon was applied
+            if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                try {
+                    $coupon = \App\Models\Coupon::find($subscription->coupon_id);
+                    if ($coupon) {
+                        $couponService = app(\App\Services\CouponService::class);
+                        $couponService->recordUsage(
+                            $coupon,
+                            $subscription->user,
+                            'subscription',
+                            $subscription->discount_amount,
+                            null,
+                            $subscription
+                        );
+                        
+                        \Log::info('Coupon usage recorded in subscription.created webhook', [
+                            'coupon_id' => $coupon->id,
+                            'subscription_id' => $subscription->id,
+                            'discount_amount' => $subscription->discount_amount,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to record coupon usage in subscription.created webhook', [
+                        'subscription_id' => $subscription->id,
+                        'coupon_id' => $subscription->coupon_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+            
             // Add customer email to newsletter
             try {
                 $email = $subscription->shipping_address['email'] ?? null;
@@ -933,6 +963,18 @@ class StripeService
                 ]);
                 return;
             }
+            
+            // Check if subscription was pre-created by SubscriptionController
+            $preCreatedSubscription = null;
+            if (isset($metadata['subscription_id'])) {
+                $preCreatedSubscription = Subscription::find($metadata['subscription_id']);
+                if ($preCreatedSubscription) {
+                    \Log::info('Found pre-created subscription, updating instead of creating new', [
+                        'subscription_id' => $preCreatedSubscription->id,
+                        'payment_intent' => $paymentIntent->id,
+                    ]);
+                }
+            }
 
             // Build subscription record
             $subscriptionRecord = [
@@ -975,9 +1017,23 @@ class StripeService
                 $subscriptionRecord['discount_months_remaining'] = $metadata['discount_months_remaining'] ?? null;
             }
 
-            \Log::info('Creating custom billing subscription record', $subscriptionRecord);
-            $subscription = Subscription::create($subscriptionRecord);
-            \Log::info('Custom billing subscription created successfully', ['id' => $subscription->id]);
+            // Create or update subscription
+            if ($preCreatedSubscription) {
+                // Update pre-created subscription
+                $preCreatedSubscription->update([
+                    'stripe_payment_intent_id' => $paymentIntent->id,
+                    'stripe_session_id' => $session['id'],
+                    'status' => 'active',
+                    'starts_at' => now(),
+                ]);
+                $subscription = $preCreatedSubscription;
+                \Log::info('Updated pre-created subscription', ['id' => $subscription->id]);
+            } else {
+                // Create new subscription
+                \Log::info('Creating custom billing subscription record', $subscriptionRecord);
+                $subscription = Subscription::create($subscriptionRecord);
+                \Log::info('Custom billing subscription created successfully', ['id' => $subscription->id]);
+            }
 
             // Record the first payment
             \App\Models\SubscriptionPayment::create([
@@ -990,6 +1046,41 @@ class StripeService
                 'period_start' => now(),
                 'period_end' => $subscription->next_billing_date,
             ]);
+            
+            // Record coupon usage if coupon was applied (only for newly created subscriptions)
+            if (!$preCreatedSubscription && $subscription->coupon_id && $subscription->discount_amount > 0) {
+                try {
+                    $coupon = \App\Models\Coupon::find($subscription->coupon_id);
+                    if ($coupon) {
+                        $couponService = app(\App\Services\CouponService::class);
+                        $couponService->recordUsage(
+                            $coupon,
+                            $subscription->user,
+                            'subscription',
+                            $subscription->discount_amount,
+                            null,
+                            $subscription
+                        );
+                        
+                        \Log::info('Coupon usage recorded in webhook', [
+                            'coupon_id' => $coupon->id,
+                            'subscription_id' => $subscription->id,
+                            'discount_amount' => $subscription->discount_amount,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to record coupon usage in webhook', [
+                        'subscription_id' => $subscription->id,
+                        'coupon_id' => $subscription->coupon_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            } elseif ($preCreatedSubscription && $subscription->coupon_id) {
+                \Log::info('Skipping coupon usage recording for pre-created subscription (already recorded)', [
+                    'subscription_id' => $subscription->id,
+                    'coupon_id' => $subscription->coupon_id,
+                ]);
+            }
 
             // Add customer email to newsletter
             try {
