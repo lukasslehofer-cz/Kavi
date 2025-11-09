@@ -88,7 +88,7 @@ try {
     echo "📧 EMAIL:\n";
     echo "   Předmět: ☕ Vítejte v novém Kavi obchodě!\n";
     echo "   Šablona: emails.welcome-after-migration\n";
-    echo "   Obsahuje: Password set link (platný 60 minut)\n\n";
+    echo "   Obsahuje: Password set link (platný 7 dní)\n\n";
     
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
     

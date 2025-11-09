@@ -40,7 +40,7 @@ class WelcomeAfterMigration extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '☕ Vítejte v novém Kavi obchodě!',
+            subject: '☕ Představujeme nové KAVI.cz!',
         );
     }
 

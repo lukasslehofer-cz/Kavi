@@ -60,10 +60,10 @@
                                 <p class="info-text" style="color: #047857;">
                                     Právě jsme <strong>úspěšně převedli</strong> Váš účet a předplatné do našeho nového, modernějšího systému. Co to pro Vás znamená?<br><br>
                                     
-                                    ✓ <strong>Vaše platební karta zůstává aktivní</strong><br>
-                                    ✓ <strong>Automatické platby pokračují</strong> bez přerušení<br>
-                                    ✓ <strong>Předplatné běží stejně</strong> jako předtím<br>
-                                    ✓ <strong>Žádné náklady</strong> ani změny ceny
+                                    ✓ <strong>Vaše stávající předplatné a způsob platby zůstávají aktivní</strong><br>
+                                    ✓ <strong>Nové možnosti nákupu</strong> doplňkového sortimentu<br>
+                                    ✓ <strong>Nové varianty kávových boxů</strong><br>
+                                    ✓ <strong>Stejné ceny</strong> jako dříve
                                 </p>
                             </div>
 
@@ -144,7 +144,7 @@
                                     A: {{ $user->email }}<br><br>
                                     
                                     <strong>Q: Jak dlouho je odkaz platný?</strong><br>
-                                    A: Odkaz je platný 60 minut. Pokud vyprší, můžete si vyžádat nový.
+                                    A: Odkaz je platný 7 dní. Pokud vyprší, můžete si vyžádat nový pomocí funkce "Zapomenuté heslo".
                                 </p>
                             </div>
                             
