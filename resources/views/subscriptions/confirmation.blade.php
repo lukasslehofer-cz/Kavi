@@ -127,8 +127,8 @@
                     
                     @if($subscription->discount_amount > 0 && $subscription->coupon)
                     @php
-                    // Calculate original price without discount
-                    $originalPrice = $subscription->configured_price + $subscription->discount_amount;
+                    // configured_price now contains FULL price (without discount)
+                    $originalPrice = $subscription->configured_price;
                     
                     // Calculate when discount ends
                     $discountEndsAt = $nextPaymentDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);
@@ -162,7 +162,7 @@
                             <div class="space-y-3 text-sm">
                                 <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg">
                                     <span class="text-gray-700">Aktuální cena se slevou:</span>
-                                    <span class="font-bold text-green-700">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                    <span class="font-bold text-green-700">{{ number_format($subscription->configured_price - $subscription->discount_amount, 0, ',', ' ') }} Kč</span>
                                 </div>
                                 
                                 @if($subscription->discount_months_total)

@@ -321,11 +321,14 @@ class StripeService
         }
         $productName .= ' (První platba)';
 
+        // Calculate actual payment amount (full price minus discount)
+        $paymentAmount = $price - $discount;
+        
         // Build line items array
         $lineItems = [[
             'price_data' => [
                 'currency' => 'czk',
-                'unit_amount' => (int)($price * 100), // Convert to haléře
+                'unit_amount' => (int)($paymentAmount * 100), // Convert to haléře (price AFTER discount)
                 'product_data' => [
                     'name' => $productName,
                     'description' => 'První platba předplatného (pokryje období do ' . $nextBillingDate->format('d.m.Y') . ')',

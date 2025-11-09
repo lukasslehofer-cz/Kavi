@@ -163,7 +163,13 @@
                     <div>
                         <p class="text-sm text-gray-600 font-medium mb-1">Cena</p>
                         @if($activeSubscription->configured_price)
-                        <p class="text-xl font-bold text-gray-900">{{ number_format($activeSubscription->configured_price + ($activeSubscription->shipping_cost ?? 0), 0, ',', ' ') }} Kč</p>
+                        @php
+                        // configured_price now contains FULL price (without discount)
+                        // If active discount, subtract it
+                        $activeDiscount = ($activeSubscription->discount_amount > 0 && $activeSubscription->discount_months_remaining > 0) ? $activeSubscription->discount_amount : 0;
+                        $currentPrice = $activeSubscription->configured_price - $activeDiscount + ($activeSubscription->shipping_cost ?? 0);
+                        @endphp
+                        <p class="text-xl font-bold text-gray-900">{{ number_format($currentPrice, 0, ',', ' ') }} Kč</p>
                         <p class="text-xs text-gray-500 mt-0.5 font-light">
                             / {{ $activeSubscription->frequency_months == 1 ? 'měsíc' : ($activeSubscription->frequency_months . ' měsíce') }}
                             @if(($activeSubscription->shipping_cost ?? 0) > 0)

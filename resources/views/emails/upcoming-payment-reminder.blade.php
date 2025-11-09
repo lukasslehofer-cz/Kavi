@@ -225,7 +225,13 @@
                                     <span style="font-size: 20px; font-weight: 700;">{{ $subscription->next_billing_date->format('j. n. Y') }}</span>
                                 </p>
                                 <p style="font-size: 16px; color: #1e3a8a; margin: 12px 0 0 0;">
-                                    <strong>Částka:</strong> <span style="font-size: 20px; font-weight: 700; color: #e6305a;">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                    @php
+                                    // configured_price now contains FULL price (without discount)
+                                    // If active discount, subtract it
+                                    $activeDiscount = ($subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) ? $subscription->discount_amount : 0;
+                                    $paymentAmount = $subscription->configured_price - $activeDiscount;
+                                    @endphp
+                                    <strong>Částka:</strong> <span style="font-size: 20px; font-weight: 700; color: #e6305a;">{{ number_format($paymentAmount, 0, ',', ' ') }} Kč</span>
                                 </p>
                             </div>
                             

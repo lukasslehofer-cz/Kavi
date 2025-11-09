@@ -105,7 +105,8 @@
                                     </div>
                                     @if($subscription->discount_months_total)
                                     @php
-                                    $originalPrice = $subscription->configured_price + $subscription->discount_amount;
+                                    // configured_price now contains FULL price (without discount)
+                                    $originalPrice = $subscription->configured_price;
                                     // Calculate when discount ends
                                     $nextBillingDate = $subscription->next_billing_date ? \Carbon\Carbon::parse($subscription->next_billing_date) : now();
                                     $discountEndsAt = $nextBillingDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);

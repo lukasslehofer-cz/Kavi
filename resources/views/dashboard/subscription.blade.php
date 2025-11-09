@@ -110,7 +110,11 @@
                 </div>
                 <div class="text-right">
                     @php
-                    $basePrice = $subscription->configured_price ?? $subscription->plan->price;
+                    // configured_price now contains FULL price (without discount)
+                    // If active discount, subtract it from price
+                    $fullPrice = $subscription->configured_price ?? $subscription->plan->price;
+                    $activeDiscount = ($subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) ? $subscription->discount_amount : 0;
+                    $basePrice = $fullPrice - $activeDiscount;
                     $shippingCost = $subscription->shipping_cost ?? 0;
                     $totalPrice = $basePrice + $shippingCost;
                     @endphp
@@ -162,7 +166,7 @@
                                     <span class="text-gray-600">Plánovaná rozesílka:</span>
                                     <span class="font-medium text-blue-600">{{ $oneTimeShipment->format('d.m.Y') }}</span>
                                 </div>
-                                <div class="text-xs text-gray-500 text-right mt-1">Rozesílka probíhá vždy 20. v měsíci</div>
+                                <div class="text-xs text-gray-500 text-right mt-1">Rozesílka probíhá většinou 20. v měsíci</div>
                                 @endif
                                 @endif
                                 
@@ -385,7 +389,9 @@
                                 </div>
                                 @if($subscription->discount_months_total)
                                 @php
-                                $originalPrice = $subscription->configured_price + $subscription->discount_amount + ($subscription->shipping_cost ?? 0);
+                                // configured_price now contains FULL price (without discount)
+                                // So original price = configured_price + shipping (NOT adding discount_amount)
+                                $originalPrice = $subscription->configured_price + ($subscription->shipping_cost ?? 0);
                                 
                                 // Calculate next billing date based on subscription state
                                 $nextBillingDate = null;

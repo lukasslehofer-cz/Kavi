@@ -81,8 +81,13 @@
                                         {{ ucfirst($subscription->status) }}
                                     @endif
                                     <br>
-                                    
-                                    <strong>Cena:</strong> {{ number_format($subscription->configured_price ?? 0, 0, ',', ' ') }} Kč / měsíc<br>
+                                    @php
+                                    // configured_price now contains FULL price (without discount)
+                                    // If active discount, subtract it
+                                    $activeDiscount = ($subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) ? $subscription->discount_amount : 0;
+                                    $displayPrice = ($subscription->configured_price ?? 0) - $activeDiscount;
+                                    @endphp
+                                    <strong>Cena:</strong> {{ number_format($displayPrice, 0, ',', ' ') }} Kč / měsíc<br>
                                     
                                     @if($subscription->next_billing_date)
                                     <strong>Další platba:</strong> {{ $subscription->next_billing_date->format('d.m.Y') }}<br>

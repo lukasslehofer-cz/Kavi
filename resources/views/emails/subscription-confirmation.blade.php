@@ -331,7 +331,13 @@
                                 
                                 <div class="config-item">
                                     <span class="config-label">Cena za dodávku:</span>
-                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                    @php
+                                    // configured_price now contains FULL price (without discount)
+                                    // If active discount, subtract it
+                                    $activeDiscount = ($subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) ? $subscription->discount_amount : 0;
+                                    $currentPrice = $subscription->configured_price - $activeDiscount;
+                                    @endphp
+                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($currentPrice, 0, ',', ' ') }} Kč</span>
                                 </div>
                             </div>
                             

@@ -613,7 +613,7 @@ class SubscriptionController extends Controller
                 $session = $this->stripeService->createConfiguredSubscriptionCheckoutSession(
                     auth()->user(),
                     $configuration,
-                    $price,
+                    $originalPrice, // Pass FULL price without discount
                     $shippingAddress,
                     $coupon,
                     $discount,
@@ -645,7 +645,7 @@ class SubscriptionController extends Controller
                     'discount_months_remaining' => $discountMonths,
                     'discount_months_total' => $discountMonths,
                     'configuration' => $configuration,
-                    'configured_price' => $price,
+                    'configured_price' => $originalPrice, // Store FULL price without discount
                     'frequency_months' => $configuration['frequency'],
                     'status' => 'pending', // Will be activated after payment confirmation
                     'starts_at' => now(),
@@ -1128,7 +1128,7 @@ class SubscriptionController extends Controller
                 'discount_months_remaining' => $discountMonths,
                 'discount_months_total' => $discountMonths,
                 'configuration' => $configuration,
-                'configured_price' => 0, // Free subscription (100% discount)
+                'configured_price' => $originalPrice, // Store FULL price without discount (even for 100% discount)
                 'frequency_months' => $configuration['frequency'],
                 'status' => 'active', // Immediately active
                 'starts_at' => now(),
