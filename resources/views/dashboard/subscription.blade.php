@@ -109,8 +109,13 @@
                     </div>
                 </div>
                 <div class="text-right">
+                    @php
+                    $basePrice = $subscription->configured_price ?? $subscription->plan->price;
+                    $shippingCost = $subscription->shipping_cost ?? 0;
+                    $totalPrice = $basePrice + $shippingCost;
+                    @endphp
                     <div class="text-2xl font-bold text-primary-600">
-                        {{ number_format($subscription->configured_price ?? $subscription->plan->price, 0, ',', ' ') }} Kč
+                        {{ number_format($totalPrice, 0, ',', ' ') }} Kč
                     </div>
                     <div class="text-sm text-gray-600 font-light mt-1">
                         @if($subscription->frequency_months === 0)
@@ -119,6 +124,9 @@
                             / {{ $subscription->frequency_months == 1 ? 'měsíc' : ($subscription->frequency_months . ' měsíce') }}
                         @else
                             / {{ $subscription->plan->billing_period === 'monthly' ? 'měsíc' : 'rok' }}
+                        @endif
+                        @if($shippingCost > 0)
+                        <span class="block text-xs text-gray-500 mt-1">({{ number_format($basePrice, 0, ',', ' ') }} Kč předplatné + {{ number_format($shippingCost, 0, ',', ' ') }} Kč doprava)</span>
                         @endif
                     </div>
                 </div>
@@ -328,6 +336,31 @@
                                 <span class="font-medium">{{ $config['frequencyText'] }}</span>
                             </div>
                             @endif
+                            
+                            <!-- Pricing breakdown -->
+                            @if($subscription->configured_price)
+                            <div class="pt-3 border-t-2 border-gray-300">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-600">Cena předplatného:</span>
+                                    <span class="font-medium">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                @if(($subscription->shipping_cost ?? 0) > 0)
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-600">Doprava:</span>
+                                    <span class="font-medium">{{ number_format($subscription->shipping_cost, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                <div class="flex justify-between pt-2 border-t border-gray-300">
+                                    <span class="text-gray-700 font-semibold">Celkem:</span>
+                                    <span class="font-bold text-lg text-primary-600">{{ number_format($subscription->configured_price + $subscription->shipping_cost, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                @else
+                                <div class="flex justify-between pt-2 border-t border-gray-300">
+                                    <span class="text-gray-700 font-semibold">Celkem:</span>
+                                    <span class="font-bold text-lg text-primary-600">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                @endif
+                            </div>
+                            @endif
                         </div>
                     </div>
                     @endif
@@ -352,7 +385,7 @@
                                 </div>
                                 @if($subscription->discount_months_total)
                                 @php
-                                $originalPrice = $subscription->configured_price + $subscription->discount_amount;
+                                $originalPrice = $subscription->configured_price + $subscription->discount_amount + ($subscription->shipping_cost ?? 0);
                                 // Calculate when discount ends
                                 $nextBillingDate = $subscription->next_billing_date ? \Carbon\Carbon::parse($subscription->next_billing_date) : now();
                                 $discountEndsAt = $nextBillingDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);

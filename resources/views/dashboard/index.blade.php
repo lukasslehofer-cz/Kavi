@@ -163,8 +163,13 @@
                     <div>
                         <p class="text-sm text-gray-600 font-medium mb-1">Cena</p>
                         @if($activeSubscription->configured_price)
-                        <p class="text-xl font-bold text-gray-900">{{ number_format($activeSubscription->configured_price, 0, ',', ' ') }} Kč</p>
-                        <p class="text-xs text-gray-500 mt-0.5 font-light">/ {{ $activeSubscription->frequency_months == 1 ? 'měsíc' : ($activeSubscription->frequency_months . ' měsíce') }}</p>
+                        <p class="text-xl font-bold text-gray-900">{{ number_format($activeSubscription->configured_price + ($activeSubscription->shipping_cost ?? 0), 0, ',', ' ') }} Kč</p>
+                        <p class="text-xs text-gray-500 mt-0.5 font-light">
+                            / {{ $activeSubscription->frequency_months == 1 ? 'měsíc' : ($activeSubscription->frequency_months . ' měsíce') }}
+                            @if(($activeSubscription->shipping_cost ?? 0) > 0)
+                            <span class="text-gray-400"> (vč. doprava {{ number_format($activeSubscription->shipping_cost, 0, ',', ' ') }} Kč)</span>
+                            @endif
+                        </p>
                         @endif
                     </div>
                 </div>

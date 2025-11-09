@@ -99,10 +99,29 @@
                         
                         <div>
                             <div class="text-sm text-gray-600 mb-1 font-light">Cena</div>
-                            <div class="text-2xl font-bold text-gray-900">
-                                {{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč
+                            <div class="space-y-2">
+                                <div>
+                                    <div class="text-base text-gray-700 font-medium">Předplatné</div>
+                                    <div class="text-xl font-bold text-gray-900">
+                                        {{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč
+                                    </div>
+                                </div>
+                                @if($subscription->shipping_cost > 0)
+                                <div class="pt-2 border-t border-gray-300">
+                                    <div class="text-base text-gray-700 font-medium">Doprava</div>
+                                    <div class="text-xl font-bold text-gray-900">
+                                        {{ number_format($subscription->shipping_cost, 0, ',', ' ') }} Kč
+                                    </div>
+                                </div>
+                                @endif
+                                <div class="pt-2 border-t-2 border-gray-400">
+                                    <div class="text-base text-gray-700 font-medium">Celkem</div>
+                                    <div class="text-2xl font-bold text-primary-600">
+                                        {{ number_format($subscription->configured_price + ($subscription->shipping_cost ?? 0), 0, ',', ' ') }} Kč
+                                    </div>
+                                    <div class="text-xs text-gray-600 font-light mt-1">{{ $frequencyText }}</div>
+                                </div>
                             </div>
-                            <div class="text-xs text-gray-600 font-light">{{ $frequencyText }}</div>
                         </div>
                     </div>
                     
