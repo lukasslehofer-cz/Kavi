@@ -228,7 +228,8 @@
                                     @php
                                     // configured_price now contains FULL price (without discount)
                                     // If active discount, subtract it
-                                    $activeDiscount = ($subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) ? $subscription->discount_amount : 0;
+                                    // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
+                                    $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
                                     $paymentAmount = $subscription->configured_price - $activeDiscount;
                                     @endphp
                                     <strong>Částka:</strong> <span style="font-size: 20px; font-weight: 700; color: #e6305a;">{{ number_format($paymentAmount, 0, ',', ' ') }} Kč</span>

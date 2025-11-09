@@ -113,7 +113,8 @@
                     // configured_price now contains FULL price (without discount)
                     // If active discount, subtract it from price
                     $fullPrice = $subscription->configured_price ?? $subscription->plan->price;
-                    $activeDiscount = ($subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) ? $subscription->discount_amount : 0;
+                    // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
+                    $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
                     $basePrice = $fullPrice - $activeDiscount;
                     $shippingCost = $subscription->shipping_cost ?? 0;
                     $totalPrice = $basePrice + $shippingCost;

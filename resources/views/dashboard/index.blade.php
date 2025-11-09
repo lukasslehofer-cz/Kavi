@@ -166,7 +166,8 @@
                         @php
                         // configured_price now contains FULL price (without discount)
                         // If active discount, subtract it
-                        $activeDiscount = ($activeSubscription->discount_amount > 0 && $activeSubscription->discount_months_remaining > 0) ? $activeSubscription->discount_amount : 0;
+                        // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
+                        $activeDiscount = ($activeSubscription->discount_amount > 0 && ($activeSubscription->discount_months_remaining === null || $activeSubscription->discount_months_remaining > 0)) ? $activeSubscription->discount_amount : 0;
                         $currentPrice = $activeSubscription->configured_price - $activeDiscount + ($activeSubscription->shipping_cost ?? 0);
                         @endphp
                         <p class="text-xl font-bold text-gray-900">{{ number_format($currentPrice, 0, ',', ' ') }} Kč</p>

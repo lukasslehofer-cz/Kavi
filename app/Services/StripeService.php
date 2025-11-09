@@ -2141,7 +2141,8 @@ class StripeService
 
             // Calculate amount (with coupon discount if applicable)
             $amount = $subscription->configured_price ?? $subscription->plan?->price ?? 0;
-            if ($subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) {
+            // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
+            if ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) {
                 $amount -= $subscription->discount_amount;
             }
 
