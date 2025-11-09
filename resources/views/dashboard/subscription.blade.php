@@ -386,22 +386,62 @@
                                 @if($subscription->discount_months_total)
                                 @php
                                 $originalPrice = $subscription->configured_price + $subscription->discount_amount + ($subscription->shipping_cost ?? 0);
-                                // Calculate when discount ends
-                                $nextBillingDate = $subscription->next_billing_date ? \Carbon\Carbon::parse($subscription->next_billing_date) : now();
-                                $discountEndsAt = $nextBillingDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);
+                                
+                                // Calculate next billing date based on subscription state
+                                $nextBillingDate = null;
+                                $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+                                
+                                // Case 1: Paused subscription - calculate from first billing after pause ends
+                                if ($subscription->status === 'paused' && $subscription->paused_until_date) {
+                                    $firstBillingAfterPause = \App\Helpers\SubscriptionHelper::getNextShipmentAfterDate(
+                                        $subscription,
+                                        \Carbon\Carbon::parse($subscription->paused_until_date)->startOfDay()
+                                    );
+                                    $nextBillingDate = $firstBillingAfterPause;
+                                }
+                                // Case 2: Cancelled subscription - discount no longer applies, but show info
+                                elseif ($subscription->status === 'cancelled') {
+                                    // For cancelled subscriptions, show when discount would have ended
+                                    $nextBillingDate = $subscription->next_billing_date 
+                                        ? \Carbon\Carbon::parse($subscription->next_billing_date) 
+                                        : now();
+                                }
+                                // Case 3: Active or other status - use next_billing_date or fallback to now
+                                else {
+                                    $nextBillingDate = $subscription->next_billing_date 
+                                        ? \Carbon\Carbon::parse($subscription->next_billing_date) 
+                                        : now()->addMonths($frequencyMonths);
+                                }
+                                
+                                // Calculate when discount ends (last payment with discount)
+                                // discount_months_remaining includes current period, so we add (remaining - 1) periods
+                                $discountEndsAt = $nextBillingDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $frequencyMonths);
+                                $fullPriceStartsAt = $discountEndsAt->copy()->addMonths($frequencyMonths);
                                 @endphp
                                 <div class="flex justify-between">
                                     <span class="text-gray-700">Zbývá plateb se slevou:</span>
                                     <span class="font-semibold text-gray-900">{{ $subscription->discount_months_remaining }} z {{ $subscription->discount_months_total }}</span>
                                 </div>
+                                @if($subscription->status === 'paused' && $subscription->paused_until_date)
+                                <div class="flex justify-between py-2 px-2 bg-yellow-50 rounded border border-yellow-200">
+                                    <span class="text-yellow-800 text-xs">⏸️ Pauza do {{ $subscription->paused_until_date->format('d.m.Y') }}</span>
+                                    <span class="text-yellow-700 text-xs font-semibold">Sleva se nespotřebovává</span>
+                                </div>
+                                @endif
                                 <div class="flex justify-between">
                                     <span class="text-gray-700">Sleva platí do:</span>
                                     <span class="font-semibold text-gray-900">{{ $discountEndsAt->format('d.m.Y') }}</span>
                                 </div>
+                                @if($subscription->status !== 'cancelled')
                                 <div class="flex justify-between pt-2 border-t border-green-300">
-                                    <span class="text-gray-700">Plná cena od {{ $discountEndsAt->copy()->addMonths($subscription->frequency_months)->format('d.m.Y') }}:</span>
+                                    <span class="text-gray-700">Plná cena od {{ $fullPriceStartsAt->format('d.m.Y') }}:</span>
                                     <span class="font-bold text-gray-900">{{ number_format($originalPrice, 0, ',', ' ') }} Kč</span>
                                 </div>
+                                @else
+                                <div class="flex justify-between pt-2 border-t border-gray-300">
+                                    <span class="text-gray-700 text-xs">Předplatné zrušeno - sleva již neplatí</span>
+                                </div>
+                                @endif
                                 @else
                                 <div class="flex justify-between">
                                     <span class="text-gray-700">Trvání:</span>
