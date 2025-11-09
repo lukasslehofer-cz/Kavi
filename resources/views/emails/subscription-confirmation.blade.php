@@ -342,9 +342,18 @@
                                     <strong>První kávový box vám dorazí:</strong><br>
                                     {{ $subscription->next_shipment_date ? $subscription->next_shipment_date->format('j. n. Y') : 'Brzy' }}
                                 </p>
+                                @if($subscription->next_billing_date && $subscription->frequency_months > 0)
+                                @php
+                                    // Calculate next shipment date after next billing
+                                    $nextBillingDate = \Carbon\Carbon::parse($subscription->next_billing_date);
+                                    $nextShipmentSchedule = \App\Models\ShipmentSchedule::getForMonth($nextBillingDate->year, $nextBillingDate->month);
+                                    $nextShipmentAfterBilling = $nextShipmentSchedule ? $nextShipmentSchedule->shipment_date : $nextBillingDate->copy()->day(20);
+                                @endphp
                                 <p class="info-text" style="color: #1e3a8a; margin-top: 8px;">
-                                    Další doručení automaticky {{ $subscription->next_billing_date ? $subscription->next_billing_date->format('j. n. Y') : 'podle frekvence' }}
+                                    <strong>Další platba:</strong> {{ $nextBillingDate->format('j. n. Y') }}<br>
+                                    <strong>Další doručení:</strong> cca {{ $nextShipmentAfterBilling->format('j. n. Y') }}
                                 </p>
+                                @endif
                             </div>
                             
                             <!-- Delivery Info -->

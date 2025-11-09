@@ -261,10 +261,18 @@
                             <!-- What happens next -->
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
                                 <h3 class="info-title" style="color: #065f46;">✓ Co se stane dále?</h3>
+                                @php
+                                    // Calculate shipment date for this billing cycle
+                                    $billingDate = \Carbon\Carbon::parse($subscription->next_billing_date);
+                                    $shipmentSchedule = \App\Models\ShipmentSchedule::getForMonth($billingDate->year, $billingDate->month);
+                                    $shipmentDate = $shipmentSchedule ? $shipmentSchedule->shipment_date : $billingDate->copy()->day(20);
+                                    $deliveryStart = $shipmentDate->copy()->addDays(1);
+                                    $deliveryEnd = $shipmentDate->copy()->addDays(2);
+                                @endphp
                                 <p class="info-text" style="color: #047857;">
-                                    1. <strong>{{ $subscription->next_billing_date->format('j. n. Y') }}</strong> - Automatická platba<br>
-                                    2. Pražení vaší kávy na míru<br>
-                                    3. Expedice k vašemu výdejnímu místu<br>
+                                    1. <strong>{{ $billingDate->format('j. n. Y') }}</strong> - Automatická platba<br>
+                                    2. <strong>{{ $shipmentDate->format('j. n. Y') }}</strong> - Pražení a expedice vaší kávy<br>
+                                    3. <strong>{{ $deliveryStart->format('j. n. Y') }} - {{ $deliveryEnd->format('j. n. Y') }}</strong> - Doručení na výdejní místo<br>
                                     4. Čerstvá káva přímo k vám!
                                 </p>
                             </div>

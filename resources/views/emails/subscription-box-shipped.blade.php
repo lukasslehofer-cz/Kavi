@@ -279,7 +279,7 @@
                         <td class="footer">
                             <p class="footer-text">
                                 <strong style="color: #111827;">KAVI.cz</strong><br>
-                                Prémiová káva s předplatným
+                                Výběrová káva s předplatným
                             </p>
                             <div class="footer-links">
                                 <a href="{{ route('home') }}" class="footer-link">Domů</a>

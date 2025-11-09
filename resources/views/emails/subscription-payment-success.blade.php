@@ -82,11 +82,22 @@
                             
                             <!-- Next Billing -->
                             <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
-                                <h3 class="info-title" style="color: #1e40af;">📅 Další platba</h3>
+                                <h3 class="info-title" style="color: #1e40af;">📅 Další platba a doručení</h3>
+                                @if($subscription->next_billing_date)
+                                @php
+                                    $nextBillingDate = \Carbon\Carbon::parse($subscription->next_billing_date);
+                                    $nextShipmentSchedule = \App\Models\ShipmentSchedule::getForMonth($nextBillingDate->year, $nextBillingDate->month);
+                                    $nextShipmentDate = $nextShipmentSchedule ? $nextShipmentSchedule->shipment_date : $nextBillingDate->copy()->day(20);
+                                @endphp
                                 <p class="info-text" style="color: #1e3a8a;">
-                                    <strong>Datum další platby:</strong><br>
-                                    {{ $subscription->next_billing_date ? $subscription->next_billing_date->format('j. n. Y') : 'Bude upřesněno' }}
+                                    <strong>Datum další platby:</strong> {{ $nextBillingDate->format('j. n. Y') }}<br>
+                                    <strong>Datum další rozesílky:</strong> cca {{ $nextShipmentDate->format('j. n. Y') }}
                                 </p>
+                                @else
+                                <p class="info-text" style="color: #1e3a8a;">
+                                    Datum bude upřesněno
+                                </p>
+                                @endif
                                 <p class="info-text" style="color: #1e3a8a; margin-top: 8px; font-size: 13px;">
                                     Platba bude automaticky stržena z vaší uložené platební karty.<br>
                                     3 dny před platbou vám pošleme připomínku.
