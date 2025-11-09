@@ -49,6 +49,9 @@ class Subscription extends Model
         'packeta_tracking_url',
         'packeta_shipment_status',
         'packeta_sent_at',
+        'shipping_cost',
+        'shipping_country',
+        'shipping_rate_id',
     ];
 
     protected $casts = [
@@ -64,6 +67,7 @@ class Subscription extends Model
         'configured_price' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'pending_invoice_amount' => 'decimal:2',
+        'shipping_cost' => 'decimal:2',
     ];
 
     public function user()

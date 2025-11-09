@@ -60,7 +60,7 @@
                         <p class="text-gray-600 font-light">{{ $subscription->subscription_number ?? '#' . $subscription->id }}</p>
                     @else
                         <h2 class="text-xl font-bold text-gray-900 mb-1">Kávové předplatné {{ $subscription->subscription_number ?? '#' . $subscription->id }}</h2>
-                        <p class="text-gray-600 font-light">Váš vlastní konfigurace</p>
+                        <p class="text-gray-600 font-light">Vaše vlastní konfigurace</p>
                     @endif
                     
                     <div class="mt-3">

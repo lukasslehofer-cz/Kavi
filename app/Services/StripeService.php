@@ -174,7 +174,9 @@ class StripeService
     public function createOneTimeBoxCheckoutSession(
         Subscription $subscription,
         float $price,
-        array $shippingAddress
+        array $shippingAddress,
+        float $shipping = 0,
+        ?\App\Models\ShippingRate $shippingRate = null
     ): StripeSession
     {
         $subscription->load('user');
@@ -213,6 +215,20 @@ class StripeService
             ],
         ];
         
+        // Add shipping if applicable
+        if ($shipping > 0) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'czk',
+                    'product_data' => [
+                        'name' => 'Doprava',
+                    ],
+                    'unit_amount' => (int)($shipping * 100),
+                ],
+                'quantity' => 1,
+            ];
+        }
+        
         return StripeSession::create([
             'customer' => $customerId,
             'payment_method_types' => ['card'],
@@ -238,7 +254,9 @@ class StripeService
         array $shippingAddress,
         ?\App\Models\Coupon $coupon = null,
         float $discount = 0,
-        ?int $discountMonths = null
+        ?int $discountMonths = null,
+        float $shipping = 0,
+        ?\App\Models\ShippingRate $shippingRate = null
     ): StripeSession {
         // Prepare metadata for subscription (includes Packeta and delivery_notes)
         // Store Packeta data in shipping_address JSON for consistency with Orders
@@ -270,6 +288,10 @@ class StripeService
             'carrier_id' => $shippingAddress['carrier_id'] ?? null,
             'carrier_pickup_point' => $shippingAddress['carrier_pickup_point'] ?? null,
             'delivery_notes' => $shippingAddress['delivery_notes'] ?? null,
+            // Shipping cost information
+            'shipping_cost' => $shipping,
+            'shipping_country' => $shippingAddress['billing_country'] ?? 'CZ',
+            'shipping_rate_id' => $shippingRate?->id,
         ];
         
         // Add coupon info to metadata if present
@@ -299,20 +321,37 @@ class StripeService
         }
         $productName .= ' (První platba)';
 
+        // Build line items array
+        $lineItems = [[
+            'price_data' => [
+                'currency' => 'czk',
+                'unit_amount' => (int)($price * 100), // Convert to haléře
+                'product_data' => [
+                    'name' => $productName,
+                    'description' => 'První platba předplatného (pokryje období do ' . $nextBillingDate->format('d.m.Y') . ')',
+                ],
+            ],
+            'quantity' => 1,
+        ]];
+        
+        // Add shipping if applicable
+        if ($shipping > 0) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'czk',
+                    'product_data' => [
+                        'name' => 'Doprava',
+                    ],
+                    'unit_amount' => (int)($shipping * 100),
+                ],
+                'quantity' => 1,
+            ];
+        }
+
         // Create session with ONE-TIME payment + save payment method for future
         $sessionData = [
             'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'czk',
-                    'unit_amount' => (int)($price * 100), // Convert to haléře
-                    'product_data' => [
-                        'name' => $productName,
-                        'description' => 'První platba předplatného (pokryje období do ' . $nextBillingDate->format('d.m.Y') . ')',
-                    ],
-                ],
-                'quantity' => 1,
-            ]],
+            'line_items' => $lineItems,
             'mode' => 'payment', // ONE-TIME payment, NOT subscription!
             'metadata' => $subscriptionMetadata, // Metadata directly in session for webhook handling
             'payment_intent_data' => [
@@ -1006,6 +1045,13 @@ class StripeService
             // Add delivery notes if available
             if (isset($metadata['delivery_notes'])) {
                 $subscriptionRecord['delivery_notes'] = $metadata['delivery_notes'];
+            }
+            
+            // Add shipping data if available
+            if (isset($metadata['shipping_cost'])) {
+                $subscriptionRecord['shipping_cost'] = $metadata['shipping_cost'];
+                $subscriptionRecord['shipping_country'] = $metadata['shipping_country'] ?? null;
+                $subscriptionRecord['shipping_rate_id'] = $metadata['shipping_rate_id'] ?? null;
             }
 
             // Add coupon info if available

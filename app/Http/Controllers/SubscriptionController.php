@@ -508,6 +508,18 @@ class SubscriptionController extends Controller
                 }
             }
             
+            // Calculate shipping cost based on billing country
+            $shippingCountry = $validated['billing_country'];
+            $shipping = $this->shippingService->calculateShippingCost($shippingCountry, $price, true); // true = is subscription
+            $shippingRate = ShippingRate::getForCountry($shippingCountry);
+            
+            \Log::info('Shipping calculated for subscription', [
+                'country' => $shippingCountry,
+                'subtotal' => $price,
+                'shipping_cost' => $shipping,
+                'shipping_rate_id' => $shippingRate?->id,
+            ]);
+            
             // Check for existing user if guest checkout
             if (!auth()->check()) {
                 $existingUser = \App\Models\User::where('email', $validated['email'])->first();
@@ -605,7 +617,9 @@ class SubscriptionController extends Controller
                     $shippingAddress,
                     $coupon,
                     $discount,
-                    $discountMonths
+                    $discountMonths,
+                    $shipping,
+                    $shippingRate
                 );
 
                 // Redirect to Stripe Checkout
@@ -652,6 +666,9 @@ class SubscriptionController extends Controller
                     'carrier_id' => $validated['carrier_id'] ?? null,
                     'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
                     'delivery_notes' => $validated['delivery_notes'] ?? null,
+                    'shipping_cost' => $shipping,
+                    'shipping_country' => $shippingCountry,
+                    'shipping_rate_id' => $shippingRate?->id,
                 ]);
 
                 // Zaznamenat použití kupónu
@@ -785,6 +802,18 @@ class SubscriptionController extends Controller
             // Mark configuration as one-time
             $configuration['is_one_time'] = true;
             
+            // Calculate shipping cost based on billing country
+            $shippingCountry = $validated['billing_country'];
+            $shipping = $this->shippingService->calculateShippingCost($shippingCountry, $price, true); // true = is subscription
+            $shippingRate = ShippingRate::getForCountry($shippingCountry);
+            
+            \Log::info('Shipping calculated for one-time box', [
+                'country' => $shippingCountry,
+                'subtotal' => $price,
+                'shipping_cost' => $shipping,
+                'shipping_rate_id' => $shippingRate?->id,
+            ]);
+            
             // For one-time boxes, we create them as subscriptions with special handling
             // This allows them to appear in admin shipments and use KVS- numbering
             
@@ -860,6 +889,9 @@ class SubscriptionController extends Controller
                     'carrier_id' => $validated['carrier_id'] ?? null,
                     'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
                     'delivery_notes' => $validated['delivery_notes'] ?? null,
+                    'shipping_cost' => $shipping,
+                    'shipping_country' => $shippingCountry,
+                    'shipping_rate_id' => $shippingRate?->id,
                 ]);
 
                 // Record coupon usage
@@ -899,7 +931,9 @@ class SubscriptionController extends Controller
                 $session = $this->stripeService->createOneTimeBoxCheckoutSession(
                     $subscription,
                     $price,
-                    $shippingAddress
+                    $shippingAddress,
+                    $shipping,
+                    $shippingRate
                 );
 
                 return redirect($session->url);
@@ -937,6 +971,9 @@ class SubscriptionController extends Controller
                 'carrier_id' => $validated['carrier_id'] ?? null,
                 'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
                 'delivery_notes' => $validated['delivery_notes'] ?? null,
+                'shipping_cost' => $shipping,
+                'shipping_country' => $shippingCountry,
+                'shipping_rate_id' => $shippingRate?->id,
             ]);
 
             // Record coupon usage
@@ -1013,6 +1050,17 @@ class SubscriptionController extends Controller
         DB::beginTransaction();
         
         try {
+            // Calculate shipping cost based on billing country
+            $shippingCountry = $validated['billing_country'];
+            $shipping = $this->shippingService->calculateShippingCost($shippingCountry, 0, true); // 0 = free price, true = is subscription
+            $shippingRate = ShippingRate::getForCountry($shippingCountry);
+            
+            \Log::info('Shipping calculated for free subscription', [
+                'country' => $shippingCountry,
+                'shipping_cost' => $shipping,
+                'shipping_rate_id' => $shippingRate?->id,
+            ]);
+            
             // Create or get user
             $user = auth()->user();
             
@@ -1101,6 +1149,9 @@ class SubscriptionController extends Controller
                 'carrier_id' => $validated['carrier_id'] ?? null,
                 'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
                 'delivery_notes' => $validated['delivery_notes'] ?? null,
+                'shipping_cost' => $shipping,
+                'shipping_country' => $shippingCountry,
+                'shipping_rate_id' => $shippingRate?->id,
             ]);
             
             // Record coupon usage
