@@ -6,7 +6,7 @@
 <div class="overflow-hidden">
 
 <!-- Hero Section - Clean with Strong Visual -->
-<div class="relative h-[70vh] sm:h-[85vh] lg:h-[90vh] min-h-[500px] sm:min-h-[600px] max-h-[900px] overflow-hidden bg-gray-50">
+<div class="relative h-[85vh] sm:h-[85vh] lg:h-[90vh] min-h-[600px] sm:min-h-[600px] max-h-[900px] overflow-hidden bg-gray-50">
     <!-- Background Image/Video -->
     <div class="absolute inset-0">
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/images/kavi-intro-video.jpg');"></div>
@@ -856,7 +856,7 @@
       </div>
 
       <!-- Step 4 -->
-      <div class="relative">
+      <div class="relative" style="z-index: 10;">
         <div class="text-center">
           <!-- Number Circle -->
           <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-500 text-white text-2xl font-bold mb-6">
@@ -991,8 +991,7 @@
 <!-- Impact Section - Minimal -->
 <div class="relative bg-white py-16 sm:py-20 md:py-24 lg:py-32">
   <!-- Organic shape decoration -->
-  <div class="absolute top-0 left-0 w-72 h-72 bg-primary-50 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-  
+  <div class="absolute top-0 left-0 w-72 h-72 bg-primary-50 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-60"></div>
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="grid lg:grid-cols-2 gap-12 sm:gap-16 items-center">
       <!-- Content Side -->
@@ -1037,7 +1036,7 @@
 <!-- Final CTA Section - Clean Minimal -->
 <div class="relative bg-gray-100 py-16 sm:py-20 lg:py-24">
   <!-- Subtle organic shape decoration -->
-  <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
+  <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2 opacity-60"></div>
 
   <div class="relative mx-auto max-w-screen-xl px-3 sm:px-4 md:px-8">
     <div class="mx-auto flex max-w-2xl flex-col items-center text-center">
