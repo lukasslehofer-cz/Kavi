@@ -150,8 +150,7 @@
             
             <!-- Flavor Tones -->
             @if(!empty($product->attributes['flavor_profile']) || !empty($product->attributes['flavor_notes']))
-            <div class="text-xs">
-              <span class="text-gray-500 font-medium">Chuťové tóny:</span>
+            <div class="text-xs">              
               <span class="text-gray-600 font-light">{{ $product->attributes['flavor_profile'] ?? $product->attributes['flavor_notes'] }}</span>
             </div>
             @endif
