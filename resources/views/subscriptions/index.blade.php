@@ -304,7 +304,7 @@
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">+ Decaf (+100 Kč)</span>
+                    <span class="font-medium text-gray-700">1x bez kofeinu<br class="sm:hidden"> (+100 Kč)</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -326,7 +326,7 @@
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">+ Decaf (+100 Kč)</span>
+                    <span class="font-medium text-gray-700">1x bez kofeinu<br class="sm:hidden"> (+100 Kč)</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -348,7 +348,7 @@
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">+ Decaf (+100 Kč)</span>
+                    <span class="font-medium text-gray-700">1x bez kofeinu<br class="sm:hidden"> (+100 Kč)</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
