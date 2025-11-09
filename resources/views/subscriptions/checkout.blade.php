@@ -511,7 +511,7 @@
                     <!-- Doprava (first) -->
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
                         <dt class="text-gray-600 text-sm">Doprava:</dt>
-                        <dd class="font-bold">
+                        <dd class="font-bold" id="shipping-cost">
                             @if(isset($shipping) && $shipping == 0)
                                 <span class="text-green-600 flex items-center gap-1">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -556,11 +556,11 @@
                     <div class="border-t border-gray-200 pt-5 mt-2">
                         <div class="flex justify-between items-center mb-1">
                             <dt class="font-bold text-gray-900 text-lg">Celkem / měsíc:</dt>
-                            <dd class="text-3xl font-bold text-gray-900">
+                            <dd class="text-3xl font-bold text-gray-900" id="total-cost">
                                 {{ number_format($price + ($shipping ?? 0), 0, ',', ' ') }} Kč
                             </dd>
                         </div>
-                        <p class="text-xs text-gray-500 text-right mt-1">
+                        <p class="text-xs text-gray-500 text-right mt-1" id="total-note">
                             ({{ $frequencyText }}, vč. DPH{{ isset($shipping) && $shipping > 0 ? ' + doprava' : '' }})
                         </p>
                     </div>
@@ -656,7 +656,16 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('select-point-btn').addEventListener('click', openPacketaWidget);
         }
         
-        // AJAX request to get carrier for this country
+        // Show loading state
+        const shippingCostElement = document.getElementById('shipping-cost');
+        const totalCostElement = document.getElementById('total-cost');
+        const totalNoteElement = document.getElementById('total-note');
+        
+        if (shippingCostElement) {
+            shippingCostElement.innerHTML = '<span class="text-gray-500">Počítám...</span>';
+        }
+        
+        // AJAX request to get carrier and shipping cost for this country
         fetch('{{ route("api.calculate-shipping") }}', {
             method: 'POST',
             headers: {
@@ -674,12 +683,48 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.available) {
                 // Update Packeta vendors for widget
                 currentPacketaVendors = data.packeta_vendors || [];
+                
+                // Update shipping cost display
+                const shippingCost = parseFloat(data.shipping) || 0;
+                if (shippingCostElement) {
+                    if (shippingCost === 0) {
+                        shippingCostElement.innerHTML = `
+                            <span class="text-green-600 flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                Zdarma
+                            </span>
+                        `;
+                    } else {
+                        shippingCostElement.innerHTML = `<span class="text-gray-900">${data.shipping_formatted}</span>`;
+                    }
+                }
+                
+                // Update total cost
+                const frequencyText = '{{ $frequencyText }}';
+                const newTotal = subscriptionPrice + shippingCost;
+                if (totalCostElement) {
+                    totalCostElement.textContent = new Intl.NumberFormat('cs-CZ').format(newTotal) + ' Kč';
+                }
+                
+                // Update total note
+                if (totalNoteElement) {
+                    const shippingNote = shippingCost > 0 ? ' + doprava' : '';
+                    totalNoteElement.textContent = `(${frequencyText}, vč. DPH${shippingNote})`;
+                }
             } else {
                 alert('Do vybrané země momentálně nedoručujeme předplatné.');
+                if (shippingCostElement) {
+                    shippingCostElement.innerHTML = '<span class="text-gray-500 text-sm">Nedostupné</span>';
+                }
             }
         })
         .catch(error => {
             console.error('Error getting carrier info:', error);
+            if (shippingCostElement) {
+                shippingCostElement.innerHTML = '<span class="text-red-500">Chyba</span>';
+            }
         });
     });
     
