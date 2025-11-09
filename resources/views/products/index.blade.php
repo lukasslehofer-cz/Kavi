@@ -148,15 +148,12 @@
             </p>
             @endif
             
-            <!-- Flavor Profile or Short Description -->
-            @if(!empty($product->attributes['flavor_profile']))
-            <p class="text-xs text-gray-600 line-clamp-2 font-light">
-              {{ $product->attributes['flavor_profile'] }}
-            </p>
-            @elseif($product->short_description)
-            <p class="text-xs text-gray-600 line-clamp-2 font-light">
-              {{ $product->short_description }}
-            </p>
+            <!-- Flavor Tones -->
+            @if(!empty($product->attributes['flavor_profile']) || !empty($product->attributes['flavor_notes']))
+            <div class="text-xs">
+              <span class="text-gray-500 font-medium">Chuťové tóny:</span>
+              <span class="text-gray-600 font-light">{{ $product->attributes['flavor_profile'] ?? $product->attributes['flavor_notes'] }}</span>
+            </div>
             @endif
           </div>
 

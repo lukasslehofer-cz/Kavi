@@ -235,7 +235,7 @@ function initSubscriptionConfigurator() {
                 if (typeOptionsContainer && !typeOptionsContainer.querySelector('.decaf-unavailable-note')) {
                     const note = document.createElement('div');
                     note.className = 'decaf-unavailable-note mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700';
-                    note.innerHTML = '<strong>Upozornění:</strong> Decaf káva tento měsíc není k dispozici';
+                    note.innerHTML = '<strong>Upozornění:</strong> Bezkofeinová káva již není tento měsíc k dispozici';
                     typeOptionsContainer.appendChild(note);
                 }
             });

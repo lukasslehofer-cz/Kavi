@@ -198,10 +198,12 @@
                             </p>
                             @endif
 
-                            @if($coffee->short_description)
-                            <p class="text-sm text-gray-600 mb-4 line-clamp-3 font-light">
-                                {{ $coffee->short_description }}
-                            </p>
+                            <!-- Flavor Tones -->
+                            @if(!empty($coffee->attributes['flavor_profile']) || !empty($coffee->attributes['flavor_notes']))
+                            <div class="text-sm mb-4">
+                                <span class="text-gray-500 font-medium">Chuťové tóny:</span>
+                                <span class="text-gray-600 font-light">{{ $coffee->attributes['flavor_profile'] ?? $coffee->attributes['flavor_notes'] }}</span>
+                            </div>
                             @endif
 
                             <button onclick="openCoffeeModal{{ $coffee->id }}()" 
