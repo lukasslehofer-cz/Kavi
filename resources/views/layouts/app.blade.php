@@ -139,15 +139,6 @@
                 <a href="{{ route('roasteries.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
                     Naše pražírny
                 </a>
-                <a href="{{ route('how-it-works') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
-                    Jak to funguje
-                </a>
-                <a href="{{ route('about') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
-                    O nás
-                </a>
-                <a href="{{ route('contact') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
-                    Kontakt
-                </a>
                 
                 <!-- Mobile CTA Button -->
                 <div class="pt-4">
