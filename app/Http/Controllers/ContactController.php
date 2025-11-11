@@ -20,8 +20,8 @@ class ContactController extends Controller
         ]);
 
         try {
-            // Send email to admin
-            $adminEmail = config('mail.from.address', 'info@kavi.cz');
+            // Send email to admin - use info@kavi.cz as recipient
+            $adminEmail = 'info@kavi.cz';
             
             // Data for the email template
             $emailData = [
@@ -31,7 +31,8 @@ class ContactController extends Controller
             ];
             
             Mail::send('emails.contact', $emailData, function ($message) use ($validated, $adminEmail) {
-                $message->to($adminEmail)
+                $message->from('noreply@kavi.cz', 'KAVI.cz Kontaktní formulář')
+                    ->to($adminEmail)
                     ->subject('Nový dotaz z kontaktního formuláře - KAVI')
                     ->replyTo($validated['email'], $validated['name']);
             });
