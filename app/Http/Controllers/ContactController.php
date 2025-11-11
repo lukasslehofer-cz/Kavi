@@ -31,8 +31,7 @@ class ContactController extends Controller
             ];
             
             Mail::send('emails.contact', $emailData, function ($message) use ($validated, $adminEmail) {
-                $message->from('noreply@kavi.cz', 'KAVI.cz Kontaktní formulář')
-                    ->to($adminEmail)
+                $message->to($adminEmail)
                     ->subject('Nový dotaz z kontaktního formuláře - KAVI')
                     ->replyTo($validated['email'], $validated['name']);
             });
