@@ -72,7 +72,16 @@ class ChargeSubscriptionPayments extends Command
             }
             
             if ($isDryRun) {
-                $this->info("  🧪 Would charge: " . number_format($subscription->configured_price, 2) . " CZK");
+                // Calculate the ACTUAL amount that would be charged (same logic as StripeService)
+                $amount = $subscription->configured_price ?? 0;
+                if ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) {
+                    $amount -= $subscription->discount_amount;
+                }
+                
+                $this->info("  🧪 Would charge: " . number_format($amount, 2) . " CZK");
+                if ($subscription->discount_amount > 0) {
+                    $this->line("      (Original: " . number_format($subscription->configured_price, 2) . " CZK, Discount: -" . number_format($subscription->discount_amount, 2) . " CZK)");
+                }
                 $successCount++;
                 continue;
             }
