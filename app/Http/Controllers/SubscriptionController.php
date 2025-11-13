@@ -54,9 +54,22 @@ class SubscriptionController extends Controller
         $activeSchedule = $currentSchedule && !$currentSchedule->isPast() ? $currentSchedule : $nextSchedule;
         $promoImage = $activeSchedule?->promo_image ?? 'images/kavi-november-25.jpg';
         
-        // Calculate display month and year (16th is the cutoff)
+        // Calculate display month and year (billing_date + 1 is the cutoff)
         $today = now();
-        $displayMonth = $today->day >= 16 ? $today->copy()->addMonthNoOverflow() : $today->copy();
+        
+        // Get billing_date for current month from ShipmentSchedule
+        $currentMonthSchedule = \App\Models\ShipmentSchedule::getForMonth($today->year, $today->month);
+        
+        // Determine display cutoff date (billing_date + 1 day)
+        if ($currentMonthSchedule && $currentMonthSchedule->billing_date) {
+            $cutoffDate = $currentMonthSchedule->billing_date->copy()->addDay();
+        } else {
+            // Fallback to 16th if no schedule configured
+            $cutoffDate = $today->copy()->day(16);
+        }
+        
+        // If today is on or after cutoff date, show next month
+        $displayMonth = $today->greaterThanOrEqualTo($cutoffDate) ? $today->copy()->addMonthNoOverflow() : $today->copy();
         
         // Get month name in nominative case
         $months = [

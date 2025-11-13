@@ -592,7 +592,22 @@
 <!-- Coffee of the Month Teaser -->
 @if($roasteriesOfMonth->count() > 0 || $coffeesOfMonth->count() > 0)
 @php
-  $displayMonth = now()->day >= 16 ? now()->addMonthNoOverflow() : now();
+  $today = now();
+  
+  // Get billing_date for current month from ShipmentSchedule
+  $currentSchedule = \App\Models\ShipmentSchedule::getForMonth($today->year, $today->month);
+  
+  // Determine display cutoff date (billing_date + 1 day)
+  if ($currentSchedule && $currentSchedule->billing_date) {
+      $cutoffDate = $currentSchedule->billing_date->copy()->addDay();
+  } else {
+      // Fallback to 16th if no schedule configured
+      $cutoffDate = $today->copy()->day(16);
+  }
+  
+  // If today is on or after cutoff date, show next month
+  $displayMonth = $today->greaterThanOrEqualTo($cutoffDate) ? $today->copy()->addMonthNoOverflow() : $today->copy();
+  
   // Get month name in nominative case (Říjen, not října)
   $monthsNominative = [
     1 => 'leden', 2 => 'únor', 3 => 'březen', 4 => 'duben',

@@ -82,15 +82,25 @@ class Roastery extends Model
 
     /**
      * Get roasteries of the month based on current date
-     * Logic: Show roasteries for next month starting from 16th of current month
+     * Logic: Show roasteries for next month starting from billing_date + 1
      */
     public static function getRoasteriesOfMonth()
     {
         $today = now();
-        $currentDay = $today->day;
         
-        // If today is 16th or later, show next month's roasteries
-        if ($currentDay >= 16) {
+        // Get billing_date for current month from ShipmentSchedule
+        $currentSchedule = \App\Models\ShipmentSchedule::getForMonth($today->year, $today->month);
+        
+        // Determine display cutoff date (billing_date + 1 day)
+        if ($currentSchedule && $currentSchedule->billing_date) {
+            $cutoffDate = $currentSchedule->billing_date->copy()->addDay();
+        } else {
+            // Fallback to 16th if no schedule configured
+            $cutoffDate = $today->copy()->day(16);
+        }
+        
+        // If today is on or after cutoff date, show next month
+        if ($today->greaterThanOrEqualTo($cutoffDate)) {
             $targetMonth = $today->copy()->addMonthNoOverflow()->format('Y-m');
         } else {
             $targetMonth = $today->format('Y-m');

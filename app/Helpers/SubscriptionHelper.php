@@ -25,7 +25,7 @@ class SubscriptionHelper
         // Fallback to default logic (20th of month)
         $dayOfMonth = $today->day;
         
-        if ($dayOfMonth >= 16) {
+        if ($dayOfMonth > 15) {
             // Order is for next period
             return Carbon::now()->addMonthNoOverflow()->day(20)->startOfDay();
         } else {
@@ -63,7 +63,7 @@ class SubscriptionHelper
         // Fallback to default logic (15th of month)
         $dayOfMonth = $today->day;
         
-        if ($dayOfMonth >= 16) {
+        if ($dayOfMonth > 15) {
             // Next cycle ends on 15th of next month
             return Carbon::now()->addMonthNoOverflow()->day(15)->startOfDay();
         } else {
@@ -99,8 +99,8 @@ class SubscriptionHelper
             // Get current month's schedule
             $currentSchedule = ShipmentSchedule::getForMonth($createdYear, $createdMonth);
             
-            if ($currentSchedule && $createdAt->lessThan($currentSchedule->billing_date)) {
-                // Created before billing date, can get this month's shipment
+            if ($currentSchedule && $createdAt->lessThanOrEqualTo($currentSchedule->billing_date)) {
+                // Created before or ON billing date, can get this month's shipment
                 return $currentSchedule->shipment_date->copy()->startOfDay();
             }
             
@@ -113,7 +113,7 @@ class SubscriptionHelper
             }
             
             // Fallback to old logic
-            if ($createdAt->day >= 16) {
+            if ($createdAt->day > 15) {
                 return Carbon::parse($createdAt)->addMonthNoOverflow()->day(20)->startOfDay();
             } else {
                 return Carbon::parse($createdAt)->day(20)->startOfDay();
@@ -284,10 +284,10 @@ class SubscriptionHelper
         
         $isAfterCutoff = false;
         if ($currentSchedule) {
-            $isAfterCutoff = $today->greaterThanOrEqualTo($currentSchedule->billing_date);
+            $isAfterCutoff = $today->greaterThan($currentSchedule->billing_date);
         } else {
             // Fallback to old logic
-            $isAfterCutoff = $today->day >= 16;
+            $isAfterCutoff = $today->day > 15;
         }
         
         return [
