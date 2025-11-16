@@ -187,9 +187,12 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($subscriptions as $subscription)
-                        <tr class="hover:bg-gray-50 transition-colors {{ $subscription->packeta_shipment_status === 'sent' ? 'bg-green-50' : '' }}">
+                        @php
+                            $shipment = $subscription->shipments->first();
+                        @endphp
+                        <tr class="hover:bg-gray-50 transition-colors {{ $shipment && $shipment->isSent() ? 'bg-green-50' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($subscription->packeta_shipment_status !== 'sent')
+                                @if(!$shipment || !$shipment->isSent())
                                 <input type="checkbox" name="subscription_ids[]" value="{{ $subscription->id }}" class="shipment-checkbox w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                                 @endif
                             </td>
@@ -258,9 +261,6 @@
                             @endif
                         </td>
                         <td class="px-6 py-4">
-                            @php
-                                $shipment = $subscription->shipments->first();
-                            @endphp
                             @if($shipment)
                             <div class="text-sm">
                                 <div class="font-medium text-gray-900">{{ $shipment->package_length }}×{{ $shipment->package_width }}×{{ $shipment->package_height }} cm</div>
@@ -293,15 +293,15 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($subscription->packeta_shipment_status === 'sent')
+                            @if($shipment && $shipment->isSent())
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                                 Podáno
                             </span>
-                            @if($subscription->packeta_packet_id)
-                            <div class="text-xs text-gray-600 mt-1">ID: {{ $subscription->packeta_packet_id }}</div>
+                            @if($shipment->packeta_packet_id)
+                            <div class="text-xs text-gray-600 mt-1">ID: {{ $shipment->packeta_packet_id }}</div>
                             @endif
                             @else
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
