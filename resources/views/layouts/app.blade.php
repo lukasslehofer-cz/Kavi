@@ -33,7 +33,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <div class="text-sm text-white font-light">
-                Naše listopadové kávy už na vás čekají!
+                Kávové boxy na prosinec jsou tu!
             </div>
         </div>
     </div>
