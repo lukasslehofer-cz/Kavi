@@ -173,8 +173,12 @@ class SubscriptionHelper
         }
         
         // Regular subscription logic
-        // If paused or cancelled, allow shipping only when there's a PAID period covering target date (already paid box)
-        if ($subscription->status === 'paused' || $subscription->status === 'cancelled') {
+        // Check if pause has expired - if so, treat as active
+        if ($subscription->status === 'paused' && $subscription->canResume()) {
+            // Pause has expired, treat as active subscription
+            // Continue with normal active subscription logic below
+        } elseif ($subscription->status === 'paused' || $subscription->status === 'cancelled') {
+            // Still paused or cancelled - only allow shipping if there's a PAID period covering target date (already paid box)
             $hasPaidCover = self::hasPaidCoverageForDate($subscription, $targetShipDate);
 
             if (!$hasPaidCover) {
