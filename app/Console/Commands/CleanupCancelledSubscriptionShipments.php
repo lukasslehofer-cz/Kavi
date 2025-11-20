@@ -29,8 +29,8 @@ class CleanupCancelledSubscriptionShipments extends Command
         foreach ($cancelledSubs as $sub) {
             // Get draft shipments (not sent)
             $draftShipments = $sub->shipments()
-                ->whereNull('packeta_packet_id')
-                ->whereNull('packeta_sent_at')
+                ->where('status', 'pending')
+                ->whereNull('sent_at')
                 ->get();
             
             foreach ($draftShipments as $shipment) {
