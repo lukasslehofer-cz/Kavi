@@ -193,7 +193,7 @@ class Subscription extends Model
         $this->update([
             'status' => 'active',
             'paused_iterations' => null,
-            'paused_until_date' => null,
+            // Keep paused_until_date for next shipment calculation
             'pause_reason' => null,
         ]);
     }

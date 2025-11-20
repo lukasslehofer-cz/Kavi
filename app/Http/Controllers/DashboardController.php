@@ -371,6 +371,12 @@ class DashboardController extends Controller
             ]);
         }
 
+        // For manual resume, set paused_until_date to now
+        // This allows correct next shipment calculation
+        $subscription->update([
+            'paused_until_date' => now(),
+        ]);
+
         // Resume locally
         $subscription->resume();
 
