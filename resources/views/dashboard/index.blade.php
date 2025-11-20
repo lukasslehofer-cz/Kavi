@@ -249,7 +249,7 @@
                             <!-- Pauza do {{ $activeSubscription->paused_until_date->format('d.m.Y') }} -->
                         </p>
                         @else
-                        <p class="text-xs text-gray-500 mt-0.5 font-light">Rozesílka probíhá vždy 20. v měsíci</p>
+                        <!-- <p class="text-xs text-gray-500 mt-0.5 font-light">Rozesílka probíhá vždy 20. v měsíci</p> -->
                         @endif
                     </div>
                 </div>
