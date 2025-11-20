@@ -120,6 +120,15 @@ class SubscriptionHelper
             }
         }
         
+        // Special handling for subscriptions that were/are paused
+        // If pause has expired, calculate from pause end date instead of last shipment
+        if ($subscription->paused_until_date && $subscription->paused_until_date->isPast()) {
+            // Calculate next shipment after pause ended
+            $baseDate = $subscription->paused_until_date->copy();
+            $nextDate = self::getNextShipmentAfterDate($subscription, $baseDate);
+            return $nextDate;
+        }
+        
         // Calculate next shipment based on last one + frequency
         $nextDate = Carbon::parse($lastShipmentDate)->addMonths($frequencyMonths);
         $nextSchedule = ShipmentSchedule::getForMonth($nextDate->year, $nextDate->month);
