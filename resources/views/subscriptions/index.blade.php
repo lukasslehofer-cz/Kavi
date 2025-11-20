@@ -586,29 +586,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedFrequency = null;
     let isDecaf = false;
     
-    // Automatický výběr plánu z URL parametru
-    const urlParams = new URLSearchParams(window.location.search);
-    const planParam = urlParams.get('plan');
-    
-    if (planParam) {
-        // Najít a označit správný radio button
-        const planRadio = document.querySelector(`input[name="amount"][value="${planParam}"]`);
-        if (planRadio) {
-            planRadio.checked = true;
-            planRadio.dispatchEvent(new Event('change'));
-            
-            // Odscrollovat k sekci "Množství kávy" s malým offsetem
-            setTimeout(() => {
-                const amountSection = planRadio.closest('.mb-10');
-                if (amountSection) {
-                    const yOffset = -20; // Offset od horní hrany (může být 0 nebo menší záporné číslo)
-                    const y = amountSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                    window.scrollTo({ top: y, behavior: 'smooth' });
-                }
-            }, 100);
-        }
-    }
-    
     // Pro Mix rozdělení
     let mixEspressoCount = 0;
     let mixFilterCount = 0;
@@ -844,6 +821,30 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = false;
         } else {
             submitButton.disabled = true;
+        }
+    }
+    
+    // Automatický výběr plánu z URL parametru
+    // (Musí být až ZA definicí všech event listenerů!)
+    const urlParams = new URLSearchParams(window.location.search);
+    const planParam = urlParams.get('plan');
+    
+    if (planParam) {
+        // Najít a označit správný radio button
+        const planRadio = document.querySelector(`input[name="amount"][value="${planParam}"]`);
+        if (planRadio) {
+            planRadio.checked = true;
+            planRadio.dispatchEvent(new Event('change'));
+            
+            // Odscrollovat k sekci "Množství kávy" s malým offsetem
+            setTimeout(() => {
+                const amountSection = planRadio.closest('.mb-10');
+                if (amountSection) {
+                    const yOffset = -20; // Offset od horní hrany (může být 0 nebo menší záporné číslo)
+                    const y = amountSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            }, 100);
         }
     }
 });
