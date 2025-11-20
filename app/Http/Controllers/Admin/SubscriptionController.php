@@ -335,19 +335,10 @@ class SubscriptionController extends Controller
     private function findPaymentForShipment(Subscription $subscription, \Carbon\Carbon $shipmentDate): ?\App\Models\SubscriptionPayment
     {
         // Look for payment where shipment_date falls within period_start and period_end
-        // or find the most recent payment before this shipment date
         return $subscription->payments()
             ->where('status', 'paid')
-            ->where(function($query) use ($shipmentDate) {
-                $query->where(function($q) use ($shipmentDate) {
-                    // Payment covers this date
-                    $q->whereDate('period_start', '<=', $shipmentDate)
-                      ->whereDate('period_end', '>=', $shipmentDate);
-                })->orWhere(function($q) use ($shipmentDate) {
-                    // Or find most recent payment before this date
-                    $q->whereDate('paid_at', '<=', $shipmentDate);
-                });
-            })
+            ->whereDate('period_start', '<=', $shipmentDate)
+            ->whereDate('period_end', '>=', $shipmentDate)
             ->orderBy('paid_at', 'desc')
             ->first();
     }
