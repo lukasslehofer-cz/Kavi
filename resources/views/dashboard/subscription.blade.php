@@ -263,13 +263,13 @@
                                 <span class="font-medium text-blue-600">{{ $postPause->format('d.m.Y') }}</span>
                             </div>
                             @endif
-                            <div class="text-xs text-gray-500 text-right mt-1">Rozesílka probíhá vždy 20. v měsíci</div>
+                            <div class="text-xs text-gray-500 text-right mt-1">Rozesílka probíhá přibližně 20. v měsíci</div>
                             @elseif($nextShipment)
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Další rozesílka:</span>
                                 <span class="font-medium text-blue-600">{{ $nextShipment->format('d.m.Y') }}</span>
                             </div>
-                            <div class="text-xs text-gray-500 text-right mt-1">Rozesílka probíhá vždy 20. v měsíci</div>
+                            <div class="text-xs text-gray-500 text-right mt-1">Rozesílka probíhá přibližně 20. v měsíci</div>
                             @endif
                             @endif {{-- End of else for regular subscription dates --}}
                         </div>
