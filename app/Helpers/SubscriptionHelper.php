@@ -173,8 +173,8 @@ class SubscriptionHelper
         }
         
         // Regular subscription logic
-        // If paused, allow shipping only when there's a PAID period covering target date (already paid box)
-        if ($subscription->status === 'paused') {
+        // If paused or cancelled, allow shipping only when there's a PAID period covering target date (already paid box)
+        if ($subscription->status === 'paused' || $subscription->status === 'cancelled') {
             $hasPaidCover = self::hasPaidCoverageForDate($subscription, $targetShipDate);
 
             if (!$hasPaidCover) {

@@ -127,9 +127,59 @@ class Subscription extends Model
 
     public function cancel()
     {
+        // Check if there's paid coverage for any future shipments
+        $nextShipment = \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($this);
+        
+        if ($nextShipment) {
+            // Check if we have paid coverage for the next shipment
+            $hasPaidCoverage = \App\Helpers\SubscriptionHelper::hasPaidCoverageForDate($this, $nextShipment);
+            
+            if ($hasPaidCoverage) {
+                // Find the last shipment date that has paid coverage
+                $frequencyMonths = max(1, (int)($this->frequency_months ?? 1));
+                $candidate = $nextShipment->copy();
+                $lastPaidShipment = null;
+                
+                // Look ahead up to 12 months to find the last paid shipment
+                $guard = 0;
+                while ($guard < 12) {
+                    if (\App\Helpers\SubscriptionHelper::hasPaidCoverageForDate($this, $candidate)) {
+                        $lastPaidShipment = $candidate->copy();
+                    } else {
+                        // Found the first unpaid shipment, stop
+                        break;
+                    }
+                    $candidate = $candidate->copy()->addMonths($frequencyMonths);
+                    $guard++;
+                }
+                
+                // Cancel at the end of the last paid period (after last paid shipment is delivered)
+                if ($lastPaidShipment) {
+                    $this->update([
+                        'status' => 'cancelled',
+                        'ends_at' => $lastPaidShipment->copy()->endOfDay(),
+                    ]);
+                    
+                    \Log::info('Subscription cancelled at period end', [
+                        'subscription_id' => $this->id,
+                        'last_paid_shipment' => $lastPaidShipment->toDateString(),
+                        'ends_at' => $lastPaidShipment->toDateString(),
+                    ]);
+                    
+                    return;
+                }
+            }
+        }
+        
+        // No paid coverage found, cancel immediately
         $this->update([
             'status' => 'cancelled',
             'ends_at' => now(),
+        ]);
+        
+        \Log::info('Subscription cancelled immediately (no paid coverage)', [
+            'subscription_id' => $this->id,
+            'ends_at' => now()->toDateString(),
         ]);
     }
 

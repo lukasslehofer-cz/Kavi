@@ -222,8 +222,9 @@ class SubscriptionController extends Controller
 
         // Get all subscriptions eligible for shipping consideration
         // Include 'pending' for one-time boxes that are paid but not yet active
+        // Include 'cancelled' to show subscriptions with prepaid/undelivered shipments
         $allSubscriptions = Subscription::with(['user', 'plan'])
-            ->whereIn('status', ['active', 'paused', 'pending'])
+            ->whereIn('status', ['active', 'paused', 'pending', 'cancelled'])
             ->get();
 
         // Filter subscriptions that should ship on target date OR were already sent on target date
