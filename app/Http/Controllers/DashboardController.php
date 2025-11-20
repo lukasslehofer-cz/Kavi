@@ -19,9 +19,27 @@ class DashboardController extends Controller
         $this->middleware('auth');
     }
 
+    /**
+     * Get the user to display (either authenticated user or user being viewed by admin)
+     */
+    protected function getViewingUser()
+    {
+        // Check if admin is viewing another user's dashboard
+        if (request()->has('view_as') && auth()->user()->is_admin) {
+            $userId = request()->get('view_as');
+            $user = \App\Models\User::find($userId);
+            
+            if ($user) {
+                return $user;
+            }
+        }
+        
+        return auth()->user();
+    }
+
     public function index()
     {
-        $user = auth()->user();
+        $user = $this->getViewingUser();
 
         $orders = Order::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
@@ -50,7 +68,7 @@ class DashboardController extends Controller
 
     public function orders()
     {
-        $orders = Order::where('user_id', auth()->id())
+        $orders = Order::where('user_id', $this->getViewingUser()->id)
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -59,7 +77,7 @@ class DashboardController extends Controller
 
     public function orderDetail(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== $this->getViewingUser()->id) {
             abort(403);
         }
 
@@ -68,7 +86,7 @@ class DashboardController extends Controller
 
     public function subscription()
     {
-        $subscriptions = auth()->user()->subscriptions()
+        $subscriptions = $this->getViewingUser()->subscriptions()
             ->whereIn('status', ['active', 'unpaid', 'paused', 'pending', 'cancelled', 'completed'])
             ->orderBy('created_at', 'desc')
             ->get()
@@ -111,9 +129,11 @@ class DashboardController extends Controller
             'carrier_pickup_point' => 'nullable|string',
         ]);
 
+        $viewingUser = $this->getViewingUser();
+
         // Find the subscription and verify it belongs to the user
         $subscription = Subscription::where('id', $request->subscription_id)
-            ->where('user_id', auth()->id())
+            ->where('user_id', $viewingUser->id)
             ->first();
 
         if (!$subscription) {
@@ -130,7 +150,7 @@ class DashboardController extends Controller
         ]);
 
         // Also update user's default pickup point
-        auth()->user()->update([
+        $viewingUser->update([
             'packeta_point_id' => $request->packeta_point_id,
             'packeta_point_name' => $request->packeta_point_name,
             'packeta_point_address' => $request->packeta_point_address,
@@ -146,7 +166,7 @@ class DashboardController extends Controller
 
     public function profile()
     {
-        $user = auth()->user();
+        $user = $this->getViewingUser();
         $paymentMethod = null;
         
         // Get payment method details if user has Stripe customer ID
@@ -166,9 +186,11 @@ class DashboardController extends Controller
 
     public function updateProfile(Request $request)
     {
+        $viewingUser = $this->getViewingUser();
+        
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . auth()->id()],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $viewingUser->id],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:100'],
@@ -181,11 +203,10 @@ class DashboardController extends Controller
             'carrier_pickup_point' => ['nullable', 'string'],
         ]);
 
-        $user = auth()->user();
-        $user->update($validated);
+        $viewingUser->update($validated);
         
         // Refresh the user instance to ensure we have latest data
-        $user->refresh();
+        $viewingUser->refresh();
 
         return redirect()->route('dashboard.profile')
             ->with('success', 'Profil byl úspěšně aktualizován.');
@@ -193,10 +214,10 @@ class DashboardController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $user = auth()->user();
+        $viewingUser = $this->getViewingUser();
         
         // Different validation based on whether user has set their password before
-        if ($user->password_set_by_user) {
+        if ($viewingUser->password_set_by_user) {
             // User has set password before - require current password
             $validated = $request->validate([
                 'current_password' => ['required', 'current_password'],
@@ -210,7 +231,7 @@ class DashboardController extends Controller
         }
 
         // Update password and mark as user-set
-        $user->update([
+        $viewingUser->update([
             'password' => Hash::make($validated['password']),
             'password_set_by_user' => true,
         ]);
@@ -227,7 +248,7 @@ class DashboardController extends Controller
     public function downloadInvoice(Order $order)
     {
         // Verify order belongs to authenticated user
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== $this->getViewingUser()->id) {
             abort(403);
         }
 
@@ -254,7 +275,7 @@ class DashboardController extends Controller
     public function downloadSubscriptionInvoice(\App\Models\SubscriptionPayment $payment)
     {
         // Verify payment belongs to authenticated user's subscription
-        if ($payment->subscription->user_id !== auth()->id()) {
+        if ($payment->subscription->user_id !== $this->getViewingUser()->id) {
             abort(403);
         }
 
@@ -291,7 +312,7 @@ class DashboardController extends Controller
         ]);
 
         $subscription = Subscription::where('id', $validated['subscription_id'])
-            ->where('user_id', auth()->id())
+            ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
 
         // Apply pause locally
@@ -337,7 +358,7 @@ class DashboardController extends Controller
         ]);
 
         $subscription = Subscription::where('id', $validated['subscription_id'])
-            ->where('user_id', auth()->id())
+            ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
 
         // Resume in Stripe first
@@ -367,7 +388,7 @@ class DashboardController extends Controller
         ]);
 
         $subscription = Subscription::where('id', $validated['subscription_id'])
-            ->where('user_id', auth()->id())
+            ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
 
         // Cancel in Stripe first (cancel_at_period_end)
@@ -409,15 +430,16 @@ class DashboardController extends Controller
     public function managePaymentMethods()
     {
         try {
+            $viewingUser = $this->getViewingUser();
             $stripeService = app(\App\Services\StripeService::class);
             $returnUrl = route('dashboard.profile');
             
-            $portalUrl = $stripeService->createCustomerPortalSession(auth()->user(), $returnUrl);
+            $portalUrl = $stripeService->createCustomerPortalSession($viewingUser, $returnUrl);
             
             return redirect($portalUrl);
         } catch (\Exception $e) {
             \Log::error('Failed to redirect to Customer Portal', [
-                'user_id' => auth()->id(),
+                'user_id' => $this->getViewingUser()->id,
                 'error' => $e->getMessage(),
             ]);
             
@@ -453,7 +475,7 @@ class DashboardController extends Controller
                 ->withInput();
         }
 
-        $user = auth()->user();
+        $user = $this->getViewingUser();
 
         // Check if account can be deleted
         $deletionService = app(AccountDeletionService::class);

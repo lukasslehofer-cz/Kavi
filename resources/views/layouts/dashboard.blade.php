@@ -118,6 +118,41 @@
         </div>
     </header>
 
+    <!-- Admin Preview Banner -->
+    @if(request()->has('view_as') && auth()->user()->is_admin)
+        @php
+            $viewingUser = \App\Models\User::find(request()->get('view_as'));
+        @endphp
+        @if($viewingUser)
+        <div class="bg-amber-500 border-b border-amber-600">
+            <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-3">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-amber-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <div>
+                            <p class="text-sm font-semibold text-amber-900">
+                                Prohlížíte dashboard uživatele
+                            </p>
+                            <p class="text-xs text-amber-800">
+                                {{ $viewingUser->name }} ({{ $viewingUser->email }})
+                            </p>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-900 hover:bg-amber-800 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Zpět do admin panelu
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endif
+    @endif
+
     <!-- Flash Messages -->
     @if(session('success'))
     <div class="max-w-screen-xl mx-auto px-4 md:px-8 mt-4">
@@ -161,40 +196,52 @@
                 <aside class="lg:w-64 flex-shrink-0">
                     <div class="bg-white rounded-2xl p-5 sticky top-24 border border-gray-200">
                         <!-- User Info -->
+                        @php
+                            $displayUser = auth()->user();
+                            if (request()->has('view_as') && auth()->user()->is_admin) {
+                                $viewedUser = \App\Models\User::find(request()->get('view_as'));
+                                if ($viewedUser) {
+                                    $displayUser = $viewedUser;
+                                }
+                            }
+                        @endphp
                         <div class="flex items-center gap-3 pb-5 border-b border-gray-100 mb-5">
                             <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white font-medium text-sm">
-                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                {{ strtoupper(substr($displayUser->name, 0, 1)) }}
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name }}</p>
-                                <p class="text-xs text-gray-500 truncate font-light">{{ auth()->user()->email }}</p>
+                                <p class="text-sm font-medium text-gray-900 truncate">{{ $displayUser->name }}</p>
+                                <p class="text-xs text-gray-500 truncate font-light">{{ $displayUser->email }}</p>
                             </div>
                         </div>
 
                         <!-- Navigation Menu -->
+                        @php
+                            $viewAsParam = request()->has('view_as') ? '?view_as=' . request()->get('view_as') : '';
+                        @endphp
                         <nav class="space-y-1">
-                            <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard.index') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <a href="{{ route('dashboard.index') . $viewAsParam }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard.index') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                                 <span class="text-sm font-medium">Nástěnka</span>
                             </a>
 
-                            <a href="{{ route('dashboard.profile') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard.profile') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <a href="{{ route('dashboard.profile') . $viewAsParam }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard.profile') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                                 <span class="text-sm font-medium">Můj profil</span>
                             </a>
 
-                            <a href="{{ route('dashboard.orders') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard.orders') || request()->routeIs('dashboard.order.detail') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <a href="{{ route('dashboard.orders') . $viewAsParam }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard.orders') || request()->routeIs('dashboard.order.detail') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
                                 <span class="text-sm font-medium">Objednávky</span>
                             </a>
 
-                            <a href="{{ route('dashboard.subscription') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard.subscription') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <a href="{{ route('dashboard.subscription') . $viewAsParam }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard.subscription') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                                 </svg>

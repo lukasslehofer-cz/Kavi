@@ -213,9 +213,16 @@
                             {{ $order->created_at->format('d.m.Y H:i') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{{ route('admin.orders.show', $order) }}" class="text-blue-600 hover:text-blue-800 font-medium">
-                                Detail →
-                            </a>
+                            <div class="flex flex-col gap-1">
+                                <a href="{{ route('admin.orders.show', $order) }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    Detail →
+                                </a>
+                                @if($order->user)
+                                <a href="{{ route('dashboard.index', ['view_as' => $order->user->id]) }}" class="text-purple-600 hover:text-purple-800 font-medium text-xs" title="Zobrazit dashboard tohoto uživatele">
+                                    👁️ Dashboard
+                                </a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty

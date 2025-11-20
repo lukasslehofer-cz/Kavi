@@ -186,9 +186,16 @@
                             {{ $subscription->created_at->format('d.m.Y') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{{ route('admin.subscriptions.show', $subscription) }}" class="text-blue-600 hover:text-blue-800 font-medium">
-                                Detail →
-                            </a>
+                            <div class="flex flex-col gap-1">
+                                <a href="{{ route('admin.subscriptions.show', $subscription) }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    Detail →
+                                </a>
+                                @if($subscription->user)
+                                <a href="{{ route('dashboard.index', ['view_as' => $subscription->user->id]) }}" class="text-purple-600 hover:text-purple-800 font-medium text-xs" title="Zobrazit dashboard tohoto uživatele">
+                                    👁️ Dashboard
+                                </a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty

@@ -409,8 +409,11 @@
                         <div class="text-gray-600">Registrován:</div>
                         <div class="font-medium text-gray-900">{{ $subscription->user->created_at->format('d.m.Y') }}</div>
                     </div>
-                    <div class="pt-3 border-t">
-                        <a href="{{ route('admin.dashboard') }}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                    <div class="pt-3 border-t space-y-2">
+                        <a href="{{ route('dashboard.index', ['view_as' => $subscription->user->id]) }}" class="block text-purple-600 hover:text-purple-700 text-sm font-medium">
+                            👁️ Zobrazit dashboard uživatele →
+                        </a>
+                        <a href="{{ route('admin.dashboard') }}" class="block text-primary-600 hover:text-primary-700 text-sm font-medium">
                             Zobrazit všechny objednávky zákazníka →
                         </a>
                     </div>
