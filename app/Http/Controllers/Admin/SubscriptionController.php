@@ -291,16 +291,18 @@ class SubscriptionController extends Controller
             ->first();
         
         if ($shipment) {
-            // If shipment exists but doesn't have payment linked, try to link it
-            if (!$shipment->subscription_payment_id) {
-                $payment = $this->findPaymentForShipment($subscription, $shipmentDate);
-                if ($payment) {
-                    $shipment->update(['subscription_payment_id' => $payment->id]);
-                    \Log::info('Linked existing shipment to payment', [
-                        'shipment_id' => $shipment->id,
-                        'payment_id' => $payment->id,
-                    ]);
-                }
+            // Always re-link payment according to current logic
+            $payment = $this->findPaymentForShipment($subscription, $shipmentDate);
+            $newPaymentId = $payment?->id;
+            
+            // Update if payment link changed
+            if ($shipment->subscription_payment_id !== $newPaymentId) {
+                $shipment->update(['subscription_payment_id' => $newPaymentId]);
+                \Log::info('Updated shipment payment link', [
+                    'shipment_id' => $shipment->id,
+                    'old_payment_id' => $shipment->subscription_payment_id,
+                    'new_payment_id' => $newPaymentId,
+                ]);
             }
             return $shipment;
         }
