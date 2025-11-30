@@ -565,7 +565,8 @@
               <h3 class="font-bold text-lg text-gray-900 mb-2">Termín následující rozesílky</h3>
               <p class="text-sm text-gray-900 font-medium mb-2">{{ $shippingInfo['cutoff_message'] }}</p>
               <p class="text-sm text-gray-600 font-light">
-                Objednávky uzavíráme <strong>15. dne v měsíci o půlnoci</strong>.
+                Objednávky uzavíráme <strong>15. dne v měsíci o půlnoci</strong>. 
+                Rozesílka kávy probíhá nejčastěji <strong>20. dne v měsíci</strong>. 
               </p>
             </div>
           </div>
