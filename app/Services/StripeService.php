@@ -331,7 +331,7 @@ class StripeService
                 'unit_amount' => (int)($paymentAmount * 100), // Convert to haléře (price AFTER discount)
                 'product_data' => [
                     'name' => $productName,
-                    'description' => 'První platba předplatného (pokryje období do ' . $nextBillingDate->format('d.m.Y') . ')',
+                    'description' => 'Platba předplatného',
                 ],
             ],
             'quantity' => 1,
