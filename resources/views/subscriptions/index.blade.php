@@ -95,7 +95,7 @@
       <div class="lg:col-span-5">
         <div class="lg:sticky lg:top-24">
           <!-- Product Photo -->
-          <div class="relative aspect-[4/3] sm:aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 mb-6">
+          <div class="relative aspect-[1/1] sm:aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 mb-6">
             @php
               // For backward compatibility: old images start with 'promo-images/' (storage), new ones with 'images/promo-images/' (public)
               $imageSrc = str_starts_with($promoImage, 'promo-images/') 
@@ -565,7 +565,6 @@
               <h3 class="font-bold text-lg text-gray-900 mb-2">Termín následující rozesílky</h3>
               <p class="text-sm text-gray-900 font-medium mb-2">{{ $shippingInfo['cutoff_message'] }}</p>
               <p class="text-sm text-gray-600 font-light">
-                Rozesílka kávy probíhá většinou <strong>20. dne v měsíci</strong>. 
                 Objednávky uzavíráme <strong>15. dne v měsíci o půlnoci</strong>.
               </p>
             </div>
