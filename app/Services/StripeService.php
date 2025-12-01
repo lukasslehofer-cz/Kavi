@@ -135,7 +135,7 @@ class StripeService
                 'price_data' => [
                     'currency' => 'czk',
                     'product_data' => $productData,
-                    'unit_amount' => (int)($item->price * 100),
+                    'unit_amount' => (int)round($item->price * 100),
                 ],
                 'quantity' => $item->quantity,
             ];
@@ -149,13 +149,14 @@ class StripeService
                     'product_data' => [
                         'name' => 'Doprava',
                     ],
-                    'unit_amount' => (int)($order->shipping * 100),
+                    'unit_amount' => (int)round($order->shipping * 100),
                 ],
                 'quantity' => 1,
             ];
         }
 
-        return StripeSession::create([
+        // Build session data
+        $sessionData = [
             'customer' => $customerId,
             'payment_method_types' => ['card'],
             'line_items' => $lineItems,
@@ -165,7 +166,38 @@ class StripeService
             'metadata' => [
                 'order_id' => $order->id,
             ],
-        ]);
+        ];
+
+        // Add discount if order has a coupon applied
+        if ($order->discount_amount > 0) {
+            try {
+                // Create a one-time Stripe Coupon for this order's discount
+                $stripeCoupon = \Stripe\Coupon::create([
+                    'amount_off' => (int)round($order->discount_amount * 100),
+                    'currency' => 'czk',
+                    'duration' => 'once',
+                    'name' => $order->coupon_code ?? 'Sleva',
+                ]);
+
+                $sessionData['discounts'] = [['coupon' => $stripeCoupon->id]];
+
+                \Log::info('Stripe coupon created for order discount', [
+                    'order_id' => $order->id,
+                    'coupon_code' => $order->coupon_code,
+                    'discount_amount' => $order->discount_amount,
+                    'stripe_coupon_id' => $stripeCoupon->id,
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Failed to create Stripe coupon for order discount', [
+                    'order_id' => $order->id,
+                    'discount_amount' => $order->discount_amount,
+                    'error' => $e->getMessage(),
+                ]);
+                // Continue without discount - better to complete payment than fail entirely
+            }
+        }
+
+        return StripeSession::create($sessionData);
     }
 
     /**
@@ -209,7 +241,7 @@ class StripeService
                         'name' => $productName,
                         'description' => 'Jednorázový kávový box bez předplatného',
                     ],
-                    'unit_amount' => (int)($price * 100),
+                    'unit_amount' => (int)round($price * 100),
                 ],
                 'quantity' => 1,
             ],
@@ -223,7 +255,7 @@ class StripeService
                     'product_data' => [
                         'name' => 'Doprava',
                     ],
-                    'unit_amount' => (int)($shipping * 100),
+                    'unit_amount' => (int)round($shipping * 100),
                 ],
                 'quantity' => 1,
             ];
@@ -328,7 +360,7 @@ class StripeService
         $lineItems = [[
             'price_data' => [
                 'currency' => 'czk',
-                'unit_amount' => (int)($paymentAmount * 100), // Convert to haléře (price AFTER discount)
+                'unit_amount' => (int)round($paymentAmount * 100), // Convert to haléře (price AFTER discount)
                 'product_data' => [
                     'name' => $productName,
                     'description' => 'Platba předplatného',
@@ -345,7 +377,7 @@ class StripeService
                     'product_data' => [
                         'name' => 'Doprava',
                     ],
-                    'unit_amount' => (int)($shipping * 100),
+                    'unit_amount' => (int)round($shipping * 100),
                 ],
                 'quantity' => 1,
             ];
@@ -477,7 +509,7 @@ class StripeService
                 'interval' => 'month',
                 'interval_count' => $configuration['frequency'] ?? 1,
             ],
-            'unit_amount' => (int)($price * 100),
+            'unit_amount' => (int)round($price * 100),
         ]);
 
         $subscription = StripeSubscription::create([
@@ -1395,7 +1427,7 @@ class StripeService
                                     'interval' => 'month',
                                     'interval_count' => $subscription->frequency_months ?? 1,
                                 ],
-                                'unit_amount' => (int)($newPrice * 100),
+                                'unit_amount' => (int)round($newPrice * 100),
                             ]);
                             
                             // Aktualizovat subscription s novou cenou
@@ -1661,7 +1693,7 @@ class StripeService
             // If no real invoice, create a generic one-time payment
             if (!$hasRealInvoice) {
                 $currency = 'czk';
-                $amount = (int)($subscription->pending_invoice_amount * 100); // Convert to cents
+                $amount = (int)round($subscription->pending_invoice_amount * 100); // Convert to cents
             }
 
             // Create a checkout session for payment
@@ -2156,7 +2188,7 @@ class StripeService
 
             // Create and confirm payment intent
             $paymentIntent = \Stripe\PaymentIntent::create([
-                'amount' => (int)($amount * 100), // Convert to cents
+                'amount' => (int)round($amount * 100), // Convert to cents
                 'currency' => 'czk',
                 'customer' => $customerId,
                 'payment_method' => $paymentMethodId,
