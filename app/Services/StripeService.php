@@ -101,6 +101,13 @@ class StripeService
         
         $customerId = $this->getOrCreateCustomer($order->user);
 
+        // Calculate gross total (items + shipping) for adjusted discount calculation
+        $itemsTotal = $order->items->sum(fn($item) => $item->price * $item->quantity);
+        $grossTotal = $itemsTotal + $order->shipping;
+        
+        // Displayed total (rounded) - what user sees on checkout page
+        $displayedTotal = round($order->total);
+        
         $lineItems = $order->items->map(function ($item) {
             $productData = [
                 'name' => $item->product_name,
@@ -131,17 +138,18 @@ class StripeService
                 }
             }
             
+            // Use exact price (not rounded) - rounding happens at total level
             return [
                 'price_data' => [
                     'currency' => 'czk',
                     'product_data' => $productData,
-                    'unit_amount' => (int)(round($item->price) * 100),
+                    'unit_amount' => (int)round($item->price * 100),
                 ],
                 'quantity' => $item->quantity,
             ];
         })->toArray();
 
-        // Add shipping if applicable
+        // Add shipping if applicable (exact price, not rounded)
         if ($order->shipping > 0) {
             $lineItems[] = [
                 'price_data' => [
@@ -149,7 +157,7 @@ class StripeService
                     'product_data' => [
                         'name' => 'Doprava',
                     ],
-                    'unit_amount' => (int)(round($order->shipping) * 100),
+                    'unit_amount' => (int)round($order->shipping * 100),
                 ],
                 'quantity' => 1,
             ];
@@ -171,22 +179,32 @@ class StripeService
         // Add discount if order has a coupon applied
         if ($order->discount_amount > 0) {
             try {
-                // Create a one-time Stripe Coupon for this order's discount
-                $stripeCoupon = \Stripe\Coupon::create([
-                    'amount_off' => (int)(round($order->discount_amount) * 100),
-                    'currency' => 'czk',
-                    'duration' => 'once',
-                    'name' => $order->coupon_code ?? 'Sleva',
-                ]);
+                // Calculate adjusted discount so Stripe total matches displayed total
+                // adjustedDiscount = grossTotal - displayedTotal
+                // This ensures: items + shipping - adjustedDiscount = displayedTotal
+                $adjustedDiscount = $grossTotal - $displayedTotal;
+                
+                // Only create coupon if there's a positive discount
+                if ($adjustedDiscount > 0) {
+                    $stripeCoupon = \Stripe\Coupon::create([
+                        'amount_off' => (int)round($adjustedDiscount * 100),
+                        'currency' => 'czk',
+                        'duration' => 'once',
+                        'name' => $order->coupon_code ?? 'Sleva',
+                    ]);
 
-                $sessionData['discounts'] = [['coupon' => $stripeCoupon->id]];
+                    $sessionData['discounts'] = [['coupon' => $stripeCoupon->id]];
 
-                \Log::info('Stripe coupon created for order discount', [
-                    'order_id' => $order->id,
-                    'coupon_code' => $order->coupon_code,
-                    'discount_amount' => $order->discount_amount,
-                    'stripe_coupon_id' => $stripeCoupon->id,
-                ]);
+                    \Log::info('Stripe coupon created for order discount', [
+                        'order_id' => $order->id,
+                        'coupon_code' => $order->coupon_code,
+                        'original_discount' => $order->discount_amount,
+                        'adjusted_discount' => $adjustedDiscount,
+                        'gross_total' => $grossTotal,
+                        'displayed_total' => $displayedTotal,
+                        'stripe_coupon_id' => $stripeCoupon->id,
+                    ]);
+                }
             } catch (\Exception $e) {
                 \Log::error('Failed to create Stripe coupon for order discount', [
                     'order_id' => $order->id,
@@ -356,32 +374,30 @@ class StripeService
         // Calculate actual payment amount (full price minus discount)
         $paymentAmount = $price - $discount;
         
-        // Build line items array
+        // Calculate displayed total (what user sees on checkout page)
+        // This ensures Stripe total exactly matches what user sees: number_format($paymentAmount + $shipping, 0)
+        $displayedTotal = round($paymentAmount + $shipping);
+        
+        // Build line items array - use single line item with full total to avoid rounding discrepancies
         $lineItems = [[
             'price_data' => [
                 'currency' => 'czk',
-                'unit_amount' => (int)(round($paymentAmount) * 100), // Convert to haléře (price AFTER discount)
+                'unit_amount' => (int)($displayedTotal * 100), // Exact displayed total in haléře
                 'product_data' => [
                     'name' => $productName,
-                    'description' => 'Platba předplatného',
+                    'description' => 'Platba předplatného' . ($shipping > 0 ? ' včetně dopravy' : ''),
                 ],
             ],
             'quantity' => 1,
         ]];
         
-        // Add shipping if applicable
-        if ($shipping > 0) {
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'czk',
-                    'product_data' => [
-                        'name' => 'Doprava',
-                    ],
-                    'unit_amount' => (int)(round($shipping) * 100),
-                ],
-                'quantity' => 1,
-            ];
-        }
+        \Log::info('Subscription checkout total calculated', [
+            'original_price' => $price,
+            'discount' => $discount,
+            'payment_amount' => $paymentAmount,
+            'shipping' => $shipping,
+            'displayed_total' => $displayedTotal,
+        ]);
 
         // Create session with ONE-TIME payment + save payment method for future
         $sessionData = [

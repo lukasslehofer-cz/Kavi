@@ -528,7 +528,7 @@
                     </div>
                     
                     <!-- Coupon discount (prominently displayed) -->
-                    @if(($discount ?? 0) > 0)
+                    @if(($adjustedDiscount ?? 0) > 0)
                     <div class="flex justify-between items-center py-3 border-b-2 border-green-200 bg-green-50 -mx-6 px-6">
                         <dt class="text-green-700 font-semibold flex items-center gap-2">
                             <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -536,7 +536,7 @@
                             </svg>
                             <span>Sleva {{ $appliedCoupon->code ?? 'kupón' }}:</span>
                         </dt>
-                        <dd class="font-bold text-green-600 text-lg">-{{ number_format($discount, 0, ',', ' ') }} Kč</dd>
+                        <dd class="font-bold text-green-600 text-lg">-{{ number_format($adjustedDiscount, 0, ',', ' ') }} Kč</dd>
                     </div>
                     @endif
                     

@@ -129,6 +129,15 @@ class CheckoutController extends Controller
             $vat = round($totalWithVat - $totalWithoutVat, 2);
         }
         
+        // Calculate adjusted discount for display (same as sent to Stripe)
+        // This ensures the displayed discount matches what Stripe receives
+        $adjustedDiscount = 0;
+        if ($discount > 0) {
+            $grossTotal = $subtotal + $shipping;
+            $displayedTotal = round($totalWithVat);
+            $adjustedDiscount = $grossTotal - $displayedTotal;
+        }
+        
         // Pokud je chyba, uložit do session pro zobrazení
         if ($errorMessage) {
             session()->flash('coupon_error', $errorMessage);
@@ -183,7 +192,8 @@ class CheckoutController extends Controller
             'totalWithoutVat', 
             'vat', 
             'appliedCoupon', 
-            'discount', 
+            'discount',
+            'adjustedDiscount',
             'packetaVendors',
             'canShipWithSubscription',
             'subscriptionShipmentInfo',

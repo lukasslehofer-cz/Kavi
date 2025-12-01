@@ -445,6 +445,15 @@ class SubscriptionController extends Controller
         if ($errorMessage) {
             session()->flash('coupon_error', $errorMessage);
         }
+        
+        // Calculate adjusted discount for display (same as sent to Stripe)
+        // This ensures the displayed discount matches what Stripe receives
+        $adjustedDiscount = 0;
+        if ($discount > 0) {
+            $grossTotal = $originalPrice + $shipping;
+            $displayedTotal = round($price + $shipping);
+            $adjustedDiscount = $grossTotal - $displayedTotal;
+        }
 
         // Get available countries for shipping
         $availableCountries = ShippingRate::where('enabled', true)
@@ -453,7 +462,7 @@ class SubscriptionController extends Controller
             ->pluck('country_name', 'country_code')
             ->toArray();
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'packetaVendors', 'shipping', 'availableCountries'));
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'packetaVendors', 'shipping', 'availableCountries'));
     }
 
     /**
