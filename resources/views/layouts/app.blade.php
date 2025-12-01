@@ -33,7 +33,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <div class="text-sm text-white font-light">
-                Kávové boxy na prosinec jsou tu!
+                Využijte vánoční slevu 25% na vše s kódem <b>VANOCE25</b>
             </div>
         </div>
     </div>
