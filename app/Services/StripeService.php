@@ -135,7 +135,7 @@ class StripeService
                 'price_data' => [
                     'currency' => 'czk',
                     'product_data' => $productData,
-                    'unit_amount' => (int)round($item->price * 100),
+                    'unit_amount' => (int)(round($item->price) * 100),
                 ],
                 'quantity' => $item->quantity,
             ];
@@ -149,7 +149,7 @@ class StripeService
                     'product_data' => [
                         'name' => 'Doprava',
                     ],
-                    'unit_amount' => (int)round($order->shipping * 100),
+                    'unit_amount' => (int)(round($order->shipping) * 100),
                 ],
                 'quantity' => 1,
             ];
@@ -173,7 +173,7 @@ class StripeService
             try {
                 // Create a one-time Stripe Coupon for this order's discount
                 $stripeCoupon = \Stripe\Coupon::create([
-                    'amount_off' => (int)round($order->discount_amount * 100),
+                    'amount_off' => (int)(round($order->discount_amount) * 100),
                     'currency' => 'czk',
                     'duration' => 'once',
                     'name' => $order->coupon_code ?? 'Sleva',
@@ -241,7 +241,7 @@ class StripeService
                         'name' => $productName,
                         'description' => 'Jednorázový kávový box bez předplatného',
                     ],
-                    'unit_amount' => (int)round($price * 100),
+                    'unit_amount' => (int)(round($price) * 100),
                 ],
                 'quantity' => 1,
             ],
@@ -255,7 +255,7 @@ class StripeService
                     'product_data' => [
                         'name' => 'Doprava',
                     ],
-                    'unit_amount' => (int)round($shipping * 100),
+                    'unit_amount' => (int)(round($shipping) * 100),
                 ],
                 'quantity' => 1,
             ];
@@ -360,7 +360,7 @@ class StripeService
         $lineItems = [[
             'price_data' => [
                 'currency' => 'czk',
-                'unit_amount' => (int)round($paymentAmount * 100), // Convert to haléře (price AFTER discount)
+                'unit_amount' => (int)(round($paymentAmount) * 100), // Convert to haléře (price AFTER discount)
                 'product_data' => [
                     'name' => $productName,
                     'description' => 'Platba předplatného',
@@ -377,7 +377,7 @@ class StripeService
                     'product_data' => [
                         'name' => 'Doprava',
                     ],
-                    'unit_amount' => (int)round($shipping * 100),
+                    'unit_amount' => (int)(round($shipping) * 100),
                 ],
                 'quantity' => 1,
             ];
@@ -509,7 +509,7 @@ class StripeService
                 'interval' => 'month',
                 'interval_count' => $configuration['frequency'] ?? 1,
             ],
-            'unit_amount' => (int)round($price * 100),
+            'unit_amount' => (int)(round($price) * 100),
         ]);
 
         $subscription = StripeSubscription::create([
@@ -1427,7 +1427,7 @@ class StripeService
                                     'interval' => 'month',
                                     'interval_count' => $subscription->frequency_months ?? 1,
                                 ],
-                                'unit_amount' => (int)round($newPrice * 100),
+                                'unit_amount' => (int)(round($newPrice) * 100),
                             ]);
                             
                             // Aktualizovat subscription s novou cenou
@@ -1693,7 +1693,7 @@ class StripeService
             // If no real invoice, create a generic one-time payment
             if (!$hasRealInvoice) {
                 $currency = 'czk';
-                $amount = (int)round($subscription->pending_invoice_amount * 100); // Convert to cents
+                $amount = (int)(round($subscription->pending_invoice_amount) * 100); // Convert to cents
             }
 
             // Create a checkout session for payment
@@ -2188,7 +2188,7 @@ class StripeService
 
             // Create and confirm payment intent
             $paymentIntent = \Stripe\PaymentIntent::create([
-                'amount' => (int)round($amount * 100), // Convert to cents
+                'amount' => (int)(round($amount) * 100), // Convert to cents
                 'currency' => 'czk',
                 'customer' => $customerId,
                 'payment_method' => $paymentMethodId,
