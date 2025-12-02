@@ -91,6 +91,12 @@
                     <span class="font-medium">{{ number_format($order->shipping, 2, ',', ' ') }} Kč</span>
                 </div>
                 @endif
+                @if($order->discount_amount > 0)
+                <div class="flex justify-between text-green-600 font-light">
+                    <span>Sleva{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}:</span>
+                    <span class="font-medium">-{{ number_format($order->discount_amount, 2, ',', ' ') }} Kč</span>
+                </div>
+                @endif
                 <div class="border-t border-gray-200 pt-3 mt-3">
                     <div class="flex justify-between text-xl font-bold">
                         <span class="text-gray-900">Celkem:</span>

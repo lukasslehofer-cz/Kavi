@@ -131,6 +131,17 @@ class FakturoidService
                 ];
             }
 
+            // Add discount as a negative line item if applicable
+            if ($order->discount_amount > 0) {
+                $lines[] = [
+                    'name' => 'Sleva' . ($order->coupon_code ? ' (' . $order->coupon_code . ')' : ''),
+                    'quantity' => '1',
+                    'unit_name' => 'ks',
+                    'unit_price' => (string)(-$order->discount_amount), // Negative price WITH VAT
+                    'vat_rate' => (string)$vatRate,
+                ];
+            }
+
             // Create invoice data
             $invoiceData = [
                 'subject_id' => $subjectId,
@@ -549,16 +560,69 @@ class FakturoidService
             // Fakturoid will calculate the base price and VAT from it
             $vatRate = 21;
             
-            // Create single line for subscription
-            $lines = [[
-                'name' => 'Kávové předplatné' . ($payment->period_start && $payment->period_end 
-                    ? ' (' . $payment->period_start->format('d.m.Y') . ' - ' . $payment->period_end->format('d.m.Y') . ')'
-                    : ''),
-                'quantity' => '1',
-                'unit_name' => 'ks',
-                'unit_price' => (string)$payment->amount, // Price WITH VAT when vat_price_mode=with_vat
-                'vat_rate' => (string)$vatRate,
-            ]];
+            // Check if discount is active for this subscription
+            // Discount is active if: discount_amount > 0 AND (unlimited OR months remaining > 0)
+            $discountActive = $subscription->discount_amount > 0 && 
+                ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0);
+            
+            // Determine line items based on whether we have breakdown info
+            $lines = [];
+            
+            // If subscription has configured_price and discount, show the breakdown
+            if ($subscription->configured_price > 0 && $discountActive) {
+                // Main subscription line (full price)
+                $lines[] = [
+                    'name' => 'Kávové předplatné' . ($payment->period_start && $payment->period_end 
+                        ? ' (' . $payment->period_start->format('d.m.Y') . ' - ' . $payment->period_end->format('d.m.Y') . ')'
+                        : ''),
+                    'quantity' => '1',
+                    'unit_name' => 'ks',
+                    'unit_price' => (string)$subscription->configured_price,
+                    'vat_rate' => (string)$vatRate,
+                ];
+                
+                // Add shipping if applicable
+                if ($subscription->shipping_cost > 0) {
+                    $lines[] = [
+                        'name' => 'Doprava',
+                        'quantity' => '1',
+                        'unit_name' => 'ks',
+                        'unit_price' => (string)$subscription->shipping_cost,
+                        'vat_rate' => (string)$vatRate,
+                    ];
+                }
+                
+                // Add discount as negative line
+                $lines[] = [
+                    'name' => 'Sleva' . ($subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : ''),
+                    'quantity' => '1',
+                    'unit_name' => 'ks',
+                    'unit_price' => (string)(-$subscription->discount_amount),
+                    'vat_rate' => (string)$vatRate,
+                ];
+            } else {
+                // No active discount - show as single line with payment amount
+                $lines[] = [
+                    'name' => 'Kávové předplatné' . ($payment->period_start && $payment->period_end 
+                        ? ' (' . $payment->period_start->format('d.m.Y') . ' - ' . $payment->period_end->format('d.m.Y') . ')'
+                        : ''),
+                    'quantity' => '1',
+                    'unit_name' => 'ks',
+                    'unit_price' => (string)$payment->amount,
+                    'vat_rate' => (string)$vatRate,
+                ];
+                
+                // Add shipping if applicable and not included in payment amount
+                if ($subscription->shipping_cost > 0 && $subscription->configured_price > 0) {
+                    $lines[] = [
+                        'name' => 'Doprava',
+                        'quantity' => '1',
+                        'unit_name' => 'ks',
+                        'unit_price' => (string)$subscription->shipping_cost,
+                        'vat_rate' => (string)$vatRate,
+                    ];
+                }
+            }
 
             // Create invoice data
             $invoiceData = [

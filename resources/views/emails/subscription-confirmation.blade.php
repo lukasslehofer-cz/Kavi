@@ -329,17 +329,33 @@
                                     </span>
                                 </div>
                                 
+                                @php
+                                // configured_price now contains FULL price (without discount)
+                                // If active discount, subtract it
+                                // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
+                                $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
+                                $currentPrice = $subscription->configured_price - $activeDiscount;
+                                @endphp
+                                
+                                @if($activeDiscount > 0)
+                                <div class="config-item">
+                                    <span class="config-label">Cena:</span>
+                                    <span class="config-value">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">Sleva{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}:</span>
+                                    <span class="config-value" style="color: #059669;">-{{ number_format($activeDiscount, 0, ',', ' ') }} Kč</span>
+                                </div>
                                 <div class="config-item">
                                     <span class="config-label">Cena za dodávku:</span>
-                                    @php
-                                    // configured_price now contains FULL price (without discount)
-                                    // If active discount, subtract it
-                                    // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
-                                    $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
-                                    $currentPrice = $subscription->configured_price - $activeDiscount;
-                                    @endphp
                                     <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($currentPrice, 0, ',', ' ') }} Kč</span>
                                 </div>
+                                @else
+                                <div class="config-item">
+                                    <span class="config-label">Cena za dodávku:</span>
+                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($currentPrice, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                @endif
                             </div>
                             
                             <!-- Next Shipment -->

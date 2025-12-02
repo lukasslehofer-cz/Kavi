@@ -411,6 +411,12 @@
                                         @endif
                                     </span>
                                 </div>
+                                @if($order->discount_amount > 0)
+                                <div class="total-row">
+                                    <span class="total-label">Sleva{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}:</span>
+                                    <span class="total-value" style="color: #059669;">-{{ number_format($order->discount_amount, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                @endif
                                 <div class="total-row highlight">
                                     <span class="total-label">Celkem:</span>
                                     <span class="total-value">{{ number_format($order->total, 0, ',', ' ') }} Kč</span>

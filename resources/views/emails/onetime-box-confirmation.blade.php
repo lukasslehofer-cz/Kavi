@@ -329,10 +329,25 @@
                                     <span class="config-value">{{ $subscription->configuration['amount'] }}× balení po 250g</span>
                                 </div>
                                 
+                                @if($subscription->discount_amount > 0)
+                                <div class="config-item">
+                                    <span class="config-label">Cena:</span>
+                                    <span class="config-value">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">Sleva{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}:</span>
+                                    <span class="config-value" style="color: #059669;">-{{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">Celková cena:</span>
+                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($subscription->configured_price - $subscription->discount_amount, 0, ',', ' ') }} Kč</span>
+                                </div>
+                                @else
                                 <div class="config-item">
                                     <span class="config-label">Celková cena:</span>
                                     <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
                                 </div>
+                                @endif
                             </div>
                             
                             <!-- Shipment Date -->
