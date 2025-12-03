@@ -144,9 +144,17 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $fullPrice = $subscription->configured_price ?? $subscription->plan->price ?? 0;
+                                $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
+                                $displayPrice = $fullPrice - $activeDiscount;
+                            @endphp
                             <span class="text-sm font-bold text-gray-900">
-                                {{ number_format($subscription->configured_price ?? $subscription->plan->price ?? 0, 0, ',', ' ') }} Kč
+                                {{ number_format($displayPrice, 0, ',', ' ') }} Kč
                             </span>
+                            @if($activeDiscount > 0)
+                                <div class="text-xs text-green-600">-{{ number_format($activeDiscount, 0) }} Kč sleva</div>
+                            @endif
                             <div class="text-xs text-gray-500">
                                 / {{ $subscription->frequency_months ?? 1 }}M
                             </div>
