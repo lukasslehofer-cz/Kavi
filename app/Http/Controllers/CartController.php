@@ -48,7 +48,32 @@ class CartController extends Controller
             $shippingMessage = 'Cena dopravy bude vypočítána v pokladně po zadání adresy';
         }
 
-        return view('cart.index', compact('cartItems', 'total', 'shipping', 'shippingMessage', 'freeShippingThreshold', 'remainingForFreeShipping'));
+        // Get recommended products from same categories
+        $cartProductIds = array_keys($cart);
+        $cartCategories = collect($cartItems)
+            ->pluck('product.category')
+            ->flatten()
+            ->unique()
+            ->filter()
+            ->values()
+            ->toArray();
+
+        $recommendedProducts = collect();
+        if (!empty($cartCategories)) {
+            $recommendedProducts = Product::forShop()
+                ->where('stock', '>', 0)
+                ->whereNotIn('id', $cartProductIds)
+                ->where(function($query) use ($cartCategories) {
+                    foreach ($cartCategories as $category) {
+                        $query->orWhereJsonContains('category', $category);
+                    }
+                })
+                ->inRandomOrder()
+                ->limit(4)
+                ->get();
+        }
+
+        return view('cart.index', compact('cartItems', 'total', 'shipping', 'shippingMessage', 'freeShippingThreshold', 'remainingForFreeShipping', 'recommendedProducts'));
     }
 
     public function add(Request $request, Product $product)

@@ -252,12 +252,20 @@
             Mohlo by vás také zajímat
         </h2>
         <p class="text-center text-gray-600 mb-12 font-light">Doplňte si objednávku o další produkty</p>
-        <!-- Placeholder for recommendations -->
+        
+        @if($recommendedProducts->isNotEmpty())
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            @foreach($recommendedProducts as $product)
+                @include('partials.product-card', ['product' => $product])
+            @endforeach
+        </div>
+        @else
         <div class="text-center">
             <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
                 Procházet další produkty
             </a>
         </div>
+        @endif
     </div>
 </section>
 @endif
