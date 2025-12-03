@@ -125,14 +125,10 @@
       </p>
       @endif
       
-      <!-- Flavor Profile (for coffee) or Short Description - Minimal -->
-      @if(!empty($product->attributes['flavor_profile']))
-      <p class="text-xs text-gray-600 line-clamp-2 italic font-light">
-        {{ $product->attributes['flavor_profile'] }}
-      </p>
-      @elseif($product->short_description)
+      <!-- Flavor Profile -->
+      @if(!empty($product->attributes['flavor_profile']) || !empty($product->attributes['flavor_notes']))
       <p class="text-xs text-gray-600 line-clamp-2 font-light">
-        {{ $product->short_description }}
+        {{ $product->attributes['flavor_profile'] ?? $product->attributes['flavor_notes'] }}
       </p>
       @endif
     </div>
