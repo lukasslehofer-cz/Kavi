@@ -121,8 +121,8 @@ class SubscriptionHelper
         }
         
         // Special handling for subscriptions that were/are paused
-        // If pause has expired, calculate from pause end date instead of last shipment
-        if ($subscription->paused_until_date && $subscription->paused_until_date->isPast()) {
+        // If pause has expired (or ends today), calculate from pause end date instead of last shipment
+        if ($subscription->paused_until_date && $subscription->paused_until_date->lte(Carbon::now()->endOfDay())) {
             // Calculate next shipment after pause ended
             $baseDate = $subscription->paused_until_date->copy();
             $nextDate = self::getNextShipmentAfterDate($subscription, $baseDate);
@@ -268,9 +268,26 @@ class SubscriptionHelper
 
     /**
      * Get the next shipment date after a given date, aligned to subscription cadence
+     * 
+     * First checks if the current month's shipment is still available (billing not closed yet).
+     * If not, falls back to adding frequency_months to find the next shipment.
      */
     public static function getNextShipmentAfterDate($subscription, Carbon $date): Carbon
     {
+        $today = Carbon::now();
+        
+        // First, check if the current month (of the given date) has an available shipment
+        // A shipment is available if: shipment_date is in the future AND billing is still open
+        $currentSchedule = ShipmentSchedule::getForMonth($date->year, $date->month);
+        
+        if ($currentSchedule && 
+            $currentSchedule->shipment_date->gte($today->startOfDay()) && 
+            $currentSchedule->billing_date->gte($today->startOfDay())) {
+            // Current month's shipment is still available
+            return $currentSchedule->shipment_date->copy()->startOfDay();
+        }
+        
+        // Current month not available, find next shipment based on frequency
         $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
         $candidate = $date->copy()->addMonths($frequencyMonths);
 
