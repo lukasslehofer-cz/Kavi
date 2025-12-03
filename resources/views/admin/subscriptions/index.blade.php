@@ -176,10 +176,22 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            @if($subscription->next_shipment_date)
-                            {{ $subscription->next_shipment_date->format('d.m.Y') }}
+                            @if($subscription->status === 'cancelled')
+                                @php
+                                    // Pro zrušená - najít poslední zaplacený box, který ještě nebyl odeslán
+                                    $nextShip = $subscription->next_shipment_date;
+                                    $hasRemainingBox = $nextShip && \App\Helpers\SubscriptionHelper::hasPaidCoverageForDate($subscription, $nextShip);
+                                @endphp
+                                @if($hasRemainingBox)
+                                    <span class="text-orange-600">{{ $nextShip->format('d.m.Y') }}</span>
+                                    <div class="text-xs text-gray-500">Zbývající box</div>
+                                @else
+                                    <span class="text-gray-400">-</span>
+                                @endif
+                            @elseif($subscription->next_shipment_date)
+                                {{ $subscription->next_shipment_date->format('d.m.Y') }}
                             @else
-                            -
+                                -
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
