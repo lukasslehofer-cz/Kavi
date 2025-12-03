@@ -25,7 +25,7 @@
     </div>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 overflow-x-hidden">
     @if(empty($cartItems))
     <!-- Empty Cart - Minimal -->
     <div class="max-w-2xl mx-auto">
@@ -56,10 +56,10 @@
         <div class="lg:col-span-2">
             <div class="space-y-4">
                 @foreach($cartItems as $item)
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                    <div class="flex gap-6">
+                <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 hover:border-gray-300 transition-all duration-200">
+                    <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
                         <!-- Product Image - Minimal -->
-                        <div class="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 mx-auto sm:mx-0">
                             @if($item['product']->image)
                             <img src="{{ asset($item['product']->image) }}" alt="{{ $item['product']->name }}" class="w-full h-full object-cover">
                             @else
@@ -72,24 +72,24 @@
                         </div>
 
                         <!-- Product Info -->
-                        <div class="flex-grow">
-                            <div class="flex justify-between items-start mb-3">
-                                <div>
-                                    <h3 class="text-lg font-bold text-gray-900 mb-1">
+                        <div class="flex-grow min-w-0">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-3 mb-3 text-center sm:text-left">
+                                <div class="min-w-0">
+                                    <h3 class="text-lg font-bold text-gray-900 mb-1 truncate">
                                         <a href="{{ route('products.show', $item['product']) }}" class="hover:text-gray-600 transition-colors">
                                             {{ $item['product']->name }}
                                         </a>
                                     </h3>
                                     <p class="text-gray-600 font-light">{{ number_format($item['product']->price, 0, ',', ' ') }} Kč / ks</p>
                                 </div>
-                                <div class="text-right">
+                                <div class="sm:text-right flex-shrink-0">
                                     <p class="text-xl font-bold text-gray-900">{{ number_format($item['subtotal'], 0, ',', ' ') }} Kč</p>
                                 </div>
                             </div>
 
                             <!-- Quantity Controls -->
-                            <div class="flex items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-100">
-                                <form action="{{ route('cart.update', $item['product']->id) }}" method="POST" class="flex items-center gap-3">
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-4 pt-4 border-t border-gray-100">
+                                <form action="{{ route('cart.update', $item['product']->id) }}" method="POST" class="flex items-center gap-2 sm:gap-3">
                                     @csrf
                                     @method('PATCH')
                                     <div class="flex items-center border border-gray-200 rounded-full overflow-hidden bg-white">
@@ -98,7 +98,7 @@
                                                class="w-12 text-center text-sm font-medium border-0 focus:ring-0 py-1.5" data-quantity-input>
                                         <button type="button" class="px-3 py-1.5 text-gray-700 hover:bg-gray-100 transition-colors font-medium text-sm">+</button>
                                     </div>
-                                    <button type="submit" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium px-4 py-1.5 rounded-full transition-colors">
+                                    <button type="submit" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium px-3 sm:px-4 py-1.5 rounded-full transition-colors whitespace-nowrap">
                                         Aktualizovat
                                     </button>
                                 </form>
@@ -149,16 +149,16 @@
                 
                 <dl class="space-y-4 mb-6">
                     <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                        <dt class="text-gray-600 font-light">Mezisoučet:</dt>
-                        <dd class="font-bold text-gray-900">{{ number_format($total, 0, ',', ' ') }} Kč</dd>
+                        <dt class="text-gray-600 font-light flex-shrink-0">Mezisoučet:</dt>
+                        <dd class="font-bold text-gray-900 text-right flex-shrink-0 ml-4 whitespace-nowrap">{{ number_format($total, 0, ',', ' ') }} Kč</dd>
                     </div>
                     
                     <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                        <dt class="text-gray-600 font-light">Doprava:</dt>
-                        <dd class="font-bold">
+                        <dt class="text-gray-600 font-light flex-shrink-0">Doprava:</dt>
+                        <dd class="font-bold text-right flex-shrink-0 ml-4">
                             @if($shipping !== null)
                                 @if($shipping == 0)
-                                    <span class="text-green-600 flex items-center gap-1">
+                                    <span class="text-green-600 inline-flex items-center gap-1">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                         </svg>
@@ -168,7 +168,7 @@
                                     <span class="text-gray-900">{{ number_format($shipping, 0, ',', ' ') }} Kč</span>
                                 @endif
                             @else
-                                <span class="text-gray-500 text-sm">{{ $shippingMessage ?? 'Bude dopočítána v pokladně' }}</span>
+                                <span class="text-gray-500 text-sm whitespace-nowrap">{{ $shippingMessage ?? 'V pokladně' }}</span>
                             @endif
                         </dd>
                     </div>
@@ -195,12 +195,12 @@
 
                     <div class="border-t border-gray-200 pt-4 mt-4">
                         <div class="flex justify-between items-center">
-                            <dt class="font-bold text-gray-900 text-lg">Celkem:</dt>
-                            <dd class="text-3xl font-bold text-gray-900">
+                            <dt class="font-bold text-gray-900 text-lg flex-shrink-0">Celkem:</dt>
+                            <dd class="text-2xl sm:text-3xl font-bold text-gray-900 text-right flex-shrink-0 ml-4">
                                 @if($shipping !== null)
-                                    {{ number_format($total + $shipping, 0, ',', ' ') }} Kč
+                                    <span class="whitespace-nowrap">{{ number_format($total + $shipping, 0, ',', ' ') }} Kč</span>
                                 @else
-                                    <span class="text-gray-500 text-base">Bude zobrazeno v pokladně</span>
+                                    <span class="text-gray-500 text-sm sm:text-base whitespace-nowrap">V pokladně</span>
                                 @endif
                             </dd>
                         </div>
