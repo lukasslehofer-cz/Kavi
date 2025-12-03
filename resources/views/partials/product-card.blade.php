@@ -34,25 +34,25 @@
       </span>
       @else
       @php
+        $categoryLabels = [
+          'espresso' => ['label' => 'Espresso', 'color' => 'bg-amber-500'],
+          'filter' => ['label' => 'Filtr', 'color' => 'bg-blue-500'],
+          'decaf' => ['label' => 'Bezkofeinová', 'color' => 'bg-green-500'],
+          'accessories' => ['label' => 'Příslušenství', 'color' => 'bg-purple-500'],
+        ];
+        
         // Pro kávy zobrazíme preparation methods
         if (!empty($product->attributes['preparation_methods'])) {
           $methods = $product->attributes['preparation_methods'];
           foreach ($methods as $method) {
-            if ($method === 'espresso') {
-              echo '<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">Espresso</span>';
-            } elseif ($method === 'filter') {
-              echo '<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">Filtr</span>';
+            if (isset($categoryLabels[$method])) {
+              $catData = $categoryLabels[$method];
+              echo '<span class="px-2.5 py-1 rounded-full text-xs font-medium ' . $catData['color'] . ' text-white">' . $catData['label'] . '</span>';
             }
           }
         } 
         // Pro ostatní kategorie zobrazíme kategorii
         else {
-          $categoryLabels = [
-            'espresso' => ['label' => 'Espresso', 'color' => 'bg-gray-900'],
-            'filter' => ['label' => 'Filtr', 'color' => 'bg-gray-900'],
-            'decaf' => ['label' => 'Bezkofeinová', 'color' => 'bg-gray-900'],
-            'accessories' => ['label' => 'Příslušenství', 'color' => 'bg-gray-900'],
-          ];
           if (is_array($product->category) && !empty($product->category)) {
             foreach ($product->category as $cat) {
               if (isset($categoryLabels[$cat])) {

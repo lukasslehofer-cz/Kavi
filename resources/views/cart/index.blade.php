@@ -255,8 +255,10 @@
         
         @if($recommendedProducts->isNotEmpty())
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            @foreach($recommendedProducts as $product)
-                @include('partials.product-card', ['product' => $product])
+            @foreach($recommendedProducts as $index => $product)
+                <div class="{{ $index >= 2 ? 'hidden md:block' : '' }}">
+                    @include('partials.product-card', ['product' => $product])
+                </div>
             @endforeach
         </div>
         @else

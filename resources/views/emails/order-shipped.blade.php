@@ -295,7 +295,7 @@
                                 <p class="info-text" style="color: #6b7280;">{{ $order->shipping_address['packeta_point_address'] }}</p>
                                 @endif
                                 <p class="info-text" style="margin-top: 12px; color: #059669;">
-                                    ✓ Zásilku vyzvedněte do 7 dnů od doručení
+                                    ✓ Sledujte informace o zásilce přímo u dopravce
                                 </p>
                                 @endif
                             </div>
