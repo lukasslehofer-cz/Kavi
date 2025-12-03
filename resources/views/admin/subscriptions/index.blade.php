@@ -176,8 +176,8 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            @if($subscription->next_billing_date)
-                            {{ $subscription->next_billing_date->format('d.m.Y') }}
+                            @if($subscription->next_shipment_date)
+                            {{ $subscription->next_shipment_date->format('d.m.Y') }}
                             @else
                             -
                             @endif
