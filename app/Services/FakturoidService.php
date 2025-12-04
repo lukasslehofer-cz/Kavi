@@ -572,8 +572,8 @@ class FakturoidService
             if ($subscription->configured_price > 0 && $discountActive) {
                 // Main subscription line (full price)
                 $lines[] = [
-                    'name' => 'Kávové předplatné' . ($payment->period_start && $payment->period_end 
-                        ? ' (' . $payment->period_start->format('d.m.Y') . ' - ' . $payment->period_end->format('d.m.Y') . ')'
+                    'name' => 'Kávové předplatné' . ($subscription->subscription_number 
+                        ? ' (' . $subscription->subscription_number . ')'
                         : ''),
                     'quantity' => '1',
                     'unit_name' => 'ks',
@@ -603,8 +603,8 @@ class FakturoidService
             } else {
                 // No active discount - show as single line with payment amount
                 $lines[] = [
-                    'name' => 'Kávové předplatné' . ($payment->period_start && $payment->period_end 
-                        ? ' (' . $payment->period_start->format('d.m.Y') . ' - ' . $payment->period_end->format('d.m.Y') . ')'
+                    'name' => 'Kávové předplatné' . ($subscription->subscription_number 
+                        ? ' (' . $subscription->subscription_number . ')'
                         : ''),
                     'quantity' => '1',
                     'unit_name' => 'ks',
