@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PaymentController;
@@ -25,6 +26,9 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Feeds
+Route::get('/feed/heureka.xml', [FeedController::class, 'heureka'])->name('feed.heureka');
 Route::view('/jak-to-funguje', 'how-it-works')->name('how-it-works');
 Route::view('/o-nas', 'about')->name('about');
 Route::view('/kontakt', 'contact')->name('contact');
