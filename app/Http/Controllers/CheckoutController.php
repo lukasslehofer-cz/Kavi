@@ -83,6 +83,9 @@ class CheckoutController extends Controller
         // Check if cart qualifies for free shipping (all products have free_shipping flag)
         $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
         
+        // Check if cart contains only digital products (no physical shipping needed)
+        $cartContainsOnlyDigitalProducts = Product::cartContainsOnlyDigitalProducts($cart);
+        
         // Calculate shipping dynamically based on user country
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : 'CZ'; // Default to Czech Republic for guests
         $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
@@ -202,7 +205,8 @@ class CheckoutController extends Controller
             'subscriptionShipmentInfo',
             'availableSubscriptions',
             'availableCountries',
-            'cartQualifiesForFreeShipping'
+            'cartQualifiesForFreeShipping',
+            'cartContainsOnlyDigitalProducts'
         ));
     }
 
@@ -258,6 +262,10 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        // Check if cart contains only digital products
+        $cart = session()->get('cart', []);
+        $cartContainsOnlyDigitalProducts = Product::cartContainsOnlyDigitalProducts($cart);
+        
         // Dynamická validace - Packeta data jsou required pouze pokud se neposílá s předplatným
         $rules = [
             'name' => 'required|string|max:255',
@@ -273,8 +281,8 @@ class CheckoutController extends Controller
             'selected_subscription_id' => 'nullable|exists:subscriptions,id',
         ];
 
-        // Packeta fields are required only if NOT shipping with subscription
-        if (!$request->ship_with_subscription) {
+        // Packeta fields are required only if NOT shipping with subscription AND NOT digital-only cart
+        if (!$request->ship_with_subscription && !$cartContainsOnlyDigitalProducts) {
             $rules['packeta_point_id'] = 'required|string';
             $rules['packeta_point_name'] = 'required|string';
             $rules['packeta_point_address'] = 'nullable|string';

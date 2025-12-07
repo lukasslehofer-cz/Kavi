@@ -24,6 +24,7 @@ class Product extends Model
         'is_active',
         'is_featured',
         'free_shipping',
+        'is_digital',
         'is_coffee_of_month',
         'coffee_of_month_date',
         'sort_order',
@@ -38,6 +39,7 @@ class Product extends Model
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
         'free_shipping' => 'boolean',
+        'is_digital' => 'boolean',
         'is_coffee_of_month' => 'boolean',
     ];
 
@@ -149,6 +151,28 @@ class Product extends Model
             ->count();
 
         return $nonFreeShippingCount === 0;
+    }
+
+    /**
+     * Check if cart contains only digital products (all products have is_digital = true)
+     *
+     * @param array $cart Array of product_id => quantity
+     * @return bool
+     */
+    public static function cartContainsOnlyDigitalProducts(array $cart): bool
+    {
+        if (empty($cart)) {
+            return false;
+        }
+
+        $productIds = array_keys($cart);
+        
+        // Count products that are NOT digital
+        $nonDigitalCount = self::whereIn('id', $productIds)
+            ->where('is_digital', false)
+            ->count();
+
+        return $nonDigitalCount === 0;
     }
 }
 

@@ -264,8 +264,17 @@
                            class="rounded border-green-300 text-green-600 focus:ring-green-500">
                     <span class="ml-2 text-sm text-coffee-900">Doprava zdarma</span>
                 </label>
+
+                <label class="flex items-center">
+                    <input type="checkbox" name="is_digital" value="1" {{ old('is_digital') ? 'checked' : '' }}
+                           class="rounded border-blue-300 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2 text-sm text-coffee-900">Digitální produkt</span>
+                </label>
             </div>
-            <p class="text-xs text-coffee-600 mt-2">💡 <strong>Doprava zdarma</strong> - pokud budou v košíku pouze produkty s touto značkou, doprava se nebude účtovat.</p>
+            <p class="text-xs text-coffee-600 mt-2">
+                💡 <strong>Doprava zdarma</strong> - pokud budou v košíku pouze produkty s touto značkou, doprava se nebude účtovat.<br>
+                📧 <strong>Digitální produkt</strong> - pokud budou v košíku pouze digitální produkty, nebude se zobrazovat výběr výdejního místa.
+            </p>
         </div>
 
         <div class="flex items-center gap-4 mt-8">

@@ -634,7 +634,8 @@
                 @endif
                 @endauth
 
-                <!-- Packeta Pickup Point - Minimal -->
+                <!-- Packeta Pickup Point - Minimal (hidden for digital-only orders) -->
+                @if(!$cartContainsOnlyDigitalProducts)
                 <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6" id="packeta-section">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
@@ -699,6 +700,22 @@
                         </div>
                     </div>
                 </div>
+                @else
+                <!-- Digital products info -->
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mt-6">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <div>
+                            <h3 class="font-bold text-gray-900 mb-1">Digitální produkt</h3>
+                            <p class="text-sm text-blue-700 font-light">
+                                Váš produkt bude doručen elektronicky na zadaný email. Není potřeba vybírat výdejní místo.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Payment Method - Minimal -->
                 <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
