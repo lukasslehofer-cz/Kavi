@@ -168,7 +168,7 @@
                             @if($product->stock >= 5)
                               <span class="font-medium text-gray-900">Více než 5 ks</span> skladem
                             @elseif($product->stock >= 2)
-                              <span class="font-medium text-gray-900">Poslední kusy</span>
+                              <span class="font-medium text-gray-900">Poslední kusy</span> skladem
                             @else
                               <span class="font-medium text-gray-900">Poslední kus</span> skladem
                             @endif
