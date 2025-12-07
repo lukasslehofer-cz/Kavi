@@ -67,16 +67,23 @@ class CheckoutController extends Controller
 
         $cartItems = [];
         $subtotal = 0;
+        $discountableSubtotal = 0; // Subtotal produktů, na které se vztahují slevy
 
         foreach ($cart as $productId => $quantity) {
             $product = Product::find($productId);
             if ($product && $product->is_active) {
+                $itemSubtotal = $product->price * $quantity;
                 $cartItems[] = [
                     'product' => $product,
                     'quantity' => $quantity,
-                    'subtotal' => $product->price * $quantity,
+                    'subtotal' => $itemSubtotal,
                 ];
-                $subtotal += $product->price * $quantity;
+                $subtotal += $itemSubtotal;
+                
+                // Přičíst k discountable subtotal pouze pokud produkt není vyloučen ze slev
+                if (!$product->exclude_from_discounts) {
+                    $discountableSubtotal += $itemSubtotal;
+                }
             }
         }
 
@@ -114,7 +121,8 @@ class CheckoutController extends Controller
             
             if ($result['valid']) {
                 $appliedCoupon = $result['coupon'];
-                $couponResult = $this->couponService->applyToOrder($appliedCoupon, $subtotal, $shipping);
+                // Předat discountableSubtotal pro výpočet slevy pouze z produktů bez vyloučení
+                $couponResult = $this->couponService->applyToOrder($appliedCoupon, $subtotal, $shipping, $discountableSubtotal);
                 
                 $discount = $couponResult['discount'];
                 $shipping = $couponResult['shipping'];
@@ -347,17 +355,25 @@ class CheckoutController extends Controller
             }
             
             $subtotal = 0;
+            $discountableSubtotal = 0; // Subtotal produktů, na které se vztahují slevy
             $orderItems = [];
 
             foreach ($cart as $productId => $quantity) {
                 $product = Product::find($productId);
                 if ($product && $product->is_active && $product->stock >= $quantity) {
-                    $subtotal += $product->price * $quantity;
+                    $itemTotal = $product->price * $quantity;
+                    $subtotal += $itemTotal;
+                    
+                    // Přičíst k discountable subtotal pouze pokud produkt není vyloučen ze slev
+                    if (!$product->exclude_from_discounts) {
+                        $discountableSubtotal += $itemTotal;
+                    }
+                    
                     $orderItems[] = [
                         'product' => $product,
                         'quantity' => $quantity,
                         'price' => $product->price,
-                        'total' => $product->price * $quantity,
+                        'total' => $itemTotal,
                     ];
                 }
             }
@@ -408,7 +424,8 @@ class CheckoutController extends Controller
                 
                 if ($result['valid']) {
                     $coupon = $result['coupon'];
-                    $couponResult = $this->couponService->applyToOrder($coupon, $subtotal, $shipping);
+                    // Předat discountableSubtotal pro výpočet slevy pouze z produktů bez vyloučení
+                    $couponResult = $this->couponService->applyToOrder($coupon, $subtotal, $shipping, $discountableSubtotal);
                     
                     $discount = $couponResult['discount'];
                     $shipping = $couponResult['shipping'];

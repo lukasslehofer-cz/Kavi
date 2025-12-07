@@ -25,6 +25,7 @@ class Product extends Model
         'is_featured',
         'free_shipping',
         'is_digital',
+        'exclude_from_discounts',
         'is_coffee_of_month',
         'coffee_of_month_date',
         'sort_order',
@@ -40,6 +41,7 @@ class Product extends Model
         'is_featured' => 'boolean',
         'free_shipping' => 'boolean',
         'is_digital' => 'boolean',
+        'exclude_from_discounts' => 'boolean',
         'is_coffee_of_month' => 'boolean',
     ];
 

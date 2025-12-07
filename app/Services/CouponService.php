@@ -59,15 +59,23 @@ class CouponService
 
     /**
      * Aplikuje kupón na objednávku a vrátí upravené ceny
+     * 
+     * @param Coupon $coupon
+     * @param float $subtotal Celková cena produktů
+     * @param float $shipping Cena dopravy
+     * @param float|null $discountableSubtotal Cena produktů, na které se vztahuje sleva (null = použít subtotal)
      */
-    public function applyToOrder(Coupon $coupon, float $subtotal, float $shipping): array
+    public function applyToOrder(Coupon $coupon, float $subtotal, float $shipping, ?float $discountableSubtotal = null): array
     {
         $discount = 0;
         $freeShipping = false;
+        
+        // Pokud není specifikován discountableSubtotal, použít celý subtotal
+        $discountableAmount = $discountableSubtotal ?? $subtotal;
 
-        // Sleva z částky
+        // Sleva z částky - pouze z produktů, které nejsou vyloučeny ze slev
         if ($coupon->hasOrderDiscount()) {
-            $discount = $coupon->calculateOrderDiscount($subtotal);
+            $discount = $coupon->calculateOrderDiscount($discountableAmount);
         }
 
         // Doprava zdarma

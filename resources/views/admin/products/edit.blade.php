@@ -315,10 +315,17 @@
                            class="rounded border-blue-300 text-blue-600 focus:ring-blue-500">
                     <span class="ml-2 text-sm text-gray-900">Digitální produkt</span>
                 </label>
+
+                <label class="flex items-center">
+                    <input type="checkbox" name="exclude_from_discounts" value="1" {{ old('exclude_from_discounts', $product->exclude_from_discounts) ? 'checked' : '' }}
+                           class="rounded border-orange-300 text-orange-600 focus:ring-orange-500">
+                    <span class="ml-2 text-sm text-gray-900">Vyloučit ze slev</span>
+                </label>
             </div>
             <p class="text-xs text-gray-600 mt-2">
                 💡 <strong>Doprava zdarma</strong> - pokud budou v košíku pouze produkty s touto značkou, doprava se nebude účtovat.<br>
-                📧 <strong>Digitální produkt</strong> - pokud budou v košíku pouze digitální produkty, nebude se zobrazovat výběr výdejního místa.
+                📧 <strong>Digitální produkt</strong> - pokud budou v košíku pouze digitální produkty, nebude se zobrazovat výběr výdejního místa.<br>
+                🏷️ <strong>Vyloučit ze slev</strong> - na tento produkt se nebudou aplikovat slevové kódy.
             </p>
         </div>
 
