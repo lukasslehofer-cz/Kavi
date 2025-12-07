@@ -204,7 +204,7 @@
                   <h3 class="text-xl font-bold text-gray-900">O produktu</h3>
                 </div>
                 <div class="text-gray-700 leading-relaxed prose max-w-none font-light">
-                    {!! nl2br(e($product->description)) !!}
+                    {!! nl2br(strip_tags($product->description, '<a><strong><em><i><b><br><p><ul><ol><li>')) !!}
                 </div>
             </div>
 

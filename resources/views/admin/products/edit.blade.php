@@ -67,6 +67,7 @@
                 @error('description')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
+                <p class="text-xs text-gray-600 mt-1">Povolené HTML tagy: &lt;a&gt;, &lt;strong&gt;, &lt;b&gt;, &lt;em&gt;, &lt;i&gt;, &lt;br&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
