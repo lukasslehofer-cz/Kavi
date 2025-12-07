@@ -775,6 +775,16 @@ class StripeService
                     ]);
                 }
                 
+                // Notify admins about new order
+                try {
+                    \App\Mail\AdminOrderNotification::notifyAdmins($order);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send admin order notification', [
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+                
                 \Log::info('Order payment completed via webhook', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
@@ -1008,6 +1018,16 @@ class StripeService
                 }
             } catch (\Exception $e) {
                 \Log::error('Failed to send subscription confirmation email: ' . $e->getMessage());
+            }
+            
+            // Notify admins about new subscription
+            try {
+                \App\Mail\AdminOrderNotification::notifyAdmins($subscription);
+            } catch (\Exception $e) {
+                \Log::error('Failed to send admin subscription notification', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
         } catch (\Exception $e) {
             \Log::error('Failed to create subscription', [
@@ -1268,6 +1288,16 @@ class StripeService
                 }
             } catch (\Exception $e) {
                 \Log::error('Failed to send subscription confirmation email: ' . $e->getMessage());
+            }
+            
+            // Notify admins about new subscription
+            try {
+                \App\Mail\AdminOrderNotification::notifyAdmins($subscription);
+            } catch (\Exception $e) {
+                \Log::error('Failed to send admin subscription notification', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             // Create Fakturoid invoice for first payment
