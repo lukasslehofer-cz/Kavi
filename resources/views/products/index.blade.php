@@ -148,11 +148,21 @@
             </p>
             @endif
             
-            <!-- Flavor Tones -->
-            @if(!empty($product->attributes['flavor_profile']) || !empty($product->attributes['flavor_notes']))
-            <div class="text-xs">              
-              <span class="text-gray-600 font-light">{{ $product->attributes['flavor_profile'] ?? $product->attributes['flavor_notes'] }}</span>
-            </div>
+            <!-- Flavor Tones / Short Description -->
+            @if(is_array($product->category) && in_array('accessories', $product->category))
+              <!-- For accessories, show short description -->
+              @if($product->short_description)
+              <div class="text-xs">              
+                <span class="text-gray-600 font-light">{{ $product->short_description }}</span>
+              </div>
+              @endif
+            @else
+              <!-- For coffee products, show flavor tones -->
+              @if(!empty($product->attributes['flavor_profile']) || !empty($product->attributes['flavor_notes']))
+              <div class="text-xs">              
+                <span class="text-gray-600 font-light">{{ $product->attributes['flavor_profile'] ?? $product->attributes['flavor_notes'] }}</span>
+              </div>
+              @endif
             @endif
           </div>
 
