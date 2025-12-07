@@ -165,7 +165,13 @@
                             <button type="button" class="px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors font-medium">+</button>
                         </div>
                         <span class="text-gray-500 font-light text-sm">
-                            <span class="font-medium text-gray-900">{{ $product->stock }}</span> ks skladem
+                            @if($product->stock >= 5)
+                              <span class="font-medium text-gray-900">Více než 5 ks</span> skladem
+                            @elseif($product->stock >= 2)
+                              <span class="font-medium text-gray-900">Poslední kusy</span>
+                            @else
+                              <span class="font-medium text-gray-900">Poslední kus</span> skladem
+                            @endif
                         </span>
                     </div>
                 </div>
