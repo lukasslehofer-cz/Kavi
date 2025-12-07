@@ -80,9 +80,12 @@ class CheckoutController extends Controller
             }
         }
 
+        // Check if cart qualifies for free shipping (all products have free_shipping flag)
+        $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
+        
         // Calculate shipping dynamically based on user country
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : 'CZ'; // Default to Czech Republic for guests
-        $shipping = $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
+        $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
         $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry);
         
         // Odebrat kupón pokud je požadováno
@@ -198,7 +201,8 @@ class CheckoutController extends Controller
             'canShipWithSubscription',
             'subscriptionShipmentInfo',
             'availableSubscriptions',
-            'availableCountries'
+            'availableCountries',
+            'cartQualifiesForFreeShipping'
         ));
     }
 
@@ -215,8 +219,12 @@ class CheckoutController extends Controller
             return response()->json(['error' => 'Country is required'], 400);
         }
 
-        // Calculate shipping
-        $shipping = $this->shippingService->calculateShippingCost($country, $subtotal, $isSubscription);
+        // Check if cart qualifies for free shipping (all products have free_shipping flag)
+        $cart = session()->get('cart', []);
+        $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
+
+        // Calculate shipping (0 if all products have free_shipping)
+        $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($country, $subtotal, $isSubscription);
         
         // Get shipping rate details
         $rate = ShippingRate::getForCountry($country);
@@ -233,7 +241,7 @@ class CheckoutController extends Controller
 
         // Calculate remaining for free shipping (only for orders, not subscriptions)
         $remaining = null;
-        if (!$isSubscription) {
+        if (!$isSubscription && !$cartQualifiesForFreeShipping) {
             $remaining = $this->shippingService->getRemainingForFreeShipping($country, $subtotal);
         }
 
@@ -244,6 +252,7 @@ class CheckoutController extends Controller
             'packeta_carrier_names' => $rate->getPacketaCarrierNames(),
             'available' => true,
             'free_shipping_remaining' => $remaining,
+            'cart_free_shipping' => $cartQualifiesForFreeShipping,
         ]);
     }
 
@@ -372,9 +381,13 @@ class CheckoutController extends Controller
                 }
             }
 
+            // Check if cart qualifies for free shipping (all products have free_shipping flag)
+            $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
+            
             // Calculate shipping based on selected country or subscription addon
+            // Free shipping if: shipped with subscription OR all products have free_shipping flag
             $shippingCountry = $request->billing_country;
-            $shipping = $shipWithSubscription ? 0 : $this->shippingService->calculateShippingCost($shippingCountry, $subtotal, false);
+            $shipping = ($shipWithSubscription || $cartQualifiesForFreeShipping) ? 0 : $this->shippingService->calculateShippingCost($shippingCountry, $subtotal, false);
             $shippingRate = ShippingRate::getForCountry($shippingCountry);
             
             // Zpracování kupónu

@@ -246,7 +246,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-6 flex-wrap gap-y-3">
                 <label class="flex items-center">
                     <input type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}
                            class="rounded border-cream-300 text-coffee-700 focus:ring-coffee-500">
@@ -258,7 +258,14 @@
                            class="rounded border-cream-300 text-coffee-700 focus:ring-coffee-500">
                     <span class="ml-2 text-sm text-coffee-900">Zvýrazněný produkt</span>
                 </label>
+
+                <label class="flex items-center">
+                    <input type="checkbox" name="free_shipping" value="1" {{ old('free_shipping') ? 'checked' : '' }}
+                           class="rounded border-green-300 text-green-600 focus:ring-green-500">
+                    <span class="ml-2 text-sm text-coffee-900">Doprava zdarma</span>
+                </label>
             </div>
+            <p class="text-xs text-coffee-600 mt-2">💡 <strong>Doprava zdarma</strong> - pokud budou v košíku pouze produkty s touto značkou, doprava se nebude účtovat.</p>
         </div>
 
         <div class="flex items-center gap-4 mt-8">

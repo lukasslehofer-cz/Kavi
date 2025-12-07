@@ -37,7 +37,14 @@ class CartController extends Controller
         $remainingForFreeShipping = null;
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
         
-        if ($userCountry) {
+        // Check if cart qualifies for free shipping (all products have free_shipping flag)
+        $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
+        
+        if ($cartQualifiesForFreeShipping) {
+            // All products in cart have free_shipping - no shipping charge
+            $shipping = 0;
+            $shippingMessage = 'Doprava zdarma (digitální produkt)';
+        } elseif ($userCountry) {
             $shipping = $this->shippingService->calculateShippingCost($userCountry, $total, false);
             $remainingForFreeShipping = $this->shippingService->getRemainingForFreeShipping($userCountry, $total);
             

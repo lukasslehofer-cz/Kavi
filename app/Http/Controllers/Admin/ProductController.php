@@ -51,6 +51,7 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'free_shipping' => 'boolean',
             'is_coffee_of_month' => 'boolean',
             'coffee_of_month_date' => 'nullable|string|regex:/^\d{4}-\d{2}$/',
             'sort_order' => 'nullable|integer|min:0',
@@ -69,6 +70,7 @@ class ProductController extends Controller
         unset($validated['categories']);
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
+        $validated['free_shipping'] = $request->has('free_shipping');
         $validated['is_coffee_of_month'] = $request->has('is_coffee_of_month');
         
         // If product is coffee of month, price and stock are optional
@@ -150,6 +152,7 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'free_shipping' => 'boolean',
             'is_coffee_of_month' => 'boolean',
             'coffee_of_month_date' => 'nullable|string|regex:/^\d{4}-\d{2}$/',
             'sort_order' => 'nullable|integer|min:0',
@@ -168,6 +171,7 @@ class ProductController extends Controller
         unset($validated['categories']);
         $validated['is_active'] = $request->has('is_active');
         $validated['is_featured'] = $request->has('is_featured');
+        $validated['free_shipping'] = $request->has('free_shipping');
         $validated['is_coffee_of_month'] = $request->has('is_coffee_of_month');
         
         // If product is coffee of month, price and stock are optional

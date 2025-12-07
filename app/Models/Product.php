@@ -23,6 +23,7 @@ class Product extends Model
         'attributes',
         'is_active',
         'is_featured',
+        'free_shipping',
         'is_coffee_of_month',
         'coffee_of_month_date',
         'sort_order',
@@ -36,6 +37,7 @@ class Product extends Model
         'category' => 'array',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
+        'free_shipping' => 'boolean',
         'is_coffee_of_month' => 'boolean',
     ];
 
@@ -125,6 +127,28 @@ class Product extends Model
     public function scopeByMonthDate($query, $month)
     {
         return $query->where('coffee_of_month_date', $month);
+    }
+
+    /**
+     * Check if cart qualifies for free shipping (all products have free_shipping = true)
+     *
+     * @param array $cart Array of product_id => quantity
+     * @return bool
+     */
+    public static function cartQualifiesForFreeShipping(array $cart): bool
+    {
+        if (empty($cart)) {
+            return false;
+        }
+
+        $productIds = array_keys($cart);
+        
+        // Count products that don't have free_shipping
+        $nonFreeShippingCount = self::whereIn('id', $productIds)
+            ->where('free_shipping', false)
+            ->count();
+
+        return $nonFreeShippingCount === 0;
     }
 }
 
