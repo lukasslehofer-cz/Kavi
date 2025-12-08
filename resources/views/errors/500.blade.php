@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Něco se pokazilo | KAVI.cz')
+@section('title', ($currentLocale ?? 'cs') === 'en' ? 'Something Went Wrong | KAVI' : 'Něco se pokazilo | KAVI.cz')
 
 @section('content')
 <div class="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-white">
@@ -15,7 +15,7 @@
                 <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <span class="text-sm font-medium text-red-600">Chyba 500</span>
+                <span class="text-sm font-medium text-red-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Error 500' : 'Chyba 500' }}</span>
             </div>
 
             <!-- Large Icon -->
@@ -29,12 +29,14 @@
 
             <!-- Heading -->
             <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                Ups, něco se pokazilo
+                {{ ($currentLocale ?? 'cs') === 'en' ? 'Oops, Something Went Wrong' : 'Ups, něco se pokazilo' }}
             </h2>
 
             <!-- Description -->
             <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-10 max-w-xl mx-auto">
-                Omlouváme se, ale na serveru došlo k chybě. Náš tým už na tom pracuje. Zkuste to prosím za chvíli znovu.
+                {{ ($currentLocale ?? 'cs') === 'en' 
+                    ? 'Sorry, but there was a server error. Our team is already working on it. Please try again in a moment.' 
+                    : 'Omlouváme se, ale na serveru došlo k chybě. Náš tým už na tom pracuje. Zkuste to prosím za chvíli znovu.' }}
             </p>
 
             <!-- CTA Buttons -->
@@ -43,28 +45,27 @@
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span>Zkusit znovu</span>
+                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Try Again' : 'Zkusit znovu' }}</span>
                 </button>
                 
                 <a href="{{ route('home') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full border border-gray-200 transition-all duration-200">
-                    <span>Zpět na úvodní stránku</span>
+                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Back to Home' : 'Zpět na úvodní stránku' }}</span>
                 </a>
             </div>
 
             <!-- Contact Support -->
             <div class="pt-8 border-t border-gray-100">
                 <p class="text-sm text-gray-600 font-light mb-4">
-                    Pokud problém přetrvává, kontaktujte nás:
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'If the problem persists, contact us:' : 'Pokud problém přetrvává, kontaktujte nás:' }}
                 </p>
-                <a href="mailto:info@kavi.cz" class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium">
+                <a href="mailto:{{ ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}" class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <span>info@kavi.cz</span>
+                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}</span>
                 </a>
             </div>
         </div>
     </div>
 </div>
 @endsection
-

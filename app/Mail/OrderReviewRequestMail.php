@@ -4,40 +4,31 @@ namespace App\Mail;
 
 use App\Models\Order;
 use App\Models\ReviewRequest;
-use Illuminate\Bus\Queueable;
+use App\Services\EmailService;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class OrderReviewRequestMail extends Mailable implements ShouldQueue
+class OrderReviewRequestMail extends LocalizedMailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    public Order $order;
+    public ReviewRequest $reviewRequest;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(
-        public Order $order,
-        public ReviewRequest $reviewRequest
-    ) {
-        //
+    public function __construct(Order $order, ReviewRequest $reviewRequest, ?string $locale = null)
+    {
+        $this->order = $order;
+        $this->reviewRequest = $reviewRequest;
+        $this->setLocale($locale ?? EmailService::getLocaleFromOrder($order));
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Jak se vám líbila káva? ⭐',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.order_review.subject'),
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         // Generate tracking link to Trustpilot via our controller
@@ -48,15 +39,13 @@ class OrderReviewRequestMail extends Mailable implements ShouldQueue
             with: [
                 'order' => $this->order,
                 'trustpilotLink' => $trustpilotLink,
+                'locale' => $this->locale,
+                'siteName' => $this->siteName,
+                'contactEmail' => $this->contactEmail,
             ],
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];

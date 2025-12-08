@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Stránka nenalezena | KAVI.cz')
+@section('title', ($currentLocale ?? 'cs') === 'en' ? 'Page Not Found | KAVI' : 'Stránka nenalezena | KAVI.cz')
 
 @section('content')
 <div class="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-white">
@@ -15,7 +15,7 @@
                 <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="text-sm font-medium text-primary-600">Chyba 404</span>
+                <span class="text-sm font-medium text-primary-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Error 404' : 'Chyba 404' }}</span>
             </div>
 
             <!-- Large Icon -->
@@ -27,12 +27,14 @@
 
             <!-- Heading -->
             <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                Tuto stránku jsme nenašli
+                {{ ($currentLocale ?? 'cs') === 'en' ? 'Page Not Found' : 'Tuto stránku jsme nenašli' }}
             </h2>
 
             <!-- Description -->
             <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-10 max-w-xl mx-auto">
-                Stránka, kterou hledáte, neexistuje nebo byla přesunuta. Možná jste se překlépli v adrese, nebo odkaz už není platný.
+                {{ ($currentLocale ?? 'cs') === 'en' 
+                    ? 'The page you\'re looking for doesn\'t exist or has been moved. You may have mistyped the address, or the link is no longer valid.' 
+                    : 'Stránka, kterou hledáte, neexistuje nebo byla přesunuta. Možná jste se překlépli v adrese, nebo odkaz už není platný.' }}
             </p>
 
             <!-- CTA Buttons -->
@@ -41,11 +43,11 @@
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
-                    <span>Zpět na úvodní stránku</span>
+                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Back to Home' : 'Zpět na úvodní stránku' }}</span>
                 </a>
                 
                 <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full border border-gray-200 transition-all duration-200">
-                    <span>Kávové boxy</span>
+                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee Boxes' : 'Kávové boxy' }}</span>
                     <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -54,26 +56,26 @@
 
             <!-- Quick Links -->
             <div class="pt-8 border-t border-gray-100">
-                <p class="text-sm text-gray-500 font-light mb-4">Možná hledáte:</p>
+                <p class="text-sm text-gray-500 font-light mb-4">{{ ($currentLocale ?? 'cs') === 'en' ? 'Maybe you\'re looking for:' : 'Možná hledáte:' }}</p>
                 <div class="flex flex-wrap gap-3 justify-center">
                     <a href="{{ localizedRoute('products.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                        Obchod
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Shop' : 'Obchod' }}
                     </a>
                     <span class="text-gray-300">•</span>
                     <a href="{{ localizedRoute('roasteries.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                        Pražírny
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Roasteries' : 'Pražírny' }}
                     </a>
                     <span class="text-gray-300">•</span>
                     <a href="{{ localizedRoute('monthly-feature.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                        Káva měsíce
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}
                     </a>
                     <span class="text-gray-300">•</span>
                     <a href="{{ localizedRoute('how-it-works') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                        Jak to funguje
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'How It Works' : 'Jak to funguje' }}
                     </a>
                     <span class="text-gray-300">•</span>
                     <a href="{{ localizedRoute('contact') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                        Kontakt
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Contact' : 'Kontakt' }}
                     </a>
                 </div>
             </div>
@@ -81,4 +83,3 @@
     </div>
 </div>
 @endsection
-

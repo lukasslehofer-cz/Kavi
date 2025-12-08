@@ -3,24 +3,25 @@
 namespace App\Mail;
 
 use App\Models\Subscription;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class SubscriptionCancelled extends Mailable
+class SubscriptionCancelled extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public Subscription $subscription;
 
-    public function __construct(
-        public Subscription $subscription
-    ) {}
+    public function __construct(Subscription $subscription, ?string $locale = null)
+    {
+        $this->subscription = $subscription;
+        $this->setLocale($locale ?? EmailService::getLocaleFromSubscription($subscription));
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Předplatné zrušeno - Budeme se těšit na viděnou! - KAVI.cz',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.subscription_cancelled.subject'),
         );
     }
 
@@ -36,4 +37,3 @@ class SubscriptionCancelled extends Mailable
         return [];
     }
 }
-

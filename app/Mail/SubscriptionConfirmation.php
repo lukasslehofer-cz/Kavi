@@ -3,39 +3,28 @@
 namespace App\Mail;
 
 use App\Models\Subscription;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class SubscriptionConfirmation extends Mailable
+class SubscriptionConfirmation extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public Subscription $subscription;
 
-    public $subscription;
-
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(Subscription $subscription)
+    public function __construct(Subscription $subscription, ?string $locale = null)
     {
         $this->subscription = $subscription;
+        $this->setLocale($locale ?? EmailService::getLocaleFromSubscription($subscription));
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('emails.subscription_confirmation.subject'),
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.subscription_confirmation.subject'),
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -43,14 +32,8 @@ class SubscriptionConfirmation extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];
     }
 }
-

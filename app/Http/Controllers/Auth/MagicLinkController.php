@@ -56,11 +56,11 @@ class MagicLinkController extends Controller
                 Mail::to($email)->send(new MagicLoginLink($loginUrl, 15));
             } catch (\Exception $e) {
                 \Log::error('Failed to send magic link email: ' . $e->getMessage());
-                return back()->with('error', 'Nepodařilo se odeslat email. Zkuste to prosím znovu.');
+                return back()->with('error', __('flash.auth.email_send_failed'));
             }
         }
 
-        return back()->with('success', 'Pokud účet s tímto emailem existuje, byl na něj odeslán přihlašovací odkaz. Platnost odkazu je 15 minut.');
+        return back()->with('success', __('flash.auth.magic_link_sent'));
     }
 
     /**
@@ -80,7 +80,7 @@ class MagicLinkController extends Controller
 
         if (!$loginToken) {
             return redirect(localizedRoute('login'))
-                ->with('error', 'Přihlašovací odkaz je neplatný nebo vypršel. Požádejte o nový odkaz.');
+                ->with('error', __('flash.auth.magic_link_invalid'));
         }
 
         // Find user
@@ -88,7 +88,7 @@ class MagicLinkController extends Controller
 
         if (!$user) {
             return redirect(localizedRoute('login'))
-                ->with('error', 'Uživatel nebyl nalezen.');
+                ->with('error', __('flash.auth.user_not_found'));
         }
 
         // Mark token as used
@@ -105,12 +105,12 @@ class MagicLinkController extends Controller
         
         if ($redirect && filter_var($redirect, FILTER_VALIDATE_URL) === false) {
             // If it's a relative path, redirect to it
-            return redirect($redirect)->with('success', 'Byli jste úspěšně přihlášeni!');
+            return redirect($redirect)->with('success', __('flash.auth.login_success'));
         }
 
         // Default redirect to dashboard
         return redirect()->intended(localizedRoute('dashboard.index'))
-            ->with('success', 'Byli jste úspěšně přihlášeni pomocí magic linku!');
+            ->with('success', __('flash.auth.magic_link_login_success'));
     }
 
     /**

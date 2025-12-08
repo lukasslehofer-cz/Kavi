@@ -112,7 +112,7 @@ class DashboardController extends Controller
 
         if ($subscriptions->isEmpty()) {
             return redirect()->localizedRoute('subscriptions.index')
-                ->with('message', 'Nemáte žádné aktivní předplatné.');
+                ->with('message', __('flash.subscription.no_active_subscription'));
         }
 
         return view('dashboard.subscription', compact('subscriptions'));
@@ -209,7 +209,7 @@ class DashboardController extends Controller
         $viewingUser->refresh();
 
         return redirect()->localizedRoute('dashboard.profile')
-            ->with('success', 'Profil byl úspěšně aktualizován.');
+            ->with('success', __('flash.profile.updated'));
     }
 
     public function updatePassword(Request $request)
@@ -237,7 +237,7 @@ class DashboardController extends Controller
         ]);
 
         return redirect()->localizedRoute('dashboard.profile')
-            ->with('success', 'Heslo bylo úspěšně změněno.');
+            ->with('success', __('flash.profile.password_changed'));
     }
 
     public function notifications()
@@ -345,7 +345,7 @@ class DashboardController extends Controller
         }
 
         return redirect()->localizedRoute('dashboard.subscription')
-            ->with('success', 'Předplatné bylo pozastaveno.');
+            ->with('success', __('flash.subscription.paused'));
     }
 
     /**
@@ -381,7 +381,7 @@ class DashboardController extends Controller
         $subscription->resume();
 
         return redirect()->localizedRoute('dashboard.subscription')
-            ->with('success', 'Předplatné bylo obnoveno.');
+            ->with('success', __('flash.subscription.resumed'));
     }
 
     /**
@@ -427,7 +427,7 @@ class DashboardController extends Controller
         }
 
         return redirect()->localizedRoute('dashboard.subscription')
-            ->with('success', 'Předplatné bylo zrušeno.');
+            ->with('success', __('flash.subscription.cancelled'));
     }
 
     /**
@@ -450,7 +450,7 @@ class DashboardController extends Controller
             ]);
             
             return redirect()->localizedRoute('dashboard.profile')
-                ->with('error', 'Nepodařilo se otevřít správu platebních metod. Zkuste to prosím později.');
+                ->with('error', __('flash.payment.management_error'));
         }
     }
 
@@ -514,21 +514,22 @@ class DashboardController extends Controller
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Váš účet byl úspěšně smazán. Na zadaný email jsme vám poslali potvrzení.',
+                    'message' => __('flash.profile.account_deleted'),
                     'redirect' => route('home'),
                 ]);
             }
 
             return redirect()->route('home')
-                ->with('success', 'Váš účet byl úspěšně smazán. Na zadaný email jsme vám poslali potvrzení.');
+                ->with('success', __('flash.profile.account_deleted'));
         } catch (\Exception $e) {
             \Log::error('Account deletion failed', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
 
-            $errorMessage = 'Při mazání účtu došlo k chybě. ' . 
-                (!auth()->check() ? 'Kontaktujte nás prosím na info@kavi.cz' : 'Zkuste to prosím později nebo nás kontaktujte.');
+            $errorMessage = !auth()->check() 
+                ? __('flash.profile.account_delete_error_contact') 
+                : __('flash.profile.account_delete_error');
 
             // Return JSON for AJAX requests
             if ($request->wantsJson() || $request->ajax()) {
@@ -541,11 +542,11 @@ class DashboardController extends Controller
             // If user was already logged out, redirect to home
             if (!auth()->check()) {
                 return redirect()->route('home')
-                    ->with('error', 'Při mazání účtu došlo k chybě. Kontaktujte nás prosím na info@kavi.cz');
+                    ->with('error', __('flash.profile.account_delete_error_contact'));
             }
 
             return redirect()->localizedRoute('dashboard.profile')
-                ->with('error', 'Při mazání účtu došlo k chybě. Zkuste to prosím později nebo nás kontaktujte.');
+                ->with('error', __('flash.profile.account_delete_error'));
         }
     }
 }

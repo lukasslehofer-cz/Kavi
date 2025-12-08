@@ -1,275 +1,100 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="{{ $locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>Připomínka platby</title>
+    <title>{{ __('emails.upcoming_payment.title', [], $locale) }}</title>
     <style>
-        body, table, td, a { 
-            -webkit-text-size-adjust: 100%; 
-            -ms-text-size-adjust: 100%; 
-        }
-        table, td { 
-            mso-table-lspace: 0pt; 
-            mso-table-rspace: 0pt; 
-        }
-        img { 
-            -ms-interpolation-mode: bicubic; 
-            border: 0; 
-            height: auto; 
-            line-height: 100%; 
-            outline: none; 
-            text-decoration: none; 
-        }
-        
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            background-color: #f3f4f6;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
-        
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-        }
-        
-        .header {
-            background-color: #111827;
-            padding: 32px 40px;
-            text-align: center;
-        }
-        
-        .logo {
-            max-width: 150px;
-            height: auto;
-        }
-        
-        .content {
-            padding: 40px;
-            color: #374151;
-        }
-        
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #111827;
-            margin: 0 0 12px 0;
-            line-height: 1.2;
-        }
-        
-        .subtitle {
-            font-size: 16px;
-            color: #6b7280;
-            margin: 0 0 32px 0;
-            font-weight: 300;
-        }
-        
-        .info-box {
-            background-color: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 24px 0;
-        }
-        
-        .info-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #111827;
-            margin: 0 0 12px 0;
-        }
-        
-        .info-text {
-            font-size: 14px;
-            color: #4b5563;
-            line-height: 1.6;
-            margin: 4px 0;
-        }
-        
-        .highlight-box {
-            background-color: #dbeafe;
-            border-left: 4px solid #3b82f6;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 24px 0;
-        }
-        
-        .button {
-            display: inline-block;
-            background-color: #e6305a;
-            color: #ffffff !important;
-            text-decoration: none;
-            padding: 14px 32px;
-            border-radius: 9999px;
-            font-weight: 600;
-            font-size: 15px;
-            margin: 24px 0;
-            text-align: center;
-        }
-        
-        .button:hover {
-            background-color: #d12a51;
-        }
-        
-        .footer {
-            background-color: #f9fafb;
-            padding: 32px 40px;
-            text-align: center;
-            color: #6b7280;
-            font-size: 14px;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .footer-text {
-            margin: 8px 0;
-            font-weight: 300;
-        }
-        
-        .footer-links {
-            margin: 16px 0;
-        }
-        
-        .footer-link {
-            color: #e6305a;
-            text-decoration: none;
-            margin: 0 8px;
-        }
-        
-        @media only screen and (max-width: 600px) {
-            .content {
-                padding: 24px !important;
-            }
-            
-            h1 {
-                font-size: 24px !important;
-            }
-            
-            .header {
-                padding: 24px !important;
-            }
-            
-            .footer {
-                padding: 24px !important;
-            }
-        }
-        
-        /* Force light mode - prevent auto color inversion */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #1a1a1a !important;
-            }
-            .email-container {
-                background-color: #ffffff !important;
-                border: 1px solid #d1d5db !important;
-            }
-            .info-box, .date-container {
-                background-color: #f9fafb !important;
-                border: 1px solid #d1d5db !important;
-            }
-            h1, .info-title, .date-box {
-                color: #111827 !important;
-            }
-            .subtitle, .info-text, .date-label {
-                color: #4b5563 !important;
-            }
-            .header {
-                background-color: #111827 !important;
-            }
-        }
-        
-        /* Prevent Gmail/Outlook.com dark mode auto-inversion */
-        [data-ogsc] .email-container {
-            background-color: #ffffff !important;
-            border: 1px solid #d1d5db !important;
-        }
-        [data-ogsc] .info-box, [data-ogsc] .date-container {
-            background-color: #f9fafb !important;
-            border: 1px solid #d1d5db !important;
-        }
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        body { margin: 0; padding: 0; width: 100%; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background-color: #111827; padding: 32px 40px; text-align: center; }
+        .logo { max-width: 150px; height: auto; }
+        .content { padding: 40px; color: #374151; }
+        h1 { font-size: 28px; font-weight: 700; color: #111827; margin: 0 0 12px 0; line-height: 1.2; }
+        .subtitle { font-size: 16px; color: #6b7280; margin: 0 0 32px 0; font-weight: 300; }
+        .info-box { background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 24px 0; }
+        .info-title { font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0; }
+        .info-text { font-size: 14px; color: #4b5563; line-height: 1.6; margin: 4px 0; }
+        .button { display: inline-block; background-color: #e6305a; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 9999px; font-weight: 600; font-size: 15px; margin: 24px 0; text-align: center; }
+        .footer { background-color: #f9fafb; padding: 32px 40px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
+        .footer-text { margin: 8px 0; font-weight: 300; }
+        .footer-links { margin: 16px 0; }
+        .footer-link { color: #e6305a; text-decoration: none; margin: 0 8px; }
+        @media only screen and (max-width: 600px) { .content { padding: 24px !important; } h1 { font-size: 24px !important; } .header, .footer { padding: 24px !important; } }
     </style>
 </head>
 <body>
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 20px 0;">
         <tr>
             <td align="center">
-                <!--[if mso]>
-                <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600">
-                <tr>
-                <td>
-                <![endif]-->
+                <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     
-                    <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
-                    <!-- Content -->
                     <tr>
                         <td class="content">
-                            <h1 style="text-align: center;">Blíží se platba předplatného ☕</h1>
-                            <p class="subtitle" style="text-align: center;">Za 3 dny proběhne automatická platba za vaše kávové předplatné.</p>
+                            <h1 style="text-align: center;">{{ __('emails.upcoming_payment.title', [], $locale) }}</h1>
+                            <p class="subtitle" style="text-align: center;">{{ __('emails.upcoming_payment.subtitle', [], $locale) }}</p>
                             
                             <!-- Payment Info -->
-                            <div class="highlight-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important;" bgcolor="#dbeafe">
-                                <h3 style="font-size: 18px; font-weight: 600; color: #1e40af; margin: 0 0 12px 0;">💳 Informace o platbě</h3>
+                            <div style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-radius: 12px; padding: 20px; margin: 24px 0;" bgcolor="#dbeafe">
+                                <h3 style="font-size: 18px; font-weight: 600; color: #1e40af; margin: 0 0 12px 0;">💳 {{ $locale === 'cs' ? 'Informace o platbě' : 'Payment information' }}</h3>
                                 <p style="font-size: 16px; color: #1e3a8a; line-height: 1.6; margin: 8px 0;">
-                                    <strong>Datum platby:</strong><br>
-                                    <span style="font-size: 20px; font-weight: 700;">{{ $subscription->next_billing_date->format('j. n. Y') }}</span>
+                                    <strong>{{ $locale === 'cs' ? 'Datum platby' : 'Payment date' }}:</strong><br>
+                                    <span style="font-size: 20px; font-weight: 700;">{{ $subscription->next_billing_date->format($locale === 'cs' ? 'j. n. Y' : 'M d, Y') }}</span>
                                 </p>
                                 <p style="font-size: 16px; color: #1e3a8a; margin: 12px 0 0 0;">
                                     @php
-                                    // configured_price now contains FULL price (without discount)
-                                    // If active discount, subtract it
-                                    // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
                                     $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
                                     $paymentAmount = $subscription->configured_price - $activeDiscount;
                                     @endphp
-                                    <strong>Částka:</strong> <span style="font-size: 20px; font-weight: 700; color: #e6305a;">{{ number_format($paymentAmount, 0, ',', ' ') }} Kč</span>
+                                    <strong>{{ $locale === 'cs' ? 'Částka' : 'Amount' }}:</strong> <span style="font-size: 20px; font-weight: 700; color: #e6305a;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($paymentAmount, $subscription->currency, 0) }}</span>
                                 </p>
                             </div>
                             
                             <!-- Subscription Details -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">📦 Vaše předplatné</h3>
+                                <h3 class="info-title">📦 {{ $locale === 'cs' ? 'Vaše předplatné' : 'Your subscription' }}</h3>
                                 <p class="info-text">
-                                    <strong>Číslo předplatného:</strong> {{ $subscription->subscription_number }}<br>
-                                    <strong>Typ kávy:</strong> 
+                                    <strong>{{ $locale === 'cs' ? 'Číslo předplatného' : 'Subscription number' }}:</strong> {{ $subscription->subscription_number }}<br>
+                                    <strong>{{ $locale === 'cs' ? 'Typ kávy' : 'Coffee type' }}:</strong> 
                                     @if($subscription->configuration['type'] === 'espresso')
                                         Espresso
                                     @elseif($subscription->configuration['type'] === 'filter')
-                                        Filter
+                                        {{ $locale === 'cs' ? 'Filtr' : 'Filter' }}
                                     @else
-                                        Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× Filter)
+                                        Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× {{ $locale === 'cs' ? 'Filtr' : 'Filter' }})
                                     @endif
                                     @if($subscription->configuration['isDecaf'] ?? false)
                                         • Decaf
                                     @endif
                                     <br>
-                                    <strong>Množství:</strong> {{ $subscription->configuration['amount'] }}× balení po 250g<br>
-                                    <strong>Frekvence:</strong> 
+                                    <strong>{{ $locale === 'cs' ? 'Množství' : 'Quantity' }}:</strong> {{ $subscription->configuration['amount'] }}× 250g<br>
+                                    <strong>{{ $locale === 'cs' ? 'Frekvence' : 'Frequency' }}:</strong> 
                                     @if($subscription->frequency_months == 1)
-                                        Každý měsíc
+                                        {{ $locale === 'cs' ? 'Každý měsíc' : 'Every month' }}
                                     @elseif($subscription->frequency_months == 2)
-                                        Každé 2 měsíce
+                                        {{ $locale === 'cs' ? 'Každé 2 měsíce' : 'Every 2 months' }}
                                     @else
-                                        Každé 3 měsíce
+                                        {{ $locale === 'cs' ? 'Každé 3 měsíce' : 'Every 3 months' }}
                                     @endif
                                 </p>
                             </div>
                             
                             <!-- What happens next -->
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
-                                <h3 class="info-title" style="color: #065f46;">✓ Co se stane dále?</h3>
+                                <h3 class="info-title" style="color: #065f46;">✓ {{ $locale === 'cs' ? 'Co se stane dále?' : 'What happens next?' }}</h3>
                                 @php
-                                    // Calculate shipment date for this billing cycle
                                     $billingDate = \Carbon\Carbon::parse($subscription->next_billing_date);
                                     $shipmentSchedule = \App\Models\ShipmentSchedule::getForMonth($billingDate->year, $billingDate->month);
                                     $shipmentDate = $shipmentSchedule ? $shipmentSchedule->shipment_date : $billingDate->copy()->day(20);
@@ -277,64 +102,63 @@
                                     $deliveryEnd = $shipmentDate->copy()->addDays(2);
                                 @endphp
                                 <p class="info-text" style="color: #047857;">
+                                    @if($locale === 'cs')
                                     1. <strong>{{ $billingDate->format('j. n. Y') }}</strong> - Automatická platba<br>
                                     2. <strong>{{ $shipmentDate->format('j. n. Y') }}</strong> - Pražení a expedice vaší kávy<br>
                                     3. <strong>{{ $deliveryStart->format('j. n. Y') }} - {{ $deliveryEnd->format('j. n. Y') }}</strong> - Doručení na výdejní místo<br>
                                     4. Čerstvá káva přímo k vám!
+                                    @else
+                                    1. <strong>{{ $billingDate->format('M d, Y') }}</strong> - Automatic payment<br>
+                                    2. <strong>{{ $shipmentDate->format('M d, Y') }}</strong> - Roasting and shipping your coffee<br>
+                                    3. <strong>{{ $deliveryStart->format('M d, Y') }} - {{ $deliveryEnd->format('M d, Y') }}</strong> - Delivery to pickup point<br>
+                                    4. Fresh coffee delivered to you!
+                                    @endif
                                 </p>
                             </div>
                             
-                            <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="{{ route('dashboard.subscription') }}" class="button">
-                                    Spravovat předplatné
+                                    {{ __('emails.subscription_paused.manage_subscription', [], $locale) }}
                                 </a>
                             </div>
                             
-                            <!-- Additional Info -->
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
-                                Pokud potřebujete upravit platební údaje, pozastavit nebo zrušit předplatné, můžete tak učinit ve svém zákaznickém účtu.
+                                {{ $locale === 'cs' ? 'Pokud potřebujete upravit platební údaje, pozastavit nebo zrušit předplatné, můžete tak učinit ve svém zákaznickém účtu.' : 'If you need to update payment details, pause or cancel your subscription, you can do so in your customer account.' }}
                             </p>
                             
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 16px; font-weight: 300;">
-                                Máte dotazy? Kontaktujte nás na 
-                                <a href="mailto:info@kavi.cz" style="color: #e6305a; text-decoration: none;">info@kavi.cz</a>
+                                {{ __('emails.common.questions', [], $locale) }} 
+                                <a href="mailto:{{ $contactEmail }}" style="color: #e6305a; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
-                                S pozdravem,<br>
-                                <strong style="color: #111827;">Tým KAVI.cz</strong>
+                                {{ __('emails.common.regards', [], $locale) }},<br>
+                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
                             </p>
                         </td>
                     </tr>
                     
-                    <!-- Footer -->
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">KAVI.cz</strong><br>
-                                Prémiová káva s předplatným
+                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
+                                {{ __('emails.common.tagline', [], $locale) }}
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">Domů</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">Obchod</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link" style="color: #e6305a;">Moje předplatné</a>
+                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('dashboard.subscription') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.my_subscription', [], $locale) }}</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
+                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
                             </p>
                         </td>
                     </tr>
                     
                 </table>
-                <!--[if mso]>
-                </td>
-                </tr>
-                </table>
-                <![endif]-->
+                <!--[if mso]></td></tr></table><![endif]-->
             </td>
         </tr>
     </table>
 </body>
 </html>
-

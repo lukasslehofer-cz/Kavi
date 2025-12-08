@@ -3,24 +3,25 @@
 namespace App\Mail;
 
 use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class WelcomeEmail extends Mailable
+class WelcomeEmail extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public User $user;
 
-    public function __construct(
-        public User $user
-    ) {}
+    public function __construct(User $user, ?string $locale = null)
+    {
+        $this->user = $user;
+        $this->setLocale($locale ?? EmailService::getLocaleFromUser($user));
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Vítejte v KAVI.cz! ☕ Začněte svou kávovou cestu',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.welcome.subject'),
         );
     }
 
@@ -36,4 +37,3 @@ class WelcomeEmail extends Mailable
         return [];
     }
 }
-

@@ -1,304 +1,77 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="{{ $locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>Potvrzení objednávky</title>
+    <title>{{ __('emails.onetime_box.title', [], $locale) }}</title>
     <style>
-        /* Reset styles */
-        body, table, td, a { 
-            -webkit-text-size-adjust: 100%; 
-            -ms-text-size-adjust: 100%; 
-        }
-        table, td { 
-            mso-table-lspace: 0pt; 
-            mso-table-rspace: 0pt; 
-        }
-        img { 
-            -ms-interpolation-mode: bicubic; 
-            border: 0; 
-            height: auto; 
-            line-height: 100%; 
-            outline: none; 
-            text-decoration: none; 
-        }
-        
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            background-color: #f3f4f6;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
-        
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-        }
-        
-        .header {
-            background-color: #111827;
-            padding: 32px 40px;
-            text-align: center;
-        }
-        
-        .logo {
-            max-width: 120px !important;
-            width: 120px !important;
-            height: auto !important;
-            display: block !important;
-            margin: 0 auto !important;
-        }
-        
-        .content {
-            padding: 40px;
-            color: #374151;
-        }
-        
-        .success-icon {
-            width: 64px;
-            height: 64px;
-            background-color: #10b981;
-            border-radius: 50%;
-            margin: 0 auto 24px;
-            display: flex;
-            align-items: center;
-            justify-center;
-        }
-        
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #111827;
-            margin: 0 0 12px 0;
-            line-height: 1.2;
-        }
-        
-        .subtitle {
-            font-size: 16px;
-            color: #6b7280;
-            margin: 0 0 32px 0;
-            font-weight: 300;
-        }
-        
-        .info-box {
-            background-color: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 24px 0;
-        }
-        
-        .info-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #111827;
-            margin: 0 0 12px 0;
-        }
-        
-        .info-text {
-            font-size: 14px;
-            color: #4b5563;
-            line-height: 1.6;
-            margin: 4px 0;
-        }
-        
-        .config-box {
-            background-color: #f9fafb;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 24px 0;
-        }
-        
-        .config-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .config-item:last-child {
-            border-bottom: none;
-        }
-        
-        .config-label {
-            color: #6b7280;
-            font-weight: 300;
-            font-size: 14px;
-        }
-        
-        .config-value {
-            font-weight: 600;
-            color: #111827;
-        }
-        
-        .highlight-box {
-            background-color: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 24px 0;
-        }
-        
-        .button {
-            display: inline-block;
-            background-color: #e6305a;
-            color: #ffffff !important;
-            text-decoration: none;
-            padding: 14px 32px;
-            border-radius: 9999px;
-            font-weight: 600;
-            font-size: 15px;
-            margin: 24px 0;
-            text-align: center;
-        }
-        
-        .button:hover {
-            background-color: #d12a51;
-        }
-        
-        .footer {
-            background-color: #f9fafb;
-            padding: 32px 40px;
-            text-align: center;
-            color: #6b7280;
-            font-size: 14px;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .footer-text {
-            margin: 8px 0;
-            font-weight: 300;
-        }
-        
-        .footer-links {
-            margin: 16px 0;
-        }
-        
-        .footer-link {
-            color: #e6305a;
-            text-decoration: none;
-            margin: 0 8px;
-        }
-        
-        .trust-badges {
-            margin: 24px 0;
-            text-align: center;
-        }
-        
-        .badge {
-            display: inline-block;
-            margin: 8px 12px;
-            font-size: 13px;
-            color: #059669;
-        }
-        
-        @media only screen and (max-width: 600px) {
-            .content {
-                padding: 24px !important;
-            }
-            
-            h1 {
-                font-size: 24px !important;
-            }
-            
-            .header {
-                padding: 24px !important;
-            }
-            
-            .footer {
-                padding: 24px !important;
-            }
-            
-            .logo {
-                max-width: 100px !important;
-                width: 100px !important;
-            }
-        }
-        
-        /* Force light mode - prevent auto color inversion */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #1a1a1a !important;
-            }
-            .email-container {
-                background-color: #ffffff !important;
-                border: 1px solid #d1d5db !important;
-            }
-            .info-box, .config-box {
-                background-color: #f9fafb !important;
-                border: 1px solid #d1d5db !important;
-            }
-            h1, .info-title, .config-value {
-                color: #111827 !important;
-            }
-            .subtitle, .info-text, .config-label {
-                color: #4b5563 !important;
-            }
-            .header {
-                background-color: #111827 !important;
-            }
-        }
-        
-        /* Prevent Gmail/Outlook.com dark mode auto-inversion */
-        [data-ogsc] .email-container {
-            background-color: #ffffff !important;
-            border: 1px solid #d1d5db !important;
-        }
-        [data-ogsc] .info-box, [data-ogsc] .config-box {
-            background-color: #f9fafb !important;
-            border: 1px solid #d1d5db !important;
-        }
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        body { margin: 0; padding: 0; width: 100%; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background-color: #111827; padding: 32px 40px; text-align: center; }
+        .logo { max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; }
+        .content { padding: 40px; color: #374151; }
+        h1 { font-size: 28px; font-weight: 700; color: #111827; margin: 0 0 12px 0; line-height: 1.2; }
+        .subtitle { font-size: 16px; color: #6b7280; margin: 0 0 32px 0; font-weight: 300; }
+        .info-box { background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 24px 0; }
+        .info-title { font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0; }
+        .info-text { font-size: 14px; color: #4b5563; line-height: 1.6; margin: 4px 0; }
+        .config-box { background-color: #f9fafb; border-radius: 12px; padding: 20px; margin: 24px 0; }
+        .config-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e5e7eb; }
+        .config-item:last-child { border-bottom: none; }
+        .config-label { color: #6b7280; font-weight: 300; font-size: 14px; }
+        .config-value { font-weight: 600; color: #111827; }
+        .button { display: inline-block; background-color: #e6305a; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 9999px; font-weight: 600; font-size: 15px; margin: 24px 0; text-align: center; }
+        .footer { background-color: #f9fafb; padding: 32px 40px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
+        .footer-text { margin: 8px 0; font-weight: 300; }
+        .footer-links { margin: 16px 0; }
+        .footer-link { color: #e6305a; text-decoration: none; margin: 0 8px; }
+        .trust-badges { margin: 24px 0; text-align: center; }
+        .badge { display: inline-block; margin: 8px 12px; font-size: 13px; color: #059669; }
+        @media only screen and (max-width: 600px) { .content { padding: 24px !important; } h1 { font-size: 24px !important; } .header, .footer { padding: 24px !important; } .logo { max-width: 100px !important; width: 100px !important; } }
     </style>
 </head>
 <body>
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 20px 0;">
         <tr>
             <td align="center">
-                <!--[if mso]>
-                <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600">
-                <tr>
-                <td>
-                <![endif]-->
+                <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     
-                    <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
-                    <!-- Content -->
                     <tr>
                         <td class="content">
-                            <!-- Success Icon -->
                             <div style="text-align: center; margin-bottom: 24px;">
                                 <div style="width: 64px; height: 64px; background-color: #10b981 !important; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; line-height: 64px;">
                                     ✓
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">Děkujeme za objednávku! ☕</h1>
-                            <p class="subtitle" style="text-align: center;">Vaše objednávka jednorázového kávového boxu byla přijata.</p>
+                            <h1 style="text-align: center;">{{ __('emails.onetime_box.title', [], $locale) }}</h1>
+                            <p class="subtitle" style="text-align: center;">{{ __('emails.onetime_box.subtitle', [], $locale) }}</p>
                             
-                            <!-- Order Number -->
                             <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
-                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">Číslo objednávky</div>
+                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">{{ __('emails.onetime_box.box_number', [], $locale) }}</div>
                                 <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $subscription->subscription_number }}</div>
                             </div>
                             
                             <!-- One-time Info Box -->
-                            <div class="highlight-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
+                            <div style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important; border-radius: 12px; padding: 20px; margin: 24px 0;" bgcolor="#fef3c7">
                                 <div style="display: flex; align-items: start; gap: 12px;">
                                     <div style="font-size: 24px; line-height: 1;">⭐</div>
                                     <div>
-                                        <h3 class="info-title" style="color: #92400e; margin-bottom: 8px;">Jednorázový nákup bez předplatného</h3>
+                                        <h3 class="info-title" style="color: #92400e; margin-bottom: 8px;">{{ $locale === 'cs' ? 'Jednorázový nákup bez předplatného' : 'One-time purchase, no subscription' }}</h3>
                                         <p class="info-text" style="color: #78350f;">
-                                            Tento box vám doručíme jednorázově. <strong>Žádné další platby ani dodávky neproběhnou.</strong> Nemusíte nic rušit ani odhlašovat.
+                                            {{ $locale === 'cs' ? 'Tento box vám doručíme jednorázově. Žádné další platby ani dodávky neproběhnou. Nemusíte nic rušit ani odhlašovat.' : 'This box will be delivered once. No further payments or deliveries will occur. You don\'t need to cancel anything.' }}
                                         </p>
                                     </div>
                                 </div>
@@ -306,17 +79,17 @@
                             
                             <!-- Box Configuration -->
                             <div class="config-box" style="background-color: #f9fafb !important; border: 1px solid #e5e7eb !important;" bgcolor="#f9fafb">
-                                <h2 class="info-title">📦 Váš kávový box</h2>
+                                <h2 class="info-title">📦 {{ __('emails.onetime_box.your_config', [], $locale) }}</h2>
                                 
                                 <div class="config-item">
-                                    <span class="config-label">Typ kávy:</span>
+                                    <span class="config-label">{{ $locale === 'cs' ? 'Typ kávy' : 'Coffee type' }}:</span>
                                     <span class="config-value">
                                         @if($subscription->configuration['type'] === 'espresso')
                                             Espresso
                                         @elseif($subscription->configuration['type'] === 'filter')
-                                            Filter
+                                            {{ $locale === 'cs' ? 'Filtr' : 'Filter' }}
                                         @else
-                                            Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× Filter)
+                                            Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× {{ $locale === 'cs' ? 'Filtr' : 'Filter' }})
                                         @endif
                                         @if($subscription->configuration['isDecaf'] ?? false)
                                             <span style="color: #059669;"> • Decaf</span>
@@ -325,159 +98,97 @@
                                 </div>
                                 
                                 <div class="config-item">
-                                    <span class="config-label">Množství:</span>
-                                    <span class="config-value">{{ $subscription->configuration['amount'] }}× balení po 250g</span>
+                                    <span class="config-label">{{ __('emails.onetime_box.bags_count', [], $locale) }}:</span>
+                                    <span class="config-value">{{ $subscription->configuration['amount'] }}× 250g</span>
                                 </div>
                                 
                                 @if($subscription->discount_amount > 0)
                                 <div class="config-item">
-                                    <span class="config-label">Cena:</span>
-                                    <span class="config-value">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                    <span class="config-label">{{ __('emails.onetime_box.price', [], $locale) }}:</span>
+                                    <span class="config-value">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency, 0) }}</span>
                                 </div>
                                 <div class="config-item">
-                                    <span class="config-label">Sleva{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}:</span>
-                                    <span class="config-value" style="color: #059669;">-{{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč</span>
+                                    <span class="config-label">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}:</span>
+                                    <span class="config-value" style="color: #059669;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->discount_amount, $subscription->currency, 0) }}</span>
                                 </div>
                                 <div class="config-item">
-                                    <span class="config-label">Celková cena:</span>
-                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($subscription->configured_price - $subscription->discount_amount, 0, ',', ' ') }} Kč</span>
+                                    <span class="config-label">{{ __('emails.order_confirmation.total', [], $locale) }}:</span>
+                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price - $subscription->discount_amount, $subscription->currency, 0) }}</span>
                                 </div>
                                 @else
                                 <div class="config-item">
-                                    <span class="config-label">Celková cena:</span>
-                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč</span>
+                                    <span class="config-label">{{ __('emails.order_confirmation.total', [], $locale) }}:</span>
+                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency, 0) }}</span>
                                 </div>
                                 @endif
                             </div>
                             
-                            <!-- Shipment Date -->
-                            @php
-                                $shipmentDate = \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($subscription);
-                            @endphp
-                            <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
-                                <h3 class="info-title" style="color: #1e40af;">📅 Doručení</h3>
-                                <p class="info-text" style="color: #1e3a8a;">
-                                    <strong>Váš kávový box vám dorazí:</strong><br>
-                                    {{ $shipmentDate ? $shipmentDate->format('j. n. Y') : 'Brzy' }}
-                                </p>
-                                <p class="info-text" style="color: #1e3a8a; margin-top: 8px; font-size: 13px;">
-                                    Rozesílka probíhá vždy 20. den v měsíci
-                                </p>
-                            </div>
-                            
                             <!-- Delivery Info -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">📦 Výdejní místo</h3>
+                                <h3 class="info-title">📦 {{ __('emails.onetime_box.delivery', [], $locale) }}</h3>
                                 @if(isset($subscription->packeta_point_name))
                                 <p class="info-text"><strong>{{ $subscription->packeta_point_name }}</strong></p>
                                 @if(isset($subscription->packeta_point_address))
                                 <p class="info-text" style="color: #6b7280;">{{ $subscription->packeta_point_address }}</p>
                                 @endif
                                 @endif
-                                
-                                @if($subscription->delivery_notes)
-                                <p class="info-text" style="margin-top: 12px;">
-                                    <strong>Poznámka:</strong><br>
-                                    {{ $subscription->delivery_notes }}
-                                </p>
-                                @endif
                             </div>
                             
-                            <!-- Billing Info -->
-                            <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">📋 Fakturační údaje</h3>
-                                <p class="info-text"><strong>{{ $subscription->shipping_address['name'] }}</strong></p>
-                                <p class="info-text">{{ $subscription->shipping_address['billing_address'] }}</p>
-                                <p class="info-text">{{ $subscription->shipping_address['billing_postal_code'] }} {{ $subscription->shipping_address['billing_city'] }}</p>
-                                <p class="info-text" style="margin-top: 8px;">
-                                    <strong>Email:</strong> {{ $subscription->shipping_address['email'] }}
-                                    @if(isset($subscription->shipping_address['phone']))
-                                    <br><strong>Telefon:</strong> {{ $subscription->shipping_address['phone'] }}
-                                    @endif
+                            <!-- What's Next -->
+                            <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
+                                <h3 class="info-title" style="color: #1e40af;">📅 {{ __('emails.onetime_box.what_next', [], $locale) }}</h3>
+                                <p class="info-text" style="color: #1e3a8a;">
+                                    1. {{ __('emails.onetime_box.step1', [], $locale) }}<br>
+                                    2. {{ __('emails.onetime_box.step2', [], $locale) }}<br>
+                                    3. {{ __('emails.onetime_box.step3', [], $locale) }}
                                 </p>
                             </div>
                             
-                            <!-- Payment Status -->
-                            @if($subscription->status === 'active')
-                            <div class="info-box" style="background-color: #d1fae5 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#d1fae5">
-                                <h3 class="info-title" style="color: #065f46;">✓ Platba proběhla úspěšně</h3>
-                                <p class="info-text" style="color: #047857;">
-                                    Váš kávový box je připraven k odeslání v nejbližším termínu rozesílky.
-                                </p>
-                            </div>
-                            @else
-                            <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e;">⏳ Čekáme na platbu</h3>
-                                <p class="info-text" style="color: #78350f;">
-                                    Vaše objednávka čeká na potvrzení platby. Po přijetí platby vás budeme informovat emailem.
-                                </p>
-                            </div>
-                            @endif
-                            
-                            <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="{{ route('dashboard.subscription') }}" class="button">
-                                    Zobrazit detail objednávky
+                                    {{ __('emails.onetime_box.view_order', [], $locale) }}
                                 </a>
                             </div>
                             
-                            <!-- Trust Badges -->
                             <div class="trust-badges">
-                                <div class="badge">
-                                    ✓ Čerstvě pražená káva
-                                </div>
-                                <div class="badge">
-                                    ✓ Jednorázový nákup
-                                </div>
-                                <div class="badge">
-                                    ✓ Žádné závazky
-                                </div>
+                                <div class="badge">✓ {{ __('emails.common.freshly_roasted', [], $locale) }}</div>
+                                <div class="badge">✓ {{ $locale === 'cs' ? 'Jednorázový nákup' : 'One-time purchase' }}</div>
+                                <div class="badge">✓ {{ $locale === 'cs' ? 'Žádné závazky' : 'No commitment' }}</div>
                             </div>
                             
-                            <!-- Additional Info -->
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
-                                Pokud máte jakékoliv dotazy k vaší objednávce, kontaktujte nás na 
-                                <a href="mailto:info@kavi.cz" style="color: #e6305a; text-decoration: none;">info@kavi.cz</a>
+                                {{ __('emails.common.questions', [], $locale) }} 
+                                <a href="mailto:{{ $contactEmail }}" style="color: #e6305a; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
-                                S pozdravem,<br>
-                                <strong style="color: #111827;">Tým KAVI.cz</strong>
+                                {{ __('emails.common.regards', [], $locale) }},<br>
+                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
                             </p>
                         </td>
                     </tr>
                     
-                    <!-- Footer -->
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">KAVI.cz</strong><br>
-                                Prémiová čerstvě pražená káva
+                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
+                                {{ __('emails.common.tagline', [], $locale) }}
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">Domů</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">Obchod</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link" style="color: #e6305a;">Můj účet</a>
+                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('dashboard.subscription') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.my_account', [], $locale) }}</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
-                            </p>
-                            <p class="footer-text" style="font-size: 12px;">
-                                Tento e-mail byl odeslán na adresu {{ $subscription->shipping_address['email'] }}<br>
-                                protože jste si objednali kávový box na našem e-shopu.
+                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
                             </p>
                         </td>
                     </tr>
                     
                 </table>
-                <!--[if mso]>
-                </td>
-                </tr>
-                </table>
-                <![endif]-->
+                <!--[if mso]></td></tr></table><![endif]-->
             </td>
         </tr>
     </table>
 </body>
 </html>
-

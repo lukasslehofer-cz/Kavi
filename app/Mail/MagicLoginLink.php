@@ -2,41 +2,30 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class MagicLoginLink extends Mailable
+class MagicLoginLink extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public string $loginUrl;
+    public int $expiresInMinutes;
 
-    public $loginUrl;
-    public $expiresInMinutes;
-
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(string $loginUrl, int $expiresInMinutes = 15)
+    public function __construct(string $loginUrl, int $expiresInMinutes = 15, string $locale = 'cs')
     {
         $this->loginUrl = $loginUrl;
         $this->expiresInMinutes = $expiresInMinutes;
+        $this->setLocale($locale);
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Přihlašovací odkaz - KAVI.cz',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.magic_login.subject'),
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -44,11 +33,6 @@ class MagicLoginLink extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];

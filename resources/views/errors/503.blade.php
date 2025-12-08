@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Údržba | KAVI.cz')
+@section('title', ($currentLocale ?? 'cs') === 'en' ? 'Maintenance | KAVI' : 'Údržba | KAVI.cz')
 
 @section('content')
 <div class="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-white">
@@ -15,7 +15,7 @@
                 <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
-                <span class="text-sm font-medium text-primary-600">Probíhá údržba</span>
+                <span class="text-sm font-medium text-primary-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Maintenance in Progress' : 'Probíhá údržba' }}</span>
             </div>
 
             <!-- Large Coffee Icon -->
@@ -29,12 +29,14 @@
 
             <!-- Heading -->
             <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                Chvíli si vaříme kávu
+                {{ ($currentLocale ?? 'cs') === 'en' ? 'Brewing Some Coffee...' : 'Chvíli si vaříme kávu' }}
             </h2>
 
             <!-- Description -->
             <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-10 max-w-xl mx-auto">
-                Náš web právě prochází údržbou, abychom vám mohli nabídnout ještě lepší služby. Už brzy budeme zpět s čerstvou kávou!
+                {{ ($currentLocale ?? 'cs') === 'en' 
+                    ? 'Our website is currently undergoing maintenance to bring you even better services. We\'ll be back soon with fresh coffee!' 
+                    : 'Náš web právě prochází údržbou, abychom vám mohli nabídnout ještě lepší služby. Už brzy budeme zpět s čerstvou kávou!' }}
             </p>
 
             <!-- Estimated Time (optional - you can remove or customize) -->
@@ -43,8 +45,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div class="text-left">
-                    <div class="text-sm text-gray-500 font-light">Předpokládaný čas návratu</div>
-                    <div class="text-lg font-semibold text-gray-900">Během několika minut</div>
+                    <div class="text-sm text-gray-500 font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Estimated return time' : 'Předpokládaný čas návratu' }}</div>
+                    <div class="text-lg font-semibold text-gray-900">{{ ($currentLocale ?? 'cs') === 'en' ? 'Within a few minutes' : 'Během několika minut' }}</div>
                 </div>
             </div>
 
@@ -54,14 +56,14 @@
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span>Zkontrolovat dostupnost</span>
+                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Check Availability' : 'Zkontrolovat dostupnost' }}</span>
                 </button>
             </div>
 
             <!-- Newsletter Suggestion -->
             <div class="pt-8 border-t border-gray-100">
                 <p class="text-sm text-gray-600 font-light mb-4">
-                    Zatímco čekáte, přihlaste se k odběru našeho newsletteru:
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'While you wait, subscribe to our newsletter:' : 'Zatímco čekáte, přihlaste se k odběru našeho newsletteru:' }}
                 </p>
                 <div class="max-w-md mx-auto">
                     <form id="newsletter-form-maintenance" class="flex gap-2">
@@ -69,12 +71,12 @@
                         <input 
                             type="email" 
                             name="email" 
-                            placeholder="Váš e-mail" 
+                            placeholder="{{ ($currentLocale ?? 'cs') === 'en' ? 'Your email' : 'Váš e-mail' }}" 
                             required
                             class="flex-1 px-5 py-3 rounded-full bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-300 focus:ring-1 focus:ring-primary-300 transition-all text-sm"
                         >
                         <button type="submit" class="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-full transition-all duration-200 whitespace-nowrap text-sm">
-                            Odebírat
+                            {{ ($currentLocale ?? 'cs') === 'en' ? 'Subscribe' : 'Odebírat' }}
                         </button>
                     </form>
                     <div id="newsletter-message-maintenance" class="mt-4 text-sm hidden"></div>
@@ -88,6 +90,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('newsletter-form-maintenance');
     const message = document.getElementById('newsletter-message-maintenance');
+    const locale = '{{ $currentLocale ?? "cs" }}';
     
     if (form) {
         form.addEventListener('submit', function(e) {
@@ -98,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const originalText = submitButton.textContent;
             
             submitButton.disabled = true;
-            submitButton.textContent = 'Odesílám...';
+            submitButton.textContent = locale === 'en' ? 'Sending...' : 'Odesílám...';
             
             fetch('{{ localizedRoute("newsletter.subscribe") }}', {
                 method: 'POST',
@@ -131,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 message.classList.remove('hidden');
                 message.className = 'mt-4 text-sm p-3 rounded-lg bg-red-100 text-red-800 border border-red-200';
-                message.textContent = 'Došlo k chybě. Zkuste to prosím později.';
+                message.textContent = locale === 'en' ? 'An error occurred. Please try again later.' : 'Došlo k chybě. Zkuste to prosím později.';
             })
             .finally(() => {
                 submitButton.disabled = false;
@@ -142,4 +145,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
-

@@ -3,24 +3,27 @@
 namespace App\Mail;
 
 use App\Models\Subscription;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class SubscriptionBoxPreparing extends Mailable
+class SubscriptionBoxPreparing extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public Subscription $subscription;
 
-    public function __construct(
-        public Subscription $subscription
-    ) {}
+    public function __construct(Subscription $subscription, ?string $locale = null)
+    {
+        $this->subscription = $subscription;
+        $this->setLocale($locale ?? EmailService::getLocaleFromSubscription($subscription));
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Připravujeme váš kávový box ☕ - ' . ($this->subscription->subscription_number ?? 'KAVI.cz'),
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.subscription_box_preparing.subject', [
+                'subscription_number' => $this->subscription->subscription_number ?? $this->siteName
+            ]),
         );
     }
 
@@ -36,4 +39,3 @@ class SubscriptionBoxPreparing extends Mailable
         return [];
     }
 }
-

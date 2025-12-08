@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="{{ $locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Přihlašovací odkaz</title>
+    <title>{{ __('emails.magic_login.title', [], $locale) }}</title>
     <style>
         /* Reset styles */
         body, table, td, a { 
@@ -190,7 +190,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none; filter: invert(1) brightness(2);">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none; filter: invert(1) brightness(2);">
                         </td>
                     </tr>
                     
@@ -206,40 +206,40 @@
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">Přihlašovací odkaz</h1>
-                            <p class="subtitle" style="text-align: center;">Obdrželi jste tento email, protože byl požadován přihlašovací odkaz pro váš účet na KAVI.cz.</p>
+                            <h1 style="text-align: center;">{{ __('emails.magic_login.title', [], $locale) }}</h1>
+                            <p class="subtitle" style="text-align: center;">{{ __('emails.magic_login.subtitle', [], $locale) }}</p>
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="{{ $loginUrl }}" class="button">
-                                    Přihlásit se do účtu
+                                    {{ __('emails.magic_login.login_button', [], $locale) }}
                                 </a>
                             </div>
                             
                             <!-- Warning Box -->
                             <div class="info-box">
-                                <p class="info-title">⏱️ Platnost odkazu</p>
+                                <p class="info-title">⏱️ {{ __('emails.magic_login.expires_title', [], $locale) }}</p>
                                 <p class="info-text">
-                                    Tento odkaz je platný po dobu <strong>{{ $expiresInMinutes }} minut</strong>. Po vypršení platnosti si budete muset vyžádat nový odkaz.
+                                    {{ __('emails.magic_login.expires_text', ['minutes' => $expiresInMinutes], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- Security Note -->
                             <div class="note-box">
                                 <p class="note-text" style="margin-bottom: 12px;">
-                                    <strong>🔒 Z bezpečnostních důvodů:</strong>
+                                    <strong>🔒 {{ __('emails.magic_login.security_title', [], $locale) }}</strong>
                                 </p>
                                 <p class="note-text">
-                                    • Odkaz funguje pouze jednou<br>
-                                    • Pokud jste nepožadovali přihlášení, ignorujte tento email<br>
-                                    • Nikdy nesdílejte tento odkaz s nikým jiným
+                                    • {{ __('emails.magic_login.security_once', [], $locale) }}<br>
+                                    • {{ __('emails.magic_login.security_ignore', [], $locale) }}<br>
+                                    • {{ __('emails.magic_login.security_share', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- Alternative Link -->
                             <div style="background-color: #f9fafb; border-radius: 8px; padding: 16px; margin-top: 24px;">
                                 <p style="font-size: 13px; color: #6b7280; margin: 0 0 8px 0; font-weight: 500;">
-                                    Nefunguje tlačítko? Zkopírujte tento odkaz:
+                                    {{ __('emails.magic_login.button_not_working', [], $locale) }}
                                 </p>
                                 <p style="font-size: 12px; color: #111827; word-break: break-all; margin: 0; font-family: monospace;">
                                     {{ $loginUrl }}
@@ -248,13 +248,13 @@
                             
                             <!-- Additional Info -->
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
-                                Pokud máte jakékoliv problémy s přihlášením, neváhejte nás kontaktovat na 
-                                <a href="mailto:info@kavi.cz" style="color: #e6305a; text-decoration: none;">info@kavi.cz</a>                                 
+                                {{ __('emails.magic_login.help_text', [], $locale) }} 
+                                <a href="mailto:{{ $contactEmail }}" style="color: #e6305a; text-decoration: none;">{{ $contactEmail }}</a>                                 
                             </p>
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
-                                S pozdravem,<br>
-                                <strong style="color: #111827;">Tým KAVI.cz</strong>
+                                {{ __('emails.common.regards', [], $locale) }},<br>
+                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
                             </p>
                         </td>
                     </tr>
@@ -263,20 +263,19 @@
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">KAVI.cz</strong><br>
-                                Prémiová káva s předplatným
+                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
+                                {{ __('emails.common.tagline', [], $locale) }}
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">Domů</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">Obchod</a>
-                                <a href="{{ route('dashboard.index') }}" class="footer-link" style="color: #e6305a;">Můj účet</a>
+                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('dashboard.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.my_account', [], $locale) }}</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
+                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
                             </p>
                             <p class="footer-text" style="font-size: 12px;">
-                                Tento e-mail byl odeslán, protože jste si vyžádali přihlašovací odkaz<br>
-                                pro svůj účet na KAVI.cz.
+                                {{ __('emails.magic_login.footer_text', [], $locale) }}
                             </p>
                         </td>
                     </tr>

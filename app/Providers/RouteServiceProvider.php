@@ -75,8 +75,12 @@ class RouteServiceProvider extends ServiceProvider
             Route::view('/' . $routes['how-it-works'], 'how-it-works')->name($this->routeName('how-it-works', $locale, $isPrimary));
             Route::view('/' . $routes['about'], 'about')->name($this->routeName('about', $locale, $isPrimary));
             Route::view('/' . $routes['contact'], 'contact')->name($this->routeName('contact', $locale, $isPrimary));
-            Route::view('/' . $routes['privacy-policy'], 'privacy-policy')->name($this->routeName('privacy-policy', $locale, $isPrimary));
-            Route::view('/' . $routes['terms-of-service'], 'terms-of-service')->name($this->routeName('terms-of-service', $locale, $isPrimary));
+            Route::get('/' . $routes['privacy-policy'], function () use ($locale) {
+                return view($locale === 'en' ? 'privacy-policy-en' : 'privacy-policy');
+            })->name($this->routeName('privacy-policy', $locale, $isPrimary));
+            Route::get('/' . $routes['terms-of-service'], function () use ($locale) {
+                return view($locale === 'en' ? 'terms-of-service-en' : 'terms-of-service');
+            })->name($this->routeName('terms-of-service', $locale, $isPrimary));
 
             // Contact form
             Route::post('/' . $routes['contact-send'], [\App\Http\Controllers\ContactController::class, 'send'])->name($this->routeName('contact.send', $locale, $isPrimary));

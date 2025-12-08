@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="{{ $locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>Vítejte v KAVI.cz</title>
+    <title>{{ __('emails.welcome.title', [], $locale) }}</title>
     <style>
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -40,7 +40,7 @@
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     <tr>
@@ -51,102 +51,102 @@
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">Vítejte v KAVI.cz! ☕</h1>
-                            <p class="subtitle" style="text-align: center;">Jsme rádi, že jste se k nám přidali. Připravili jsme pro vás několik tipů na začátek.</p>
+                            <h1 style="text-align: center;">{{ __('emails.welcome.title', [], $locale) }}</h1>
+                            <p class="subtitle" style="text-align: center;">{{ __('emails.welcome.subtitle', [], $locale) }}</p>
                             
                             <!-- Welcome message -->
                             <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
-                                <h3 class="info-title" style="color: #1e40af;">🎉 Ahoj, {{ $user->name }}!</h3>
+                                <h3 class="info-title" style="color: #1e40af;">🎉 {{ __('emails.welcome.greeting', ['name' => $user->name], $locale) }}</h3>
                                 <p class="info-text" style="color: #1e3a8a;">
-                                    Vítejte v komunitě milovníků kávy! V KAVI.cz věříme, že dobrá káva dokáže rozjasnit každý den. Těšíme se, že společně objevíme ty nejlepší chutě z celého světa.
+                                    {{ __('emails.welcome.intro', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- Quick start -->
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
-                                <h3 class="info-title" style="color: #065f46;">🚀 Jak začít?</h3>
+                                <h3 class="info-title" style="color: #065f46;">🚀 {{ __('emails.welcome.how_to_start', [], $locale) }}</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    <strong>1. Prozkoumejte náš sortiment</strong><br>
-                                    Nabízíme čerstvě praženou kávu z nejlepších pražíren po celé Evropě.<br><br>
+                                    <strong>1. {{ __('emails.welcome.step1_title', [], $locale) }}</strong><br>
+                                    {{ __('emails.welcome.step1_text', [], $locale) }}<br><br>
                                     
-                                    <strong>2. Vyzkoušejte předplatné</strong><br>
-                                    Každý měsíc vám doručíme vybrané vzorky káv přímo domů.<br><br>
+                                    <strong>2. {{ __('emails.welcome.step2_title', [], $locale) }}</strong><br>
+                                    {{ __('emails.welcome.step2_text', [], $locale) }}<br><br>
                                     
-                                    <strong>3. Objevujte nové chutě</strong><br>
-                                    Každá káva má svůj příběh. Těšte se na objevování!
+                                    <strong>3. {{ __('emails.welcome.step3_title', [], $locale) }}</strong><br>
+                                    {{ __('emails.welcome.step3_text', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- CTA -->
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="{{ route('subscriptions.index') }}" class="button">
-                                    Prozkoumat předplatné
+                                    {{ __('emails.welcome.explore_subscription', [], $locale) }}
                                 </a>
                             </div>
                             
                             <!-- What we offer -->
                             <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e;">✨ Co u nás najdete</h3>
+                                <h3 class="info-title" style="color: #92400e;">✨ {{ __('emails.welcome.what_we_offer', [], $locale) }}</h3>
                                 <p class="info-text" style="color: #78350f;">
-                                    ☕ <strong>Prémiová káva</strong> - Jen ta nejlepší kvalita<br>
-                                    🌍 <strong>Z celé Evropy</strong> - Malé pražírny, velké chutě<br>
-                                    📦 <strong>Kávové předplatné</strong> - Objevujte nové druhy<br>
-                                    🎁 <strong>Dárkové boxy</strong> - Ideální dárek pro kávomily<br>
-                                    💬 <strong>Odborné rady</strong> - Jak připravit tu nejlepší kávu
+                                    ☕ <strong>{{ __('emails.welcome.offer_premium', [], $locale) }}</strong><br>
+                                    🌍 <strong>{{ __('emails.welcome.offer_europe', [], $locale) }}</strong><br>
+                                    📦 <strong>{{ __('emails.welcome.offer_subscription', [], $locale) }}</strong><br>
+                                    🎁 <strong>{{ __('emails.welcome.offer_gift', [], $locale) }}</strong><br>
+                                    💬 <strong>{{ __('emails.welcome.offer_advice', [], $locale) }}</strong>
                                 </p>
                             </div>
                             
                             <!-- Account info -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">👤 Váš účet</h3>
+                                <h3 class="info-title">👤 {{ __('emails.welcome.your_account', [], $locale) }}</h3>
                                 <p class="info-text">
-                                    <strong>Email:</strong> {{ $user->email }}<br>
-                                    <strong>Jméno:</strong> {{ $user->name }}<br><br>
+                                    <strong>{{ __('emails.welcome.email_label', [], $locale) }}:</strong> {{ $user->email }}<br>
+                                    <strong>{{ __('emails.welcome.name_label', [], $locale) }}:</strong> {{ $user->name }}<br><br>
                                     
-                                    Všechny informace můžete spravovat ve svém účtu.
+                                    {{ __('emails.welcome.account_info', [], $locale) }}
                                 </p>
                                 <div style="text-align: center; margin-top: 16px;">
                                     <a href="{{ route('dashboard.profile') }}" style="color: #e6305a; text-decoration: none; font-weight: 600;">
-                                        Upravit profil →
+                                        {{ __('emails.common.edit_profile', [], $locale) }} →
                                     </a>
                                 </div>
                             </div>
                             
                             <!-- Support -->
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
-                                <h3 class="info-title" style="color: #065f46;">💬 Potřebujete pomoc?</h3>
+                                <h3 class="info-title" style="color: #065f46;">💬 {{ __('emails.welcome.need_help', [], $locale) }}</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    Jsme tu pro vás! Pokud máte jakékoliv dotazy, neváhejte nás kontaktovat:<br><br>
+                                    {{ __('emails.welcome.help_intro', [], $locale) }}<br><br>
                                     
-                                    📧 <strong>Email:</strong> <a href="mailto:info@kavi.cz" style="color: #e6305a;">info@kavi.cz</a><br>
-                                    💬 <strong>Chat:</strong> Na našem webu<br>
-                                    📚 <strong>FAQ:</strong> Často kladené otázky
+                                    📧 <strong>{{ __('emails.welcome.email', [], $locale) }}:</strong> <a href="mailto:{{ $contactEmail }}" style="color: #e6305a;">{{ $contactEmail }}</a><br>
+                                    💬 <strong>{{ __('emails.welcome.chat', [], $locale) }}</strong><br>
+                                    📚 <strong>{{ __('emails.welcome.faq', [], $locale) }}</strong>
                                 </p>
                             </div>
                             
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300; text-align: center;">
-                                <strong>Těšíme se na vaši kávovou cestu s námi!</strong>
+                                <strong>{{ __('emails.welcome.looking_forward', [], $locale) }}</strong>
                             </p>
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px;">
-                                S láskou k dobré kávě,<br>
-                                <strong style="color: #111827;">Tým KAVI.cz</strong>
+                                {{ __('emails.welcome.with_love', [], $locale) }},<br>
+                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">KAVI.cz</strong><br>
-                                Prémiová káva s předplatným
+                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
+                                {{ __('emails.common.tagline', [], $locale) }}
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link">Domů</a>
-                                <a href="{{ route('products.index') }}" class="footer-link">Obchod</a>
-                                <a href="{{ route('subscriptions.index') }}" class="footer-link">Předplatné</a>
+                                <a href="{{ route('home') }}" class="footer-link">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" class="footer-link">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('subscriptions.index') }}" class="footer-link">{{ __('emails.common.subscription', [], $locale) }}</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
+                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
                             </p>
                         </td>
                     </tr>
@@ -157,4 +157,3 @@
     </table>
 </body>
 </html>
-

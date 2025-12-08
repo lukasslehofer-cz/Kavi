@@ -3,25 +3,27 @@
 namespace App\Mail;
 
 use App\Models\Subscription;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class SubscriptionPaymentFailed extends Mailable
+class SubscriptionPaymentFailed extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public Subscription $subscription;
+    public string $failureReason;
 
-    public function __construct(
-        public Subscription $subscription,
-        public ?string $failureReason = null
-    ) {}
+    public function __construct(Subscription $subscription, string $failureReason = '', ?string $locale = null)
+    {
+        $this->subscription = $subscription;
+        $this->failureReason = $failureReason;
+        $this->setLocale($locale ?? EmailService::getLocaleFromSubscription($subscription));
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('emails.subscription_payment_failed.subject'),
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.subscription_payment_failed.subject'),
         );
     }
 
@@ -37,4 +39,3 @@ class SubscriptionPaymentFailed extends Mailable
         return [];
     }
 }
-

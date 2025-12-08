@@ -3,26 +3,29 @@
 namespace App\Mail;
 
 use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class PaymentMethodChanged extends Mailable
+class PaymentMethodChanged extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public User $user;
+    public string $cardLast4;
+    public string $cardBrand;
 
-    public function __construct(
-        public User $user,
-        public string $cardLast4,
-        public string $cardBrand
-    ) {}
+    public function __construct(User $user, string $cardLast4, string $cardBrand, ?string $locale = null)
+    {
+        $this->user = $user;
+        $this->cardLast4 = $cardLast4;
+        $this->cardBrand = $cardBrand;
+        $this->setLocale($locale ?? EmailService::getLocaleFromUser($user));
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Platební metoda byla změněna - KAVI.cz',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.payment_method_changed.subject'),
         );
     }
 
@@ -38,4 +41,3 @@ class PaymentMethodChanged extends Mailable
         return [];
     }
 }
-

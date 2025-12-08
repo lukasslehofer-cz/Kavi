@@ -154,7 +154,7 @@ class SubscriptionController extends Controller
     {
         if (!auth()->check()) {
             return redirect()->localizedRoute('login')
-                ->with('message', 'Pro aktivaci předplatného se prosím přihlaste.');
+                ->with('message', __('flash.auth.please_login_subscription'));
         }
 
         // Store plan ID in session for checkout
@@ -200,7 +200,7 @@ class SubscriptionController extends Controller
             return back()
                 ->withErrors($e->errors())
                 ->withInput()
-                ->with('error', 'Chyba při validaci konfigurace. Zkuste to prosím znovu.');
+                ->with('error', __('flash.subscription.config_validation_error'));
         }
 
         // Validate mix total if type is mix
@@ -398,7 +398,7 @@ class SubscriptionController extends Controller
                 ]);
                 
                 return redirect()->localizedRoute('subscriptions.index')
-                    ->with('success', 'Děkujeme za objednávku! Zpracováváme vaši platbu a brzy vám zašleme potvrzení na email.');
+                    ->with('success', __('flash.subscription.order_processing'));
             }
         }
 
@@ -409,7 +409,7 @@ class SubscriptionController extends Controller
 
         if (!$configuration || !$price) {
             return redirect()->localizedRoute('subscriptions.index')
-                ->with('error', 'Konfigurace předplatného nenalezena. Prosím nakonfigurujte si předplatné znovu.');
+                ->with('error', __('flash.subscription.config_not_found'));
         }
 
         // Handle coupon from GET parameter only (simple, reliable)
@@ -501,7 +501,7 @@ class SubscriptionController extends Controller
 
         if (!$configuration || !$price) {
             return redirect()->localizedRoute('subscriptions.index')
-                ->with('error', 'Konfigurace nenalezena.');
+                ->with('error', __('flash.subscription.config_missing'));
         }
 
         $validated = $request->validate([
@@ -552,7 +552,7 @@ class SubscriptionController extends Controller
                     // Kupón není platný - vrátit chybu
                     return back()
                         ->withInput()
-                        ->with('error', 'Kupón "' . $couponCode . '" není platný: ' . $result['message']);
+                        ->with('error', __('flash.coupon.invalid', ['code' => $couponCode, 'message' => $result['message']]));
                 }
             }
             
@@ -575,7 +575,7 @@ class SubscriptionController extends Controller
                 if ($existingUser) {
                     return back()
                         ->withInput()
-                        ->with('error', 'Účet s tímto emailem již existuje. Prosím přihlaste se.');
+                        ->with('error', __('flash.auth.account_exists'));
                 }
                 
                 // Store guest info in session for later registration
@@ -762,10 +762,10 @@ class SubscriptionController extends Controller
 
                 if (auth()->check()) {
                     return redirect()->localizedRoute('dashboard.subscription')
-                        ->with('success', 'Předplatné bylo vytvořeno! Po přijetí platby bude aktivováno.');
+                        ->with('success', __('flash.subscription.created_pending_payment'));
                 } else {
                     return redirect()->localizedRoute('subscriptions.index')
-                        ->with('success', 'Děkujeme za objednávku! Na email ' . $validated['email'] . ' vám zašleme platební údaje.');
+                        ->with('success', __('flash.subscription.created_email_sent', ['email' => $validated['email']]));
                 }
             }
 
@@ -777,7 +777,7 @@ class SubscriptionController extends Controller
             
             return back()
                 ->withInput()
-                ->with('error', 'Nastala chyba při vytváření předplatného. Zkuste to prosím znovu.');
+                ->with('error', __('flash.subscription.creation_error'));
         }
     }
 
@@ -881,7 +881,7 @@ class SubscriptionController extends Controller
                     if ($existingUser) {
                         return back()
                             ->withInput()
-                            ->with('error', 'Účet s tímto emailem již existuje. Prosím přihlaste se.');
+                            ->with('error', __('flash.auth.account_exists'));
                     }
                     
                     $newUser = \App\Models\User::create([
@@ -1068,10 +1068,10 @@ class SubscriptionController extends Controller
 
             if (auth()->check()) {
                 return redirect()->localizedRoute('dashboard.subscription')
-                    ->with('success', 'Objednávka jednorázového boxu byla vytvořena! Po přijetí platby bude zpracována.');
+                    ->with('success', __('flash.onetime_box.created_pending'));
             } else {
                 return redirect()->localizedRoute('subscriptions.confirmation', $subscription)
-                    ->with('success', 'Děkujeme za objednávku! Na email ' . $validated['email'] . ' vám zašleme platební údaje.');
+                    ->with('success', __('flash.onetime_box.created_email_sent', ['email' => $validated['email']]));
             }
 
         } catch (\Exception $e) {
@@ -1083,7 +1083,7 @@ class SubscriptionController extends Controller
             
             return back()
                 ->withInput()
-                ->with('error', 'Nastala chyba při vytváření objednávky. Zkuste to prosím znovu.');
+                ->with('error', __('flash.onetime_box.creation_error'));
         }
     }
 
@@ -1122,7 +1122,7 @@ class SubscriptionController extends Controller
                 if ($existingUser) {
                     return back()
                         ->withInput()
-                        ->with('error', 'Účet s tímto emailem již existuje. Prosím přihlaste se.');
+                        ->with('error', __('flash.auth.account_exists'));
                 }
                 
                 // Create new user
@@ -1260,7 +1260,7 @@ class SubscriptionController extends Controller
             ]);
             
             return redirect()->localizedRoute('subscriptions.confirmation', $subscription)
-                ->with('success', 'Děkujeme! Vaše předplatné bylo aktivováno s 100% slevou.');
+                ->with('success', __('flash.subscription.activated_free'));
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -1272,7 +1272,7 @@ class SubscriptionController extends Controller
             
             return back()
                 ->withInput()
-                ->with('error', 'Nastala chyba při vytváření předplatného. Zkuste to prosím znovu.');
+                ->with('error', __('flash.subscription.creation_error'));
         }
     }
 
@@ -1288,14 +1288,14 @@ class SubscriptionController extends Controller
 
         // Check if subscription has unpaid status and pending invoice
         if ($subscription->status !== 'unpaid' || !$subscription->pending_invoice_id) {
-            return back()->with('error', 'Toto předplatné nemá neuhrazenou fakturu.');
+            return back()->with('error', __('flash.subscription.no_unpaid_invoice'));
         }
 
         try {
             $checkoutUrl = $this->stripeService->createInvoicePaymentSession($subscription);
             
             if (!$checkoutUrl) {
-                return back()->with('error', 'Nelze vytvořit platební session. Kontaktujte prosím podporu.');
+                return back()->with('error', __('flash.subscription.payment_session_error'));
             }
 
             return redirect($checkoutUrl);
@@ -1305,7 +1305,7 @@ class SubscriptionController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Nastala chyba při vytváření platby. Zkuste to prosím později.');
+            return back()->with('error', __('flash.subscription.payment_error'));
         }
     }
 }

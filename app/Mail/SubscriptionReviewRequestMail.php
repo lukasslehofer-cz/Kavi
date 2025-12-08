@@ -4,40 +4,31 @@ namespace App\Mail;
 
 use App\Models\Subscription;
 use App\Models\ReviewRequest;
-use Illuminate\Bus\Queueable;
+use App\Services\EmailService;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class SubscriptionReviewRequestMail extends Mailable implements ShouldQueue
+class SubscriptionReviewRequestMail extends LocalizedMailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    public Subscription $subscription;
+    public ReviewRequest $reviewRequest;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(
-        public Subscription $subscription,
-        public ReviewRequest $reviewRequest
-    ) {
-        //
+    public function __construct(Subscription $subscription, ReviewRequest $reviewRequest, ?string $locale = null)
+    {
+        $this->subscription = $subscription;
+        $this->reviewRequest = $reviewRequest;
+        $this->setLocale($locale ?? EmailService::getLocaleFromSubscription($subscription));
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Jak se vám líbí naše služby? ⭐',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.subscription_review.subject'),
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         // Generate tracking link to Trustpilot via our controller
@@ -54,15 +45,13 @@ class SubscriptionReviewRequestMail extends Mailable implements ShouldQueue
                 'subscription' => $this->subscription,
                 'trustpilotLink' => $trustpilotLink,
                 'deliveredOrdersCount' => $deliveredOrdersCount,
+                'locale' => $this->locale,
+                'siteName' => $this->siteName,
+                'contactEmail' => $this->contactEmail,
             ],
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];

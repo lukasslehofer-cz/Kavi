@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="{{ $locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>Platba předplatného úspěšně provedena</title>
+    <title>{{ __('emails.subscription_payment_success.title', [], $locale) }}</title>
     <style>
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -25,15 +25,11 @@
         .config-label { color: #6b7280; font-weight: 300; font-size: 14px; }
         .config-value { font-weight: 600; color: #111827; }
         .button { display: inline-block; background-color: #e6305a; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 9999px; font-weight: 600; font-size: 15px; margin: 24px 0; text-align: center; }
-        .button:hover { background-color: #d12a51; }
         .footer { background-color: #f9fafb !important; padding: 32px; text-align: center; }
         .footer-text { font-size: 14px; color: #6b7280; line-height: 1.6; margin: 8px 0; }
         .footer-links { margin: 16px 0; }
         .footer-link { color: #e6305a; text-decoration: none; margin: 0 12px; font-size: 14px; }
-        @media only screen and (max-width: 600px) { .content { padding: 24px !important; } h1 { font-size: 24px !important; } .header { padding: 24px !important; } .footer { padding: 24px !important; } .logo { max-width: 100px !important; width: 100px !important; } }
-        @media (prefers-color-scheme: dark) { body { background-color: #1a1a1a !important; } .email-container { background-color: #ffffff !important; border: 1px solid #d1d5db !important; } .info-box { background-color: #f9fafb !important; border: 1px solid #d1d5db !important; } h1, .info-title { color: #111827 !important; } .subtitle, .info-text { color: #4b5563 !important; } .header { background-color: #111827 !important; } }
-        [data-ogsc] .email-container { background-color: #ffffff !important; border: 1px solid #d1d5db !important; }
-        [data-ogsc] .info-box { background-color: #f9fafb !important; border: 1px solid #d1d5db !important; }
+        @media only screen and (max-width: 600px) { .content { padding: 24px !important; } h1 { font-size: 24px !important; } .header, .footer { padding: 24px !important; } .logo { max-width: 100px !important; width: 100px !important; } }
     </style>
 </head>
 <body>
@@ -44,7 +40,7 @@
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="KAVI.cz" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     <tr>
@@ -55,34 +51,34 @@
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">Platba úspěšně provedena! ☕</h1>
-                            <p class="subtitle" style="text-align: center;">Vaše pravidelná platba za kávové předplatné byla zpracována.</p>
+                            <h1 style="text-align: center;">{{ __('emails.subscription_payment_success.title', [], $locale) }}</h1>
+                            <p class="subtitle" style="text-align: center;">{{ __('emails.subscription_payment_success.subtitle', [], $locale) }}</p>
                             
                             <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
-                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">Předplatné</div>
+                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">{{ __('emails.subscription_payment_success.subscription_number', [], $locale) }}</div>
                                 <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $subscription->subscription_number }}</div>
                             </div>
                             
                             <!-- Payment Details -->
                             <div class="info-box" style="background-color: #d1fae5 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#d1fae5">
-                                <h3 class="info-title" style="color: #065f46;">✓ Potvrzení platby</h3>
+                                <h3 class="info-title" style="color: #065f46;">✓ {{ $locale === 'cs' ? 'Potvrzení platby' : 'Payment Confirmation' }}</h3>
                                 <div class="config-item" style="border-bottom: 1px solid #bbf7d0;">
-                                    <span class="config-label" style="color: #047857;">Částka:</span>
-                                    <span class="config-value" style="color: #065f46; font-size: 18px;">{{ number_format($payment->amount, 0, ',', ' ') }} Kč</span>
+                                    <span class="config-label" style="color: #047857;">{{ __('emails.subscription_payment_success.amount', [], $locale) }}:</span>
+                                    <span class="config-value" style="color: #065f46; font-size: 18px;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($payment->amount, $subscription->currency, 0) }}</span>
                                 </div>
                                 <div class="config-item" style="border-bottom: 1px solid #bbf7d0;">
-                                    <span class="config-label" style="color: #047857;">Datum platby:</span>
+                                    <span class="config-label" style="color: #047857;">{{ __('emails.subscription_payment_success.payment_date', [], $locale) }}:</span>
                                     <span class="config-value" style="color: #065f46;">{{ $payment->paid_at->format('j. n. Y') }}</span>
                                 </div>
                                 <div class="config-item" style="border-bottom: none;">
                                     <span class="config-label" style="color: #047857;">Status:</span>
-                                    <span class="config-value" style="color: #065f46;">Zaplaceno ✓</span>
+                                    <span class="config-value" style="color: #065f46;">{{ $locale === 'cs' ? 'Zaplaceno' : 'Paid' }} ✓</span>
                                 </div>
                             </div>
                             
                             <!-- Next Billing -->
                             <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
-                                <h3 class="info-title" style="color: #1e40af;">📅 Další platba a doručení</h3>
+                                <h3 class="info-title" style="color: #1e40af;">📅 {{ __('emails.subscription_payment_success.next_payment', [], $locale) }}</h3>
                                 @if($subscription->next_billing_date)
                                 @php
                                     $nextBillingDate = \Carbon\Carbon::parse($subscription->next_billing_date);
@@ -90,33 +86,29 @@
                                     $nextShipmentDate = $nextShipmentSchedule ? $nextShipmentSchedule->shipment_date : $nextBillingDate->copy()->day(20);
                                 @endphp
                                 <p class="info-text" style="color: #1e3a8a;">
-                                    <strong>Datum další platby:</strong> {{ $nextBillingDate->format('j. n. Y') }}<br>
-                                    <strong>Datum další rozesílky:</strong> cca {{ $nextShipmentDate->format('j. n. Y') }}
+                                    <strong>{{ $locale === 'cs' ? 'Datum další platby' : 'Next payment date' }}:</strong> {{ $nextBillingDate->format('j. n. Y') }}<br>
+                                    <strong>{{ $locale === 'cs' ? 'Datum další rozesílky' : 'Next shipment date' }}:</strong> {{ $locale === 'cs' ? 'cca' : 'approx.' }} {{ $nextShipmentDate->format('j. n. Y') }}
                                 </p>
                                 @else
                                 <p class="info-text" style="color: #1e3a8a;">
-                                    Datum bude upřesněno
+                                    {{ $locale === 'cs' ? 'Datum bude upřesněno' : 'Date to be confirmed' }}
                                 </p>
                                 @endif
-                                <p class="info-text" style="color: #1e3a8a; margin-top: 8px; font-size: 13px;">
-                                    Platba bude automaticky stržena z vaší uložené platební karty.<br>
-                                    3 dny před platbou vám pošleme připomínku.
-                                </p>
                             </div>
                             
                             <!-- Subscription Summary -->
                             <div class="info-box" style="background-color: #f9fafb !important; border: 1px solid #e5e7eb !important;" bgcolor="#f9fafb">
-                                <h3 class="info-title">📦 Vaše předplatné</h3>
+                                <h3 class="info-title">📦 {{ __('emails.subscription_confirmation.your_config', [], $locale) }}</h3>
                                 
                                 <div class="config-item">
-                                    <span class="config-label">Typ kávy:</span>
+                                    <span class="config-label">{{ $locale === 'cs' ? 'Typ kávy' : 'Coffee type' }}:</span>
                                     <span class="config-value">
                                         @if($subscription->configuration['type'] === 'espresso')
                                             Espresso
                                         @elseif($subscription->configuration['type'] === 'filter')
-                                            Filter
+                                            {{ $locale === 'cs' ? 'Filtr' : 'Filter' }}
                                         @else
-                                            Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× Filter)
+                                            Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× {{ $locale === 'cs' ? 'Filtr' : 'Filter' }})
                                         @endif
                                         @if($subscription->configuration['isDecaf'] ?? false)
                                             <span style="color: #059669;"> • Decaf</span>
@@ -125,91 +117,55 @@
                                 </div>
                                 
                                 <div class="config-item">
-                                    <span class="config-label">Množství:</span>
-                                    <span class="config-value">{{ $subscription->configuration['amount'] }}× balení po 250g</span>
+                                    <span class="config-label">{{ __('emails.subscription_confirmation.bags_count', [], $locale) }}:</span>
+                                    <span class="config-value">{{ $subscription->configuration['amount'] }}× 250g</span>
                                 </div>
                                 
                                 <div class="config-item">
-                                    <span class="config-label">Frekvence:</span>
+                                    <span class="config-label">{{ __('emails.subscription_confirmation.frequency', [], $locale) }}:</span>
                                     <span class="config-value">
                                         @if($subscription->frequency_months == 1)
-                                            Každý měsíc
+                                            {{ __('emails.frequency.monthly', [], $locale) }}
                                         @elseif($subscription->frequency_months == 2)
-                                            Každé 2 měsíce
+                                            {{ __('emails.frequency.bimonthly', [], $locale) }}
                                         @else
-                                            Každé 3 měsíce
+                                            {{ __('emails.frequency.quarterly', [], $locale) }}
                                         @endif
                                     </span>
                                 </div>
                             </div>
                             
-                            <!-- Invoice Info -->
-                            @if($payment->invoice_pdf_path)
-                            <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e;">📄 Faktura</h3>
-                                <p class="info-text" style="color: #78350f;">
-                                    Faktura je přiložena k tomuto emailu jako PDF příloha.<br>
-                                    Fakturu také najdete ve svém zákaznickém účtu v sekci "Předplatné".
-                                </p>
-                            </div>
-                            @else
-                            <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
-                                <h3 class="info-title" style="color: #1e40af;">📄 Faktura</h3>
-                                <p class="info-text" style="color: #1e3a8a;">
-                                    Faktura se připravuje a bude vám odeslána v samostatném emailu.
-                                </p>
-                            </div>
-                            @endif
-                            
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="{{ route('dashboard.subscription') }}" class="button">
-                                    Zobrazit předplatné
+                                    {{ __('emails.subscription_payment_success.view_subscription', [], $locale) }}
                                 </a>
                             </div>
                             
-                            <!-- Help Section -->
-                            <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">💡 Potřebujete změnu?</h3>
-                                <p class="info-text">
-                                    V zákaznickém účtu můžete kdykoliv:<br><br>
-                                    
-                                    • ⏸️ <strong>Pozastavit</strong> předplatné na dovolenou<br>
-                                    • 🔄 <strong>Změnit</strong> frekvenci nebo typ kávy<br>
-                                    • 💳 <strong>Aktualizovat</strong> platební údaje<br>
-                                    • 📦 <strong>Upravit</strong> doručovací adresu<br>
-                                    • ❌ <strong>Zrušit</strong> předplatné kdykoliv
-                                </p>
-                            </div>
-                            
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
-                                Děkujeme, že jste s námi! Pokud máte jakékoliv dotazy, kontaktujte nás na 
-                                <a href="mailto:info@kavi.cz" style="color: #e6305a; text-decoration: none;">info@kavi.cz</a>
+                                {{ __('emails.common.questions', [], $locale) }} 
+                                <a href="mailto:{{ $contactEmail }}" style="color: #e6305a; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             
                             <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
-                                S pozdravem,<br>
-                                <strong style="color: #111827;">Tým KAVI.cz</strong>
+                                {{ __('emails.common.regards', [], $locale) }},<br>
+                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <td class="footer">
                             <p class="footer-text">
-                                <strong style="color: #111827;">KAVI.cz</strong><br>
-                                Prémiová káva s předplatným
+                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
+                                {{ __('emails.common.tagline', [], $locale) }}
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link">Domů</a>
-                                <a href="{{ route('products.index') }}" class="footer-link">Obchod</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link">Moje předplatné</a>
+                                <a href="{{ route('home') }}" class="footer-link">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" class="footer-link">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('dashboard.subscription') }}" class="footer-link">{{ __('emails.common.subscription', [], $locale) }}</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                © {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.
-                            </p>
-                            <p class="footer-text" style="font-size: 12px;">
-                                Tento e-mail byl odeslán na adresu {{ $subscription->shipping_address['email'] ?? $subscription->user?->email }}<br>
-                                protože máte aktivní kávové předplatné.
+                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
                             </p>
                         </td>
                     </tr>
@@ -220,4 +176,3 @@
     </table>
 </body>
 </html>
-

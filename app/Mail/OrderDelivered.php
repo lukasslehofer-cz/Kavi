@@ -3,39 +3,30 @@
 namespace App\Mail;
 
 use App\Models\Order;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class OrderDelivered extends Mailable
+class OrderDelivered extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public Order $order;
 
-    public $order;
-
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(Order $order)
+    public function __construct(Order $order, ?string $locale = null)
     {
         $this->order = $order;
+        $this->setLocale($locale ?? EmailService::getLocaleFromOrder($order));
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Vaše objednávka ' . $this->order->order_number . ' čeká na vyzvednutí - KAVI.cz',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.order_delivered.subject', [
+                'order_number' => $this->order->order_number
+            ]),
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -43,15 +34,8 @@ class OrderDelivered extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];
     }
 }
-
-

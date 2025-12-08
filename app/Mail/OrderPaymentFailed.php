@@ -3,25 +3,29 @@
 namespace App\Mail;
 
 use App\Models\Order;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class OrderPaymentFailed extends Mailable
+class OrderPaymentFailed extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public Order $order;
+    public string $failureReason;
 
-    public function __construct(
-        public Order $order,
-        public ?string $failureReason = null
-    ) {}
+    public function __construct(Order $order, string $failureReason = '', ?string $locale = null)
+    {
+        $this->order = $order;
+        $this->failureReason = $failureReason;
+        $this->setLocale($locale ?? EmailService::getLocaleFromOrder($order));
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Problém s platbou objednávky - ' . ($this->order->order_number ?? 'KAVI.cz'),
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.order_payment_failed.subject', [
+                'order_number' => $this->order->order_number ?? $this->siteName
+            ]),
         );
     }
 

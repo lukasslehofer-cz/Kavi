@@ -3,39 +3,28 @@
 namespace App\Mail;
 
 use App\Models\Order;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class OrderReviewRequest extends Mailable
+class OrderReviewRequest extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public Order $order;
 
-    public $order;
-
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(Order $order)
+    public function __construct(Order $order, ?string $locale = null)
     {
         $this->order = $order;
+        $this->setLocale($locale ?? EmailService::getLocaleFromOrder($order));
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Jak se vám líbila káva? - KAVI.cz',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.order_review.subject'),
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -43,15 +32,8 @@ class OrderReviewRequest extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];
     }
 }
-
-

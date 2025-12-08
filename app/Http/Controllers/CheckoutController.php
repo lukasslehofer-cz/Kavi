@@ -63,7 +63,7 @@ class CheckoutController extends Controller
 
         if (empty($cart)) {
             return redirect()->localizedRoute('cart.index')
-                ->with('error', 'Váš košík je prázdný.');
+                ->with('error', __('flash.checkout.cart_empty'));
         }
 
         $cartItems = [];
@@ -306,7 +306,7 @@ class CheckoutController extends Controller
             if ($existingUser) {
                 return back()
                     ->withInput()
-                    ->with('error', 'Účet s tímto emailem již existuje. Prosím přihlaste se nebo použijte jiný email.');
+                    ->with('error', __('flash.auth.account_exists_or_use_other'));
             }
         }
 
@@ -314,7 +314,7 @@ class CheckoutController extends Controller
 
         if (empty($cart)) {
             return redirect()->localizedRoute('cart.index')
-                ->with('error', 'Váš košík je prázdný.');
+                ->with('error', __('flash.checkout.cart_empty'));
         }
 
         DB::beginTransaction();
@@ -350,7 +350,7 @@ class CheckoutController extends Controller
                         }
                         
                         return redirect()->route('order.confirmation', $existingPendingOrder)
-                            ->with('success', 'Objednávka byla úspěšně vytvořena!');
+                            ->with('success', __('flash.checkout.order_created'));
                     }
                 }
             }
@@ -402,7 +402,7 @@ class CheckoutController extends Controller
                 } else {
                     return back()
                         ->withInput()
-                        ->with('error', 'Překročili jste limit doplňkového zboží nebo předplatné není dostupné.');
+                        ->with('error', __('flash.checkout.addon_limit_exceeded'));
                 }
             }
 
@@ -621,7 +621,7 @@ class CheckoutController extends Controller
             }
 
             return redirect()->route('order.confirmation', $order)
-                ->with('success', 'Objednávka byla úspěšně vytvořena!');
+                ->with('success', __('flash.checkout.order_created'));
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -631,7 +631,7 @@ class CheckoutController extends Controller
             ]);
             return back()
                 ->withInput()
-                ->with('error', 'Při vytváření objednávky došlo k chybě: ' . $e->getMessage());
+                ->with('error', __('flash.checkout.order_error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -774,14 +774,14 @@ class CheckoutController extends Controller
 
         // Check if order has unpaid status
         if ($order->payment_status !== 'unpaid') {
-            return back()->with('error', 'Tato objednávka není v neuhrazeném stavu.');
+            return back()->with('error', __('flash.checkout.order_not_unpaid'));
         }
 
         try {
             $checkoutUrl = $this->stripeService->createOrderPaymentSession($order);
             
             if (!$checkoutUrl) {
-                return back()->with('error', 'Nelze vytvořit platební session. Kontaktujte prosím podporu.');
+                return back()->with('error', __('flash.subscription.payment_session_error'));
             }
 
             return redirect($checkoutUrl);
@@ -791,7 +791,7 @@ class CheckoutController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Nastala chyba při vytváření platby. Zkuste to prosím později.');
+            return back()->with('error', __('flash.subscription.payment_error'));
         }
     }
 }

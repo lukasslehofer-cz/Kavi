@@ -3,26 +3,29 @@
 namespace App\Mail;
 
 use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
+use App\Services\EmailService;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
-class EmailChangeConfirmation extends Mailable
+class EmailChangeConfirmation extends LocalizedMailable
 {
-    use Queueable, SerializesModels;
+    public User $user;
+    public string $newEmail;
+    public string $confirmationUrl;
 
-    public function __construct(
-        public User $user,
-        public string $newEmail,
-        public string $confirmationToken
-    ) {}
+    public function __construct(User $user, string $newEmail, string $confirmationUrl, ?string $locale = null)
+    {
+        $this->user = $user;
+        $this->newEmail = $newEmail;
+        $this->confirmationUrl = $confirmationUrl;
+        $this->setLocale($locale ?? EmailService::getLocaleFromUser($user));
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Potvrďte změnu emailové adresy - KAVI.cz',
+            from: $this->getFromAddress(),
+            subject: $this->trans('emails.email_change.subject'),
         );
     }
 
@@ -38,4 +41,3 @@ class EmailChangeConfirmation extends Mailable
         return [];
     }
 }
-

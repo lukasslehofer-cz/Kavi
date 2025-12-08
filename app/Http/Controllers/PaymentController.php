@@ -52,7 +52,7 @@ class PaymentController extends Controller
             ]);
             // Don't go back() - cart is empty. Go to order confirmation with error.
             return redirect()->route('order.confirmation', $order)
-                ->with('error', 'Nepodařilo se vytvořit platební session: ' . $e->getMessage() . ' Zkuste to prosím znovu níže.');
+                ->with('error', __('flash.payment.session_error', ['error' => $e->getMessage()]));
         }
     }
 

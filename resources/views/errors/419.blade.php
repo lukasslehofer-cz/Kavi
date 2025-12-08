@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Platnost stránky vypršela | KAVI.cz')
+@section('title', ($currentLocale ?? 'cs') === 'en' ? 'Page Expired | KAVI' : 'Platnost stránky vypršela | KAVI.cz')
 
 @section('content')
 <div class="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-white">
@@ -15,7 +15,7 @@
                 <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="text-sm font-medium text-primary-600">Chyba 419</span>
+                <span class="text-sm font-medium text-primary-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Error 419' : 'Chyba 419' }}</span>
             </div>
 
             <!-- Large Clock Icon -->
@@ -29,12 +29,14 @@
 
             <!-- Heading -->
             <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                Platnost stránky vypršela
+                {{ ($currentLocale ?? 'cs') === 'en' ? 'Page Expired' : 'Platnost stránky vypršela' }}
             </h2>
 
             <!-- Description -->
             <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-10 max-w-xl mx-auto">
-                Vaše relace vypršela z bezpečnostních důvodů. Obnovte prosím stránku a zkuste to znovu.
+                {{ ($currentLocale ?? 'cs') === 'en' 
+                    ? 'Your session has expired for security reasons. Please refresh the page and try again.' 
+                    : 'Vaše relace vypršela z bezpečnostních důvodů. Obnovte prosím stránku a zkuste to znovu.' }}
             </p>
 
             <!-- CTA Buttons -->
@@ -43,22 +45,23 @@
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span>Obnovit stránku</span>
+                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Refresh Page' : 'Obnovit stránku' }}</span>
                 </button>
                 
                 <a href="{{ route('home') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full border border-gray-200 transition-all duration-200">
-                    <span>Zpět na úvodní stránku</span>
+                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Back to Home' : 'Zpět na úvodní stránku' }}</span>
                 </a>
             </div>
 
             <!-- Help Text -->
             <div class="pt-8 border-t border-gray-100">
                 <p class="text-sm text-gray-600 font-light">
-                    K této chybě dochází, když stránka zůstane otevřená příliš dlouho. Stačí stránku obnovit.
+                    {{ ($currentLocale ?? 'cs') === 'en' 
+                        ? 'This error occurs when a page has been open for too long. Simply refresh the page.' 
+                        : 'K této chybě dochází, když stránka zůstane otevřená příliš dlouho. Stačí stránku obnovit.' }}
                 </p>
             </div>
         </div>
     </div>
 </div>
 @endsection
-

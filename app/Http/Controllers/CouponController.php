@@ -24,7 +24,7 @@ class CouponController extends Controller
 
         return redirect()->route('home')
             ->cookie($cookie)
-            ->with('success', "Kupón {$code} byl aktivován! Při objednávce bude automaticky aplikován.");
+            ->with('success', __('flash.coupon.activated', ['code' => $code]));
     }
 
     /**
