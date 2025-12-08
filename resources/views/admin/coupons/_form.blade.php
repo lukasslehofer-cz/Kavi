@@ -41,25 +41,39 @@
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">📦 Sleva pro jednorázové objednávky</h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label for="discount_type_order" class="block text-sm font-medium text-gray-700 mb-1">Typ slevy</label>
                 <select name="discount_type_order" id="discount_type_order" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onchange="toggleOrderEurField()">
                     <option value="none" {{ old('discount_type_order', $coupon->discount_type_order ?? 'none') == 'none' ? 'selected' : '' }}>Žádná</option>
                     <option value="percentage" {{ old('discount_type_order', $coupon->discount_type_order ?? '') == 'percentage' ? 'selected' : '' }}>Procenta (%)</option>
-                    <option value="fixed" {{ old('discount_type_order', $coupon->discount_type_order ?? '') == 'fixed' ? 'selected' : '' }}>Pevná částka (Kč)</option>
+                    <option value="fixed" {{ old('discount_type_order', $coupon->discount_type_order ?? '') == 'fixed' ? 'selected' : '' }}>Pevná částka</option>
                 </select>
             </div>
 
             <div>
-                <label for="discount_value_order" class="block text-sm font-medium text-gray-700 mb-1">Hodnota slevy</label>
+                <label for="discount_value_order" class="block text-sm font-medium text-gray-700 mb-1">Hodnota slevy (Kč)</label>
                 <input type="number" name="discount_value_order" id="discount_value_order" 
                     value="{{ old('discount_value_order', $coupon->discount_value_order ?? '') }}" 
                     step="0.01" min="0"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="10">
                 @error('discount_value_order')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div id="order_eur_field" style="display: none;">
+                <label for="discount_value_order_eur" class="block text-sm font-medium text-gray-700 mb-1">Hodnota slevy (EUR)</label>
+                <input type="number" name="discount_value_order_eur" id="discount_value_order_eur" 
+                    value="{{ old('discount_value_order_eur', $coupon->discount_value_order_eur ?? '') }}" 
+                    step="0.01" min="0"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="1">
+                <p class="text-xs text-gray-500 mt-1">Pro kavibox.com</p>
+                @error('discount_value_order_eur')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
@@ -79,25 +93,39 @@
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">🔄 Sleva pro předplatné</h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label for="discount_type_subscription" class="block text-sm font-medium text-gray-700 mb-1">Typ slevy</label>
                 <select name="discount_type_subscription" id="discount_type_subscription" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onchange="toggleSubscriptionEurField()">
                     <option value="none" {{ old('discount_type_subscription', $coupon->discount_type_subscription ?? 'none') == 'none' ? 'selected' : '' }}>Žádná</option>
                     <option value="percentage" {{ old('discount_type_subscription', $coupon->discount_type_subscription ?? '') == 'percentage' ? 'selected' : '' }}>Procenta (%)</option>
-                    <option value="fixed" {{ old('discount_type_subscription', $coupon->discount_type_subscription ?? '') == 'fixed' ? 'selected' : '' }}>Pevná částka (Kč)</option>
+                    <option value="fixed" {{ old('discount_type_subscription', $coupon->discount_type_subscription ?? '') == 'fixed' ? 'selected' : '' }}>Pevná částka</option>
                 </select>
             </div>
 
             <div>
-                <label for="discount_value_subscription" class="block text-sm font-medium text-gray-700 mb-1">Hodnota slevy</label>
+                <label for="discount_value_subscription" class="block text-sm font-medium text-gray-700 mb-1">Hodnota slevy (Kč)</label>
                 <input type="number" name="discount_value_subscription" id="discount_value_subscription" 
                     value="{{ old('discount_value_subscription', $coupon->discount_value_subscription ?? '') }}" 
                     step="0.01" min="0"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="100">
                 @error('discount_value_subscription')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div id="subscription_eur_field" style="display: none;">
+                <label for="discount_value_subscription_eur" class="block text-sm font-medium text-gray-700 mb-1">Hodnota slevy (EUR)</label>
+                <input type="number" name="discount_value_subscription_eur" id="discount_value_subscription_eur" 
+                    value="{{ old('discount_value_subscription_eur', $coupon->discount_value_subscription_eur ?? '') }}" 
+                    step="0.01" min="0"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="5">
+                <p class="text-xs text-gray-500 mt-1">Pro kavibox.com</p>
+                @error('discount_value_subscription_eur')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
@@ -143,7 +171,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label for="min_order_value" class="block text-sm font-medium text-gray-700 mb-1">Min. hodnota objednávky (Kč)</label>
                 <input type="number" name="min_order_value" id="min_order_value" 
@@ -153,6 +181,19 @@
                     placeholder="500">
                 <p class="text-xs text-gray-500 mt-1">Nechte prázdné pro bez omezení</p>
                 @error('min_order_value')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="min_order_value_eur" class="block text-sm font-medium text-gray-700 mb-1">Min. hodnota objednávky (EUR)</label>
+                <input type="number" name="min_order_value_eur" id="min_order_value_eur" 
+                    value="{{ old('min_order_value_eur', $coupon->min_order_value_eur ?? '') }}" 
+                    step="0.01" min="0"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="20">
+                <p class="text-xs text-gray-500 mt-1">Pro kavibox.com</p>
+                @error('min_order_value_eur')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
@@ -208,4 +249,32 @@
         </button>
     </div>
 </div>
+
+<script>
+function toggleOrderEurField() {
+    const typeSelect = document.getElementById('discount_type_order');
+    const eurField = document.getElementById('order_eur_field');
+    if (typeSelect.value === 'fixed') {
+        eurField.style.display = 'block';
+    } else {
+        eurField.style.display = 'none';
+    }
+}
+
+function toggleSubscriptionEurField() {
+    const typeSelect = document.getElementById('discount_type_subscription');
+    const eurField = document.getElementById('subscription_eur_field');
+    if (typeSelect.value === 'fixed') {
+        eurField.style.display = 'block';
+    } else {
+        eurField.style.display = 'none';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleOrderEurField();
+    toggleSubscriptionEurField();
+});
+</script>
 

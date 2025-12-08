@@ -15,13 +15,24 @@
         @method('PUT')
 
         <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-900 mb-2">Název produktu</label>
-                <input type="text" name="name" value="{{ old('name', $product->name) }}" required 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror">
-                @error('name')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Název produktu 🇨🇿</label>
+                    <input type="text" name="name" value="{{ old('name', $product->name) }}" required 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror">
+                    @error('name')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Product Name 🇬🇧</label>
+                    <input type="text" name="name_en" value="{{ old('name_en', $product->name_en) }}" 
+                           placeholder="English product name"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name_en') border-red-500 @enderror">
+                    @error('name_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div>
@@ -51,31 +62,62 @@
                 <p class="text-xs text-gray-600 mt-1">Podporované formáty: JPG, PNG, GIF. Maximální velikost: 2MB</p>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-900 mb-2">Krátký popis</label>
-                <input type="text" name="short_description" value="{{ old('short_description', $product->short_description) }}" 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('short_description') border-red-500 @enderror">
-                @error('short_description')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Krátký popis 🇨🇿</label>
+                    <input type="text" name="short_description" value="{{ old('short_description', $product->short_description) }}" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('short_description') border-red-500 @enderror">
+                    @error('short_description')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Short Description 🇬🇧</label>
+                    <input type="text" name="short_description_en" value="{{ old('short_description_en', $product->short_description_en) }}" 
+                           placeholder="English short description"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('short_description_en') border-red-500 @enderror">
+                    @error('short_description_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-900 mb-2">Detailní popis</label>
-                <textarea name="description" rows="6" required 
-                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('description') border-red-500 @enderror">{{ old('description', $product->description) }}</textarea>
-                @error('description')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-                <p class="text-xs text-gray-600 mt-1">Povolené HTML tagy: &lt;a&gt;, &lt;strong&gt;, &lt;b&gt;, &lt;em&gt;, &lt;i&gt;, &lt;br&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Detailní popis 🇨🇿</label>
+                    <textarea name="description" rows="6" required 
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('description') border-red-500 @enderror">{{ old('description', $product->description) }}</textarea>
+                    @error('description')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-gray-600 mt-1">Povolené HTML tagy: &lt;a&gt;, &lt;strong&gt;, &lt;b&gt;, &lt;em&gt;, &lt;i&gt;, &lt;br&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Detailed Description 🇬🇧</label>
+                    <textarea name="description_en" rows="6" 
+                              placeholder="English detailed description"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('description_en') border-red-500 @enderror">{{ old('description_en', $product->description_en) }}</textarea>
+                    @error('description_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-900 mb-2">Cena (Kč) <span class="text-sm text-gray-600">(volitelné pro kávu měsíce)</span></label>
                     <input type="number" name="price" value="{{ old('price', $product->price) }}" step="0.01" min="0" 
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('price') border-red-500 @enderror" id="price-input">
                     @error('price')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Cena (EUR) <span class="text-sm text-gray-600">(pro kavibox.com)</span></label>
+                    <input type="number" name="price_eur" value="{{ old('price_eur', $product->price_eur) }}" step="0.01" min="0" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('price_eur') border-red-500 @enderror">
+                    @error('price_eur')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -131,59 +173,99 @@
             <div class="bg-gray-50 border-2 border-gray-200 p-6 rounded-lg space-y-4">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Informace o kávě (volitelné)</h3>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-900 mb-2">Původ kávy</label>
-                    <input type="text" name="origin" value="{{ old('origin', $product->attributes['origin'] ?? '') }}" 
-                           placeholder="např. Etiopie, Keňa, Honduras..."
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('origin') border-red-500 @enderror">
-                    @error('origin')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-xs text-gray-600 mt-1">Zadejte zemi nebo region původu kávy</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Původ kávy 🇨🇿</label>
+                        <input type="text" name="origin" value="{{ old('origin', $product->attributes['origin'] ?? '') }}" 
+                               placeholder="např. Etiopie, Keňa, Honduras..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('origin') border-red-500 @enderror">
+                        @error('origin')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Origin 🇬🇧</label>
+                        <input type="text" name="origin_en" value="{{ old('origin_en', $product->attributes['origin_en'] ?? '') }}" 
+                               placeholder="e.g. Ethiopia, Kenya, Honduras..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('origin_en') border-red-500 @enderror">
+                        @error('origin_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-900 mb-2">Nadmořská výška</label>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Nadmořská výška / Altitude</label>
                     <input type="text" name="altitude" value="{{ old('altitude', $product->attributes['altitude'] ?? '') }}" 
                            placeholder="např. 1200-1800 m n.m."
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('altitude') border-red-500 @enderror">
                     @error('altitude')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-xs text-gray-600 mt-1">Nadmořská výška pěstování v metrech</p>
+                    <p class="text-xs text-gray-600 mt-1">Nadmořská výška pěstování v metrech (nepřekládá se)</p>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-900 mb-2">Zpracování</label>
-                    <input type="text" name="processing" value="{{ old('processing', $product->attributes['processing'] ?? '') }}" 
-                           placeholder="např. Washed, Natural, Honey..."
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('processing') border-red-500 @enderror">
-                    @error('processing')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-xs text-gray-600 mt-1">Způsob zpracování kávy</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Zpracování 🇨🇿</label>
+                        <input type="text" name="processing" value="{{ old('processing', $product->attributes['processing'] ?? '') }}" 
+                               placeholder="např. Praná, Přírodní, Honey..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('processing') border-red-500 @enderror">
+                        @error('processing')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Processing 🇬🇧</label>
+                        <input type="text" name="processing_en" value="{{ old('processing_en', $product->attributes['processing_en'] ?? '') }}" 
+                               placeholder="e.g. Washed, Natural, Honey..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('processing_en') border-red-500 @enderror">
+                        @error('processing_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-900 mb-2">Odrůda</label>
-                    <input type="text" name="variety" value="{{ old('variety', $product->attributes['variety'] ?? '') }}" 
-                           placeholder="např. Arabica, Bourbon, Caturra..."
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('variety') border-red-500 @enderror">
-                    @error('variety')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-xs text-gray-600 mt-1">Odrůda kávovníku</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Odrůda 🇨🇿</label>
+                        <input type="text" name="variety" value="{{ old('variety', $product->attributes['variety'] ?? '') }}" 
+                               placeholder="např. Arabica, Bourbon, Caturra..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('variety') border-red-500 @enderror">
+                        @error('variety')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Variety 🇬🇧</label>
+                        <input type="text" name="variety_en" value="{{ old('variety_en', $product->attributes['variety_en'] ?? '') }}" 
+                               placeholder="e.g. Arabica, Bourbon, Caturra..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('variety_en') border-red-500 @enderror">
+                        @error('variety_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-900 mb-2">Chuťové tóny</label>
-                    <textarea name="flavor_notes" rows="3" 
-                              placeholder="např. citrus, čokoláda, karamel, oříšky..."
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('flavor_notes') border-red-500 @enderror">{{ old('flavor_notes', $product->attributes['flavor_notes'] ?? '') }}</textarea>
-                    @error('flavor_notes')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-xs text-gray-600 mt-1">Popište chuťový profil kávy</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Chuťové tóny 🇨🇿</label>
+                        <textarea name="flavor_notes" rows="3" 
+                                  placeholder="např. citrus, čokoláda, karamel, oříšky..."
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('flavor_notes') border-red-500 @enderror">{{ old('flavor_notes', $product->attributes['flavor_notes'] ?? '') }}</textarea>
+                        @error('flavor_notes')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-900 mb-2">Flavor Notes 🇬🇧</label>
+                        <textarea name="flavor_notes_en" rows="3" 
+                                  placeholder="e.g. citrus, chocolate, caramel, nuts..."
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('flavor_notes_en') border-red-500 @enderror">{{ old('flavor_notes_en', $product->attributes['flavor_notes_en'] ?? '') }}</textarea>
+                        @error('flavor_notes_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-300">

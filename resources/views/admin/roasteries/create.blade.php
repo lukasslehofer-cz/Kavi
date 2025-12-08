@@ -19,18 +19,29 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Základní informace</h2>
                     
                     <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Název pražírny *</label>
-                            <input type="text" name="name" value="{{ old('name') }}" required 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror">
-                            @error('name')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Název pražírny 🇨🇿 *</label>
+                                <input type="text" name="name" value="{{ old('name') }}" required 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror">
+                                @error('name')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Roastery Name 🇬🇧</label>
+                                <input type="text" name="name_en" value="{{ old('name_en') }}" 
+                                       placeholder="English roastery name"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name_en') border-red-500 @enderror">
+                                @error('name_en')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Země *</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Země 🇨🇿 *</label>
                                 <select name="country" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('country') border-red-500 @enderror" id="country-select">
                                     <option value="">Vyberte zemi</option>
                                     @foreach($countries as $country => $flag)
@@ -43,12 +54,32 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Město</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Country 🇬🇧</label>
+                                <input type="text" name="country_en" value="{{ old('country_en') }}" 
+                                       placeholder="e.g. Czech Republic, Germany..."
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('country_en') border-red-500 @enderror">
+                                @error('country_en')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Město 🇨🇿</label>
                                 <input type="text" name="city" value="{{ old('city') }}" 
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('city') border-red-500 @enderror">
                                 @error('city')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">City 🇬🇧</label>
+                                <input type="text" name="city_en" value="{{ old('city_en') }}" 
+                                       placeholder="English city name"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('city_en') border-red-500 @enderror">
+                                @error('city_en')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -92,27 +123,49 @@
 
                 <!-- Descriptions -->
                 <div class="border-b border-gray-200 pb-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Popisy</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Popisy / Descriptions</h2>
                     
                     <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Krátký popis (max 500 znaků)</label>
-                            <textarea name="short_description" rows="3" maxlength="500" 
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('short_description') border-red-500 @enderror">{{ old('short_description') }}</textarea>
-                            @error('short_description')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                            <p class="text-xs text-gray-500 mt-1">Zobrazí se v přehledu pražíren</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Krátký popis 🇨🇿 (max 500 znaků)</label>
+                                <textarea name="short_description" rows="3" maxlength="500" 
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('short_description') border-red-500 @enderror">{{ old('short_description') }}</textarea>
+                                @error('short_description')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                                <p class="text-xs text-gray-500 mt-1">Zobrazí se v přehledu pražíren</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Short Description 🇬🇧 (max 500 chars)</label>
+                                <textarea name="short_description_en" rows="3" maxlength="500" 
+                                          placeholder="English short description"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('short_description_en') border-red-500 @enderror">{{ old('short_description_en') }}</textarea>
+                                @error('short_description_en')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Plný popis</label>
-                            <textarea name="full_description" rows="8" 
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('full_description') border-red-500 @enderror">{{ old('full_description') }}</textarea>
-                            @error('full_description')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                            <p class="text-xs text-gray-500 mt-1">Zobrazí se v detailu pražírny</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Plný popis 🇨🇿</label>
+                                <textarea name="full_description" rows="8" 
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('full_description') border-red-500 @enderror">{{ old('full_description') }}</textarea>
+                                @error('full_description')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                                <p class="text-xs text-gray-500 mt-1">Zobrazí se v detailu pražírny</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Full Description 🇬🇧</label>
+                                <textarea name="full_description_en" rows="8" 
+                                          placeholder="English full description"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('full_description_en') border-red-500 @enderror">{{ old('full_description_en') }}</textarea>
+                                @error('full_description_en')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>

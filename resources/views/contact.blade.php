@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kontakt - KAVI | Kávové předplatné')
+@section('title', __('pages.contact.title'))
 
 @section('content')
 
@@ -19,16 +19,16 @@
                 <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <span class="text-sm font-medium text-gray-900">Máte dotaz?</span>
+                <span class="text-sm font-medium text-gray-900">{{ __('pages.contact.badge') }}</span>
             </div>
             
             <!-- Clean Heading -->
             <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-                Kontaktujte nás
+                {{ __('pages.contact.heading') }}
             </h1>
             
             <p class="mx-auto max-w-2xl text-lg text-gray-600 font-light mb-8">
-                Rádi odpovíme na vaše dotazy a pomůžeme vám s čímkoliv
+                {{ __('pages.contact.subtitle') }}
             </p>
         </div>
     </div>
@@ -54,9 +54,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                         </svg>
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-900 mb-3">Napište nám</h2>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3">{{ __('pages.contact.form_title') }}</h2>
                     <p class="text-gray-600 font-light leading-relaxed">
-                        Vyplňte formulář a my se vám ozveme co nejdříve
+                        {{ __('pages.contact.form_subtitle') }}
                     </p>
                 </div>
 
@@ -66,7 +66,7 @@
                     <!-- Name / Company -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-900 mb-2">
-                            Jméno / Firma <span class="text-red-500">*</span>
+                            {{ __('pages.contact.form_name') }} <span class="text-red-500">*</span>
                         </label>
                         <input 
                             type="text" 
@@ -74,14 +74,14 @@
                             name="name" 
                             required
                             class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
-                            placeholder="Vaše jméno nebo název firmy"
+                            placeholder="{{ __('pages.contact.form_name_placeholder') }}"
                         >
                     </div>
 
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-900 mb-2">
-                            E-mail <span class="text-red-500">*</span>
+                            {{ __('pages.contact.form_email') }} <span class="text-red-500">*</span>
                         </label>
                         <input 
                             type="email" 
@@ -89,21 +89,21 @@
                             name="email" 
                             required
                             class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all"
-                            placeholder="vas@email.cz"
+                            placeholder="{{ __('pages.contact.form_email_placeholder') }}"
                         >
                     </div>
 
                     <!-- Message -->
                     <div>
                         <label for="message" class="block text-sm font-medium text-gray-900 mb-2">
-                            Váš dotaz
+                            {{ __('pages.contact.form_message') }}
                         </label>
                         <textarea 
                             id="message" 
                             name="message" 
                             rows="6"
                             class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all resize-none"
-                            placeholder="Popište prosím váš dotaz..."
+                            placeholder="{{ __('pages.contact.form_message_placeholder') }}"
                         ></textarea>
                     </div>
 
@@ -112,7 +112,7 @@
                         type="submit" 
                         class="w-full inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium px-8 py-4 rounded-full transition-all duration-200"
                     >
-                        <span>Odeslat zprávu</span>
+                        <span>{{ __('pages.contact.form_submit') }}</span>
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -134,7 +134,7 @@
                         </svg>
                     </div>
                     
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">Kontaktní informace</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">{{ __('pages.contact.info_title') }}</h3>
                     
                     <div class="space-y-4">
                         <!-- Email -->
@@ -145,7 +145,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm font-medium text-gray-500 mb-1">E-mail</div>
+                                <div class="text-sm font-medium text-gray-500 mb-1">{{ __('pages.contact.info_email') }}</div>
                                 <a href="mailto:info@kavi.cz" class="text-gray-900 hover:text-primary-600 transition-colors font-medium">
                                     info@kavi.cz
                                 </a>
@@ -162,32 +162,32 @@
                         </svg>
                     </div>
                     
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">Fakturační adresa</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">{{ __('pages.contact.billing_title') }}</h3>
                     
                     <div class="space-y-3 text-gray-600 font-light leading-relaxed">
                         <p class="font-semibold text-gray-900">Lukáš Šlehofer</p>
                         <p>Kurzova 2222/16</p>
                         <p>155 00 Praha 5</p>                        
                         <div class="pt-4 mt-4 border-t border-gray-100 space-y-1">
-                            <p><span class="text-gray-500">IČ:</span> <span class="font-medium text-gray-900">66899095</span></p>
-                            <p><span class="text-gray-500">DIČ:</span> <span class="font-medium text-gray-900">CZ7912150191</span></p>
+                            <p><span class="text-gray-500">{{ __('pages.contact.billing_id') }}:</span> <span class="font-medium text-gray-900">66899095</span></p>
+                            <p><span class="text-gray-500">{{ __('pages.contact.billing_vat') }}:</span> <span class="font-medium text-gray-900">CZ7912150191</span></p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Quick Links -->
                 <div class="bg-primary-50 rounded-2xl p-8 border border-primary-100">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Užitečné odkazy</h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">{{ __('pages.contact.links_title') }}</h3>
                     <div class="space-y-2">
                         <a href="{{ route('how-it-works') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
-                            → Jak to funguje (FAQ)
+                            {{ __('pages.contact.link_faq') }}
                         </a>
                         <a href="{{ route('subscriptions.index') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
-                            → Kávové předplatné
+                            {{ __('pages.contact.link_subscription') }}
                         </a>
                         @auth
                         <a href="{{ route('dashboard.index') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
-                            → Můj účet
+                            {{ __('pages.contact.link_account') }}
                         </a>
                         @endauth
                     </div>
@@ -211,24 +211,24 @@
         <div class="mx-auto flex max-w-2xl flex-col items-center text-center">
             <!-- Heading -->
             <h2 class="mb-6 text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
-                Začněte svou kávovou cestu ještě dnes
+                {{ __('pages.contact.cta_title') }}
             </h2>
 
             <p class="mb-10 text-lg text-gray-600 max-w-xl leading-relaxed font-light">
-                Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.
+                {{ __('pages.contact.cta_text') }}
             </p>
 
             <!-- CTA Buttons -->
             <div class="flex flex-col sm:flex-row gap-3">
                 <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
-                    <span>Vybrat předplatné</span>
+                    <span>{{ __('pages.contact.cta_subscription') }}</span>
                     <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
 
                 <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 transition-all duration-200">
-                    <span>Procházet kávy</span>
+                    <span>{{ __('pages.contact.cta_browse') }}</span>
                 </a>
             </div>
         </div>
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Disable button and show loading state
             submitButton.disabled = true;
-            submitButton.innerHTML = '<span>Odesílám...</span>';
+            submitButton.innerHTML = '<span>{{ __('pages.contact.form_sending') }}</span>';
 
             fetch(form.action, {
                 method: 'POST',
@@ -266,11 +266,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (data.success) {
                     message.className = 'p-4 rounded-lg bg-green-100 text-green-800 border border-green-200';
-                    message.textContent = data.message || 'Děkujeme! Vaše zpráva byla odeslána.';
+                    message.textContent = data.message || '{{ __('pages.contact.form_success') }}';
                     form.reset();
                 } else {
                     message.className = 'p-4 rounded-lg bg-red-100 text-red-800 border border-red-200';
-                    message.textContent = data.message || 'Došlo k chybě. Zkuste to prosím znovu.';
+                    message.textContent = data.message || '{{ __('pages.contact.form_error') }}';
                 }
 
                 // Hide message after 5 seconds
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 message.classList.remove('hidden');
                 message.className = 'p-4 rounded-lg bg-red-100 text-red-800 border border-red-200';
-                message.textContent = 'Došlo k chybě. Zkuste to prosím znovu nebo nás kontaktujte e-mailem.';
+                message.textContent = '{{ __('pages.contact.form_error_email') }}';
             })
             .finally(() => {
                 // Re-enable button
@@ -294,4 +294,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 @endsection
-

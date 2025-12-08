@@ -320,13 +320,20 @@ class SubscriptionHelper
             $isAfterCutoff = $today->day > 15;
         }
         
+        // Generate locale-aware cutoff message
+        if (app()->getLocale() === 'en') {
+            $cutoffMessage = 'Your first coffee box will be shipped on ' . $nextShipping->format('M d, Y');
+        } else {
+            $cutoffMessage = 'První kávový box bude odeslán ' . $nextShipping->format('d.m.Y');
+        }
+        
         return [
             'next_shipping_date' => $nextShipping,
             'next_shipping_formatted' => $nextShipping->format('d.m.Y'),
             'next_billing_date' => $nextBilling,
             'cycle_end' => $nextBilling->endOfDay(), // For backward compatibility
             'is_after_cutoff' => $isAfterCutoff,
-            'cutoff_message' => 'První kávový box bude odeslán ' . $nextShipping->format('d.m.Y'),
+            'cutoff_message' => $cutoffMessage,
         ];
     }
 }

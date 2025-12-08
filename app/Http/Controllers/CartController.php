@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\Product;
 use App\Services\ShippingService;
 use Illuminate\Http\Request;
@@ -17,24 +18,31 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
         $cartItems = [];
         $total = 0;
+        $totalEur = 0;
 
         foreach ($cart as $productId => $quantity) {
             $product = Product::find($productId);
             if ($product && $product->is_active) {
+                $subtotal = $product->price * $quantity;
+                $subtotalEur = ($product->price_eur ?? 0) * $quantity;
                 $cartItems[] = [
                     'product' => $product,
                     'quantity' => $quantity,
-                    'subtotal' => $product->price * $quantity,
+                    'subtotal' => $subtotal,
+                    'subtotal_eur' => $subtotalEur,
                 ];
-                $total += $product->price * $quantity;
+                $total += $subtotal;
+                $totalEur += $subtotalEur;
             }
         }
 
         // Calculate shipping if user country is known
         $shipping = null;
+        $shippingEur = null;
         $shippingMessage = null;
         $freeShippingThreshold = null;
         $remainingForFreeShipping = null;
+        $remainingForFreeShippingEur = null;
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
         
         // Check if cart qualifies for free shipping (all products have free_shipping flag)
@@ -43,16 +51,25 @@ class CartController extends Controller
         if ($cartQualifiesForFreeShipping) {
             // All products in cart have free_shipping - no shipping charge
             $shipping = 0;
-            $shippingMessage = 'Doprava zdarma (digitální produkt)';
+            $shippingEur = 0;
+            $shippingMessage = app()->getLocale() === 'en' 
+                ? 'Free shipping (digital product)' 
+                : 'Doprava zdarma (digitální produkt)';
         } elseif ($userCountry) {
             $shipping = $this->shippingService->calculateShippingCost($userCountry, $total, false);
             $remainingForFreeShipping = $this->shippingService->getRemainingForFreeShipping($userCountry, $total);
             
-            // Get threshold for display
+            // Get threshold and EUR values for display
             $rate = \App\Models\ShippingRate::getForCountry($userCountry);
             $freeShippingThreshold = $rate?->free_shipping_threshold_czk;
+            $shippingEur = $rate?->price_eur ?? 0;
+            $remainingForFreeShippingEur = $rate?->free_shipping_threshold_eur 
+                ? max(0, $rate->free_shipping_threshold_eur - $totalEur)
+                : null;
         } else {
-            $shippingMessage = 'Cena dopravy bude vypočítána v pokladně po zadání adresy';
+            $shippingMessage = app()->getLocale() === 'en' 
+                ? 'Shipping cost will be calculated at checkout'
+                : 'Cena dopravy bude vypočítána v pokladně po zadání adresy';
         }
 
         // Get recommended products from same categories
@@ -80,7 +97,18 @@ class CartController extends Controller
                 ->get();
         }
 
-        return view('cart.index', compact('cartItems', 'total', 'shipping', 'shippingMessage', 'freeShippingThreshold', 'remainingForFreeShipping', 'recommendedProducts'));
+        return view('cart.index', compact(
+            'cartItems', 
+            'total', 
+            'totalEur',
+            'shipping', 
+            'shippingEur',
+            'shippingMessage', 
+            'freeShippingThreshold', 
+            'remainingForFreeShipping',
+            'remainingForFreeShippingEur',
+            'recommendedProducts'
+        ));
     }
 
     public function add(Request $request, Product $product)
@@ -90,7 +118,10 @@ class CartController extends Controller
         ]);
 
         if (!$product->is_active || !$product->isInStock()) {
-            return back()->with('error', 'Produkt není k dispozici.');
+            $errorMessage = app()->getLocale() === 'en' 
+                ? 'Product is not available.'
+                : 'Produkt není k dispozici.';
+            return back()->with('error', $errorMessage);
         }
 
         $cart = session()->get('cart', []);
@@ -105,12 +136,15 @@ class CartController extends Controller
 
         // Check stock
         if ($cart[$productId] > $product->stock) {
-            return back()->with('error', 'Omlouváme se, ale nemáme dostatek zásob.');
+            $errorMessage = app()->getLocale() === 'en' 
+                ? 'Sorry, we don\'t have enough stock.'
+                : 'Omlouváme se, ale nemáme dostatek zásob.';
+            return back()->with('error', $errorMessage);
         }
 
         session()->put('cart', $cart);
 
-        return back()->with('success', 'Produkt byl přidán do košíku.');
+        return back()->with('success', __('cart.added'));
     }
 
     public function update(Request $request, $productId)
@@ -128,13 +162,16 @@ class CartController extends Controller
             if ($product && $request->quantity <= $product->stock) {
                 $cart[$productId] = $request->quantity;
             } else {
-                return back()->with('error', 'Nemáme dostatek zásob.');
+                $errorMessage = app()->getLocale() === 'en' 
+                    ? 'We don\'t have enough stock.'
+                    : 'Nemáme dostatek zásob.';
+                return back()->with('error', $errorMessage);
             }
         }
 
         session()->put('cart', $cart);
 
-        return back()->with('success', 'Košík byl aktualizován.');
+        return back()->with('success', __('cart.updated'));
     }
 
     public function remove($productId)
@@ -143,13 +180,16 @@ class CartController extends Controller
         unset($cart[$productId]);
         session()->put('cart', $cart);
 
-        return back()->with('success', 'Produkt byl odstraněn z košíku.');
+        return back()->with('success', __('cart.removed'));
     }
 
     public function clear()
     {
         session()->forget('cart');
-        return back()->with('success', 'Košík byl vyprázdněn.');
+        $successMessage = app()->getLocale() === 'en' 
+            ? 'Cart cleared.'
+            : 'Košík byl vyprázdněn.';
+        return back()->with('success', $successMessage);
     }
 }
 

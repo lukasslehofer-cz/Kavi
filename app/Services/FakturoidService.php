@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
@@ -26,6 +27,62 @@ class FakturoidService
         $this->clientSecret = config('services.fakturoid.client_secret');
         $this->numberFormat = config('services.fakturoid.number_format');
         $this->userAgent = config('services.fakturoid.user_agent', 'Kavi (info@kavi.cz)');
+    }
+
+    /**
+     * Get invoice language code based on entity currency
+     * Returns 'cs' for CZK or 'en' for EUR
+     */
+    private function getInvoiceLanguageFromCurrency(?string $currency): string
+    {
+        return ($currency === 'EUR') ? 'en' : 'cs';
+    }
+
+    /**
+     * Get invoice language code based on current locale (fallback for session-based)
+     * Returns 'cs' for Czech or 'en' for English
+     */
+    private function getInvoiceLanguage(): string
+    {
+        return CurrencyHelper::isCzk() ? 'cs' : 'en';
+    }
+
+    /**
+     * Get invoice currency code
+     */
+    private function getInvoiceCurrency(): string
+    {
+        return CurrencyHelper::code();
+    }
+
+    /**
+     * Get localized text for invoice items
+     */
+    private function getLocalizedText(string $key, ?string $currency = null): string
+    {
+        $texts = [
+            'cs' => [
+                'shipping' => 'Doprava',
+                'discount' => 'Sleva',
+                'unit' => 'ks',
+                'subscription' => 'Předplatné kávy',
+                'note' => 'Objednávka z e-shopu Kavi',
+                'subscription_note' => 'Platba předplatného Kavi',
+                'customer' => 'Zákazník',
+            ],
+            'en' => [
+                'shipping' => 'Shipping',
+                'discount' => 'Discount',
+                'unit' => 'pcs',
+                'subscription' => 'Coffee Subscription',
+                'note' => 'Order from Kavi e-shop',
+                'subscription_note' => 'Kavi subscription payment',
+                'customer' => 'Customer',
+            ],
+        ];
+
+        $lang = $currency ? $this->getInvoiceLanguageFromCurrency($currency) : $this->getInvoiceLanguage();
+        return $texts[$lang][$key] ?? $texts['cs'][$key] ?? $key;
     }
 
     /**
@@ -110,11 +167,15 @@ class FakturoidService
             // Fakturoid will calculate the base price and VAT from it
             $vatRate = 21; // DPH 21%
             
-            $lines = $order->items->map(function ($item) use ($vatRate) {
+            // Use order's currency for invoice (stored at order creation time)
+            $orderCurrency = $order->currency ?? 'CZK';
+            
+            $unitName = $this->getLocalizedText('unit', $orderCurrency);
+            $lines = $order->items->map(function ($item) use ($vatRate, $unitName) {
                 return [
                     'name' => $item->product_name,
                     'quantity' => (string)$item->quantity,
-                    'unit_name' => 'ks',
+                    'unit_name' => $unitName,
                     'unit_price' => (string)$item->price, // Price WITH VAT when vat_price_mode=with_vat
                     'vat_rate' => (string)$vatRate,
                 ];
@@ -123,9 +184,9 @@ class FakturoidService
             // Add shipping as a line item if applicable
             if ($order->shipping > 0) {
                 $lines[] = [
-                    'name' => 'Doprava',
+                    'name' => $this->getLocalizedText('shipping', $orderCurrency),
                     'quantity' => '1',
-                    'unit_name' => 'ks',
+                    'unit_name' => $unitName,
                     'unit_price' => (string)$order->shipping, // Price WITH VAT
                     'vat_rate' => (string)$vatRate,
                 ];
@@ -133,10 +194,11 @@ class FakturoidService
 
             // Add discount as a negative line item if applicable
             if ($order->discount_amount > 0) {
+                $discountName = $this->getLocalizedText('discount', $orderCurrency);
                 $lines[] = [
-                    'name' => 'Sleva' . ($order->coupon_code ? ' (' . $order->coupon_code . ')' : ''),
+                    'name' => $discountName . ($order->coupon_code ? ' (' . $order->coupon_code . ')' : ''),
                     'quantity' => '1',
-                    'unit_name' => 'ks',
+                    'unit_name' => $unitName,
                     'unit_price' => (string)(-$order->discount_amount), // Negative price WITH VAT
                     'vat_rate' => (string)$vatRate,
                 ];
@@ -149,11 +211,13 @@ class FakturoidService
                 'document_type' => 'invoice',
                 'issued_on' => now()->format('Y-m-d'),
                 'taxable_fulfillment_due' => now()->format('Y-m-d'),
-                'due' => 14, // Splatnost 14 dní
-                'payment_method' => 'card', // Karta
+                'due' => 14,
+                'payment_method' => 'card',
                 'vat_price_mode' => 'with_vat', // Prices include VAT, Fakturoid calculates base price
+                'currency' => $orderCurrency,
+                'language' => $this->getInvoiceLanguageFromCurrency($orderCurrency),
                 'lines' => $lines,
-                'note' => 'Objednávka z e-shopu Kavi',
+                'note' => $this->getLocalizedText('note', $orderCurrency),
             ];
 
             // Add number format ID if configured
@@ -282,7 +346,7 @@ class FakturoidService
 
             // Prepare subject data
             $subjectData = [
-                'name' => $address['name'] ?? $user?->name ?? 'Zákazník',
+                'name' => $address['name'] ?? $user?->name ?? $this->getLocalizedText('customer'),
                 'email' => $address['email'] ?? $user?->email ?? '',
                 'phone' => $address['phone'] ?? '',
                 'street' => $address['address'] ?? $address['billing_address'] ?? '',
@@ -565,18 +629,25 @@ class FakturoidService
             $discountActive = $subscription->discount_amount > 0 && 
                 ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0);
             
+            // Use subscription's currency for invoice (stored at subscription creation time)
+            $subscriptionCurrency = $subscription->currency ?? 'CZK';
+            
             // Determine line items based on whether we have breakdown info
             $lines = [];
+            $unitName = $this->getLocalizedText('unit', $subscriptionCurrency);
+            $subscriptionName = $this->getLocalizedText('subscription', $subscriptionCurrency);
+            $shippingName = $this->getLocalizedText('shipping', $subscriptionCurrency);
+            $discountName = $this->getLocalizedText('discount', $subscriptionCurrency);
             
             // If subscription has configured_price and discount, show the breakdown
             if ($subscription->configured_price > 0 && $discountActive) {
                 // Main subscription line (full price)
                 $lines[] = [
-                    'name' => 'Kávové předplatné' . ($subscription->subscription_number 
+                    'name' => $subscriptionName . ($subscription->subscription_number 
                         ? ' (' . $subscription->subscription_number . ')'
                         : ''),
                     'quantity' => '1',
-                    'unit_name' => 'ks',
+                    'unit_name' => $unitName,
                     'unit_price' => (string)$subscription->configured_price,
                     'vat_rate' => (string)$vatRate,
                 ];
@@ -584,9 +655,9 @@ class FakturoidService
                 // Add shipping if applicable
                 if ($subscription->shipping_cost > 0) {
                     $lines[] = [
-                        'name' => 'Doprava',
+                        'name' => $shippingName,
                         'quantity' => '1',
-                        'unit_name' => 'ks',
+                        'unit_name' => $unitName,
                         'unit_price' => (string)$subscription->shipping_cost,
                         'vat_rate' => (string)$vatRate,
                     ];
@@ -594,20 +665,20 @@ class FakturoidService
                 
                 // Add discount as negative line
                 $lines[] = [
-                    'name' => 'Sleva' . ($subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : ''),
+                    'name' => $discountName . ($subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : ''),
                     'quantity' => '1',
-                    'unit_name' => 'ks',
+                    'unit_name' => $unitName,
                     'unit_price' => (string)(-$subscription->discount_amount),
                     'vat_rate' => (string)$vatRate,
                 ];
             } else {
                 // No active discount - show as single line with payment amount
                 $lines[] = [
-                    'name' => 'Kávové předplatné' . ($subscription->subscription_number 
+                    'name' => $subscriptionName . ($subscription->subscription_number 
                         ? ' (' . $subscription->subscription_number . ')'
                         : ''),
                     'quantity' => '1',
-                    'unit_name' => 'ks',
+                    'unit_name' => $unitName,
                     'unit_price' => (string)$payment->amount,
                     'vat_rate' => (string)$vatRate,
                 ];
@@ -615,9 +686,9 @@ class FakturoidService
                 // Add shipping if applicable and not included in payment amount
                 if ($subscription->shipping_cost > 0 && $subscription->configured_price > 0) {
                     $lines[] = [
-                        'name' => 'Doprava',
+                        'name' => $shippingName,
                         'quantity' => '1',
-                        'unit_name' => 'ks',
+                        'unit_name' => $unitName,
                         'unit_price' => (string)$subscription->shipping_cost,
                         'vat_rate' => (string)$vatRate,
                     ];
@@ -634,8 +705,10 @@ class FakturoidService
                 'due' => 0, // Already paid
                 'payment_method' => 'card',
                 'vat_price_mode' => 'with_vat', // Prices include VAT, Fakturoid calculates base price
+                'currency' => $subscriptionCurrency,
+                'language' => $this->getInvoiceLanguageFromCurrency($subscriptionCurrency),
                 'lines' => $lines,
-                'note' => 'Platba za předplatné',
+                'note' => $this->getLocalizedText('subscription_note', $subscriptionCurrency),
             ];
 
             // Add number format ID if configured

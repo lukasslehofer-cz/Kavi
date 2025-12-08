@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Naše pražírny - KAVI.cz')
+@section('title', $currentLocale === 'en' ? 'Our Roasters - KAVI' : 'Naše pražírny - KAVI.cz')
 
 @section('content')
 <!-- Hero Header Section - Minimal -->
@@ -18,16 +18,16 @@
         <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
         </svg>
-        <span class="text-sm font-medium text-gray-900">Prémiové pražírny</span>
+        <span class="text-sm font-medium text-gray-900">{{ $currentLocale === 'en' ? 'Premium Roasters' : 'Prémiové pražírny' }}</span>
       </div>
 
       <!-- Clean Heading -->
       <h1 class="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-        Naše pražírny
+        {{ $currentLocale === 'en' ? 'Our Roasters' : 'Naše pražírny' }}
       </h1>
       
       <p class="mx-auto max-w-2xl text-base sm:text-lg text-gray-600 font-light">
-        Spolupracujeme s těmi nejlepšími pražírnami z celé Evropy. Kvalita, tradice a láska ke kávě.
+        {{ $currentLocale === 'en' ? 'We work with the best roasters from all over Europe. Quality, tradition and love for coffee.' : 'Spolupracujeme s těmi nejlepšími pražírnami z celé Evropy. Kvalita, tradice a láska ke kávě.' }}
       </p>
     </div>
   </div>
@@ -47,8 +47,8 @@
     <!-- Country Filters - Minimal -->
     <div class="mb-8 sm:mb-10">
       <div class="text-center mb-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-1">Filtrovat podle země</h2>
-        <p class="text-gray-600 text-sm font-light">Vyberte zemi, ze které chcete vidět pražírny</p>
+        <h2 class="text-xl font-semibold text-gray-900 mb-1">{{ $currentLocale === 'en' ? 'Filter by country' : 'Filtrovat podle země' }}</h2>
+        <p class="text-gray-600 text-sm font-light">{{ $currentLocale === 'en' ? 'Select a country to see roasters from' : 'Vyberte zemi, ze které chcete vidět pražírny' }}</p>
       </div>
       
       <div class="flex flex-wrap justify-center gap-2">
@@ -59,10 +59,10 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
           @endif
-          <span>Všechny země</span>
+          <span>{{ $currentLocale === 'en' ? 'All countries' : 'Všechny země' }}</span>
         </a>
         
-        @foreach($countries as $country => $flag)
+        @foreach($countries as $country => $countryData)
         <a href="{{ route('roasteries.index', ['country' => $country]) }}" 
            class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 {{ $selectedCountry == $country ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300' }}">
           @if($selectedCountry == $country)
@@ -70,8 +70,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
           @endif
-          <span class="text-xl sm:text-lg">{{ $flag }}</span>
-          <span>{{ $country }}</span>
+          <span class="text-xl sm:text-lg">{{ $countryData['flag'] }}</span>
+          <span>{{ $countryData['name'] }}</span>
         </a>
         @endforeach
       </div>
@@ -104,11 +104,15 @@
           <div class="absolute left-3 top-3 bg-gray-900 text-white rounded-full px-2.5 py-1 text-xs font-medium">
             @php
               $coffeeCount = $roastery->products()->count();
-              $coffeeWord = match(true) {
-                $coffeeCount === 1 => 'káva',
-                $coffeeCount >= 2 && $coffeeCount <= 4 => 'kávy',
-                default => 'káv'
-              };
+              if ($currentLocale === 'en') {
+                $coffeeWord = $coffeeCount === 1 ? 'coffee' : 'coffees';
+              } else {
+                $coffeeWord = match(true) {
+                  $coffeeCount === 1 => 'káva',
+                  $coffeeCount >= 2 && $coffeeCount <= 4 => 'kávy',
+                  default => 'káv'
+                };
+              }
             @endphp
             {{ $coffeeCount }} {{ $coffeeWord }}
           </div>
@@ -118,27 +122,27 @@
         <div class="p-5">
           <a href="{{ route('roasteries.show', $roastery) }}" class="block mb-2">
             <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-gray-600 transition-colors">
-              {{ $roastery->name }}
+              {{ $roastery->getName() }}
             </h3>
             <div class="flex items-center gap-1.5 text-sm text-gray-500">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
               </svg>
-              <span class="font-light">{{ $roastery->city ?? $roastery->country }}</span>
+              <span class="font-light">{{ $roastery->getCity() ?? $roastery->getCountry() }}</span>
             </div>
           </a>
 
-          @if($roastery->short_description)
+          @if($roastery->getShortDescription())
           <p class="text-gray-600 text-sm mb-5 line-clamp-3 font-light leading-relaxed">
-            {{ $roastery->short_description }}
+            {{ $roastery->getShortDescription() }}
           </p>
           @endif
 
           <div class="flex gap-2">
             <a href="{{ route('roasteries.show', $roastery) }}" 
                class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
-              Více o pražírně
+              {{ $currentLocale === 'en' ? 'More about roaster' : 'Více o pražírně' }}
             </a>
 
             @if($roastery->website_url)
@@ -177,17 +181,17 @@
           <svg class="mx-auto h-24 w-24 text-gray-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
           </svg>
-          <h3 class="text-2xl font-bold text-gray-900 mb-2">Žádné pražírny</h3>
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ $currentLocale === 'en' ? 'No roasters' : 'Žádné pražírny' }}</h3>
           <p class="text-gray-600 mb-6">
             @if($selectedCountry)
-              Pro zemi {{ $selectedCountry }} nemáme žádné pražírny. Zkuste vybrat jinou zemi.
+              {{ $currentLocale === 'en' ? 'We have no roasters from ' . ($selectedCountryName ?? $selectedCountry) . '. Try selecting another country.' : 'Pro zemi ' . ($selectedCountryName ?? $selectedCountry) . ' nemáme žádné pražírny. Zkuste vybrat jinou zemi.' }}
             @else
-              Momentálně nemáme žádné pražírny v nabídce.
+              {{ $currentLocale === 'en' ? 'We currently have no roasters available.' : 'Momentálně nemáme žádné pražírny v nabídce.' }}
             @endif
           </p>
           @if($selectedCountry)
           <a href="{{ route('roasteries.index') }}" class="inline-flex items-center gap-2 bg-primary-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-primary-700 transition-colors">
-            <span>Zobrazit všechny pražírny</span>
+            <span>{{ $currentLocale === 'en' ? 'Show all roasters' : 'Zobrazit všechny pražírny' }}</span>
           </a>
           @endif
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -28,8 +29,10 @@ class OrderConfirmation extends Mailable
      */
     public function envelope(): Envelope
     {
+        $subject = __('emails.order_confirmation.subject', ['order_number' => $this->order->order_number]);
+        
         return new Envelope(
-            subject: 'Potvrzení objednávky ' . $this->order->order_number . ' - KAVI.cz',
+            subject: $subject,
         );
     }
 
@@ -54,8 +57,9 @@ class OrderConfirmation extends Mailable
         
         // Attach invoice PDF if available
         if ($this->order->invoice_pdf_path && \Storage::exists($this->order->invoice_pdf_path)) {
+            $invoicePrefix = CurrencyHelper::isCzk() ? 'Faktura-' : 'Invoice-';
             $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromStorage($this->order->invoice_pdf_path)
-                ->as('Faktura-' . $this->order->order_number . '.pdf')
+                ->as($invoicePrefix . $this->order->order_number . '.pdf')
                 ->withMime('application/pdf');
         }
         

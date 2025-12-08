@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrencyHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,6 +14,8 @@ class ShippingRate extends Model
         'country_code',
         'country_name',
         'enabled',
+        'available_on_cz',
+        'available_on_com',
         'price_czk',
         'price_eur',
         'applies_to_subscriptions',
@@ -23,6 +26,8 @@ class ShippingRate extends Model
 
     protected $casts = [
         'enabled' => 'boolean',
+        'available_on_cz' => 'boolean',
+        'available_on_com' => 'boolean',
         'applies_to_subscriptions' => 'boolean',
         'price_czk' => 'decimal:2',
         'price_eur' => 'decimal:2',
@@ -30,9 +35,43 @@ class ShippingRate extends Model
     ];
 
     /**
-     * Get shipping rate for a specific country
+     * Get the shipping price in the current currency
+     */
+    public function getPrice(): float
+    {
+        return CurrencyHelper::price($this->price_czk, $this->price_eur);
+    }
+
+    /**
+     * Get formatted shipping price
+     */
+    public function getFormattedPrice(): string
+    {
+        return CurrencyHelper::format($this->price_czk, $this->price_eur);
+    }
+
+    /**
+     * Get shipping rate for a specific country (filtered by current region)
      */
     public static function getForCountry(string $countryCode): ?self
+    {
+        $query = static::where('country_code', strtoupper($countryCode))
+            ->where('enabled', true);
+        
+        // Filter by region availability
+        if (CurrencyHelper::isCzRegion()) {
+            $query->where('available_on_cz', true);
+        } else {
+            $query->where('available_on_com', true);
+        }
+        
+        return $query->first();
+    }
+
+    /**
+     * Get shipping rate for a specific country regardless of region (for admin)
+     */
+    public static function getForCountryAdmin(string $countryCode): ?self
     {
         return static::where('country_code', strtoupper($countryCode))
             ->where('enabled', true)
@@ -40,9 +79,26 @@ class ShippingRate extends Model
     }
 
     /**
-     * Get all enabled shipping rates
+     * Get all enabled shipping rates for the current region
      */
     public static function getAllEnabled()
+    {
+        $query = static::where('enabled', true);
+        
+        // Filter by region availability
+        if (CurrencyHelper::isCzRegion()) {
+            $query->where('available_on_cz', true);
+        } else {
+            $query->where('available_on_com', true);
+        }
+        
+        return $query->orderBy('country_name')->get();
+    }
+
+    /**
+     * Get all enabled shipping rates regardless of region (for admin)
+     */
+    public static function getAllEnabledAdmin()
     {
         return static::where('enabled', true)
             ->orderBy('country_name')
@@ -60,11 +116,12 @@ class ShippingRate extends Model
         }
 
         // Check free shipping threshold (only for one-time orders)
-        if (!$isSubscription && $this->free_shipping_threshold_czk && $subtotal >= $this->free_shipping_threshold_czk) {
+        // TODO: Add free_shipping_threshold_eur for EUR threshold
+        if (!$isSubscription && $this->free_shipping_threshold_czk && CurrencyHelper::isCzk() && $subtotal >= $this->free_shipping_threshold_czk) {
             return 0;
         }
 
-        return (float) $this->price_czk;
+        return $this->getPrice();
     }
 
     /**

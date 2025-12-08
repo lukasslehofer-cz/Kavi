@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\Subscription;
 use App\Models\SubscriptionPayment;
 use Illuminate\Bus\Queueable;
@@ -22,7 +23,7 @@ class SubscriptionPaymentSuccess extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Platba předplatného úspěšně provedena ✓ - ' . ($this->subscription->subscription_number ?? 'KAVI.cz'),
+            subject: __('emails.subscription_payment_success.subject'),
         );
     }
 
@@ -39,8 +40,9 @@ class SubscriptionPaymentSuccess extends Mailable
         
         // Attach invoice PDF if it exists
         if ($this->payment->invoice_pdf_path && \Storage::exists($this->payment->invoice_pdf_path)) {
+            $invoicePrefix = CurrencyHelper::isCzk() ? 'Faktura-' : 'Invoice-';
             $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromStorage($this->payment->invoice_pdf_path)
-                ->as('Faktura-' . ($this->subscription->subscription_number ?? 'predplatne') . '.pdf')
+                ->as($invoicePrefix . ($this->subscription->subscription_number ?? 'subscription') . '.pdf')
                 ->withMime('application/pdf');
         }
         

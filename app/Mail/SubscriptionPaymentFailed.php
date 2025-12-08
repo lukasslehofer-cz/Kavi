@@ -21,7 +21,7 @@ class SubscriptionPaymentFailed extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Problém s platbou předplatného - ' . ($this->subscription->subscription_number ?? 'KAVI.cz'),
+            subject: __('emails.subscription_payment_failed.subject'),
         );
     }
 

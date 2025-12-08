@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Nákupní košík - KAVI.cz')
+@section('title', __('cart.page_title'))
 
 @section('content')
 <!-- Hero Header - Minimal -->
@@ -8,10 +8,21 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">Nákupní košík</h1>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">{{ __('cart.title') }}</h1>
                 <p class="text-lg text-gray-600 font-light">
-                    <span class="font-medium">{{ count($cartItems ?? []) }}</span> 
-                    {{ count($cartItems ?? []) === 1 ? 'položka' : (count($cartItems ?? []) < 5 ? 'položky' : 'položek') }}
+                    @php
+                        $count = count($cartItems ?? []);
+                        if ($currentLocale === 'en') {
+                            $itemsWord = $count === 1 ? __('cart.items_count_1') : __('cart.items_count_5plus');
+                        } else {
+                            $itemsWord = match(true) {
+                                $count === 1 => __('cart.items_count_1'),
+                                $count >= 2 && $count <= 4 => __('cart.items_count_234'),
+                                default => __('cart.items_count_5plus')
+                            };
+                        }
+                    @endphp
+                    <span class="font-medium">{{ $count }}</span> {{ $itemsWord }}
                 </p>
             </div>
             <div class="hidden md:block">
@@ -35,17 +46,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
             </div>
-            <h2 class="text-3xl font-bold text-gray-900 mb-4 tracking-tight">Váš košík je prázdný</h2>
-            <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto font-light">Objevte naši nabídku výběrových káv a vyberte si tu pravou pro vás.</p>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4 tracking-tight">{{ __('cart.empty') }}</h2>
+            <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto font-light">{{ __('cart.empty_description') }}</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('subscriptions.index') }}" class="inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
-                    <span>Sestavte si box</span>
+                    <span>{{ __('cart.build_box') }}</span>
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
                 <a href="{{ route('products.index') }}" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                    Zobrazit obchod
+                    {{ __('cart.view_shop') }}
                 </a>
             </div>
         </div>
@@ -61,7 +72,7 @@
                         <!-- Product Image - Minimal -->
                         <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 mx-auto sm:mx-0">
                             @if($item['product']->image)
-                            <img src="{{ asset($item['product']->image) }}" alt="{{ $item['product']->name }}" class="w-full h-full object-cover">
+                            <img src="{{ asset($item['product']->image) }}" alt="{{ $item['product']->getName() }}" class="w-full h-full object-cover">
                             @else
                             <div class="w-full h-full flex flex-col items-center justify-center p-4 bg-gray-100">
                                 <svg class="w-10 h-10 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
@@ -77,13 +88,19 @@
                                 <div class="min-w-0">
                                     <h3 class="text-lg font-bold text-gray-900 mb-1 truncate">
                                         <a href="{{ route('products.show', $item['product']) }}" class="hover:text-gray-600 transition-colors">
-                                            {{ $item['product']->name }}
+                                            {{ $item['product']->getName() }}
                                         </a>
                                     </h3>
-                                    <p class="text-gray-600 font-light">{{ number_format($item['product']->price, 0, ',', ' ') }} Kč / ks</p>
+                                    <p class="text-gray-600 font-light">{{ $item['product']->getFormattedPrice() }} {{ __('cart.per_item') }}</p>
                                 </div>
                                 <div class="sm:text-right flex-shrink-0">
-                                    <p class="text-xl font-bold text-gray-900">{{ number_format($item['subtotal'], 0, ',', ' ') }} Kč</p>
+                                    <p class="text-xl font-bold text-gray-900">
+                                        @if($currentLocale === 'en')
+                                            €{{ number_format($item['subtotal_eur'] ?? 0, 0, '.', ' ') }}
+                                        @else
+                                            {{ number_format($item['subtotal'], 0, ',', ' ') }} Kč
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
 
@@ -99,7 +116,7 @@
                                         <button type="button" class="px-3 py-1.5 text-gray-700 hover:bg-gray-100 transition-colors font-medium text-sm">+</button>
                                     </div>
                                     <button type="submit" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium px-3 sm:px-4 py-1.5 rounded-full transition-colors whitespace-nowrap">
-                                        Aktualizovat
+                                        {{ __('cart.update') }}
                                     </button>
                                 </form>
 
@@ -107,7 +124,7 @@
                                 <form action="{{ route('cart.remove', $item['product']->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors group" title="Odebrat z košíku">
+                                    <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors group" title="{{ __('cart.remove_from_cart') }}">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16"/>
                                         </svg>
@@ -129,7 +146,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1v3M4 7h16"/>
                         </svg>
-                        Vyprázdnit celý košík
+                        {{ __('cart.clear') }}
                     </button>
                 </form>
             </div>
@@ -144,17 +161,23 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900">Souhrn objednávky</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ __('cart.order_summary') }}</h3>
                 </div>
                 
                 <dl class="space-y-4 mb-6">
                     <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                        <dt class="text-gray-600 font-light flex-shrink-0">Mezisoučet:</dt>
-                        <dd class="font-bold text-gray-900 text-right flex-shrink-0 ml-4 whitespace-nowrap">{{ number_format($total, 0, ',', ' ') }} Kč</dd>
+                        <dt class="text-gray-600 font-light flex-shrink-0">{{ __('cart.subtotal') }}</dt>
+                        <dd class="font-bold text-gray-900 text-right flex-shrink-0 ml-4 whitespace-nowrap">
+                            @if($currentLocale === 'en')
+                                €{{ number_format($totalEur ?? 0, 0, '.', ' ') }}
+                            @else
+                                {{ number_format($total, 0, ',', ' ') }} Kč
+                            @endif
+                        </dd>
                     </div>
                     
                     <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                        <dt class="text-gray-600 font-light flex-shrink-0">Doprava:</dt>
+                        <dt class="text-gray-600 font-light flex-shrink-0">{{ __('cart.shipping') }}</dt>
                         <dd class="font-bold text-right flex-shrink-0 ml-4">
                             @if($shipping !== null)
                                 @if($shipping == 0)
@@ -162,13 +185,19 @@
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                         </svg>
-                                        Zdarma
+                                        {{ __('cart.shipping_free') }}
                                     </span>
                                 @else
-                                    <span class="text-gray-900">{{ number_format($shipping, 0, ',', ' ') }} Kč</span>
+                                    <span class="text-gray-900">
+                                        @if($currentLocale === 'en')
+                                            €{{ number_format($shippingEur ?? 0, 0, '.', ' ') }}
+                                        @else
+                                            {{ number_format($shipping, 0, ',', ' ') }} Kč
+                                        @endif
+                                    </span>
                                 @endif
                             @else
-                                <span class="text-gray-500 text-sm whitespace-nowrap">{{ $shippingMessage ?? 'V pokladně' }}</span>
+                                <span class="text-gray-500 text-sm whitespace-nowrap">{{ $shippingMessage ?? __('cart.at_checkout') }}</span>
                             @endif
                         </dd>
                     </div>
@@ -179,7 +208,12 @@
                             <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
-                            <span>Do dopravy zdarma vám chybí <strong>{{ number_format($remainingForFreeShipping, 0, ',', ' ') }} Kč</strong></span>
+                            @php
+                                $remainingFormatted = $currentLocale === 'en' 
+                                    ? '€' . number_format($remainingForFreeShippingEur ?? 0, 0, '.', ' ')
+                                    : number_format($remainingForFreeShipping, 0, ',', ' ') . ' Kč';
+                            @endphp
+                            <span>{!! __('cart.free_shipping_remaining', ['amount' => $remainingFormatted]) !!}</span>
                         </p>
                     </div>
                     @elseif($shipping !== null && $shipping == 0)
@@ -188,19 +222,25 @@
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            Získali jste dopravu zdarma!
+                            {{ __('cart.free_shipping_earned') }}
                         </p>
                     </div>
                     @endif
 
                     <div class="border-t border-gray-200 pt-4 mt-4">
                         <div class="flex justify-between items-center">
-                            <dt class="font-bold text-gray-900 text-lg flex-shrink-0">Celkem:</dt>
+                            <dt class="font-bold text-gray-900 text-lg flex-shrink-0">{{ __('cart.grand_total') }}</dt>
                             <dd class="text-2xl sm:text-3xl font-bold text-gray-900 text-right flex-shrink-0 ml-4">
                                 @if($shipping !== null)
-                                    <span class="whitespace-nowrap">{{ number_format($total + $shipping, 0, ',', ' ') }} Kč</span>
+                                    <span class="whitespace-nowrap">
+                                        @if($currentLocale === 'en')
+                                            €{{ number_format(($totalEur ?? 0) + ($shippingEur ?? 0), 0, '.', ' ') }}
+                                        @else
+                                            {{ number_format($total + $shipping, 0, ',', ' ') }} Kč
+                                        @endif
+                                    </span>
                                 @else
-                                    <span class="text-gray-500 text-sm sm:text-base whitespace-nowrap">V pokladně</span>
+                                    <span class="text-gray-500 text-sm sm:text-base whitespace-nowrap">{{ __('cart.at_checkout') }}</span>
                                 @endif
                             </dd>
                         </div>
@@ -208,13 +248,13 @@
                 </dl>
 
                 <a href="{{ route('checkout.index') }}" class="group w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-3">
-                    <span>Pokračovat k pokladně</span>
+                    <span>{{ __('cart.checkout') }}</span>
                     <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
                 <a href="{{ route('products.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                    Pokračovat v nákupu
+                    {{ __('cart.continue_shopping') }}
                 </a>
 
                 <!-- Trust Badges - Minimal -->
@@ -223,19 +263,19 @@
                         <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>Bezpečná platba</span>
+                        <span>{{ __('cart.secure_payment') }}</span>
                     </div>
                     <div class="flex items-center text-sm text-gray-600 font-light">
                         <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>Ekologické balení</span>
+                        <span>{{ __('cart.eco_packaging') }}</span>
                     </div>
                     <div class="flex items-center text-sm text-gray-600 font-light">
                         <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>Káva z celé Evropy</span>
+                        <span>{{ __('cart.coffee_from_europe') }}</span>
                     </div>
                 </div>
             </div>
@@ -249,9 +289,9 @@
 <section class="bg-gray-100 py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 text-center tracking-tight">
-            Mohlo by vás také zajímat
+            {{ __('cart.recommendations_title') }}
         </h2>
-        <p class="text-center text-gray-600 mb-12 font-light">Doplňte si objednávku o další produkty</p>
+        <p class="text-center text-gray-600 mb-12 font-light">{{ __('cart.recommendations_subtitle') }}</p>
         
         @if($recommendedProducts->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -264,7 +304,7 @@
         @else
         <div class="text-center">
             <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                Procházet další produkty
+                {{ __('cart.browse_products') }}
             </a>
         </div>
         @endif

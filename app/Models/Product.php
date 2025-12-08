@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrencyHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,10 +12,14 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'name_en',
         'slug',
         'description',
+        'description_en',
         'short_description',
+        'short_description_en',
         'price',
+        'price_eur',
         'stock',
         'image',
         'images',
@@ -33,6 +38,7 @@ class Product extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'price_eur' => 'decimal:2',
         'stock' => 'integer',
         'images' => 'array',
         'attributes' => 'array',
@@ -44,6 +50,76 @@ class Product extends Model
         'exclude_from_discounts' => 'boolean',
         'is_coffee_of_month' => 'boolean',
     ];
+
+    /**
+     * Get the price in the current currency (CZK or EUR)
+     */
+    public function getPrice(): float
+    {
+        return CurrencyHelper::price($this->price, $this->price_eur);
+    }
+
+    /**
+     * Get the formatted price with currency symbol
+     */
+    public function getFormattedPrice(int $decimals = 0): string
+    {
+        return CurrencyHelper::format($this->price, $this->price_eur, $decimals);
+    }
+
+    /**
+     * Get translated name based on current locale
+     */
+    public function getName(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->name_en)) {
+            return $this->name_en;
+        }
+        return $this->name;
+    }
+
+    /**
+     * Get translated description based on current locale
+     */
+    public function getDescription(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->description_en)) {
+            return $this->description_en;
+        }
+        return $this->description ?? '';
+    }
+
+    /**
+     * Get translated short description based on current locale
+     */
+    public function getShortDescription(): ?string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->short_description_en)) {
+            return $this->short_description_en;
+        }
+        return $this->short_description;
+    }
+
+    /**
+     * Get translated attribute value based on current locale
+     * Looks for {key}_en in attributes array when in EN mode
+     * 
+     * @param string $key The attribute key (e.g., 'origin', 'processing')
+     * @return mixed
+     */
+    public function getTranslatedAttribute(string $key)
+    {
+        $attributes = $this->attributes ?? [];
+        
+        if (app()->getLocale() === 'en') {
+            $enKey = $key . '_en';
+            if (!empty($attributes[$enKey])) {
+                return $attributes[$enKey];
+            }
+        }
+        
+        return $attributes[$key] ?? null;
+    }
 
     public function orderItems()
     {

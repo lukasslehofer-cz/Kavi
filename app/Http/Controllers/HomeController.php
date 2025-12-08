@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\Product;
 use App\Models\SubscriptionConfig;
 use App\Models\SubscriptionPlan;
@@ -20,12 +21,20 @@ class HomeController extends Controller
             ->orderBy('price')
             ->get();
 
-        // Get subscription pricing configuration
-        $subscriptionPricing = [
-            '2' => SubscriptionConfig::get('price_2_bags', 500),
-            '3' => SubscriptionConfig::get('price_3_bags', 720),
-            '4' => SubscriptionConfig::get('price_4_bags', 920),
-        ];
+        // Get subscription pricing configuration based on currency
+        if (CurrencyHelper::isEur()) {
+            $subscriptionPricing = [
+                '2' => SubscriptionConfig::get('price_2_bags_eur', 20),
+                '3' => SubscriptionConfig::get('price_3_bags_eur', 29),
+                '4' => SubscriptionConfig::get('price_4_bags_eur', 37),
+            ];
+        } else {
+            $subscriptionPricing = [
+                '2' => SubscriptionConfig::get('price_2_bags', 500),
+                '3' => SubscriptionConfig::get('price_3_bags', 720),
+                '4' => SubscriptionConfig::get('price_4_bags', 920),
+            ];
+        }
 
         // Get roasteries and coffees of the month
         $roasteriesOfMonth = \App\Models\Roastery::getRoasteriesOfMonth();

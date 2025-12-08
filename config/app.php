@@ -60,6 +60,45 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Multi-Region Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for multi-region support. Each domain maps to a locale
+    | and currency. The region_code is used internally to identify the region.
+    |
+    */
+
+    'regions' => [
+        'kavi.cz' => [
+            'locale' => 'cs',
+            'currency' => 'CZK',
+            'region_code' => 'cz',
+        ],
+        'kavi.local' => [  // pro localhost
+            'locale' => 'cs',
+            'currency' => 'CZK',
+            'region_code' => 'cz',
+        ],
+        'kavibox.com' => [
+            'locale' => 'en',
+            'currency' => 'EUR',
+            'region_code' => 'com',
+        ],
+        'kavibox.local' => [  // pro localhost
+            'locale' => 'en',
+            'currency' => 'EUR',
+            'region_code' => 'com',
+        ],
+    ],
+
+    // Default currency (used when region detection fails)
+    'currency' => env('APP_CURRENCY', 'CZK'),
+
+    // Default region code
+    'region' => env('APP_REGION', 'cz'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     */

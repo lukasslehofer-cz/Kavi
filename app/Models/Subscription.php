@@ -34,6 +34,7 @@ class Subscription extends Model
         'delivery_notes',
         'configuration',
         'configured_price',
+        'currency',
         'frequency_months',
         'paused_iterations',
         'paused_until_date',

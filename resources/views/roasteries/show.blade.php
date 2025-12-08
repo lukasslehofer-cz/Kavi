@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $roastery->name . ' - Naše pražírny - KAVI.cz')
+@section('title', $roastery->getName() . ' - Naše pražírny - KAVI.cz')
 
 @section('content')
 <!-- Minimal Breadcrumb -->
@@ -20,7 +20,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </li>
-        <li class="text-gray-900 font-medium truncate max-w-xs">{{ $roastery->name }}</li>
+        <li class="text-gray-900 font-medium truncate max-w-xs">{{ $roastery->getName() }}</li>
       </ol>
     </nav>
   </div>
@@ -39,7 +39,7 @@
             </div>
             
             <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight tracking-tight">
-                {{ $roastery->name }}
+                {{ $roastery->getName() }}
             </h1>
             
             <!-- Location - Minimal -->
@@ -49,10 +49,10 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                <span class="font-medium">{{ $roastery->country }}</span>
-                @if($roastery->city)
+                <span class="font-medium">{{ $roastery->getCountry() }}</span>
+                @if($roastery->getCity())
                 <span class="text-gray-400">•</span>
-                <span>{{ $roastery->city }}</span>
+                <span>{{ $roastery->getCity() }}</span>
                 @endif
               </p>
               @if($roastery->address)
@@ -60,8 +60,8 @@
               @endif
             </div>
             
-            @if($roastery->short_description)
-            <p class="text-lg text-gray-600 mb-8 leading-relaxed font-light">{{ $roastery->short_description }}</p>
+            @if($roastery->getShortDescription())
+            <p class="text-lg text-gray-600 mb-8 leading-relaxed font-light">{{ $roastery->getShortDescription() }}</p>
             @endif
             
             <!-- Links - Minimal -->
@@ -86,10 +86,10 @@
             </div>
             
             <!-- Full Description with gallery images mixed in -->
-            @if($roastery->full_description)
+            @if($roastery->getFullDescription())
             <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
               @php
-                $paragraphs = explode("\n", $roastery->full_description);
+                $paragraphs = explode("\n", $roastery->getFullDescription());
                 $galleryImages = $roastery->gallery ?? [];
                 $totalParagraphs = count($paragraphs);
                 $galleryIndex = 0;
@@ -103,7 +103,7 @@
                 <!-- Insert gallery image after every 2 paragraphs -->
                 @if($galleryImages && $galleryIndex < count($galleryImages) && ($index + 1) % 2 == 0 && $index > 0)
                 <div class="my-8 {{ $galleryIndex % 2 == 0 ? 'float-right ml-6 mb-6' : 'float-left mr-6 mb-6' }} w-full sm:w-1/2 lg:w-2/5">
-                  <img src="{{ asset($galleryImages[$galleryIndex]) }}" alt="{{ $roastery->name }}" class="w-full rounded-2xl shadow-xl">
+                  <img src="{{ asset($galleryImages[$galleryIndex]) }}" alt="{{ $roastery->getName() }}" class="w-full rounded-2xl shadow-xl">
                 </div>
                 @php $galleryIndex++; @endphp
                 @endif
@@ -114,7 +114,7 @@
               <div class="clear-both pt-8 grid grid-cols-2 gap-4">
                 @for($i = $galleryIndex; $i < count($galleryImages); $i++)
                 <div class="relative aspect-square rounded-xl overflow-hidden shadow-lg">
-                  <img src="{{ asset($galleryImages[$i]) }}" alt="{{ $roastery->name }}" class="w-full h-full object-cover">
+                  <img src="{{ asset($galleryImages[$i]) }}" alt="{{ $roastery->getName() }}" class="w-full h-full object-cover">
                 </div>
                 @endfor
               </div>
@@ -129,13 +129,13 @@
         <div class="lg:sticky lg:top-24 h-fit">
             <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50">
                 @if($roastery->image)
-                <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->name }}" class="w-full h-full object-cover">
+                <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->getName() }}" class="w-full h-full object-cover">
                 @else
                 <div class="w-full h-full flex flex-col items-center justify-center p-12 bg-gray-100">
                     <svg class="w-32 h-32 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
-                    <p class="text-center text-gray-600 font-medium">{{ $roastery->name }}</p>
+                    <p class="text-center text-gray-600 font-medium">{{ $roastery->getName() }}</p>
                 </div>
                 @endif
             </div>
@@ -146,7 +146,7 @@
     <div>
       <div class="text-center mb-10">
         <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
-          Naše kávy od {{ $roastery->name }}
+          Naše kávy od {{ $roastery->getName() }}
         </h2>
         <p class="text-lg text-gray-600 font-light">
           Prozkoumejte všechny kávy, které jsme od této pražírny měli nebo momentálně máme v nabídce
@@ -171,10 +171,10 @@
           <!-- Coffee of Month Card - Minimal -->
           <div class="bg-white rounded-2xl border border-gray-200 hover:border-gray-300 overflow-hidden transition-all duration-200">
             <!-- Coffee Image - Minimal -->
-            <div class="relative h-64 overflow-hidden cursor-pointer bg-gray-50" onclick="openCoffeeModal({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ $product->image ? asset($product->image) : '' }}', '{{ addslashes($product->short_description ?? '') }}', {{ json_encode($product->attributes ?? []) }})">
+            <div class="relative h-64 overflow-hidden cursor-pointer bg-gray-50" onclick="openCoffeeModal({{ $product->id }}, '{{ addslashes($product->getName()) }}', '{{ $product->image ? asset($product->image) : '' }}', '{{ addslashes($product->getShortDescription() ?? '') }}', {{ json_encode($product->attributes ?? []) }})">
               @if($product->image)
               <img src="{{ asset($product->image) }}" 
-                   alt="{{ $product->name }}"
+                   alt="{{ $product->getName() }}"
                    class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
               @else
               <div class="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -201,16 +201,16 @@
             <!-- Coffee Info - Minimal -->
             <div class="p-5">
               <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                {{ $product->name }}
+                {{ $product->getName() }}
               </h3>
 
-              @if($product->short_description)
+              @if($product->getShortDescription())
               <p class="text-sm text-gray-600 mb-4 line-clamp-3 font-light">
-                {{ $product->short_description }}
+                {{ $product->getShortDescription() }}
               </p>
               @endif
 
-              <button onclick="openCoffeeModal({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ $product->image ? asset($product->image) : '' }}', '{{ addslashes($product->short_description ?? '') }}', {{ json_encode($product->attributes ?? []) }})" 
+              <button onclick="openCoffeeModal({{ $product->id }}, '{{ addslashes($product->getName()) }}', '{{ $product->image ? asset($product->image) : '' }}', '{{ addslashes($product->getShortDescription() ?? '') }}', {{ json_encode($product->attributes ?? []) }})" 
                       class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
                 Zobrazit detail
               </button>
@@ -231,7 +231,7 @@
           <div class="relative max-w-3xl mx-auto">
             <h3 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 tracking-tight">{{ $coffeeOfMonthProducts->count() === 1 ? 'Chcete tuto kávu vyzkoušet?' : 'Chcete tyto kávy vyzkoušet?' }}</h3>
             <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto font-light">
-              Připojte se k našemu předplatnému a dostávejte každý měsíc exkluzivní kávy přímo od {{ $roastery->name }} a dalších skvělých pražíren!
+              Připojte se k našemu předplatnému a dostávejte každý měsíc exkluzivní kávy přímo od {{ $roastery->getName() }} a dalších skvělých pražíren!
             </p>
             <a href="{{ route('subscriptions.index') }}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-8 rounded-full transition-all duration-200">
               <span>Vybrat předplatné</span>
@@ -257,7 +257,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900">Další kávy od {{ $roastery->name }}</h3>
+          <h3 class="text-xl font-bold text-gray-900">Další kávy od {{ $roastery->getName() }}</h3>
         </div>
         
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

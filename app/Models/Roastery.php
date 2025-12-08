@@ -12,16 +12,21 @@ class Roastery extends Model
 
     protected $fillable = [
         'name',
+        'name_en',
         'slug',
         'website_url',
         'instagram',
         'image',
         'country',
+        'country_en',
         'country_flag',
         'city',
+        'city_en',
         'address',
         'short_description',
+        'short_description_en',
         'full_description',
+        'full_description_en',
         'gallery',
         'is_active',
         'sort_order',
@@ -32,6 +37,69 @@ class Roastery extends Model
         'gallery' => 'array',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Get translated name based on current locale
+     */
+    public function getName(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->name_en)) {
+            return $this->name_en;
+        }
+        return $this->name;
+    }
+
+    /**
+     * Get translated short description based on current locale
+     */
+    public function getShortDescription(): ?string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->short_description_en)) {
+            return $this->short_description_en;
+        }
+        return $this->short_description;
+    }
+
+    /**
+     * Get translated full description based on current locale
+     */
+    public function getFullDescription(): ?string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->full_description_en)) {
+            return $this->full_description_en;
+        }
+        return $this->full_description;
+    }
+
+    /**
+     * Get translated country name based on current locale
+     */
+    public function getCountry(): ?string
+    {
+        // If EN locale, try country_en first, then translation file, then fallback to original
+        if (app()->getLocale() === 'en') {
+            if (!empty($this->country_en)) {
+                return $this->country_en;
+            }
+            // Try translation file
+            $translated = __('countries.' . $this->country);
+            if ($translated !== 'countries.' . $this->country) {
+                return $translated;
+            }
+        }
+        return $this->country;
+    }
+
+    /**
+     * Get translated city name based on current locale
+     */
+    public function getCity(): ?string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->city_en)) {
+            return $this->city_en;
+        }
+        return $this->city;
+    }
 
     protected static function boot()
     {

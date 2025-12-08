@@ -18,19 +18,24 @@ class RoasteryController extends Controller
         
         $roasteries = $query->get();
         
-        // Get all unique countries for filter
-        $countries = Roastery::active()
+        // Get all unique countries for filter with translations
+        $countriesRaw = Roastery::active()
             ->select('country', 'country_flag')
             ->groupBy('country', 'country_flag')
             ->orderBy('country')
-            ->get()
-            ->mapWithKeys(function ($item) {
-                return [$item->country => $item->country_flag];
-            });
+            ->get();
+        
+        $countries = $countriesRaw->mapWithKeys(function ($item) {
+            return [$item->country => [
+                'flag' => $item->country_flag,
+                'name' => __('countries.' . $item->country, [], app()->getLocale()),
+            ]];
+        });
         
         $selectedCountry = $request->country;
+        $selectedCountryName = $selectedCountry ? __('countries.' . $selectedCountry, [], app()->getLocale()) : null;
         
-        return view('roasteries.index', compact('roasteries', 'countries', 'selectedCountry'));
+        return view('roasteries.index', compact('roasteries', 'countries', 'selectedCountry', 'selectedCountryName'));
     }
 
     public function show(Roastery $roastery)

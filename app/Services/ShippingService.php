@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\ShippingRate;
 use Illuminate\Support\Facades\Log;
 
@@ -108,10 +109,10 @@ class ShippingService
     public function formatShippingCost(float $cost): string
     {
         if ($cost == 0) {
-            return 'Zdarma';
+            return CurrencyHelper::isCzk() ? 'Zdarma' : 'Free';
         }
 
-        return number_format($cost, 0, ',', ' ') . ' Kč';
+        return CurrencyHelper::formatAmount($cost);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrencyHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +15,7 @@ class SubscriptionPlan extends Model
         'slug',
         'description',
         'price',
+        'price_eur',
         'interval',
         'coffee_count',
         'coffee_weight',
@@ -24,6 +26,7 @@ class SubscriptionPlan extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'price_eur' => 'decimal:2',
         'is_active' => 'boolean',
         'features' => 'array',
     ];
@@ -43,13 +46,30 @@ class SubscriptionPlan extends Model
         return 'slug';
     }
 
+    /**
+     * Get the price in the current currency (CZK or EUR)
+     */
+    public function getPrice(): float
+    {
+        return CurrencyHelper::price($this->price, $this->price_eur);
+    }
+
+    /**
+     * Get the formatted price with currency symbol
+     */
+    public function getFormattedPrice(int $decimals = 0): string
+    {
+        return CurrencyHelper::format($this->price, $this->price_eur, $decimals);
+    }
+
     public function getPricePerMonthAttribute()
     {
+        $price = $this->getPrice();
         return match($this->interval) {
-            'monthly' => $this->price,
-            'quarterly' => $this->price / 3,
-            'yearly' => $this->price / 12,
-            default => $this->price,
+            'monthly' => $price,
+            'quarterly' => $price / 3,
+            'yearly' => $price / 12,
+            default => $price,
         };
     }
 }

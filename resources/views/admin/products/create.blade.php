@@ -13,13 +13,24 @@
         @csrf
 
         <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-coffee-900 mb-2">Název produktu</label>
-                <input type="text" name="name" value="{{ old('name') }}" required 
-                       class="input @error('name') border-red-500 @enderror">
-                @error('name')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Název produktu 🇨🇿</label>
+                    <input type="text" name="name" value="{{ old('name') }}" required 
+                           class="input @error('name') border-red-500 @enderror">
+                    @error('name')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Product Name 🇬🇧</label>
+                    <input type="text" name="name_en" value="{{ old('name_en') }}" 
+                           placeholder="English product name"
+                           class="input @error('name_en') border-red-500 @enderror">
+                    @error('name_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div>
@@ -40,31 +51,62 @@
                 <p class="text-xs text-coffee-600 mt-1">Podporované formáty: JPG, PNG, GIF. Maximální velikost: 2MB</p>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-coffee-900 mb-2">Krátký popis</label>
-                <input type="text" name="short_description" value="{{ old('short_description') }}" 
-                       class="input @error('short_description') border-red-500 @enderror">
-                @error('short_description')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Krátký popis 🇨🇿</label>
+                    <input type="text" name="short_description" value="{{ old('short_description') }}" 
+                           class="input @error('short_description') border-red-500 @enderror">
+                    @error('short_description')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Short Description 🇬🇧</label>
+                    <input type="text" name="short_description_en" value="{{ old('short_description_en') }}" 
+                           placeholder="English short description"
+                           class="input @error('short_description_en') border-red-500 @enderror">
+                    @error('short_description_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-coffee-900 mb-2">Detailní popis</label>
-                <textarea name="description" rows="6" required 
-                          class="input @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
-                @error('description')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-                <p class="text-xs text-coffee-600 mt-1">Povolené HTML tagy: &lt;a&gt;, &lt;strong&gt;, &lt;b&gt;, &lt;em&gt;, &lt;i&gt;, &lt;br&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Detailní popis 🇨🇿</label>
+                    <textarea name="description" rows="6" required 
+                              class="input @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
+                    @error('description')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">Povolené HTML tagy: &lt;a&gt;, &lt;strong&gt;, &lt;b&gt;, &lt;em&gt;, &lt;i&gt;, &lt;br&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Detailed Description 🇬🇧</label>
+                    <textarea name="description_en" rows="6" 
+                              placeholder="English detailed description"
+                              class="input @error('description_en') border-red-500 @enderror">{{ old('description_en') }}</textarea>
+                    @error('description_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Cena (Kč) <span class="text-sm text-coffee-600">(volitelné pro kávu měsíce)</span></label>
                     <input type="number" name="price" value="{{ old('price') }}" step="0.01" min="0" 
                            class="input @error('price') border-red-500 @enderror" id="price-input">
                     @error('price')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Cena (EUR) <span class="text-sm text-coffee-600">(pro kavibox.com)</span></label>
+                    <input type="number" name="price_eur" value="{{ old('price_eur') }}" step="0.01" min="0" 
+                           class="input @error('price_eur') border-red-500 @enderror">
+                    @error('price_eur')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -117,59 +159,99 @@
             <div class="bg-cream-50 border-2 border-cream-200 p-6 rounded-lg space-y-4">
                 <h3 class="text-lg font-semibold text-coffee-900 mb-4">Informace o kávě (volitelné)</h3>
                 
-                <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Původ kávy</label>
-                    <input type="text" name="origin" value="{{ old('origin') }}" 
-                           placeholder="např. Etiopie, Keňa, Honduras..."
-                           class="input @error('origin') border-red-500 @enderror">
-                    @error('origin')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-xs text-coffee-600 mt-1">Zadejte zemi nebo region původu kávy</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Původ kávy 🇨🇿</label>
+                        <input type="text" name="origin" value="{{ old('origin') }}" 
+                               placeholder="např. Etiopie, Keňa, Honduras..."
+                               class="input @error('origin') border-red-500 @enderror">
+                        @error('origin')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Origin 🇬🇧</label>
+                        <input type="text" name="origin_en" value="{{ old('origin_en') }}" 
+                               placeholder="e.g. Ethiopia, Kenya, Honduras..."
+                               class="input @error('origin_en') border-red-500 @enderror">
+                        @error('origin_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Nadmořská výška</label>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Nadmořská výška / Altitude</label>
                     <input type="text" name="altitude" value="{{ old('altitude') }}" 
                            placeholder="např. 1200-1800 m n.m."
                            class="input @error('altitude') border-red-500 @enderror">
                     @error('altitude')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-xs text-coffee-600 mt-1">Nadmořská výška pěstování v metrech</p>
+                    <p class="text-xs text-coffee-600 mt-1">Nadmořská výška pěstování v metrech (nepřekládá se)</p>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Zpracování</label>
-                    <input type="text" name="processing" value="{{ old('processing') }}" 
-                           placeholder="např. Washed, Natural, Honey..."
-                           class="input @error('processing') border-red-500 @enderror">
-                    @error('processing')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-xs text-coffee-600 mt-1">Způsob zpracování kávy</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Zpracování 🇨🇿</label>
+                        <input type="text" name="processing" value="{{ old('processing') }}" 
+                               placeholder="např. Praná, Přírodní, Honey..."
+                               class="input @error('processing') border-red-500 @enderror">
+                        @error('processing')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Processing 🇬🇧</label>
+                        <input type="text" name="processing_en" value="{{ old('processing_en') }}" 
+                               placeholder="e.g. Washed, Natural, Honey..."
+                               class="input @error('processing_en') border-red-500 @enderror">
+                        @error('processing_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Odrůda</label>
-                    <input type="text" name="variety" value="{{ old('variety') }}" 
-                           placeholder="např. Arabica, Bourbon, Caturra..."
-                           class="input @error('variety') border-red-500 @enderror">
-                    @error('variety')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-xs text-coffee-600 mt-1">Odrůda kávovníku</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Odrůda 🇨🇿</label>
+                        <input type="text" name="variety" value="{{ old('variety') }}" 
+                               placeholder="např. Arabica, Bourbon, Caturra..."
+                               class="input @error('variety') border-red-500 @enderror">
+                        @error('variety')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Variety 🇬🇧</label>
+                        <input type="text" name="variety_en" value="{{ old('variety_en') }}" 
+                               placeholder="e.g. Arabica, Bourbon, Caturra..."
+                               class="input @error('variety_en') border-red-500 @enderror">
+                        @error('variety_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Chuťové tóny</label>
-                    <textarea name="flavor_notes" rows="3" 
-                              placeholder="např. citrus, čokoláda, karamel, oříšky..."
-                              class="input @error('flavor_notes') border-red-500 @enderror">{{ old('flavor_notes') }}</textarea>
-                    @error('flavor_notes')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                    <p class="text-xs text-coffee-600 mt-1">Popište chuťový profil kávy</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Chuťové tóny 🇨🇿</label>
+                        <textarea name="flavor_notes" rows="3" 
+                                  placeholder="např. citrus, čokoláda, karamel, oříšky..."
+                                  class="input @error('flavor_notes') border-red-500 @enderror">{{ old('flavor_notes') }}</textarea>
+                        @error('flavor_notes')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2">Flavor Notes 🇬🇧</label>
+                        <textarea name="flavor_notes_en" rows="3" 
+                                  placeholder="e.g. citrus, chocolate, caramel, nuts..."
+                                  class="input @error('flavor_notes_en') border-red-500 @enderror">{{ old('flavor_notes_en') }}</textarea>
+                        @error('flavor_notes_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-cream-300">

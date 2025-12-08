@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrencyHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -32,6 +33,27 @@ class SubscriptionConfig extends Model
 
             return static::castValue($config->value, $config->type);
         });
+    }
+
+    /**
+     * Get a price config value in the current currency
+     * Automatically selects CZK or EUR version based on current region
+     * 
+     * @param string $baseKey The base key without currency suffix (e.g., 'price_2_bags')
+     * @param mixed $default Default value if not found
+     * @return float
+     */
+    public static function getPrice(string $baseKey, $default = 0): float
+    {
+        if (CurrencyHelper::isEur()) {
+            $value = static::get($baseKey . '_eur');
+            if ($value !== null) {
+                return (float) $value;
+            }
+        }
+        
+        // Fall back to CZK value
+        return (float) static::get($baseKey, $default);
     }
 
     /**

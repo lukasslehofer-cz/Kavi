@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kávové předplatné | Výběrová káva | KAVI.cz')
+@section('title', $currentLocale === 'en' ? 'Coffee Subscription | Specialty Coffee | KAVI' : 'Kávové předplatné | Výběrová káva | KAVI.cz')
 
 @section('content')
 <div class="overflow-hidden">
@@ -77,30 +77,35 @@
                 <!-- Small Badge -->
                 <div class="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2">
                     <span class="w-2 h-2 rounded-full bg-primary-500"></span>
-                    <span class="text-sm font-medium text-gray-900">Každý měsíc něco nového</span>
+                    <span class="text-sm font-medium text-gray-900">{{ $currentLocale === 'en' ? 'Something new every month' : 'Každý měsíc něco nového' }}</span>
                 </div>
 
                 <!-- Heading - Clean Typography -->
                 <div class="space-y-6">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-white tracking-tight">
-                        Objevte tu nejlepší kávu z celé Evropy
+                        {{ $currentLocale === 'en' ? 'Discover the best coffee from all over Europe' : 'Objevte tu nejlepší kávu z celé Evropy' }}
                     </h1>
                     <p class="text-lg sm:text-xl md:text-2xl text-white/90 leading-relaxed font-light">
+                        @if($currentLocale === 'en')
+                        Premium coffee with regular subscription.<br/>
+                        Freshly roasted, carefully selected, delivered to you.
+                        @else
                         Prémiová káva s pravidelným předplatným.<br/>
                         Čerstvě pražená, pečlivě vybraná, doručená přímo k vám.
+                        @endif
                     </p>
                 </div>
 
                 <!-- CTA Buttons - Minimal -->
                 <div class="flex flex-col sm:flex-row gap-4 pt-4">
                     <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-lg px-8 py-5 rounded-full transition-all duration-200">
-                        <span>Sestavte si vlastní box</span>
+                        <span>{{ $currentLocale === 'en' ? 'Build your own box' : 'Sestavte si vlastní box' }}</span>
                         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </a>
                     <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-5 rounded-full transition-all duration-200">
-                        <span>Kávový obchod</span>
+                        <span>{{ $currentLocale === 'en' ? 'Coffee Shop' : 'Kávový obchod' }}</span>
                         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -126,8 +131,8 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header - Minimal -->
     <div class="mb-20 max-w-2xl">
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Proč si vybrat KAVI?</h2>
-      <p class="text-lg sm:text-xl text-gray-600 font-light">Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.</p>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">{{ $currentLocale === 'en' ? 'Why choose KAVI?' : 'Proč si vybrat KAVI?' }}</h2>
+      <p class="text-lg sm:text-xl text-gray-600 font-light">{{ $currentLocale === 'en' ? 'We know what makes coffee exceptional. And we love to share it with you.' : 'Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.' }}</p>
     </div>
 
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
@@ -139,8 +144,8 @@
           </svg>
         </div>
 
-        <h3 class="mb-3 text-2xl font-semibold text-gray-900">Čerstvá káva</h3>
-        <p class="text-gray-600 leading-relaxed font-light">Každá pražírna nám dodává čerstvě praženou kávu do vašich kávových boxů.</p>
+        <h3 class="mb-3 text-2xl font-semibold text-gray-900">{{ $currentLocale === 'en' ? 'Fresh Coffee' : 'Čerstvá káva' }}</h3>
+        <p class="text-gray-600 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Every roastery delivers freshly roasted coffee to your coffee boxes.' : 'Každá pražírna nám dodává čerstvě praženou kávu do vašich kávových boxů.' }}</p>
       </div>
       <!-- feature - end -->
 
@@ -152,8 +157,8 @@
           </svg>
         </div>
 
-        <h3 class="mb-3 text-2xl font-semibold text-gray-900">Výjimečné chutě</h3>
-        <p class="text-gray-600 leading-relaxed font-light">Žádné nudné a monotonní kávy. Každý měsíc objevíte nové chutě z různých koutů světa.</p>        
+        <h3 class="mb-3 text-2xl font-semibold text-gray-900">{{ $currentLocale === 'en' ? 'Exceptional Flavors' : 'Výjimečné chutě' }}</h3>
+        <p class="text-gray-600 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'No boring and monotonous coffees. Every month you discover new flavors from different corners of the world.' : 'Žádné nudné a monotonní kávy. Každý měsíc objevíte nové chutě z různých koutů světa.' }}</p>        
       </div>
       <!-- feature - end -->
 
@@ -165,8 +170,8 @@
           </svg>
         </div>
 
-        <h3 class="mb-3 text-2xl font-semibold text-gray-900">Doprava zdarma</h3>
-        <p class="text-gray-600 leading-relaxed font-light">Doprava zdarma pro všechna předplatná. Ať už si vyberete jakoukoluv velikost boxu.</p>
+        <h3 class="mb-3 text-2xl font-semibold text-gray-900">{{ $currentLocale === 'en' ? 'Free Shipping' : 'Doprava zdarma' }}</h3>
+        <p class="text-gray-600 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Free shipping for all subscriptions. No matter which box size you choose.' : 'Doprava zdarma pro všechna předplatná. Ať už si vyberete jakoukoluv velikost boxu.' }}</p>
       </div>
       <!-- feature - end -->
     </div>
@@ -203,7 +208,7 @@
             </div>
             <div>
               <div class="text-2xl font-bold text-gray-900">98%</div>
-              <div class="text-sm text-gray-600">spokojených zákazníků</div>
+              <div class="text-sm text-gray-600">{{ $currentLocale === 'en' ? 'satisfied customers' : 'spokojených zákazníků' }}</div>
             </div>
           </div>
         </div>
@@ -213,11 +218,11 @@
       <div class="space-y-8 order-1 lg:order-2">
         <div>
           <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-            Káva, kterou budete milovat
+            {{ $currentLocale === 'en' ? 'Coffee you will love' : 'Káva, kterou budete milovat' }}
           </h2>
           
           <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-6">
-            Pečlivě vybíráme nejkvalitnější kávu z ověřených pražíren. Každý měsíc objevte nové chutě přímo u vás doma.
+            {{ $currentLocale === 'en' ? 'We carefully select the highest quality coffee from trusted roasteries. Discover new flavors every month right at your home.' : 'Pečlivě vybíráme nejkvalitnější kávu z ověřených pražíren. Každý měsíc objevte nové chutě přímo u vás doma.' }}
           </p>
         </div>
 
@@ -230,8 +235,8 @@
               </svg>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900 mb-1">Nikde v ČR nekoupíte</h3>
-              <p class="text-gray-600 font-light">Dodáváme vám kávu z pražíren, které nejsou dostupné v ČR.</p>
+              <h3 class="font-semibold text-gray-900 mb-1">{{ $currentLocale === 'en' ? 'Exclusive European roasters' : 'Nikde v ČR nekoupíte' }}</h3>
+              <p class="text-gray-600 font-light">{{ $currentLocale === 'en' ? 'We deliver coffee from roasteries that are not available elsewhere.' : 'Dodáváme vám kávu z pražíren, které nejsou dostupné v ČR.' }}</p>
             </div>
           </div>
 
@@ -242,8 +247,8 @@
               </svg>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900 mb-1">Bezkonkurenční cena</h3>
-              <p class="text-gray-600 font-light">Kávy v našich boxech jsou výhodnější než kdekoliv jinde.</p>
+              <h3 class="font-semibold text-gray-900 mb-1">{{ $currentLocale === 'en' ? 'Unbeatable price' : 'Bezkonkurenční cena' }}</h3>
+              <p class="text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Coffees in our boxes are more affordable than anywhere else.' : 'Kávy v našich boxech jsou výhodnější než kdekoliv jinde.' }}</p>
             </div>
           </div>
 
@@ -254,8 +259,8 @@
               </svg>
             </div>
             <div>
-              <h3 class="font-semibold text-gray-900 mb-1">Flexibilní předplatné</h3>
-              <p class="text-gray-600 font-light">Přizpůsobte množství a frekvenci podle svých potřeb.</p>
+              <h3 class="font-semibold text-gray-900 mb-1">{{ $currentLocale === 'en' ? 'Flexible subscription' : 'Flexibilní předplatné' }}</h3>
+              <p class="text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Adjust the amount and frequency according to your needs.' : 'Přizpůsobte množství a frekvenci podle svých potřeb.' }}</p>
             </div>
           </div>
         </div>
@@ -263,7 +268,7 @@
         <!-- CTA Button -->
         <div class="pt-4">
           <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
-            <span>Začít předplatné</span>
+            <span>{{ $currentLocale === 'en' ? 'Start subscription' : 'Začít předplatné' }}</span>
             <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -289,8 +294,8 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header - Minimal -->
     <div class="mb-16 sm:mb-20 max-w-2xl mx-auto text-center">
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Vyberte si ideální kávový box</h2>
-      <p class="text-lg sm:text-xl text-gray-600 font-light">Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.</p>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">{{ $currentLocale === 'en' ? 'Choose your ideal coffee box' : 'Vyberte si ideální kávový box' }}</h2>
+      <p class="text-lg sm:text-xl text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}</p>
     </div>
 
     <div class="mb-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -302,47 +307,50 @@
             <div class="text-5xl font-bold text-gray-900">M Box</div>
           </div>
 
-          <p class="text-gray-600 mb-8 leading-relaxed font-light">Ideální pro jednotlivce nebo domácnosti s&nbsp;menší spotřebou kávy</p>
+          <p class="text-gray-600 mb-8 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Ideal for individuals or households with lower coffee consumption' : 'Ideální pro jednotlivce nebo domácnosti s&nbsp;menší spotřebou kávy' }}</p>
 
           <div class="space-y-3">
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">2 balíčky po 250g</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? '2 bags of 250g' : '2 balíčky po 250g' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">2 druhy výběrové kávy</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? '2 types of specialty coffee' : '2 druhy výběrové kávy' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Doprava zdarma</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Zrušení nebo přestávka kdykoliv</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</span>
             </div>
           </div>
         </div>
 
         <div class="mt-auto pt-8 border-t border-gray-100">
           <div class="flex items-baseline gap-1 mb-6">
-            <span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span>
-            <span class="text-lg text-gray-500 font-light">Kč/box</span>
+            @if($currentLocale === 'en')
+              <span class="text-lg text-gray-500 font-light">€</span><span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['2'], 0, '.', ' ') }}</span><span class="text-lg text-gray-500 font-light">/box</span>
+            @else
+              <span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span><span class="text-lg text-gray-500 font-light">Kč/box</span>
+            @endif
           </div>
 
           <a href="{{ route('subscriptions.index', ['plan' => 2]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
-            Vybrat M Box
+            {{ $currentLocale === 'en' ? 'Select M Box' : 'Vybrat M Box' }}
           </a>
         </div>
       </div>
@@ -353,7 +361,7 @@
         <!-- Popular Badge -->
           <div class="absolute inset-x-0 -top-3 flex justify-center">
           <span class="px-4 py-1 bg-primary-500 rounded-full text-xs font-medium text-white">
-            Nejoblíbenější
+            {{ $currentLocale === 'en' ? 'Most Popular' : 'Nejoblíbenější' }}
           </span>
         </div>
 
@@ -363,35 +371,35 @@
             <div class="text-5xl font-bold text-gray-900">L Box</div>
           </div>
 
-          <p class="text-gray-600 mb-8 leading-relaxed font-light">Nejpopulárnější volba pro milovníky výběrové kávy</p>
+          <p class="text-gray-600 mb-8 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Most popular choice for specialty coffee lovers' : 'Nejpopulárnější volba pro milovníky výběrové kávy' }}</p>
 
           <div class="space-y-3">
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">3 balíčky po 250g</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? '3 bags of 250g' : '3 balíčky po 250g' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">3 druhy výběrové kávy</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Doprava zdarma</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Zrušení nebo přestávka kdykoliv</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</span>
             </div>
             
           </div>
@@ -399,12 +407,15 @@
 
         <div class="mt-auto pt-8 border-t border-gray-100">
           <div class="flex items-baseline gap-1 mb-6">
-            <span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span>
-            <span class="text-lg text-gray-500 font-light">Kč/box</span>
+            @if($currentLocale === 'en')
+              <span class="text-lg text-gray-500 font-light">€</span><span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['3'], 0, '.', ' ') }}</span><span class="text-lg text-gray-500 font-light">/box</span>
+            @else
+              <span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span><span class="text-lg text-gray-500 font-light">Kč/box</span>
+            @endif
           </div>
 
           <a href="{{ route('subscriptions.index', ['plan' => 3]) }}" class="group/btn flex items-center justify-center gap-2 w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
-            <span>Vybrat L Box</span>
+            <span>{{ $currentLocale === 'en' ? 'Select L Box' : 'Vybrat L Box' }}</span>
             <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
@@ -421,54 +432,57 @@
             <div class="text-5xl font-bold text-gray-900">XL Box</div>
           </div>
 
-          <p class="text-gray-600 mb-8 leading-relaxed font-light">Pro kávové nadšence a větší domácnosti</p>
+          <p class="text-gray-600 mb-8 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'For coffee enthusiasts and larger households' : 'Pro kávové nadšence a větší domácnosti' }}</p>
 
           <div class="space-y-3">
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">4 balíčky po 250g</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? '4 bags of 250g' : '4 balíčky po 250g' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">3 druhy výběrové kávy</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Doprava zdarma</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">Zrušení nebo přestávka kdykoliv</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</span>
             </div>
           </div>
         </div>
 
         <div class="mt-auto pt-8 border-t border-gray-100">
           <div class="flex items-baseline gap-1 mb-6">
-            <span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span>
-            <span class="text-lg text-gray-500 font-light">Kč/box</span>
+            @if($currentLocale === 'en')
+              <span class="text-lg text-gray-500 font-light">€</span><span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['4'], 0, '.', ' ') }}</span><span class="text-lg text-gray-500 font-light">/box</span>
+            @else
+              <span class="text-4xl font-bold text-gray-900">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span><span class="text-lg text-gray-500 font-light">Kč/box</span>
+            @endif
           </div>
 
           <a href="{{ route('subscriptions.index', ['plan' => 4]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
-            Vybrat XL Box
+            {{ $currentLocale === 'en' ? 'Select XL Box' : 'Vybrat XL Box' }}
           </a>
         </div>
       </div>
       <!-- plan - end -->
     </div>
 
-    <div class="text-center text-gray-500 font-light mt-8">Další nastavení vašeho kávového předplatného následuje v dalším kroku.</div>
+    <div class="text-center text-gray-500 font-light mt-8">{{ $currentLocale === 'en' ? 'Further customization of your coffee subscription follows in the next step.' : 'Další nastavení vašeho kávového předplatného následuje v dalším kroku.' }}</div>
   </div>
   
   <!-- Wave Divider -->
@@ -489,13 +503,13 @@
     <div class="mb-16 sm:mb-20">
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 max-w-full">
         <div class="max-w-2xl">
-          <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Co říkají naši zákazníci</h2>
-          <p class="text-lg sm:text-xl text-gray-600 font-light">Přidejte se k řadě spokojených milovníků kávy</p>
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">{{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}</h2>
+          <p class="text-lg sm:text-xl text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Join our satisfied coffee lovers' : 'Přidejte se k řadě spokojených milovníků kávy' }}</p>
         </div>
         
         <!-- TrustBox widget - Review Collector -->
         <div class="w-full md:w-auto md:flex-shrink-0">
-          <div class="trustpilot-widget" data-locale="cs-CZ" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="69092043c7aae452ccbb5a2e" data-style-height="52px" data-style-width="100%" data-token="8f005bc4-b948-4d5e-84f8-7a589f14404d">
+          <div class="trustpilot-widget" data-locale="{{ $currentLocale === 'en' ? 'en-US' : 'cs-CZ' }}" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="69092043c7aae452ccbb5a2e" data-style-height="52px" data-style-width="100%" data-token="8f005bc4-b948-4d5e-84f8-7a589f14404d">
             <a href="https://www.trustpilot.com/review/kavi.cz" target="_blank" rel="noopener">Trustpilot</a>
           </div>
         </div>
@@ -514,16 +528,16 @@
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
           </div>
-          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"Jsem členem KAVI předplatného už skoro rok a každá jedna zásilka kávy byla skvělá!"</p>
+          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"{{ $currentLocale === 'en' ? 'I\'ve been a KAVI subscriber for almost a year and every single coffee delivery has been amazing!' : 'Jsem členem KAVI předplatného už skoro rok a každá jedna zásilka kávy byla skvělá!' }}"</p>
         </div>
 
         <div class="flex items-center gap-3">
           <div class="h-12 w-12 overflow-hidden rounded-full">
-            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Jana Nováková" class="h-full w-full object-cover object-center" />
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Eva V." class="h-full w-full object-cover object-center" />
           </div>
           <div>
             <div class="font-semibold text-gray-900">Eva V.</div>
-            <p class="text-sm text-gray-500 font-light">Zákaznice 1 rok</p>
+            <p class="text-sm text-gray-500 font-light">{{ $currentLocale === 'en' ? 'Customer for 1 year' : 'Zákaznice 1 rok' }}</p>
           </div>
         </div>
       </div>
@@ -539,16 +553,16 @@
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
           </div>
-          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"Skvělý servis a prvotřídní káva. Flexibilita předplatného je skvělá - můžu kdykoli změnit množství nebo typ kávy."</p>
+          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"{{ $currentLocale === 'en' ? 'Great service and top-notch coffee. The subscription flexibility is great - I can change the quantity or coffee type anytime.' : 'Skvělý servis a prvotřídní káva. Flexibilita předplatného je skvělá - můžu kdykoli změnit množství nebo typ kávy.' }}"</p>
         </div>
 
         <div class="flex items-center gap-3">
           <div class="h-12 w-12 overflow-hidden rounded-full">
-            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Petr Dvořák" class="h-full w-full object-cover object-center" />
+            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Petr D." class="h-full w-full object-cover object-center" />
           </div>
           <div>
             <div class="font-semibold text-gray-900">Petr D.</div>
-            <p class="text-sm text-gray-500 font-light">Zákazník 6 měsíců</p>
+            <p class="text-sm text-gray-500 font-light">{{ $currentLocale === 'en' ? 'Customer for 6 months' : 'Zákazník 6 měsíců' }}</p>
           </div>
         </div>
       </div>
@@ -564,16 +578,16 @@
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
             <svg class="w-4 h-4 text-primary-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
           </div>
-          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"Miluju ochutnávat kávy z Evropských pražíren! Čerstvost kávy a výběr jsou skvělé."</p>
+          <p class="text-lg text-gray-700 leading-relaxed font-light mb-6">"{{ $currentLocale === 'en' ? 'I love tasting coffees from European roasters! The freshness and selection are amazing.' : 'Miluju ochutnávat kávy z Evropských pražíren! Čerstvost kávy a výběr jsou skvělé.' }}"</p>
         </div>
 
         <div class="flex items-center gap-3">
           <div class="h-12 w-12 overflow-hidden rounded-full">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Marie Horáková" class="h-full w-full object-cover object-center" />
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Marie H." class="h-full w-full object-cover object-center" />
           </div>
           <div>
             <div class="font-semibold text-gray-900">Marie H.</div>
-            <p class="text-sm text-gray-500 font-light">Zákaznice 6+ měsíců</p>
+            <p class="text-sm text-gray-500 font-light">{{ $currentLocale === 'en' ? 'Customer for 6+ months' : 'Zákaznice 6+ měsíců' }}</p>
           </div>
         </div>
       </div>
@@ -608,8 +622,12 @@
   // If today is on or after cutoff date, show next month
   $displayMonth = $today->greaterThanOrEqualTo($cutoffDate) ? $today->copy()->addMonthNoOverflow() : $today->copy();
   
-  // Get month name in nominative case (Říjen, not října)
-  $monthsNominative = [
+  // Get month name in nominative case
+  $monthsNominative = $currentLocale === 'en' ? [
+    1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+    5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+    9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+  ] : [
     1 => 'leden', 2 => 'únor', 3 => 'březen', 4 => 'duben',
     5 => 'květen', 6 => 'červen', 7 => 'červenec', 8 => 'srpen',
     9 => 'září', 10 => 'říjen', 11 => 'listopad', 12 => 'prosinec'
@@ -629,8 +647,8 @@
         </svg>
         <span class="text-sm font-medium text-gray-700" style="text-transform: capitalize;">{{ $monthName }} {{ $displayYear }}</span>
       </div>
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Káva měsíce</h2>
-      <p class="text-lg sm:text-xl text-gray-600 font-light max-w-2xl mx-auto">Každý měsíc přinášíme výběr káv od vybraných pražíren</p>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">{{ $currentLocale === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}</h2>
+      <p class="text-lg sm:text-xl text-gray-600 font-light max-w-2xl mx-auto">{{ $currentLocale === 'en' ? 'Every month we bring a selection of coffees from chosen roasters' : 'Každý měsíc přinášíme výběr káv od vybraných pražíren' }}</p>
     </div>
 
     <div class="grid lg:grid-cols-2 gap-16">
@@ -675,12 +693,12 @@
               @endif
             </div>
             <p class="text-sm text-gray-600 font-light">
-              @if($roastery->city && $roastery->country)
-                {{ $roastery->city }}, {{ $roastery->country }}
-              @elseif($roastery->city)
-                {{ $roastery->city }}
-              @elseif($roastery->country)
-                {{ $roastery->country }}
+              @if($roastery->getCity() && $roastery->getCountry())
+                {{ $roastery->getCity() }}, {{ $roastery->getCountry() }}
+              @elseif($roastery->getCity())
+                {{ $roastery->getCity() }}
+              @elseif($roastery->getCountry())
+                {{ $roastery->getCountry() }}
               @endif
             </p>
           </div>
@@ -771,7 +789,7 @@
     <!-- CTA Button -->
     <div class="mt-16 text-center">
       <a href="{{ route('monthly-feature.index') }}" class="group inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
-        <span>Prozkoumat kávy na {{ $monthName }}</span>
+        <span>{{ $currentLocale === 'en' ? 'Explore coffees for ' . $monthName : 'Prozkoumat kávy na ' . $monthName }}</span>
         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
@@ -794,8 +812,8 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
     <div class="mb-12 sm:mb-16 text-center">
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">Jak to funguje</h2>
-      <p class="text-lg sm:text-xl text-gray-600 font-light max-w-2xl mx-auto">Čtyři jednoduché kroky k perfektní kávě</p>
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">{{ $currentLocale === 'en' ? 'How it works' : 'Jak to funguje' }}</h2>
+      <p class="text-lg sm:text-xl text-gray-600 font-light max-w-2xl mx-auto">{{ $currentLocale === 'en' ? 'Four simple steps to perfect coffee' : 'Čtyři jednoduché kroky k perfektní kávě' }}</p>
     </div>
 
     <!-- Steps Grid with Arrows -->
@@ -810,10 +828,10 @@
           </div>
           
           <!-- Title -->
-          <h3 class="text-xl font-bold text-gray-900 mb-3">Vyberte si plán</h3>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $currentLocale === 'en' ? 'Choose your plan' : 'Vyberte si plán' }}</h3>
           
           <!-- Description -->
-          <p class="text-gray-600 font-light leading-relaxed">Zvolte množství kávy a frekvenci dodání podle vašich potřeb</p>
+          <p class="text-gray-600 font-light leading-relaxed">{{ $currentLocale === 'en' ? 'Select coffee quantity and delivery frequency according to your needs' : 'Zvolte množství kávy a frekvenci dodání podle vašich potřeb' }}</p>
         </div>
         
         <!-- Arrow - Hidden on mobile, visible on large screens between items -->
@@ -833,10 +851,10 @@
           </div>
           
           <!-- Title -->
-          <h3 class="text-xl font-bold text-gray-900 mb-3">Personalizujte</h3>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $currentLocale === 'en' ? 'Personalize' : 'Personalizujte' }}</h3>
           
           <!-- Description -->
-          <p class="text-gray-600 font-light leading-relaxed">Vyberte typ kávy, způsob přípravy a doručovací adresu</p>
+          <p class="text-gray-600 font-light leading-relaxed">{{ $currentLocale === 'en' ? 'Choose coffee type, brewing method and delivery address' : 'Vyberte typ kávy, způsob přípravy a doručovací adresu' }}</p>
         </div>
         
         <!-- Arrow -->
@@ -856,10 +874,10 @@
           </div>
           
           <!-- Title -->
-          <h3 class="text-xl font-bold text-gray-900 mb-3">Vyzvedněte si box</h3>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $currentLocale === 'en' ? 'Pick up your box' : 'Vyzvedněte si box' }}</h3>
           
           <!-- Description -->
-          <p class="text-gray-600 font-light leading-relaxed">Čerstvě praženou kávu doručíme na vámi vybrané místo</p>
+          <p class="text-gray-600 font-light leading-relaxed">{{ $currentLocale === 'en' ? 'We deliver freshly roasted coffee to your chosen location' : 'Čerstvě praženou kávu doručíme na vámi vybrané místo' }}</p>
         </div>
         
         <!-- Arrow -->
@@ -879,10 +897,10 @@
           </div>
           
           <!-- Title -->
-          <h3 class="text-xl font-bold text-gray-900 mb-3">Vychutnejte si</h3>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $currentLocale === 'en' ? 'Enjoy' : 'Vychutnejte si' }}</h3>
           
           <!-- Description -->
-          <p class="text-gray-600 font-light leading-relaxed">Užijte si skvělou výběrovou kávu a těšte se na další kávový box</p>
+          <p class="text-gray-600 font-light leading-relaxed">{{ $currentLocale === 'en' ? 'Enjoy great specialty coffee and look forward to your next coffee box' : 'Užijte si skvělou výběrovou kávu a těšte se na další kávový box' }}</p>
         </div>
       </div>
 
@@ -907,11 +925,11 @@
     <!-- Section Header - Minimal -->
     <div class="mb-12 sm:mb-16 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
       <div>
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">Naše kávy</h2>
-        <p class="text-lg sm:text-xl text-gray-600 font-light">Ručně vybrané z nejlepších pražíren Evropy</p>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">{{ $currentLocale === 'en' ? 'Our Coffees' : 'Naše kávy' }}</h2>
+        <p class="text-lg sm:text-xl text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Hand-picked from the best European roasters' : 'Ručně vybrané z nejlepších pražíren Evropy' }}</p>
       </div>
       <a href="{{ route('products.index') }}" class="group inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
-        <span>Zobrazit více</span>
+        <span>{{ $currentLocale === 'en' ? 'View more' : 'Zobrazit více' }}</span>
         <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
@@ -924,7 +942,7 @@
       <div class="group">
         <a href="{{ route('products.show', $product) }}" class="relative block mb-4 h-80 overflow-hidden rounded-2xl bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300">
           @if($product->image)
-          <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->name }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-110" />
+          <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-110" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           @else
           <div class="h-full w-full bg-gradient-to-br from-primary-100 to-pink-100 flex items-center justify-center p-8">
@@ -933,7 +951,7 @@
                 <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/>
                 <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
               </svg>
-              <p class="text-sm font-semibold text-primary-600">{{ $product->name }}</p>
+              <p class="text-sm font-semibold text-primary-600">{{ $product->getName() }}</p>
             </div>
           </div>
           @endif
@@ -944,7 +962,7 @@
               <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
             </svg>
-            sleva
+            {{ $currentLocale === 'en' ? 'sale' : 'sleva' }}
           </span>
           @endif
 
@@ -954,14 +972,14 @@
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
-              Zobrazit detail
+              {{ $currentLocale === 'en' ? 'View detail' : 'Zobrazit detail' }}
             </button>
           </div>
         </a>
 
         <div class="space-y-2">
           <a href="{{ route('products.show', $product) }}" class="block">
-            <h3 class="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors mb-1">{{ $product->name }}</h3>
+            <h3 class="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors mb-1">{{ $product->getName() }}</h3>
           </a>
           
           <!-- Roaster/Manufacturer -->
@@ -982,9 +1000,9 @@
           @endif
 
           <div class="flex items-baseline gap-2 pt-1">
-            <span class="text-2xl font-black text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Kč</span>
+            <span class="text-2xl font-black text-gray-900">{{ $product->getFormattedPrice() }}</span>
             @if($product->original_price ?? false)
-            <span class="text-sm text-gray-500 line-through">{{ number_format($product->original_price, 0, ',', ' ') }} Kč</span>
+            <span class="text-sm text-gray-500 line-through">{{ number_format($product->original_price, 0, ',', ' ') }} {{ $currentLocale === 'en' ? '€' : 'Kč' }}</span>
             @endif
           </div>
         </div>
@@ -1013,22 +1031,26 @@
       <div class="space-y-6 sm:space-y-8">
         <div>
           <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-            Káva s pozitivním dopadem
+            {{ $currentLocale === 'en' ? 'Coffee with positive impact' : 'Káva s pozitivním dopadem' }}
           </h2>
           <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-6 sm:mb-8">
-            V KAVI věříme, že výběrová káva může měnit svět. Z každého kávového boxu proto věnujeme 5 Kč organizaci <a href="https://water.org" target="_blank" class="text-primary-500 hover:text-primary-600 underline">Water.org</a>, která zajišťuje přístup k čisté vodě v rozvojových zemích. <b>Každý box tak poskytne jednomu člověku vodu na půl roku</b. Když si vychutnáváte naši kávu, pomáháte zároveň lidem po celém světě získat to nejzákladnější – bezpečnou vodu.
+            @if($currentLocale === 'en')
+            At KAVI, we believe specialty coffee can change the world. From every coffee box, we donate to <a href="https://water.org" target="_blank" class="text-primary-500 hover:text-primary-600 underline">Water.org</a>, which provides access to clean water in developing countries. <b>Every box provides one person with water for half a year</b>. When you enjoy our coffee, you also help people around the world get the most basic thing – safe water.
+            @else
+            V KAVI věříme, že výběrová káva může měnit svět. Z každého kávového boxu proto věnujeme 5 Kč organizaci <a href="https://water.org" target="_blank" class="text-primary-500 hover:text-primary-600 underline">Water.org</a>, která zajišťuje přístup k čisté vodě v rozvojových zemích. <b>Každý box tak poskytne jednomu člověku vodu na půl roku</b>. Když si vychutnáváte naši kávu, pomáháte zároveň lidem po celém světě získat to nejzákladnější – bezpečnou vodu.
+            @endif
           </p>
         </div>
 
         <!-- Stats - Minimal -->
         <div class="grid grid-cols-2 gap-8">
           <div>
-            <div class="text-4xl font-bold text-gray-900 mb-1">6 měsíců</div>
-            <div class="text-sm text-gray-600 font-light">vody za jeden box</div>
+            <div class="text-4xl font-bold text-gray-900 mb-1">{{ $currentLocale === 'en' ? '6 months' : '6 měsíců' }}</div>
+            <div class="text-sm text-gray-600 font-light">{{ $currentLocale === 'en' ? 'of water per box' : 'vody za jeden box' }}</div>
           </div>
           <div>
             <div class="text-4xl font-bold text-gray-900 mb-1">Water.org</div>
-            <div class="text-sm text-gray-600 font-light">darujeme napřímo</div>
+            <div class="text-sm text-gray-600 font-light">{{ $currentLocale === 'en' ? 'direct donation' : 'darujeme napřímo' }}</div>
           </div>
         </div>
       </div>
@@ -1057,24 +1079,24 @@
     <div class="mx-auto flex max-w-2xl flex-col items-center text-center">
       <!-- Heading -->
       <h2 class="mb-6 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
-        Začněte svou kávovou cestu ještě dnes
+        {{ $currentLocale === 'en' ? 'Start your coffee journey today' : 'Začněte svou kávovou cestu ještě dnes' }}
       </h2>
 
       <p class="mb-8 sm:mb-10 text-base sm:text-lg text-gray-600 max-w-xl leading-relaxed font-light">
-        Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.
+        {{ $currentLocale === 'en' ? 'Get access to the best coffee from all over Europe. Flexible subscription, no commitment.' : 'Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.' }}
       </p>
 
       <!-- CTA Buttons -->
       <div class="flex flex-col sm:flex-row gap-3">
         <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
-          <span>Vybrat předplatné</span>
+          <span>{{ $currentLocale === 'en' ? 'Choose subscription' : 'Vybrat předplatné' }}</span>
           <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </a>
 
         <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 transition-all duration-200">
-          <span>Procházet kávy</span>
+          <span>{{ $currentLocale === 'en' ? 'Browse coffees' : 'Procházet kávy' }}</span>
         </a>
       </div>
 

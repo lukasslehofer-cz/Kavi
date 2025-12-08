@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CurrencyHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
@@ -16,11 +17,14 @@ class Coupon extends Model
         'description',
         'discount_type_order',
         'discount_value_order',
+        'discount_value_order_eur',
         'discount_type_subscription',
         'discount_value_subscription',
+        'discount_value_subscription_eur',
         'subscription_discount_months',
         'free_shipping',
         'min_order_value',
+        'min_order_value_eur',
         'valid_from',
         'valid_until',
         'usage_limit_total',
@@ -31,13 +35,43 @@ class Coupon extends Model
 
     protected $casts = [
         'discount_value_order' => 'decimal:2',
+        'discount_value_order_eur' => 'decimal:2',
         'discount_value_subscription' => 'decimal:2',
+        'discount_value_subscription_eur' => 'decimal:2',
         'min_order_value' => 'decimal:2',
+        'min_order_value_eur' => 'decimal:2',
         'valid_from' => 'datetime',
         'valid_until' => 'datetime',
         'free_shipping' => 'boolean',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Get the order discount value in current currency
+     */
+    public function getOrderDiscountValue(): float
+    {
+        return CurrencyHelper::price($this->discount_value_order, $this->discount_value_order_eur);
+    }
+
+    /**
+     * Get the subscription discount value in current currency
+     */
+    public function getSubscriptionDiscountValue(): float
+    {
+        return CurrencyHelper::price($this->discount_value_subscription, $this->discount_value_subscription_eur);
+    }
+
+    /**
+     * Get the minimum order value in current currency
+     */
+    public function getMinOrderValue(): ?float
+    {
+        if ($this->min_order_value === null && $this->min_order_value_eur === null) {
+            return null;
+        }
+        return CurrencyHelper::price($this->min_order_value ?? 0, $this->min_order_value_eur ?? 0);
+    }
 
     /**
      * Vztah k použitím kupónu
@@ -128,11 +162,12 @@ class Coupon extends Model
      */
     public function meetsMinimumOrderValue(float $orderValue): bool
     {
-        if ($this->min_order_value === null) {
+        $minValue = $this->getMinOrderValue();
+        if ($minValue === null) {
             return true;
         }
 
-        return $orderValue >= $this->min_order_value;
+        return $orderValue >= $minValue;
     }
 
     /**
@@ -149,7 +184,8 @@ class Coupon extends Model
         }
 
         if ($this->discount_type_order === 'fixed') {
-            return min($this->discount_value_order, $subtotal); // Sleva nemůže být vyšší než subtotal
+            $discountValue = $this->getOrderDiscountValue();
+            return min($discountValue, $subtotal); // Sleva nemůže být vyšší než subtotal
         }
 
         return 0;
@@ -169,7 +205,8 @@ class Coupon extends Model
         }
 
         if ($this->discount_type_subscription === 'fixed') {
-            return min($this->discount_value_subscription, $price); // Sleva nemůže být vyšší než cena
+            $discountValue = $this->getSubscriptionDiscountValue();
+            return min($discountValue, $price); // Sleva nemůže být vyšší než cena
         }
 
         return 0;
@@ -209,14 +246,15 @@ class Coupon extends Model
         }
 
         if ($this->discount_type_order === 'fixed') {
-            return "-{$this->discount_value_order} Kč";
+            $value = $this->getOrderDiscountValue();
+            return "-" . CurrencyHelper::formatAmount($value);
         }
 
         if ($this->free_shipping) {
-            return "Doprava zdarma";
+            return CurrencyHelper::isCzk() ? "Doprava zdarma" : "Free shipping";
         }
 
-        return "Žádná sleva";
+        return CurrencyHelper::isCzk() ? "Žádná sleva" : "No discount";
     }
 
     /**
@@ -227,15 +265,20 @@ class Coupon extends Model
         if ($this->discount_type_subscription === 'percentage') {
             $desc = "-{$this->discount_value_subscription}%";
         } elseif ($this->discount_type_subscription === 'fixed') {
-            $desc = "-{$this->discount_value_subscription} Kč";
+            $value = $this->getSubscriptionDiscountValue();
+            $desc = "-" . CurrencyHelper::formatAmount($value);
         } else {
-            return "Žádná sleva";
+            return CurrencyHelper::isCzk() ? "Žádná sleva" : "No discount";
         }
 
         if ($this->subscription_discount_months) {
-            $desc .= " po dobu {$this->subscription_discount_months} " . $this->getMonthsWord($this->subscription_discount_months);
+            if (CurrencyHelper::isCzk()) {
+                $desc .= " po dobu {$this->subscription_discount_months} " . $this->getMonthsWord($this->subscription_discount_months);
+            } else {
+                $desc .= " for {$this->subscription_discount_months} " . ($this->subscription_discount_months === 1 ? 'month' : 'months');
+            }
         } else {
-            $desc .= " neomezeně";
+            $desc .= CurrencyHelper::isCzk() ? " neomezeně" : " unlimited";
         }
 
         return $desc;

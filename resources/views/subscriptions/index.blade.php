@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kávové předplatné - KAVI.cz')
+@section('title', $currentLocale === 'en' ? 'Coffee Subscription - KAVI' : 'Kávové předplatné - KAVI.cz')
 
 @section('content')
 <!-- Hero Header Section - Minimal -->
@@ -18,16 +18,16 @@
         <svg class="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
         </svg>
-        <span class="text-sm font-medium text-gray-900">Kávové předplatné</span>
+        <span class="text-sm font-medium text-gray-900">{{ $currentLocale === 'en' ? 'Coffee Subscription' : 'Kávové předplatné' }}</span>
       </div>
 
       <!-- Clean Heading -->
       <h1 class="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-        Sestavte si svůj kávový box
+        {{ $currentLocale === 'en' ? 'Build your coffee box' : 'Sestavte si svůj kávový box' }}
       </h1>
       
       <p class="mx-auto max-w-2xl text-base sm:text-lg text-gray-600 font-light mb-8">
-        Vyberte si množství, typ kávy a frekvenci dodání. Jednoduše a bez závazků.
+        {{ $currentLocale === 'en' ? 'Choose the quantity, coffee type and delivery frequency. Simple and no commitment.' : 'Vyberte si množství, typ kávy a frekvenci dodání. Jednoduše a bez závazků.' }}
       </p>
 
       <!-- Features Pills - Minimal -->
@@ -36,19 +36,19 @@
           <svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
-          <span class="text-sm font-medium text-gray-700">Doprava zdarma</span>
+          <span class="text-sm font-medium text-gray-700">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</span>
         </div>
         <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-200">
           <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span class="text-sm font-medium text-gray-700">Flexibilní platba</span>
+          <span class="text-sm font-medium text-gray-700">{{ $currentLocale === 'en' ? 'Flexible payment' : 'Flexibilní platba' }}</span>
         </div>
         <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-200">
           <svg class="w-4 h-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
-          <span class="text-sm font-medium text-gray-700">Zrušení kdykoliv</span>
+          <span class="text-sm font-medium text-gray-700">{{ $currentLocale === 'en' ? 'Cancel anytime' : 'Zrušení kdykoliv' }}</span>
         </div>
       </div>
     </div>
@@ -113,7 +113,7 @@
               <svg class="w-5 h-5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
               </svg>
-              <h3 class="text-sm font-bold text-gray-900">Pražírny na {{ $monthName }} {{ $displayYear }}</h3>
+              <h3 class="text-sm font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Roasters for ' . $monthName . ' ' . $displayYear : 'Pražírny na ' . $monthName . ' ' . $displayYear }}</h3>
             </div>
             
             @if($roasteriesOfMonth && $roasteriesOfMonth->count() > 0)
@@ -122,8 +122,8 @@
                   <div class="flex items-center gap-2">
                     <span class="text-lg">{{ $roastery->country_flag }}</span>
                     <div class="flex-1">
-                      <span class="text-sm text-gray-700 font-medium">{{ $roastery->name }}</span>
-                      <span class="text-xs text-gray-500 font-light ml-1">{{ $roastery->city ? $roastery->city . ', ' : '' }}{{ $roastery->country }}</span>
+                      <span class="text-sm text-gray-700 font-medium">{{ $roastery->getName() }}</span>
+                      <span class="text-xs text-gray-500 font-light ml-1">{{ $roastery->getCity() ? $roastery->getCity() . ', ' : '' }}{{ $roastery->getCountry() }}</span>
                     </div>
                   </div>
                 @endforeach
@@ -132,7 +132,7 @@
             
             <a href="{{ route('monthly-feature.index') }}" 
                class="block w-full py-2.5 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm text-center">
-              Zobrazit detailní informace
+              {{ $currentLocale === 'en' ? 'View detailed information' : 'Zobrazit detailní informace' }}
             </a>
           </div>
         </div>
@@ -150,16 +150,16 @@
           </div>
           
           <h2 class="text-3xl font-bold text-gray-900 mb-4">
-            Omlouváme se, tento měsíc jsou naše kávy vyprodané
+            {{ $currentLocale === 'en' ? 'Sorry, our coffees are sold out this month' : 'Omlouváme se, tento měsíc jsou naše kávy vyprodané' }}
           </h2>
           
           <p class="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
-            Děkujeme za velký zájem! Všechny naše kávy pro tento měsíc jsou bohužel již rozebrané.
+            {{ $currentLocale === 'en' ? 'Thank you for your interest! All our coffees for this month are unfortunately already taken.' : 'Děkujeme za velký zájem! Všechny naše kávy pro tento měsíc jsou bohužel již rozebrané.' }}
           </p>
           
           <div class="bg-primary-50 border border-primary-200 rounded-xl p-6 mb-8 max-w-2xl mx-auto">
             <p class="text-base text-gray-900 font-medium mb-2">
-              📅 Nové kávy budou k dispozici od <strong>{{ $nextAvailableDate->format('d.m.Y') }}</strong>
+              📅 {{ $currentLocale === 'en' ? 'New coffees will be available from' : 'Nové kávy budou k dispozici od' }} <strong>{{ $currentLocale === 'en' ? $nextAvailableDate->format('m/d/Y') : $nextAvailableDate->format('d.m.Y') }}</strong>
             </p>
             <p class="text-sm text-gray-600">
               ({{ $nextAvailableMonthName }} {{ $nextAvailableDate->year }})
@@ -172,12 +172,12 @@
               <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
               </svg>
-              Prohlédnout jednorázové produkty
+              {{ $currentLocale === 'en' ? 'Browse one-time products' : 'Prohlédnout jednorázové produkty' }}
             </a>
             
             <a href="{{ route('home') }}" 
                class="inline-flex items-center justify-center px-6 py-3 bg-white text-gray-900 font-medium rounded-full border border-gray-300 hover:bg-gray-50 transition-all duration-200">
-              Zpět na hlavní stránku
+              {{ $currentLocale === 'en' ? 'Back to homepage' : 'Zpět na hlavní stránku' }}
             </a>
           </div>
         </div>
@@ -196,8 +196,8 @@
                 <span class="text-white text-sm font-bold">1</span>
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-gray-900">Množství kávy</h2>
-                <p class="text-sm text-gray-600 font-light">Vyberte balíček, který vám vyhovuje</p>
+                <h2 class="text-2xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Coffee quantity' : 'Množství kávy' }}</h2>
+                <p class="text-sm text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Choose the package that suits you' : 'Vyberte balíček, který vám vyhovuje' }}</p>
               </div>
             </div>
 
@@ -208,16 +208,19 @@
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
                     <div class="text-2xl font-bold text-gray-900">M Box</div>
-                    <p class="text-xs text-gray-500 font-light">2 balíčky po 250g</p>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? '2 bags of 250g' : '2 balíčky po 250g' }}</p>
                   </div>
                   <div class="hidden sm:block flex-1">
-                    <p class="text-sm text-gray-600 font-light">Ideální pro jednotlivce nebo páry</p>
+                    <p class="text-sm text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Ideal for individuals or couples' : 'Ideální pro jednotlivce nebo páry' }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-4">
                   <div class="text-right">
-                    <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span>
-                    <span class="text-sm text-gray-500 ml-1">Kč</span>
+                    @if($currentLocale === 'en')
+                      <span class="text-sm text-gray-500 mr-1">€</span><span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['2'], 0, '.', ' ') }}</span>
+                    @else
+                      <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span><span class="text-sm text-gray-500 ml-1">Kč</span>
+                    @endif
                   </div>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -233,16 +236,19 @@
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
                     <div class="text-2xl font-bold text-gray-900">L Box</div>
-                    <p class="text-xs text-gray-500 font-light">3 balíčky po 250g</p>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? '3 bags of 250g' : '3 balíčky po 250g' }}</p>
                   </div>
                   <div class="hidden sm:block flex-1">
-                    <p class="text-sm text-gray-600 font-light">Nejpopulárnější volba</p>
+                    <p class="text-sm text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Most popular choice' : 'Nejpopulárnější volba' }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-4">
                   <div class="text-right">
-                    <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span>
-                    <span class="text-sm text-gray-500 ml-1">Kč</span>
+                    @if($currentLocale === 'en')
+                      <span class="text-sm text-gray-500 mr-1">€</span><span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['3'], 0, '.', ' ') }}</span>
+                    @else
+                      <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span><span class="text-sm text-gray-500 ml-1">Kč</span>
+                    @endif
                   </div>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -258,16 +264,19 @@
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
                     <div class="text-2xl font-bold text-gray-900">XL Box</div>
-                    <p class="text-xs text-gray-500 font-light">4 balíčky po 250g</p>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? '4 bags of 250g' : '4 balíčky po 250g' }}</p>
                   </div>
                   <div class="hidden sm:block flex-1">
-                    <p class="text-sm text-gray-600 font-light">Pro kávové nadšence</p>
+                    <p class="text-sm text-gray-600 font-light">{{ $currentLocale === 'en' ? 'For coffee enthusiasts' : 'Pro kávové nadšence' }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-4">
                   <div class="text-right">
-                    <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span>
-                    <span class="text-sm text-gray-500 ml-1">Kč</span>
+                    @if($currentLocale === 'en')
+                      <span class="text-sm text-gray-500 mr-1">€</span><span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['4'], 0, '.', ' ') }}</span>
+                    @else
+                      <span class="text-2xl font-bold text-gray-900">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span><span class="text-sm text-gray-500 ml-1">Kč</span>
+                    @endif
                   </div>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -286,8 +295,8 @@
                 <span class="text-white text-sm font-bold">2</span>
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-gray-900">Preferovaný typ kávy</h2>
-                <p class="text-sm text-gray-600 font-light">Vyberte si váš oblíbený způsob přípravy</p>
+                <h2 class="text-2xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Preferred coffee type' : 'Preferovaný typ kávy' }}</h2>
+                <p class="text-sm text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Choose your favorite brewing method' : 'Vyberte si váš oblíbený způsob přípravy' }}</p>
               </div>
             </div>
 
@@ -298,13 +307,13 @@
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
                     <div class="text-xl font-bold text-gray-900">Espresso</div>
-                    <p class="text-xs text-gray-500 font-light">Plné tělo, tmavší pražení</p>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? 'Full body, darker roast' : 'Plné tělo, tmavší pražení' }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">1x bez kofeinu<br class="sm:hidden"> (+100 Kč)</span>
+                    <span class="font-medium text-gray-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }}<br class="sm:hidden"> (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -319,14 +328,14 @@
                 <input type="radio" name="type" value="filter" class="hidden" required>
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
-                    <div class="text-xl font-bold text-gray-900">Filtr</div>
-                    <p class="text-xs text-gray-500 font-light">Lehčí tělo, světlejší pražení</p>
+                    <div class="text-xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Filter' : 'Filtr' }}</div>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? 'Lighter body, lighter roast' : 'Lehčí tělo, světlejší pražení' }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">1x bez kofeinu<br class="sm:hidden"> (+100 Kč)</span>
+                    <span class="font-medium text-gray-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }}<br class="sm:hidden"> (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -341,14 +350,14 @@
                 <input type="radio" name="type" value="mix" class="hidden" required>
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
-                    <div class="text-xl font-bold text-gray-900">Kombinace</div>
-                    <p class="text-xs text-gray-500 font-light">Espresso i filtr</p>
+                    <div class="text-xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Mix' : 'Kombinace' }}</div>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? 'Espresso and filter' : 'Espresso i filtr' }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
                   <label class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm" onclick="event.stopPropagation();">
                     <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500 rounded">
-                    <span class="font-medium text-gray-700">1x bez kofeinu<br class="sm:hidden"> (+100 Kč)</span>
+                    <span class="font-medium text-gray-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }}<br class="sm:hidden"> (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                   </label>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -361,7 +370,7 @@
 
             <!-- Rozdělení kávy pro mix -->
             <div id="caffeine-distribution" class="hidden mt-6 p-4 bg-gray-100 rounded-xl border border-gray-200">
-              <h4 class="text-lg font-semibold text-gray-900 mb-4">Rozdělení kávy</h4>
+              <h4 class="text-lg font-semibold text-gray-900 mb-4">{{ $currentLocale === 'en' ? 'Coffee distribution' : 'Rozdělení kávy' }}</h4>
               
               <div id="mix-no-decaf-distribution" class="hidden grid grid-cols-2 gap-4">
                 <!-- Espresso -->
@@ -410,8 +419,8 @@
                 <span class="text-white text-sm font-bold">3</span>
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-gray-900">Frekvence dodání</h2>
-                <p class="text-sm text-gray-600 font-light">Jak často chcete kávu dostávat?</p>
+                <h2 class="text-2xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Delivery frequency' : 'Frekvence dodání' }}</h2>
+                <p class="text-sm text-gray-600 font-light">{{ $currentLocale === 'en' ? 'How often do you want to receive coffee?' : 'Jak často chcete kávu dostávat?' }}</p>
               </div>
             </div>
 
@@ -421,8 +430,8 @@
                 <input type="radio" name="frequency" value="1" class="hidden" required>
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
-                    <div class="text-xl font-bold text-gray-900">Každý měsíc</div>
-                    <p class="text-xs text-gray-500 font-light">Pro pravidelnou spotřebu</p>
+                    <div class="text-xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Every month' : 'Každý měsíc' }}</div>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? 'For regular consumption' : 'Pro pravidelnou spotřebu' }}</p>
                   </div>
                 </div>
                 <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
@@ -437,8 +446,8 @@
                 <input type="radio" name="frequency" value="2" class="hidden" required>
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
-                    <div class="text-xl font-bold text-gray-900">Jednou za 2 měsíce</div>
-                    <p class="text-xs text-gray-500 font-light">Pro střední spotřebu</p>
+                    <div class="text-xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Every 2 months' : 'Jednou za 2 měsíce' }}</div>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? 'For medium consumption' : 'Pro střední spotřebu' }}</p>
                   </div>
                 </div>
                 <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
@@ -453,8 +462,8 @@
                 <input type="radio" name="frequency" value="3" class="hidden" required>
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
-                    <div class="text-xl font-bold text-gray-900">Jednou za 3 měsíce</div>
-                    <p class="text-xs text-gray-500 font-light">Pro občasné pití</p>
+                    <div class="text-xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Every 3 months' : 'Jednou za 3 měsíce' }}</div>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? 'For occasional drinking' : 'Pro občasné pití' }}</p>
                   </div>
                 </div>
                 <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
@@ -470,19 +479,19 @@
                 <div class="flex items-center gap-4 flex-1">
                   <div class="flex-shrink-0">
                     <div class="flex items-center gap-2">
-                      <span class="text-xl font-bold text-gray-900">Jednorázově</span>
+                      <span class="text-xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'One-time' : 'Jednorázově' }}</span>
                       <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-600 text-white text-xs font-bold rounded-full">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
-                        <span>Zkuste to</span>
+                        <span>{{ $currentLocale === 'en' ? 'Try it' : 'Zkuste to' }}</span>
                       </span>
                     </div>
-                    <p class="text-xs text-gray-500 font-light">Bez předplatného</p>
+                    <p class="text-xs text-gray-500 font-light">{{ $currentLocale === 'en' ? 'No subscription' : 'Bez předplatného' }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
-                  <span class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700">+100 Kč</span>
+                  <span class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700">+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }}</span>
                   <div class="w-5 h-5 rounded-full border-2 border-gray-300 group-has-[:checked]:border-primary-500 group-has-[:checked]:bg-primary-500 flex items-center justify-center">
                     <svg class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
@@ -495,31 +504,34 @@
 
           <!-- Shrnutí a Submit -->
           <div class="p-4 sm:p-6 bg-gray-100 rounded-2xl border border-gray-200">
-            <h3 id="summary-title" class="text-lg sm:text-xl font-bold text-gray-900 mb-4">Shrnutí objednávky</h3>
+            <h3 id="summary-title" class="text-lg sm:text-xl font-bold text-gray-900 mb-4">{{ $currentLocale === 'en' ? 'Order summary' : 'Shrnutí objednávky' }}</h3>
             
             <div class="space-y-2 mb-6">
               <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Množství:</span>
+                <span class="text-gray-600">{{ $currentLocale === 'en' ? 'Quantity:' : 'Množství:' }}</span>
                 <span class="font-medium text-gray-900" id="summary-amount">-</span>
               </div>
               <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Typ kávy:</span>
+                <span class="text-gray-600">{{ $currentLocale === 'en' ? 'Coffee type:' : 'Typ kávy:' }}</span>
                 <span class="font-medium text-gray-900" id="summary-type">-</span>
               </div>
               <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Frekvence:</span>
+                <span class="text-gray-600">{{ $currentLocale === 'en' ? 'Frequency:' : 'Frekvence:' }}</span>
                 <span class="font-medium text-gray-900" id="summary-frequency">-</span>
               </div>
               <div id="onetime-surcharge" class="hidden flex justify-between text-sm">
-                <span class="text-gray-600">Příplatek jednorázový:</span>
-                <span class="font-medium text-gray-900">+100 Kč</span>
+                <span class="text-gray-600">{{ $currentLocale === 'en' ? 'One-time surcharge:' : 'Příplatek jednorázový:' }}</span>
+                <span class="font-medium text-gray-900">+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }}</span>
               </div>
               <div class="flex justify-between items-center pt-4 border-t border-gray-200">
-                <span class="text-lg font-bold text-gray-900">Celková cena:</span>
+                <span class="text-lg font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Total price:' : 'Celková cena:' }}</span>
                 <div class="text-right">
-                  <span class="text-3xl font-bold text-gray-900" id="summary-price">-</span>
-                  <span class="text-sm text-gray-500 ml-1">Kč</span>
-                  <p id="summary-price-note" class="text-xs text-gray-500 mt-1">při každé dodávce</p>
+                  @if($currentLocale === 'en')
+                    <span class="text-sm text-gray-500 mr-1">€</span><span class="text-3xl font-bold text-gray-900" id="summary-price">-</span>
+                  @else
+                    <span class="text-3xl font-bold text-gray-900" id="summary-price">-</span><span class="text-sm text-gray-500 ml-1">Kč</span>
+                  @endif
+                  <p id="summary-price-note" class="text-xs text-gray-500 mt-1">{{ $currentLocale === 'en' ? 'per delivery' : 'při každé dodávce' }}</p>
                 </div>
               </div>
             </div>
@@ -527,7 +539,7 @@
             <button type="submit" id="submit-button" 
                     class="w-full py-3 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
                     disabled>
-              <span>Pokračovat k objednávce</span>
+              <span>{{ $currentLocale === 'en' ? 'Continue to checkout' : 'Pokračovat k objednávce' }}</span>
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -538,13 +550,13 @@
                 <svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                Bez závazků
+                {{ $currentLocale === 'en' ? 'No commitment' : 'Bez závazků' }}
               </span>
               <span class="flex items-center gap-1">
                 <svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                Kdykoli zrušte
+                {{ $currentLocale === 'en' ? 'Cancel anytime' : 'Kdykoli zrušte' }}
               </span>
             </div>
           </div>
@@ -562,11 +574,16 @@
               </div>
             </div>
             <div>
-              <h3 class="font-bold text-lg text-gray-900 mb-2">Termín následující rozesílky</h3>
+              <h3 class="font-bold text-lg text-gray-900 mb-2">{{ $currentLocale === 'en' ? 'Next shipping date' : 'Termín následující rozesílky' }}</h3>
               <p class="text-sm text-gray-900 font-medium mb-2">{{ $shippingInfo['cutoff_message'] }}</p>
               <p class="text-sm text-gray-600 font-light">
+                @if($currentLocale === 'en')
+                Orders close on the <strong>15th of each month at midnight</strong>. 
+                Coffee shipping usually happens on the <strong>20th of each month</strong>. 
+                @else
                 Objednávky uzavíráme <strong>15. dne v měsíci o půlnoci</strong>. 
                 Rozesílka kávy probíhá nejčastěji <strong>20. dne v měsíci</strong>. 
+                @endif
               </p>
             </div>
           </div>
@@ -580,6 +597,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const pricing = @json($subscriptionPricing);
+    const currentLocale = '{{ $currentLocale }}';
+    const currencySymbol = currentLocale === 'en' ? '€' : 'Kč';
     
     let selectedAmount = null;
     let selectedType = null;
@@ -748,7 +767,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Množství
         if (selectedAmount) {
             const grams = selectedAmount * 250;
-            document.getElementById('summary-amount').textContent = grams + 'g (' + selectedAmount + ' balení)';
+            const bagsText = currentLocale === 'en' ? ' bags' : ' balení';
+            document.getElementById('summary-amount').textContent = grams + 'g (' + selectedAmount + bagsText + ')';
         } else {
             document.getElementById('summary-amount').textContent = '-';
         }
@@ -756,25 +776,36 @@ document.addEventListener('DOMContentLoaded', function() {
         // Typ
         let typeText = '-';
         if (selectedType) {
-            const types = {
+            const types = currentLocale === 'en' ? {
+                'espresso': 'Espresso',
+                'filter': 'Filter',
+                'mix': 'Mix'
+            } : {
                 'espresso': 'Espresso',
                 'filter': 'Filtr',
                 'mix': 'Kombinace'
             };
             typeText = types[selectedType];
             
+            const filterLabel = currentLocale === 'en' ? 'Filter' : 'Filtr';
             if (selectedType === 'mix' && (mixEspressoCount > 0 || mixFilterCount > 0)) {
-                typeText += ` (${mixEspressoCount}x Espresso, ${mixFilterCount}x Filtr)`;
+                typeText += ` (${mixEspressoCount}x Espresso, ${mixFilterCount}x ${filterLabel})`;
             }
             
             if (isDecaf) {
-                typeText += ' (1x decaf) +100 Kč';
+                const decafSurcharge = currentLocale === 'en' ? '+€5' : '+100 Kč';
+                typeText += ` (1x decaf) ${decafSurcharge}`;
             }
         }
         document.getElementById('summary-type').textContent = typeText;
         
         // Frekvence
-        const frequencies = {
+        const frequencies = currentLocale === 'en' ? {
+            0: 'One-time (no subscription)',
+            1: 'Every month',
+            2: 'Every 2 months',
+            3: 'Every 3 months'
+        } : {
             0: 'Jednorázově (bez předplatného)',
             1: 'Každý měsíc',
             2: 'Jednou za 2 měsíce',
@@ -789,13 +820,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (selectedFrequency === 0) {
             // Jednorázová objednávka
-            summaryTitle.textContent = 'Shrnutí objednávky';
-            summaryPriceNote.textContent = 'jednorázově';
+            summaryTitle.textContent = currentLocale === 'en' ? 'Order summary' : 'Shrnutí objednávky';
+            summaryPriceNote.textContent = currentLocale === 'en' ? 'one-time' : 'jednorázově';
             onetimeSurcharge.classList.remove('hidden');
         } else {
             // Předplatné
-            summaryTitle.textContent = 'Shrnutí předplatného';
-            summaryPriceNote.textContent = 'při každé dodávce';
+            summaryTitle.textContent = currentLocale === 'en' ? 'Subscription summary' : 'Shrnutí předplatného';
+            summaryPriceNote.textContent = currentLocale === 'en' ? 'per delivery' : 'při každé dodávce';
             onetimeSurcharge.classList.add('hidden');
         }
         
@@ -803,13 +834,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectedAmount) {
             let price = pricing[selectedAmount] || 0;
             if (isDecaf) {
-                price += 100;
+                price += currentLocale === 'en' ? 5 : 100;
             }
-            // Přidat příplatek +100 Kč pro jednorázový box
+            // Přidat příplatek pro jednorázový box
             if (selectedFrequency === 0) {
-                price += 100;
+                price += currentLocale === 'en' ? 5 : 100;
             }
-            document.getElementById('summary-price').textContent = price.toLocaleString('cs-CZ');
+            document.getElementById('summary-price').textContent = price.toLocaleString(currentLocale === 'en' ? 'en-US' : 'cs-CZ');
         } else {
             document.getElementById('summary-price').textContent = '-';
         }

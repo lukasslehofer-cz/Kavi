@@ -29,7 +29,7 @@ class SubscriptionConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Potvrzení předplatného ' . ($this->subscription->subscription_number ?? '') . ' - KAVI.cz',
+            subject: __('emails.subscription_confirmation.subject'),
         );
     }
 

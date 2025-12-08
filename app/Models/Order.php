@@ -25,6 +25,7 @@ class Order extends Model
         'shipping_country',
         'tax',
         'total',
+        'currency',
         'status',
         'payment_status',
         'payment_failure_count',

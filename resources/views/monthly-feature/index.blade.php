@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Káva měsíce ' . $monthNameWithYear)
+@section('title', ($currentLocale === 'en' ? 'Coffee of the Month ' : 'Káva měsíce ') . $monthNameWithYear)
 
 @section('content')
 <!-- Hero Header Section - Minimal -->
@@ -18,7 +18,7 @@
                 <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
-                <span class="text-sm font-medium text-gray-900">Pražírny a kávy měsíce</span>
+                <span class="text-sm font-medium text-gray-900">{{ $currentLocale === 'en' ? 'Roasters and Coffees of the Month' : 'Pražírny a kávy měsíce' }}</span>
             </div>
 
             <!-- Clean Heading -->
@@ -27,7 +27,7 @@
             </h1>
             
             <p class="mx-auto max-w-2xl text-base sm:text-lg text-gray-600 font-light">
-                Každý měsíc pro vás vybíráme výjimečné kávy z nejlepších evropských pražíren. Co&nbsp;vás čeká tento měsíc?
+                {{ $currentLocale === 'en' ? 'Every month we select exceptional coffees from the best European roasters. What awaits you this month?' : 'Každý měsíc pro vás vybíráme výjimečné kávy z nejlepších evropských pražíren. Co&nbsp;vás čeká tento měsíc?' }}
             </p>
         </div>
     </div>
@@ -50,10 +50,18 @@
             <div class="mb-12 sm:mb-16">
                 <div class="text-center mb-8 sm:mb-10">
                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
-                        {{ $roasteries->count() === 1 ? 'Pražírna měsíce' : 'Pražírny měsíce' }}
+                        @if($currentLocale === 'en')
+                            {{ $roasteries->count() === 1 ? 'Roaster of the Month' : 'Roasters of the Month' }}
+                        @else
+                            {{ $roasteries->count() === 1 ? 'Pražírna měsíce' : 'Pražírny měsíce' }}
+                        @endif
                     </h2>
                     <p class="text-base text-gray-600 font-light">
-                        {{ $roasteries->count() === 1 ? 'Tentokrát jsme vybrali kávy od této výjimečné pražírny' : 'Tentokrát jsme vybrali kávy od těchto výjimečných pražíren' }}
+                        @if($currentLocale === 'en')
+                            {{ $roasteries->count() === 1 ? 'This time we selected coffees from this exceptional roaster' : 'This time we selected coffees from these exceptional roasters' }}
+                        @else
+                            {{ $roasteries->count() === 1 ? 'Tentokrát jsme vybrali kávy od této výjimečné pražírny' : 'Tentokrát jsme vybrali kávy od těchto výjimečných pražíren' }}
+                        @endif
                     </p>
                 </div>
 
@@ -64,7 +72,7 @@
                         <a href="{{ route('roasteries.show', $roastery) }}" class="relative block aspect-[4/3] md:aspect-square overflow-hidden bg-gray-50">
                             @if($roastery->image)
                             <img src="{{ asset($roastery->image) }}" 
-                                 alt="{{ $roastery->name }}"
+                                 alt="{{ $roastery->getName() }}"
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             @else
                             <div class="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -75,7 +83,7 @@
                             <!-- Minimal Badge -->
                             <div class="absolute top-3 left-3">
                                 <span class="bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-full">
-                                    Pražírna měsíce
+                                    {{ $currentLocale === 'en' ? 'Roaster of the Month' : 'Pražírna měsíce' }}
                                 </span>
                             </div>
 
@@ -89,7 +97,7 @@
                         <div class="p-5">
                             <a href="{{ route('roasteries.show', $roastery) }}" class="block mb-2">
                                 <h3 class="text-xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors">
-                                    {{ $roastery->name }}
+                                    {{ $roastery->getName() }}
                                 </h3>
                             </a>
 
@@ -98,19 +106,19 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span class="text-sm font-light">{{ $roastery->country }}@if($roastery->city), {{ $roastery->city }}@endif</span>
+                                <span class="text-sm font-light">{{ $roastery->getCountry() }}@if($roastery->getCity()), {{ $roastery->getCity() }}@endif</span>
                             </div>
 
-                            @if($roastery->short_description)
+                            @if($roastery->getShortDescription())
                             <p class="text-gray-600 mb-5 line-clamp-3 text-sm font-light leading-relaxed">
-                                {{ $roastery->short_description }}
+                                {{ $roastery->getShortDescription() }}
                             </p>
                             @endif
 
                             <div class="flex gap-2">
                                 <a href="{{ route('roasteries.show', $roastery) }}" 
                                    class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
-                                    Více o pražírně
+                                    {{ $currentLocale === 'en' ? 'More about roaster' : 'Více o pražírně' }}
                                 </a>
 
                                 @if($roastery->website_url)
@@ -143,10 +151,10 @@
             <div class="border-t border-gray-100 pt-12 sm:pt-16">
                 <div class="text-center mb-8 sm:mb-10">
                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
-                        Kávy měsíce
+                        {{ $currentLocale === 'en' ? 'Coffees of the Month' : 'Kávy měsíce' }}
                     </h2>
                     <p class="text-sm sm:text-base text-gray-600 font-light">
-                        Tyto výběrové kávy jsou součástí našeho aktuálního předplatného
+                        {{ $currentLocale === 'en' ? 'These specialty coffees are part of our current subscription' : 'Tyto výběrové kávy jsou součástí našeho aktuálního předplatného' }}
                     </p>
                 </div>
 
@@ -186,14 +194,14 @@
                         <!-- Coffee Info -->
                         <div class="p-5">
                             <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                                {{ $coffee->name }}
+                                {{ $coffee->getName() }}
                             </h3>
 
                             @if($coffee->roastery)
                             <p class="text-sm text-gray-500 font-light mb-3 flex items-center gap-1">
                                 <span class="text-base">{{ $coffee->roastery->country_flag }}</span>
                                 <a href="{{ route('roasteries.show', $coffee->roastery) }}" class="hover:text-gray-900 transition-colors">
-                                    {{ $coffee->roastery->name }}
+                                    {{ $coffee->roastery->getName() }}
                                 </a>
                             </p>
                             @endif
@@ -201,17 +209,17 @@
                             <!-- Flavor Tones -->
                             @if(!empty($coffee->attributes['flavor_profile']) || !empty($coffee->attributes['flavor_notes']))
                             <div class="text-sm mb-4">                                
-                                <span class="text-gray-600 font-light">{{ $coffee->attributes['flavor_profile'] ?? $coffee->attributes['flavor_notes'] }}</span>
+                                <span class="text-gray-600 font-light">{{ $coffee->getTranslatedAttribute('flavor_notes') ?? $coffee->attributes['flavor_profile'] ?? $coffee->attributes['flavor_notes'] }}</span>
                             </div>
                             @endif
 
                             <button onclick="openCoffeeModal{{ $coffee->id }}()" 
                                     class="w-full py-2.5 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
-                                Zobrazit detail
+                                {{ $currentLocale === 'en' ? 'View detail' : 'Zobrazit detail' }}
                             </button>
 
                             <p class="text-xs text-center text-gray-500 mt-2.5 font-light">
-                                Tuto kávu nelze zakoupit samostatně
+                                {{ $currentLocale === 'en' ? 'This coffee cannot be purchased separately' : 'Tuto kávu nelze zakoupit samostatně' }}
                             </p>
                         </div>
                     </div>
@@ -237,53 +245,58 @@
 
                                 <div class="absolute top-4 left-4">
                                     <span class="bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-full">
-                                        Káva měsíce {{ $monthNameWithYear }}
+                                        {{ $currentLocale === 'en' ? 'Coffee of the Month ' . $monthNameWithYear : 'Káva měsíce ' . $monthNameWithYear }}
                                     </span>
                                 </div>
                             </div>
 
                             <div class="p-4 sm:p-6 md:p-8">
                                 <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                                    {{ $coffee->name }}
+                                    {{ $coffee->getName() }}
                                 </h3>
 
                                 @if($coffee->roastery)
                                 <p class="text-lg text-gray-600 font-medium mb-6 flex items-center gap-2">
                                     <span class="text-2xl">{{ $coffee->roastery->country_flag }}</span>
                                     <a href="{{ route('roasteries.show', $coffee->roastery) }}" class="hover:text-primary-600 transition-colors font-semibold">
-                                        {{ $coffee->roastery->name }}
+                                        {{ $coffee->roastery->getName() }}
                                     </a>
                                 </p>
                                 @endif
 
-                                @if($coffee->description)
+                                @if($coffee->getDescription())
                                 <div class="prose max-w-none mb-6">
-                                    {!! nl2br(e($coffee->description)) !!}
+                                    {!! nl2br(e($coffee->getDescription())) !!}
                                 </div>
                                 @endif
 
                                 @if($coffee->attributes && is_array($coffee->attributes) && count($coffee->attributes) > 0)
                                 <div class="bg-gray-50 rounded-2xl p-6 mb-6">
-                                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Parametry kávy</h4>
+                                    <h4 class="text-lg font-semibold text-gray-900 mb-4">{{ $currentLocale === 'en' ? 'Coffee parameters' : 'Parametry kávy' }}</h4>
                                     
                                     @php
-                                        $mainAttributes = ['origin' => 'Původ', 'altitude' => 'Nadmořská výška', 'processing' => 'Zpracování', 'variety' => 'Odrůda', 'flavor_notes' => 'Chuťové tóny'];
+                                        $mainAttributes = $currentLocale === 'en' ? 
+                                            ['origin' => 'Origin', 'altitude' => 'Altitude', 'processing' => 'Processing', 'variety' => 'Variety', 'flavor_notes' => 'Flavor notes'] :
+                                            ['origin' => 'Původ', 'altitude' => 'Nadmořská výška', 'processing' => 'Zpracování', 'variety' => 'Odrůda', 'flavor_notes' => 'Chuťové tóny'];
                                     @endphp
                                     
                                     <!-- Main Attributes -->
                                     <div class="space-y-3 mb-4">
                                         @foreach($mainAttributes as $key => $label)
-                                            @if(isset($coffee->attributes[$key]) && !empty($coffee->attributes[$key]))
+                                            @php
+                                                $attrValue = $coffee->getTranslatedAttribute($key);
+                                            @endphp
+                                            @if($attrValue)
                                             <div>
                                                 <span class="text-sm text-gray-500 block">{{ $label }}</span>
-                                                <span class="text-base font-medium text-gray-900">{{ $coffee->attributes[$key] }}</span>
+                                                <span class="text-base font-medium text-gray-900">{{ $attrValue }}</span>
                                             </div>
                                             @endif
                                         @endforeach
                                         
                                         <!-- Other attributes -->
                                         @foreach($coffee->attributes as $key => $value)
-                                            @if($value && !is_array($value) && !in_array($key, ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date']))
+                                            @if($value && !is_array($value) && !in_array($key, ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date', 'origin_en', 'altitude_en', 'processing_en', 'variety_en', 'flavor_notes_en']))
                                             <div>
                                                 <span class="text-sm text-gray-500 block">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
                                                 <span class="text-base font-medium text-gray-900">{{ $value }}</span>
@@ -295,20 +308,20 @@
                                     <!-- Additional Info -->
                                     @if(isset($coffee->attributes['weight']) || isset($coffee->attributes['roast_date']))
                                     <div class="pt-4 border-t border-gray-200">
-                                        <h5 class="text-sm font-semibold text-gray-700 mb-3">Doplňkové informace</h5>
+                                        <h5 class="text-sm font-semibold text-gray-700 mb-3">{{ $currentLocale === 'en' ? 'Additional information' : 'Doplňkové informace' }}</h5>
                                         <div class="grid grid-cols-2 gap-4">
                                             @if(isset($coffee->attributes['weight']) && !empty($coffee->attributes['weight']))
                                             <div>
-                                                <span class="text-sm text-gray-500 block">Hmotnost</span>
+                                                <span class="text-sm text-gray-500 block">{{ $currentLocale === 'en' ? 'Weight' : 'Hmotnost' }}</span>
                                                 <span class="text-base font-medium text-gray-900">{{ $coffee->attributes['weight'] }} g</span>
                                             </div>
                                             @endif
                                             
                                             @if(isset($coffee->attributes['roast_date']) && !empty($coffee->attributes['roast_date']))
                                             <div>
-                                                <span class="text-sm text-gray-500 block">Datum pražení</span>
+                                                <span class="text-sm text-gray-500 block">{{ $currentLocale === 'en' ? 'Roast date' : 'Datum pražení' }}</span>
                                                 <span class="text-base font-medium text-gray-900">
-                                                    {{ \Carbon\Carbon::parse($coffee->attributes['roast_date'])->format('d.m.Y') }}
+                                                    {{ \Carbon\Carbon::parse($coffee->attributes['roast_date'])->format($currentLocale === 'en' ? 'm/d/Y' : 'd.m.Y') }}
                                                 </span>
                                             </div>
                                             @endif
@@ -320,14 +333,14 @@
 
                                 <div class="bg-gray-50 rounded-2xl p-6 text-center">
                                     <p class="text-base font-semibold text-gray-900 mb-2">
-                                        Tato káva je součástí aktuálního předplatného
+                                        {{ $currentLocale === 'en' ? 'This coffee is part of the current subscription' : 'Tato káva je součástí aktuálního předplatného' }}
                                     </p>
                                     <p class="text-gray-600 mb-4 text-sm font-light">
-                                        Získejte ji společně s dalšími výběrovými kávami v našem měsíčním předplatném
+                                        {{ $currentLocale === 'en' ? 'Get it together with other specialty coffees in our monthly subscription' : 'Získejte ji společně s dalšími výběrovými kávami v našem měsíčním předplatném' }}
                                     </p>
                                     <a href="{{ route('subscriptions.index') }}" 
                                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all duration-200 text-sm">
-                                        <span>Zjistit více o předplatném</span>
+                                        <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                         </svg>
@@ -361,14 +374,14 @@
                     
                     <div class="relative">
                         <h2 class="text-3xl md:text-4xl font-bold mb-3 text-gray-900 tracking-tight">
-                            Chcete dostávat podobné kávy pravidelně?
+                            {{ $currentLocale === 'en' ? 'Want to receive similar coffees regularly?' : 'Chcete dostávat podobné kávy pravidelně?' }}
                         </h2>
                         <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto font-light">
-                            Přihlaste se k našemu předplatnému a box s vybranými kávovými speciály na vás bude pravidelně čekat ve výdejním místě.
+                            {{ $currentLocale === 'en' ? 'Subscribe to our subscription and a box with selected coffee specials will be waiting for you at the pickup point.' : 'Přihlaste se k našemu předplatnému a box s vybranými kávovými speciály na vás bude pravidelně čekat ve výdejním místě.' }}
                         </p>
                         <a href="{{ route('subscriptions.index') }}" 
                            class="inline-flex items-center gap-2 px-8 py-3 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all">
-                            <span>Zjistit více o předplatném</span>
+                            <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
@@ -384,14 +397,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12h.01M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <h2 class="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
-                    Káva měsíce připravujeme
+                    {{ $currentLocale === 'en' ? 'Coffee of the Month coming soon' : 'Káva měsíce připravujeme' }}
                 </h2>
                 <p class="text-lg text-gray-600 mb-8 font-light">
-                    Právě vybíráme výjimečné kávy pro měsíc {{ $monthNameWithYear }}. Brzy vás překvapíme!
+                    {{ $currentLocale === 'en' ? 'We are currently selecting exceptional coffees for ' . $monthNameWithYear . '. We will surprise you soon!' : 'Právě vybíráme výjimečné kávy pro měsíc ' . $monthNameWithYear . '. Brzy vás překvapíme!' }}
                 </p>
                 <a href="{{ route('subscriptions.index') }}" 
                    class="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all duration-200">
-                    <span>Zjistit více o předplatném</span>
+                    <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>

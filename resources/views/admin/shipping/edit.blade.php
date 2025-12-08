@@ -56,6 +56,51 @@
                 @enderror
             </div>
 
+            <!-- Region Availability -->
+            <div class="mb-6 pb-6 border-b border-gray-200">
+                <h4 class="text-lg font-bold text-gray-900 mb-2">Dostupnost podle regionu</h4>
+                <p class="text-sm text-gray-600 mb-4">Nastavte, na které verzi webu bude tato doprava dostupná</p>
+                
+                <div class="flex flex-col md:flex-row gap-4">
+                    <label class="flex items-center gap-3 cursor-pointer bg-blue-50 rounded-lg px-4 py-3 border border-blue-200">
+                        <input type="hidden" name="available_on_cz" value="0">
+                        <input 
+                            type="checkbox" 
+                            name="available_on_cz" 
+                            value="1" 
+                            {{ old('available_on_cz', $rate->available_on_cz) ? 'checked' : '' }}
+                            class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
+                        >
+                        <div>
+                            <span class="text-sm font-medium text-gray-900">🇨🇿 kavi.cz</span>
+                            <p class="text-xs text-gray-500">Česká verze webu</p>
+                        </div>
+                    </label>
+                    
+                    <label class="flex items-center gap-3 cursor-pointer bg-purple-50 rounded-lg px-4 py-3 border border-purple-200">
+                        <input type="hidden" name="available_on_com" value="0">
+                        <input 
+                            type="checkbox" 
+                            name="available_on_com" 
+                            value="1" 
+                            {{ old('available_on_com', $rate->available_on_com) ? 'checked' : '' }}
+                            class="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 cursor-pointer"
+                        >
+                        <div>
+                            <span class="text-sm font-medium text-gray-900">🌍 kavibox.com</span>
+                            <p class="text-xs text-gray-500">Mezinárodní EN verze</p>
+                        </div>
+                    </label>
+                </div>
+                
+                @error('available_on_cz')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+                @error('available_on_com')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Pricing Section -->
             <div class="mb-6 pb-6 border-b border-gray-200">
                 <h4 class="text-lg font-bold text-gray-900 mb-4">Ceny dopravy</h4>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CurrencyHelper;
 use App\Mail\OrderConfirmation;
 use App\Models\Coupon;
 use App\Models\Order;
@@ -72,7 +73,7 @@ class CheckoutController extends Controller
         foreach ($cart as $productId => $quantity) {
             $product = Product::find($productId);
             if ($product && $product->is_active) {
-                $itemSubtotal = $product->price * $quantity;
+                $itemSubtotal = $product->getPrice() * $quantity;
                 $cartItems[] = [
                     'product' => $product,
                     'quantity' => $quantity,
@@ -361,7 +362,7 @@ class CheckoutController extends Controller
             foreach ($cart as $productId => $quantity) {
                 $product = Product::find($productId);
                 if ($product && $product->is_active && $product->stock >= $quantity) {
-                    $itemTotal = $product->price * $quantity;
+                    $itemTotal = $product->getPrice() * $quantity;
                     $subtotal += $itemTotal;
                     
                     // Přičíst k discountable subtotal pouze pokud produkt není vyloučen ze slev
@@ -372,7 +373,7 @@ class CheckoutController extends Controller
                     $orderItems[] = [
                         'product' => $product,
                         'quantity' => $quantity,
-                        'price' => $product->price,
+                        'price' => $product->getPrice(),
                         'total' => $itemTotal,
                     ];
                 }
@@ -482,6 +483,7 @@ class CheckoutController extends Controller
                 'shipping_country' => $shippingCountry,
                 'tax' => $tax,
                 'total' => $totalWithVat,
+                'currency' => CurrencyHelper::code(),
                 'status' => 'pending',
                 'payment_status' => 'pending',
                 'payment_method' => $request->payment_method,

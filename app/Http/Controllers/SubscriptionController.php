@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CurrencyHelper;
 use App\Mail\SubscriptionConfirmation;
 use App\Models\Coupon;
 use App\Models\ShippingRate;
@@ -30,12 +31,20 @@ class SubscriptionController extends Controller
             ->orderBy('price')
             ->get();
 
-        // Get subscription pricing configuration
-        $subscriptionPricing = [
-            '2' => SubscriptionConfig::get('price_2_bags', 500),
-            '3' => SubscriptionConfig::get('price_3_bags', 720),
-            '4' => SubscriptionConfig::get('price_4_bags', 920),
-        ];
+        // Get subscription pricing configuration based on currency
+        if (CurrencyHelper::isEur()) {
+            $subscriptionPricing = [
+                '2' => SubscriptionConfig::get('price_2_bags_eur', 20),
+                '3' => SubscriptionConfig::get('price_3_bags_eur', 29),
+                '4' => SubscriptionConfig::get('price_4_bags_eur', 37),
+            ];
+        } else {
+            $subscriptionPricing = [
+                '2' => SubscriptionConfig::get('price_2_bags', 500),
+                '3' => SubscriptionConfig::get('price_3_bags', 720),
+                '4' => SubscriptionConfig::get('price_4_bags', 920),
+            ];
+        }
 
         // Get shipping date info
         $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
@@ -71,8 +80,12 @@ class SubscriptionController extends Controller
         // If today is on or after cutoff date, show next month
         $displayMonth = $today->greaterThanOrEqualTo($cutoffDate) ? $today->copy()->addMonthNoOverflow() : $today->copy();
         
-        // Get month name in nominative case
-        $months = [
+        // Get month name in nominative case based on locale
+        $months = app()->getLocale() === 'en' ? [
+            1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+            5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+        ] : [
             1 => 'Leden', 2 => 'Únor', 3 => 'Březen', 4 => 'Duben',
             5 => 'Květen', 6 => 'Červen', 7 => 'Červenec', 8 => 'Srpen',
             9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec'
@@ -102,7 +115,16 @@ class SubscriptionController extends Controller
         
         // Calculate next available month (after 16th of next month)
         $nextAvailableDate = now()->addMonthNoOverflow()->day(16);
-        $nextAvailableMonthName = $months[$nextAvailableDate->month];
+        $nextAvailableMonths = app()->getLocale() === 'en' ? [
+            1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+            5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+        ] : [
+            1 => 'Leden', 2 => 'Únor', 3 => 'Březen', 4 => 'Duben',
+            5 => 'Květen', 6 => 'Červen', 7 => 'Červenec', 8 => 'Srpen',
+            9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec'
+        ];
+        $nextAvailableMonthName = $nextAvailableMonths[$nextAvailableDate->month];
 
         return view('subscriptions.index', compact(
             'plans', 
@@ -239,16 +261,20 @@ class SubscriptionController extends Controller
 
         // Calculate price based on amount (tiered pricing)
         $pricingKey = 'price_' . $validated['amount'] . '_bags';
-        $totalPriceWithVat = SubscriptionConfig::get($pricingKey, 500); // Default to 500 if not found
+        if (CurrencyHelper::isEur()) {
+            $totalPriceWithVat = SubscriptionConfig::get($pricingKey . '_eur', 29);
+        } else {
+            $totalPriceWithVat = SubscriptionConfig::get($pricingKey, 500);
+        }
         
         // Add decaf surcharge if selected
         if ($validated['isDecaf']) {
-            $totalPriceWithVat += 100; // +100 Kč za decaf variantu
+            $totalPriceWithVat += CurrencyHelper::isEur() ? 5 : 100; // +5 € / +100 Kč za decaf variantu
         }
         
         // Add one-time box surcharge if selected
         if ($validated['frequency'] == 0) {
-            $totalPriceWithVat += 100; // +100 Kč za jednorázový box
+            $totalPriceWithVat += CurrencyHelper::isEur() ? 5 : 100; // +5 € / +100 Kč za jednorázový box
         }
         
         // Calculate VAT (all prices include 21% VAT)
@@ -668,6 +694,7 @@ class SubscriptionController extends Controller
                     'discount_months_total' => $discountMonths,
                     'configuration' => $configuration,
                     'configured_price' => $originalPrice, // Store FULL price without discount
+                    'currency' => CurrencyHelper::code(),
                     'frequency_months' => $configuration['frequency'],
                     'status' => 'pending', // Will be activated after payment confirmation
                     'starts_at' => now(),
@@ -891,6 +918,7 @@ class SubscriptionController extends Controller
                     'discount_months_total' => null,
                     'configuration' => $configuration,
                     'configured_price' => $price,
+                    'currency' => CurrencyHelper::code(),
                     'frequency_months' => 0, // 0 = one-time
                     'status' => 'pending',
                     'starts_at' => now(),
@@ -973,6 +1001,7 @@ class SubscriptionController extends Controller
                 'discount_months_total' => null,
                 'configuration' => $configuration,
                 'configured_price' => $price,
+                'currency' => CurrencyHelper::code(),
                 'frequency_months' => 0, // 0 = one-time
                 'status' => 'pending',
                 'starts_at' => now(),
@@ -1151,6 +1180,7 @@ class SubscriptionController extends Controller
                 'discount_months_total' => $discountMonths,
                 'configuration' => $configuration,
                 'configured_price' => $originalPrice, // Store FULL price without discount (even for 100% discount)
+                'currency' => CurrencyHelper::code(),
                 'frequency_months' => $configuration['frequency'],
                 'status' => 'active', // Immediately active
                 'starts_at' => now(),

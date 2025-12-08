@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Jak to funguje - KAVI.cz')
+@section('title', __('pages.how_it_works.title'))
 
 @section('content')
 
@@ -19,16 +19,16 @@
                 <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="text-sm font-medium text-gray-900">Nápověda & FAQ</span>
+                <span class="text-sm font-medium text-gray-900">{{ __('pages.how_it_works.badge') }}</span>
             </div>
             
             <!-- Clean Heading -->
             <h1 class="mb-6 text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-                Jak to funguje?
+                {{ __('pages.how_it_works.heading') }}
             </h1>
             
             <p class="mx-auto max-w-2xl text-lg text-gray-600 font-light mb-8">
-                Vše, co potřebujete vědět o kávovém předplatném
+                {{ __('pages.how_it_works.subtitle') }}
             </p>
             
             <!-- Quick Links -->
@@ -37,13 +37,13 @@
                     <svg class="w-4 h-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
-                    <span>Předplatné</span>
+                    <span>{{ __('pages.how_it_works.subscription') }}</span>
                 </a>
                 <a href="#vyber-kavy" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
                     <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    <span>Výběr kávy</span>
+                    <span>{{ __('pages.how_it_works.coffee_selection') }}</span>
                 </a>
             </div>
         </div>
@@ -68,10 +68,10 @@
                 </svg>
             </div>
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Předplatné a doprava
+                {{ __('pages.how_it_works.section1_title') }}
             </h2>
             <p class="text-lg text-gray-600 font-light">
-                Vše o objednávkách, platbách a doručení
+                {{ __('pages.how_it_works.section1_subtitle') }}
             </p>
         </div>
 
@@ -83,10 +83,10 @@
                     <span class="text-lg font-medium text-primary-600">1</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Jak funguje předplatné kávy?
+                    {{ __('pages.how_it_works.faq1_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Předplatné si jednoduše nastavíte online – zvolíte typ boxu (espresso, filtr nebo kombinace), rozhodnete se zda chcete přidat i bezkofeinovou kávu, vyberete si četnost dodávek a místo doručení a my se postaráme o zbytek. Káva vám automaticky dorazí pravidelně na vámi zadané místo.
+                    {{ __('pages.how_it_works.faq1_text') }}
                 </p>
             </div>
 
@@ -96,10 +96,10 @@
                     <span class="text-lg font-medium text-primary-600">2</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Kdy mi dorazí balíček s kávou?
+                    {{ __('pages.how_it_works.faq2_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Objednávky pro daný měsíc končí většinou <strong class="text-gray-900 font-medium">15.</strong> Kávové boxy odesíláme o pár dní později, nejčastěji <strong class="text-gray-900 font-medium">20.</strong> Pokud si svůj první kávový box objednáte do 15. dne měsíce, první zásilka kávy vám přijde hned v nejbližší várce.
+                    {!! __('pages.how_it_works.faq2_text') !!}
                 </p>
             </div>
 
@@ -109,10 +109,10 @@
                     <span class="text-lg font-medium text-primary-600">3</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Jakou dopravu nabízíte?
+                    {{ __('pages.how_it_works.faq3_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Doručujeme do <strong class="text-gray-900 font-medium">Z-boxů a na Z-pointy</strong> (výdejní místa) společnosti Zásilkovna. Jiná doprava není v tuto chvíli možná.
+                    {!! __('pages.how_it_works.faq3_text') !!}
                 </p>
             </div>
 
@@ -122,10 +122,10 @@
                     <span class="text-lg font-medium text-primary-600">4</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Jak probíhá platba za předplatné?
+                    {{ __('pages.how_it_works.faq4_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Platba probíhá automaticky každý <strong class="text-gray-900 font-medium">15. den v měsíci</strong> formou opakované platby přes vaši platební kartu, kterou jste zadali při objednávce. O každé platbě dostanete potvrzení na e-mail.
+                    {!! __('pages.how_it_works.faq4_text') !!}
                 </p>
             </div>
 
@@ -135,10 +135,10 @@
                     <span class="text-lg font-medium text-primary-600">5</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Co když mi nedorazí balíček?
+                    {{ __('pages.how_it_works.faq5_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Pokud se zásilka zpozdí nebo nedorazí, kontaktujte nás a vše rychle vyřešíme. Balíčky jsou vždy sledované.
+                    {{ __('pages.how_it_works.faq5_text') }}
                 </p>
             </div>
 
@@ -148,10 +148,10 @@
                     <span class="text-lg font-medium text-primary-600">6</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Dostanu kávu i když si nevyzvednu balíček včas?
+                    {{ __('pages.how_it_works.faq6_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Pokud si balíček nestihnete vyzvednout, Zásilkovna ho automaticky vrátí zpět. Následně vás kontaktujeme a domluvíme se na novém odeslání.
+                    {{ __('pages.how_it_works.faq6_text') }}
                 </p>
             </div>
 
@@ -161,10 +161,10 @@
                     <span class="text-lg font-medium text-primary-600">7</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Posíláte i do zahraničí?
+                    {{ __('pages.how_it_works.faq7_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Momentálně doručujeme pouze v rámci České republiky a Slovenskapřes Zásilkovnu.
+                    {{ __('pages.how_it_works.faq7_text') }}
                 </p>
             </div>
 
@@ -174,10 +174,10 @@
                     <span class="text-lg font-medium text-white">8</span>
                 </div>
                 <h3 class="text-lg font-bold text-white mb-4 pr-14">
-                    Je možné předplatné změnit či zrušit?
+                    {{ __('pages.how_it_works.faq8_title') }}
                 </h3>
                 <p class="text-white/90 leading-relaxed font-light">
-                    Pochopitelně! Naše předplatné můžete kdykoliv zrušit nebo pozastavit. Stejně tak upravíme doručovací adresu nebo platební metodu. Veškeré změny můžete provést prostřednictvím vašeho zákaznického účtu.
+                    {{ __('pages.how_it_works.faq8_text') }}
                 </p>
             </div>
         </div>
@@ -195,10 +195,10 @@
                 </svg>
             </div>
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Výběr kávy pro předplatné
+                {{ __('pages.how_it_works.section2_title') }}
             </h2>
             <p class="text-lg text-gray-600 font-light">
-                Jak vybíráme kávy a co můžete očekávat
+                {{ __('pages.how_it_works.section2_subtitle') }}
             </p>
         </div>
 
@@ -210,10 +210,10 @@
                     <span class="text-lg font-medium text-amber-600">1</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Jaké druhy kávy zařazujete do předplatného?
+                    {{ __('pages.how_it_works.faq9_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Vybíráme pouze tu <strong class="text-gray-900 font-medium">nejkvalitnější výběrovou kávu</strong> od těch nejzajímavějších pražíren z celé Evropy. Některé kupují kávu přímo od farmářů, jiné spolupracují s renomovanými dovozci.
+                    {!! __('pages.how_it_works.faq9_text') !!}
                 </p>
             </div>
 
@@ -223,10 +223,10 @@
                     <span class="text-lg font-medium text-amber-600">2</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Jak vybíráte kávu?
+                    {{ __('pages.how_it_works.faq10_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Náš tým průběžně ochutnává kávy jednotlivých pražíren. Kávy dělíme do kategorií podle chuťového profilu a zařazujeme je v takové kombinaci, abyste dostali optimální chuťový zážitek. Kávy jsou vybírány čistě na základě řemesla, kvality a chuti.
+                    {{ __('pages.how_it_works.faq10_text') }}
                 </p>
             </div>
 
@@ -236,10 +236,10 @@
                     <span class="text-lg font-medium text-amber-600">3</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Můžete mi kávu dodat mletou?
+                    {{ __('pages.how_it_works.faq11_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Ne. Abychom zajistili čerstvost, dodáváme pouze <strong class="text-gray-900 font-medium">celá zrnka</strong>. Kávy dostanete v originálních vzduchotěsných sáčcích, abychom zachovali kávu čerstvou až do okamžiku, kdy si ji doma otevřete.
+                    {!! __('pages.how_it_works.faq11_text') !!}
                 </p>
             </div>
 
@@ -249,10 +249,10 @@
                     <span class="text-lg font-medium text-white">4</span>
                 </div>
                 <h3 class="text-lg font-bold text-white mb-4 pr-14">
-                    Jaký je rozdíl mezi espresso a filtr boxem?
+                    {{ __('pages.how_it_works.faq12_title') }}
                 </h3>
                 <p class="text-white/90 leading-relaxed font-light">
-                    <strong class="text-white font-medium">Espresso box</strong> obsahuje kávy ideální pro přípravu v kávovaru nebo moka konvičce – s vyšší intenzitou. <strong class="text-white font-medium">Filtr box</strong> je laděný pro V60, Chemex nebo Aeropress – s jemnější chutí.
+                    {!! __('pages.how_it_works.faq12_text') !!}
                 </p>
             </div>
 
@@ -262,10 +262,10 @@
                     <span class="text-lg font-medium text-amber-600">5</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Můžu si vybrat konkrétní kávy?
+                    {{ __('pages.how_it_works.faq13_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Ne – překvapení je součástí kouzla předplatného. Každý měsíc ochutnáte něco nového, co byste si možná sami nevybrali.
+                    {{ __('pages.how_it_works.faq13_text') }}
                 </p>
             </div>
 
@@ -275,10 +275,10 @@
                     <span class="text-lg font-medium text-amber-600">6</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Jak čerstvá je káva, kterou dostanu?
+                    {{ __('pages.how_it_works.faq14_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Káva je vždy <strong class="text-gray-900 font-medium">čerstvě pražená</strong> – odebíráme ji přímo z pražíren jen pár týdnů před odesláním vašich balíčků.
+                    {!! __('pages.how_it_works.faq14_text') !!}
                 </p>
             </div>
 
@@ -288,10 +288,10 @@
                     <span class="text-lg font-medium text-amber-600">7</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Co když mi káva nechutná?
+                    {{ __('pages.how_it_works.faq15_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Chápeme, že chutě jsou individuální. Naším cílem je objevování. Pokud vám něco nesedne, dejte nám vědět – zpětná vazba nám pomáhá zlepšovat výběr.
+                    {{ __('pages.how_it_works.faq15_text') }}
                 </p>
             </div>
 
@@ -301,10 +301,10 @@
                     <span class="text-lg font-medium text-amber-600">8</span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-4 pr-14">
-                    Jak velká balení kávy dostanu?
+                    {{ __('pages.how_it_works.faq16_title') }}
                 </h3>
                 <p class="text-gray-600 leading-relaxed font-light">
-                    Standardně dodáváme <strong class="text-gray-900 font-medium">balení kávy po 250g</strong>. Ve výjimečných případech může být hmotnost sáčků odlišná, ale vždy výměnou za skvělý chuťový zážitek.
+                    {!! __('pages.how_it_works.faq16_text') !!}
                 </p>
             </div>
         </div>
@@ -316,10 +316,10 @@
     <div class="mx-auto max-w-screen-xl px-4 md:px-8">
         <div class="mb-16 max-w-2xl mx-auto text-center">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Proč zvolit KAVI.cz?
+                {{ __('pages.how_it_works.benefits_title') }}
             </h2>
             <p class="text-lg text-gray-600 font-light">
-                Výhody našeho kávového předplatného
+                {{ __('pages.how_it_works.benefits_subtitle') }}
             </p>
         </div>
 
@@ -331,8 +331,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">Ekologické balení</h3>
-                <p class="text-gray-600 font-light leading-relaxed">Baleno do papíru, 100% recyklovatelné</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-3">{{ __('pages.how_it_works.benefit1_title') }}</h3>
+                <p class="text-gray-600 font-light leading-relaxed">{{ __('pages.how_it_works.benefit1_text') }}</p>
             </div>
 
             <!-- Benefit 2 -->
@@ -342,8 +342,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">Snadné změny</h3>
-                <p class="text-gray-600 font-light leading-relaxed">Změna, pauza nebo zrušení kdykoliv</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-3">{{ __('pages.how_it_works.benefit2_title') }}</h3>
+                <p class="text-gray-600 font-light leading-relaxed">{{ __('pages.how_it_works.benefit2_text') }}</p>
             </div>
 
             <!-- Benefit 3 -->
@@ -353,8 +353,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">Bezpečná platba</h3>
-                <p class="text-gray-600 font-light leading-relaxed">Chráněno Stripe platební bránou</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-3">{{ __('pages.how_it_works.benefit3_title') }}</h3>
+                <p class="text-gray-600 font-light leading-relaxed">{{ __('pages.how_it_works.benefit3_text') }}</p>
             </div>
         </div>
     </div>
@@ -367,24 +367,24 @@
         <div class="mx-auto flex max-w-2xl flex-col items-center text-center">
             <!-- Heading -->
             <h2 class="mb-6 text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">
-                Máte další otázky?
+                {{ __('pages.how_it_works.cta_title') }}
             </h2>
 
             <p class="mb-10 text-lg text-gray-600 max-w-xl leading-relaxed font-light">
-                Kontaktujte nás a my vám rádi odpovíme na všechny vaše dotazy ohledně předplatného nebo kávy.
+                {{ __('pages.how_it_works.cta_text') }}
             </p>
 
             <!-- CTA Buttons -->
             <div class="flex flex-col sm:flex-row gap-3">
                 <a href="{{ route('contact') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
-                    <span>Napište nám</span>
+                    <span>{{ __('pages.how_it_works.cta_contact') }}</span>
                     <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
 
                 <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 transition-all duration-200">
-                    <span>Vybrat předplatné</span>
+                    <span>{{ __('pages.how_it_works.cta_subscription') }}</span>
                 </a>
             </div>
         </div>

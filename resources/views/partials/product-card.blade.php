@@ -9,13 +9,13 @@
   <a href="{{ route('products.show', $product) }}" class="relative block h-64 overflow-hidden bg-gray-50">
   @endif
     @if($product->image)
-    <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->name }}" class="h-full w-full object-cover object-center transition duration-300 {{ $historical ?? false ? '' : 'group-hover:scale-105' }}" />
+    <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-300 {{ $historical ?? false ? '' : 'group-hover:scale-105' }}" />
     @else
     <div class="h-full w-full flex flex-col items-center justify-center p-8 bg-gray-100">
       <svg class="w-16 h-16 text-gray-300 mb-3" fill="currentColor" viewBox="0 0 24 24">
         <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
       </svg>
-      <p class="text-center text-sm font-medium text-gray-600">{{ $product->name }}</p>
+      <p class="text-center text-sm font-medium text-gray-600">{{ $product->getName() }}</p>
     </div>
     @endif
 
@@ -93,11 +93,11 @@
     <div class="mb-3">
       @if($historical ?? false)
       <div class="block">
-        <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-2">{{ $product->name }}</h3>
+        <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-2">{{ $product->getName() }}</h3>
       </div>
       @else
       <a href="{{ route('products.show', $product) }}" class="block">
-        <h3 class="text-base font-bold text-gray-900 group-hover:text-gray-600 transition-colors mb-2 line-clamp-2">{{ $product->name }}</h3>
+        <h3 class="text-base font-bold text-gray-900 group-hover:text-gray-600 transition-colors mb-2 line-clamp-2">{{ $product->getName() }}</h3>
       </a>
       @endif
       
@@ -106,7 +106,7 @@
       <p class="text-sm text-gray-500 font-light mb-2 flex items-center gap-1">
         <span class="text-lg">{{ $product->roastery->country_flag }}</span>
         <a href="{{ route('roasteries.show', $product->roastery) }}" class="hover:text-primary-600 transition-colors">
-          {{ $product->roastery->name }}
+          {{ $product->roastery->getName() }}
         </a>
       </p>
       @elseif(!empty($product->attributes['roaster']))
@@ -138,7 +138,7 @@
     <div class="pt-4 border-t border-gray-100">
       <div class="flex items-center justify-between mb-3">
         <p class="text-xl font-bold text-gray-900">
-          {{ number_format($product->price, 0, ',', ' ') }} Kč
+          {{ $product->getFormattedPrice() }}
         </p>
       </div>
       

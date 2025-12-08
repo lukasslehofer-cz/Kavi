@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\CurrencyHelper;
 use App\Models\NewsletterSubscriber;
 use App\Models\Order;
 use App\Models\Subscription;
@@ -141,7 +142,7 @@ class StripeService
             // Use exact price (not rounded) - rounding happens at total level
             return [
                 'price_data' => [
-                    'currency' => 'czk',
+                    'currency' => CurrencyHelper::stripeCode(),
                     'product_data' => $productData,
                     'unit_amount' => (int)round($item->price * 100),
                 ],
@@ -153,9 +154,9 @@ class StripeService
         if ($order->shipping > 0) {
             $lineItems[] = [
                 'price_data' => [
-                    'currency' => 'czk',
+                    'currency' => CurrencyHelper::stripeCode(),
                     'product_data' => [
-                        'name' => 'Doprava',
+                        'name' => CurrencyHelper::isCzk() ? 'Doprava' : 'Shipping',
                     ],
                     'unit_amount' => (int)round($order->shipping * 100),
                 ],
@@ -188,9 +189,9 @@ class StripeService
                 if ($adjustedDiscount > 0) {
                     $stripeCoupon = \Stripe\Coupon::create([
                         'amount_off' => (int)round($adjustedDiscount * 100),
-                        'currency' => 'czk',
+                        'currency' => CurrencyHelper::stripeCode(),
                         'duration' => 'once',
-                        'name' => $order->coupon_code ?? 'Sleva',
+                        'name' => $order->coupon_code ?? (CurrencyHelper::isCzk() ? 'Sleva' : 'Discount'),
                     ]);
 
                     $sessionData['discounts'] = [['coupon' => $stripeCoupon->id]];
@@ -242,22 +243,15 @@ class StripeService
             ? json_decode($subscription->configuration, true) 
             : $subscription->configuration;
         
-        $boxSize = ['2' => 'M Box (2× 250g)', '3' => 'L Box (3× 250g)', '4' => 'XL Box (4× 250g)'];
-        $boxType = ['espresso' => 'Espresso', 'filter' => 'Filtr', 'mix' => 'Mix'];
-        
-        $productName = ($boxSize[$config['amount']] ?? 'Box') . ' - ' . ($boxType[$config['type']] ?? 'Káva');
-        if ($config['isDecaf'] ?? false) {
-            $productName .= ' + Decaf';
-        }
-        $productName .= ' (Jednorázově)';
+        $productName = $this->buildProductName($config, 'one_time');
         
         $lineItems = [
             [
                 'price_data' => [
-                    'currency' => 'czk',
+                    'currency' => CurrencyHelper::stripeCode(),
                     'product_data' => [
                         'name' => $productName,
-                        'description' => 'Jednorázový kávový box bez předplatného',
+                        'description' => CurrencyHelper::isCzk() ? 'Jednorázový kávový box bez předplatného' : 'One-time coffee box without subscription',
                     ],
                     'unit_amount' => (int)(round($price) * 100),
                 ],
@@ -269,9 +263,9 @@ class StripeService
         if ($shipping > 0) {
             $lineItems[] = [
                 'price_data' => [
-                    'currency' => 'czk',
+                    'currency' => CurrencyHelper::stripeCode(),
                     'product_data' => [
-                        'name' => 'Doprava',
+                        'name' => CurrencyHelper::isCzk() ? 'Doprava' : 'Shipping',
                     ],
                     'unit_amount' => (int)(round($shipping) * 100),
                 ],
@@ -363,13 +357,7 @@ class StripeService
         $subscriptionMetadata['frequency_months'] = $frequencyMonths;
 
         // Build product description
-        $boxSize = ['2' => 'M Box (2× 250g)', '3' => 'L Box (3× 250g)', '4' => 'XL Box (4× 250g)'];
-        $boxType = ['espresso' => 'Espresso', 'filter' => 'Filtr', 'mix' => 'Mix'];
-        $productName = ($boxSize[$configuration['amount']] ?? 'Box') . ' - ' . ($boxType[$configuration['type']] ?? 'Káva');
-        if ($configuration['isDecaf'] ?? false) {
-            $productName .= ' + Decaf';
-        }
-        $productName .= ' (První platba)';
+        $productName = $this->buildProductName($configuration, 'first_payment');
 
         // Calculate actual payment amount (full price minus discount)
         $paymentAmount = $price - $discount;
@@ -381,11 +369,13 @@ class StripeService
         // Build line items array - use single line item with full total to avoid rounding discrepancies
         $lineItems = [[
             'price_data' => [
-                'currency' => 'czk',
-                'unit_amount' => (int)($displayedTotal * 100), // Exact displayed total in haléře
+                'currency' => CurrencyHelper::stripeCode(),
+                'unit_amount' => (int)($displayedTotal * 100), // Exact displayed total in cents/haléře
                 'product_data' => [
                     'name' => $productName,
-                    'description' => 'Platba předplatného' . ($shipping > 0 ? ' včetně dopravy' : ''),
+                    'description' => CurrencyHelper::isCzk() 
+                        ? ('Platba předplatného' . ($shipping > 0 ? ' včetně dopravy' : ''))
+                        : ('Subscription payment' . ($shipping > 0 ? ' including shipping' : '')),
                 ],
             ],
             'quantity' => 1,
@@ -431,6 +421,51 @@ class StripeService
         ]);
 
         return StripeSession::create($sessionData);
+    }
+
+    /**
+     * Build localized product name for Stripe
+     * 
+     * @param array $configuration Subscription configuration
+     * @param string $type 'one_time', 'first_payment', 'recurring'
+     * @return string
+     */
+    private function buildProductName(array $configuration, string $type = 'recurring'): string
+    {
+        $isEur = CurrencyHelper::isEur();
+        
+        // Box sizes - same in both languages
+        $boxSize = [
+            '2' => 'M Box (2× 250g)',
+            '3' => 'L Box (3× 250g)',
+            '4' => 'XL Box (4× 250g)',
+        ];
+        
+        // Box types - localized
+        $boxType = $isEur 
+            ? ['espresso' => 'Espresso', 'filter' => 'Filter', 'mix' => 'Mix']
+            : ['espresso' => 'Espresso', 'filter' => 'Filtr', 'mix' => 'Mix'];
+        
+        $defaultCoffee = $isEur ? 'Coffee' : 'Káva';
+        
+        $productName = ($boxSize[$configuration['amount']] ?? 'Box') . ' - ' . ($boxType[$configuration['type']] ?? $defaultCoffee);
+        
+        if ($configuration['isDecaf'] ?? false) {
+            $productName .= ' + Decaf';
+        }
+        
+        // Add suffix based on type
+        switch ($type) {
+            case 'one_time':
+                $productName .= $isEur ? ' (One-time)' : ' (Jednorázově)';
+                break;
+            case 'first_payment':
+                $productName .= $isEur ? ' (First payment)' : ' (První platba)';
+                break;
+            // 'recurring' - no suffix
+        }
+        
+        return $productName;
     }
 
     /**
@@ -519,7 +554,7 @@ class StripeService
 
         // Create a Price object with dynamic pricing
         $stripePrice = \Stripe\Price::create([
-            'currency' => 'czk',
+            'currency' => CurrencyHelper::stripeCode(),
             'product' => $productId,
             'recurring' => [
                 'interval' => 'month',
@@ -1461,13 +1496,16 @@ class StripeService
                         try {
                             $newPrice = $subscription->configured_price ?? $subscription->plan?->price ?? 0;
                             
+                            // Use subscription's stored currency
+                            $subscriptionCurrency = strtolower($subscription->currency ?? 'CZK');
+                            
                             // Získat aktuální Stripe subscription
                             $stripeSubscription = \Stripe\Subscription::retrieve($subscription->stripe_subscription_id);
                             
                             // Vytvořit nový Price objekt s plnou cenou
                             $productId = $this->getOrCreateBaseSubscriptionProduct();
                             $newStripePrice = \Stripe\Price::create([
-                                'currency' => 'czk',
+                                'currency' => $subscriptionCurrency,
                                 'product' => $productId,
                                 'recurring' => [
                                     'interval' => 'month',
@@ -1738,7 +1776,7 @@ class StripeService
             
             // If no real invoice, create a generic one-time payment
             if (!$hasRealInvoice) {
-                $currency = 'czk';
+                $currency = CurrencyHelper::stripeCode();
                 $amount = (int)(round($subscription->pending_invoice_amount) * 100); // Convert to cents
             }
 
@@ -1750,8 +1788,8 @@ class StripeService
                     'price_data' => [
                         'currency' => $currency,
                         'product_data' => [
-                            'name' => 'Platba předplatného - ' . ($subscription->subscription_number ?? '#' . $subscription->id),
-                            'description' => 'Neuhrazená platba za kávové předplatné',
+                            'name' => (CurrencyHelper::isCzk() ? 'Platba předplatného - ' : 'Subscription payment - ') . ($subscription->subscription_number ?? '#' . $subscription->id),
+                            'description' => CurrencyHelper::isCzk() ? 'Neuhrazená platba za kávové předplatné' : 'Unpaid subscription payment',
                         ],
                         'unit_amount' => $amount,
                     ],
@@ -2224,23 +2262,28 @@ class StripeService
                 $amount -= $subscription->discount_amount;
             }
 
+            // Use subscription's stored currency (not session currency)
+            $subscriptionCurrency = strtolower($subscription->currency ?? 'CZK');
+            $isEur = $subscriptionCurrency === 'eur';
+
             \Log::info('Attempting to charge subscription', [
                 'subscription_id' => $subscription->id,
                 'subscription_number' => $subscription->subscription_number,
                 'customer_id' => $customerId,
                 'payment_method_id' => $paymentMethodId,
                 'amount' => $amount,
+                'currency' => $subscriptionCurrency,
             ]);
 
             // Create and confirm payment intent
             $paymentIntent = \Stripe\PaymentIntent::create([
                 'amount' => (int)(round($amount) * 100), // Convert to cents
-                'currency' => 'czk',
+                'currency' => $subscriptionCurrency,
                 'customer' => $customerId,
                 'payment_method' => $paymentMethodId,
                 'confirm' => true,
                 'off_session' => true, // Important: tells Stripe this is automated
-                'description' => 'Kávové předplatné - ' . ($subscription->subscription_number ?? '#' . $subscription->id),
+                'description' => ($isEur ? 'Coffee subscription - ' : 'Kávové předplatné - ') . ($subscription->subscription_number ?? '#' . $subscription->id),
                 'metadata' => [
                     'subscription_id' => $subscription->id,
                     'subscription_number' => $subscription->subscription_number ?? '',
@@ -2255,7 +2298,7 @@ class StripeService
                     'subscription_id' => $subscription->id,
                     'stripe_payment_intent_id' => $paymentIntent->id,
                     'amount' => $amount,
-                    'currency' => 'czk',
+                    'currency' => $subscriptionCurrency,
                     'status' => 'paid',
                     'paid_at' => now(),
                     'period_start' => $subscription->next_billing_date?->copy()->subMonths($subscription->frequency_months ?? 1),

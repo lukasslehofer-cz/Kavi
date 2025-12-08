@@ -46,15 +46,18 @@ class CouponController extends Controller
             // Jednorázový nákup
             'discount_type_order' => 'required|in:percentage,fixed,none',
             'discount_value_order' => 'nullable|numeric|min:0',
+            'discount_value_order_eur' => 'nullable|numeric|min:0',
             'free_shipping' => 'boolean',
             
             // Předplatné
             'discount_type_subscription' => 'required|in:percentage,fixed,none',
             'discount_value_subscription' => 'nullable|numeric|min:0',
+            'discount_value_subscription_eur' => 'nullable|numeric|min:0',
             'subscription_discount_months' => 'nullable|integer|min:1',
             
             // Minimální hodnota
             'min_order_value' => 'nullable|numeric|min:0',
+            'min_order_value_eur' => 'nullable|numeric|min:0',
             
             // Platnost
             'valid_from' => 'nullable|date',
@@ -103,15 +106,18 @@ class CouponController extends Controller
             // Jednorázový nákup
             'discount_type_order' => 'required|in:percentage,fixed,none',
             'discount_value_order' => 'nullable|numeric|min:0',
+            'discount_value_order_eur' => 'nullable|numeric|min:0',
             'free_shipping' => 'boolean',
             
             // Předplatné
             'discount_type_subscription' => 'required|in:percentage,fixed,none',
             'discount_value_subscription' => 'nullable|numeric|min:0',
+            'discount_value_subscription_eur' => 'nullable|numeric|min:0',
             'subscription_discount_months' => 'nullable|integer|min:1',
             
             // Minimální hodnota
             'min_order_value' => 'nullable|numeric|min:0',
+            'min_order_value_eur' => 'nullable|numeric|min:0',
             
             // Platnost
             'valid_from' => 'nullable|date',
