@@ -52,7 +52,7 @@
       </div>
       
       <div class="flex flex-wrap justify-center gap-2">
-        <a href="{{ route('roasteries.index') }}" 
+        <a href="{{ localizedRoute('roasteries.index') }}" 
            class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 {{ !$selectedCountry ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300' }}">
           @if(!$selectedCountry)
           <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,7 +63,7 @@
         </a>
         
         @foreach($countries as $country => $countryData)
-        <a href="{{ route('roasteries.index', ['country' => $country]) }}" 
+        <a href="{{ localizedRoute('roasteries.index', ['country' => $country]) }}" 
            class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 {{ $selectedCountry == $country ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300' }}">
           @if($selectedCountry == $country)
           <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -84,7 +84,7 @@
       <!-- roastery - start -->
       <div class="group relative bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-200">
         <!-- Image Container -->
-        <a href="{{ route('roasteries.show', $roastery) }}" class="relative block aspect-[4/3] md:aspect-square overflow-hidden bg-gray-50">
+        <a href="{{ localizedRoute('roasteries.show', $roastery) }}" class="relative block aspect-[4/3] md:aspect-square overflow-hidden bg-gray-50">
           @if($roastery->image)
           <img src="{{ asset($roastery->image) }}" loading="lazy" alt="{{ $roastery->name }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105" />
           @else
@@ -120,7 +120,7 @@
 
         <!-- Content - Minimal -->
         <div class="p-5">
-          <a href="{{ route('roasteries.show', $roastery) }}" class="block mb-2">
+          <a href="{{ localizedRoute('roasteries.show', $roastery) }}" class="block mb-2">
             <h3 class="text-xl font-bold text-gray-900 mb-1 group-hover:text-gray-600 transition-colors">
               {{ $roastery->getName() }}
             </h3>
@@ -140,7 +140,7 @@
           @endif
 
           <div class="flex gap-2">
-            <a href="{{ route('roasteries.show', $roastery) }}" 
+            <a href="{{ localizedRoute('roasteries.show', $roastery) }}" 
                class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
               {{ $currentLocale === 'en' ? 'More about roaster' : 'Více o pražírně' }}
             </a>
@@ -190,7 +190,7 @@
             @endif
           </p>
           @if($selectedCountry)
-          <a href="{{ route('roasteries.index') }}" class="inline-flex items-center gap-2 bg-primary-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-primary-700 transition-colors">
+          <a href="{{ localizedRoute('roasteries.index') }}" class="inline-flex items-center gap-2 bg-primary-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-primary-700 transition-colors">
             <span>{{ $currentLocale === 'en' ? 'Show all roasters' : 'Zobrazit všechny pražírny' }}</span>
           </a>
           @endif

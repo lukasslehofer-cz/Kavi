@@ -6,7 +6,7 @@
   <div class="relative block h-64 overflow-hidden cursor-default bg-gray-50">
   @else
   <!-- Active product - with link -->
-  <a href="{{ route('products.show', $product) }}" class="relative block h-64 overflow-hidden bg-gray-50">
+  <a href="{{ localizedRoute('products.show', $product) }}" class="relative block h-64 overflow-hidden bg-gray-50">
   @endif
     @if($product->image)
     <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-300 {{ $historical ?? false ? '' : 'group-hover:scale-105' }}" />
@@ -96,7 +96,7 @@
         <h3 class="text-base font-bold text-gray-900 mb-2 line-clamp-2">{{ $product->getName() }}</h3>
       </div>
       @else
-      <a href="{{ route('products.show', $product) }}" class="block">
+      <a href="{{ localizedRoute('products.show', $product) }}" class="block">
         <h3 class="text-base font-bold text-gray-900 group-hover:text-gray-600 transition-colors mb-2 line-clamp-2">{{ $product->getName() }}</h3>
       </a>
       @endif
@@ -105,7 +105,7 @@
       @if($product->roastery)
       <p class="text-sm text-gray-500 font-light mb-2 flex items-center gap-1">
         <span class="text-lg">{{ $product->roastery->country_flag }}</span>
-        <a href="{{ route('roasteries.show', $product->roastery) }}" class="hover:text-primary-600 transition-colors">
+        <a href="{{ localizedRoute('roasteries.show', $product->roastery) }}" class="hover:text-primary-600 transition-colors">
           {{ $product->roastery->getName() }}
         </a>
       </p>
@@ -143,7 +143,7 @@
       </div>
       
       @if($product->stock > 0)
-      <form action="{{ route('cart.add', $product) }}" method="POST">
+      <form action="{{ localizedRoute('cart.add', $product) }}" method="POST">
         @csrf
         <button type="submit" class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm flex items-center justify-center gap-1.5">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

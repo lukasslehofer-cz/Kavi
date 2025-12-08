@@ -1,0 +1,271 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Translations - English
+    |--------------------------------------------------------------------------
+    */
+
+    // Page titles
+    'title_dashboard' => 'Dashboard - KAVI',
+    'title_orders' => 'Orders - KAVI',
+    'title_order_detail' => 'Order Detail - KAVI',
+    'title_subscription' => 'Subscription - KAVI',
+    'title_profile' => 'My Profile - KAVI',
+    'title_notifications' => 'Notifications - KAVI',
+
+    // Index page
+    'welcome_back' => 'Welcome back!',
+    'welcome_message' => 'Great to see you again',
+
+    // Payment issues
+    'payment_issue_subscription' => 'Subscription payment issue',
+    'payment_issue_subscriptions' => 'Subscription payment issues',
+    'payment_issue_order' => 'Order payment issue',
+    'payment_issue_orders' => 'Order payment issues',
+    'subscription_payment_failed' => 'Your subscription payment failed. You won\'t receive your next coffee box until the payment is completed.',
+    'subscriptions_payment_failed' => 'Several of your subscription payments have failed. You won\'t receive your next coffee boxes until the payments are completed.',
+    'order_payment_failed' => 'Your order payment failed. The order won\'t be processed until the payment is completed.',
+    'orders_payment_failed' => 'Several of your order payments have failed. The orders won\'t be processed until the payments are completed.',
+    'subscription_number' => 'Subscription #:id',
+    'amount_to_pay' => 'Amount due:',
+    'reason' => 'Reason:',
+    'pay_now' => 'Pay now',
+    'secure_payment_stripe' => 'Secure card payment via Stripe',
+
+    // Subscription section
+    'your_subscriptions' => 'Your subscriptions (:count)',
+    'your_subscription' => 'Your subscription',
+    'coffee_subscription' => 'Coffee subscription',
+    'view_all' => 'View all',
+    'manage' => 'Manage',
+    'manage_subscriptions' => 'Manage subscriptions',
+    'subscriptions_overview' => 'Overview of all your active subscriptions (:count)',
+    
+    // Subscription details
+    'price' => 'Price',
+    'per_month' => '/ month',
+    'per_months' => '/ :count months',
+    'incl_shipping' => '(incl. shipping :amount)',
+    'status' => 'Status',
+    'status_active' => 'Active',
+    'status_paused' => 'Paused',
+    'status_paused_until' => 'until :date',
+    'status_pending' => 'Pending activation',
+    'status_pending_payment' => 'Pending payment',
+    'status_completed' => 'Completed',
+    'status_unpaid' => 'Unpaid',
+    'status_cancelled' => 'Cancelled',
+    'next_shipment' => 'Next shipment',
+    'shipment_after_pause' => 'Shipment after pause',
+
+    // No subscription
+    'no_active_subscription' => 'No active subscription',
+    'start_coffee_journey' => 'Start your coffee journey with us and discover the best coffees from premium roasteries.',
+    'select_subscription' => 'Select subscription',
+
+    // Orders section
+    'recent_orders' => 'Recent orders',
+    'my_orders' => 'My orders',
+    'orders_history' => 'History of all your orders',
+    'view_all_orders' => 'View all',
+    'order_number' => 'Order number',
+    'date' => 'Date',
+    'items' => 'Items',
+    'item_singular' => 'item',
+    'items_plural' => 'items',
+    'total' => 'Total',
+    'actions' => 'Actions',
+    'unpaid' => '⚠️ Unpaid',
+    'completed' => 'Completed',
+    'pending' => 'Pending',
+    'processing' => 'Processing',
+    'cancelled' => 'Cancelled',
+    'shipped' => 'Shipped',
+    'delivered' => 'Delivered',
+    'pay' => 'Pay',
+    'detail' => 'Detail →',
+    'shipped_with_subscription' => 'Will be shipped with subscription',
+    'planned_delivery' => 'Planned delivery:',
+    'no_orders' => 'No orders',
+    'no_orders_yet' => 'You haven\'t placed any orders yet.',
+    'browse_products' => 'Browse products',
+
+    // Order detail page
+    'back_to_orders' => 'Back to orders',
+    'order_detail' => 'Order detail :number',
+    'created_at' => 'Created: :date',
+    'order_status' => 'Order status',
+    'status_completed_icon' => '✓ Completed',
+    'status_pending_icon' => '⏱ Pending',
+    'status_processing_icon' => '🔄 Processing',
+    'status_cancelled_icon' => '✕ Cancelled',
+    'order_items' => 'Order items',
+    'quantity' => 'Quantity:',
+    'order_summary' => 'Order summary',
+    'subtotal' => 'Subtotal:',
+    'vat' => 'VAT:',
+    'shipping' => 'Shipping:',
+    'discount' => 'Discount',
+    'payment_id' => 'Payment ID:',
+    'invoice' => 'Invoice',
+    'tax_document' => 'Tax document',
+    'order' => 'Order :number',
+    'download_invoice' => 'Download invoice',
+
+    // Subscription page
+    'payment_success' => 'Payment successful!',
+    'payment_success_message' => 'Your subscription has been renewed and will continue normally.',
+    'payment_cancelled' => 'Payment cancelled',
+    'payment_cancelled_message' => 'You can try again anytime.',
+    'one_time_box' => 'One-time coffee box',
+    'no_subscription_badge' => 'No subscription',
+    'your_configuration' => 'Your custom configuration',
+    'subscription_config' => 'Subscription configuration',
+    'coffee_type' => 'Coffee type',
+    'espresso' => 'Espresso',
+    'filter' => 'Filter',
+    'mix' => 'Mix (espresso + filter)',
+    'grind' => 'Grind',
+    'whole_beans' => 'Whole beans',
+    'ground' => 'Ground',
+    'ground_for' => 'Ground for :method',
+    'decaf' => 'Decaf',
+    'yes_extra' => 'Yes (+:amount)',
+    'no_decaf' => 'No',
+    'coffee_amount' => 'Coffee amount',
+    'bags_per_shipment' => ':count × 250g / shipment',
+    'price_breakdown' => 'Price breakdown',
+    'subscription_price' => 'Subscription',
+    'shipping_price' => 'Shipping',
+    'total_per_shipment' => 'Total per shipment',
+    'active_discount' => 'Active discount',
+    'discount_remaining' => ':count months remaining',
+    'discount_unlimited' => 'Permanent',
+    'original_price' => 'Original price:',
+    'edit_configuration' => 'Edit configuration',
+    
+    // Subscription actions
+    'pause_subscription' => 'Pause subscription',
+    'pause_description' => 'Select how many shipments you want to skip. After the pause ends, your subscription will resume automatically.',
+    'skip_shipments' => 'Skip shipments',
+    'skip_1' => '1 shipment',
+    'skip_2' => '2 shipments',
+    'skip_3' => '3 shipments',
+    'confirm_pause' => 'Confirm pause',
+    'resume_subscription' => 'Resume subscription',
+    'cancel_subscription' => 'Cancel subscription',
+    'cancel_warning' => 'Are you sure you want to cancel your subscription?',
+    'cancel_confirm' => 'Yes, cancel subscription',
+    'keep_subscription' => 'No, keep subscription',
+    
+    // Delivery address
+    'delivery_address' => 'Delivery address',
+    'edit_address' => 'Edit address',
+    'pickup_point' => 'Pickup point',
+    'home_delivery' => 'Home delivery',
+    
+    // Payment method
+    'payment_method' => 'Payment method',
+    'card_ending' => 'Card ending in :last4',
+    'expires' => 'Expires :date',
+    'update_card' => 'Update card',
+    
+    // Payment history
+    'payment_history' => 'Payment history',
+    'no_payments' => 'No payments yet',
+    'paid' => 'Paid',
+    'failed' => 'Failed',
+    'refunded' => 'Refunded',
+    
+    // Shipment history
+    'shipment_history' => 'Shipment history',
+    'no_shipments' => 'No shipments yet',
+    'track_shipment' => 'Track shipment',
+
+    // Profile page
+    'success' => 'Success!',
+    'error' => 'Error',
+    'personal_info' => 'Personal information',
+    'full_name' => 'Full name',
+    'email' => 'Email',
+    'phone' => 'Phone',
+    'profile_tip' => 'Tip: Fill in your phone and address for faster checkout. The information will be pre-filled at checkout.',
+    'save_changes' => 'Save changes',
+    
+    // Payment methods in profile
+    'payment_methods' => 'Payment methods',
+    'payment_methods_description' => 'Manage your payment cards for subscriptions',
+    'card_expired' => 'Card expired',
+    'card_expires_soon' => 'Card expires soon',
+    'change_card' => 'Change card',
+    'no_payment_method' => 'No payment method',
+    'no_payment_method_description' => 'You\'ll add a payment card when making your first subscription payment.',
+    
+    // Shipping address in profile
+    'shipping_address' => 'Shipping address',
+    'shipping_address_description' => 'Default address for order delivery',
+    'street_address' => 'Street address',
+    'city' => 'City',
+    'postal_code' => 'Postal code',
+    'country' => 'Country',
+    
+    // Password section
+    'change_password' => 'Change password',
+    'current_password' => 'Current password',
+    'new_password' => 'New password',
+    'confirm_password' => 'Confirm new password',
+    'update_password' => 'Update password',
+    'password_not_set' => 'Password not set',
+    'password_not_set_description' => 'Your account was created via magic link. To log in with a password, please set one first.',
+    'set_password' => 'Set password',
+    
+    // Delete account
+    'delete_account' => 'Delete account',
+    'delete_account_description' => 'Once your account is deleted, all your data will be permanently removed.',
+    'delete_account_button' => 'Delete account',
+    'delete_account_warning' => 'This action cannot be undone. Are you sure you want to delete your account?',
+    'delete_confirm' => 'Yes, delete account',
+    'delete_cancel' => 'No, keep account',
+
+    // Notifications page
+    'notifications' => 'Notifications',
+    'notifications_overview' => 'Overview of all your notifications',
+    'mark_all_read' => 'Mark all as read',
+    'order_confirmed' => 'Order confirmed',
+    'order_confirmed_message' => 'Your order #:number has been confirmed and will be shipped soon.',
+    'hours_ago' => ':count hours ago',
+    'view_detail' => 'View detail',
+    'shipment_sent' => 'Shipment sent',
+    'shipment_sent_message' => 'Your subscription shipment has been sent via Packeta. Tracking number: :tracking',
+    'yesterday_at' => 'Yesterday at :time',
+    'track_package' => 'Track package',
+    'subscription_renewal' => 'Subscription will be renewed',
+    'subscription_renewal_message' => 'Your subscription will be automatically renewed on :date. The amount of :amount will be charged to your card.',
+    'days_ago' => ':count days ago',
+    'manage_subscription' => 'Manage subscription',
+    'special_offer' => 'Special offer for you! 🎉',
+    'special_offer_message' => 'Get 20% off all individual coffee bags. Offer valid until the end of the month.',
+    'week_ago' => 'A week ago',
+    'view_offer' => 'View offer',
+    'review_request' => 'How do you like our coffee?',
+    'review_request_message' => 'Share your experience with us. Your feedback helps us improve our services.',
+    'weeks_ago' => ':count weeks ago',
+    'write_review' => 'Write a review',
+    'no_notifications' => 'No notifications',
+    'no_notifications_message' => 'There are no new notifications yet.',
+    
+    // Notification settings
+    'notification_settings' => 'Notification settings',
+    'email_notifications' => 'Email notifications',
+    'email_notifications_description' => 'Receive important updates about orders and subscriptions',
+    'marketing_emails' => 'Marketing emails',
+    'marketing_emails_description' => 'Receive updates about new products and special offers',
+    'sms_notifications' => 'SMS notifications',
+    'sms_notifications_description' => 'Receive SMS alerts for important events',
+    'save_settings' => 'Save settings',
+
+];
+

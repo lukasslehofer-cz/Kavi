@@ -153,14 +153,14 @@ class SubscriptionController extends Controller
     public function subscribe(Request $request, SubscriptionPlan $plan)
     {
         if (!auth()->check()) {
-            return redirect()->route('login')
+            return redirect()->localizedRoute('login')
                 ->with('message', 'Pro aktivaci předplatného se prosím přihlaste.');
         }
 
         // Store plan ID in session for checkout
         session(['subscription_plan_id' => $plan->id]);
 
-        return redirect()->route('checkout.subscription');
+        return redirect()->localizedRoute('checkout.subscription');
     }
 
     /**
@@ -254,7 +254,7 @@ class SubscriptionController extends Controller
             }
             
             if (!$typeAvailable) {
-                return redirect()->route('subscriptions.index')
+                return redirect()->localizedRoute('subscriptions.index')
                     ->with('error', $errorMessage);
             }
         }
@@ -298,7 +298,7 @@ class SubscriptionController extends Controller
         ]);
 
         // Proceed to checkout (same for subscription and one-time)
-        return redirect()->route('subscriptions.checkout');
+        return redirect()->localizedRoute('subscriptions.checkout');
     }
 
     /**
@@ -388,7 +388,7 @@ class SubscriptionController extends Controller
                     'guest_subscription_phone',
                 ]);
                 
-                return redirect()->route('subscriptions.confirmation', $subscription);
+                return redirect()->localizedRoute('subscriptions.confirmation', $subscription);
             } else {
                 // Subscription not found yet (race condition) - show processing message
                 \Log::warning('Subscription not found after payment', [
@@ -397,7 +397,7 @@ class SubscriptionController extends Controller
                     'guest_email' => session('guest_subscription_email'),
                 ]);
                 
-                return redirect()->route('subscriptions.index')
+                return redirect()->localizedRoute('subscriptions.index')
                     ->with('success', 'Děkujeme za objednávku! Zpracováváme vaši platbu a brzy vám zašleme potvrzení na email.');
             }
         }
@@ -408,7 +408,7 @@ class SubscriptionController extends Controller
         $vat = session('subscription_vat');
 
         if (!$configuration || !$price) {
-            return redirect()->route('subscriptions.index')
+            return redirect()->localizedRoute('subscriptions.index')
                 ->with('error', 'Konfigurace předplatného nenalezena. Prosím nakonfigurujte si předplatné znovu.');
         }
 
@@ -420,7 +420,7 @@ class SubscriptionController extends Controller
         
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
-            return redirect()->route('subscriptions.checkout');
+            return redirect()->localizedRoute('subscriptions.checkout');
         }
         
         // Zpracovat kupón z query parametru
@@ -500,7 +500,7 @@ class SubscriptionController extends Controller
         $price = session('subscription_price');
 
         if (!$configuration || !$price) {
-            return redirect()->route('subscriptions.index')
+            return redirect()->localizedRoute('subscriptions.index')
                 ->with('error', 'Konfigurace nenalezena.');
         }
 
@@ -761,10 +761,10 @@ class SubscriptionController extends Controller
                 ]);
 
                 if (auth()->check()) {
-                    return redirect()->route('dashboard.subscription')
+                    return redirect()->localizedRoute('dashboard.subscription')
                         ->with('success', 'Předplatné bylo vytvořeno! Po přijetí platby bude aktivováno.');
                 } else {
-                    return redirect()->route('subscriptions.index')
+                    return redirect()->localizedRoute('subscriptions.index')
                         ->with('success', 'Děkujeme za objednávku! Na email ' . $validated['email'] . ' vám zašleme platební údaje.');
                 }
             }
@@ -1067,10 +1067,10 @@ class SubscriptionController extends Controller
             ]);
 
             if (auth()->check()) {
-                return redirect()->route('dashboard.subscription')
+                return redirect()->localizedRoute('dashboard.subscription')
                     ->with('success', 'Objednávka jednorázového boxu byla vytvořena! Po přijetí platby bude zpracována.');
             } else {
-                return redirect()->route('subscriptions.confirmation', $subscription)
+                return redirect()->localizedRoute('subscriptions.confirmation', $subscription)
                     ->with('success', 'Děkujeme za objednávku! Na email ' . $validated['email'] . ' vám zašleme platební údaje.');
             }
 
@@ -1259,7 +1259,7 @@ class SubscriptionController extends Controller
                 'subscription_vat',
             ]);
             
-            return redirect()->route('subscriptions.confirmation', $subscription)
+            return redirect()->localizedRoute('subscriptions.confirmation', $subscription)
                 ->with('success', 'Děkujeme! Vaše předplatné bylo aktivováno s 100% slevou.');
             
         } catch (\Exception $e) {

@@ -49,7 +49,7 @@ class RegisterController extends Controller
             // Don't fail registration if email fails
         }
 
-        return redirect()->route('dashboard.index');
+        return redirect()->to(localizedRoute('dashboard.index'));
     }
 }
 

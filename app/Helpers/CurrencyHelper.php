@@ -141,5 +141,25 @@ class CurrencyHelper
     {
         return strtolower(self::code());
     }
+    
+    /**
+     * Format an amount with a specific currency (not session-based)
+     * Use this for displaying historical data like orders/subscriptions
+     * 
+     * @param float $amount The amount to format
+     * @param string|null $currency The currency code (CZK or EUR), defaults to current session currency
+     * @param int $decimals Number of decimal places
+     * @return string Formatted price with symbol
+     */
+    public static function formatByCurrency(float $amount, ?string $currency = null, int $decimals = 0): string
+    {
+        $currency = $currency ?? self::code();
+        
+        if (strtoupper($currency) === 'EUR') {
+            return '€' . number_format($amount, $decimals, '.', ' ');
+        }
+        
+        return number_format($amount, $decimals, ',', ' ') . ' Kč';
+    }
 }
 

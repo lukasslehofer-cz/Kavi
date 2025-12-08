@@ -23,10 +23,10 @@
                     <a href="{{ route('home') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         Úvod
                     </a>
-                    <a href="{{ route('subscriptions.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         Kávové boxy
                     </a>
-                    <a href="{{ route('contact') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('contact') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         Kontakt
                     </a>
                 </nav>
@@ -45,9 +45,9 @@
             <div class="py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
                 <p>© {{ date('Y') }} KAVI.cz. Všechna práva vyhrazena.</p>
                 <div class="flex gap-6">
-                    <a href="{{ route('terms-of-service') }}" class="hover:text-gray-900 transition-colors">Obchodní podmínky</a>
-                    <a href="{{ route('privacy-policy') }}" class="hover:text-gray-900 transition-colors">Ochrana osobních údajů</a>
-                    <a href="{{ route('contact') }}" class="hover:text-gray-900 transition-colors">Kontakt</a>
+                    <a href="{{ localizedRoute('terms-of-service') }}" class="hover:text-gray-900 transition-colors">Obchodní podmínky</a>
+                    <a href="{{ localizedRoute('privacy-policy') }}" class="hover:text-gray-900 transition-colors">Ochrana osobních údajů</a>
+                    <a href="{{ localizedRoute('contact') }}" class="hover:text-gray-900 transition-colors">Kontakt</a>
                 </div>
             </div>
         </div>

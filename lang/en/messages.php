@@ -75,5 +75,20 @@ return [
         'eur' => 'EUR',
     ],
 
+    // Product related
+    'view_detail' => 'View Detail',
+    'category_espresso' => 'Espresso',
+    'category_filter' => 'Filter',
+    'category_decaf' => 'Decaf',
+    'category_accessories' => 'Accessories',
+
+    // Coffee attributes
+    'flavor_profile' => 'Flavor Profile',
+    'origin' => 'Origin',
+    'processing' => 'Processing',
+    'altitude' => 'Altitude',
+    'variety' => 'Variety',
+    'flavor_notes' => 'Flavor Notes',
+
 ];
 

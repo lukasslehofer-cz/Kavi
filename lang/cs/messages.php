@@ -75,4 +75,19 @@ return [
         'eur' => 'EUR',
     ],
 
+    // Product related
+    'view_detail' => 'Zobrazit detail',
+    'category_espresso' => 'Espresso',
+    'category_filter' => 'Filtr',
+    'category_decaf' => 'Bezkofeinová',
+    'category_accessories' => 'Příslušenství',
+
+    // Coffee attributes
+    'flavor_profile' => 'Chuťový profil',
+    'origin' => 'Původ',
+    'processing' => 'Zpracování',
+    'altitude' => 'Nadmořská výška',
+    'variety' => 'Odrůda',
+    'flavor_notes' => 'Chuťové tóny',
+
 ];

@@ -49,13 +49,13 @@
             <h2 class="text-3xl font-bold text-gray-900 mb-4 tracking-tight">{{ __('cart.empty') }}</h2>
             <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto font-light">{{ __('cart.empty_description') }}</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('subscriptions.index') }}" class="inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
+                <a href="{{ localizedRoute('subscriptions.index') }}" class="inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
                     <span>{{ __('cart.build_box') }}</span>
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
-                <a href="{{ route('products.index') }}" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
+                <a href="{{ localizedRoute('products.index') }}" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
                     {{ __('cart.view_shop') }}
                 </a>
             </div>
@@ -87,7 +87,7 @@
                             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-3 mb-3 text-center sm:text-left">
                                 <div class="min-w-0">
                                     <h3 class="text-lg font-bold text-gray-900 mb-1 truncate">
-                                        <a href="{{ route('products.show', $item['product']) }}" class="hover:text-gray-600 transition-colors">
+                                        <a href="{{ localizedRoute('products.show', $item['product']) }}" class="hover:text-gray-600 transition-colors">
                                             {{ $item['product']->getName() }}
                                         </a>
                                     </h3>
@@ -106,7 +106,7 @@
 
                             <!-- Quantity Controls -->
                             <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-4 pt-4 border-t border-gray-100">
-                                <form action="{{ route('cart.update', $item['product']->id) }}" method="POST" class="flex items-center gap-2 sm:gap-3">
+                                <form action="{{ localizedRoute('cart.update', $item['product']->id) }}" method="POST" class="flex items-center gap-2 sm:gap-3">
                                     @csrf
                                     @method('PATCH')
                                     <div class="flex items-center border border-gray-200 rounded-full overflow-hidden bg-white">
@@ -121,7 +121,7 @@
                                 </form>
 
                                 <!-- Remove Button -->
-                                <form action="{{ route('cart.remove', $item['product']->id) }}" method="POST">
+                                <form action="{{ localizedRoute('cart.remove', $item['product']->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors group" title="{{ __('cart.remove_from_cart') }}">
@@ -139,7 +139,7 @@
 
             <!-- Clear Cart - Minimal -->
             <div class="mt-6">
-                <form action="{{ route('cart.clear') }}" method="POST">
+                <form action="{{ localizedRoute('cart.clear') }}" method="POST">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="inline-flex items-center gap-2 text-red-600 hover:bg-red-50 text-sm font-medium px-4 py-2 rounded-full transition-colors">
@@ -247,13 +247,13 @@
                     </div>
                 </dl>
 
-                <a href="{{ route('checkout.index') }}" class="group w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-3">
+                <a href="{{ localizedRoute('checkout.index') }}" class="group w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-3">
                     <span>{{ __('cart.checkout') }}</span>
                     <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
-                <a href="{{ route('products.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
+                <a href="{{ localizedRoute('products.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
                     {{ __('cart.continue_shopping') }}
                 </a>
 
@@ -303,7 +303,7 @@
         </div>
         @else
         <div class="text-center">
-            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
+            <a href="{{ localizedRoute('products.index') }}" class="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
                 {{ __('cart.browse_products') }}
             </a>
         </div>

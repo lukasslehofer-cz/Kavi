@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Přihlášení - KAVI.cz')
+@section('title', __('auth.login_title') . ' - KAVI')
 
 @section('content')
 <div class="min-h-[calc(100vh-20rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -8,18 +8,18 @@
         <div class="bg-white rounded-2xl p-10 border border-gray-200">
             <!-- Header -->
             <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Vítejte zpět</h2>
-                <p class="text-gray-600 font-light">Přihlaste se ke svému účtu</p>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ __('auth.welcome_back') }}</h2>
+                <p class="text-gray-600 font-light">{{ __('auth.login_subtitle') }}</p>
             </div>
             
-            <form method="POST" action="/prihlaseni" class="space-y-6">
+            <form method="POST" action="{{ localizedRoute('login') }}" class="space-y-6">
                 @csrf
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-900 mb-2">Email</label>
+                    <label for="email" class="block text-sm font-medium text-gray-900 mb-2">{{ __('auth.email') }}</label>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 transition-all @error('email') border-red-500 @enderror"
-                           placeholder="vas@email.cz">
+                           placeholder="{{ __('auth.email_placeholder') }}">
                     @error('email')
                     <p class="text-red-600 text-sm mt-2 flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -31,10 +31,10 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-900 mb-2">Heslo</label>
+                    <label for="password" class="block text-sm font-medium text-gray-900 mb-2">{{ __('auth.password') }}</label>
                     <input id="password" type="password" name="password" required
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 transition-all @error('password') border-red-500 @enderror"
-                           placeholder="••••••••">
+                           placeholder="{{ __('auth.password_placeholder') }}">
                     @error('password')
                     <p class="text-red-600 text-sm mt-2 flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -48,15 +48,15 @@
                 <div class="flex items-center justify-between">
                     <label class="flex items-center cursor-pointer">
                         <input type="checkbox" name="remember" class="rounded border-gray-300 text-primary-500 focus:ring-primary-500">
-                        <span class="ml-2 text-sm text-gray-700 font-light">Zapamatovat si mě</span>
+                        <span class="ml-2 text-sm text-gray-700 font-light">{{ __('auth.remember_me') }}</span>
                     </label>
-                    <a href="{{ route('password.request') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                        Zapomenuté heslo?
+                    <a href="{{ localizedRoute('password.request') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                        {{ __('auth.forgot_password') }}
                     </a>
                 </div>
 
                 <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
-                    Přihlásit se
+                    {{ __('auth.login_button') }}
                 </button>
             </form>
 
@@ -67,31 +67,31 @@
                         <div class="w-full border-t border-gray-200"></div>
                     </div>
                     <div class="relative flex justify-center text-sm">
-                        <span class="px-4 bg-white text-gray-600 font-light">nebo</span>
+                        <span class="px-4 bg-white text-gray-600 font-light">{{ __('auth.or') }}</span>
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('magic-link.send') }}" class="mt-6" id="magic-link-form">
+                <form method="POST" action="{{ localizedRoute('magic-link.send') }}" class="mt-6" id="magic-link-form">
                     @csrf
                     <input type="hidden" name="email" id="magic-link-email">
                     <button type="button" onclick="sendMagicLink()" class="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-full text-gray-700 bg-white hover:bg-gray-50 font-medium transition-all">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
-                        Přihlásit se odkazem z emailu
+                        {{ __('auth.magic_link_button') }}
                     </button>
                 </form>
 
                 <p class="mt-3 text-xs text-center text-gray-600 font-light">
-                    💡 Bez hesla! Stačí zadat email a my vám pošleme přihlašovací odkaz.
+                    {{ __('auth.magic_link_info') }}
                 </p>
             </div>
 
             <div class="mt-8 pt-6 border-t border-gray-200 text-center">
                 <p class="text-gray-600 font-light">
-                    Ještě nemáte účet?
-                    <a href="{{ route('register') }}" class="text-primary-600 hover:text-primary-700 font-medium ml-1">
-                        Zaregistrujte se zdarma
+                    {{ __('auth.no_account') }}
+                    <a href="{{ localizedRoute('register') }}" class="text-primary-600 hover:text-primary-700 font-medium ml-1">
+                        {{ __('auth.register_free') }}
                     </a>
                 </p>
             </div>
@@ -104,13 +104,13 @@
                     <svg class="w-4 h-4 text-primary-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    Bezpečné
+                    {{ __('auth.secure') }}
                 </span>
                 <span class="flex items-center">
                     <svg class="w-4 h-4 text-primary-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    Rychlé
+                    {{ __('auth.fast') }}
                 </span>
             </div>
         </div>
@@ -123,7 +123,7 @@ function sendMagicLink() {
     const email = emailInput.value.trim();
     
     if (!email) {
-        alert('Prosím zadejte váš email');
+        alert('{{ __('auth.enter_email_alert') }}');
         emailInput.focus();
         return;
     }
@@ -131,7 +131,7 @@ function sendMagicLink() {
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        alert('Prosím zadejte platný email');
+        alert('{{ __('auth.invalid_email_alert') }}');
         emailInput.focus();
         return;
     }

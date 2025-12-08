@@ -69,7 +69,7 @@
                     @foreach($roasteries as $roastery)
                     <div class="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-200">
                         <!-- Roastery Image -->
-                        <a href="{{ route('roasteries.show', $roastery) }}" class="relative block aspect-[4/3] md:aspect-square overflow-hidden bg-gray-50">
+                        <a href="{{ localizedRoute('roasteries.show', $roastery) }}" class="relative block aspect-[4/3] md:aspect-square overflow-hidden bg-gray-50">
                             @if($roastery->image)
                             <img src="{{ asset($roastery->image) }}" 
                                  alt="{{ $roastery->getName() }}"
@@ -95,7 +95,7 @@
 
                         <!-- Roastery Info -->
                         <div class="p-5">
-                            <a href="{{ route('roasteries.show', $roastery) }}" class="block mb-2">
+                            <a href="{{ localizedRoute('roasteries.show', $roastery) }}" class="block mb-2">
                                 <h3 class="text-xl font-bold text-gray-900 group-hover:text-gray-600 transition-colors">
                                     {{ $roastery->getName() }}
                                 </h3>
@@ -116,7 +116,7 @@
                             @endif
 
                             <div class="flex gap-2">
-                                <a href="{{ route('roasteries.show', $roastery) }}" 
+                                <a href="{{ localizedRoute('roasteries.show', $roastery) }}" 
                                    class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
                                     {{ $currentLocale === 'en' ? 'More about roaster' : 'Více o pražírně' }}
                                 </a>
@@ -200,7 +200,7 @@
                             @if($coffee->roastery)
                             <p class="text-sm text-gray-500 font-light mb-3 flex items-center gap-1">
                                 <span class="text-base">{{ $coffee->roastery->country_flag }}</span>
-                                <a href="{{ route('roasteries.show', $coffee->roastery) }}" class="hover:text-gray-900 transition-colors">
+                                <a href="{{ localizedRoute('roasteries.show', $coffee->roastery) }}" class="hover:text-gray-900 transition-colors">
                                     {{ $coffee->roastery->getName() }}
                                 </a>
                             </p>
@@ -258,7 +258,7 @@
                                 @if($coffee->roastery)
                                 <p class="text-lg text-gray-600 font-medium mb-6 flex items-center gap-2">
                                     <span class="text-2xl">{{ $coffee->roastery->country_flag }}</span>
-                                    <a href="{{ route('roasteries.show', $coffee->roastery) }}" class="hover:text-primary-600 transition-colors font-semibold">
+                                    <a href="{{ localizedRoute('roasteries.show', $coffee->roastery) }}" class="hover:text-primary-600 transition-colors font-semibold">
                                         {{ $coffee->roastery->getName() }}
                                     </a>
                                 </p>
@@ -338,7 +338,7 @@
                                     <p class="text-gray-600 mb-4 text-sm font-light">
                                         {{ $currentLocale === 'en' ? 'Get it together with other specialty coffees in our monthly subscription' : 'Získejte ji společně s dalšími výběrovými kávami v našem měsíčním předplatném' }}
                                     </p>
-                                    <a href="{{ route('subscriptions.index') }}" 
+                                    <a href="{{ localizedRoute('subscriptions.index') }}" 
                                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all duration-200 text-sm">
                                         <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -379,7 +379,7 @@
                         <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto font-light">
                             {{ $currentLocale === 'en' ? 'Subscribe to our subscription and a box with selected coffee specials will be waiting for you at the pickup point.' : 'Přihlaste se k našemu předplatnému a box s vybranými kávovými speciály na vás bude pravidelně čekat ve výdejním místě.' }}
                         </p>
-                        <a href="{{ route('subscriptions.index') }}" 
+                        <a href="{{ localizedRoute('subscriptions.index') }}" 
                            class="inline-flex items-center gap-2 px-8 py-3 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all">
                             <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -402,7 +402,7 @@
                 <p class="text-lg text-gray-600 mb-8 font-light">
                     {{ $currentLocale === 'en' ? 'We are currently selecting exceptional coffees for ' . $monthNameWithYear . '. We will surprise you soon!' : 'Právě vybíráme výjimečné kávy pro měsíc ' . $monthNameWithYear . '. Brzy vás překvapíme!' }}
                 </p>
-                <a href="{{ route('subscriptions.index') }}" 
+                <a href="{{ localizedRoute('subscriptions.index') }}" 
                    class="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all duration-200">
                     <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

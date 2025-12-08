@@ -111,7 +111,7 @@ class DashboardController extends Controller
             });
 
         if ($subscriptions->isEmpty()) {
-            return redirect()->route('subscriptions.index')
+            return redirect()->localizedRoute('subscriptions.index')
                 ->with('message', 'Nemáte žádné aktivní předplatné.');
         }
 
@@ -208,7 +208,7 @@ class DashboardController extends Controller
         // Refresh the user instance to ensure we have latest data
         $viewingUser->refresh();
 
-        return redirect()->route('dashboard.profile')
+        return redirect()->localizedRoute('dashboard.profile')
             ->with('success', 'Profil byl úspěšně aktualizován.');
     }
 
@@ -236,7 +236,7 @@ class DashboardController extends Controller
             'password_set_by_user' => true,
         ]);
 
-        return redirect()->route('dashboard.profile')
+        return redirect()->localizedRoute('dashboard.profile')
             ->with('success', 'Heslo bylo úspěšně změněno.');
     }
 
@@ -344,7 +344,7 @@ class DashboardController extends Controller
             ]);
         }
 
-        return redirect()->route('dashboard.subscription')
+        return redirect()->localizedRoute('dashboard.subscription')
             ->with('success', 'Předplatné bylo pozastaveno.');
     }
 
@@ -380,7 +380,7 @@ class DashboardController extends Controller
         // Resume locally
         $subscription->resume();
 
-        return redirect()->route('dashboard.subscription')
+        return redirect()->localizedRoute('dashboard.subscription')
             ->with('success', 'Předplatné bylo obnoveno.');
     }
 
@@ -426,7 +426,7 @@ class DashboardController extends Controller
             ]);
         }
 
-        return redirect()->route('dashboard.subscription')
+        return redirect()->localizedRoute('dashboard.subscription')
             ->with('success', 'Předplatné bylo zrušeno.');
     }
 
@@ -438,7 +438,7 @@ class DashboardController extends Controller
         try {
             $viewingUser = $this->getViewingUser();
             $stripeService = app(\App\Services\StripeService::class);
-            $returnUrl = route('dashboard.profile');
+            $returnUrl = localizedRoute('dashboard.profile');
             
             $portalUrl = $stripeService->createCustomerPortalSession($viewingUser, $returnUrl);
             
@@ -449,7 +449,7 @@ class DashboardController extends Controller
                 'error' => $e->getMessage(),
             ]);
             
-            return redirect()->route('dashboard.profile')
+            return redirect()->localizedRoute('dashboard.profile')
                 ->with('error', 'Nepodařilo se otevřít správu platebních metod. Zkuste to prosím později.');
         }
     }
@@ -476,7 +476,7 @@ class DashboardController extends Controller
                     'errors' => $validator->errors(),
                 ], 422);
             }
-            return redirect()->route('dashboard.profile')
+            return redirect()->localizedRoute('dashboard.profile')
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -497,7 +497,7 @@ class DashboardController extends Controller
                 ], 400);
             }
             
-            return redirect()->route('dashboard.profile')
+            return redirect()->localizedRoute('dashboard.profile')
                 ->with('error', $errorMessage);
         }
 
@@ -544,7 +544,7 @@ class DashboardController extends Controller
                     ->with('error', 'Při mazání účtu došlo k chybě. Kontaktujte nás prosím na info@kavi.cz');
             }
 
-            return redirect()->route('dashboard.profile')
+            return redirect()->localizedRoute('dashboard.profile')
                 ->with('error', 'Při mazání účtu došlo k chybě. Zkuste to prosím později nebo nás kontaktujte.');
         }
     }

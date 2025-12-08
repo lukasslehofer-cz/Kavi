@@ -1,13 +1,13 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Nástěnka - KAVI.cz')
+@section('title', __('dashboard.title_dashboard'))
 
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
     <div class="bg-white rounded-2xl p-6 border border-gray-200">
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Vítejte zpět!</h1>
-        <p class="text-base text-gray-600 font-light">Jsme rádi, že vás opět vidíme, <span class="text-primary-600 font-medium">{{ auth()->user()->name }}</span></p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">{{ __('dashboard.welcome_back') }}</h1>
+        <p class="text-base text-gray-600 font-light">{{ __('dashboard.welcome_message') }}, <span class="text-primary-600 font-medium">{{ auth()->user()->name }}</span></p>
     </div>
 
     <!-- Unpaid Subscriptions Alert -->
@@ -21,12 +21,12 @@
             </div>
             <div class="flex-1">
                 <h3 class="text-xl font-bold text-red-900 mb-2">
-                    Problém s platbou {{ $unpaidSubscriptions->count() > 1 ? 'předplatných' : 'předplatného' }}
+                    {{ $unpaidSubscriptions->count() > 1 ? __('dashboard.payment_issue_subscriptions') : __('dashboard.payment_issue_subscription') }}
                 </h3>
                 <p class="text-red-800 mb-4">
                     {{ $unpaidSubscriptions->count() > 1 
-                        ? 'U několika vašich předplatných selhala platba. Neobdržíte další kávové boxy, dokud nebude platba uhrazena.' 
-                        : 'Platba za vaše předplatné se nezdařila. Neobdržíte další kávový box, dokud nebude platba uhrazena.'
+                        ? __('dashboard.subscriptions_payment_failed')
+                        : __('dashboard.subscription_payment_failed')
                     }}
                 </p>
                 
@@ -35,27 +35,27 @@
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex-1">
                             <div class="text-gray-900 font-bold text-base mb-2">
-                                Předplatné #{{ $unpaidSub->id }}
+                                {{ __('dashboard.subscription_number', ['id' => $unpaidSub->id]) }}
                                 @if($unpaidSub->subscription_number)
                                     <span class="text-sm font-normal text-gray-600">({{ $unpaidSub->subscription_number }})</span>
                                 @endif
                             </div>
                             @if($unpaidSub->pending_invoice_amount)
                             <div class="text-gray-700 text-sm mb-1">
-                                <span class="text-gray-600">Částka k úhradě:</span> 
-                                <span class="font-bold text-red-600">{{ number_format($unpaidSub->pending_invoice_amount, 0, ',', ' ') }} Kč</span>
+                                <span class="text-gray-600">{{ __('dashboard.amount_to_pay') }}</span> 
+                                <span class="font-bold text-red-600">{{ \App\Helpers\CurrencyHelper::formatByCurrency($unpaidSub->pending_invoice_amount, $unpaidSub->currency) }}</span>
                             </div>
                             @endif
                             @if($unpaidSub->last_payment_failure_reason)
                             <div class="text-gray-600 text-xs">
-                                <span class="font-medium">Důvod:</span> {{ $unpaidSub->last_payment_failure_reason }}
+                                <span class="font-medium">{{ __('dashboard.reason') }}</span> {{ $unpaidSub->last_payment_failure_reason }}
                             </div>
                             @endif
                         </div>
-                        <form method="POST" action="{{ route('dashboard.subscription.pay', $unpaidSub) }}">
+                        <form method="POST" action="{{ localizedRoute('dashboard.subscription.pay', $unpaidSub) }}">
                             @csrf
                             <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-full transition-colors">
-                                Zaplatit nyní
+                                {{ __('dashboard.pay_now') }}
                             </button>
                         </form>
                     </div>
@@ -63,7 +63,7 @@
                 @endforeach
                 
                 <div class="text-sm text-gray-600 mt-3">
-                    Bezpečná platba kartou přes Stripe
+                    {{ __('dashboard.secure_payment_stripe') }}
                 </div>
             </div>
         </div>
@@ -81,12 +81,12 @@
             </div>
             <div class="flex-1">
                 <h3 class="text-xl font-bold text-red-900 mb-2">
-                    Problém s platbou {{ $unpaidOrders->count() > 1 ? 'objednávek' : 'objednávky' }}
+                    {{ $unpaidOrders->count() > 1 ? __('dashboard.payment_issue_orders') : __('dashboard.payment_issue_order') }}
                 </h3>
                 <p class="text-red-800 mb-4">
                     {{ $unpaidOrders->count() > 1 
-                        ? 'U několika vašich objednávek selhala platba. Objednávky nebudou zpracovány, dokud nebude platba uhrazena.' 
-                        : 'Platba za vaši objednávku se nezdařila. Objednávka nebude zpracována, dokud nebude platba uhrazena.'
+                        ? __('dashboard.orders_payment_failed')
+                        : __('dashboard.order_payment_failed')
                     }}
                 </p>
                 
@@ -95,22 +95,22 @@
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex-1">
                             <div class="text-gray-900 font-bold text-base mb-2">
-                                Objednávka {{ $unpaidOrder->order_number }}
+                                {{ __('dashboard.order', ['number' => $unpaidOrder->order_number]) }}
                             </div>
                             <div class="text-gray-700 text-sm mb-1">
-                                <span class="text-gray-600">Částka k úhradě:</span> 
-                                <span class="font-bold text-red-600">{{ number_format($unpaidOrder->total, 0, ',', ' ') }} Kč</span>
+                                <span class="text-gray-600">{{ __('dashboard.amount_to_pay') }}</span> 
+                                <span class="font-bold text-red-600">{{ \App\Helpers\CurrencyHelper::formatByCurrency($unpaidOrder->total, $unpaidOrder->currency) }}</span>
                             </div>
                             @if($unpaidOrder->last_payment_failure_reason)
                             <div class="text-gray-600 text-xs">
-                                <span class="font-medium">Důvod:</span> {{ $unpaidOrder->last_payment_failure_reason }}
+                                <span class="font-medium">{{ __('dashboard.reason') }}</span> {{ $unpaidOrder->last_payment_failure_reason }}
                             </div>
                             @endif
                         </div>
-                        <form method="POST" action="{{ route('order.pay', $unpaidOrder) }}">
+                        <form method="POST" action="{{ localizedRoute('order.pay', $unpaidOrder) }}">
                             @csrf
                             <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-full transition-colors">
-                                Zaplatit nyní
+                                {{ __('dashboard.pay_now') }}
                             </button>
                         </form>
                     </div>
@@ -118,7 +118,7 @@
                 @endforeach
                 
                 <div class="text-sm text-gray-600 mt-3">
-                    Bezpečná platba kartou přes Stripe
+                    {{ __('dashboard.secure_payment_stripe') }}
                 </div>
             </div>
         </div>
@@ -133,20 +133,20 @@
                 <div class="flex-1">
                     <h2 class="text-xl font-bold text-gray-900 mb-1">
                         @if($activeSubscriptions->count() > 1)
-                            Vaše předplatná ({{ $activeSubscriptions->count() }})
+                            {{ __('dashboard.your_subscriptions', ['count' => $activeSubscriptions->count()]) }}
                         @else
-                            Vaše předplatné
+                            {{ __('dashboard.your_subscription') }}
                         @endif
                     </h2>
                     <p class="text-gray-600 font-light">
-                        {{ $activeSubscription->plan ? $activeSubscription->plan->name : 'Kávové předplatné' }}
+                        {{ $activeSubscription->plan ? $activeSubscription->plan->name : __('dashboard.coffee_subscription') }}
                     </p>
                 </div>
-                <a href="{{ route('dashboard.subscription') }}" class="bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-2.5 rounded-full transition-all duration-200 inline-flex items-center gap-2">
+                <a href="{{ localizedRoute('dashboard.subscription') }}" class="bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-2.5 rounded-full transition-all duration-200 inline-flex items-center gap-2">
                     @if($activeSubscriptions->count() > 1)
-                        Zobrazit všechna
+                        {{ __('dashboard.view_all') }}
                     @else
-                        Spravovat
+                        {{ __('dashboard.manage') }}
                     @endif
                 </a>
             </div>
@@ -161,7 +161,7 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600 font-medium mb-1">Cena</p>
+                        <p class="text-sm text-gray-600 font-medium mb-1">{{ __('dashboard.price') }}</p>
                         @if($activeSubscription->configured_price)
                         @php
                         // configured_price now contains FULL price (without discount)
@@ -170,11 +170,11 @@
                         $activeDiscount = ($activeSubscription->discount_amount > 0 && ($activeSubscription->discount_months_remaining === null || $activeSubscription->discount_months_remaining > 0)) ? $activeSubscription->discount_amount : 0;
                         $currentPrice = $activeSubscription->configured_price - $activeDiscount + ($activeSubscription->shipping_cost ?? 0);
                         @endphp
-                        <p class="text-xl font-bold text-gray-900">{{ number_format($currentPrice, 0, ',', ' ') }} Kč</p>
+                        <p class="text-xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::formatByCurrency($currentPrice, $activeSubscription->currency) }}</p>
                         <p class="text-xs text-gray-500 mt-0.5 font-light">
-                            / {{ $activeSubscription->frequency_months == 1 ? 'měsíc' : ($activeSubscription->frequency_months . ' měsíce') }}
+                            {{ $activeSubscription->frequency_months == 1 ? __('dashboard.per_month') : __('dashboard.per_months', ['count' => $activeSubscription->frequency_months]) }}
                             @if(($activeSubscription->shipping_cost ?? 0) > 0)
-                            <span class="text-gray-400"> (vč. doprava {{ number_format($activeSubscription->shipping_cost, 0, ',', ' ') }} Kč)</span>
+                            <span class="text-gray-400"> {{ __('dashboard.incl_shipping', ['amount' => \App\Helpers\CurrencyHelper::formatByCurrency($activeSubscription->shipping_cost, $activeSubscription->currency)]) }}</span>
                             @endif
                         </p>
                         @endif
@@ -188,24 +188,24 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600 font-medium mb-1">Stav</p>
+                        <p class="text-sm text-gray-600 font-medium mb-1">{{ __('dashboard.status') }}</p>
                         @if($activeSubscription->status === 'active')
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
-                                Aktivní
+                                {{ __('dashboard.status_active') }}
                             </span>
                         @elseif($activeSubscription->status === 'paused')
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                 <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5"></span>
-                                Pozastaveno
+                                {{ __('dashboard.status_paused') }}
                                 @if($activeSubscription->paused_until_date)
-                                    <span class="ml-1 text-yellow-700">do {{ $activeSubscription->paused_until_date->format('d.m.Y') }}</span>
+                                    <span class="ml-1 text-yellow-700">{{ __('dashboard.status_paused_until', ['date' => $activeSubscription->paused_until_date->format('d.m.Y')]) }}</span>
                                 @endif
                             </span>
                         @elseif($activeSubscription->status === 'pending')
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                 <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5"></span>
-                                Čeká na aktivaci
+                                {{ __('dashboard.status_pending') }}
                             </span>
                         @else
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -218,7 +218,7 @@
                 @php
                     // Calculate appropriate shipment date based on subscription status
                     $nextShipment = null;
-                    $shipmentLabel = 'Další rozesílka';
+                    $shipmentLabel = __('dashboard.next_shipment');
                     
                     if ($activeSubscription->status === 'paused' && $activeSubscription->paused_until_date) {
                         // For paused subscriptions, show shipment after pause ends
@@ -226,7 +226,7 @@
                             $activeSubscription,
                             \Carbon\Carbon::parse($activeSubscription->paused_until_date)->startOfDay()
                         );
-                        $shipmentLabel = 'Rozesílka po pauze';
+                        $shipmentLabel = __('dashboard.shipment_after_pause');
                     } else {
                         // For active subscriptions, use normal next shipment date
                         $nextShipment = $activeSubscription->next_shipment_date;
@@ -266,15 +266,15 @@
                 </svg>
             </div>
             <div class="flex-1">
-                <p class="text-gray-900 font-bold text-base mb-1">Nemáte aktivní předplatné</p>
+                <p class="text-gray-900 font-bold text-base mb-1">{{ __('dashboard.no_active_subscription') }}</p>
                 <p class="text-gray-600 font-light mb-4">
-                    Začněte svou kávovou cestu s námi a objevte ty nejlepší kávy z prémiových pražíren.
+                    {{ __('dashboard.start_coffee_journey') }}
                 </p>
-                <a href="{{ route('subscriptions.index') }}" class="btn btn-primary inline-flex items-center gap-2 font-medium">
+                <a href="{{ localizedRoute('subscriptions.index') }}" class="btn btn-primary inline-flex items-center gap-2 font-medium">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
-                    Vybrat předplatné
+                    {{ __('dashboard.select_subscription') }}
                 </a>
             </div>
         </div>
@@ -285,9 +285,9 @@
     <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-900">Poslední objednávky</h2>
-                <a href="{{ route('dashboard.orders') }}" class="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2">
-                    Zobrazit všechny
+                <h2 class="text-xl font-bold text-gray-900">{{ __('dashboard.recent_orders') }}</h2>
+                <a href="{{ localizedRoute('dashboard.orders') }}" class="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2">
+                    {{ __('dashboard.view_all_orders') }}
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
@@ -301,19 +301,19 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            Číslo objednávky
+                            {{ __('dashboard.order_number') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            Datum
+                            {{ __('dashboard.date') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            Stav
+                            {{ __('dashboard.status') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            Celkem
+                            {{ __('dashboard.total') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            Akce
+                            {{ __('dashboard.actions') }}
                         </th>
                     </tr>
                 </thead>
@@ -329,15 +329,15 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($order->status === 'completed')
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
-                                    Dokončeno
+                                    {{ __('dashboard.completed') }}
                                 </span>
                             @elseif($order->status === 'pending')
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-yellow-100 text-yellow-800">
-                                    Čeká
+                                    {{ __('dashboard.pending') }}
                                 </span>
                             @elseif($order->status === 'processing')
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100 text-blue-800">
-                                    Zpracovává se
+                                    {{ __('dashboard.processing') }}
                                 </span>
                             @else
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800">
@@ -346,11 +346,11 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                            {{ number_format($order->total, 2, ',', ' ') }} Kč
+                            {{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency, 2) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{{ route('dashboard.order.detail', $order) }}" class="text-primary-600 hover:text-primary-700 font-medium">
-                                Detail →
+                            <a href="{{ localizedRoute('dashboard.order.detail', $order) }}" class="text-primary-600 hover:text-primary-700 font-medium">
+                                {{ __('dashboard.detail') }}
                             </a>
                         </td>
                     </tr>
@@ -369,13 +369,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
             </div>
-            <h3 class="text-base font-bold text-gray-900 mb-1">Žádné objednávky</h3>
-            <p class="text-gray-600 font-light mb-6">Zatím jste neprovedli žádnou objednávku.</p>
-            <a href="{{ route('products.index') }}" class="btn btn-primary inline-flex items-center gap-2 font-medium">
+            <h3 class="text-base font-bold text-gray-900 mb-1">{{ __('dashboard.no_orders') }}</h3>
+            <p class="text-gray-600 font-light mb-6">{{ __('dashboard.no_orders_yet') }}</p>
+            <a href="{{ localizedRoute('products.index') }}" class="btn btn-primary inline-flex items-center gap-2 font-medium">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                Prohlédnout produkty
+                {{ __('dashboard.browse_products') }}
             </a>
         </div>
         @endif

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $roastery->getName() . ' - Naše pražírny - KAVI.cz')
+@section('title', $roastery->getName() . ' - ' . __('roasteries.page_title') . ' - ' . (app()->getLocale() === 'en' ? 'KAVI' : 'KAVI.cz'))
 
 @section('content')
 <!-- Minimal Breadcrumb -->
@@ -8,13 +8,13 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <nav class="text-sm">
       <ol class="flex items-center space-x-2 text-gray-500">
-        <li><a href="{{ route('home') }}" class="hover:text-gray-900 transition-colors font-light">Domů</a></li>
+        <li><a href="{{ route('home') }}" class="hover:text-gray-900 transition-colors font-light">{{ __('messages.general.home') }}</a></li>
         <li class="text-gray-300">
           <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </li>
-        <li><a href="{{ route('roasteries.index') }}" class="hover:text-gray-900 transition-colors font-light">Naše pražírny</a></li>
+        <li><a href="{{ localizedRoute('roasteries.index') }}" class="hover:text-gray-900 transition-colors font-light">{{ __('roasteries.page_title') }}</a></li>
         <li class="text-gray-300">
           <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -71,7 +71,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
                 </svg>
-                <span>Navštívit web</span>
+                <span>{{ __('roasteries.visit_website') }}</span>
               </a>
               @endif
               
@@ -146,10 +146,10 @@
     <div>
       <div class="text-center mb-10">
         <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
-          Naše kávy od {{ $roastery->getName() }}
+          {{ __('roasteries.our_coffees_from', ['name' => $roastery->getName()]) }}
         </h2>
         <p class="text-lg text-gray-600 font-light">
-          Prozkoumejte všechny kávy, které jsme od této pražírny měli nebo momentálně máme v nabídce
+          {{ __('roasteries.coffees_description') }}
         </p>
       </div>
 
@@ -162,7 +162,7 @@
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900">V aktuálním předplatném</h3>
+          <h3 class="text-xl font-bold text-gray-900">{{ __('roasteries.in_current_subscription') }}</h3>
         </div>
         
         <!-- Coffees Grid - Minimal -->
@@ -189,9 +189,9 @@
                 @if(is_array($product->category))
                   @foreach($product->category as $cat)
                     @if($cat === 'espresso')
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">Espresso</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">{{ __('messages.category_espresso') }}</span>
                     @elseif($cat === 'filter')
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">Filtr</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">{{ __('messages.category_filter') }}</span>
                     @endif
                   @endforeach
                 @endif
@@ -212,11 +212,11 @@
 
               <button onclick="openCoffeeModal({{ $product->id }}, '{{ addslashes($product->getName()) }}', '{{ $product->image ? asset($product->image) : '' }}', '{{ addslashes($product->getShortDescription() ?? '') }}', {{ json_encode($product->attributes ?? []) }})" 
                       class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
-                Zobrazit detail
+                {{ __('messages.view_detail') }}
               </button>
 
               <p class="text-xs text-center text-gray-500 mt-3 font-light">
-                Tuto kávu nelze zakoupit samostatně
+                {{ __('roasteries.cannot_buy_separately') }}
               </p>
             </div>
           </div>
@@ -229,12 +229,12 @@
           <div class="absolute top-0 right-0 w-64 h-64 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
           
           <div class="relative max-w-3xl mx-auto">
-            <h3 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 tracking-tight">{{ $coffeeOfMonthProducts->count() === 1 ? 'Chcete tuto kávu vyzkoušet?' : 'Chcete tyto kávy vyzkoušet?' }}</h3>
+            <h3 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900 tracking-tight">{{ $coffeeOfMonthProducts->count() === 1 ? __('roasteries.want_to_try_this_coffee') : __('roasteries.want_to_try_these_coffees') }}</h3>
             <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto font-light">
-              Připojte se k našemu předplatnému a dostávejte každý měsíc exkluzivní kávy přímo od {{ $roastery->getName() }} a dalších skvělých pražíren!
+              {{ __('roasteries.subscription_promo_text', ['name' => $roastery->getName()]) }}
             </p>
-            <a href="{{ route('subscriptions.index') }}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-8 rounded-full transition-all duration-200">
-              <span>Vybrat předplatné</span>
+            <a href="{{ localizedRoute('subscriptions.index') }}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-8 rounded-full transition-all duration-200">
+              <span>{{ __('roasteries.choose_subscription') }}</span>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -257,7 +257,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-gray-900">Další kávy od {{ $roastery->getName() }}</h3>
+          <h3 class="text-xl font-bold text-gray-900">{{ __('roasteries.other_coffees_from', ['name' => $roastery->getName()]) }}</h3>
         </div>
         
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -273,8 +273,8 @@
         <svg class="mx-auto h-20 w-20 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
         </svg>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">Zatím žádné kávy</h3>
-        <p class="text-gray-600 font-light">Od této pražírny momentálně nemáme žádné kávy v nabídce.</p>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('roasteries.no_coffees_yet') }}</h3>
+        <p class="text-gray-600 font-light">{{ __('roasteries.no_coffees_description') }}</p>
       </div>
       @endif
     </div>
@@ -303,7 +303,7 @@
           <svg class="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
           </svg>
-          <span class="text-xs font-medium text-gray-900">V aktuálním předplatném</span>
+          <span class="text-xs font-medium text-gray-900">{{ __('roasteries.in_current_subscription') }}</span>
         </div>
         
         <h2 id="modalTitle" class="text-2xl md:text-3xl font-bold text-gray-900 mb-3 tracking-tight"></h2>
@@ -315,10 +315,10 @@
         
         <!-- CTA - Minimal -->
         <div class="bg-gray-100 rounded-2xl p-6 border border-gray-200">
-          <h3 class="font-semibold text-gray-900 mb-2">Chcete tuto kávu vyzkoušet?</h3>
-          <p class="text-sm text-gray-600 mb-4 font-light">Tato káva je dostupná pouze v našem měsíčním předplatném. Připojte se a každý měsíc objevujte nové chuti!</p>
-          <a href="{{ route('subscriptions.index') }}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 px-6 rounded-full transition-all duration-200 text-sm">
-            <span>Vybrat předplatné</span>
+          <h3 class="font-semibold text-gray-900 mb-2">{{ __('roasteries.want_to_try_this_coffee') }}</h3>
+          <p class="text-sm text-gray-600 mb-4 font-light">{{ __('roasteries.modal_subscription_text') }}</p>
+          <a href="{{ localizedRoute('subscriptions.index') }}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 px-6 rounded-full transition-all duration-200 text-sm">
+            <span>{{ __('roasteries.choose_subscription') }}</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
             </svg>
@@ -330,6 +330,12 @@
 </div>
 
 <script>
+const translations = {
+  flavorProfile: '{{ __('messages.flavor_profile') }}',
+  origin: '{{ __('messages.origin') }}',
+  processing: '{{ __('messages.processing') }}'
+};
+
 function openCoffeeModal(id, name, image, description, attributes) {
   const modal = document.getElementById('coffeeModal');
   const modalImage = document.getElementById('modalImage');
@@ -366,7 +372,7 @@ function openCoffeeModal(id, name, image, description, attributes) {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
           </svg>
           <div>
-            <p class="font-semibold text-gray-900">Chuťový profil</p>
+            <p class="font-semibold text-gray-900">${translations.flavorProfile}</p>
             <p class="text-gray-700">${attributes.flavor_profile}</p>
           </div>
         </div>
@@ -379,7 +385,7 @@ function openCoffeeModal(id, name, image, description, attributes) {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
           <div>
-            <p class="font-semibold text-gray-900">Původ</p>
+            <p class="font-semibold text-gray-900">${translations.origin}</p>
             <p class="text-gray-700">${attributes.origin}</p>
           </div>
         </div>
@@ -392,7 +398,7 @@ function openCoffeeModal(id, name, image, description, attributes) {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
           </svg>
           <div>
-            <p class="font-semibold text-gray-900">Zpracování</p>
+            <p class="font-semibold text-gray-900">${translations.processing}</p>
             <p class="text-gray-700">${attributes.process}</p>
           </div>
         </div>

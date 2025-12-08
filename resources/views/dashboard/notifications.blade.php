@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Notifikace - KAVI.cz')
+@section('title', __('dashboard.title_notifications'))
 
 @section('content')
 <div class="space-y-6">
@@ -8,16 +8,16 @@
     <div class="bg-white rounded-2xl p-6 border border-gray-200">
         <div class="flex justify-between items-center flex-wrap gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Notifikace</h1>
-                <p class="mt-1 text-gray-600 font-light">Přehled všech vašich oznámení</p>
+                <h1 class="text-2xl font-bold text-gray-900">{{ __('dashboard.notifications') }}</h1>
+                <p class="mt-1 text-gray-600 font-light">{{ __('dashboard.notifications_overview') }}</p>
             </div>
             <button type="button" 
-                    onclick="alert('Označit vše jako přečtené - bude implementováno')"
+                    onclick="alert('{{ __('dashboard.mark_all_read') }}')"
                     class="bg-gray-100 text-gray-900 hover:bg-gray-200 font-medium px-6 py-2.5 rounded-full transition-all duration-200">
                 <svg class="w-4 h-4 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                Označit vše jako přečtené
+                {{ __('dashboard.mark_all_read') }}
             </button>
         </div>
     </div>
@@ -35,21 +35,21 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-start gap-4 mb-2">
-                            <h3 class="text-base font-bold text-gray-900">Objednávka byla potvrzena</h3>
+                            <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.order_confirmed') }}</h3>
                             <span class="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-2"></span>
                         </div>
                         <p class="text-gray-600 font-light mb-3">
-                            Vaše objednávka #1234 byla úspěšně potvrzena a bude odeslána v nejbližších dnech.
+                            {{ __('dashboard.order_confirmed_message', ['number' => '1234']) }}
                         </p>
                         <div class="flex items-center gap-4 text-sm text-gray-500 font-light">
                             <span class="flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Před 2 hodinami
+                                {{ __('dashboard.hours_ago', ['count' => 2]) }}
                             </span>
                             <button type="button" class="text-primary-600 hover:text-primary-700 font-medium">
-                                Zobrazit detail
+                                {{ __('dashboard.view_detail') }}
                             </button>
                         </div>
                     </div>
@@ -68,21 +68,21 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-start gap-4 mb-2">
-                            <h3 class="text-base font-bold text-gray-900">Zásilka byla odeslána</h3>
+                            <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.shipment_sent') }}</h3>
                             <span class="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-2"></span>
                         </div>
                         <p class="text-gray-600 font-light mb-3">
-                            Vaše zásilka z předplatného byla odeslána přes Zásilkovnu. Číslo zásilky: Z987654321
+                            {{ __('dashboard.shipment_sent_message', ['tracking' => 'Z987654321']) }}
                         </p>
                         <div class="flex items-center gap-4 text-sm text-gray-500 font-light">
                             <span class="flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Včera v 14:30
+                                {{ __('dashboard.yesterday_at', ['time' => '14:30']) }}
                             </span>
                             <button type="button" class="text-primary-600 hover:text-primary-700 font-medium">
-                                Sledovat zásilku
+                                {{ __('dashboard.track_package') }}
                             </button>
                         </div>
                     </div>
@@ -101,20 +101,20 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-start gap-4 mb-2">
-                            <h3 class="text-base font-bold text-gray-900">Předplatné bude obnoveno</h3>
+                            <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.subscription_renewal') }}</h3>
                         </div>
                         <p class="text-gray-600 font-light mb-3">
-                            Vaše předplatné bude automaticky obnoveno 20. listopadu 2025. Částka 890 Kč bude odečtena z vaší karty.
+                            {{ __('dashboard.subscription_renewal_message', ['date' => '20.11.2025', 'amount' => '€35']) }}
                         </p>
                         <div class="flex items-center gap-4 text-sm text-gray-500 font-light">
                             <span class="flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Před 3 dny
+                                {{ __('dashboard.days_ago', ['count' => 3]) }}
                             </span>
                             <button type="button" class="text-primary-600 hover:text-primary-700 font-medium">
-                                Spravovat předplatné
+                                {{ __('dashboard.manage_subscription') }}
                             </button>
                         </div>
                     </div>
@@ -133,20 +133,20 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-start gap-4 mb-2">
-                            <h3 class="text-base font-bold text-gray-900">Speciální nabídka pro vás! 🎉</h3>
+                            <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.special_offer') }}</h3>
                         </div>
                         <p class="text-gray-600 font-light mb-3">
-                            Získejte 20% slevu na všechny jednotlivé balení kávy. Nabídka platí do konce měsíce.
+                            {{ __('dashboard.special_offer_message') }}
                         </p>
                         <div class="flex items-center gap-4 text-sm text-gray-500 font-light">
                             <span class="flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Před týdnem
+                                {{ __('dashboard.week_ago') }}
                             </span>
                             <button type="button" class="text-primary-600 hover:text-primary-700 font-medium">
-                                Prohlédnout nabídku
+                                {{ __('dashboard.view_offer') }}
                             </button>
                         </div>
                     </div>
@@ -165,20 +165,20 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-start gap-4 mb-2">
-                            <h3 class="text-base font-bold text-gray-900">Jak se vám líbí naše káva?</h3>
+                            <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.review_request') }}</h3>
                         </div>
                         <p class="text-gray-600 font-light mb-3">
-                            Sdílejte s námi vaše zkušenosti. Vaše zpětná vazba nám pomáhá zlepšovat naše služby.
+                            {{ __('dashboard.review_request_message') }}
                         </p>
                         <div class="flex items-center gap-4 text-sm text-gray-500 font-light">
                             <span class="flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Před 2 týdny
+                                {{ __('dashboard.weeks_ago', ['count' => 2]) }}
                             </span>
                             <button type="button" class="text-primary-600 hover:text-primary-700 font-medium">
-                                Napsat hodnocení
+                                {{ __('dashboard.write_review') }}
                             </button>
                         </div>
                     </div>
@@ -193,22 +193,22 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
             </div>
-            <h3 class="text-base font-bold text-gray-900 mb-2">Žádné notifikace</h3>
-            <p class="text-gray-600 font-light">Zatím zde nejsou žádné nové oznámení.</p>
+            <h3 class="text-base font-bold text-gray-900 mb-2">{{ __('dashboard.no_notifications') }}</h3>
+            <p class="text-gray-600 font-light">{{ __('dashboard.no_notifications_message') }}</p>
         </div>
     </div>
 
     <!-- Notification Settings -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Nastavení notifikací</h2>
+            <h2 class="text-xl font-bold text-gray-900">{{ __('dashboard.notification_settings') }}</h2>
         </div>
         <div class="p-6">
             <div class="space-y-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-base font-bold text-gray-900">Emailové notifikace</h3>
-                        <p class="text-sm text-gray-600 font-light mt-1">Dostávat důležité informace o objednávkách a předplatném</p>
+                        <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.email_notifications') }}</h3>
+                        <p class="text-sm text-gray-600 font-light mt-1">{{ __('dashboard.email_notifications_description') }}</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" checked class="sr-only peer">
@@ -218,8 +218,8 @@
 
                 <div class="flex items-center justify-between border-t border-gray-200 pt-6">
                     <div>
-                        <h3 class="text-base font-bold text-gray-900">Marketingové emaily</h3>
-                        <p class="text-sm text-gray-600 font-light mt-1">Dostávat informace o nových produktech a speciálních nabídkách</p>
+                        <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.marketing_emails') }}</h3>
+                        <p class="text-sm text-gray-600 font-light mt-1">{{ __('dashboard.marketing_emails_description') }}</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" checked class="sr-only peer">
@@ -229,8 +229,8 @@
 
                 <div class="flex items-center justify-between border-t border-gray-200 pt-6">
                     <div>
-                        <h3 class="text-base font-bold text-gray-900">SMS notifikace</h3>
-                        <p class="text-sm text-gray-600 font-light mt-1">Dostávat SMS upozornění o důležitých událostech</p>
+                        <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.sms_notifications') }}</h3>
+                        <p class="text-sm text-gray-600 font-light mt-1">{{ __('dashboard.sms_notifications_description') }}</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" class="sr-only peer">
@@ -244,13 +244,10 @@
                     <svg class="w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Uložit nastavení
+                    {{ __('dashboard.save_settings') }}
                 </button>
             </div>
         </div>
     </div>
 </div>
 @endsection
-
-
-

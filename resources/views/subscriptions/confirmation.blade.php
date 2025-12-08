@@ -394,11 +394,11 @@
 
                 <div class="space-y-3">
                     @auth
-                    <a href="{{ route('dashboard.subscription') }}" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('dashboard.subscription') }}" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
                         Zobrazit předplatné
                     </a>
                     @else
-                    <a href="{{ route('login') }}" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('login') }}" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
                         Přihlásit se / Vytvořit účet
                     </a>
                     @endauth

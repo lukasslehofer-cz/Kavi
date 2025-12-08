@@ -1,40 +1,40 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Detail objednávky - KAVI.cz')
+@section('title', __('dashboard.title_order_detail'))
 
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
     <div class="bg-white rounded-2xl border border-gray-200 p-6">
-        <a href="{{ route('dashboard.orders') }}" class="text-primary-600 hover:text-primary-700 font-medium mb-4 inline-flex items-center gap-2">
+        <a href="{{ localizedRoute('dashboard.orders') }}" class="text-primary-600 hover:text-primary-700 font-medium mb-4 inline-flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            Zpět na objednávky
+            {{ __('dashboard.back_to_orders') }}
         </a>
-        <h1 class="text-xl font-bold text-gray-900 mt-2">Detail objednávky {{ $order->order_number ?? '#' . $order->id }}</h1>
-        <p class="mt-2 text-gray-600 font-light">Vytvořeno: {{ $order->created_at->format('d.m.Y H:i') }}</p>
+        <h1 class="text-xl font-bold text-gray-900 mt-2">{{ __('dashboard.order_detail', ['number' => $order->order_number ?? '#' . $order->id]) }}</h1>
+        <p class="mt-2 text-gray-600 font-light">{{ __('dashboard.created_at', ['date' => $order->created_at->format('d.m.Y H:i')]) }}</p>
     </div>
 
     <!-- Order Status -->
     <div class="bg-white rounded-2xl border border-gray-200 p-6">
-        <h2 class="text-base font-bold text-gray-900 mb-4">Stav objednávky</h2>
+        <h2 class="text-base font-bold text-gray-900 mb-4">{{ __('dashboard.order_status') }}</h2>
         <div class="flex items-center">
             @if($order->status === 'completed')
                 <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
-                    ✓ Dokončeno
+                    {{ __('dashboard.status_completed_icon') }}
                 </span>
             @elseif($order->status === 'pending')
                 <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
-                    ⏱ Čeká na zpracování
+                    {{ __('dashboard.status_pending_icon') }}
                 </span>
             @elseif($order->status === 'processing')
                 <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
-                    🔄 Zpracovává se
+                    {{ __('dashboard.status_processing_icon') }}
                 </span>
             @elseif($order->status === 'cancelled')
                 <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-red-100 text-red-800 border border-red-200">
-                    ✕ Zrušeno
+                    {{ __('dashboard.status_cancelled_icon') }}
                 </span>
             @else
                 <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-gray-100 text-gray-800 border border-gray-200">
@@ -47,7 +47,7 @@
     <!-- Order Items -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-base font-bold text-gray-900">Položky objednávky</h2>
+            <h2 class="text-base font-bold text-gray-900">{{ __('dashboard.order_items') }}</h2>
         </div>
         <div class="divide-y divide-gray-200">
             @foreach($order->items as $item)
@@ -55,12 +55,12 @@
                 <div class="flex-1">
                     <h3 class="text-base font-bold text-gray-900">{{ $item->product_name }}</h3>
                     <p class="text-sm text-gray-600 font-light mt-1">
-                        Množství: {{ $item->quantity }} × {{ number_format($item->price, 2, ',', ' ') }} Kč
+                        {{ __('dashboard.quantity') }} {{ $item->quantity }} × {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency, 2) }}
                     </p>
                 </div>
                 <div class="text-right">
                     <p class="text-base font-bold text-primary-600">
-                        {{ number_format($item->price * $item->quantity, 2, ',', ' ') }} Kč
+                        {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price * $item->quantity, $order->currency, 2) }}
                     </p>
                 </div>
             </div>
@@ -71,36 +71,36 @@
     <!-- Order Summary -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-base font-bold text-gray-900">Souhrn objednávky</h2>
+            <h2 class="text-base font-bold text-gray-900">{{ __('dashboard.order_summary') }}</h2>
         </div>
         <div class="p-6">
             <div class="space-y-3">
                 <div class="flex justify-between text-gray-600 font-light">
-                    <span>Mezisoučet:</span>
-                    <span class="font-medium">{{ number_format($order->subtotal, 2, ',', ' ') }} Kč</span>
+                    <span>{{ __('dashboard.subtotal') }}</span>
+                    <span class="font-medium">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->subtotal, $order->currency, 2) }}</span>
                 </div>
                 @if($order->tax > 0)
                 <div class="flex justify-between text-gray-600 font-light">
-                    <span>DPH:</span>
-                    <span class="font-medium">{{ number_format($order->tax, 2, ',', ' ') }} Kč</span>
+                    <span>{{ __('dashboard.vat') }}</span>
+                    <span class="font-medium">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->tax, $order->currency, 2) }}</span>
                 </div>
                 @endif
                 @if($order->shipping > 0)
                 <div class="flex justify-between text-gray-600 font-light">
-                    <span>Doprava:</span>
-                    <span class="font-medium">{{ number_format($order->shipping, 2, ',', ' ') }} Kč</span>
+                    <span>{{ __('dashboard.shipping') }}</span>
+                    <span class="font-medium">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->shipping, $order->currency, 2) }}</span>
                 </div>
                 @endif
                 @if($order->discount_amount > 0)
                 <div class="flex justify-between text-green-600 font-light">
-                    <span>Sleva{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}:</span>
-                    <span class="font-medium">-{{ number_format($order->discount_amount, 2, ',', ' ') }} Kč</span>
+                    <span>{{ __('dashboard.discount') }}{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}:</span>
+                    <span class="font-medium">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency, 2) }}</span>
                 </div>
                 @endif
                 <div class="border-t border-gray-200 pt-3 mt-3">
                     <div class="flex justify-between text-xl font-bold">
-                        <span class="text-gray-900">Celkem:</span>
-                        <span class="text-primary-600">{{ number_format($order->total, 2, ',', ' ') }} Kč</span>
+                        <span class="text-gray-900">{{ __('dashboard.total') }}:</span>
+                        <span class="text-primary-600">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency, 2) }}</span>
                     </div>
                 </div>
             </div>
@@ -110,14 +110,14 @@
     @if($order->stripe_payment_intent_id)
     <div class="bg-blue-50 border border-blue-200 bg-blue-50 rounded-xl p-4">
         <p class="text-sm text-gray-900">
-            <span class="font-bold">ID platby:</span> {{ $order->stripe_payment_intent_id }}
+            <span class="font-bold">{{ __('dashboard.payment_id') }}</span> {{ $order->stripe_payment_intent_id }}
         </p>
     </div>
     @endif
 
     @if($order->invoice_pdf_path)
     <div class="bg-white rounded-2xl border border-gray-200 p-6">
-        <h2 class="text-base font-bold text-gray-900 mb-4">Faktura</h2>
+        <h2 class="text-base font-bold text-gray-900 mb-4">{{ __('dashboard.invoice') }}</h2>
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-lg bg-primary-50 flex items-center justify-center">
@@ -126,16 +126,16 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm font-bold text-gray-900">Daňový doklad</p>
-                    <p class="text-xs text-gray-600 font-light">Objednávka {{ $order->order_number }}</p>
+                    <p class="text-sm font-bold text-gray-900">{{ __('dashboard.tax_document') }}</p>
+                    <p class="text-xs text-gray-600 font-light">{{ __('dashboard.order', ['number' => $order->order_number]) }}</p>
                 </div>
             </div>
-            <a href="{{ route('dashboard.order.invoice', $order) }}" 
+            <a href="{{ localizedRoute('dashboard.order.invoice', $order) }}" 
                class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Stáhnout fakturu
+                {{ __('dashboard.download_invoice') }}
             </a>
         </div>
     </div>

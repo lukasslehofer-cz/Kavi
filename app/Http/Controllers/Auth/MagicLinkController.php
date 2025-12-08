@@ -79,7 +79,7 @@ class MagicLinkController extends Controller
             ->first();
 
         if (!$loginToken) {
-            return redirect()->route('login')
+            return redirect(localizedRoute('login'))
                 ->with('error', 'Přihlašovací odkaz je neplatný nebo vypršel. Požádejte o nový odkaz.');
         }
 
@@ -87,7 +87,7 @@ class MagicLinkController extends Controller
         $user = User::where('email', $loginToken->email)->first();
 
         if (!$user) {
-            return redirect()->route('login')
+            return redirect(localizedRoute('login'))
                 ->with('error', 'Uživatel nebyl nalezen.');
         }
 
@@ -109,7 +109,7 @@ class MagicLinkController extends Controller
         }
 
         // Default redirect to dashboard
-        return redirect()->intended(route('dashboard.index'))
+        return redirect()->intended(localizedRoute('dashboard.index'))
             ->with('success', 'Byli jste úspěšně přihlášeni pomocí magic linku!');
     }
 

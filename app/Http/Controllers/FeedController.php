@@ -68,7 +68,7 @@ class FeedController extends Controller
         $this->addElement($dom, $shopItem, 'PRODUCTNAME', $product->name);
         $this->addElement($dom, $shopItem, 'PRODUCT', $product->name);
         $this->addElement($dom, $shopItem, 'DESCRIPTION', $this->cleanDescription($product->description));
-        $this->addElement($dom, $shopItem, 'URL', route('products.show', $product));
+        $this->addElement($dom, $shopItem, 'URL', localizedRoute('products.show', $product));
         
         // Obrázek
         if ($product->image) {

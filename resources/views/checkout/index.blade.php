@@ -26,7 +26,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Checkout Form -->
         <div class="lg:col-span-2">
-            <form action="{{ route('checkout.store') }}" method="POST">
+            <form action="{{ localizedRoute('checkout.store') }}" method="POST">
                 @csrf
 
                 <!-- Contact Information - Minimal -->
@@ -53,7 +53,7 @@
                                 <h3 class="font-medium text-gray-900 mb-1.5">{{ __('checkout.have_account') }}</h3>
                                 <p class="text-sm text-gray-600 mb-3 font-light">{{ __('checkout.login_faster') }}</p>
                                 <div class="flex flex-wrap gap-2">
-                                    <a href="{{ route('login') }}?redirect={{ urlencode(route('checkout.index')) }}" class="inline-block bg-white hover:bg-gray-50 text-blue-600 font-medium px-5 py-2 rounded-full border border-blue-200 hover:border-blue-300 transition-all text-sm">
+                                    <a href="{{ localizedRoute('login') }}?redirect={{ urlencode(localizedRoute('checkout.index')) }}" class="inline-block bg-white hover:bg-gray-50 text-blue-600 font-medium px-5 py-2 rounded-full border border-blue-200 hover:border-blue-300 transition-all text-sm">
                                         {{ __('checkout.login') }}
                                     </a>
                                     <button type="button" onclick="showMagicLinkModal()" class="inline-flex items-center gap-1 bg-white hover:bg-gray-50 text-gray-700 font-medium px-5 py-2 rounded-full border border-gray-200 hover:border-gray-300 transition-all text-sm">
@@ -848,7 +848,7 @@
                                     </svg>
                                     <span class="text-sm font-medium text-green-800">{{ __('checkout.coupon.applied') }}</span>
                                 </div>
-                                <a href="{{ route('checkout.index', ['remove_coupon' => 1]) }}" class="text-xs text-red-600 hover:text-red-800 hover:underline">
+                                <a href="{{ localizedRoute('checkout.index', ['remove_coupon' => 1]) }}" class="text-xs text-red-600 hover:text-red-800 hover:underline">
                                     {{ __('checkout.coupon.remove') }}
                                 </a>
                             </div>
@@ -863,7 +863,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </summary>
-                            <form method="GET" action="{{ route('checkout.index') }}" class="mt-3">
+                            <form method="GET" action="{{ localizedRoute('checkout.index') }}" class="mt-3">
                                 <div class="flex gap-2">
                                     <input type="text" name="coupon_code" placeholder="{{ __('checkout.coupon.placeholder') }}" 
                                         class="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-primary-500 focus:border-primary-500 uppercase text-sm"
@@ -951,12 +951,12 @@
                 <div class="flex items-start mb-4 p-3 bg-gray-50 rounded-xl">
                     <input type="checkbox" id="terms" required form="checkout-form" class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mr-2.5 mt-0.5 flex-shrink-0">
                     <label for="terms" class="text-xs text-gray-600 font-light">
-                        {{ __('checkout.terms.agree') }} <a href="{{ route('terms-of-service') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium underline">{{ __('checkout.terms.terms_of_service') }}</a> 
-                        {{ __('checkout.terms.and') }} <a href="{{ route('privacy-policy') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium underline">{{ __('checkout.terms.privacy_policy') }}</a>
+                        {{ __('checkout.terms.agree') }} <a href="{{ localizedRoute('terms-of-service') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium underline">{{ __('checkout.terms.terms_of_service') }}</a> 
+                        {{ __('checkout.terms.and') }} <a href="{{ localizedRoute('privacy-policy') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium underline">{{ __('checkout.terms.privacy_policy') }}</a>
                     </label>
                 </div>
 
-                <a href="{{ route('cart.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200 flex items-center justify-center gap-2">
+                <a href="{{ localizedRoute('cart.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200 flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -1001,9 +1001,9 @@
             </button>
         </div>
         <p class="text-gray-600 mb-4">{{ __('checkout.magic_link_description') }}</p>
-        <form method="POST" action="{{ route('magic-link.send') }}" id="checkout-magic-link-form">
+        <form method="POST" action="{{ localizedRoute('magic-link.send') }}" id="checkout-magic-link-form">
             @csrf
-            <input type="hidden" name="redirect" value="{{ route('checkout.index') }}">
+            <input type="hidden" name="redirect" value="{{ localizedRoute('checkout.index') }}">
             <div class="mb-4">
                 <label for="magic-link-email-input" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                 <input type="email" id="magic-link-email-input" name="email" required
@@ -1046,7 +1046,7 @@ let currentPacketaVendors = @json($packetaVendors ?? []);
 
 // Add form id to the form element
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form[action="{{ route('checkout.store') }}"]');
+    const form = document.querySelector('form[action="{{ localizedRoute('checkout.store') }}"]');
     if (form) {
         form.id = 'checkout-form';
     }

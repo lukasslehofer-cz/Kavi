@@ -57,16 +57,16 @@
                     <a href="{{ route('home') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Home' : 'Úvod' }}
                     </a>
-                    <a href="{{ route('subscriptions.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee Boxes' : 'Kávové boxy' }}
                     </a>
-                    <a href="{{ route('monthly-feature.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('monthly-feature.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}
                     </a>
-                    <a href="{{ route('products.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('products.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Shop' : 'Obchod' }}
                     </a>
-                    <a href="{{ route('roasteries.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('roasteries.index') }}" class="text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Our Roasteries' : 'Naše pražírny' }}
                     </a>
                     @auth
@@ -83,19 +83,19 @@
 
                     <!-- User Account -->
                     @auth
-                    <a href="{{ route('dashboard.index') }}" class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'My Account' : 'Můj účet' }}">
+                    <a href="{{ localizedRoute('dashboard.index') }}" class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'My Account' : 'Můj účet' }}">
                         <svg class="w-4 h-4 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                     </a>
                     @else
-                    <a href="{{ route('login') }}" class="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('login') }}" class="hidden md:inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 px-4 py-2 rounded-full transition-all duration-200">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Sign In' : 'Přihlásit' }}</span>
                     </a>
                     @endauth
 
                     <!-- Cart -->
-                    <a href="{{ route('cart.index') }}" class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-primary-50 transition-colors duration-200 group" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}">
+                    <a href="{{ localizedRoute('cart.index') }}" class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-primary-50 transition-colors duration-200 group" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}">
                         <svg class="w-4 h-4 text-gray-700 group-hover:text-primary-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
@@ -107,7 +107,7 @@
                     </a>
                     
                     <!-- CTA Button - Desktop -->
-                    <a href="{{ route('subscriptions.index') }}" class="hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm px-5 py-2 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm px-5 py-2 rounded-full transition-all duration-200">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Build Your Box' : 'Sestavte si box' }}</span>
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -131,22 +131,22 @@
                 <a href="{{ route('home') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Home' : 'Domů' }}
                 </a>
-                <a href="{{ route('subscriptions.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
+                <a href="{{ localizedRoute('subscriptions.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee Boxes' : 'Kávové boxy' }}
                 </a>
-                <a href="{{ route('monthly-feature.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
+                <a href="{{ localizedRoute('monthly-feature.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}
                 </a>
-                <a href="{{ route('products.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
+                <a href="{{ localizedRoute('products.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Shop' : 'Obchod' }}
                 </a>
-                <a href="{{ route('roasteries.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
+                <a href="{{ localizedRoute('roasteries.index') }}" class="block text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Our Roasteries' : 'Naše pražírny' }}
                 </a>
                 
                 <!-- Mobile CTA Button -->
                 <div class="pt-4">
-                    <a href="{{ route('subscriptions.index') }}" class="flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Build Your Box' : 'Sestavte si box' }}</span>
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -157,7 +157,7 @@
                 <!-- Account Section -->
                 <div class="pt-4 mt-4 border-t border-gray-100 space-y-2">
                     @auth
-                        <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3 text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all">
+                        <a href="{{ localizedRoute('dashboard.index') }}" class="flex items-center gap-3 text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
@@ -172,7 +172,7 @@
                             <span>Admin</span>
                         </a>
                         @endif
-                        <form action="{{ route('logout') }}" method="POST">
+                        <form action="{{ localizedRoute('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="w-full flex items-center gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 font-medium py-3 px-4 rounded-full transition-all">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -182,13 +182,13 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="flex items-center gap-3 text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all">
+                        <a href="{{ localizedRoute('login') }}" class="flex items-center gap-3 text-gray-900 hover:text-primary-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-full transition-all">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                             </svg>
                             <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Sign In' : 'Přihlásit se' }}</span>
                         </a>
-                        <a href="{{ route('register') }}" class="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 font-medium transition-all text-center rounded-full">
+                        <a href="{{ localizedRoute('register') }}" class="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 font-medium transition-all text-center rounded-full">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                             </svg>
@@ -253,9 +253,9 @@
           <div>
             <h3 class="text-gray-900 font-semibold text-sm mb-4">{{ ($currentLocale ?? 'cs') === 'en' ? 'Subscription' : 'Předplatné' }}</h3>
             <nav class="space-y-2.5">
-              <a href="{{ route('subscriptions.index') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Configurator' : 'Konfigurátor' }}</a>
-              <a href="{{ route('subscriptions.index') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'One-time Box' : 'Jednorázový box' }}</a>
-              <a href="{{ route('monthly-feature.index') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}</a>        
+              <a href="{{ localizedRoute('subscriptions.index') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Configurator' : 'Konfigurátor' }}</a>
+              <a href="{{ localizedRoute('subscriptions.index') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'One-time Box' : 'Jednorázový box' }}</a>
+              <a href="{{ localizedRoute('monthly-feature.index') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}</a>        
             </nav>
           </div>
 
@@ -263,10 +263,10 @@
           <div>
             <h3 class="text-gray-900 font-semibold text-sm mb-4">{{ ($currentLocale ?? 'cs') === 'en' ? 'Shop' : 'Obchod' }}</h3>
             <nav class="space-y-2.5">
-              <a href="{{ route('products.index') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'All Products' : 'Všechny produkty' }}</a>
-              <a href="{{ route('products.index', ['category' => 'espresso']) }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Espresso Coffee' : 'Espresso káva' }}</a>
-              <a href="{{ route('products.index', ['category' => 'filter']) }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Filter Coffee' : 'Filtrovaná káva' }}</a>
-              <a href="{{ route('products.index', ['category' => 'decaf']) }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Decaf Coffee' : 'Bezkofeinová káva' }}</a>
+              <a href="{{ localizedRoute('products.index') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'All Products' : 'Všechny produkty' }}</a>
+              <a href="{{ localizedRoute('products.index', ['category' => 'espresso']) }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Espresso Coffee' : 'Espresso káva' }}</a>
+              <a href="{{ localizedRoute('products.index', ['category' => 'filter']) }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Filter Coffee' : 'Filtrovaná káva' }}</a>
+              <a href="{{ localizedRoute('products.index', ['category' => 'decaf']) }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Decaf Coffee' : 'Bezkofeinová káva' }}</a>
             </nav>
           </div>
 
@@ -274,9 +274,9 @@
           <div>
             <h3 class="text-gray-900 font-semibold text-sm mb-4">{{ ($currentLocale ?? 'cs') === 'en' ? 'Information' : 'Informace' }}</h3>
             <nav class="space-y-2.5">
-              <a href="{{ route('how-it-works') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'How It Works' : 'Jak to funguje' }}</a>
-              <a href="{{ route('about') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'About Us' : 'O nás' }}</a>
-              <a href="{{ route('how-it-works') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">FAQ</a>              
+              <a href="{{ localizedRoute('how-it-works') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'How It Works' : 'Jak to funguje' }}</a>
+              <a href="{{ localizedRoute('about') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'About Us' : 'O nás' }}</a>
+              <a href="{{ localizedRoute('how-it-works') }}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">FAQ</a>              
             </nav>
           </div>
 
@@ -284,17 +284,18 @@
           <div>
             <h3 class="text-gray-900 font-semibold text-sm mb-4">{{ ($currentLocale ?? 'cs') === 'en' ? 'Contact' : 'Kontakt' }}</h3>
             <nav class="space-y-3">
-              <a href="{{ route('contact') }}" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">
+              <a href="{{ localizedRoute('contact') }}" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
                 <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Write Us' : 'Napište nám' }}</span>
               </a>
-              <a href="mailto:info@kavi.cz" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">
+              @php $footerEmail = ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz'; @endphp
+              <a href="mailto:{{ $footerEmail }}" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <span>info@kavi.cz</span>
+                <span>{{ $footerEmail }}</span>
               </a>
             </nav>
           </div>
@@ -328,8 +329,8 @@
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-light">
             <p>© {{ date('Y') }} {{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}. {{ ($currentLocale ?? 'cs') === 'en' ? 'All rights reserved.' : 'Všechna práva vyhrazena.' }}</p>
             <div class="flex gap-6">
-              <a href="{{ route('terms-of-service') }}" class="hover:text-gray-900 transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Terms of Service' : 'Obchodní podmínky' }}</a>
-              <a href="{{ route('privacy-policy') }}" class="hover:text-gray-900 transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Privacy Policy' : 'Ochrana osobních údajů' }}</a>              
+              <a href="{{ localizedRoute('terms-of-service') }}" class="hover:text-gray-900 transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Terms of Service' : 'Obchodní podmínky' }}</a>
+              <a href="{{ localizedRoute('privacy-policy') }}" class="hover:text-gray-900 transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Privacy Policy' : 'Ochrana osobních údajů' }}</a>              
             </div>
           </div>
         </div>
@@ -375,7 +376,7 @@
                     submitButton.disabled = true;
                     submitButton.textContent = isEnglish ? 'Sending...' : 'Odesílám...';
 
-                    fetch('{{ route("newsletter.subscribe") }}', {
+                    fetch('{{ localizedRoute('newsletter.subscribe') }}', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

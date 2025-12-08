@@ -62,7 +62,7 @@ class CheckoutController extends Controller
         $cart = session()->get('cart', []);
 
         if (empty($cart)) {
-            return redirect()->route('cart.index')
+            return redirect()->localizedRoute('cart.index')
                 ->with('error', 'Váš košík je prázdný.');
         }
 
@@ -102,7 +102,7 @@ class CheckoutController extends Controller
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
             $this->couponService->clearCouponFromStorage();
-            return redirect()->route('checkout.index');
+            return redirect()->localizedRoute('checkout.index');
         }
         
         // Zpracovat kupón z query parametru (pokud byl zadán v formuláři)
@@ -313,7 +313,7 @@ class CheckoutController extends Controller
         $cart = session()->get('cart', []);
 
         if (empty($cart)) {
-            return redirect()->route('cart.index')
+            return redirect()->localizedRoute('cart.index')
                 ->with('error', 'Váš košík je prázdný.');
         }
 

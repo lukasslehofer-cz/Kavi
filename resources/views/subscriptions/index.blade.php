@@ -130,7 +130,7 @@
               </div>
             @endif
             
-            <a href="{{ route('monthly-feature.index') }}" 
+            <a href="{{ localizedRoute('monthly-feature.index') }}" 
                class="block w-full py-2.5 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm text-center">
               {{ $currentLocale === 'en' ? 'View detailed information' : 'Zobrazit detailní informace' }}
             </a>
@@ -167,7 +167,7 @@
           </div>
           
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('products.index') }}" 
+            <a href="{{ localizedRoute('products.index') }}" 
                class="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200">
               <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -182,7 +182,7 @@
           </div>
         </div>
         @else
-        <form id="subscription-configurator" method="POST" action="{{ route('subscriptions.configure.checkout') }}">
+        <form id="subscription-configurator" method="POST" action="{{ localizedRoute('subscriptions.configure.checkout') }}">
           @csrf
           
           <!-- Hidden inputy pro mix rozdělení -->

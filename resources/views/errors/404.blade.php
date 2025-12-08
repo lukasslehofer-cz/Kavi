@@ -44,7 +44,7 @@
                     <span>Zpět na úvodní stránku</span>
                 </a>
                 
-                <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full border border-gray-200 transition-all duration-200">
+                <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full border border-gray-200 transition-all duration-200">
                     <span>Kávové boxy</span>
                     <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -56,23 +56,23 @@
             <div class="pt-8 border-t border-gray-100">
                 <p class="text-sm text-gray-500 font-light mb-4">Možná hledáte:</p>
                 <div class="flex flex-wrap gap-3 justify-center">
-                    <a href="{{ route('products.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                    <a href="{{ localizedRoute('products.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
                         Obchod
                     </a>
                     <span class="text-gray-300">•</span>
-                    <a href="{{ route('roasteries.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                    <a href="{{ localizedRoute('roasteries.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
                         Pražírny
                     </a>
                     <span class="text-gray-300">•</span>
-                    <a href="{{ route('monthly-feature.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                    <a href="{{ localizedRoute('monthly-feature.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
                         Káva měsíce
                     </a>
                     <span class="text-gray-300">•</span>
-                    <a href="{{ route('how-it-works') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                    <a href="{{ localizedRoute('how-it-works') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
                         Jak to funguje
                     </a>
                     <span class="text-gray-300">•</span>
-                    <a href="{{ route('contact') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                    <a href="{{ localizedRoute('contact') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
                         Kontakt
                     </a>
                 </div>

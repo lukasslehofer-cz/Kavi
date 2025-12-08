@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Můj profil - KAVI.cz')
+@section('title', __('dashboard.title_profile'))
 
 @section('content')
 <div class="space-y-6">
@@ -12,7 +12,7 @@
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
             <div>
-                <h3 class="text-base font-bold text-green-900 mb-1">Úspěch!</h3>
+                <h3 class="text-base font-bold text-green-900 mb-1">{{ __('dashboard.success') }}</h3>
                 <p class="text-sm text-green-800">{{ session('success') }}</p>
             </div>
         </div>
@@ -26,7 +26,7 @@
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
             </svg>
             <div>
-                <h3 class="text-base font-bold text-red-900 mb-1">Chyba</h3>
+                <h3 class="text-base font-bold text-red-900 mb-1">{{ __('dashboard.error') }}</h3>
                 <p class="text-sm text-red-800">{{ session('error') }}</p>
             </div>
         </div>
@@ -49,16 +49,16 @@
     <!-- Personal Information -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Osobní údaje</h2>
+            <h2 class="text-xl font-bold text-gray-900">{{ __('dashboard.personal_info') }}</h2>
         </div>
         <div class="p-6">
-            <form method="POST" action="{{ route('dashboard.profile.update') }}" class="space-y-6">
+            <form method="POST" action="{{ localizedRoute('dashboard.profile.update') }}" class="space-y-6">
                 @csrf
                 @method('PUT')
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-900 mb-2">Celé jméno</label>
+                        <label for="name" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.full_name') }}</label>
                         <input type="text" 
                                id="name" 
                                name="name" 
@@ -76,7 +76,7 @@
                     </div>
 
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-900 mb-2">Email</label>
+                        <label for="email" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.email') }}</label>
                         <input type="email" 
                                id="email" 
                                name="email" 
@@ -94,7 +94,7 @@
                     </div>
 
                     <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-900 mb-2">Telefon</label>
+                        <label for="phone" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.phone') }}</label>
                         <input type="tel" 
                                id="phone" 
                                name="phone" 
@@ -121,7 +121,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-blue-800">
-                                <strong>Tip:</strong> Vyplňte si telefon a adresu pro rychlejší objednávky. Údaje budou automaticky předvyplněné v pokladně.
+                                {{ __('dashboard.profile_tip') }}
                             </p>
                         </div>
                     </div>
@@ -132,7 +132,7 @@
                         <svg class="w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        Uložit změny
+                        {{ __('dashboard.save_changes') }}
                     </button>
                 </div>
             </form>
@@ -142,8 +142,8 @@
     <!-- Payment Methods -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Platební metody</h2>
-            <p class="text-sm text-gray-600 mt-1 font-light">Správa vašich platebních karet pro předplatné</p>
+            <h2 class="text-xl font-bold text-gray-900">{{ __('dashboard.payment_methods') }}</h2>
+            <p class="text-sm text-gray-600 mt-1 font-light">{{ __('dashboard.payment_methods_description') }}</p>
         </div>
         <div class="p-6">
             @if($paymentMethod)
@@ -191,14 +191,14 @@
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                         </svg>
-                                        Karta vypršela
+                                        {{ __('dashboard.card_expired') }}
                                     </span>
                                 @elseif($daysUntilExpiry <= 30)
                                     <span class="inline-flex items-center gap-1 mt-2 px-2 py-1 text-xs font-medium text-orange-700 bg-orange-50 rounded-full">
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                         </svg>
-                                        Brzy vyprší
+                                        {{ __('dashboard.card_expires_soon') }}
                                     </span>
                                 @endif
                             </div>
@@ -206,12 +206,12 @@
                     </div>
                 </div>
                 
-                <a href="{{ route('dashboard.payment-methods.manage') }}" 
+                <a href="{{ localizedRoute('dashboard.payment-methods.manage') }}" 
                    class="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                     </svg>
-                    Změnit platební metodu
+                    {{ __('dashboard.change_card') }}
                 </a>
             @else
                 <!-- No payment method -->
@@ -230,7 +230,7 @@
                 </div>
                 
                 @if(auth()->user()->stripe_customer_id)
-                    <a href="{{ route('dashboard.payment-methods.manage') }}" 
+                    <a href="{{ localizedRoute('dashboard.payment-methods.manage') }}" 
                        class="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -245,11 +245,11 @@
     <!-- Billing Address -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Fakturační adresa</h2>
-            <p class="text-sm text-gray-600 mt-1 font-light">Tato adresa bude předvyplněná při objednávkách</p>
+            <h2 class="text-xl font-bold text-gray-900">{{ __('dashboard.shipping_address') }}</h2>
+            <p class="text-sm text-gray-600 mt-1 font-light">{{ __('dashboard.shipping_address_description') }}</p>
         </div>
         <div class="p-6">
-            <form method="POST" action="{{ route('dashboard.profile.update') }}" class="space-y-6" id="billing-address-form">
+            <form method="POST" action="{{ localizedRoute('dashboard.profile.update') }}" class="space-y-6" id="billing-address-form">
                 @csrf
                 @method('PUT')
                 
@@ -259,7 +259,7 @@
                 <input type="hidden" name="phone" value="{{ auth()->user()->phone ?? '' }}">
 
                 <div>
-                    <label for="address" class="block text-sm font-medium text-gray-900 mb-2">Ulice a číslo popisné</label>
+                    <label for="address" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.street_address') }}</label>
                     <input type="text" 
                            id="address" 
                            name="address" 
@@ -278,7 +278,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <label for="city" class="block text-sm font-medium text-gray-900 mb-2">Město</label>
+                        <label for="city" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.city') }}</label>
                         <input type="text" 
                                id="city" 
                                name="city" 
@@ -296,7 +296,7 @@
                     </div>
 
                     <div>
-                        <label for="postal_code" class="block text-sm font-medium text-gray-900 mb-2">PSČ</label>
+                        <label for="postal_code" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.postal_code') }}</label>
                         <input type="text" 
                                id="postal_code" 
                                name="postal_code" 
@@ -314,7 +314,7 @@
                     </div>
 
                     <div>
-                        <label for="country" class="block text-sm font-medium text-gray-900 mb-2">Země</label>
+                        <label for="country" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.country') }}</label>
                         <select id="country" 
                                 name="country" 
                                 class="input @error('country') border-red-500 @enderror">
@@ -373,11 +373,11 @@
     <!-- Packeta Pickup Point -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Výdejní místo</h2>
-            <p class="text-sm text-gray-600 mt-1 font-light">Nastavte si preferované výdejní místo pro vaše objednávky</p>
+            <h2 class="text-xl font-bold text-gray-900">{{ __('dashboard.pickup_point') }}</h2>
+            <p class="text-sm text-gray-600 mt-1 font-light">{{ __('messages.shipping.select_pickup_point') }}</p>
         </div>
         <div class="p-6">
-            <form method="POST" action="{{ route('dashboard.profile.update') }}" id="packeta-form" class="space-y-6">
+            <form method="POST" action="{{ localizedRoute('dashboard.profile.update') }}" id="packeta-form" class="space-y-6">
                 @csrf
                 @method('PUT')
                 
@@ -460,9 +460,9 @@
         <div class="bg-gray-50 p-6 border-b border-gray-200">
             <h2 class="text-xl font-bold text-gray-900">
                 @if(!auth()->user()->password_set_by_user)
-                    Nastavit heslo
+                    {{ __('dashboard.set_password') }}
                 @else
-                    Změna hesla
+                    {{ __('dashboard.change_password') }}
                 @endif
             </h2>
             @if(!auth()->user()->password_set_by_user)
@@ -487,7 +487,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('dashboard.password.update') }}" class="space-y-6">
+            <form method="POST" action="{{ localizedRoute('dashboard.password.update') }}" class="space-y-6">
                 @csrf
                 @method('PUT')
 
@@ -624,20 +624,20 @@
     <!-- Danger Zone -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden border border-red-200">
         <div class="bg-red-50 p-6 border-b border-red-200">
-            <h2 class="text-xl font-bold text-red-800">Nebezpečná zóna</h2>
+            <h2 class="text-xl font-bold text-red-800">{{ __('dashboard.delete_account') }}</h2>
         </div>
         <div class="p-6">
             <div class="flex items-start justify-between flex-wrap gap-4">
                 <div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-1">Smazat účet</h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">{{ __('dashboard.delete_account') }}</h3>
                     <p class="text-gray-600 font-light">
-                        Trvale odstraní váš účet a všechna související data. Tato akce je nevratná.
+                        {{ __('dashboard.delete_account_description') }}
                     </p>
                 </div>
                 <button type="button" 
                         onclick="openDeleteAccountModal()"
                         class="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-full transition-all duration-200">
-                    Smazat účet
+                    {{ __('dashboard.delete_account_button') }}
                 </button>
             </div>
         </div>
@@ -759,7 +759,7 @@
             </div>
 
             <!-- Confirmation Form -->
-            <form method="POST" action="{{ route('dashboard.profile.delete') }}" id="deleteAccountForm">
+            <form method="POST" action="{{ localizedRoute('dashboard.profile.delete') }}" id="deleteAccountForm">
                 @csrf
                 @method('DELETE')
 

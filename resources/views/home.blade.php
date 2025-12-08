@@ -98,13 +98,13 @@
 
                 <!-- CTA Buttons - Minimal -->
                 <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                    <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-lg px-8 py-5 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-lg px-8 py-5 rounded-full transition-all duration-200">
                         <span>{{ $currentLocale === 'en' ? 'Build your own box' : 'Sestavte si vlastní box' }}</span>
                         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                     </a>
-                    <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-5 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-5 rounded-full transition-all duration-200">
                         <span>{{ $currentLocale === 'en' ? 'Coffee Shop' : 'Kávový obchod' }}</span>
                         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -267,7 +267,7 @@
 
         <!-- CTA Button -->
         <div class="pt-4">
-          <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
+          <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
             <span>{{ $currentLocale === 'en' ? 'Start subscription' : 'Začít předplatné' }}</span>
             <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -349,7 +349,7 @@
             @endif
           </div>
 
-          <a href="{{ route('subscriptions.index', ['plan' => 2]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
+          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 2]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
             {{ $currentLocale === 'en' ? 'Select M Box' : 'Vybrat M Box' }}
           </a>
         </div>
@@ -414,7 +414,7 @@
             @endif
           </div>
 
-          <a href="{{ route('subscriptions.index', ['plan' => 3]) }}" class="group/btn flex items-center justify-center gap-2 w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
+          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 3]) }}" class="group/btn flex items-center justify-center gap-2 w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
             <span>{{ $currentLocale === 'en' ? 'Select L Box' : 'Vybrat L Box' }}</span>
             <svg class="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -474,7 +474,7 @@
             @endif
           </div>
 
-          <a href="{{ route('subscriptions.index', ['plan' => 4]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
+          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 4]) }}" class="block w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 text-center">
             {{ $currentLocale === 'en' ? 'Select XL Box' : 'Vybrat XL Box' }}
           </a>
         </div>
@@ -788,7 +788,7 @@
 
     <!-- CTA Button -->
     <div class="mt-16 text-center">
-      <a href="{{ route('monthly-feature.index') }}" class="group inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
+      <a href="{{ localizedRoute('monthly-feature.index') }}" class="group inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 rounded-full transition-all duration-200">
         <span>{{ $currentLocale === 'en' ? 'Explore coffees for ' . $monthName : 'Prozkoumat kávy na ' . $monthName }}</span>
         <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -928,7 +928,7 @@
         <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">{{ $currentLocale === 'en' ? 'Our Coffees' : 'Naše kávy' }}</h2>
         <p class="text-lg sm:text-xl text-gray-600 font-light">{{ $currentLocale === 'en' ? 'Hand-picked from the best European roasters' : 'Ručně vybrané z nejlepších pražíren Evropy' }}</p>
       </div>
-      <a href="{{ route('products.index') }}" class="group inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+      <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
         <span>{{ $currentLocale === 'en' ? 'View more' : 'Zobrazit více' }}</span>
         <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -940,7 +940,7 @@
       @foreach($featuredProducts->take(4) as $product)
       <!-- product - start -->
       <div class="group">
-        <a href="{{ route('products.show', $product) }}" class="relative block mb-4 h-80 overflow-hidden rounded-2xl bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+        <a href="{{ localizedRoute('products.show', $product) }}" class="relative block mb-4 h-80 overflow-hidden rounded-2xl bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300">
           @if($product->image)
           <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-110" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -978,7 +978,7 @@
         </a>
 
         <div class="space-y-2">
-          <a href="{{ route('products.show', $product) }}" class="block">
+          <a href="{{ localizedRoute('products.show', $product) }}" class="block">
             <h3 class="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors mb-1">{{ $product->getName() }}</h3>
           </a>
           
@@ -1088,14 +1088,14 @@
 
       <!-- CTA Buttons -->
       <div class="flex flex-col sm:flex-row gap-3">
-        <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
+        <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
           <span>{{ $currentLocale === 'en' ? 'Choose subscription' : 'Vybrat předplatné' }}</span>
           <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </a>
 
-        <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 transition-all duration-200">
+        <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 transition-all duration-200">
           <span>{{ $currentLocale === 'en' ? 'Browse coffees' : 'Procházet kávy' }}</span>
         </a>
       </div>

@@ -388,7 +388,7 @@
                 
                 <div class="bg-primary-50 rounded-2xl p-6 border border-primary-200">
                     <p class="text-gray-700 font-light leading-relaxed">
-                        <strong class="font-medium text-gray-900">2)</strong> Podrobnější informace o ochraně osobních údajů naleznete v <a href="{{ route('privacy-policy') }}" class="text-primary-600 hover:text-primary-700 font-medium">Zásadách ochrany osobních údajů</a>.
+                        <strong class="font-medium text-gray-900">2)</strong> Podrobnější informace o ochraně osobních údajů naleznete v <a href="{{ localizedRoute('privacy-policy') }}" class="text-primary-600 hover:text-primary-700 font-medium">Zásadách ochrany osobních údajů</a>.
                     </p>
                 </div>
             </div>

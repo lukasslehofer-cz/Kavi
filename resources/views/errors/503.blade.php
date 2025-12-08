@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.textContent = 'Odesílám...';
             
-            fetch('{{ route("newsletter.subscribe") }}', {
+            fetch('{{ localizedRoute("newsletter.subscribe") }}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

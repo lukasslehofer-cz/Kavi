@@ -22,7 +22,7 @@
             Číslo objednávky: <span class="font-medium text-gray-900">#{{ $order->order_number ?? $order->id }}</span>
         </p>
         <div class="flex items-center justify-center gap-4">
-            <a href="{{ route('payment.card', $order) }}" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all">
+            <a href="{{ localizedRoute('payment.card', $order) }}" class="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all">
                 <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
@@ -76,7 +76,7 @@
                         <p class="text-purple-800 mb-3">
                             Vaše zboží bude přidáno do příští rozesílky předplatného 
                             @if($order->subscription)
-                                <a href="{{ route('dashboard.subscription', $order->subscription) }}" class="font-medium underline hover:text-purple-900">
+                                <a href="{{ localizedRoute('dashboard.subscription', $order->subscription) }}" class="font-medium underline hover:text-purple-900">
                                     {{ $order->subscription->subscription_number ?? '#' . $order->subscription->id }}
                                 </a>
                             @endif
@@ -366,7 +366,7 @@
                             <span class="font-medium">Objednávka ještě není zaplacená</span>
                         </div>
                         @if($order->payment_method === 'card')
-                        <a href="{{ route('payment.card', $order) }}" class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white font-medium rounded-full hover:bg-yellow-700 transition-all text-sm">
+                        <a href="{{ localizedRoute('payment.card', $order) }}" class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white font-medium rounded-full hover:bg-yellow-700 transition-all text-sm">
                             <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                             </svg>
@@ -378,11 +378,11 @@
                 @endif
 
                 <div class="space-y-3">
-                    <a href="{{ route('dashboard.orders') }}" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                    <a href="{{ localizedRoute('dashboard.orders') }}" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
                         Zobrazit objednávky
                     </a>
                     
-                    <a href="{{ route('products.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
+                    <a href="{{ localizedRoute('products.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
                         Pokračovat v nákupu
                     </a>
                 </div>

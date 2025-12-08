@@ -1,0 +1,271 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Translations - Czech
+    |--------------------------------------------------------------------------
+    */
+
+    // Page titles
+    'title_dashboard' => 'Nástěnka - KAVI.cz',
+    'title_orders' => 'Objednávky - KAVI.cz',
+    'title_order_detail' => 'Detail objednávky - KAVI.cz',
+    'title_subscription' => 'Předplatné - KAVI.cz',
+    'title_profile' => 'Můj profil - KAVI.cz',
+    'title_notifications' => 'Notifikace - KAVI.cz',
+
+    // Index page
+    'welcome_back' => 'Vítejte zpět!',
+    'welcome_message' => 'Jsme rádi, že vás opět vidíme',
+
+    // Payment issues
+    'payment_issue_subscription' => 'Problém s platbou předplatného',
+    'payment_issue_subscriptions' => 'Problém s platbou předplatných',
+    'payment_issue_order' => 'Problém s platbou objednávky',
+    'payment_issue_orders' => 'Problém s platbou objednávek',
+    'subscription_payment_failed' => 'Platba za vaše předplatné se nezdařila. Neobdržíte další kávový box, dokud nebude platba uhrazena.',
+    'subscriptions_payment_failed' => 'U několika vašich předplatných selhala platba. Neobdržíte další kávové boxy, dokud nebude platba uhrazena.',
+    'order_payment_failed' => 'Platba za vaši objednávku se nezdařila. Objednávka nebude zpracována, dokud nebude platba uhrazena.',
+    'orders_payment_failed' => 'U několika vašich objednávek selhala platba. Objednávky nebudou zpracovány, dokud nebude platba uhrazena.',
+    'subscription_number' => 'Předplatné #:id',
+    'amount_to_pay' => 'Částka k úhradě:',
+    'reason' => 'Důvod:',
+    'pay_now' => 'Zaplatit nyní',
+    'secure_payment_stripe' => 'Bezpečná platba kartou přes Stripe',
+
+    // Subscription section
+    'your_subscriptions' => 'Vaše předplatná (:count)',
+    'your_subscription' => 'Vaše předplatné',
+    'coffee_subscription' => 'Kávové předplatné',
+    'view_all' => 'Zobrazit všechna',
+    'manage' => 'Spravovat',
+    'manage_subscriptions' => 'Správa předplatných',
+    'subscriptions_overview' => 'Přehled všech vašich aktivních předplatných (:count)',
+    
+    // Subscription details
+    'price' => 'Cena',
+    'per_month' => '/ měsíc',
+    'per_months' => '/ :count měsíce',
+    'incl_shipping' => '(vč. doprava :amount)',
+    'status' => 'Stav',
+    'status_active' => 'Aktivní',
+    'status_paused' => 'Pozastaveno',
+    'status_paused_until' => 'do :date',
+    'status_pending' => 'Čeká na aktivaci',
+    'status_pending_payment' => 'Čeká na platbu',
+    'status_completed' => 'Dokončeno',
+    'status_unpaid' => 'Neuhrazená platba',
+    'status_cancelled' => 'Zrušeno',
+    'next_shipment' => 'Další rozesílka',
+    'shipment_after_pause' => 'Rozesílka po pauze',
+
+    // No subscription
+    'no_active_subscription' => 'Nemáte aktivní předplatné',
+    'start_coffee_journey' => 'Začněte svou kávovou cestu s námi a objevte ty nejlepší kávy z prémiových pražíren.',
+    'select_subscription' => 'Vybrat předplatné',
+
+    // Orders section
+    'recent_orders' => 'Poslední objednávky',
+    'my_orders' => 'Moje objednávky',
+    'orders_history' => 'Historie všech vašich objednávek',
+    'view_all_orders' => 'Zobrazit všechny',
+    'order_number' => 'Číslo objednávky',
+    'date' => 'Datum',
+    'items' => 'Položky',
+    'item_singular' => 'položka',
+    'items_plural' => 'položek',
+    'total' => 'Celkem',
+    'actions' => 'Akce',
+    'unpaid' => '⚠️ Neuhrazeno',
+    'completed' => 'Dokončeno',
+    'pending' => 'Čeká',
+    'processing' => 'Zpracovává se',
+    'cancelled' => 'Zrušeno',
+    'shipped' => 'Odesláno',
+    'delivered' => 'Doručeno',
+    'pay' => 'Zaplatit',
+    'detail' => 'Detail →',
+    'shipped_with_subscription' => 'Bude odesláno s předplatným',
+    'planned_delivery' => 'Plánované doručení:',
+    'no_orders' => 'Žádné objednávky',
+    'no_orders_yet' => 'Zatím jste neprovedli žádnou objednávku.',
+    'browse_products' => 'Prohlédnout produkty',
+
+    // Order detail page
+    'back_to_orders' => 'Zpět na objednávky',
+    'order_detail' => 'Detail objednávky :number',
+    'created_at' => 'Vytvořeno: :date',
+    'order_status' => 'Stav objednávky',
+    'status_completed_icon' => '✓ Dokončeno',
+    'status_pending_icon' => '⏱ Čeká na zpracování',
+    'status_processing_icon' => '🔄 Zpracovává se',
+    'status_cancelled_icon' => '✕ Zrušeno',
+    'order_items' => 'Položky objednávky',
+    'quantity' => 'Množství:',
+    'order_summary' => 'Souhrn objednávky',
+    'subtotal' => 'Mezisoučet:',
+    'vat' => 'DPH:',
+    'shipping' => 'Doprava:',
+    'discount' => 'Sleva',
+    'payment_id' => 'ID platby:',
+    'invoice' => 'Faktura',
+    'tax_document' => 'Daňový doklad',
+    'order' => 'Objednávka :number',
+    'download_invoice' => 'Stáhnout fakturu',
+
+    // Subscription page
+    'payment_success' => 'Platba byla úspěšná!',
+    'payment_success_message' => 'Vaše předplatné bylo obnoveno a bude normálně pokračovat.',
+    'payment_cancelled' => 'Platba byla zrušena',
+    'payment_cancelled_message' => 'Platbu můžete zkusit znovu kdykoli.',
+    'one_time_box' => 'Jednorázový kávový box',
+    'no_subscription_badge' => 'Bez předplatného',
+    'your_configuration' => 'Vaše vlastní konfigurace',
+    'subscription_config' => 'Konfigurace předplatného',
+    'coffee_type' => 'Typ kávy',
+    'espresso' => 'Espresso',
+    'filter' => 'Filtr',
+    'mix' => 'Mix (espresso + filtr)',
+    'grind' => 'Mletí',
+    'whole_beans' => 'Zrnková',
+    'ground' => 'Mletá',
+    'ground_for' => 'Mletí pro :method',
+    'decaf' => 'Bezkofeinová',
+    'yes_extra' => 'Ano (+:amount)',
+    'no_decaf' => 'Ne',
+    'coffee_amount' => 'Množství kávy',
+    'bags_per_shipment' => ':count × 250g / zásilka',
+    'price_breakdown' => 'Rozpad ceny',
+    'subscription_price' => 'Předplatné',
+    'shipping_price' => 'Doprava',
+    'total_per_shipment' => 'Celkem za zásilku',
+    'active_discount' => 'Aktivní sleva',
+    'discount_remaining' => 'Zbývá :count měsíců',
+    'discount_unlimited' => 'Trvale',
+    'original_price' => 'Původní cena:',
+    'edit_configuration' => 'Upravit konfiguraci',
+    
+    // Subscription actions
+    'pause_subscription' => 'Pozastavit předplatné',
+    'pause_description' => 'Vyberte, kolik zásilek chcete přeskočit. Po skončení pauzy bude předplatné automaticky obnoveno.',
+    'skip_shipments' => 'Přeskočit zásilky',
+    'skip_1' => '1 zásilku',
+    'skip_2' => '2 zásilky',
+    'skip_3' => '3 zásilky',
+    'confirm_pause' => 'Potvrdit pozastavení',
+    'resume_subscription' => 'Obnovit předplatné',
+    'cancel_subscription' => 'Zrušit předplatné',
+    'cancel_warning' => 'Opravdu chcete zrušit předplatné?',
+    'cancel_confirm' => 'Ano, zrušit předplatné',
+    'keep_subscription' => 'Ne, ponechat předplatné',
+    
+    // Delivery address
+    'delivery_address' => 'Doručovací adresa',
+    'edit_address' => 'Upravit adresu',
+    'pickup_point' => 'Výdejní místo',
+    'home_delivery' => 'Doručení na adresu',
+    
+    // Payment method
+    'payment_method' => 'Platební metoda',
+    'card_ending' => 'Karta končící na :last4',
+    'expires' => 'Vyprší :date',
+    'update_card' => 'Aktualizovat kartu',
+    
+    // Payment history
+    'payment_history' => 'Historie plateb',
+    'no_payments' => 'Zatím žádné platby',
+    'paid' => 'Uhrazeno',
+    'failed' => 'Selhalo',
+    'refunded' => 'Vráceno',
+    
+    // Shipment history
+    'shipment_history' => 'Historie zásilek',
+    'no_shipments' => 'Zatím žádné zásilky',
+    'track_shipment' => 'Sledovat zásilku',
+
+    // Profile page
+    'success' => 'Úspěch!',
+    'error' => 'Chyba',
+    'personal_info' => 'Osobní údaje',
+    'full_name' => 'Celé jméno',
+    'email' => 'Email',
+    'phone' => 'Telefon',
+    'profile_tip' => 'Tip: Vyplňte si telefon a adresu pro rychlejší objednávky. Údaje budou automaticky předvyplněné v pokladně.',
+    'save_changes' => 'Uložit změny',
+    
+    // Payment methods in profile
+    'payment_methods' => 'Platební metody',
+    'payment_methods_description' => 'Správa vašich platebních karet pro předplatné',
+    'card_expired' => 'Karta vypršela',
+    'card_expires_soon' => 'Karta brzy vyprší',
+    'change_card' => 'Změnit kartu',
+    'no_payment_method' => 'Žádná platební metoda',
+    'no_payment_method_description' => 'Platební kartu přidáte při první platbě předplatného.',
+    
+    // Shipping address in profile
+    'shipping_address' => 'Doručovací adresa',
+    'shipping_address_description' => 'Výchozí adresa pro doručení objednávek',
+    'street_address' => 'Ulice a číslo popisné',
+    'city' => 'Město',
+    'postal_code' => 'PSČ',
+    'country' => 'Země',
+    
+    // Password section
+    'change_password' => 'Změna hesla',
+    'current_password' => 'Aktuální heslo',
+    'new_password' => 'Nové heslo',
+    'confirm_password' => 'Potvrzení nového hesla',
+    'update_password' => 'Aktualizovat heslo',
+    'password_not_set' => 'Heslo není nastaveno',
+    'password_not_set_description' => 'Váš účet byl vytvořen přes magický odkaz. Pro přihlášení pomocí hesla si ho nejdříve nastavte.',
+    'set_password' => 'Nastavit heslo',
+    
+    // Delete account
+    'delete_account' => 'Smazání účtu',
+    'delete_account_description' => 'Po smazání účtu budou všechna vaše data trvale odstraněna.',
+    'delete_account_button' => 'Smazat účet',
+    'delete_account_warning' => 'Tato akce je nevratná. Opravdu chcete smazat svůj účet?',
+    'delete_confirm' => 'Ano, smazat účet',
+    'delete_cancel' => 'Ne, ponechat účet',
+
+    // Notifications page
+    'notifications' => 'Notifikace',
+    'notifications_overview' => 'Přehled všech vašich oznámení',
+    'mark_all_read' => 'Označit vše jako přečtené',
+    'order_confirmed' => 'Objednávka byla potvrzena',
+    'order_confirmed_message' => 'Vaše objednávka #:number byla úspěšně potvrzena a bude odeslána v nejbližších dnech.',
+    'hours_ago' => 'Před :count hodinami',
+    'view_detail' => 'Zobrazit detail',
+    'shipment_sent' => 'Zásilka byla odeslána',
+    'shipment_sent_message' => 'Vaše zásilka z předplatného byla odeslána přes Zásilkovnu. Číslo zásilky: :tracking',
+    'yesterday_at' => 'Včera v :time',
+    'track_package' => 'Sledovat zásilku',
+    'subscription_renewal' => 'Předplatné bude obnoveno',
+    'subscription_renewal_message' => 'Vaše předplatné bude automaticky obnoveno :date. Částka :amount bude odečtena z vaší karty.',
+    'days_ago' => 'Před :count dny',
+    'manage_subscription' => 'Spravovat předplatné',
+    'special_offer' => 'Speciální nabídka pro vás! 🎉',
+    'special_offer_message' => 'Získejte 20% slevu na všechny jednotlivé balení kávy. Nabídka platí do konce měsíce.',
+    'week_ago' => 'Před týdnem',
+    'view_offer' => 'Prohlédnout nabídku',
+    'review_request' => 'Jak se vám líbí naše káva?',
+    'review_request_message' => 'Sdílejte s námi vaše zkušenosti. Vaše zpětná vazba nám pomáhá zlepšovat naše služby.',
+    'weeks_ago' => 'Před :count týdny',
+    'write_review' => 'Napsat hodnocení',
+    'no_notifications' => 'Žádné notifikace',
+    'no_notifications_message' => 'Zatím zde nejsou žádné nové oznámení.',
+    
+    // Notification settings
+    'notification_settings' => 'Nastavení notifikací',
+    'email_notifications' => 'Emailové notifikace',
+    'email_notifications_description' => 'Dostávat důležité informace o objednávkách a předplatném',
+    'marketing_emails' => 'Marketingové emaily',
+    'marketing_emails_description' => 'Dostávat informace o nových produktech a speciálních nabídkách',
+    'sms_notifications' => 'SMS notifikace',
+    'sms_notifications_description' => 'Dostávat SMS upozornění o důležitých událostech',
+    'save_settings' => 'Uložit nastavení',
+
+];
+

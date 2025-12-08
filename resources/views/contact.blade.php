@@ -60,7 +60,7 @@
                     </p>
                 </div>
 
-                <form id="contact-form" method="POST" action="{{ route('contact.send') }}" class="space-y-6">
+                <form id="contact-form" method="POST" action="{{ localizedRoute('contact.send') }}" class="space-y-6">
                     @csrf
                     
                     <!-- Name / Company -->
@@ -146,8 +146,11 @@
                             </div>
                             <div>
                                 <div class="text-sm font-medium text-gray-500 mb-1">{{ __('pages.contact.info_email') }}</div>
-                                <a href="mailto:info@kavi.cz" class="text-gray-900 hover:text-primary-600 transition-colors font-medium">
-                                    info@kavi.cz
+                                @php
+                                    $contactEmail = app()->getLocale() === 'en' ? 'info@kavibox.com' : 'info@kavi.cz';
+                                @endphp
+                                <a href="mailto:{{ $contactEmail }}" class="text-gray-900 hover:text-primary-600 transition-colors font-medium">
+                                    {{ $contactEmail }}
                                 </a>
                             </div>
                         </div>                        
@@ -179,14 +182,14 @@
                 <div class="bg-primary-50 rounded-2xl p-8 border border-primary-100">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">{{ __('pages.contact.links_title') }}</h3>
                     <div class="space-y-2">
-                        <a href="{{ route('how-it-works') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
+                        <a href="{{ localizedRoute('how-it-works') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
                             {{ __('pages.contact.link_faq') }}
                         </a>
-                        <a href="{{ route('subscriptions.index') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
+                        <a href="{{ localizedRoute('subscriptions.index') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
                             {{ __('pages.contact.link_subscription') }}
                         </a>
                         @auth
-                        <a href="{{ route('dashboard.index') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
+                        <a href="{{ localizedRoute('dashboard.index') }}" class="block text-gray-700 hover:text-primary-600 transition-colors font-light">
                             {{ __('pages.contact.link_account') }}
                         </a>
                         @endauth
@@ -220,14 +223,14 @@
 
             <!-- CTA Buttons -->
             <div class="flex flex-col sm:flex-row gap-3">
-                <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
+                <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200">
                     <span>{{ __('pages.contact.cta_subscription') }}</span>
                     <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
 
-                <a href="{{ route('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 transition-all duration-200">
+                <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium px-8 py-3 rounded-full border border-gray-200 transition-all duration-200">
                     <span>{{ __('pages.contact.cta_browse') }}</span>
                 </a>
             </div>

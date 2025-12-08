@@ -60,7 +60,7 @@
     @endphp
     <div class="mb-8 sm:mb-10">
       <div class="flex flex-wrap justify-center gap-2">
-        <a href="{{ route('products.index') }}" 
+        <a href="{{ localizedRoute('products.index') }}" 
            class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 {{ !request('category') ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300' }}">
           @if(!request('category'))
           <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -70,7 +70,7 @@
           <span>{{ $currentLocale === 'en' ? 'All' : 'Vše' }}</span>
         </a>
         @foreach($categories as $key => $label)
-        <a href="{{ route('products.index', ['category' => $key]) }}" 
+        <a href="{{ localizedRoute('products.index', ['category' => $key]) }}" 
            class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 {{ request('category') == $key ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300' }}">
           @if(request('category') == $key)
           <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,7 +89,7 @@
       <!-- product - start -->
       <div class="group relative bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-200">
         <!-- Image Container -->
-        <a href="{{ route('products.show', $product) }}" class="relative block h-64 overflow-hidden bg-gray-50">
+        <a href="{{ localizedRoute('products.show', $product) }}" class="relative block h-64 overflow-hidden bg-gray-50">
           @if($product->image)
           <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105" />
           @else
@@ -138,7 +138,7 @@
         <!-- Product Info - Minimal -->
         <div class="p-4">
           <div class="mb-2.5">
-            <a href="{{ route('products.show', $product) }}" class="block">
+            <a href="{{ localizedRoute('products.show', $product) }}" class="block">
               <h3 class="text-base font-semibold text-gray-900 group-hover:text-gray-600 transition-colors mb-2 line-clamp-2">{{ $product->getName() }}</h3>
             </a>
             
@@ -146,7 +146,7 @@
             @if($product->roastery)
             <p class="text-sm text-gray-500 font-light mb-2 flex items-center gap-1">
               <span class="text-base">{{ $product->roastery->country_flag }}</span>
-              <a href="{{ route('roasteries.show', $product->roastery) }}" class="hover:text-gray-900 transition-colors">
+              <a href="{{ localizedRoute('roasteries.show', $product->roastery) }}" class="hover:text-gray-900 transition-colors">
                 {{ $product->roastery->getName() }}
               </a>
             </p>
@@ -199,7 +199,7 @@
             </div>
             
             <!-- View Detail Button -->
-            <a href="{{ route('products.show', $product) }}" class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm flex items-center justify-center">
+            <a href="{{ localizedRoute('products.show', $product) }}" class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm flex items-center justify-center">
               {{ $currentLocale === 'en' ? 'View details' : 'Zobrazit detail' }}
             </a>
           </div>
@@ -242,7 +242,7 @@
         {{ $currentLocale === 'en' ? 'With our subscription, you save time and money. Fresh coffee delivered to your door, cancel anytime.' : 'S naším předplatným ušetříte čas i peníze. Čerstvá káva přímo k vám domů, kdykoliv zrušitelné.' }}
       </p>
 
-      <a href="{{ route('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200 mb-8">
+      <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200 mb-8">
         <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
         <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />

@@ -33,7 +33,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard.index'));
+            return redirect()->intended(localizedRoute('dashboard.index'));
         }
 
         return back()->withErrors([

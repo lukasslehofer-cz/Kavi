@@ -14,7 +14,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </li>
-            <li><a href="{{ route('products.index') }}" class="hover:text-gray-900 transition-colors font-light">{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}</a></li>
+            <li><a href="{{ localizedRoute('products.index') }}" class="hover:text-gray-900 transition-colors font-light">{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}</a></li>
             <li class="text-gray-300">
               <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -104,7 +104,7 @@
             @if($product->roastery)
             <p class="text-base text-gray-600 font-light mb-5 flex items-center gap-2">
               <span class="text-xl">{{ $product->roastery->country_flag }}</span>
-              <a href="{{ route('roasteries.show', $product->roastery) }}" class="hover:text-gray-900 transition-colors">
+              <a href="{{ localizedRoute('roasteries.show', $product->roastery) }}" class="hover:text-gray-900 transition-colors">
                 {{ $product->roastery->getName() }}
               </a>
             </p>
@@ -150,7 +150,7 @@
             </div>
 
             @if($product->isInStock())
-            <form action="{{ route('cart.add', $product) }}" method="POST" class="mb-10">
+            <form action="{{ localizedRoute('cart.add', $product) }}" method="POST" class="mb-10">
                 @csrf
                 <div class="bg-gray-50 rounded-2xl p-5 mb-5 border border-gray-200">
                     <label class="block text-gray-900 font-semibold mb-3 text-sm">
@@ -310,7 +310,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach($relatedProducts as $relatedProduct)
             <div class="group relative bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                <a href="{{ route('products.show', $relatedProduct) }}" class="relative block h-56 overflow-hidden bg-gray-50">
+                <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="relative block h-56 overflow-hidden bg-gray-50">
                     @if($relatedProduct->image)
                     <img src="{{ asset($relatedProduct->image) }}" alt="{{ $relatedProduct->getName() }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @else
@@ -323,14 +323,14 @@
                     @endif
                 </a>
                 <div class="p-4">
-                    <a href="{{ route('products.show', $relatedProduct) }}" class="block">
+                    <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="block">
                       <h3 class="text-base font-semibold text-gray-900 group-hover:text-gray-600 transition-colors mb-2 line-clamp-2">
                           {{ $relatedProduct->getName() }}
                       </h3>
                     </a>
                     <div class="flex items-center justify-between pt-2.5 border-t border-gray-100">
                       <span class="text-lg font-bold text-gray-900">{{ $relatedProduct->getFormattedPrice() }}</span>
-                      <a href="{{ route('products.show', $relatedProduct) }}" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200">
+                      <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
