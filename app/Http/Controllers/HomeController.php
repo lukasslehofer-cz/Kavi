@@ -12,6 +12,7 @@ class HomeController extends Controller
     public function index()
     {
         $featuredProducts = Product::forShop()
+            ->withPriceInCurrentCurrency()
             ->featured()
             ->orderBy('sort_order')
             ->take(6)

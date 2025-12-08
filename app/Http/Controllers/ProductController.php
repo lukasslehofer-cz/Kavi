@@ -9,7 +9,9 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with('roastery')->forShop(); // Exclude coffee of month products
+        $query = Product::with('roastery')
+            ->forShop() // Exclude coffee of month products
+            ->withPriceInCurrentCurrency(); // Only show products with price in current currency (EUR/.com or CZK/.cz)
 
         if ($request->has('category')) {
             $query->category($request->category);
@@ -36,8 +38,8 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        // If product is coffee of month, don't show in regular shop
-        if ($product->is_coffee_of_month || !$product->is_active) {
+        // If product is coffee of month, not active, or doesn't have price in current currency - 404
+        if ($product->is_coffee_of_month || !$product->is_active || !$product->hasPriceInCurrentCurrency()) {
             abort(404);
         }
 
@@ -45,6 +47,7 @@ class ProductController extends Controller
         $product->load('roastery');
 
         $relatedProducts = Product::forShop()
+            ->withPriceInCurrentCurrency()
             ->where('category', $product->category)
             ->where('id', '!=', $product->id)
             ->take(4)

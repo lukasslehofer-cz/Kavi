@@ -143,6 +143,30 @@ class Product extends Model
                      ->where('is_coffee_of_month', false);
     }
 
+    /**
+     * Filter products that have a valid price in the current currency
+     * EUR: price_eur must be set and > 0
+     * CZK: price must be set and > 0
+     */
+    public function scopeWithPriceInCurrentCurrency($query)
+    {
+        if (CurrencyHelper::isEur()) {
+            return $query->whereNotNull('price_eur')->where('price_eur', '>', 0);
+        }
+        return $query->whereNotNull('price')->where('price', '>', 0);
+    }
+
+    /**
+     * Check if the product has a valid price in the current currency
+     */
+    public function hasPriceInCurrentCurrency(): bool
+    {
+        if (CurrencyHelper::isEur()) {
+            return $this->price_eur !== null && $this->price_eur > 0;
+        }
+        return $this->price !== null && $this->price > 0;
+    }
+
     public function scopeCoffeeOfMonth($query)
     {
         return $query->where('is_coffee_of_month', true);
