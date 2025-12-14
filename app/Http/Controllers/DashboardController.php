@@ -380,6 +380,25 @@ class DashboardController extends Controller
         // Resume locally
         $subscription->resume();
 
+        // Calculate and set next_billing_date (same logic as cron)
+        $firstShipmentAfterPause = \App\Helpers\SubscriptionHelper::getNextShipmentAfterDate(
+            $subscription,
+            now()
+        );
+
+        $schedule = \App\Models\ShipmentSchedule::getForMonth(
+            $firstShipmentAfterPause->year,
+            $firstShipmentAfterPause->month
+        );
+
+        $nextBillingDate = $schedule 
+            ? $schedule->billing_date->copy()->startOfDay()
+            : $firstShipmentAfterPause->copy()->day(15)->startOfDay();
+
+        $subscription->update([
+            'next_billing_date' => $nextBillingDate,
+        ]);
+
         return redirect()->localizedRoute('dashboard.subscription')
             ->with('success', __('flash.subscription.resumed'));
     }
