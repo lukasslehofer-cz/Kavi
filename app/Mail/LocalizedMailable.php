@@ -14,8 +14,9 @@ abstract class LocalizedMailable extends Mailable
 
     /**
      * The locale for this email (cs or en)
+     * Note: Named $emailLocale to avoid conflict with Laravel 11's Mailable::$locale
      */
-    public string $locale;
+    public string $emailLocale;
 
     /**
      * The site name based on locale
@@ -32,7 +33,7 @@ abstract class LocalizedMailable extends Mailable
      */
     protected function setLocale(string $locale): void
     {
-        $this->locale = $locale;
+        $this->emailLocale = $locale;
         $this->siteName = EmailService::getSiteName($locale);
         $this->contactEmail = EmailService::getContactEmail($locale);
     }
@@ -42,7 +43,7 @@ abstract class LocalizedMailable extends Mailable
      */
     protected function getFromAddress(): Address
     {
-        $from = EmailService::getFromAddress($this->locale);
+        $from = EmailService::getFromAddress($this->emailLocale);
         return new Address($from['address'], $from['name']);
     }
 
@@ -55,11 +56,25 @@ abstract class LocalizedMailable extends Mailable
     }
 
     /**
+     * Get the view data for the message.
+     * Adds $locale for backward compatibility with Blade templates.
+     */
+    public function buildViewData(): array
+    {
+        $data = parent::buildViewData();
+        
+        // Add $locale as alias for $emailLocale for backward compatibility
+        $data['locale'] = $this->emailLocale;
+        
+        return $data;
+    }
+
+    /**
      * Translate a key with the current locale
      */
     protected function trans(string $key, array $replace = []): string
     {
-        return __($key, $replace, $this->locale);
+        return __($key, $replace, $this->emailLocale);
     }
 }
 

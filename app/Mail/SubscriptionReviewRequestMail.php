@@ -45,7 +45,7 @@ class SubscriptionReviewRequestMail extends LocalizedMailable implements ShouldQ
                 'subscription' => $this->subscription,
                 'trustpilotLink' => $trustpilotLink,
                 'deliveredOrdersCount' => $deliveredOrdersCount,
-                'locale' => $this->locale,
+                'locale' => $this->emailLocale,
                 'siteName' => $this->siteName,
                 'contactEmail' => $this->contactEmail,
             ],

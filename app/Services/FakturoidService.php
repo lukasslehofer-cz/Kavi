@@ -31,20 +31,22 @@ class FakturoidService
 
     /**
      * Get invoice language code based on entity currency
-     * Returns 'cs' for CZK or 'en' for EUR
+     * Returns 'cz' for CZK or 'en' for EUR
+     * Note: Fakturoid uses 'cz' (not 'cs') for Czech language
      */
     private function getInvoiceLanguageFromCurrency(?string $currency): string
     {
-        return ($currency === 'EUR') ? 'en' : 'cs';
+        return ($currency === 'EUR') ? 'en' : 'cz';
     }
 
     /**
      * Get invoice language code based on current locale (fallback for session-based)
-     * Returns 'cs' for Czech or 'en' for English
+     * Returns 'cz' for Czech or 'en' for English
+     * Note: Fakturoid uses 'cz' (not 'cs') for Czech language
      */
     private function getInvoiceLanguage(): string
     {
-        return CurrencyHelper::isCzk() ? 'cs' : 'en';
+        return CurrencyHelper::isCzk() ? 'cz' : 'en';
     }
 
     /**
@@ -61,7 +63,7 @@ class FakturoidService
     private function getLocalizedText(string $key, ?string $currency = null): string
     {
         $texts = [
-            'cs' => [
+            'cz' => [
                 'shipping' => 'Doprava',
                 'discount' => 'Sleva',
                 'unit' => 'ks',
@@ -82,7 +84,7 @@ class FakturoidService
         ];
 
         $lang = $currency ? $this->getInvoiceLanguageFromCurrency($currency) : $this->getInvoiceLanguage();
-        return $texts[$lang][$key] ?? $texts['cs'][$key] ?? $key;
+        return $texts[$lang][$key] ?? $texts['cz'][$key] ?? $key;
     }
 
     /**

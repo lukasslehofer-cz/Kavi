@@ -2336,6 +2336,7 @@ class StripeService
                 }
 
                 // Send success confirmation email
+                // Using \Throwable to catch both Exception and Error (e.g., Fatal errors in Mailable)
                 try {
                     $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
                     if ($email) {
@@ -2346,11 +2347,12 @@ class StripeService
                             'email' => $email,
                         ]);
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     \Log::error('Failed to send payment confirmation email', [
                         'subscription_id' => $subscription->id,
                         'payment_id' => $payment->id,
                         'error' => $e->getMessage(),
+                        'type' => get_class($e),
                     ]);
                     // Don't fail the whole payment if email fails
                 }

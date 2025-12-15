@@ -39,7 +39,7 @@ class OrderReviewRequestMail extends LocalizedMailable implements ShouldQueue
             with: [
                 'order' => $this->order,
                 'trustpilotLink' => $trustpilotLink,
-                'locale' => $this->locale,
+                'locale' => $this->emailLocale,
                 'siteName' => $this->siteName,
                 'contactEmail' => $this->contactEmail,
             ],
