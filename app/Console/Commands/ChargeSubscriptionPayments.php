@@ -95,15 +95,50 @@ class ChargeSubscriptionPayments extends Command
             }
             
             if ($isDryRun) {
-                // Calculate the ACTUAL amount that would be charged (same logic as StripeService)
+                // Perform all the same checks as real run
+                $this->line("  📅 next_billing_date: " . ($subscription->next_billing_date?->format('Y-m-d') ?? 'NULL'));
+                
+                // Check 1: Already charged today?
+                $alreadyChargedToday = $subscription->payments()->whereDate('paid_at', today())->exists();
+                if ($alreadyChargedToday) {
+                    $this->warn("  ⚠️ Would skip - Already charged today");
+                    $skippedCount++;
+                    continue;
+                }
+                
+                // Check 2: User has Stripe customer ID?
+                $customerId = $subscription->user->stripe_customer_id ?? null;
+                if (!$customerId) {
+                    $this->error("  ✗ Would fail - User has no Stripe customer ID");
+                    $failedCount++;
+                    continue;
+                }
+                
+                // Check 3: Customer has payment method?
+                try {
+                    $paymentMethodId = $stripeService->getCustomerDefaultPaymentMethod($customerId);
+                    if (!$paymentMethodId) {
+                        $this->error("  ✗ Would fail - No payment method found for customer");
+                        $failedCount++;
+                        continue;
+                    }
+                    $this->line("  💳 Payment method: " . substr($paymentMethodId, 0, 20) . '...');
+                } catch (\Exception $e) {
+                    $this->error("  ✗ Would fail - Cannot check payment method: " . $e->getMessage());
+                    $failedCount++;
+                    continue;
+                }
+                
+                // Calculate the amount that would be charged
                 $amount = $subscription->configured_price ?? 0;
                 if ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) {
                     $amount -= $subscription->discount_amount;
                 }
                 
-                $this->info("  🧪 Would charge: " . number_format($amount, 2) . " CZK");
+                $currency = $subscription->currency ?? 'CZK';
+                $this->info("  ✓ Would charge: " . number_format($amount, 2) . " {$currency}");
                 if ($subscription->discount_amount > 0) {
-                    $this->line("      (Original: " . number_format($subscription->configured_price, 2) . " CZK, Discount: -" . number_format($subscription->discount_amount, 2) . " CZK)");
+                    $this->line("      (Original: " . number_format($subscription->configured_price, 2) . " {$currency}, Discount: -" . number_format($subscription->discount_amount, 2) . " {$currency})");
                 }
                 $successCount++;
                 continue;
