@@ -336,7 +336,16 @@ class SubscriptionController extends Controller
      */
     private function findPaymentForShipment(Subscription $subscription, \Carbon\Carbon $shipmentDate): ?\App\Models\SubscriptionPayment
     {
-        // Look for payment where shipment_date falls within period_start and period_end
+        // For initial shipment (no shipment sent yet), return the first payment
+        // This matches the logic in SubscriptionHelper::hasPaidCoverageForDate()
+        if (\App\Helpers\SubscriptionHelper::isInitialShipmentCovered($subscription, $shipmentDate)) {
+            return $subscription->payments()
+                ->where('status', 'paid')
+                ->orderBy('paid_at', 'asc')
+                ->first();
+        }
+        
+        // For subsequent shipments, look for payment where shipment_date falls within period_start and period_end
         return $subscription->payments()
             ->where('status', 'paid')
             ->whereDate('period_start', '<=', $shipmentDate)
