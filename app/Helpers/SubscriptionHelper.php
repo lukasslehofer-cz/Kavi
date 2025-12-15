@@ -193,6 +193,11 @@ class SubscriptionHelper
             if (!$hasPaidCover) {
                 return false;
             }
+            
+            // Has paid coverage for this date - include in shipment list
+            // Skip calculateNextShipmentDate check as it doesn't work correctly for paused subscriptions
+            // (it calculates based on last_shipment_date which may be months ago)
+            return true;
         } elseif ($subscription->status !== 'active') {
             return false;
         }
