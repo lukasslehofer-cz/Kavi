@@ -14,7 +14,9 @@ class ChargeSubscriptionPayments extends Command
      *
      * @var string
      */
-    protected $signature = 'subscriptions:charge-payments {--dry-run : Run without actually charging}';
+    protected $signature = 'subscriptions:charge-payments 
+                            {--dry-run : Run without actually charging}
+                            {--subscription= : Process only a specific subscription ID}';
 
     /**
      * The console command description.
@@ -28,30 +30,51 @@ class ChargeSubscriptionPayments extends Command
      */
     public function handle(StripeService $stripeService)
     {
-        $this->info('🔍 Looking for subscriptions with payments due today...');
         $isDryRun = $this->option('dry-run');
+        $specificSubscriptionId = $this->option('subscription');
+        
+        if ($specificSubscriptionId) {
+            $this->info("🎯 Processing specific subscription ID: {$specificSubscriptionId}");
+        } else {
+            $this->info('🔍 Looking for subscriptions with payments due today...');
+        }
         
         if ($isDryRun) {
             $this->warn('🧪 DRY RUN MODE - No actual charges will be made');
         }
         
-        // Find active subscriptions where next_billing_date is today or earlier
-        $subscriptions = Subscription::where('status', 'active')
+        // Find subscriptions to process
+        $query = Subscription::where('status', 'active')
             ->whereNotNull('next_billing_date')
-            ->whereDate('next_billing_date', '<=', today())
-            ->with('user')
-            ->get();
+            ->with('user');
+        
+        if ($specificSubscriptionId) {
+            // Process only the specific subscription (regardless of next_billing_date)
+            $query->where('id', $specificSubscriptionId);
+        } else {
+            // Normal mode: only subscriptions due today or earlier
+            $query->whereDate('next_billing_date', '<=', today());
+        }
+        
+        $subscriptions = $query->get();
         
         if ($subscriptions->isEmpty()) {
-            $this->info('✓ No subscriptions due for payment today.');
-            
-            // Mark cron as run successfully
-            \Cache::put('subscription_billing_cron_last_run', now(), now()->addDay());
+            if ($specificSubscriptionId) {
+                $this->error("✗ Subscription ID {$specificSubscriptionId} not found or not active.");
+            } else {
+                $this->info('✓ No subscriptions due for payment today.');
+                // Mark cron as run successfully
+                \Cache::put('subscription_billing_cron_last_run', now(), now()->addDay());
+            }
             
             return 0;
         }
         
-        $this->info("📦 Found {$subscriptions->count()} subscription(s) due for payment.");
+        if ($specificSubscriptionId) {
+            $this->info("📦 Processing 1 subscription.");
+        } else {
+            $this->info("📦 Found {$subscriptions->count()} subscription(s) due for payment.");
+        }
         $this->newLine();
         
         $successCount = 0;
@@ -153,20 +176,22 @@ class ChargeSubscriptionPayments extends Command
             ]
         );
         
-        // Mark cron as run successfully
-        \Cache::put('subscription_billing_cron_last_run', now(), now()->addDay());
-        \Cache::put('subscription_billing_cron_last_summary', [
-            'timestamp' => now()->toDateTimeString(),
-            'total' => $subscriptions->count(),
-            'successful' => $successCount,
-            'failed' => $failedCount,
-            'skipped' => $skippedCount,
-            'results' => $results,
-        ], now()->addWeek());
-        
-        // Send alert if there were failures
-        if ($failedCount > 0 && !$isDryRun) {
-            $this->sendFailureAlert($failedCount, $results);
+        // Mark cron as run successfully (only for full runs, not single subscription)
+        if (!$specificSubscriptionId) {
+            \Cache::put('subscription_billing_cron_last_run', now(), now()->addDay());
+            \Cache::put('subscription_billing_cron_last_summary', [
+                'timestamp' => now()->toDateTimeString(),
+                'total' => $subscriptions->count(),
+                'successful' => $successCount,
+                'failed' => $failedCount,
+                'skipped' => $skippedCount,
+                'results' => $results,
+            ], now()->addWeek());
+            
+            // Send alert if there were failures
+            if ($failedCount > 0 && !$isDryRun) {
+                $this->sendFailureAlert($failedCount, $results);
+            }
         }
         
         // Return non-zero exit code if there were failures
