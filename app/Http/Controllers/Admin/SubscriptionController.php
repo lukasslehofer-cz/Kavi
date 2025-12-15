@@ -345,11 +345,12 @@ class SubscriptionController extends Controller
                 ->first();
         }
         
-        // For subsequent shipments, look for payment where shipment_date falls within period_start and period_end
+        // For subsequent shipments, find payment where period_end is in the same month as shipment
+        // This matches dashboard logic: period_end (15.12) → shipmentDate (20.12)
         return $subscription->payments()
             ->where('status', 'paid')
-            ->whereDate('period_start', '<=', $shipmentDate)
-            ->whereDate('period_end', '>=', $shipmentDate)
+            ->whereYear('period_end', $shipmentDate->year)
+            ->whereMonth('period_end', $shipmentDate->month)
             ->orderBy('paid_at', 'desc')
             ->first();
     }
