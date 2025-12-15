@@ -210,6 +210,14 @@ class SubscriptionHelper
      */
     public static function hasPaidCoverageForDate($subscription, Carbon $date): bool
     {
+        // If shipment date is before next_billing_date, it's covered.
+        // next_billing_date represents the NEXT payment date, so everything before it is already paid.
+        // This handles race conditions where payment was processed but subscription_payments
+        // record hasn't been created yet (e.g., webhook delay).
+        if ($subscription->next_billing_date && $date->lt($subscription->next_billing_date)) {
+            return true;
+        }
+
         // Initial shipment coverage: if customer just subscribed and hasn't received any shipment yet,
         // the first scheduled shipment (per configurator rules) is considered covered by the initial payment
         if (self::isInitialShipmentCovered($subscription, $date)) {
