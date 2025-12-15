@@ -10,12 +10,12 @@ use Illuminate\Mail\Mailables\Envelope;
 class SubscriptionPaused extends LocalizedMailable
 {
     public Subscription $subscription;
-    public string $reason;
+    public string $pauseReason;
 
     public function __construct(Subscription $subscription, string $reason = '', ?string $locale = null)
     {
         $this->subscription = $subscription;
-        $this->reason = $reason;
+        $this->pauseReason = $reason;
         $this->setLocale($locale ?? EmailService::getLocaleFromSubscription($subscription));
     }
 

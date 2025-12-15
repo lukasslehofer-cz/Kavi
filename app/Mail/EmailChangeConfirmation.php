@@ -11,13 +11,13 @@ class EmailChangeConfirmation extends LocalizedMailable
 {
     public User $user;
     public string $newEmail;
-    public string $confirmationUrl;
+    public string $verificationUrl;
 
     public function __construct(User $user, string $newEmail, string $confirmationUrl, ?string $locale = null)
     {
         $this->user = $user;
         $this->newEmail = $newEmail;
-        $this->confirmationUrl = $confirmationUrl;
+        $this->verificationUrl = $confirmationUrl;
         $this->setLocale($locale ?? EmailService::getLocaleFromUser($user));
     }
 

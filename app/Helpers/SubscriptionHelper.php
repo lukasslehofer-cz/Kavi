@@ -252,6 +252,13 @@ class SubscriptionHelper
         $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
         $candidate = self::calculateNextShipmentDate($subscription) ?? self::getNextShippingDate();
 
+        // Ensure we start from a future date (today or later)
+        // This fixes the bug where old last_shipment_date would cause past dates to be returned
+        $today = Carbon::now()->startOfDay();
+        while ($candidate->lt($today)) {
+            $candidate = $candidate->copy()->addMonths($frequencyMonths);
+        }
+
         // Iterate through cadence until we find a date not covered by a paid period
         $guard = 0;
         while ($guard < 24) { // prevent infinite loops
