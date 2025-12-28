@@ -389,6 +389,14 @@ class StripeService
             'displayed_total' => $displayedTotal,
         ]);
 
+        // Add user_id or guest_email to metadata BEFORE creating $sessionData
+        // This ensures metadata is included in both session and payment_intent copies
+        if ($user) {
+            $subscriptionMetadata['user_id'] = $user->id;
+        } else {
+            $subscriptionMetadata['guest_email'] = $shippingAddress['email'];
+        }
+
         // Create session with ONE-TIME payment + save payment method for future
         $sessionData = [
             'payment_method_types' => ['card'],
@@ -403,14 +411,12 @@ class StripeService
             'cancel_url' => route('subscriptions.checkout'),
         ];
 
-        // Add customer if user is authenticated
+        // Add customer to session data
         if ($user) {
             $sessionData['customer'] = $this->getOrCreateCustomer($user);
-            $sessionData['payment_intent_data']['metadata']['user_id'] = $user->id;
         } else {
             // Guest checkout - use customer email
             $sessionData['customer_email'] = $shippingAddress['email'];
-            $subscriptionMetadata['guest_email'] = $shippingAddress['email'];
         }
 
         \Log::info('Creating custom billing subscription checkout', [
