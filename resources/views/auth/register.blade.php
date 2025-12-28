@@ -12,8 +12,15 @@
                 <p class="text-gray-600 font-light">{{ __('auth.register_subtitle') }}</p>
             </div>
             
-            <form method="POST" action="{{ localizedRoute('register') }}" class="space-y-6">
+            <form method="POST" action="{{ localizedRoute('register') }}" class="space-y-6" id="register-form">
                 @csrf
+                <input type="hidden" name="recaptcha_token" id="recaptcha_token">
+
+                @error('recaptcha')
+                <div class="p-4 rounded-lg bg-red-100 text-red-800 border border-red-200 text-sm">
+                    {{ $message }}
+                </div>
+                @enderror
 
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-900 mb-2">{{ __('auth.full_name') }}</label>
@@ -123,4 +130,24 @@
         </div>
     </div>
 </div>
+
+@if(config('services.recaptcha.site_key'))
+<script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('register-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            grecaptcha.ready(function() {
+                grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {action: 'register'}).then(function(token) {
+                    document.getElementById('recaptcha_token').value = token;
+                    form.submit();
+                });
+            });
+        });
+    }
+});
+</script>
+@endif
 @endsection

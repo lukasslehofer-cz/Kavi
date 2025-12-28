@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -13,6 +14,39 @@ class ContactController extends Controller
      */
     public function send(Request $request)
     {
+        // Validate reCAPTCHA if configured
+        if (config('services.recaptcha.secret_key')) {
+            $recaptchaToken = $request->input('recaptcha_token');
+            
+            if (!$recaptchaToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ověření reCAPTCHA selhalo. Zkuste to prosím znovu.',
+                ], 422);
+            }
+            
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => config('services.recaptcha.secret_key'),
+                'response' => $recaptchaToken,
+                'remoteip' => $request->ip(),
+            ]);
+            
+            $recaptchaData = $response->json();
+            
+            if (!$recaptchaData['success'] || $recaptchaData['score'] < config('services.recaptcha.min_score', 0.5)) {
+                Log::warning('reCAPTCHA failed for contact form', [
+                    'ip' => $request->ip(),
+                    'email' => $request->input('email'),
+                    'score' => $recaptchaData['score'] ?? null,
+                    'action' => $recaptchaData['action'] ?? null,
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ověření reCAPTCHA selhalo. Zkuste to prosím znovu.',
+                ], 422);
+            }
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',

@@ -62,6 +62,7 @@
 
                 <form id="contact-form" method="POST" action="{{ localizedRoute('contact.send') }}" class="space-y-6">
                     @csrf
+                    <input type="hidden" name="recaptcha_token" id="recaptcha_token">
                     
                     <!-- Name / Company -->
                     <div>
@@ -238,6 +239,9 @@
     </div>
 </div>
 
+@if(config('services.recaptcha.site_key'))
+<script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script>
+@endif
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('contact-form');
@@ -247,7 +251,6 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const formData = new FormData(form);
             const submitButton = form.querySelector('button[type="submit"]');
             const originalButtonText = submitButton.innerHTML;
 
@@ -255,42 +258,59 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.innerHTML = '<span>{{ __('pages.contact.form_sending') }}</span>';
 
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                message.classList.remove('hidden');
+            // Function to submit the form
+            const submitForm = function() {
+                const formData = new FormData(form);
                 
-                if (data.success) {
-                    message.className = 'p-4 rounded-lg bg-green-100 text-green-800 border border-green-200';
-                    message.textContent = data.message || '{{ __('pages.contact.form_success') }}';
-                    form.reset();
-                } else {
-                    message.className = 'p-4 rounded-lg bg-red-100 text-red-800 border border-red-200';
-                    message.textContent = data.message || '{{ __('pages.contact.form_error') }}';
-                }
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    message.classList.remove('hidden');
+                    
+                    if (data.success) {
+                        message.className = 'p-4 rounded-lg bg-green-100 text-green-800 border border-green-200';
+                        message.textContent = data.message || '{{ __('pages.contact.form_success') }}';
+                        form.reset();
+                    } else {
+                        message.className = 'p-4 rounded-lg bg-red-100 text-red-800 border border-red-200';
+                        message.textContent = data.message || '{{ __('pages.contact.form_error') }}';
+                    }
 
-                // Hide message after 5 seconds
-                setTimeout(() => {
-                    message.classList.add('hidden');
-                }, 5000);
-            })
-            .catch(error => {
-                message.classList.remove('hidden');
-                message.className = 'p-4 rounded-lg bg-red-100 text-red-800 border border-red-200';
-                message.textContent = '{{ __('pages.contact.form_error_email') }}';
-            })
-            .finally(() => {
-                // Re-enable button
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonText;
+                    // Hide message after 5 seconds
+                    setTimeout(() => {
+                        message.classList.add('hidden');
+                    }, 5000);
+                })
+                .catch(error => {
+                    message.classList.remove('hidden');
+                    message.className = 'p-4 rounded-lg bg-red-100 text-red-800 border border-red-200';
+                    message.textContent = '{{ __('pages.contact.form_error_email') }}';
+                })
+                .finally(() => {
+                    // Re-enable button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
+                });
+            };
+
+            // Get reCAPTCHA token if configured
+            @if(config('services.recaptcha.site_key'))
+            grecaptcha.ready(function() {
+                grecaptcha.execute('{{ config('services.recaptcha.site_key') }}', {action: 'contact'}).then(function(token) {
+                    document.getElementById('recaptcha_token').value = token;
+                    submitForm();
+                });
             });
+            @else
+            submitForm();
+            @endif
         });
     }
 });

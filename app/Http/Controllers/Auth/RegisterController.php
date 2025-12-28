@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class RegisterController extends Controller
 {
@@ -22,6 +24,33 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
+        // Validate reCAPTCHA if configured
+        if (config('services.recaptcha.secret_key')) {
+            $recaptchaToken = $request->input('recaptcha_token');
+            
+            if (!$recaptchaToken) {
+                return back()->withErrors(['recaptcha' => 'Ověření reCAPTCHA selhalo. Zkuste to prosím znovu.'])->withInput();
+            }
+            
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => config('services.recaptcha.secret_key'),
+                'response' => $recaptchaToken,
+                'remoteip' => $request->ip(),
+            ]);
+            
+            $recaptchaData = $response->json();
+            
+            if (!$recaptchaData['success'] || $recaptchaData['score'] < config('services.recaptcha.min_score', 0.5)) {
+                Log::warning('reCAPTCHA failed for registration', [
+                    'ip' => $request->ip(),
+                    'email' => $request->input('email'),
+                    'score' => $recaptchaData['score'] ?? null,
+                    'action' => $recaptchaData['action'] ?? null,
+                ]);
+                return back()->withErrors(['recaptcha' => 'Ověření reCAPTCHA selhalo. Zkuste to prosím znovu.'])->withInput();
+            }
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
