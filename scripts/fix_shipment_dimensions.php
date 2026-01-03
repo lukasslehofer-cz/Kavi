@@ -52,12 +52,12 @@ foreach ($shipments as $shipment) {
     
     $amount = $config['amount'] ?? 2;
     
-    // Get dimensions from SubscriptionConfig
+    // Get dimensions from SubscriptionConfig (dimensions must be integers)
     $dimensions = [
         'package_weight' => SubscriptionConfig::get("package_{$amount}_weight", $amount * 0.25),
-        'package_length' => SubscriptionConfig::get("package_{$amount}_length", 30),
-        'package_width' => SubscriptionConfig::get("package_{$amount}_width", 20),
-        'package_height' => SubscriptionConfig::get("package_{$amount}_height", 10),
+        'package_length' => (int) SubscriptionConfig::get("package_{$amount}_length", 30),
+        'package_width' => (int) SubscriptionConfig::get("package_{$amount}_width", 20),
+        'package_height' => (int) SubscriptionConfig::get("package_{$amount}_height", 10),
         'carrier_id' => $subscription->carrier_id,
         'carrier_pickup_point' => $subscription->carrier_pickup_point,
     ];

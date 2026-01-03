@@ -772,9 +772,9 @@ class SubscriptionShipmentService
         
         return [
             'package_weight' => \App\Models\SubscriptionConfig::get("package_{$amount}_weight", $amount * 0.25),
-            'package_length' => \App\Models\SubscriptionConfig::get("package_{$amount}_length", 30),
-            'package_width' => \App\Models\SubscriptionConfig::get("package_{$amount}_width", 20),
-            'package_height' => \App\Models\SubscriptionConfig::get("package_{$amount}_height", 10),
+            'package_length' => (int) \App\Models\SubscriptionConfig::get("package_{$amount}_length", 30),
+            'package_width' => (int) \App\Models\SubscriptionConfig::get("package_{$amount}_width", 20),
+            'package_height' => (int) \App\Models\SubscriptionConfig::get("package_{$amount}_height", 10),
             'carrier_id' => $subscription->carrier_id,
             'carrier_pickup_point' => $subscription->carrier_pickup_point,
         ];
