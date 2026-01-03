@@ -78,5 +78,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/doprava/{rate}/upravit', [\App\Http\Controllers\Admin\ShippingRateController::class, 'edit'])->name('shipping.edit');
     Route::put('/doprava/{rate}', [\App\Http\Controllers\Admin\ShippingRateController::class, 'update'])->name('shipping.update');
     Route::post('/doprava/get-carriers', [\App\Http\Controllers\Admin\ShippingRateController::class, 'getCarriers'])->name('shipping.get-carriers');
+    
+    // Announcement Banners
+    Route::get('/hlasky', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'index'])->name('announcements.index');
+    Route::post('/hlasky', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'store'])->name('announcements.store');
+    Route::put('/hlasky/{announcement}', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'update'])->name('announcements.update');
+    Route::delete('/hlasky/{announcement}', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'destroy'])->name('announcements.destroy');
+    Route::post('/hlasky/{announcement}/toggle', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'toggle'])->name('announcements.toggle');
 });
 

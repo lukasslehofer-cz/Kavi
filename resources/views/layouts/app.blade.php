@@ -27,20 +27,19 @@
     <!-- End Google Tag Manager (noscript) -->
     
     <!-- Top Announcement Banner - Dark Minimal -->
+    @php $announcementBanner = \App\Models\AnnouncementBanner::getCurrent(); @endphp
+    @if($announcementBanner)
     <div class="bg-gray-900">
         <div class="flex items-center justify-center gap-2 px-4 py-2.5">
             <svg class="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $announcementBanner->getIconPath() }}" />
             </svg>
             <div class="text-sm text-white font-light">
-                @if(($currentLocale ?? 'cs') === 'en')
-                    Use Christmas discount 25% on everything with code <b>VANOCE25</b>
-                @else
-                    Využijte vánoční slevu 25% na vše s kódem <b>VANOCE25</b>
-                @endif
+                {!! $announcementBanner->getMessage($currentLocale ?? 'cs') !!}
             </div>
         </div>
     </div>
+    @endif
     <!-- Banner - end -->
 
     <!-- Compact Transparent Navigation -->
