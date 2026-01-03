@@ -254,6 +254,7 @@ class SubscriptionShipmentService
             'shipment_schedule_id' => $schedule?->id,
             'subscription_payment_id' => $payment?->id,
             'status' => 'pending',
+            ...$this->getPackageDimensions($subscription),
         ]);
     }
 
@@ -554,6 +555,7 @@ class SubscriptionShipmentService
             'subscription_payment_id' => $payment->id,
             'status' => 'pending',
             'notes' => 'Created after payment',
+            ...$this->getPackageDimensions($subscription),
         ]);
         
         \Log::info('Created pending shipment for payment', [
@@ -638,6 +640,7 @@ class SubscriptionShipmentService
             'shipment_schedule_id' => $schedule?->id,
             'subscription_payment_id' => $payment?->id,
             'status' => 'pending',
+            ...$this->getPackageDimensions($subscription),
         ]);
     }
 
@@ -754,6 +757,27 @@ class SubscriptionShipmentService
 
         $firstScheduled = $this->getFirstShipmentDate($subscription);
         return $firstScheduled->isSameDay($date);
+    }
+
+    /**
+     * Get package dimensions based on subscription configuration
+     */
+    protected function getPackageDimensions(Subscription $subscription): array
+    {
+        $config = is_string($subscription->configuration) 
+            ? json_decode($subscription->configuration, true) 
+            : $subscription->configuration;
+        
+        $amount = $config['amount'] ?? 2;
+        
+        return [
+            'package_weight' => \App\Models\SubscriptionConfig::get("package_{$amount}_weight", $amount * 0.25),
+            'package_length' => \App\Models\SubscriptionConfig::get("package_{$amount}_length", 30),
+            'package_width' => \App\Models\SubscriptionConfig::get("package_{$amount}_width", 20),
+            'package_height' => \App\Models\SubscriptionConfig::get("package_{$amount}_height", 10),
+            'carrier_id' => $subscription->carrier_id,
+            'carrier_pickup_point' => $subscription->carrier_pickup_point,
+        ];
     }
 }
 
