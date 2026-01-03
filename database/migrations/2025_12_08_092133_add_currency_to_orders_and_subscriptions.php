@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('currency', 3)->default('CZK')->after('total');
-        });
+        if (!Schema::hasColumn('orders', 'currency')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->string('currency', 3)->default('CZK')->after('total');
+            });
+        }
 
-        Schema::table('subscriptions', function (Blueprint $table) {
-            $table->string('currency', 3)->default('CZK')->after('configured_price');
-        });
+        if (!Schema::hasColumn('subscriptions', 'currency')) {
+            Schema::table('subscriptions', function (Blueprint $table) {
+                $table->string('currency', 3)->default('CZK')->after('configured_price');
+            });
+        }
     }
 
     /**

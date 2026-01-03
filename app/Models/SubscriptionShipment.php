@@ -11,6 +11,7 @@ class SubscriptionShipment extends Model
 
     protected $fillable = [
         'subscription_id',
+        'shipment_schedule_id',
         'shipment_date',
         'packeta_packet_id',
         'packeta_tracking_url',
@@ -49,6 +50,22 @@ class SubscriptionShipment extends Model
     public function payment()
     {
         return $this->belongsTo(\App\Models\SubscriptionPayment::class, 'subscription_payment_id');
+    }
+
+    /**
+     * Get the shipment schedule for this shipment
+     */
+    public function schedule()
+    {
+        return $this->belongsTo(\App\Models\ShipmentSchedule::class, 'shipment_schedule_id');
+    }
+
+    /**
+     * Check if shipment was skipped (paused)
+     */
+    public function isSkipped(): bool
+    {
+        return $this->status === 'skipped';
     }
 
     /**
@@ -114,5 +131,36 @@ class SubscriptionShipment extends Model
     public function scopeForDate($query, $date)
     {
         return $query->whereDate('shipment_date', $date);
+    }
+
+    /**
+     * Scope to get skipped shipments
+     */
+    public function scopeSkipped($query)
+    {
+        return $query->where('status', 'skipped');
+    }
+
+    /**
+     * Scope to get cancelled shipments
+     */
+    public function scopeCancelled($query)
+    {
+        return $query->where('status', 'cancelled');
+    }
+
+    /**
+     * Get human-readable status label
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match($this->status) {
+            'pending' => __('shipments.status.pending'),
+            'sent' => __('shipments.status.sent'),
+            'delivered' => __('shipments.status.delivered'),
+            'skipped' => __('shipments.status.skipped'),
+            'cancelled' => __('shipments.status.cancelled'),
+            default => $this->status,
+        };
     }
 }

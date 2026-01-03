@@ -147,25 +147,25 @@
                     <div>
                         <h3 class="text-lg font-medium text-gray-900 mb-3">{{ __('dashboard.next_shipment') }}</h3>
                         <div class="space-y-2 text-sm">
+                            @php
+                                $shipmentInfo = $shipmentInfos[$subscription->id] ?? null;
+                            @endphp
                             @if($subscription->frequency_months == 0)
                                 <!-- One-time box dates -->
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">{{ __('dashboard.date') }}:</span>
                                     <span class="font-medium">{{ $subscription->created_at->format('d.m.Y') }}</span>
                                 </div>
-                                @if($subscription->last_shipment_date)
+                                @if($shipmentInfo && $shipmentInfo->lastSentDate())
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">{{ __('dashboard.shipped') }}:</span>
-                                    <span class="font-medium text-green-600">{{ $subscription->last_shipment_date->format('d.m.Y') }}</span>
+                                    <span class="font-medium text-green-600">{{ $shipmentInfo->lastSentDate()->format('d.m.Y') }}</span>
                                 </div>
                                 @elseif($subscription->status === 'active' || $subscription->status === 'pending')
-                                @php
-                                    $oneTimeShipment = \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($subscription);
-                                @endphp
-                                @if($oneTimeShipment)
+                                @if($shipmentInfo && $shipmentInfo->nextShipmentDate())
                                 <div class="flex justify-between">
                                     <span class="text-gray-600">{{ __('dashboard.next_shipment') }}:</span>
-                                    <span class="font-medium text-blue-600">{{ $oneTimeShipment->format('d.m.Y') }}</span>
+                                    <span class="font-medium text-blue-600">{{ $shipmentInfo->nextShipmentDate()->format('d.m.Y') }}</span>
                                 </div>
                                 @endif
                                 @endif
@@ -185,64 +185,43 @@
                                 @endif
                                 
                                 @php
-                                $nextShipment = $subscription->next_shipment_date;
-                                $lastPrePause = null;
-                                $postPause = null;
-                                $lastShipmentForCancelled = null;
-                                
-                                if ($subscription->status === 'paused' && $subscription->paused_until_date) {
-                                    // Derive last shipment before pause from the first unpaid shipment
-                                    $firstUnpaid = \App\Helpers\SubscriptionHelper::getFirstUnpaidShipmentDate($subscription);
-                                    $freq = max(1, (int)($subscription->frequency_months ?? 1));
-                                    $lastPrePause = $firstUnpaid ? $firstUnpaid->copy()->subMonths($freq) : null;
-                                    // First shipment after pause end
-                                    $postPause = \App\Helpers\SubscriptionHelper::getNextShipmentAfterDate(
-                                        $subscription,
-                                        \Carbon\Carbon::parse($subscription->paused_until_date)->startOfDay()
-                                    );
-                                }
-                                
-                                if ($subscription->status === 'cancelled') {
-                                    // For cancelled, find the last paid shipment (which may be in the future)
-                                    $candidate = $nextShipment ?? \App\Helpers\SubscriptionHelper::getNextShippingDate();
-                                    $freq = max(1, (int)($subscription->frequency_months ?? 1));
-                                    $guard = 0;
-                                    while ($guard < 12) {
-                                        if (\App\Helpers\SubscriptionHelper::hasPaidCoverageForDate($subscription, $candidate)) {
-                                            $lastShipmentForCancelled = $candidate;
-                                            break;
-                                        }
-                                        $candidate = $candidate->copy()->subMonths($freq);
-                                        $guard++;
-                                    }
-                                }
+                                // Use centralized shipment info from service
+                                $nextShipment = $shipmentInfo?->nextShipmentDate();
+                                $lastSent = $shipmentInfo?->lastSentDate();
+                                $pauseInfo = $shipmentInfo?->pauseInfo;
                             @endphp
                             @if($subscription->status === 'cancelled')
                             <div class="flex justify-between">
                                 <span class="text-gray-600">{{ __('dashboard.status_cancelled') }}:</span>
                                 <span class="font-medium text-red-700">{{ $subscription->ends_at ? $subscription->ends_at->format('d.m.Y') : '-' }}</span>
                             </div>
-                            @if($subscription->last_shipment_date)
+                            @if($lastSent)
                             <div class="flex justify-between">
                                 <span class="text-gray-600">{{ __('dashboard.shipped') }}:</span>
-                                <span class="font-medium text-green-600">{{ $subscription->last_shipment_date->format('d.m.Y') }}</span>
+                                <span class="font-medium text-green-600">{{ $lastSent->format('d.m.Y') }}</span>
                             </div>
                             @endif
-                            @if($lastShipmentForCancelled && $lastShipmentForCancelled->isFuture())
+                            @if($nextShipment && $nextShipment->isFuture())
                             <div class="flex justify-between">
                                 <span class="text-gray-600">{{ __('dashboard.next_shipment') }}:</span>
-                                <span class="font-medium text-blue-600">{{ $lastShipmentForCancelled->format('d.m.Y') }}</span>
+                                <span class="font-medium text-blue-600">{{ $nextShipment->format('d.m.Y') }}</span>
                             </div>
                             @endif
-                            @elseif($subscription->status === 'paused' && $subscription->paused_until_date)
+                            @elseif($subscription->status === 'paused' && $pauseInfo)
                             <div class="flex justify-between">
                                 <span class="text-gray-600">{{ __('dashboard.status_paused_until', ['date' => '']) }}</span>
-                                <span class="font-medium text-yellow-700">{{ $subscription->paused_until_date->format('d.m.Y') }}</span>
+                                <span class="font-medium text-yellow-700">{{ $pauseInfo->pausedUntil?->format('d.m.Y') ?? '-' }}</span>
                             </div>
-                            @if($postPause)
+                            @if($pauseInfo->resumeDate)
                             <div class="flex justify-between">
                                 <span class="text-gray-600">{{ __('dashboard.shipment_after_pause') }}:</span>
-                                <span class="font-medium text-blue-600">{{ $postPause->format('d.m.Y') }}</span>
+                                <span class="font-medium text-blue-600">{{ $pauseInfo->resumeDate->format('d.m.Y') }}</span>
+                            </div>
+                            @endif
+                            @if($pauseInfo->skippedCount > 0)
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>{{ __('dashboard.skipped_shipments') ?? 'Přeskočené rozesílky' }}:</span>
+                                <span>{{ $pauseInfo->skippedCount }}</span>
                             </div>
                             @endif
                             @elseif($nextShipment)
@@ -368,33 +347,22 @@
                                 $originalPrice = $subscription->configured_price + ($subscription->shipping_cost ?? 0);
                                 
                                 // Calculate next billing date based on subscription state
-                                $nextBillingDate = null;
                                 $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
                                 
-                                // Case 1: Paused subscription - calculate from first billing after pause ends
-                                if ($subscription->status === 'paused' && $subscription->paused_until_date) {
-                                    $firstBillingAfterPause = \App\Helpers\SubscriptionHelper::getNextShipmentAfterDate(
-                                        $subscription,
-                                        \Carbon\Carbon::parse($subscription->paused_until_date)->startOfDay()
-                                    );
-                                    $nextBillingDate = $firstBillingAfterPause;
-                                }
-                                // Case 2: Cancelled subscription - discount no longer applies, but show info
-                                elseif ($subscription->status === 'cancelled') {
-                                    // For cancelled subscriptions, show when discount would have ended
+                                // Use shipmentInfo from the centralized service
+                                if ($subscription->status === 'paused' && $pauseInfo?->resumeDate) {
+                                    $nextBillingDate = $pauseInfo->resumeDate;
+                                } elseif ($subscription->status === 'cancelled') {
                                     $nextBillingDate = $subscription->next_billing_date 
                                         ? \Carbon\Carbon::parse($subscription->next_billing_date) 
                                         : now();
-                                }
-                                // Case 3: Active or other status - use next_billing_date or fallback to now
-                                else {
+                                } else {
                                     $nextBillingDate = $subscription->next_billing_date 
                                         ? \Carbon\Carbon::parse($subscription->next_billing_date) 
                                         : now()->addMonths($frequencyMonths);
                                 }
                                 
                                 // Calculate when discount ends (last payment with discount)
-                                // discount_months_remaining includes current period, so we add (remaining - 1) periods
                                 $discountEndsAt = $nextBillingDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $frequencyMonths);
                                 $fullPriceStartsAt = $discountEndsAt->copy()->addMonths($frequencyMonths);
                                 @endphp
@@ -538,7 +506,9 @@
                         <div class="space-y-2">
                             @if($subscription->status === 'active')
                             @php
-                                $firstUnpaidForModal = \App\Helpers\SubscriptionHelper::getFirstUnpaidShipmentDate($subscription);
+                                // Use service to get first UNPAID shipment date (skips already paid shipments)
+                                $firstUnpaidForModal = app(\App\Services\SubscriptionShipmentService::class)
+                                    ->getFirstUnpaidShipmentDate($subscription) ?? now();
                             @endphp
                             <button type="button"
                                     class="open-pause-modal w-full text-center px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition font-medium"
@@ -583,6 +553,76 @@
             </div>
         </div>
 
+        <!-- Shipment History -->
+        @if($shipmentInfo && $shipmentInfo->history->count() > 0)
+        <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden mt-6">
+            <div class="bg-gray-50 p-6 border-b border-gray-200">
+                <h3 class="text-base font-bold text-gray-900">{{ __('dashboard.shipment_history') ?? 'Historie rozesílek' }}</h3>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                {{ __('dashboard.date') }}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                {{ __('dashboard.status') }}
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                {{ __('dashboard.tracking') ?? 'Sledování' }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        @foreach($shipmentInfo->history as $shipment)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $shipment->shipment_date->format('d.m.Y') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                @if($shipment->status === 'sent' || $shipment->status === 'delivered')
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
+                                        ✓ {{ __('dashboard.shipped') ?? 'Odesláno' }}
+                                    </span>
+                                @elseif($shipment->status === 'pending')
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                                        ⏱ {{ __('dashboard.pending') }}
+                                    </span>
+                                @elseif($shipment->status === 'skipped')
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                        ⏸ {{ __('dashboard.skipped') ?? 'Přeskočeno' }}
+                                    </span>
+                                @elseif($shipment->status === 'cancelled')
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+                                        ✕ {{ __('dashboard.cancelled') ?? 'Zrušeno' }}
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                @if($shipment->packeta_tracking_url)
+                                    <a href="{{ $shipment->packeta_tracking_url }}" 
+                                       target="_blank"
+                                       class="inline-flex items-center gap-1.5 text-primary-600 hover:text-primary-700 font-medium">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        {{ __('dashboard.track_package') ?? 'Sledovat zásilku' }}
+                                    </a>
+                                @else
+                                    <span class="text-gray-400 text-xs">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
         <!-- Payment History -->
         @php
             $payments = $subscription->payments()->orderBy('paid_at', 'desc')->get();
@@ -624,30 +664,8 @@
                                 {{ $payment->paid_at ? $payment->paid_at->format('d.m.Y') : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-light">
-                                @if($payment->paid_at)
-                                    @php
-                                        // Check if this is the initial (first) payment
-                                        $isInitialPayment = ($payment->id === $firstPaymentId);
-                                        
-                                        if ($isInitialPayment) {
-                                            // For initial payment, find the next shipment date (20th) after paid_at
-                                            $shipmentDate = $payment->paid_at->copy();
-                                            if ($shipmentDate->day >= 20) {
-                                                $shipmentDate->addMonthNoOverflow()->day(20);
-                                            } else {
-                                                $shipmentDate->day(20);
-                                            }
-                                        } else {
-                                            // For recurring payments, derive from period_end
-                                            $shipmentDate = $payment->period_end ? $payment->period_end->copy() : $payment->paid_at->copy();
-                                            if ($shipmentDate->day > 20) {
-                                                $shipmentDate->addMonthNoOverflow()->day(20);
-                                            } else {
-                                                $shipmentDate->day(20);
-                                            }
-                                        }
-                                    @endphp
-                                    {{ $shipmentDate->format('d.m.Y') }}
+                                @if($payment->expected_shipment_date)
+                                    {{ $payment->expected_shipment_date->format('d.m.Y') }}
                                 @else
                                     -
                                 @endif

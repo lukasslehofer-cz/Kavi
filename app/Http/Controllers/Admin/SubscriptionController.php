@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Subscription;
 use App\Services\PacketaService;
+use App\Services\SubscriptionShipmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -215,44 +216,65 @@ class SubscriptionController extends Controller
      */
     public function shipments(Request $request)
     {
+        $shipmentService = app(SubscriptionShipmentService::class);
+        
         // Get target ship date (default: next 20th)
         $targetDate = $request->has('date') 
             ? \Carbon\Carbon::parse($request->date)
             : \App\Helpers\SubscriptionHelper::getNextShippingDate();
 
-        // Get all subscriptions eligible for shipping consideration
-        // Include 'pending' for one-time boxes that are paid but not yet active
-        // Include 'cancelled' to show subscriptions with prepaid/undelivered shipments
+        // Get billing date for this shipment month (used for pause filtering)
+        $billingDate = \App\Models\ShipmentSchedule::getBillingDateForMonth($targetDate->year, $targetDate->month);
+        
+        // Get subscriptions with pending shipments for this date
+        // Exclude paused subscriptions where billing_date < paused_until_date
+        $pendingShipments = \App\Models\SubscriptionShipment::with(['subscription.user', 'subscription.plan', 'payment'])
+            ->whereDate('shipment_date', $targetDate->toDateString())
+            ->whereIn('status', ['pending', 'sent'])
+            ->whereHas('subscription', function($q) use ($billingDate) {
+                // Include if: not paused OR no pause date OR billing_date >= paused_until_date
+                $q->where(function($q2) use ($billingDate) {
+                    $q2->where('status', '!=', 'paused')
+                       ->orWhereNull('paused_until_date')
+                       ->orWhere('paused_until_date', '<=', $billingDate);
+                });
+            })
+            ->get();
+        
+        $subscriptionIds = $pendingShipments->pluck('subscription_id')->unique();
+        
+        // Also get subscriptions that SHOULD ship on this date but don't have a record yet
+        // Exclude paused subscriptions with active pause (billing_date < paused_until_date)
         $allSubscriptions = Subscription::with(['user', 'plan'])
             ->whereIn('status', ['active', 'paused', 'pending', 'cancelled'])
+            ->whereNotIn('id', $subscriptionIds)
+            ->where(function($q) use ($billingDate) {
+                // Include if: not paused OR no pause date OR billing_date >= paused_until_date
+                $q->where('status', '!=', 'paused')
+                  ->orWhereNull('paused_until_date')
+                  ->orWhere('paused_until_date', '<=', $billingDate);
+            })
             ->get();
 
-        // Filter subscriptions that should ship on target date OR were already sent on target date
-        $subscriptions = $allSubscriptions->filter(function($subscription) use ($targetDate) {
-            // Include if should ship on this date
-            if ($subscription->shouldShipOn($targetDate)) {
-                return true;
-            }
-            
-            // Also include if already sent on this exact date
-            if ($subscription->last_shipment_date && 
-                $subscription->last_shipment_date->format('Y-m-d') === $targetDate->format('Y-m-d')) {
-                return true;
-            }
-            
-            return false;
+        // Filter subscriptions that should ship on target date
+        $newSubscriptions = $allSubscriptions->filter(function($subscription) use ($targetDate, $shipmentService) {
+            return $shipmentService->shouldShipOn($subscription, $targetDate) 
+                || ($subscription->last_shipment_date && 
+                    $subscription->last_shipment_date->format('Y-m-d') === $targetDate->format('Y-m-d'));
         });
 
-        // Create or get draft shipments for each subscription
-        foreach ($subscriptions as $subscription) {
-            $this->getOrCreateShipment($subscription, $targetDate);
+        // Create pending shipments for new subscriptions
+        foreach ($newSubscriptions as $subscription) {
+            $shipmentService->getOrCreateShipment($subscription, $targetDate);
         }
         
+        // Combine all subscription IDs
+        $allSubscriptionIds = $subscriptionIds->merge($newSubscriptions->pluck('id'))->unique();
+        
         // Reload subscriptions with shipments relation
-        $subscriptionIds = $subscriptions->pluck('id');
         $subscriptions = Subscription::with(['user', 'plan', 'shipments' => function($query) use ($targetDate) {
             $query->forDate($targetDate)->with('payment');
-        }])->whereIn('id', $subscriptionIds)->get();
+        }])->whereIn('id', $allSubscriptionIds)->get();
 
         // Group by frequency for stats
         $stats = [
@@ -333,12 +355,14 @@ class SubscriptionController extends Controller
 
     /**
      * Find payment for given shipment date
+     * @deprecated Use SubscriptionShipmentService instead
      */
     private function findPaymentForShipment(Subscription $subscription, \Carbon\Carbon $shipmentDate): ?\App\Models\SubscriptionPayment
     {
-        // For initial shipment (no shipment sent yet), return the first payment
-        // This matches the logic in SubscriptionHelper::hasPaidCoverageForDate()
-        if (\App\Helpers\SubscriptionHelper::isInitialShipmentCovered($subscription, $shipmentDate)) {
+        // Check for initial shipment (no shipment sent yet)
+        $hasSentShipments = $subscription->shipments()->whereIn('status', ['sent', 'delivered'])->exists();
+        
+        if (!$hasSentShipments) {
             return $subscription->payments()
                 ->where('status', 'paid')
                 ->orderBy('paid_at', 'asc')
@@ -346,14 +370,14 @@ class SubscriptionController extends Controller
         }
         
         // For subsequent shipments, find payment where billing_date falls within period
-        // Get billing_date for the shipment's month (e.g., shipment 19.12. → billing 15.12.)
+        // period_end is EXCLUSIVE (it's the next billing date), so use > not >=
         $schedule = \App\Models\ShipmentSchedule::getForMonth($shipmentDate->year, $shipmentDate->month);
         $billingDate = $schedule?->billing_date ?? $shipmentDate->copy()->day(15);
         
         return $subscription->payments()
             ->where('status', 'paid')
             ->whereDate('period_start', '<=', $billingDate)
-            ->whereDate('period_end', '>=', $billingDate)
+            ->whereDate('period_end', '>', $billingDate)
             ->orderBy('paid_at', 'desc')
             ->first();
     }
@@ -466,25 +490,17 @@ class SubscriptionController extends Controller
                     // Get tracking URL from Packeta
                     $trackingUrl = $this->getPacketaTrackingUrl($result['id']);
                     
-                    // Mark shipment as sent
-                    $shipment->markAsSent($result['id'], $trackingUrl);
+                    // Use the central shipment service to mark as sent
+                    $shipmentService = app(SubscriptionShipmentService::class);
+                    $shipmentService->markAsShipped($shipment, $result['id'], $trackingUrl);
                     
-                    // Update subscription last_shipment_date
+                    // Update subscription packeta fields for backward compatibility
                     $subscription->update([
-                        'last_shipment_date' => $targetDate,
-                        'packeta_packet_id' => $result['id'], // Keep for backward compatibility
+                        'packeta_packet_id' => $result['id'],
                         'packeta_tracking_url' => $trackingUrl,
                         'packeta_shipment_status' => 'sent',
                         'packeta_sent_at' => now(),
                     ]);
-                    
-                    // For one-time boxes, mark as completed after shipping
-                    if ($subscription->frequency_months == 0) {
-                        $subscription->update([
-                            'status' => 'completed',
-                            'canceled_at' => now(),
-                        ]);
-                    }
 
                     // Send subscription shipped email
                     try {

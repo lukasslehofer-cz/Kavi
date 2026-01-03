@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Helpers\SubscriptionHelper;
-use App\Models\ShipmentSchedule;
 use App\Models\Subscription;
+use App\Services\SubscriptionShipmentService;
 use Illuminate\Console\Command;
 
 class ResumeExpiredPausedSubscriptions extends Command
@@ -13,7 +12,7 @@ class ResumeExpiredPausedSubscriptions extends Command
 
     protected $description = 'Resume subscriptions whose pause period has ended';
 
-    public function handle(): int
+    public function handle(SubscriptionShipmentService $shipmentService): int
     {
         $this->info('🔍 Looking for subscriptions with expired pause period...');
         
@@ -40,31 +39,15 @@ class ResumeExpiredPausedSubscriptions extends Command
             $this->line("Processing: {$subscriptionNumber}");
             
             try {
-                // Calculate first shipment after pause
-                $firstShipmentAfterPause = SubscriptionHelper::getNextShipmentAfterDate(
-                    $subscription,
-                    $subscription->paused_until_date
-                );
+                // Resume subscription using the central service
+                $shipmentService->resumeSubscription($subscription);
                 
-                // Get billing date for this shipment month
-                $schedule = ShipmentSchedule::getForMonth(
-                    $firstShipmentAfterPause->year,
-                    $firstShipmentAfterPause->month
-                );
+                // Get the calculated next shipment info
+                $shipmentInfo = $shipmentService->getShipmentInfo($subscription);
+                $nextShipment = $shipmentInfo->nextShipmentDate();
+                $nextBilling = $subscription->next_billing_date;
                 
-                $nextBillingDate = $schedule 
-                    ? $schedule->billing_date->copy()->startOfDay()
-                    : $firstShipmentAfterPause->copy()->day(15)->startOfDay();
-                
-                // Resume subscription (clears pause data, sets status to active)
-                $subscription->resume();
-                
-                // Update next_billing_date
-                $subscription->update([
-                    'next_billing_date' => $nextBillingDate,
-                ]);
-                
-                $this->info("  ✓ Resumed → Next billing: {$nextBillingDate->format('d.m.Y')}, Next shipment: {$firstShipmentAfterPause->format('d.m.Y')}");
+                $this->info("  ✓ Resumed → Next billing: {$nextBilling?->format('d.m.Y')}, Next shipment: {$nextShipment?->format('d.m.Y')}");
                 $resumedCount++;
                 
             } catch (\Exception $e) {

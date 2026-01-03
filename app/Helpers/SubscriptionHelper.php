@@ -229,10 +229,12 @@ class SubscriptionHelper
             return true;
         }
 
+        // Check payment periods
+        // period_end is EXCLUSIVE (it's the next billing date), so use > not >=
         return $subscription->payments()
             ->where('status', 'paid')
             ->whereDate('period_start', '<=', $date->toDateString())
-            ->whereDate('period_end', '>=', $date->toDateString())
+            ->whereDate('period_end', '>', $date->toDateString())
             ->exists();
     }
 

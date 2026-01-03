@@ -36,9 +36,67 @@ class SubscriptionPayment extends Model
         return $this->belongsTo(Subscription::class);
     }
 
+    /**
+     * Get the shipment associated with this payment
+     */
+    public function shipment()
+    {
+        return $this->hasOne(SubscriptionShipment::class);
+    }
+
     public function isPaid(): bool
     {
         return $this->status === 'paid';
+    }
+
+    /**
+     * Get the expected shipment date for this payment
+     * Returns the shipment date from subscription_shipments if linked,
+     * otherwise calculates based on period_start (billing date determines shipment month)
+     * 
+     * Logic: Payment on 15.01. covers January shipment (20.01.)
+     *        Payment on 15.02. covers February shipment (20.02.)
+     */
+    public function getExpectedShipmentDateAttribute(): ?\Carbon\Carbon
+    {
+        // If we have a linked shipment, use its date
+        if ($this->shipment) {
+            return $this->shipment->shipment_date;
+        }
+
+        // Calculate from period_start - billing date determines the shipment month
+        // Payment on 15.01. → shipment on 20.01. (same month)
+        if ($this->period_start) {
+            $schedule = \App\Models\ShipmentSchedule::getForMonth(
+                $this->period_start->year,
+                $this->period_start->month
+            );
+            
+            if ($schedule) {
+                return $schedule->shipment_date;
+            }
+            
+            // Fallback to 20th of the same month
+            return $this->period_start->copy()->day(20)->startOfDay();
+        }
+
+        // Fallback based on paid_at
+        if ($this->paid_at) {
+            // If paid after 15th, it's for next month's shipment
+            $month = $this->paid_at->day > 15 
+                ? $this->paid_at->copy()->addMonthNoOverflow() 
+                : $this->paid_at;
+            
+            $schedule = \App\Models\ShipmentSchedule::getForMonth($month->year, $month->month);
+            
+            if ($schedule) {
+                return $schedule->shipment_date;
+            }
+            
+            return $month->copy()->day(20)->startOfDay();
+        }
+
+        return null;
     }
 
     public function hasFaktura(): bool

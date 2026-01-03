@@ -143,7 +143,13 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <span class="text-gray-600">Další dodávka:</span>
+                                    <span class="text-gray-600">Další rozesílka:</span>
+                                    <span class="font-medium text-gray-900 ml-2">
+                                        {{ $subscription->next_shipment_date ? $subscription->next_shipment_date->format('d.m.Y') : '-' }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">Další platba:</span>
                                     <span class="font-medium text-gray-900 ml-2">
                                         {{ $subscription->next_billing_date ? $subscription->next_billing_date->format('d.m.Y') : '-' }}
                                     </span>
@@ -498,6 +504,10 @@
                                 @elseif($shipment->status === 'delivered')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                     Doručeno
+                                </span>
+                                @elseif($shipment->status === 'skipped')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    ⏸ Přeskočeno (pauza)
                                 </span>
                                 @elseif($shipment->status === 'cancelled')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">

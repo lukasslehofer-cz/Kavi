@@ -36,7 +36,11 @@
                 </div>
                 
                 @php
+                // Handle double-encoded JSON (string inside string)
                 $config = $subscription->configuration;
+                if (is_string($config)) {
+                    $config = json_decode($config, true);
+                }
                 $frequencyTexts = [
                     1 => 'Každý měsíc',
                     2 => 'Jednou za 2 měsíce',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Services\AccountDeletionService;
+use App\Services\SubscriptionShipmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -115,7 +116,13 @@ class DashboardController extends Controller
                 ->with('message', __('flash.subscription.no_active_subscription'));
         }
 
-        return view('dashboard.subscription', compact('subscriptions'));
+        // Get shipment info for each subscription using the central service
+        $shipmentService = app(SubscriptionShipmentService::class);
+        $shipmentInfos = $subscriptions->mapWithKeys(function ($subscription) use ($shipmentService) {
+            return [$subscription->id => $shipmentService->getShipmentInfo($subscription)];
+        });
+
+        return view('dashboard.subscription', compact('subscriptions', 'shipmentInfos'));
     }
 
     public function updatePacketaPoint(Request $request)
@@ -315,8 +322,9 @@ class DashboardController extends Controller
             ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
 
-        // Apply pause locally
-        $subscription->pauseFor((int)$validated['iterations'], 'user_request');
+        // Apply pause using the central service
+        $shipmentService = app(SubscriptionShipmentService::class);
+        $shipmentService->pauseSubscription($subscription, (int)$validated['iterations'], 'user_request');
 
         // Pause in Stripe (no billing during pause)
         try {
@@ -371,33 +379,9 @@ class DashboardController extends Controller
             ]);
         }
 
-        // For manual resume, set paused_until_date to now
-        // This allows correct next shipment calculation
-        $subscription->update([
-            'paused_until_date' => now(),
-        ]);
-
-        // Resume locally
-        $subscription->resume();
-
-        // Calculate and set next_billing_date (same logic as cron)
-        $firstShipmentAfterPause = \App\Helpers\SubscriptionHelper::getNextShipmentAfterDate(
-            $subscription,
-            now()
-        );
-
-        $schedule = \App\Models\ShipmentSchedule::getForMonth(
-            $firstShipmentAfterPause->year,
-            $firstShipmentAfterPause->month
-        );
-
-        $nextBillingDate = $schedule 
-            ? $schedule->billing_date->copy()->startOfDay()
-            : $firstShipmentAfterPause->copy()->day(15)->startOfDay();
-
-        $subscription->update([
-            'next_billing_date' => $nextBillingDate,
-        ]);
+        // Resume using the central service (handles all calculations)
+        $shipmentService = app(SubscriptionShipmentService::class);
+        $shipmentService->resumeSubscription($subscription);
 
         return redirect()->localizedRoute('dashboard.subscription')
             ->with('success', __('flash.subscription.resumed'));
@@ -426,8 +410,9 @@ class DashboardController extends Controller
             ]);
         }
 
-        // Cancel locally
-        $subscription->cancel();
+        // Cancel using the central service
+        $shipmentService = app(SubscriptionShipmentService::class);
+        $shipmentService->cancelSubscription($subscription);
 
         // Send cancellation email
         try {

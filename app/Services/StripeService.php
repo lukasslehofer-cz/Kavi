@@ -726,6 +726,17 @@ class StripeService
                         'starts_at' => now(),
                     ]);
                     
+                    // Create pending shipment for one-time box
+                    try {
+                        $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+                        $shipmentService->ensurePendingShipmentExists($subscription);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to create pending shipment for one-time box', [
+                            'subscription_id' => $subscription->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                    
                     // Send confirmation email (one-time box specific template)
                     try {
                         \Mail::to($subscription->user->email)->send(new \App\Mail\OneTimeBoxConfirmation($subscription));
@@ -955,6 +966,17 @@ class StripeService
             \Log::info('Creating subscription record', $subscriptionRecord);
             $subscription = Subscription::create($subscriptionRecord);
             \Log::info('Subscription created successfully', ['id' => $subscription->id]);
+            
+            // Create pending shipment for new subscription
+            try {
+                $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+                $shipmentService->ensurePendingShipmentExists($subscription);
+            } catch (\Exception $e) {
+                \Log::error('Failed to create pending shipment for new subscription', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
             
             // Record coupon usage if coupon was applied
             if ($subscription->coupon_id && $subscription->discount_amount > 0) {
@@ -1194,7 +1216,7 @@ class StripeService
             }
 
             // Record the first payment
-            \App\Models\SubscriptionPayment::create([
+            $payment = \App\Models\SubscriptionPayment::create([
                 'subscription_id' => $subscription->id,
                 'stripe_payment_intent_id' => $paymentIntent->id,
                 'amount' => $paymentIntent->amount / 100, // Convert from cents
@@ -1204,6 +1226,18 @@ class StripeService
                 'period_start' => now(),
                 'period_end' => $subscription->next_billing_date,
             ]);
+            
+            // Link payment to pending shipment
+            try {
+                $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+                $shipmentService->linkPaymentToShipment($payment, $subscription);
+            } catch (\Exception $e) {
+                \Log::error('Failed to link payment to shipment', [
+                    'payment_id' => $payment->id,
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
             
             // Decrement discount months for first payment (if applicable)
             if ($subscription->discount_months_remaining > 0) {
@@ -1483,6 +1517,18 @@ class StripeService
                         ? \Carbon\Carbon::createFromTimestamp($invoiceData['period_end'])
                         : null,
                 ]);
+
+                // Link payment to pending shipment
+                try {
+                    $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+                    $shipmentService->linkPaymentToShipment($payment, $subscription);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to link payment to shipment (invoice)', [
+                        'payment_id' => $payment->id,
+                        'subscription_id' => $subscription->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
 
                 // Handle coupon discount countdown
                 if ($subscription->coupon_id && $subscription->discount_amount > 0 && $subscription->discount_months_remaining > 0) {
@@ -2327,6 +2373,18 @@ class StripeService
                 // Handle coupon countdown
                 if ($subscription->discount_months_remaining > 0) {
                     $subscription->decrement('discount_months_remaining');
+                }
+
+                // Link payment to pending shipment
+                try {
+                    $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+                    $shipmentService->linkPaymentToShipment($payment, $subscription);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to link payment to shipment', [
+                        'payment_id' => $payment->id,
+                        'subscription_id' => $subscription->id,
+                        'error' => $e->getMessage(),
+                    ]);
                 }
 
                 // Create Fakturoid invoice
