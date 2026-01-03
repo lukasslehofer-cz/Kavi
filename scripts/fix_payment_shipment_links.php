@@ -8,8 +8,12 @@
  * 
  * This script finds and unlinks such payments from shipments.
  * 
- * Usage: php artisan tinker scripts/fix_payment_shipment_links.php
+ * Usage: php scripts/fix_payment_shipment_links.php
  */
+
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Models\SubscriptionShipment;
 use App\Models\SubscriptionPayment;
