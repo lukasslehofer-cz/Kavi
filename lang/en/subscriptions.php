@@ -30,6 +30,7 @@ return [
     'coffee_types' => [
         'espresso' => 'Espresso',
         'filter' => 'Filter',
+        'mix' => 'Mix',
         'omni' => 'Omni-roast',
         'decaf' => 'Decaf',
     ],

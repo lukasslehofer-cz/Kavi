@@ -369,7 +369,17 @@ class DashboardController extends Controller
             ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
 
-        // Resume in Stripe first
+        // Check availability and resume using the central service
+        $shipmentService = app(SubscriptionShipmentService::class);
+        $result = $shipmentService->resumeSubscription($subscription);
+
+        // If coffee not available, show error and don't resume
+        if (!$result['success']) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', $result['message']);
+        }
+
+        // Resume in Stripe (only if local resume was successful)
         try {
             app(\App\Services\StripeService::class)->resumeSubscription($subscription);
         } catch (\Exception $e) {
@@ -379,12 +389,8 @@ class DashboardController extends Controller
             ]);
         }
 
-        // Resume using the central service (handles all calculations)
-        $shipmentService = app(SubscriptionShipmentService::class);
-        $shipmentService->resumeSubscription($subscription);
-
         return redirect()->localizedRoute('dashboard.subscription')
-            ->with('success', __('flash.subscription.resumed'));
+            ->with('success', $result['message']);
     }
 
     /**

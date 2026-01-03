@@ -406,12 +406,33 @@ class SubscriptionShipmentService
             'pause_reason' => $reason,
         ]);
 
+        // 7. Update coffee reservations for all skipped months (release reserved stock)
+        $reservationService = app(StockReservationService::class);
+        $updatedSchedules = collect();
+        
+        foreach ($skippedDates as $skippedDate) {
+            $schedule = ShipmentSchedule::getForMonth($skippedDate->year, $skippedDate->month);
+            if ($schedule && !$updatedSchedules->contains($schedule->id)) {
+                try {
+                    $reservationService->updateReservationsForSchedule($schedule);
+                    $updatedSchedules->push($schedule->id);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to update reservations after pause', [
+                        'subscription_id' => $subscription->id,
+                        'schedule_id' => $schedule->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
+
         \Log::info('Subscription paused', [
             'subscription_id' => $subscription->id,
             'iterations' => $iterations,
             'paid_shipments_preserved' => $paidPendingShipments->pluck('shipment_date')->map->toDateString(),
             'skipped_dates' => $skippedDates->map->toDateString(),
             'resume_date' => $resumeDate?->toDateString(),
+            'reservations_updated_for_schedules' => $updatedSchedules->toArray(),
         ]);
     }
 
@@ -419,19 +440,106 @@ class SubscriptionShipmentService
      * Resume subscription from pause
      * Handles early resume by cleaning up future skipped/pending records
      * and creating a new pending record for the nearest available shipment
+     * 
+     * @return array ['success' => bool, 'message' => string, 'next_shipment' => ?Carbon]
      */
-    public function resumeSubscription(Subscription $subscription): void
+    public function resumeSubscription(Subscription $subscription): array
     {
-        // 1. Delete all future skipped shipments (those that haven't happened yet)
+        // 1. Calculate what would be the next shipment date
+        $nextShipmentDate = $this->calculateNextShipmentDate($subscription);
+        
+        if (!$nextShipmentDate) {
+            return [
+                'success' => false,
+                'message' => __('flash.subscription.resume_no_date'),
+                'next_shipment' => null,
+            ];
+        }
+
+        // 2. Check if the next shipment is already paid - if so, skip availability check
+        $existingPaidShipment = $subscription->shipments()
+            ->whereDate('shipment_date', $nextShipmentDate->toDateString())
+            ->where('status', 'pending')
+            ->whereNotNull('subscription_payment_id')
+            ->first();
+
+        if ($existingPaidShipment) {
+            \Log::info('Skipping availability check - shipment already paid', [
+                'subscription_id' => $subscription->id,
+                'shipment_id' => $existingPaidShipment->id,
+                'shipment_date' => $nextShipmentDate->toDateString(),
+            ]);
+        } else {
+            // 3. Check coffee availability for this shipment month (only for unpaid shipments)
+            $schedule = ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
+            
+            if ($schedule && $schedule->hasCoffeeSlotsConfigured()) {
+                $config = is_string($subscription->configuration) 
+                    ? json_decode($subscription->configuration, true) 
+                    : $subscription->configuration;
+                
+                if ($config) {
+                    $subscriptionType = $config['type'] ?? 'espresso';
+                    $isDecaf = $config['isDecaf'] ?? false;
+                    
+                    // Use checkTypeAvailability to check only relevant coffee slots
+                    $reservationService = app(\App\Services\StockReservationService::class);
+                    $typeAvailability = $reservationService->checkTypeAvailability($schedule);
+                    
+                    // Determine if the subscription's type is available
+                    $typeAvailable = match($subscriptionType) {
+                        'espresso' => $typeAvailability['espresso'],
+                        'filter' => $typeAvailability['filter'],
+                        'mix' => $typeAvailability['mix'],
+                        default => $typeAvailability['espresso'],
+                    };
+                    
+                    // Also check decaf if needed
+                    if ($isDecaf && !$typeAvailability['decaf']) {
+                        $typeAvailable = false;
+                    }
+                    
+                    if (!$typeAvailable) {
+                        $typeName = match($subscriptionType) {
+                            'espresso' => __('subscriptions.coffee_types.espresso'),
+                            'filter' => __('subscriptions.coffee_types.filter'),
+                            'mix' => __('subscriptions.coffee_types.mix'),
+                            default => $subscriptionType,
+                        };
+                        
+                        \Log::warning('Cannot resume subscription - coffee type out of stock', [
+                            'subscription_id' => $subscription->id,
+                            'next_shipment' => $nextShipmentDate->toDateString(),
+                            'type' => $subscriptionType,
+                            'is_decaf' => $isDecaf,
+                            'type_availability' => $typeAvailability,
+                        ]);
+                        
+                        return [
+                            'success' => false,
+                            'message' => __('flash.subscription.resume_out_of_stock', [
+                                'month' => $nextShipmentDate->translatedFormat('F Y'),
+                                'coffees' => $typeName . ($isDecaf ? ' + decaf' : ''),
+                            ]),
+                            'next_shipment' => $nextShipmentDate,
+                        ];
+                    }
+                }
+            }
+        }
+
+        // 4. Delete all future skipped shipments (those that haven't happened yet)
         $deletedSkipped = $subscription->shipments()
             ->where('status', 'skipped')
             ->where('shipment_date', '>', now())
             ->delete();
 
-        // 2. Delete all future pending shipments (created when pause was set up)
+        // 5. Delete all future pending shipments (created when pause was set up)
+        // BUT preserve paid pending shipments
         $deletedPending = $subscription->shipments()
             ->where('status', 'pending')
             ->where('shipment_date', '>', now())
+            ->whereNull('subscription_payment_id') // Don't delete paid shipments
             ->delete();
 
         \Log::info('Cleaned up future shipments on resume', [
@@ -440,7 +548,7 @@ class SubscriptionShipmentService
             'deleted_pending' => $deletedPending,
         ]);
 
-        // 3. Clear pause-related fields first
+        // 6. Clear pause-related fields
         $subscription->update([
             'status' => 'active',
             'paused_iterations' => null,
@@ -448,10 +556,10 @@ class SubscriptionShipmentService
             'pause_reason' => null,
         ]);
 
-        // 4. Create new pending shipment for the nearest available date
+        // 7. Create new pending shipment for the nearest available date (if not already paid)
         $this->ensurePendingShipmentExists($subscription);
 
-        // 5. Get the newly created pending shipment and set billing date
+        // 8. Get the next pending shipment and set billing date
         $nextPending = $subscription->shipments()
             ->where('status', 'pending')
             ->orderBy('shipment_date', 'asc')
@@ -468,6 +576,19 @@ class SubscriptionShipmentService
             $subscription->update([
                 'next_billing_date' => $nextBillingDate,
             ]);
+            
+            // 9. Update coffee reservations for this schedule
+            if ($schedule) {
+                try {
+                    $reservationService = app(\App\Services\StockReservationService::class);
+                    $reservationService->updateReservationsForSchedule($schedule);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to update reservations after resume', [
+                        'subscription_id' => $subscription->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
         }
 
         \Log::info('Subscription resumed', [
@@ -475,6 +596,12 @@ class SubscriptionShipmentService
             'next_shipment' => $nextPending?->shipment_date?->toDateString(),
             'next_billing_date' => $nextBillingDate?->toDateString(),
         ]);
+
+        return [
+            'success' => true,
+            'message' => __('flash.subscription.resumed'),
+            'next_shipment' => $nextPending?->shipment_date,
+        ];
     }
 
     /**
@@ -708,16 +835,77 @@ class SubscriptionShipmentService
 
     /**
      * Check if a subscription should ship on a specific date
-     * Legacy method for backward compatibility with existing code
+     * Used for coffee reservation calculations
+     * 
+     * Includes:
+     * - Active subscriptions with pending shipment for this date
+     * - Paused subscriptions whose pause ends ON or BEFORE the billing_date
+     *   (they will be active when billing occurs)
      */
     public function shouldShipOn(Subscription $subscription, Carbon $date): bool
     {
+        // 1. Check for existing pending shipment
         $shipment = $subscription->shipments()
             ->whereDate('shipment_date', $date->toDateString())
             ->where('status', 'pending')
             ->first();
 
-        return $shipment !== null;
+        if ($shipment) {
+            return true;
+        }
+
+        // 2. For paused subscriptions: check if pause ends before/on billing_date
+        // If so, the subscription WILL be active when billing occurs
+        if ($subscription->status === 'paused' && $subscription->paused_until_date) {
+            $billingDate = ShipmentSchedule::getBillingDateForMonth($date->year, $date->month);
+            
+            // paused_until_date <= billing_date → subscription will be active for this shipment
+            if ($subscription->paused_until_date->lte($billingDate)) {
+                return $this->wouldShipOnDateIfActive($subscription, $date);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if subscription WOULD ship on date if it were active
+     * Used to determine if paused subscription should be counted in reservations
+     */
+    protected function wouldShipOnDateIfActive(Subscription $subscription, Carbon $date): bool
+    {
+        // One-time boxes
+        if ($subscription->frequency_months == 0) {
+            // Would ship only if not yet shipped
+            return !$subscription->last_shipment_date;
+        }
+
+        // Recurring subscription - check frequency alignment
+        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+        
+        // Get last shipment or start date
+        $lastShipment = $subscription->last_shipment_date ?? $subscription->starts_at ?? $subscription->created_at;
+        
+        // Calculate expected next shipment dates
+        $candidate = $lastShipment->copy();
+        
+        for ($i = 0; $i < 24; $i++) { // Max 2 years
+            $candidate = $candidate->copy()->addMonths($frequencyMonths);
+            $schedule = ShipmentSchedule::getForMonth($candidate->year, $candidate->month);
+            $shipDate = $schedule?->shipment_date ?? $candidate->copy()->day(20);
+            
+            // Found matching date
+            if ($shipDate->isSameDay($date)) {
+                return true;
+            }
+            
+            // Past the target date
+            if ($shipDate->gt($date)) {
+                return false;
+            }
+        }
+
+        return false;
     }
 
     /**

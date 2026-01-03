@@ -209,10 +209,12 @@ class Subscription extends Model
 
     /**
      * Check if this subscription should ship on the given date
+     * Uses the central SubscriptionShipmentService for consistent logic
      */
     public function shouldShipOn(\Carbon\Carbon $date): bool
     {
-        return \App\Helpers\SubscriptionHelper::shouldShipInNextBatch($this, $date);
+        return app(\App\Services\SubscriptionShipmentService::class)
+            ->shouldShipOn($this, $date);
     }
 
     /**
