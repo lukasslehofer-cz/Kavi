@@ -30,9 +30,9 @@ class SubscriptionShipment extends Model
     protected $casts = [
         'shipment_date' => 'date',
         'package_weight' => 'decimal:2',
-        'package_length' => 'decimal:2',
-        'package_width' => 'decimal:2',
-        'package_height' => 'decimal:2',
+        'package_length' => 'integer',
+        'package_width' => 'integer',
+        'package_height' => 'integer',
         'sent_at' => 'datetime',
     ];
 
