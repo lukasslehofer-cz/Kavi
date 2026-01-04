@@ -189,9 +189,11 @@
                 @if(is_array($product->category))
                   @foreach($product->category as $cat)
                     @if($cat === 'espresso')
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">{{ __('messages.category_espresso') }}</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500 text-white">{{ __('messages.category_espresso') }}</span>
                     @elseif($cat === 'filter')
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-900 text-white">{{ __('messages.category_filter') }}</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500 text-white">{{ __('messages.category_filter') }}</span>
+                    @elseif($cat === 'decaf')
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-500 text-white">{{ __('messages.category_decaf') }}</span>
                     @endif
                   @endforeach
                 @endif
