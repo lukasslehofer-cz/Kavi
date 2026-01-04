@@ -25,6 +25,7 @@ return [
     'subscription_promo_text' => 'Join our subscription and receive exclusive coffees directly from :name and other great roasteries every month!',
     'choose_subscription' => 'Choose Subscription',
     'modal_subscription_text' => 'This coffee is only available in our monthly subscription. Join us and discover new flavors every month!',
+    'coffee_in_subscription' => 'This coffee is part of the current subscription',
 
     // Empty state
     'no_coffees_yet' => 'No coffees yet',

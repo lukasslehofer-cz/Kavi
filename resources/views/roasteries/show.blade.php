@@ -171,7 +171,7 @@
           <!-- Coffee of Month Card - Minimal -->
           <div class="bg-white rounded-2xl border border-gray-200 hover:border-gray-300 overflow-hidden transition-all duration-200">
             <!-- Coffee Image - Minimal -->
-            <div class="relative h-64 overflow-hidden cursor-pointer bg-gray-50" onclick="openCoffeeModal({{ $product->id }}, '{{ addslashes($product->getName()) }}', '{{ $product->image ? asset($product->image) : '' }}', '{{ addslashes($product->getShortDescription() ?? '') }}', {{ json_encode($product->attributes ?? []) }})">
+            <div class="relative h-64 overflow-hidden cursor-pointer bg-gray-50" onclick="openCoffeeModal{{ $product->id }}()">
               @if($product->image)
               <img src="{{ asset($product->image) }}" 
                    alt="{{ $product->getName() }}"
@@ -210,7 +210,7 @@
               </p>
               @endif
 
-              <button onclick="openCoffeeModal({{ $product->id }}, '{{ addslashes($product->getName()) }}', '{{ $product->image ? asset($product->image) : '' }}', '{{ addslashes($product->getShortDescription() ?? '') }}', {{ json_encode($product->attributes ?? []) }})" 
+              <button onclick="openCoffeeModal{{ $product->id }}()" 
                       class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm">
                 {{ __('messages.view_detail') }}
               </button>
@@ -220,6 +220,147 @@
               </p>
             </div>
           </div>
+
+          <!-- Modal for Coffee Detail -->
+          <div id="coffeeModal{{ $product->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="closeCoffeeModal{{ $product->id }}(event)">
+              <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                  <div class="relative">
+                      @if($product->image)
+                      <div class="aspect-square w-full overflow-hidden rounded-t-3xl bg-gray-100">
+                        <img src="{{ asset($product->image) }}" 
+                             alt="{{ $product->getName() }}"
+                             class="w-full h-full object-cover">
+                      </div>
+                      @endif
+                      
+                      <button onclick="closeCoffeeModal{{ $product->id }}()" 
+                              class="absolute top-4 right-4 bg-white rounded-full p-2.5 sm:p-2 shadow-lg hover:bg-gray-100 transition-colors">
+                          <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                      </button>
+
+                      <div class="absolute top-4 left-4">
+                          <span class="bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-full">
+                              {{ __('roasteries.in_current_subscription') }}
+                          </span>
+                      </div>
+                  </div>
+
+                  <div class="p-4 sm:p-6 md:p-8">
+                      <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                          {{ $product->getName() }}
+                      </h3>
+
+                      @if($product->roastery)
+                      <p class="text-lg text-gray-600 font-medium mb-6 flex items-center gap-2">
+                          <span class="text-2xl">{{ $product->roastery->country_flag }}</span>
+                          <a href="{{ localizedRoute('roasteries.show', $product->roastery) }}" class="hover:text-primary-600 transition-colors font-semibold">
+                              {{ $product->roastery->getName() }}
+                          </a>
+                      </p>
+                      @endif
+
+                      @if($product->getDescription())
+                      <div class="prose max-w-none mb-6">
+                          {!! nl2br(e($product->getDescription())) !!}
+                      </div>
+                      @endif
+
+                      @if($product->attributes && is_array($product->attributes) && count($product->attributes) > 0)
+                      <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                          <h4 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.coffee_parameters') }}</h4>
+                          
+                          @php
+                              $mainAttributes = app()->getLocale() === 'en' ? 
+                                  ['origin' => 'Origin', 'altitude' => 'Altitude', 'processing' => 'Processing', 'variety' => 'Variety', 'flavor_notes' => 'Flavor notes'] :
+                                  ['origin' => 'Původ', 'altitude' => 'Nadmořská výška', 'processing' => 'Zpracování', 'variety' => 'Odrůda', 'flavor_notes' => 'Chuťové tóny'];
+                          @endphp
+                          
+                          <!-- Main Attributes -->
+                          <div class="space-y-3 mb-4">
+                              @foreach($mainAttributes as $key => $label)
+                                  @php
+                                      $attrValue = $product->getTranslatedAttribute($key);
+                                  @endphp
+                                  @if($attrValue)
+                                  <div>
+                                      <span class="text-sm text-gray-500 block">{{ $label }}</span>
+                                      <span class="text-base font-medium text-gray-900">{{ $attrValue }}</span>
+                                  </div>
+                                  @endif
+                              @endforeach
+                              
+                              <!-- Other attributes -->
+                              @foreach($product->attributes as $key => $value)
+                                  @if($value && !is_array($value) && !in_array($key, ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date']) && !str_ends_with($key, '_en'))
+                                  <div>
+                                      <span class="text-sm text-gray-500 block">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
+                                      <span class="text-base font-medium text-gray-900">{{ $value }}</span>
+                                  </div>
+                                  @endif
+                              @endforeach
+                          </div>
+                          
+                          <!-- Additional Info -->
+                          @if(isset($product->attributes['weight']) || isset($product->attributes['roast_date']))
+                          <div class="pt-4 border-t border-gray-200">
+                              <h5 class="text-sm font-semibold text-gray-700 mb-3">{{ __('messages.additional_info') }}</h5>
+                              <div class="grid grid-cols-2 gap-4">
+                                  @if(isset($product->attributes['weight']) && !empty($product->attributes['weight']))
+                                  <div>
+                                      <span class="text-sm text-gray-500 block">{{ __('messages.weight') }}</span>
+                                      <span class="text-base font-medium text-gray-900">{{ $product->attributes['weight'] }} g</span>
+                                  </div>
+                                  @endif
+                                  
+                                  @if(isset($product->attributes['roast_date']) && !empty($product->attributes['roast_date']))
+                                  <div>
+                                      <span class="text-sm text-gray-500 block">{{ __('messages.roast_date') }}</span>
+                                      <span class="text-base font-medium text-gray-900">
+                                          {{ \Carbon\Carbon::parse($product->attributes['roast_date'])->format(app()->getLocale() === 'en' ? 'm/d/Y' : 'd.m.Y') }}
+                                      </span>
+                                  </div>
+                                  @endif
+                              </div>
+                          </div>
+                          @endif
+                      </div>
+                      @endif
+
+                      <div class="bg-gray-50 rounded-2xl p-6 text-center">
+                          <p class="text-base font-semibold text-gray-900 mb-2">
+                              {{ __('roasteries.coffee_in_subscription') }}
+                          </p>
+                          <p class="text-gray-600 mb-4 text-sm font-light">
+                              {{ __('roasteries.modal_subscription_text') }}
+                          </p>
+                          <a href="{{ localizedRoute('subscriptions.index') }}" 
+                             class="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all duration-200 text-sm">
+                              <span>{{ __('roasteries.choose_subscription') }}</span>
+                              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                              </svg>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <script>
+              function openCoffeeModal{{ $product->id }}() {
+                  document.getElementById('coffeeModal{{ $product->id }}').classList.remove('hidden');
+                  document.body.style.overflow = 'hidden';
+              }
+
+              function closeCoffeeModal{{ $product->id }}(event) {
+                  if (event) {
+                      event.stopPropagation();
+                  }
+                  document.getElementById('coffeeModal{{ $product->id }}').classList.add('hidden');
+                  document.body.style.overflow = 'auto';
+              }
+          </script>
           @endforeach
         </div>
         
@@ -282,151 +423,5 @@
   </div>
 </div>
 
-<!-- Coffee Modal -->
-<div id="coffeeModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4" onclick="closeCoffeeModal(event)">
-  <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
-    <div class="relative">
-      <!-- Close Button -->
-      <button onclick="closeCoffeeModal()" class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-gray-900 transition-colors shadow-lg">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-      
-      <!-- Coffee Image - Minimal -->
-      <div id="modalImage" class="aspect-square w-full bg-gray-100 rounded-t-3xl overflow-hidden"></div>
-      
-      <!-- Content -->
-      <div class="p-8">
-        <!-- Badge - Minimal -->
-        <div class="inline-flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5 mb-4">
-          <svg class="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-          </svg>
-          <span class="text-xs font-medium text-gray-900">{{ __('roasteries.in_current_subscription') }}</span>
-        </div>
-        
-        <h2 id="modalTitle" class="text-2xl md:text-3xl font-bold text-gray-900 mb-3 tracking-tight"></h2>
-        
-        <div id="modalDescription" class="text-base text-gray-600 mb-6 font-light"></div>
-        
-        <!-- Attributes -->
-        <div id="modalAttributes" class="space-y-3 mb-8"></div>
-        
-        <!-- CTA - Minimal -->
-        <div class="bg-gray-100 rounded-2xl p-6 border border-gray-200">
-          <h3 class="font-semibold text-gray-900 mb-2">{{ __('roasteries.want_to_try_this_coffee') }}</h3>
-          <p class="text-sm text-gray-600 mb-4 font-light">{{ __('roasteries.modal_subscription_text') }}</p>
-          <a href="{{ localizedRoute('subscriptions.index') }}" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 px-6 rounded-full transition-all duration-200 text-sm">
-            <span>{{ __('roasteries.choose_subscription') }}</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-const translations = {
-  flavorProfile: '{{ __('messages.flavor_profile') }}',
-  origin: '{{ __('messages.origin') }}',
-  processing: '{{ __('messages.processing') }}'
-};
-
-function openCoffeeModal(id, name, image, description, attributes) {
-  const modal = document.getElementById('coffeeModal');
-  const modalImage = document.getElementById('modalImage');
-  const modalTitle = document.getElementById('modalTitle');
-  const modalDescription = document.getElementById('modalDescription');
-  const modalAttributes = document.getElementById('modalAttributes');
-  
-  // Set title
-  modalTitle.textContent = name;
-  
-  // Set image
-  if (image) {
-    modalImage.innerHTML = `<img src="${image}" alt="${name}" class="w-full h-full object-cover">`;
-  } else {
-    modalImage.innerHTML = `
-      <div class="w-full h-full flex items-center justify-center">
-        <svg class="w-20 h-20 text-primary-400" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
-        </svg>
-      </div>
-    `;
-  }
-  
-  // Set description
-  modalDescription.textContent = description || '';
-  
-  // Set attributes
-  modalAttributes.innerHTML = '';
-  if (attributes) {
-    if (attributes.flavor_profile) {
-      modalAttributes.innerHTML += `
-        <div class="flex items-start gap-3">
-          <svg class="w-5 h-5 text-primary-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-          </svg>
-          <div>
-            <p class="font-semibold text-gray-900">${translations.flavorProfile}</p>
-            <p class="text-gray-700">${attributes.flavor_profile}</p>
-          </div>
-        </div>
-      `;
-    }
-    if (attributes.origin) {
-      modalAttributes.innerHTML += `
-        <div class="flex items-start gap-3">
-          <svg class="w-5 h-5 text-primary-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <div>
-            <p class="font-semibold text-gray-900">${translations.origin}</p>
-            <p class="text-gray-700">${attributes.origin}</p>
-          </div>
-        </div>
-      `;
-    }
-    if (attributes.process) {
-      modalAttributes.innerHTML += `
-        <div class="flex items-start gap-3">
-          <svg class="w-5 h-5 text-primary-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-          </svg>
-          <div>
-            <p class="font-semibold text-gray-900">${translations.processing}</p>
-            <p class="text-gray-700">${attributes.process}</p>
-          </div>
-        </div>
-      `;
-    }
-  }
-  
-  // Show modal
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeCoffeeModal(event) {
-  if (event && event.target !== event.currentTarget) return;
-  
-  const modal = document.getElementById('coffeeModal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-  document.body.style.overflow = '';
-}
-
-// Close on Escape key
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    closeCoffeeModal();
-  }
-});
-</script>
 @endsection
 

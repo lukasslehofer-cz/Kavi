@@ -226,7 +226,7 @@
 
                     <!-- Modal for Coffee Detail -->
                     <div id="coffeeModal{{ $coffee->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="closeCoffeeModal{{ $coffee->id }}(event)">
-                        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
                             <div class="relative">
                                 @if($coffee->image)
                                 <div class="aspect-square w-full overflow-hidden rounded-t-3xl bg-gray-100">

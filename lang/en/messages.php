@@ -89,6 +89,10 @@ return [
     'altitude' => 'Altitude',
     'variety' => 'Variety',
     'flavor_notes' => 'Flavor Notes',
+    'coffee_parameters' => 'Coffee Parameters',
+    'additional_info' => 'Additional Information',
+    'weight' => 'Weight',
+    'roast_date' => 'Roast Date',
 
 ];
 

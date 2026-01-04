@@ -89,5 +89,9 @@ return [
     'altitude' => 'Nadmořská výška',
     'variety' => 'Odrůda',
     'flavor_notes' => 'Chuťové tóny',
+    'coffee_parameters' => 'Parametry kávy',
+    'additional_info' => 'Doplňkové informace',
+    'weight' => 'Hmotnost',
+    'roast_date' => 'Datum pražení',
 
 ];

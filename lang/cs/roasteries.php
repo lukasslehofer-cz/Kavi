@@ -25,6 +25,7 @@ return [
     'subscription_promo_text' => 'Připojte se k našemu předplatnému a dostávejte každý měsíc exkluzivní kávy přímo od :name a dalších skvělých pražíren!',
     'choose_subscription' => 'Vybrat předplatné',
     'modal_subscription_text' => 'Tato káva je dostupná pouze v našem měsíčním předplatném. Připojte se a každý měsíc objevujte nové chuti!',
+    'coffee_in_subscription' => 'Tato káva je součástí aktuálního předplatného',
 
     // Empty state
     'no_coffees_yet' => 'Zatím žádné kávy',
