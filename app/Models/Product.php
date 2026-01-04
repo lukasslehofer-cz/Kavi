@@ -34,6 +34,14 @@ class Product extends Model
         'is_coffee_of_month',
         'coffee_of_month_date',
         'sort_order',
+        // Discount fields
+        'discount_type',
+        'discount_percent',
+        'discount_amount_czk',
+        'discount_amount_eur',
+        'sale_start_date',
+        'sale_end_date',
+        'show_discount_percentage',
     ];
 
     protected $casts = [
@@ -49,22 +57,211 @@ class Product extends Model
         'is_digital' => 'boolean',
         'exclude_from_discounts' => 'boolean',
         'is_coffee_of_month' => 'boolean',
+        // Discount casts
+        'discount_percent' => 'decimal:2',
+        'discount_amount_czk' => 'decimal:2',
+        'discount_amount_eur' => 'decimal:2',
+        'sale_start_date' => 'datetime',
+        'sale_end_date' => 'datetime',
+        'show_discount_percentage' => 'boolean',
     ];
 
     /**
      * Get the price in the current currency (CZK or EUR)
+     * Returns sale price if product is on sale
      */
     public function getPrice(): float
     {
+        if ($this->isOnSale()) {
+            return $this->getSalePrice();
+        }
         return CurrencyHelper::price($this->price, $this->price_eur);
     }
 
     /**
      * Get the formatted price with currency symbol
+     * Returns sale price if product is on sale
      */
     public function getFormattedPrice(int $decimals = 0): string
     {
+        if ($this->isOnSale()) {
+            return $this->getFormattedSalePrice($decimals);
+        }
         return CurrencyHelper::format($this->price, $this->price_eur, $decimals);
+    }
+
+    /**
+     * Check if the product is currently on sale
+     * Respects time constraints and exclude_from_discounts flag
+     */
+    public function isOnSale(): bool
+    {
+        // Product excluded from discounts
+        if ($this->exclude_from_discounts) {
+            return false;
+        }
+
+        // No discount type set
+        if (empty($this->discount_type)) {
+            return false;
+        }
+
+        // Check if discount value is set
+        if ($this->discount_type === 'percent' && (empty($this->discount_percent) || $this->discount_percent <= 0)) {
+            return false;
+        }
+
+        if ($this->discount_type === 'amount') {
+            $hasDiscountCzk = !empty($this->discount_amount_czk) && $this->discount_amount_czk > 0;
+            $hasDiscountEur = !empty($this->discount_amount_eur) && $this->discount_amount_eur > 0;
+            
+            // For amount discount, check if the current currency has a discount set
+            if (CurrencyHelper::isEur() && !$hasDiscountEur) {
+                return false;
+            }
+            if (CurrencyHelper::isCzk() && !$hasDiscountCzk) {
+                return false;
+            }
+        }
+
+        // Check time constraints
+        $now = now();
+        
+        if ($this->sale_start_date && $now->lt($this->sale_start_date)) {
+            return false;
+        }
+        
+        if ($this->sale_end_date && $now->gt($this->sale_end_date)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the original price in current currency (before discount)
+     */
+    public function getOriginalPrice(): float
+    {
+        return CurrencyHelper::price($this->price, $this->price_eur);
+    }
+
+    /**
+     * Get the formatted original price with currency symbol
+     */
+    public function getFormattedOriginalPrice(int $decimals = 0): string
+    {
+        return CurrencyHelper::format($this->price, $this->price_eur, $decimals);
+    }
+
+    /**
+     * Get the sale price in current currency
+     * CZK: rounded to whole numbers
+     * EUR: rounded to 1 decimal place
+     */
+    public function getSalePrice(): float
+    {
+        $originalPrice = $this->getOriginalPrice();
+        
+        if ($this->discount_type === 'percent') {
+            $discountAmount = $originalPrice * ($this->discount_percent / 100);
+            $salePrice = $originalPrice - $discountAmount;
+        } elseif ($this->discount_type === 'amount') {
+            if (CurrencyHelper::isEur()) {
+                $salePrice = $originalPrice - ($this->discount_amount_eur ?? 0);
+            } else {
+                $salePrice = $originalPrice - ($this->discount_amount_czk ?? 0);
+            }
+        } else {
+            return $originalPrice;
+        }
+
+        // Ensure price doesn't go below 0
+        $salePrice = max(0, $salePrice);
+
+        // Round based on currency
+        if (CurrencyHelper::isEur()) {
+            return round($salePrice, 1); // EUR: round to 1 decimal
+        }
+        
+        return round($salePrice); // CZK: round to whole numbers
+    }
+
+    /**
+     * Get the formatted sale price with currency symbol
+     */
+    public function getFormattedSalePrice(int $decimals = 0): string
+    {
+        $salePrice = $this->getSalePrice();
+        
+        // For EUR, use 1 decimal if decimals is 0
+        if (CurrencyHelper::isEur() && $decimals === 0) {
+            $decimals = 1;
+        }
+        
+        return CurrencyHelper::formatAmount($salePrice, $decimals);
+    }
+
+    /**
+     * Get the discount percentage (calculated)
+     * Returns null if not on sale
+     */
+    public function getDiscountPercentage(): ?int
+    {
+        if (!$this->isOnSale()) {
+            return null;
+        }
+
+        if ($this->discount_type === 'percent') {
+            return (int) round($this->discount_percent);
+        }
+
+        // Calculate percentage from amount
+        $originalPrice = $this->getOriginalPrice();
+        if ($originalPrice <= 0) {
+            return null;
+        }
+
+        $salePrice = $this->getSalePrice();
+        $percentage = (($originalPrice - $salePrice) / $originalPrice) * 100;
+        
+        return (int) round($percentage);
+    }
+
+    /**
+     * Check if discount percentage should be displayed
+     */
+    public function shouldShowDiscountPercentage(): bool
+    {
+        return $this->isOnSale() && $this->show_discount_percentage;
+    }
+
+    /**
+     * Get the discount amount saved in current currency
+     */
+    public function getDiscountAmount(): float
+    {
+        if (!$this->isOnSale()) {
+            return 0;
+        }
+        
+        return $this->getOriginalPrice() - $this->getSalePrice();
+    }
+
+    /**
+     * Clear all discount fields
+     */
+    public function clearDiscount(): void
+    {
+        $this->update([
+            'discount_type' => null,
+            'discount_percent' => null,
+            'discount_amount_czk' => null,
+            'discount_amount_eur' => null,
+            'sale_start_date' => null,
+            'sale_end_date' => null,
+            'show_discount_percentage' => true,
+        ]);
     }
 
     /**

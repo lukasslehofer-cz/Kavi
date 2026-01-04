@@ -91,7 +91,18 @@
                                             {{ $item['product']->getName() }}
                                         </a>
                                     </h3>
-                                    <p class="text-gray-600 font-light">{{ $item['product']->getFormattedPrice() }} {{ __('cart.per_item') }}</p>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        @if($item['product']->isOnSale())
+                                        <span class="text-red-600 font-medium">{{ $item['product']->getFormattedPrice() }}</span>
+                                        <span class="text-gray-400 line-through text-sm">{{ $item['product']->getFormattedOriginalPrice() }}</span>
+                                        @if($item['product']->shouldShowDiscountPercentage())
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">-{{ $item['product']->getDiscountPercentage() }}%</span>
+                                        @endif
+                                        @else
+                                        <span class="text-gray-600 font-light">{{ $item['product']->getFormattedPrice() }}</span>
+                                        @endif
+                                        <span class="text-gray-500 font-light">{{ __('cart.per_item') }}</span>
+                                    </div>
                                 </div>
                                 <div class="sm:text-right flex-shrink-0">
                                     <p class="text-xl font-bold text-gray-900">

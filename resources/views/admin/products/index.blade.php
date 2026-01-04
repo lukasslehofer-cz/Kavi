@@ -10,12 +10,20 @@
             <h1 class="text-3xl font-bold text-gray-900">Správa produktů</h1>
             <p class="text-gray-600 mt-1">Spravujte produkty ve vašem eshopu</p>
         </div>
-        <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Přidat produkt
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.products.bulk-discount') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                Hromadné slevy
+            </a>
+            <a href="{{ route('admin.products.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Přidat produkt
+            </a>
+        </div>
     </div>
 
     <!-- Products Table -->
@@ -67,7 +75,25 @@
                                 @endforeach
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Kč</td>
+                        <td class="px-6 py-4 text-sm">
+                            @if($product->isOnSale())
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-red-600">{{ number_format($product->getSalePrice(), 0, ',', ' ') }} Kč</span>
+                                <span class="text-xs text-gray-500 line-through">{{ number_format($product->price, 0, ',', ' ') }} Kč</span>
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">-{{ $product->getDiscountPercentage() }}%</span>
+                            </div>
+                            @elseif($product->discount_type)
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Kč</span>
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800" title="Sleva nastavena, ale není aktivní (časové omezení nebo vyloučeno ze slev)">
+                                    <svg class="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                    Čeká
+                                </span>
+                            </div>
+                            @else
+                            <span class="font-bold text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Kč</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-sm">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $product->stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ $product->stock }} ks

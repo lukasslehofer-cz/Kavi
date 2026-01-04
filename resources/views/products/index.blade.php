@@ -128,9 +128,9 @@
           </div>
 
           <!-- Discount Badge - Minimal -->
-          @if($product->discount_percentage ?? false)
+          @if($product->shouldShowDiscountPercentage())
           <div class="absolute right-3 top-3 bg-red-500 rounded-full px-2.5 py-1">
-            <span class="text-xs font-medium text-white">-{{ $product->discount_percentage }}%</span>
+            <span class="text-xs font-medium text-white">-{{ $product->getDiscountPercentage() }}%</span>
           </div>
           @endif
         </a>
@@ -191,9 +191,11 @@
           <div class="pt-2.5 border-t border-gray-100">
             <div class="flex items-center justify-between mb-3">
               <div>
+                @if($product->isOnSale())
+                <span class="text-lg font-bold text-red-600">{{ $product->getFormattedPrice() }}</span>
+                <div class="text-xs text-gray-500 line-through font-light">{{ $product->getFormattedOriginalPrice() }}</div>
+                @else
                 <span class="text-lg font-bold text-gray-900">{{ $product->getFormattedPrice() }}</span>
-                @if($product->original_price ?? false)
-                <div class="text-xs text-red-500 line-through font-light">{{ number_format($product->original_price, 0, ',', ' ') }} Kč</div>
                 @endif
               </div>
             </div>

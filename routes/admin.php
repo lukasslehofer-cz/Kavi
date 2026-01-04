@@ -36,6 +36,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Products
     Route::resource('products', AdminProductController::class)->except(['show']);
+    Route::get('/products-bulk-discount', [AdminProductController::class, 'bulkDiscount'])->name('products.bulk-discount');
+    Route::post('/products-bulk-discount', [AdminProductController::class, 'applyBulkDiscount'])->name('products.apply-bulk-discount');
+    Route::post('/products-clear-discounts', [AdminProductController::class, 'clearAllDiscounts'])->name('products.clear-all-discounts');
     
     // Roasteries
     Route::resource('roasteries', AdminRoasteryController::class)->except(['show']);

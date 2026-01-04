@@ -61,6 +61,14 @@ class ProductController extends Controller
             'is_coffee_of_month' => 'boolean',
             'coffee_of_month_date' => 'nullable|string|regex:/^\d{4}-\d{2}$/',
             'sort_order' => 'nullable|integer|min:0',
+            // Discount fields
+            'discount_type' => 'nullable|in:percent,amount',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
+            'discount_amount_czk' => 'nullable|numeric|min:0',
+            'discount_amount_eur' => 'nullable|numeric|min:0',
+            'sale_start_date' => 'nullable|date',
+            'sale_end_date' => 'nullable|date|after_or_equal:sale_start_date',
+            'show_discount_percentage' => 'boolean',
             // Attributes for coffee products (CZ)
             'origin' => 'nullable|string|max:255',
             'altitude' => 'nullable|string|max:255',
@@ -85,6 +93,17 @@ class ProductController extends Controller
         $validated['is_digital'] = $request->has('is_digital');
         $validated['exclude_from_discounts'] = $request->has('exclude_from_discounts');
         $validated['is_coffee_of_month'] = $request->has('is_coffee_of_month');
+        $validated['show_discount_percentage'] = $request->has('show_discount_percentage');
+        
+        // Handle discount fields - clear if no type selected
+        if (empty($validated['discount_type'])) {
+            $validated['discount_type'] = null;
+            $validated['discount_percent'] = null;
+            $validated['discount_amount_czk'] = null;
+            $validated['discount_amount_eur'] = null;
+            $validated['sale_start_date'] = null;
+            $validated['sale_end_date'] = null;
+        }
         
         // If product is coffee of month, price and stock are optional
         if ($validated['is_coffee_of_month']) {
@@ -164,6 +183,14 @@ class ProductController extends Controller
             'is_coffee_of_month' => 'boolean',
             'coffee_of_month_date' => 'nullable|string|regex:/^\d{4}-\d{2}$/',
             'sort_order' => 'nullable|integer|min:0',
+            // Discount fields
+            'discount_type' => 'nullable|in:percent,amount',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
+            'discount_amount_czk' => 'nullable|numeric|min:0',
+            'discount_amount_eur' => 'nullable|numeric|min:0',
+            'sale_start_date' => 'nullable|date',
+            'sale_end_date' => 'nullable|date|after_or_equal:sale_start_date',
+            'show_discount_percentage' => 'boolean',
             // Attributes for coffee products (CZ)
             'origin' => 'nullable|string|max:255',
             'altitude' => 'nullable|string|max:255',
@@ -188,6 +215,17 @@ class ProductController extends Controller
         $validated['is_digital'] = $request->has('is_digital');
         $validated['exclude_from_discounts'] = $request->has('exclude_from_discounts');
         $validated['is_coffee_of_month'] = $request->has('is_coffee_of_month');
+        $validated['show_discount_percentage'] = $request->has('show_discount_percentage');
+        
+        // Handle discount fields - clear if no type selected
+        if (empty($validated['discount_type'])) {
+            $validated['discount_type'] = null;
+            $validated['discount_percent'] = null;
+            $validated['discount_amount_czk'] = null;
+            $validated['discount_amount_eur'] = null;
+            $validated['sale_start_date'] = null;
+            $validated['sale_end_date'] = null;
+        }
         
         // If product is coffee of month, price and stock are optional
         if ($validated['is_coffee_of_month']) {
@@ -245,6 +283,77 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Produkt byl úspěšně smazán.');
+    }
+
+    /**
+     * Show bulk discount form
+     */
+    public function bulkDiscount()
+    {
+        $productsCount = Product::where('exclude_from_discounts', false)->count();
+        $excludedCount = Product::where('exclude_from_discounts', true)->count();
+        $currentlyOnSale = Product::whereNotNull('discount_type')->count();
+
+        return view('admin.products.bulk-discount', compact('productsCount', 'excludedCount', 'currentlyOnSale'));
+    }
+
+    /**
+     * Apply bulk discount to all eligible products
+     */
+    public function applyBulkDiscount(Request $request)
+    {
+        $validated = $request->validate([
+            'discount_type' => 'required|in:percent,amount',
+            'discount_percent' => 'required_if:discount_type,percent|nullable|numeric|min:0|max:100',
+            'discount_amount_czk' => 'required_if:discount_type,amount|nullable|numeric|min:0',
+            'discount_amount_eur' => 'required_if:discount_type,amount|nullable|numeric|min:0',
+            'sale_start_date' => 'nullable|date',
+            'sale_end_date' => 'nullable|date|after_or_equal:sale_start_date',
+            'show_discount_percentage' => 'boolean',
+        ]);
+
+        $updateData = [
+            'discount_type' => $validated['discount_type'],
+            'sale_start_date' => $validated['sale_start_date'] ?? null,
+            'sale_end_date' => $validated['sale_end_date'] ?? null,
+            'show_discount_percentage' => $request->has('show_discount_percentage'),
+        ];
+
+        if ($validated['discount_type'] === 'percent') {
+            $updateData['discount_percent'] = $validated['discount_percent'];
+            $updateData['discount_amount_czk'] = null;
+            $updateData['discount_amount_eur'] = null;
+        } else {
+            $updateData['discount_percent'] = null;
+            $updateData['discount_amount_czk'] = $validated['discount_amount_czk'];
+            $updateData['discount_amount_eur'] = $validated['discount_amount_eur'];
+        }
+
+        $affectedCount = Product::where('exclude_from_discounts', false)
+            ->update($updateData);
+
+        return redirect()->route('admin.products.bulk-discount')
+            ->with('success', "Sleva byla aplikována na {$affectedCount} produktů.");
+    }
+
+    /**
+     * Remove all discounts from all products
+     */
+    public function clearAllDiscounts()
+    {
+        $affectedCount = Product::whereNotNull('discount_type')
+            ->update([
+                'discount_type' => null,
+                'discount_percent' => null,
+                'discount_amount_czk' => null,
+                'discount_amount_eur' => null,
+                'sale_start_date' => null,
+                'sale_end_date' => null,
+                'show_discount_percentage' => true,
+            ]);
+
+        return redirect()->route('admin.products.bulk-discount')
+            ->with('success', "Slevy byly odstraněny z {$affectedCount} produktů.");
     }
 }
 

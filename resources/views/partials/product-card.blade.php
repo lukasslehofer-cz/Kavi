@@ -66,20 +66,24 @@
       @endif
     </div>
 
-    <!-- Stock Status - Minimal -->
+    <!-- Stock Status / Discount Badge - Minimal -->
     @if(!($historical ?? false) && !isset($badge))
-    @if($product->stock > 0)
-    <div class="absolute right-3 top-3 bg-green-500 rounded-full px-2.5 py-1">
-      <span class="text-xs font-medium text-white flex items-center gap-1">
-        <span class="w-1.5 h-1.5 bg-white rounded-full"></span>
-        Skladem
-      </span>
-    </div>
-    @else
-    <div class="absolute right-3 top-3 bg-red-500 rounded-full px-2.5 py-1">
-      <span class="text-xs font-medium text-white">Vyprodáno</span>
-    </div>
-    @endif
+      @if($product->shouldShowDiscountPercentage())
+      <div class="absolute right-3 top-3 bg-red-500 rounded-full px-2.5 py-1">
+        <span class="text-xs font-medium text-white">-{{ $product->getDiscountPercentage() }}%</span>
+      </div>
+      @elseif($product->stock > 0)
+      <div class="absolute right-3 top-3 bg-green-500 rounded-full px-2.5 py-1">
+        <span class="text-xs font-medium text-white flex items-center gap-1">
+          <span class="w-1.5 h-1.5 bg-white rounded-full"></span>
+          Skladem
+        </span>
+      </div>
+      @else
+      <div class="absolute right-3 top-3 bg-red-500 rounded-full px-2.5 py-1">
+        <span class="text-xs font-medium text-white">Vyprodáno</span>
+      </div>
+      @endif
     @endif
 
   @if($historical ?? false)
@@ -137,9 +141,14 @@
     <!-- Price & Add to Cart - Minimal -->
     <div class="pt-4 border-t border-gray-100">
       <div class="flex items-center justify-between mb-3">
-        <p class="text-xl font-bold text-gray-900">
-          {{ $product->getFormattedPrice() }}
-        </p>
+        <div>
+          @if($product->isOnSale())
+          <p class="text-xl font-bold text-red-600">{{ $product->getFormattedPrice() }}</p>
+          <p class="text-sm text-gray-400 line-through">{{ $product->getFormattedOriginalPrice() }}</p>
+          @else
+          <p class="text-xl font-bold text-gray-900">{{ $product->getFormattedPrice() }}</p>
+          @endif
+        </div>
       </div>
       
       @if($product->stock > 0)

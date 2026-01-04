@@ -66,8 +66,13 @@
                   @endphp
                 </div>
 
+                <!-- Discount Badge - Minimal -->
+                @if($product->shouldShowDiscountPercentage())
+                <div class="absolute top-3 right-3 bg-red-500 rounded-full px-3 py-1">
+                  <span class="text-xs font-medium text-white">-{{ $product->getDiscountPercentage() }}%</span>
+                </div>
+                @elseif($product->is_featured)
                 <!-- Featured Badge - Minimal -->
-                @if($product->is_featured)
                 <div class="absolute top-3 right-3 bg-gray-900 rounded-full px-3 py-1">
                   <span class="text-xs font-medium text-white flex items-center gap-1">
                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -145,8 +150,20 @@
             </div>
             @endif
 
-            <div class="flex items-baseline gap-2 mb-8 pb-8 border-b border-gray-200">
+            <div class="mb-8 pb-8 border-b border-gray-200">
+                @if($product->isOnSale())
+                <div class="flex flex-wrap items-baseline gap-3">
+                    <span class="text-5xl font-bold text-red-600">{{ $product->getFormattedPrice() }}</span>
+                    <span class="text-2xl text-gray-400 line-through font-light">{{ $product->getFormattedOriginalPrice() }}</span>
+                    @if($product->shouldShowDiscountPercentage())
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-700">
+                        {{ $currentLocale === 'en' ? 'Save' : 'Ušetříte' }} {{ $product->getDiscountPercentage() }}%
+                    </span>
+                    @endif
+                </div>
+                @else
                 <span class="text-5xl font-bold text-gray-900">{{ $product->getFormattedPrice() }}</span>
+                @endif
             </div>
 
             @if($product->isInStock())
@@ -321,6 +338,11 @@
                         <p class="text-center text-xs font-light text-gray-500">{{ $relatedProduct->getName() }}</p>
                     </div>
                     @endif
+                    @if($relatedProduct->shouldShowDiscountPercentage())
+                    <div class="absolute top-2 right-2 bg-red-500 rounded-full px-2 py-0.5">
+                      <span class="text-xs font-medium text-white">-{{ $relatedProduct->getDiscountPercentage() }}%</span>
+                    </div>
+                    @endif
                 </a>
                 <div class="p-4">
                     <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="block">
@@ -329,7 +351,14 @@
                       </h3>
                     </a>
                     <div class="flex items-center justify-between pt-2.5 border-t border-gray-100">
-                      <span class="text-lg font-bold text-gray-900">{{ $relatedProduct->getFormattedPrice() }}</span>
+                      <div>
+                        @if($relatedProduct->isOnSale())
+                        <span class="text-lg font-bold text-red-600">{{ $relatedProduct->getFormattedPrice() }}</span>
+                        <div class="text-xs text-gray-500 line-through">{{ $relatedProduct->getFormattedOriginalPrice() }}</div>
+                        @else
+                        <span class="text-lg font-bold text-gray-900">{{ $relatedProduct->getFormattedPrice() }}</span>
+                        @endif
+                      </div>
                       <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

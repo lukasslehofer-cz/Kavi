@@ -23,8 +23,22 @@ class CartController extends Controller
         foreach ($cart as $productId => $quantity) {
             $product = Product::find($productId);
             if ($product && $product->is_active) {
-                $subtotal = $product->price * $quantity;
-                $subtotalEur = ($product->price_eur ?? 0) * $quantity;
+                // Use sale-aware pricing
+                if ($product->isOnSale()) {
+                    // Get sale price for each currency
+                    $priceCzk = CurrencyHelper::isCzk() 
+                        ? $product->getSalePrice() 
+                        : $this->calculateSalePriceCzk($product);
+                    $priceEur = CurrencyHelper::isEur() 
+                        ? $product->getSalePrice() 
+                        : $this->calculateSalePriceEur($product);
+                } else {
+                    $priceCzk = $product->price ?? 0;
+                    $priceEur = $product->price_eur ?? 0;
+                }
+                
+                $subtotal = $priceCzk * $quantity;
+                $subtotalEur = $priceEur * $quantity;
                 $cartItems[] = [
                     'product' => $product,
                     'quantity' => $quantity,
@@ -190,6 +204,40 @@ class CartController extends Controller
             ? 'Cart cleared.'
             : 'Košík byl vyprázdněn.';
         return back()->with('success', $successMessage);
+    }
+
+    /**
+     * Calculate sale price in CZK for a product (when current currency might be EUR)
+     */
+    private function calculateSalePriceCzk(Product $product): float
+    {
+        $originalPrice = $product->price ?? 0;
+        
+        if ($product->discount_type === 'percent') {
+            $discountAmount = $originalPrice * ($product->discount_percent / 100);
+            return round(max(0, $originalPrice - $discountAmount));
+        } elseif ($product->discount_type === 'amount') {
+            return round(max(0, $originalPrice - ($product->discount_amount_czk ?? 0)));
+        }
+        
+        return $originalPrice;
+    }
+
+    /**
+     * Calculate sale price in EUR for a product (when current currency might be CZK)
+     */
+    private function calculateSalePriceEur(Product $product): float
+    {
+        $originalPrice = $product->price_eur ?? 0;
+        
+        if ($product->discount_type === 'percent') {
+            $discountAmount = $originalPrice * ($product->discount_percent / 100);
+            return round(max(0, $originalPrice - $discountAmount), 1);
+        } elseif ($product->discount_type === 'amount') {
+            return round(max(0, $originalPrice - ($product->discount_amount_eur ?? 0)), 1);
+        }
+        
+        return $originalPrice;
     }
 }
 

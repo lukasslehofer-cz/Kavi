@@ -303,6 +303,101 @@
                 <p class="text-xs text-gray-600 mt-1">Čím nižší číslo, tím výše se produkt zobrazí (0 = výchozí)</p>
             </div>
 
+            <!-- Discount Section -->
+            <div class="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 p-6 rounded-lg space-y-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="flex-shrink-0">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Sleva na produktu</h3>
+                        <p class="text-xs text-gray-600">Nastavte slevu přímo na tomto produktu</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Typ slevy</label>
+                    <select name="discount_type" id="discount-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        <option value="">Bez slevy</option>
+                        <option value="percent" {{ old('discount_type', $product->discount_type) === 'percent' ? 'selected' : '' }}>Procentuální sleva</option>
+                        <option value="amount" {{ old('discount_type', $product->discount_type) === 'amount' ? 'selected' : '' }}>Sleva částkou</option>
+                    </select>
+                </div>
+
+                <div id="discount-percent-container" style="display: none;">
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Sleva v procentech (%)</label>
+                    <input type="number" name="discount_percent" value="{{ old('discount_percent', $product->discount_percent) }}" step="0.01" min="0" max="100" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent @error('discount_percent') border-red-500 @enderror">
+                    @error('discount_percent')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-gray-600 mt-1">Např. 20 pro 20% slevu</p>
+                </div>
+
+                <div id="discount-amount-container" style="display: none;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-900 mb-2">Sleva v Kč</label>
+                            <input type="number" name="discount_amount_czk" value="{{ old('discount_amount_czk', $product->discount_amount_czk) }}" step="0.01" min="0" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent @error('discount_amount_czk') border-red-500 @enderror">
+                            @error('discount_amount_czk')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-900 mb-2">Sleva v EUR</label>
+                            <input type="number" name="discount_amount_eur" value="{{ old('discount_amount_eur', $product->discount_amount_eur) }}" step="0.01" min="0" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent @error('discount_amount_eur') border-red-500 @enderror">
+                            @error('discount_amount_eur')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">Zadejte částku, která se odečte od ceny produktu</p>
+                </div>
+
+                <div id="discount-dates-container" style="display: none;">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-900 mb-2">Začátek slevy (volitelné)</label>
+                            <input type="datetime-local" name="sale_start_date" value="{{ old('sale_start_date', $product->sale_start_date ? $product->sale_start_date->format('Y-m-d\TH:i') : '') }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent @error('sale_start_date') border-red-500 @enderror">
+                            @error('sale_start_date')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-900 mb-2">Konec slevy (volitelné)</label>
+                            <input type="datetime-local" name="sale_end_date" value="{{ old('sale_end_date', $product->sale_end_date ? $product->sale_end_date->format('Y-m-d\TH:i') : '') }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent @error('sale_end_date') border-red-500 @enderror">
+                            @error('sale_end_date')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">Nechte prázdné pro trvalou slevu bez časového omezení</p>
+                </div>
+
+                <div id="discount-show-percentage-container" style="display: none;">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" name="show_discount_percentage" value="1" {{ old('show_discount_percentage', $product->show_discount_percentage ?? true) ? 'checked' : '' }}
+                               class="rounded border-red-300 text-red-600 focus:ring-red-500">
+                        <span class="ml-2 text-sm text-gray-900">Zobrazit procentuální slevu u produktu</span>
+                    </label>
+                    <p class="text-xs text-gray-600 mt-1 ml-6">Pokud je zaškrtnuto, zobrazí se badge s % slevy vedle ceny</p>
+                </div>
+
+                @if($product->exclude_from_discounts)
+                <div class="bg-orange-100 border border-orange-300 rounded-lg p-3 mt-4">
+                    <p class="text-sm text-orange-800">
+                        <strong>⚠️ Upozornění:</strong> Tento produkt má nastaveno "Vyloučit ze slev", takže se na něj slevy nebudou aplikovat.
+                    </p>
+                </div>
+                @endif
+            </div>
+
             <div id="preparation-methods-container" style="display: none;">
                 <label class="block text-sm font-medium text-gray-900 mb-2">Typ pražení (pro kávu)</label>
                 <div class="space-y-2">
@@ -454,6 +549,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
     coffeeOfMonthCheckbox.addEventListener('change', toggleCoffeeOfMonth);
     toggleCoffeeOfMonth(); // Initial state
+
+    // Discount type toggle
+    const discountTypeSelect = document.getElementById('discount-type');
+    const discountPercentContainer = document.getElementById('discount-percent-container');
+    const discountAmountContainer = document.getElementById('discount-amount-container');
+    const discountDatesContainer = document.getElementById('discount-dates-container');
+    const discountShowPercentageContainer = document.getElementById('discount-show-percentage-container');
+
+    function toggleDiscountFields() {
+        const discountType = discountTypeSelect.value;
+        
+        if (discountType === '') {
+            discountPercentContainer.style.display = 'none';
+            discountAmountContainer.style.display = 'none';
+            discountDatesContainer.style.display = 'none';
+            discountShowPercentageContainer.style.display = 'none';
+        } else if (discountType === 'percent') {
+            discountPercentContainer.style.display = 'block';
+            discountAmountContainer.style.display = 'none';
+            discountDatesContainer.style.display = 'block';
+            discountShowPercentageContainer.style.display = 'block';
+        } else if (discountType === 'amount') {
+            discountPercentContainer.style.display = 'none';
+            discountAmountContainer.style.display = 'block';
+            discountDatesContainer.style.display = 'block';
+            discountShowPercentageContainer.style.display = 'block';
+        }
+    }
+
+    discountTypeSelect.addEventListener('change', toggleDiscountFields);
+    toggleDiscountFields(); // Initial state
 });
 </script>
 @endsection
