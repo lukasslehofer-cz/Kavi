@@ -63,6 +63,22 @@
             @if($roastery->getShortDescription())
             <p class="text-lg text-gray-600 mb-8 leading-relaxed font-light">{{ $roastery->getShortDescription() }}</p>
             @endif
+
+            <!-- Mobile Image - shown only on mobile, right after perex -->
+            <div class="lg:hidden mb-8">
+                <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50">
+                    @if($roastery->image)
+                    <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->getName() }}" class="w-full h-full object-cover">
+                    @else
+                    <div class="w-full h-full flex flex-col items-center justify-center p-12 bg-gray-100">
+                        <svg class="w-32 h-32 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        <p class="text-center text-gray-600 font-medium">{{ $roastery->getName() }}</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
             
             <!-- Links - Minimal -->
             <div class="flex flex-wrap items-center gap-3 mb-8">
@@ -125,8 +141,8 @@
             @endif
         </div>
 
-        <!-- Roastery Image (RIGHT side, sticky) - Minimal -->
-        <div class="lg:sticky lg:top-24 h-fit">
+        <!-- Roastery Image (RIGHT side, sticky) - Desktop only -->
+        <div class="hidden lg:block lg:sticky lg:top-24 h-fit">
             <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50">
                 @if($roastery->image)
                 <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->getName() }}" class="w-full h-full object-cover">
