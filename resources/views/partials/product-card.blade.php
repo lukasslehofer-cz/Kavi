@@ -138,7 +138,7 @@
     </div>
 
     @if(!($historical ?? false) && !isset($badge))
-    <!-- Price & Add to Cart - Minimal -->
+    <!-- Price & View Detail - Minimal -->
     <div class="pt-4 border-t border-gray-100">
       <div class="flex items-center justify-between mb-3">
         <div>
@@ -151,19 +151,9 @@
         </div>
       </div>
       
-      @if($product->stock > 0)
-      <form action="{{ localizedRoute('cart.add', $product) }}" method="POST">
-        @csrf
-        <button type="submit" class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm flex items-center justify-center gap-1.5">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          </svg>
-          <span>Do košíku</span>
-        </button>
-      </form>
-      @else
-      <span class="text-sm font-medium text-red-600">Nedostupné</span>
-      @endif
+      <a href="{{ localizedRoute('products.show', $product) }}" class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm flex items-center justify-center">
+        {{ __('messages.view_detail') }}
+      </a>
     </div>
     @elseif($historical ?? false)
     <!-- Historical Product - No Price/Cart -->
