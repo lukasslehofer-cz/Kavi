@@ -220,8 +220,46 @@
 
     <!-- Pagination -->
     @if($products->hasPages())
-    <div class="mt-12 flex justify-center">
-      {{ $products->links() }}
+    <div class="mt-12 flex flex-col items-center gap-4">
+      <!-- <p class="text-sm text-gray-500">
+        {{ $currentLocale === 'en' ? 'Showing' : 'Zobrazeno' }} {{ $products->firstItem() }} - {{ $products->lastItem() }} {{ $currentLocale === 'en' ? 'of' : 'z' }} {{ $products->total() }} {{ $currentLocale === 'en' ? 'products' : 'produktů' }}
+      </p> -->
+      <nav class="flex items-center gap-1">
+        {{-- Previous Page Link --}}
+        @if($products->onFirstPage())
+          <span class="px-4 py-2 text-sm text-gray-400 bg-white border border-gray-200 rounded-full cursor-not-allowed">
+            &laquo; {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
+          </span>
+        @else
+          <a href="{{ $products->previousPageUrl() }}" class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+            &laquo; {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
+          </a>
+        @endif
+
+        {{-- Page Numbers --}}
+        @foreach($products->getUrlRange(1, $products->lastPage()) as $page => $url)
+          @if($page == $products->currentPage())
+            <span class="px-4 py-2 text-sm font-medium text-white bg-primary-500 border border-primary-500 rounded-full">
+              {{ $page }}
+            </span>
+          @else
+            <a href="{{ $url }}" class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+              {{ $page }}
+            </a>
+          @endif
+        @endforeach
+
+        {{-- Next Page Link --}}
+        @if($products->hasMorePages())
+          <a href="{{ $products->nextPageUrl() }}" class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+            {{ $currentLocale === 'en' ? 'Next' : 'Další' }} &raquo;
+          </a>
+        @else
+          <span class="px-4 py-2 text-sm text-gray-400 bg-white border border-gray-200 rounded-full cursor-not-allowed">
+            {{ $currentLocale === 'en' ? 'Next' : 'Další' }} &raquo;
+          </span>
+        @endif
+      </nav>
     </div>
     @endif
   </div>

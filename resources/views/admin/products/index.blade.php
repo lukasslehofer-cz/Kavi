@@ -111,11 +111,50 @@
         </div>
     </div>
 
-    @if($products->hasPages())
-    <div class="mt-6">
-        {{ $products->links() }}
+    <!-- Pagination -->
+    <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-sm text-gray-600">
+            Zobrazeno {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} z {{ $products->total() }} produktů
+        </div>
+        @if($products->hasPages())
+        <nav class="flex items-center gap-1">
+            {{-- Previous Page Link --}}
+            @if($products->onFirstPage())
+                <span class="px-3 py-2 text-sm text-gray-400 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+                    &laquo; Předchozí
+                </span>
+            @else
+                <a href="{{ $products->previousPageUrl() }}" class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    &laquo; Předchozí
+                </a>
+            @endif
+
+            {{-- Page Numbers --}}
+            @foreach($products->getUrlRange(1, $products->lastPage()) as $page => $url)
+                @if($page == $products->currentPage())
+                    <span class="px-3 py-2 text-sm font-medium text-white bg-gray-900 border border-gray-900 rounded-lg">
+                        {{ $page }}
+                    </span>
+                @else
+                    <a href="{{ $url }}" class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        {{ $page }}
+                    </a>
+                @endif
+            @endforeach
+
+            {{-- Next Page Link --}}
+            @if($products->hasMorePages())
+                <a href="{{ $products->nextPageUrl() }}" class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    Další &raquo;
+                </a>
+            @else
+                <span class="px-3 py-2 text-sm text-gray-400 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+                    Další &raquo;
+                </span>
+            @endif
+        </nav>
+        @endif
     </div>
-    @endif
 </div>
 @endsection
 
