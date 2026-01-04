@@ -267,7 +267,7 @@
                     
                     <!-- Other attributes not in main or additional lists -->
                     @foreach($product->attributes as $key => $value)
-                        @if(!in_array($key, ['roaster', 'flavor_profile', 'preparation_methods', 'origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date']))
+                        @if(!in_array($key, ['roaster', 'flavor_profile', 'preparation_methods', 'origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date']) && !str_ends_with($key, '_en'))
                         <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
                             <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">{{ str_replace('_', ' ', ucfirst($key)) }}</dt>
                             <dd class="text-gray-900 font-semibold">

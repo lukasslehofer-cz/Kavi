@@ -306,7 +306,7 @@ class Product extends Model
      */
     public function getTranslatedAttribute(string $key)
     {
-        $attributes = $this->attributes ?? [];
+        $attributes = $this->getAttribute('attributes') ?? [];
         
         if (app()->getLocale() === 'en') {
             $enKey = $key . '_en';
