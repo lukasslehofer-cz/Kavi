@@ -107,7 +107,7 @@
                                 <div class="sm:text-right flex-shrink-0">
                                     <p class="text-xl font-bold text-gray-900">
                                         @if($currentLocale === 'en')
-                                            €{{ number_format($item['subtotal_eur'] ?? 0, 0, '.', ' ') }}
+                                            €{{ number_format($item['subtotal_eur'] ?? 0, 2, '.', ' ') }}
                                         @else
                                             {{ number_format($item['subtotal'], 0, ',', ' ') }} Kč
                                         @endif
@@ -180,7 +180,7 @@
                         <dt class="text-gray-600 font-light flex-shrink-0">{{ __('cart.subtotal') }}</dt>
                         <dd class="font-bold text-gray-900 text-right flex-shrink-0 ml-4 whitespace-nowrap">
                             @if($currentLocale === 'en')
-                                €{{ number_format($totalEur ?? 0, 0, '.', ' ') }}
+                                €{{ number_format($totalEur ?? 0, 2, '.', ' ') }}
                             @else
                                 {{ number_format($total, 0, ',', ' ') }} Kč
                             @endif
@@ -201,7 +201,7 @@
                                 @else
                                     <span class="text-gray-900">
                                         @if($currentLocale === 'en')
-                                            €{{ number_format($shippingEur ?? 0, 0, '.', ' ') }}
+                                            €{{ number_format($shippingEur ?? 0, 2, '.', ' ') }}
                                         @else
                                             {{ number_format($shipping, 0, ',', ' ') }} Kč
                                         @endif
@@ -221,7 +221,7 @@
                             </svg>
                             @php
                                 $remainingFormatted = $currentLocale === 'en' 
-                                    ? '€' . number_format($remainingForFreeShippingEur ?? 0, 0, '.', ' ')
+                                    ? '€' . number_format($remainingForFreeShippingEur ?? 0, 2, '.', ' ')
                                     : number_format($remainingForFreeShipping, 0, ',', ' ') . ' Kč';
                             @endphp
                             <span>{!! __('cart.free_shipping_remaining', ['amount' => $remainingFormatted]) !!}</span>
@@ -245,7 +245,7 @@
                                 @if($shipping !== null)
                                     <span class="whitespace-nowrap">
                                         @if($currentLocale === 'en')
-                                            €{{ number_format(($totalEur ?? 0) + ($shippingEur ?? 0), 0, '.', ' ') }}
+                                            €{{ number_format(($totalEur ?? 0) + ($shippingEur ?? 0), 2, '.', ' ') }}
                                         @else
                                             {{ number_format($total + $shipping, 0, ',', ' ') }} Kč
                                         @endif

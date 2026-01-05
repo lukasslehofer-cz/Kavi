@@ -427,7 +427,7 @@
                     
                     function formatCurrency(amount) {
                         if (isEur) {
-                            return '€' + amount.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                            return '€' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                         } else {
                             return amount.toLocaleString('cs-CZ') + ' Kč';
                         }

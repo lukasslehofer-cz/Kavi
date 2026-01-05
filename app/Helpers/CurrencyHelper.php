@@ -80,19 +80,21 @@ class CurrencyHelper
      * 
      * @param float|null $priceCzk Price in CZK
      * @param float|null $priceEur Price in EUR
-     * @param int $decimals Number of decimal places
+     * @param int|null $decimals Number of decimal places (null = auto: 2 for EUR, 0 for CZK)
      * @return string Formatted price with symbol
      */
-    public static function format(?float $priceCzk, ?float $priceEur, int $decimals = 0): string
+    public static function format(?float $priceCzk, ?float $priceEur, ?int $decimals = null): string
     {
         $price = self::price($priceCzk, $priceEur);
         
         if (self::isEur()) {
-            // EUR format: €29 or €29.90
+            // EUR format: €29.00 (default 2 decimals)
+            $decimals = $decimals ?? 2;
             return '€' . number_format($price, $decimals, '.', ' ');
         }
         
-        // CZK format: 690 Kč
+        // CZK format: 690 Kč (default 0 decimals)
+        $decimals = $decimals ?? 0;
         return number_format($price, $decimals, ',', ' ') . ' Kč';
     }
     
@@ -101,14 +103,18 @@ class CurrencyHelper
      * Use this when you already have the correct amount for the current currency
      * 
      * @param float $amount
-     * @param int $decimals
+     * @param int|null $decimals Number of decimals (null = auto: 2 for EUR, 0 for CZK)
      * @return string
      */
-    public static function formatAmount(float $amount, int $decimals = 0): string
+    public static function formatAmount(float $amount, ?int $decimals = null): string
     {
         if (self::isEur()) {
+            // EUR: default to 2 decimals (e.g., €11.40)
+            $decimals = $decimals ?? 2;
             return '€' . number_format($amount, $decimals, '.', ' ');
         }
+        // CZK: default to 0 decimals
+        $decimals = $decimals ?? 0;
         return number_format($amount, $decimals, ',', ' ') . ' Kč';
     }
     
@@ -148,17 +154,21 @@ class CurrencyHelper
      * 
      * @param float $amount The amount to format
      * @param string|null $currency The currency code (CZK or EUR), defaults to current session currency
-     * @param int $decimals Number of decimal places
+     * @param int|null $decimals Number of decimal places (null = auto: 2 for EUR, 0 for CZK)
      * @return string Formatted price with symbol
      */
-    public static function formatByCurrency(float $amount, ?string $currency = null, int $decimals = 0): string
+    public static function formatByCurrency(float $amount, ?string $currency = null, ?int $decimals = null): string
     {
         $currency = $currency ?? self::code();
         
         if (strtoupper($currency) === 'EUR') {
+            // EUR: default 2 decimals
+            $decimals = $decimals ?? 2;
             return '€' . number_format($amount, $decimals, '.', ' ');
         }
         
+        // CZK: default 0 decimals
+        $decimals = $decimals ?? 0;
         return number_format($amount, $decimals, ',', ' ') . ' Kč';
     }
 }

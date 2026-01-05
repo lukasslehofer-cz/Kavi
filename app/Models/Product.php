@@ -82,15 +82,10 @@ class Product extends Model
      * Get the formatted price with currency symbol
      * Returns sale price if product is on sale
      */
-    public function getFormattedPrice(int $decimals = 0): string
+    public function getFormattedPrice(?int $decimals = null): string
     {
         if ($this->isOnSale()) {
             return $this->getFormattedSalePrice($decimals);
-        }
-        
-        // For EUR, use 2 decimals for display (e.g., €11.40)
-        if (CurrencyHelper::isEur() && $decimals === 0) {
-            $decimals = 2;
         }
         
         return CurrencyHelper::format($this->price, $this->price_eur, $decimals);
@@ -155,13 +150,8 @@ class Product extends Model
     /**
      * Get the formatted original price with currency symbol
      */
-    public function getFormattedOriginalPrice(int $decimals = 0): string
+    public function getFormattedOriginalPrice(?int $decimals = null): string
     {
-        // For EUR, use 2 decimals for display (e.g., €11.40)
-        if (CurrencyHelper::isEur() && $decimals === 0) {
-            $decimals = 2;
-        }
-        
         return CurrencyHelper::format($this->price, $this->price_eur, $decimals);
     }
 
@@ -201,14 +191,9 @@ class Product extends Model
     /**
      * Get the formatted sale price with currency symbol
      */
-    public function getFormattedSalePrice(int $decimals = 0): string
+    public function getFormattedSalePrice(?int $decimals = null): string
     {
         $salePrice = $this->getSalePrice();
-        
-        // For EUR, use 2 decimals for display (e.g., €11.40)
-        if (CurrencyHelper::isEur() && $decimals === 0) {
-            $decimals = 2;
-        }
         
         return CurrencyHelper::formatAmount($salePrice, $decimals);
     }
