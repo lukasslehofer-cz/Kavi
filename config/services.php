@@ -58,6 +58,12 @@ return [
         'min_score' => env('RECAPTCHA_MIN_SCORE', 0.5),
     ],
 
+    'deepl' => [
+        'api_key' => env('DEEPL_API_KEY'),
+        // Use 'https://api-free.deepl.com/v2' for free tier, 'https://api.deepl.com/v2' for pro
+        'api_url' => env('DEEPL_API_URL', 'https://api-free.deepl.com/v2'),
+    ],
+
 ];
 
 

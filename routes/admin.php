@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\RoasteryController as AdminRoasteryController;
+use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CouponController;
@@ -88,5 +89,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/hlasky/{announcement}', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'update'])->name('announcements.update');
     Route::delete('/hlasky/{announcement}', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'destroy'])->name('announcements.destroy');
     Route::post('/hlasky/{announcement}/toggle', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'toggle'])->name('announcements.toggle');
+    
+    // Translation API (DeepL)
+    Route::post('/translate', [TranslationController::class, 'translate'])->name('translate');
+    Route::post('/translate/batch', [TranslationController::class, 'translateBatch'])->name('translate.batch');
+    Route::get('/translate/usage', [TranslationController::class, 'usage'])->name('translate.usage');
+    Route::get('/translate/status', [TranslationController::class, 'status'])->name('translate.status');
 });
 

@@ -16,15 +16,21 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Název produktu 🇨🇿</label>
-                    <input type="text" name="name" value="{{ old('name') }}" required 
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" required 
                            class="input @error('name') border-red-500 @enderror">
                     @error('name')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Product Name 🇬🇧</label>
-                    <input type="text" name="name_en" value="{{ old('name_en') }}" 
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Product Name 🇬🇧</span>
+                        <button type="button" onclick="translateField('name', 'name_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <input type="text" name="name_en" id="name_en" value="{{ old('name_en') }}" 
                            placeholder="English product name"
                            class="input @error('name_en') border-red-500 @enderror">
                     @error('name_en')
@@ -54,15 +60,21 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Krátký popis 🇨🇿</label>
-                    <input type="text" name="short_description" value="{{ old('short_description') }}" 
+                    <input type="text" name="short_description" id="short_description" value="{{ old('short_description') }}" 
                            class="input @error('short_description') border-red-500 @enderror">
                     @error('short_description')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Short Description 🇬🇧</label>
-                    <input type="text" name="short_description_en" value="{{ old('short_description_en') }}" 
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Short Description 🇬🇧</span>
+                        <button type="button" onclick="translateField('short_description', 'short_description_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <input type="text" name="short_description_en" id="short_description_en" value="{{ old('short_description_en') }}" 
                            placeholder="English short description"
                            class="input @error('short_description_en') border-red-500 @enderror">
                     @error('short_description_en')
@@ -74,7 +86,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Detailní popis 🇨🇿</label>
-                    <textarea name="description" rows="6" required 
+                    <textarea name="description" id="description" rows="6" required 
                               class="input @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
                     @error('description')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -82,8 +94,14 @@
                     <p class="text-xs text-coffee-600 mt-1">Povolené HTML tagy: &lt;a&gt;, &lt;strong&gt;, &lt;b&gt;, &lt;em&gt;, &lt;i&gt;, &lt;br&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Detailed Description 🇬🇧</label>
-                    <textarea name="description_en" rows="6" 
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Detailed Description 🇬🇧</span>
+                        <button type="button" onclick="translateField('description', 'description_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <textarea name="description_en" id="description_en" rows="6" 
                               placeholder="English detailed description"
                               class="input @error('description_en') border-red-500 @enderror">{{ old('description_en') }}</textarea>
                     @error('description_en')
@@ -162,7 +180,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Původ kávy 🇨🇿</label>
-                        <input type="text" name="origin" value="{{ old('origin') }}" 
+                        <input type="text" name="origin" id="origin" value="{{ old('origin') }}" 
                                placeholder="např. Etiopie, Keňa, Honduras..."
                                class="input @error('origin') border-red-500 @enderror">
                         @error('origin')
@@ -170,8 +188,14 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-coffee-900 mb-2">Origin 🇬🇧</label>
-                        <input type="text" name="origin_en" value="{{ old('origin_en') }}" 
+                        <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                            <span>Origin 🇬🇧</span>
+                            <button type="button" onclick="translateField('origin', 'origin_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                Přeložit
+                            </button>
+                        </label>
+                        <input type="text" name="origin_en" id="origin_en" value="{{ old('origin_en') }}" 
                                placeholder="e.g. Ethiopia, Kenya, Honduras..."
                                class="input @error('origin_en') border-red-500 @enderror">
                         @error('origin_en')
@@ -194,7 +218,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Zpracování 🇨🇿</label>
-                        <input type="text" name="processing" value="{{ old('processing') }}" 
+                        <input type="text" name="processing" id="processing" value="{{ old('processing') }}" 
                                placeholder="např. Praná, Přírodní, Honey..."
                                class="input @error('processing') border-red-500 @enderror">
                         @error('processing')
@@ -202,8 +226,14 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-coffee-900 mb-2">Processing 🇬🇧</label>
-                        <input type="text" name="processing_en" value="{{ old('processing_en') }}" 
+                        <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                            <span>Processing 🇬🇧</span>
+                            <button type="button" onclick="translateField('processing', 'processing_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                Přeložit
+                            </button>
+                        </label>
+                        <input type="text" name="processing_en" id="processing_en" value="{{ old('processing_en') }}" 
                                placeholder="e.g. Washed, Natural, Honey..."
                                class="input @error('processing_en') border-red-500 @enderror">
                         @error('processing_en')
@@ -215,7 +245,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Odrůda 🇨🇿</label>
-                        <input type="text" name="variety" value="{{ old('variety') }}" 
+                        <input type="text" name="variety" id="variety" value="{{ old('variety') }}" 
                                placeholder="např. Arabica, Bourbon, Caturra..."
                                class="input @error('variety') border-red-500 @enderror">
                         @error('variety')
@@ -223,8 +253,14 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-coffee-900 mb-2">Variety 🇬🇧</label>
-                        <input type="text" name="variety_en" value="{{ old('variety_en') }}" 
+                        <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                            <span>Variety 🇬🇧</span>
+                            <button type="button" onclick="translateField('variety', 'variety_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                Přeložit
+                            </button>
+                        </label>
+                        <input type="text" name="variety_en" id="variety_en" value="{{ old('variety_en') }}" 
                                placeholder="e.g. Arabica, Bourbon, Caturra..."
                                class="input @error('variety_en') border-red-500 @enderror">
                         @error('variety_en')
@@ -236,7 +272,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Chuťové tóny 🇨🇿</label>
-                        <textarea name="flavor_notes" rows="3" 
+                        <textarea name="flavor_notes" id="flavor_notes" rows="3" 
                                   placeholder="např. citrus, čokoláda, karamel, oříšky..."
                                   class="input @error('flavor_notes') border-red-500 @enderror">{{ old('flavor_notes') }}</textarea>
                         @error('flavor_notes')
@@ -244,8 +280,14 @@
                         @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-coffee-900 mb-2">Flavor Notes 🇬🇧</label>
-                        <textarea name="flavor_notes_en" rows="3" 
+                        <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                            <span>Flavor Notes 🇬🇧</span>
+                            <button type="button" onclick="translateField('flavor_notes', 'flavor_notes_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                Přeložit
+                            </button>
+                        </label>
+                        <textarea name="flavor_notes_en" id="flavor_notes_en" rows="3" 
                                   placeholder="e.g. citrus, chocolate, caramel, nuts..."
                                   class="input @error('flavor_notes_en') border-red-500 @enderror">{{ old('flavor_notes_en') }}</textarea>
                         @error('flavor_notes_en')
@@ -473,6 +515,72 @@ function previewImage(event) {
             previewContainer.classList.remove('hidden');
         }
         reader.readAsDataURL(file);
+    }
+}
+
+// AI Translation function
+async function translateField(sourceId, targetId) {
+    const sourceElement = document.getElementById(sourceId);
+    const targetElement = document.getElementById(targetId);
+    const button = event.target.closest('button');
+    
+    if (!sourceElement || !targetElement) {
+        alert('Chyba: Nelze najít zdrojové nebo cílové pole.');
+        return;
+    }
+    
+    const sourceText = sourceElement.value.trim();
+    
+    if (!sourceText) {
+        alert('Zdrojové pole je prázdné. Nejprve vyplňte český text.');
+        return;
+    }
+    
+    // Show loading state
+    const originalContent = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = `
+        <svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Překládám...
+    `;
+    
+    try {
+        const response = await fetch('{{ route("admin.translate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                text: sourceText,
+                source_lang: 'CS',
+                target_lang: 'EN'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            targetElement.value = data.translation;
+            // Flash success
+            targetElement.classList.add('ring-2', 'ring-green-500');
+            setTimeout(() => {
+                targetElement.classList.remove('ring-2', 'ring-green-500');
+            }, 1500);
+        } else {
+            alert('Chyba překladu: ' + (data.error || 'Neznámá chyba'));
+        }
+    } catch (error) {
+        console.error('Translation error:', error);
+        alert('Chyba při komunikaci s překladovou službou.');
+    } finally {
+        // Restore button
+        button.disabled = false;
+        button.innerHTML = originalContent;
     }
 }
 
