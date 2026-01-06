@@ -279,8 +279,14 @@
                       </p>
                       @endif
 
+                      @if($product->getShortDescription())
+                      <p class="text-lg text-gray-700 mb-4 leading-relaxed font-medium">
+                          {{ $product->getShortDescription() }}
+                      </p>
+                      @endif
+
                       @if($product->getDescription())
-                      <div class="prose max-w-none mb-6">
+                      <div class="prose max-w-none mb-6 text-gray-600 font-light">
                           {!! nl2br(e($product->getDescription())) !!}
                       </div>
                       @endif

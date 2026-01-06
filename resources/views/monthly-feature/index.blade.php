@@ -264,8 +264,14 @@
                                 </p>
                                 @endif
 
+                                @if($coffee->getShortDescription())
+                                <p class="text-lg text-gray-700 mb-4 leading-relaxed font-medium">
+                                    {{ $coffee->getShortDescription() }}
+                                </p>
+                                @endif
+
                                 @if($coffee->getDescription())
-                                <div class="prose max-w-none mb-6">
+                                <div class="prose max-w-none mb-6 text-gray-600 font-light">
                                     {!! nl2br(e($coffee->getDescription())) !!}
                                 </div>
                                 @endif
