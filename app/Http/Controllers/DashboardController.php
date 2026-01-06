@@ -82,6 +82,8 @@ class DashboardController extends Controller
             abort(403);
         }
 
+        $order->load(['items.product.roastery']);
+
         return view('dashboard.order-detail', compact('order'));
     }
 
