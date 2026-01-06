@@ -192,10 +192,8 @@ class CheckoutController extends Controller
             }
         }
 
-        // Get available countries for shipping
-        $availableCountries = ShippingRate::where('enabled', true)
-            ->orderBy('country_name')
-            ->get()
+        // Get available countries for shipping (filtered by current region)
+        $availableCountries = ShippingRate::getAllEnabled()
             ->pluck('country_name', 'country_code')
             ->toArray();
 
