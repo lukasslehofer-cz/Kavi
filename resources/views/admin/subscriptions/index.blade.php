@@ -150,10 +150,10 @@
                                 $displayPrice = $fullPrice - $activeDiscount;
                             @endphp
                             <span class="text-sm font-bold text-gray-900">
-                                {{ number_format($displayPrice, 0, ',', ' ') }} Kč
+                                {!! \App\Helpers\CurrencyHelper::formatByCurrency($displayPrice, $subscription->currency) !!}
                             </span>
                             @if($activeDiscount > 0)
-                                <div class="text-xs text-green-600">-{{ number_format($activeDiscount, 0) }} Kč sleva</div>
+                                <div class="text-xs text-green-600">-{!! \App\Helpers\CurrencyHelper::formatByCurrency($activeDiscount, $subscription->currency) !!} sleva</div>
                             @endif
                             <div class="text-xs text-gray-500">
                                 / {{ $subscription->frequency_months ?? 1 }}M

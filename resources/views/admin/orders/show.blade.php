@@ -27,7 +27,7 @@
             <div class="flex-1">
                 <h3 class="text-xl font-bold text-red-900 mb-2">Problém s platbou objednávky</h3>
                 <div class="space-y-2 text-sm text-red-800">
-                    <p><span class="font-semibold">Částka k úhradě:</span> {{ number_format($order->total, 0, ',', ' ') }} Kč</p>
+                    <p><span class="font-semibold">Částka k úhradě:</span> {!! \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency) !!}</p>
                     @if($order->payment_failure_count > 0)
                     <p><span class="font-semibold">Počet neúspěšných pokusů:</span> {{ $order->payment_failure_count }}×</p>
                     @endif
@@ -148,13 +148,13 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ number_format($item->price, 0, ',', ' ') }} Kč
+                                    {!! \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency) !!}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $item->quantity }}×
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                                    {{ number_format($item->price * $item->quantity, 0, ',', ' ') }} Kč
+                                    {!! \App\Helpers\CurrencyHelper::formatByCurrency($item->price * $item->quantity, $order->currency) !!}
                                 </td>
                             </tr>
                             @endforeach
@@ -165,7 +165,7 @@
                                     Mezisoučet:
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">
-                                    {{ number_format($order->subtotal, 0, ',', ' ') }} Kč
+                                    {!! \App\Helpers\CurrencyHelper::formatByCurrency($order->subtotal, $order->currency) !!}
                                 </td>
                             </tr>
                             <tr>
@@ -173,7 +173,7 @@
                                     Doprava:
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">
-                                    {{ number_format($order->shipping, 0, ',', ' ') }} Kč
+                                    {!! \App\Helpers\CurrencyHelper::formatByCurrency($order->shipping, $order->currency) !!}
                                 </td>
                             </tr>
                             @if($order->discount_amount > 0 && $order->coupon)
@@ -182,7 +182,7 @@
                                     Sleva ({{ $order->coupon_code }}):
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap font-bold text-green-700">
-                                    -{{ number_format($order->discount_amount, 0, ',', ' ') }} Kč
+                                    -{!! \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency) !!}
                                 </td>
                             </tr>
                             @endif
@@ -191,7 +191,7 @@
                                     DPH (21%):
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">
-                                    {{ number_format($order->tax, 2, ',', ' ') }} Kč
+                                    {!! \App\Helpers\CurrencyHelper::formatByCurrency($order->tax, $order->currency, 2) !!}
                                 </td>
                             </tr>
                             <tr class="border-t-2 border-gray-900">
@@ -199,7 +199,7 @@
                                     Celkem (včetně DPH):
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-lg font-bold text-gray-900">
-                                    {{ number_format($order->total, 0, ',', ' ') }} Kč
+                                    {!! \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency) !!}
                                 </td>
                             </tr>
                         </tfoot>

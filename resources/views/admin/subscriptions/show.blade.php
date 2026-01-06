@@ -78,7 +78,7 @@
                             </div>
                             <div class="text-right">
                                 <div class="text-2xl font-bold text-gray-900">
-                                    {{ number_format($subscription->configured_price ?? $subscription->plan->price ?? 0, 0, ',', ' ') }} Kč
+                                    {!! \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price ?? $subscription->plan->price ?? 0, $subscription->currency) !!}
                                 </div>
                                 <div class="text-sm text-gray-600">
                                     / {{ $subscription->frequency_months == 1 ? 'měsíc' : ($subscription->frequency_months . ' měsíce') }}
@@ -96,7 +96,7 @@
                                         </svg>
                                         <span class="font-bold text-green-900">Aktivní sleva</span>
                                     </div>
-                                    <span class="text-lg font-bold text-green-700">-{{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč</span>
+                                    <span class="text-lg font-bold text-green-700">-{!! \App\Helpers\CurrencyHelper::formatByCurrency($subscription->discount_amount, $subscription->currency) !!}</span>
                                 </div>
                                 <div class="space-y-2 text-sm">
                                     <div class="flex justify-between">
@@ -121,7 +121,7 @@
                                     </div>
                                     <div class="flex justify-between pt-2 border-t border-green-300">
                                         <span class="text-gray-700">Plná cena od {{ $discountEndsAt->copy()->addMonths($subscription->frequency_months)->format('d.m.Y') }}:</span>
-                                        <span class="font-bold text-gray-900">{{ number_format($originalPrice, 0, ',', ' ') }} Kč</span>
+                                        <span class="font-bold text-gray-900">{!! \App\Helpers\CurrencyHelper::formatByCurrency($originalPrice, $subscription->currency) !!}</span>
                                     </div>
                                     @else
                                     <div class="flex justify-between">
@@ -214,7 +214,7 @@
                         @if(isset($config['isDecaf']) && $config['isDecaf'])
                         <div class="flex justify-between py-2 border-b">
                             <span class="text-gray-600">Decaf varianta:</span>
-                            <span class="font-semibold text-gray-900">Ano (+100 Kč)</span>
+                            <span class="font-semibold text-gray-900">Ano (+{!! \App\Helpers\CurrencyHelper::formatByCurrency($subscription->currency === 'EUR' ? 4 : 100, $subscription->currency) !!})</span>
                         </div>
                         @endif
 
@@ -378,7 +378,7 @@
                         @if($subscription->pending_invoice_amount)
                         <div class="flex justify-between font-semibold">
                             <span>K úhradě:</span>
-                            <span>{{ number_format($subscription->pending_invoice_amount, 0, ',', ' ') }} Kč</span>
+                            <span>{!! \App\Helpers\CurrencyHelper::formatByCurrency($subscription->pending_invoice_amount, $subscription->currency) !!}</span>
                         </div>
                         @endif
                         @if($subscription->payment_failure_count)

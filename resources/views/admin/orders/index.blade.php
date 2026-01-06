@@ -147,7 +147,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm font-bold text-gray-900">{{ number_format($order->total, 0, ',', ' ') }} Kč</span>
+                            <span class="text-sm font-bold text-gray-900">{!! \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency) !!}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($order->shipped_with_subscription)
