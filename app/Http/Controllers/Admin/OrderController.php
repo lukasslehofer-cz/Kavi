@@ -248,7 +248,7 @@ class OrderController extends Controller
                 'weight' => $weight,
                 'size' => $packageSize, // Package dimensions
                 'order_number' => $order->order_number,
-                'note' => $order->customer_notes ?? null,
+                'note' => null,
                 'currency' => $currency,
                 'country' => $shippingCountry,
                 'adult_content' => false, // Set to true if selling alcohol/tobacco
