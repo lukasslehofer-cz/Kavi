@@ -120,9 +120,31 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center">
                                         @if($item->product_image)
-                                        <img src="{{ Storage::url($item->product_image) }}" alt="{{ $item->product_name }}" class="w-12 h-12 object-cover rounded mr-4">
+                                        <img src="{{ asset($item->product_image) }}" alt="{{ $item->product_name }}" class="w-12 h-12 object-cover rounded mr-4">
                                         @endif
-                                        <span class="font-medium text-gray-900">{{ $item->product_name }}</span>
+                                        <div>
+                                            <span class="font-medium text-gray-900">{{ $item->product_name }}</span>
+                                            @if($item->product?->roastery)
+                                            <div class="text-sm text-gray-500">
+                                                {{ $item->product->roastery->name }}
+                                            </div>
+                                            @endif
+                                            @if($item->product?->category && count($item->product->category) > 0)
+                                            <div class="flex flex-wrap gap-1 mt-1">
+                                                @foreach($item->product->category as $category)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                                                    @if($category === 'espresso') bg-amber-100 text-amber-800
+                                                    @elseif($category === 'filter') bg-blue-100 text-blue-800
+                                                    @elseif($category === 'decaf') bg-green-100 text-green-800
+                                                    @elseif($category === 'accessories') bg-purple-100 text-purple-800
+                                                    @else bg-gray-100 text-gray-800
+                                                    @endif">
+                                                    {{ ucfirst($category) }}
+                                                </span>
+                                                @endforeach
+                                            </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
