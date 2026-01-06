@@ -90,7 +90,7 @@ return [
     'subscription_addon' => [
         'title' => 'Ship with subscription option',
         'checkbox_label' => 'Include in next subscription shipment',
-        'free_shipping' => 'Free shipping 🎉',
+        'free_shipping' => 'Ships with your box 🎉',
         'capacity_full' => '⚠️ Add-on capacity is exhausted for all your subscriptions.',
         'select_subscription' => 'Select subscription:',
         'capacity_label' => 'Add-on capacity:',
@@ -177,7 +177,7 @@ return [
         'coffee_from_europe' => 'Coffee from all over Europe',
         'no_commitment' => 'No commitment - cancel anytime',
         'fresh_coffee' => 'Freshly roasted coffee',
-        'free_shipping_always' => 'Always free shipping',
+        'free_shipping_always' => 'Freshly roasted & shipped with care',
     ],
     
     // Errors

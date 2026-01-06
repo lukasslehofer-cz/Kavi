@@ -33,8 +33,8 @@ return [
     'at_checkout' => 'At checkout',
     'grand_total' => 'Total:',
     
-    'free_shipping_remaining' => 'Add <strong>:amount</strong> more for free shipping',
-    'free_shipping_earned' => 'You\'ve earned free shipping!',
+    'free_shipping_remaining' => 'Add <strong>:amount</strong> more to complete your order',
+    'free_shipping_earned' => 'Your order is ready for checkout!',
     
     'update' => 'Update',
     'remove' => 'Remove',

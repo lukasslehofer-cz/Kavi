@@ -42,7 +42,7 @@ return [
     ],
     
     'features' => [
-        'free_shipping' => 'Free shipping',
+        'free_shipping' => 'Lovingly packed',
         'cancel_anytime' => 'Cancel or pause anytime',
         'fresh_roasted' => 'Freshly roasted coffee',
         'curated' => 'Hand-picked selection',

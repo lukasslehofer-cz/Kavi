@@ -295,7 +295,7 @@
           <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
-          <span class="text-sm font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</span>
+          <span class="text-sm font-light">{{ $currentLocale === 'en' ? 'Freshly roasted' : 'Doprava zdarma' }}</span>
         </div>
         <div class="flex items-center gap-1.5 text-gray-600">
           <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

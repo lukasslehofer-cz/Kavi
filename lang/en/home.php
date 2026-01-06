@@ -26,8 +26,8 @@ return [
         'flavors_title' => 'Exceptional Flavors',
         'flavors_desc' => 'No boring, monotonous coffees. Discover new flavors from around the world every month.',
         
-        'shipping_title' => 'Free Shipping',
-        'shipping_desc' => 'Free shipping on all subscriptions, regardless of box size.',
+        'shipping_title' => 'Shipped with Care',
+        'shipping_desc' => 'Freshly roasted, lovingly packed by our team, and delivered right to your door.',
     ],
     
     'love_coffee' => [
