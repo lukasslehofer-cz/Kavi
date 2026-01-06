@@ -621,7 +621,7 @@
 // Currency formatting helper
 const isEur = {{ \App\Helpers\CurrencyHelper::isEur() ? 'true' : 'false' }};
 
-function formatCurrency(amount) {
+window.formatCurrency = function(amount) {
     if (isEur) {
         return '€' + amount.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
     } else {
