@@ -171,7 +171,7 @@
         </div>
 
         <h3 class="mb-3 text-2xl font-semibold text-gray-900">{{ $currentLocale === 'en' ? 'Shipped with Care' : 'Doprava zdarma' }}</h3>
-        <p class="text-gray-600 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Freshly roasted, lovingly packed by our team, and delivered right to your door.' : 'Doprava zdarma pro všechna předplatná. Ať už si vyberete jakoukoluv velikost boxu.' }}</p>
+        <p class="text-gray-600 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Like a clockwork, coffee is lovingly packed by our team, and delivered right to your door.' : 'Doprava zdarma pro všechna předplatná. Ať už si vyberete jakoukoluv velikost boxu.' }}</p>
       </div>
       <!-- feature - end -->
     </div>
@@ -328,7 +328,7 @@
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Lovingly packed & shipped' : 'Doprava zdarma' }}</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Roasted to order' : 'Doprava zdarma' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
@@ -453,7 +453,7 @@
               <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Packed with love' : 'Doprava zdarma' }}</span>
+              <span class="text-gray-700 font-light">{{ $currentLocale === 'en' ? 'Roasted to order' : 'Doprava zdarma' }}</span>
             </div>
 
             <div class="flex gap-3 items-center">
