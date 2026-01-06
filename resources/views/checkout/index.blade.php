@@ -1019,6 +1019,16 @@
 
 <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
 <script>
+// Currency formatting helper (must be global for all users)
+const isEur = {{ \App\Helpers\CurrencyHelper::isEur() ? 'true' : 'false' }};
+window.formatCurrency = function(amount) {
+    if (isEur) {
+        return '€' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    } else {
+        return amount.toLocaleString('cs-CZ') + ' Kč';
+    }
+};
+
 function showMagicLinkModal() {
     document.getElementById('magic-link-modal').classList.remove('hidden');
 }
