@@ -193,8 +193,10 @@ class CheckoutController extends Controller
         }
 
         // Get available countries for shipping (filtered by current region)
+        // Translate names and sort by translated names for correct alphabetical order
         $availableCountries = ShippingRate::getAllEnabled()
-            ->pluck('country_name', 'country_code')
+            ->mapWithKeys(fn($rate) => [$rate->country_code => __('countries.' . $rate->country_name)])
+            ->sort()
             ->toArray();
 
         return view('checkout.index', compact(
