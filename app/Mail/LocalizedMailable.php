@@ -36,6 +36,7 @@ abstract class LocalizedMailable extends Mailable
         $this->emailLocale = $locale;
         $this->siteName = EmailService::getSiteName($locale);
         $this->contactEmail = EmailService::getContactEmail($locale);
+        $this->mailer = EmailService::getMailer($locale);
     }
 
     /**
