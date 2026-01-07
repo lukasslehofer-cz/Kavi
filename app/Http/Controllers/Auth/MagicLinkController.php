@@ -53,7 +53,7 @@ class MagicLinkController extends Controller
 
             // Send email with magic link
             try {
-                Mail::to($email)->send(new MagicLoginLink($loginUrl, 15));
+                Mail::to($email)->send(new MagicLoginLink($loginUrl, 15, app()->getLocale()));
             } catch (\Exception $e) {
                 \Log::error('Failed to send magic link email: ' . $e->getMessage());
                 return back()->with('error', __('flash.auth.email_send_failed'));

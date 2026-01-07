@@ -67,7 +67,7 @@ class AccountDeletionService
      * 
      * @throws \Exception if account cannot be deleted
      */
-    public function deleteAccount(User $user): void
+    public function deleteAccount(User $user, string $locale = 'cs'): void
     {
         // Double-check if account can be deleted
         $canDelete = $this->canDeleteAccount($user);
@@ -111,7 +111,7 @@ class AccountDeletionService
 
             // 8. Send confirmation email (before session logout)
             try {
-                \Mail::to($originalEmail)->send(new \App\Mail\AccountDeleted($originalEmail));
+                \Mail::to($originalEmail)->send(new \App\Mail\AccountDeleted($originalEmail, $locale));
             } catch (\Exception $e) {
                 \Log::error('Failed to send account deletion email', [
                     'user_id' => $user->id,

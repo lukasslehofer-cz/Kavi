@@ -68,7 +68,7 @@ class RegisterController extends Controller
 
         // Send welcome email
         try {
-            \Mail::to($user->email)->send(new \App\Mail\WelcomeEmail($user));
+            \Mail::to($user->email)->send(new \App\Mail\WelcomeEmail($user, app()->getLocale()));
             \Log::info('Welcome email sent', ['user_id' => $user->id, 'email' => $user->email]);
         } catch (\Exception $e) {
             \Log::error('Failed to send welcome email', [

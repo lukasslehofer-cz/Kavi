@@ -520,7 +520,7 @@ class DashboardController extends Controller
             $request->session()->regenerateToken();
 
             // Delete account
-            $deletionService->deleteAccount($user);
+            $deletionService->deleteAccount($user, app()->getLocale());
 
             // Return JSON for AJAX requests
             if ($request->wantsJson() || $request->ajax()) {
