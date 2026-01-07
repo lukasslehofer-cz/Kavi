@@ -178,7 +178,7 @@
                                     <span class="font-medium text-gray-900">{{ $paymentMethod['last4'] }}</span>
                                 </div>
                                 <p class="text-sm text-gray-600">
-                                    Vyprší {{ str_pad($paymentMethod['exp_month'], 2, '0', STR_PAD_LEFT) }}/{{ $paymentMethod['exp_year'] }}
+                                    {{ __('dashboard.expires', ['date' => str_pad($paymentMethod['exp_month'], 2, '0', STR_PAD_LEFT) . '/' . $paymentMethod['exp_year']]) }}
                                 </p>
                                 
                                 @php
@@ -221,9 +221,9 @@
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                         </svg>
                         <div>
-                            <p class="text-sm text-blue-800 font-medium mb-1">Zatím nemáte nastavenou žádnou platební metodu</p>
+                            <p class="text-sm text-blue-800 font-medium mb-1">{{ __('dashboard.no_payment_method') }}</p>
                             <p class="text-xs text-blue-700">
-                                Při vytvoření předplatného nebo první platbě bude karta automaticky uložena pro budoucí použití.
+                                {{ __('dashboard.no_payment_method_description') }}
                             </p>
                         </div>
                     </div>
@@ -235,7 +235,7 @@
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                         </svg>
-                        Přidat platební metodu
+                        {{ __('dashboard.add_payment_method') }}
                     </a>
                 @endif
             @endif
@@ -265,7 +265,7 @@
                            name="address" 
                            value="{{ old('address', auth()->user()->address ?? '') }}" 
                            class="input @error('address') border-red-500 @enderror"
-                           placeholder="Např. Karlova 123">
+                           placeholder="{{ __('dashboard.address_placeholder') }}">
                     @error('address')
                     <p class="text-red-600 text-sm mt-2 flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -284,7 +284,7 @@
                                name="city" 
                                value="{{ old('city', auth()->user()->city ?? '') }}" 
                                class="input @error('city') border-red-500 @enderror"
-                               placeholder="Např. Praha">
+                               placeholder="{{ __('dashboard.city_placeholder') }}">
                         @error('city')
                         <p class="text-red-600 text-sm mt-2 flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -318,34 +318,34 @@
                         <select id="country" 
                                 name="country" 
                                 class="input @error('country') border-red-500 @enderror">
-                            <option value="">Vyberte zemi</option>
-                            <option value="AT" {{ old('country', auth()->user()->country ?? '') == 'AT' ? 'selected' : '' }}>Rakousko</option>
-                            <option value="BE" {{ old('country', auth()->user()->country ?? '') == 'BE' ? 'selected' : '' }}>Belgie</option>
-                            <option value="BG" {{ old('country', auth()->user()->country ?? '') == 'BG' ? 'selected' : '' }}>Bulharsko</option>
-                            <option value="HR" {{ old('country', auth()->user()->country ?? '') == 'HR' ? 'selected' : '' }}>Chorvatsko</option>
-                            <option value="CY" {{ old('country', auth()->user()->country ?? '') == 'CY' ? 'selected' : '' }}>Kypr</option>
-                            <option value="CZ" {{ old('country', auth()->user()->country ?? 'CZ') == 'CZ' ? 'selected' : '' }}>Česká republika</option>
-                            <option value="DK" {{ old('country', auth()->user()->country ?? '') == 'DK' ? 'selected' : '' }}>Dánsko</option>
-                            <option value="EE" {{ old('country', auth()->user()->country ?? '') == 'EE' ? 'selected' : '' }}>Estonsko</option>
-                            <option value="FI" {{ old('country', auth()->user()->country ?? '') == 'FI' ? 'selected' : '' }}>Finsko</option>
-                            <option value="FR" {{ old('country', auth()->user()->country ?? '') == 'FR' ? 'selected' : '' }}>Francie</option>
-                            <option value="DE" {{ old('country', auth()->user()->country ?? '') == 'DE' ? 'selected' : '' }}>Německo</option>
-                            <option value="GR" {{ old('country', auth()->user()->country ?? '') == 'GR' ? 'selected' : '' }}>Řecko</option>
-                            <option value="HU" {{ old('country', auth()->user()->country ?? '') == 'HU' ? 'selected' : '' }}>Maďarsko</option>
-                            <option value="IE" {{ old('country', auth()->user()->country ?? '') == 'IE' ? 'selected' : '' }}>Irsko</option>
-                            <option value="IT" {{ old('country', auth()->user()->country ?? '') == 'IT' ? 'selected' : '' }}>Itálie</option>
-                            <option value="LV" {{ old('country', auth()->user()->country ?? '') == 'LV' ? 'selected' : '' }}>Lotyšsko</option>
-                            <option value="LT" {{ old('country', auth()->user()->country ?? '') == 'LT' ? 'selected' : '' }}>Litva</option>
-                            <option value="LU" {{ old('country', auth()->user()->country ?? '') == 'LU' ? 'selected' : '' }}>Lucembursko</option>
-                            <option value="MT" {{ old('country', auth()->user()->country ?? '') == 'MT' ? 'selected' : '' }}>Malta</option>
-                            <option value="NL" {{ old('country', auth()->user()->country ?? '') == 'NL' ? 'selected' : '' }}>Nizozemsko</option>
-                            <option value="PL" {{ old('country', auth()->user()->country ?? '') == 'PL' ? 'selected' : '' }}>Polsko</option>
-                            <option value="PT" {{ old('country', auth()->user()->country ?? '') == 'PT' ? 'selected' : '' }}>Portugalsko</option>
-                            <option value="RO" {{ old('country', auth()->user()->country ?? '') == 'RO' ? 'selected' : '' }}>Rumunsko</option>
-                            <option value="SK" {{ old('country', auth()->user()->country ?? '') == 'SK' ? 'selected' : '' }}>Slovensko</option>
-                            <option value="SI" {{ old('country', auth()->user()->country ?? '') == 'SI' ? 'selected' : '' }}>Slovinsko</option>
-                            <option value="ES" {{ old('country', auth()->user()->country ?? '') == 'ES' ? 'selected' : '' }}>Španělsko</option>
-                            <option value="SE" {{ old('country', auth()->user()->country ?? '') == 'SE' ? 'selected' : '' }}>Švédsko</option>
+                            <option value="">{{ __('dashboard.select_country') }}</option>
+                            <option value="AT" {{ old('country', auth()->user()->country ?? '') == 'AT' ? 'selected' : '' }}>{{ __('dashboard.country_AT') }}</option>
+                            <option value="BE" {{ old('country', auth()->user()->country ?? '') == 'BE' ? 'selected' : '' }}>{{ __('dashboard.country_BE') }}</option>
+                            <option value="BG" {{ old('country', auth()->user()->country ?? '') == 'BG' ? 'selected' : '' }}>{{ __('dashboard.country_BG') }}</option>
+                            <option value="HR" {{ old('country', auth()->user()->country ?? '') == 'HR' ? 'selected' : '' }}>{{ __('dashboard.country_HR') }}</option>
+                            <option value="CY" {{ old('country', auth()->user()->country ?? '') == 'CY' ? 'selected' : '' }}>{{ __('dashboard.country_CY') }}</option>
+                            <option value="CZ" {{ old('country', auth()->user()->country ?? 'CZ') == 'CZ' ? 'selected' : '' }}>{{ __('dashboard.country_CZ') }}</option>
+                            <option value="DK" {{ old('country', auth()->user()->country ?? '') == 'DK' ? 'selected' : '' }}>{{ __('dashboard.country_DK') }}</option>
+                            <option value="EE" {{ old('country', auth()->user()->country ?? '') == 'EE' ? 'selected' : '' }}>{{ __('dashboard.country_EE') }}</option>
+                            <option value="FI" {{ old('country', auth()->user()->country ?? '') == 'FI' ? 'selected' : '' }}>{{ __('dashboard.country_FI') }}</option>
+                            <option value="FR" {{ old('country', auth()->user()->country ?? '') == 'FR' ? 'selected' : '' }}>{{ __('dashboard.country_FR') }}</option>
+                            <option value="DE" {{ old('country', auth()->user()->country ?? '') == 'DE' ? 'selected' : '' }}>{{ __('dashboard.country_DE') }}</option>
+                            <option value="GR" {{ old('country', auth()->user()->country ?? '') == 'GR' ? 'selected' : '' }}>{{ __('dashboard.country_GR') }}</option>
+                            <option value="HU" {{ old('country', auth()->user()->country ?? '') == 'HU' ? 'selected' : '' }}>{{ __('dashboard.country_HU') }}</option>
+                            <option value="IE" {{ old('country', auth()->user()->country ?? '') == 'IE' ? 'selected' : '' }}>{{ __('dashboard.country_IE') }}</option>
+                            <option value="IT" {{ old('country', auth()->user()->country ?? '') == 'IT' ? 'selected' : '' }}>{{ __('dashboard.country_IT') }}</option>
+                            <option value="LV" {{ old('country', auth()->user()->country ?? '') == 'LV' ? 'selected' : '' }}>{{ __('dashboard.country_LV') }}</option>
+                            <option value="LT" {{ old('country', auth()->user()->country ?? '') == 'LT' ? 'selected' : '' }}>{{ __('dashboard.country_LT') }}</option>
+                            <option value="LU" {{ old('country', auth()->user()->country ?? '') == 'LU' ? 'selected' : '' }}>{{ __('dashboard.country_LU') }}</option>
+                            <option value="MT" {{ old('country', auth()->user()->country ?? '') == 'MT' ? 'selected' : '' }}>{{ __('dashboard.country_MT') }}</option>
+                            <option value="NL" {{ old('country', auth()->user()->country ?? '') == 'NL' ? 'selected' : '' }}>{{ __('dashboard.country_NL') }}</option>
+                            <option value="PL" {{ old('country', auth()->user()->country ?? '') == 'PL' ? 'selected' : '' }}>{{ __('dashboard.country_PL') }}</option>
+                            <option value="PT" {{ old('country', auth()->user()->country ?? '') == 'PT' ? 'selected' : '' }}>{{ __('dashboard.country_PT') }}</option>
+                            <option value="RO" {{ old('country', auth()->user()->country ?? '') == 'RO' ? 'selected' : '' }}>{{ __('dashboard.country_RO') }}</option>
+                            <option value="SK" {{ old('country', auth()->user()->country ?? '') == 'SK' ? 'selected' : '' }}>{{ __('dashboard.country_SK') }}</option>
+                            <option value="SI" {{ old('country', auth()->user()->country ?? '') == 'SI' ? 'selected' : '' }}>{{ __('dashboard.country_SI') }}</option>
+                            <option value="ES" {{ old('country', auth()->user()->country ?? '') == 'ES' ? 'selected' : '' }}>{{ __('dashboard.country_ES') }}</option>
+                            <option value="SE" {{ old('country', auth()->user()->country ?? '') == 'SE' ? 'selected' : '' }}>{{ __('dashboard.country_SE') }}</option>
                         </select>
                         @error('country')
                         <p class="text-red-600 text-sm mt-2 flex items-center">
@@ -363,7 +363,7 @@
                         <svg class="w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        Uložit změny
+                        {{ __('dashboard.save_changes') }}
                     </button>
                 </div>
             </form>
@@ -408,7 +408,7 @@
                                     <svg class="w-4 h-4 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                     </svg>
-                                    <span class="font-medium text-gray-900 text-sm">Aktuální výdejní místo:</span>
+                                    <span class="font-medium text-gray-900 text-sm">{{ __('dashboard.current_pickup_point') }}</span>
                                 </div>
                                 <p class="text-gray-900 font-medium ml-6" id="selected-point-name">{{ auth()->user()->packeta_point_name }}</p>
                                 <p class="text-sm text-gray-600 ml-6 font-light" id="selected-point-address">{{ auth()->user()->packeta_point_address }}</p>
@@ -421,7 +421,7 @@
                             <svg class="w-5 h-5 text-gray-400 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
-                            <p class="text-sm text-gray-600">Zatím nemáte nastavené žádné výdejní místo.</p>
+                            <p class="text-sm text-gray-600">{{ __('dashboard.no_pickup_point') }}</p>
                         </div>
                     </div>
                     @endif
@@ -430,7 +430,7 @@
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>{{ auth()->user()->packeta_point_id ? 'Změnit výdejní místo' : 'Vybrat výdejní místo' }}</span>
+                        <span>{{ auth()->user()->packeta_point_id ? __('dashboard.change_pickup_point') : __('dashboard.select_pickup_point_btn') }}</span>
                     </button>
                 </div>
 
@@ -448,7 +448,7 @@
                         <svg class="w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        Uložit změny
+                        {{ __('dashboard.save_changes') }}
                     </button>
                 </div>
             </form>
@@ -466,7 +466,7 @@
                 @endif
             </h2>
             @if(!auth()->user()->password_set_by_user)
-                <p class="text-sm text-gray-600 mt-1 font-light">Nastavte si vlastní heslo pro přihlášení</p>
+                <p class="text-sm text-gray-600 mt-1 font-light">{{ __('dashboard.set_password_description') }}</p>
             @endif
         </div>
         <div class="p-6">
@@ -478,9 +478,9 @@
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                         </svg>
                         <div>
-                            <p class="text-sm text-blue-800 font-medium mb-1">Přihlašujete se přes magic link</p>
+                            <p class="text-sm text-blue-800 font-medium mb-1">{{ __('dashboard.login_via_magic_link') }}</p>
                             <p class="text-xs text-blue-700 font-light">
-                                Zatím nemáte nastavené vlastní heslo. Můžete si ho nastavit zde, nebo pokračovat v používání magic linku pro přihlášení.
+                                {{ __('dashboard.magic_link_info') }}
                             </p>
                         </div>
                     </div>
@@ -494,7 +494,7 @@
                 @if(auth()->user()->password_set_by_user)
                     <!-- Show current password field only if user has set password before -->
                     <div>
-                        <label for="current_password" class="block text-sm font-medium text-gray-900 mb-2">Současné heslo</label>
+                        <label for="current_password" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.current_password') }}</label>
                         <input type="password" 
                                id="current_password" 
                                name="current_password" 
@@ -514,11 +514,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-900 mb-2">
-                            @if(!auth()->user()->password_set_by_user)
-                                Nové heslo
-                            @else
-                                Nové heslo
-                            @endif
+                            {{ __('dashboard.new_password') }}
                         </label>
                         <input type="password" 
                                id="password" 
@@ -536,7 +532,7 @@
                     </div>
 
                     <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-900 mb-2">Potvrdit heslo</label>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.confirm_password') }}</label>
                         <input type="password" 
                                id="password_confirmation" 
                                name="password_confirmation" 
@@ -554,7 +550,7 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm text-blue-800">
-                                Heslo musí obsahovat minimálně 8 znaků.
+                                {{ __('dashboard.password_requirements') }}
                             </p>
                         </div>
                     </div>
@@ -566,9 +562,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                         @if(!auth()->user()->password_set_by_user)
-                            Nastavit heslo
+                            {{ __('dashboard.set_password_btn') }}
                         @else
-                            Změnit heslo
+                            {{ __('dashboard.update_password_btn') }}
                         @endif
                     </button>
                 </div>
@@ -586,7 +582,7 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 font-light font-medium mb-1">Celkem objednávek</p>
+                    <p class="text-sm text-gray-600 font-light font-medium mb-1">{{ __('dashboard.total_orders') }}</p>
                     <p class="text-3xl font-bold text-gray-900">{{ auth()->user()->orders()->count() }}</p>
                 </div>
             </div>
@@ -600,7 +596,7 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 font-light font-medium mb-1">Aktivní předplatné</p>
+                    <p class="text-sm text-gray-600 font-light font-medium mb-1">{{ __('dashboard.active_subscriptions') }}</p>
                     <p class="text-3xl font-bold text-gray-900">{{ auth()->user()->subscriptions()->where('status', 'active')->count() }}</p>
                 </div>
             </div>
@@ -614,7 +610,7 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 font-light font-medium mb-1">Členem od</p>
+                    <p class="text-sm text-gray-600 font-light font-medium mb-1">{{ __('dashboard.member_since') }}</p>
                     <p class="text-xl font-bold text-gray-900">{{ auth()->user()->created_at->format('m/Y') }}</p>
                 </div>
             </div>
@@ -656,8 +652,8 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-red-800">Smazání účtu</h3>
-                        <p class="text-sm text-red-700 font-light">Tato akce je nevratná</p>
+                        <h3 class="text-xl font-bold text-red-800">{{ __('dashboard.delete_account_modal_title') }}</h3>
+                        <p class="text-sm text-red-700 font-light">{{ __('dashboard.action_irreversible') }}</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeDeleteAccountModal()" class="text-gray-400 hover:text-gray-600">
@@ -676,9 +672,9 @@
                         <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                     </svg>
                     <div>
-                        <h4 class="text-red-800 font-bold mb-1">POZOR: Smazání účtu je nevratné</h4>
+                        <h4 class="text-red-800 font-bold mb-1">{{ __('dashboard.delete_warning_title') }}</h4>
                         <p class="text-red-700 text-sm font-light">
-                            Po potvrzení nebude možné tuto akci vzít zpět.
+                            {{ __('dashboard.delete_warning_message') }}
                         </p>
                     </div>
                 </div>
@@ -691,28 +687,28 @@
                         <svg class="w-5 h-5 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        Co bude smazáno:
+                        {{ __('dashboard.what_will_be_deleted') }}
                     </h4>
                     <ul class="space-y-2 text-gray-600 ml-7">
                         <li class="flex items-start">
                             <span class="text-red-500 mr-2">✗</span>
-                            <span class="font-light">Všechna vaše osobní data (jméno, email, telefon, adresa)</span>
+                            <span class="font-light">{{ __('dashboard.delete_item_personal_data') }}</span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-red-500 mr-2">✗</span>
-                            <span class="font-light">Přihlašovací údaje - už se nebudete moci přihlásit</span>
+                            <span class="font-light">{{ __('dashboard.delete_item_login') }}</span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-red-500 mr-2">✗</span>
-                            <span class="font-light">Všechny uložené platební metody</span>
+                            <span class="font-light">{{ __('dashboard.delete_item_payment_methods') }}</span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-red-500 mr-2">✗</span>
-                            <span class="font-light">Všechna aktivní předplatná budou zrušena</span>
+                            <span class="font-light">{{ __('dashboard.delete_item_subscriptions') }}</span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-red-500 mr-2">✗</span>
-                            <span class="font-light">Nezaplacené objednávky budou smazány</span>
+                            <span class="font-light">{{ __('dashboard.delete_item_unpaid_orders') }}</span>
                         </li>
                     </ul>
                 </div>
@@ -722,24 +718,24 @@
                         <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Co zachováme (zákonná povinnost):
+                        {{ __('dashboard.what_we_keep') }}
                     </h4>
                     <ul class="space-y-2 text-gray-600 ml-7">
                         <li class="flex items-start">
                             <span class="text-blue-500 mr-2">✓</span>
-                            <span class="font-light">Faktury a historii plateb (10 let dle zákona o účetnictví)</span>
+                            <span class="font-light">{{ __('dashboard.keep_item_invoices') }}</span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-blue-500 mr-2">✓</span>
-                            <span class="font-light">Anonymizovaná data o doručených objednávkách</span>
+                            <span class="font-light">{{ __('dashboard.keep_item_orders') }}</span>
                         </li>
                         <li class="flex items-start">
                             <span class="text-blue-500 mr-2">✓</span>
-                            <span class="font-light">Historie předplatných (anonymizovaná)</span>
+                            <span class="font-light">{{ __('dashboard.keep_item_subscriptions') }}</span>
                         </li>
                     </ul>
                     <p class="text-sm text-gray-500 mt-2 ml-7 font-light italic">
-                        Všechny zachované údaje jsou plně anonymizované.
+                        {{ __('dashboard.data_anonymized_note') }}
                     </p>
                 </div>
 
@@ -748,12 +744,12 @@
                         <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                         </svg>
-                        Nelze smazat účet pokud:
+                        {{ __('dashboard.cannot_delete_if') }}
                     </h4>
                     <ul class="space-y-1 text-yellow-800 text-sm ml-7">
-                        <li class="font-light">• Máte aktivní nebo pozastavená předplatná</li>
-                        <li class="font-light">• Máte nezaplacené objednávky</li>
-                        <li class="font-light">• Máte zaplacené objednávky, které ještě nebyly doručeny</li>
+                        <li class="font-light">• {{ __('dashboard.cannot_delete_active_subs') }}</li>
+                        <li class="font-light">• {{ __('dashboard.cannot_delete_unpaid') }}</li>
+                        <li class="font-light">• {{ __('dashboard.cannot_delete_pending') }}</li>
                     </ul>
                 </div>
             </div>
@@ -766,13 +762,13 @@
                 <div class="space-y-4">
                     <div>
                         <label for="delete_password" class="block text-sm font-medium text-gray-900 mb-2">
-                            Zadejte své heslo pro potvrzení
+                            {{ __('dashboard.enter_password_to_confirm') }}
                         </label>
                         <input type="password" 
                                id="delete_password" 
                                name="password" 
                                class="input w-full"
-                               placeholder="Vaše heslo"
+                               placeholder="{{ __('dashboard.your_password') }}"
                                required>
                         <p id="delete_password_error" class="text-red-600 text-sm mt-2 hidden flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -791,7 +787,7 @@
                                    class="mt-1 w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
                                    required>
                             <label for="delete_confirmation" class="ml-3 text-sm text-gray-700">
-                                Potvrzuji, že jsem si vědom/a důsledků a chci <strong>trvale smazat</strong> svůj účet.
+                                {!! __('dashboard.delete_confirmation_text') !!}
                             </label>
                         </div>
                         <p id="delete_confirmation_error" class="text-red-600 text-sm mt-2 ml-7 hidden flex items-center">
@@ -817,7 +813,7 @@
                     <button type="button" 
                             onclick="closeDeleteAccountModal()"
                             class="px-6 py-2.5 border border-gray-300 rounded-full font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200">
-                        Zrušit
+                        {{ __('dashboard.cancel') }}
                     </button>
                     <button type="submit" 
                             id="delete_submit_btn"
@@ -825,7 +821,7 @@
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        <span id="delete_submit_text">Ano, smazat můj účet</span>
+                        <span id="delete_submit_text">{{ __('dashboard.yes_delete_account') }}</span>
                     </button>
                 </div>
             </form>
@@ -835,6 +831,16 @@
 
 <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
 <script>
+// Translations for JavaScript
+const translations = {
+    currentPickupPoint: @json(__('dashboard.current_pickup_point')),
+    changePickupPoint: @json(__('dashboard.change_pickup_point')),
+    packetaWidgetError: @json(__('dashboard.packeta_widget_error')),
+    deleting: @json(__('dashboard.deleting')),
+    deleteError: @json(__('dashboard.delete_error')),
+    yesDeleteAccount: @json(__('dashboard.yes_delete_account')),
+};
+
 // Packeta widget vendors configuration - MUST be global for widget access
 let currentPacketaVendors = @json($packetaVendors ?? []);
 
@@ -878,14 +884,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function openPacketaWidget() {
         if (!packetaApiKey) {
-            alert('Packeta widget není správně nakonfigurován. Kontaktujte administrátora.');
+            alert(translations.packetaWidgetError);
             return;
         }
         
         const userCountry = '{{ auth()->user()->country ?? "cz" }}';
         const widgetOptions = {
             country: userCountry.toLowerCase(),
-            language: 'cs',
+            language: '{{ app()->getLocale() }}',
         };
         
         // Add vendor filter if vendors are set (supports multiple carriers and Packeta own network)
@@ -937,7 +943,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <svg class="w-4 h-4 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                     </svg>
-                                    <span class="font-medium text-gray-900 text-sm">Aktuální výdejní místo:</span>
+                                    <span class="font-medium text-gray-900 text-sm">${translations.currentPickupPoint}</span>
                                 </div>
                                 <p class="text-gray-900 font-medium ml-6">${point.name}</p>
                                 <p class="text-sm text-gray-600 ml-6 font-light">${address}</p>
@@ -948,7 +954,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>Změnit výdejní místo</span>
+                        <span>${translations.changePickupPoint}</span>
                     </button>
                 `;
 
@@ -1036,7 +1042,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const originalText = submitText.textContent;
         
         submitBtn.disabled = true;
-        submitText.textContent = 'Mazání...';
+        submitText.textContent = translations.deleting;
         submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
         
         // Get form data
@@ -1079,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error:', error);
-            showDeleteAccountError('general', 'Došlo k chybě při mazání účtu. Zkuste to prosím znovu.');
+            showDeleteAccountError('general', translations.deleteError);
             
             // Re-enable submit button
             submitBtn.disabled = false;
