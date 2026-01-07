@@ -48,11 +48,13 @@ abstract class LocalizedMailable extends Mailable
     }
 
     /**
-     * Build the message with locale-aware from address
+     * Build the message with locale-aware from address and mailer
      */
     public function build()
     {
-        return $this->from($this->getFromAddress());
+        return $this
+            ->mailer(EmailService::getMailer($this->emailLocale))
+            ->from($this->getFromAddress());
     }
 
     /**

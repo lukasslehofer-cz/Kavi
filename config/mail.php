@@ -34,15 +34,27 @@ return [
     */
 
     'mailers' => [
+        // CZ mailer (kavi.cz) - default
         'smtp' => [
             'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+            'host' => env('MAIL_HOST', 'heracles.mxrouting.net'),
             'port' => env('MAIL_PORT', 587),
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
+        ],
+
+        // EN mailer (kavibox.com)
+        'smtp_en' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_HOST_EN', 'heracles.mxrouting.net'),
+            'port' => env('MAIL_PORT_EN', 587),
+            'encryption' => env('MAIL_ENCRYPTION_EN', 'tls'),
+            'username' => env('MAIL_USERNAME_EN'),
+            'password' => env('MAIL_PASSWORD_EN'),
+            'timeout' => null,
         ],
 
         'ses' => [

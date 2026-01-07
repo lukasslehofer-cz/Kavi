@@ -101,5 +101,14 @@ class EmailService
     {
         return $locale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz';
     }
+    
+    /**
+     * Get the mailer name based on locale
+     * Different SMTP credentials are needed for each domain
+     */
+    public static function getMailer(string $locale): string
+    {
+        return $locale === 'en' ? 'smtp_en' : 'smtp';
+    }
 }
 
