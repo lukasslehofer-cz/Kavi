@@ -122,7 +122,8 @@ fi
 
 # 6.9 ZÁLOHA BILLING CACHE
 echo -e "${YELLOW}💾 Zálohuji billing cache...${NC}"
-BILLING_CACHE=$(php artisan tinker --execute="echo json_encode(['last_run' => \Cache::get('subscription_billing_cron_last_run'), 'last_summary' => \Cache::get('subscription_billing_cron_last_summary')]);" 2>/dev/null | tail -1)
+BILLING_CACHE_FILE="/tmp/kavi_billing_cache_$$.json"
+php artisan tinker --execute="file_put_contents('$BILLING_CACHE_FILE', json_encode(['last_run' => \Cache::get('subscription_billing_cron_last_run')?->toIso8601String(), 'last_summary' => \Cache::get('subscription_billing_cron_last_summary')]));" 2>/dev/null || true
 echo -e "${GREEN}✓ Billing cache zálohována${NC}"
 
 # 7. CACHE CLEAR
@@ -146,18 +147,10 @@ php artisan optimize > /dev/null 2>&1
 echo -e "${GREEN}✓ Optimalizace dokončena${NC}"
 
 # 9.5 OBNOVENÍ BILLING CACHE
-if [ -n "$BILLING_CACHE" ] && [ "$BILLING_CACHE" != "null" ]; then
+if [ -f "$BILLING_CACHE_FILE" ]; then
     echo -e "${YELLOW}💾 Obnovuji billing cache...${NC}"
-    php artisan tinker --execute="
-        \$data = json_decode('$BILLING_CACHE', true);
-        if (!empty(\$data['last_run'])) {
-            \Cache::put('subscription_billing_cron_last_run', \Carbon\Carbon::parse(\$data['last_run']), now()->addDay());
-        }
-        if (!empty(\$data['last_summary'])) {
-            \Cache::put('subscription_billing_cron_last_summary', \$data['last_summary'], now()->addDay());
-        }
-        echo 'OK';
-    " 2>/dev/null || true
+    php artisan tinker --execute="\$d=json_decode(file_get_contents('$BILLING_CACHE_FILE'),true); if(!empty(\$d['last_run'])){\Cache::put('subscription_billing_cron_last_run',\Carbon\Carbon::parse(\$d['last_run']),now()->addDay());} if(!empty(\$d['last_summary'])){\Cache::put('subscription_billing_cron_last_summary',\$d['last_summary'],now()->addDay());}" 2>/dev/null || true
+    rm -f "$BILLING_CACHE_FILE" 2>/dev/null || true
     echo -e "${GREEN}✓ Billing cache obnovena${NC}"
 fi
 
