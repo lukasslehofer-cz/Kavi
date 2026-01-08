@@ -266,6 +266,17 @@ return [
         'manage_subscription' => 'Spravovat předplatné',
     ],
 
+    // Pause Ending Reminder
+    'pause_ending_reminder' => [
+        'subject' => 'Pauza předplatného končí za 3 dny - :subscription_number',
+        'title' => 'Vaše pauza brzy končí',
+        'subtitle' => 'Za 3 dny se vaše předplatné automaticky obnoví.',
+        'pause_ends' => 'Pauza končí',
+        'what_happens' => 'Co se stane po obnovení?',
+        'options_title' => 'Potřebujete více času?',
+        'manage_button' => 'Spravovat předplatné',
+    ],
+
     // Email Change Confirmation
     'email_change' => [
         'subject' => 'Potvrďte změnu emailové adresy - KAVI.cz',

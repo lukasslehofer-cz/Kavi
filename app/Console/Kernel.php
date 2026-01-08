@@ -66,6 +66,12 @@ class Kernel extends ConsoleKernel
             ->timezone('Europe/Prague')
             ->appendOutputTo($cronLog);
 
+        // Send pause ending reminders 3 days before pause ends (daily at 9:00 AM)
+        $schedule->command('subscriptions:send-pause-ending-reminders')
+            ->dailyAt('09:00')
+            ->timezone('Europe/Prague')
+            ->appendOutputTo($cronLog);
+
         // Resume subscriptions whose pause ended (daily at 4:00 AM)
         $schedule->command('subscriptions:resume-paused')
             ->dailyAt('04:00')

@@ -266,6 +266,17 @@ return [
         'manage_subscription' => 'Manage Subscription',
     ],
 
+    // Pause Ending Reminder
+    'pause_ending_reminder' => [
+        'subject' => 'Your Subscription Pause Ends in 3 Days - :subscription_number',
+        'title' => 'Your Pause Is Ending Soon',
+        'subtitle' => 'Your subscription will automatically resume in 3 days.',
+        'pause_ends' => 'Pause Ends',
+        'what_happens' => 'What happens after resuming?',
+        'options_title' => 'Need more time?',
+        'manage_button' => 'Manage Subscription',
+    ],
+
     // Email Change Confirmation
     'email_change' => [
         'subject' => 'Confirm Your Email Change - KAVI',
