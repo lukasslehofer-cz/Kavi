@@ -228,10 +228,11 @@ class PacketaService
     }
 
     /**
-     * Get tracking info for a packet
+     * Get tracking info for a packet (REST API - deprecated)
      *
      * @param string $packetId
      * @return array|null
+     * @deprecated Use getPacketStatus() instead for reliable status checking
      */
     public function getTrackingInfo(string $packetId): ?array
     {
@@ -248,6 +249,132 @@ class PacketaService
             Log::error('Packeta Service Exception: ' . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Get packet status via XML API
+     * 
+     * Status codes:
+     * - 1: received (přijata)
+     * - 2: arrived at depot (dorazila na depo)
+     * - 3: ready for pickup (připravena k vyzvednutí)
+     * - 4: delivered/picked up (doručena/vyzvednuta)
+     * - 5: returned to sender (vrácena odesílateli)
+     * - 6: cancelled (zrušena)
+     * - 7: on the way (na cestě)
+     * - 8: handed over to carrier (předána dopravci)
+     * - 9: awaiting pickup (čeká na vyzvednutí u dopravce)
+     * - 10: unknown
+     *
+     * @param string $packetId
+     * @return array|null Returns ['statusCode' => int, 'codeText' => string, 'isDelivered' => bool, 'isReturned' => bool] or null on error
+     */
+    public function getPacketStatus(string $packetId): ?array
+    {
+        try {
+            // Build XML request for packetStatus
+            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><packetStatus/>');
+            $xml->addChild('apiPassword', $this->apiPassword);
+            $xml->addChild('packetId', $packetId);
+
+            $xmlString = $xml->asXML();
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'text/xml; charset=utf-8',
+            ])->timeout(10)->send('POST', $this->apiUrl, [
+                'body' => $xmlString,
+            ]);
+
+            if ($response->successful()) {
+                $responseXml = simplexml_load_string($response->body());
+                
+                if ($responseXml && $responseXml->getName() === 'response') {
+                    $status = (string)$responseXml->status;
+                    
+                    if ($status === 'ok') {
+                        $statusCode = (int)($responseXml->result->statusCode ?? 0);
+                        $codeText = (string)($responseXml->result->codeText ?? '');
+                        
+                        // Determine if delivered or returned based on status code
+                        // Status 4 = delivered/picked up
+                        // Status 5 = returned to sender
+                        $isDelivered = $statusCode === 4;
+                        $isReturned = $statusCode === 5;
+                        
+                        return [
+                            'statusCode' => $statusCode,
+                            'codeText' => $codeText,
+                            'isDelivered' => $isDelivered,
+                            'isReturned' => $isReturned,
+                        ];
+                    } else {
+                        Log::warning('Packeta packetStatus API returned error', [
+                            'packet_id' => $packetId,
+                            'status' => $status,
+                            'fault' => (string)($responseXml->fault ?? 'Unknown error'),
+                        ]);
+                        return null;
+                    }
+                }
+            }
+
+            Log::error('Packeta packetStatus API Error', [
+                'packet_id' => $packetId,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Packeta packetStatus Exception', [
+                'packet_id' => $packetId,
+                'message' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Check if a packet status code represents a delivered state
+     *
+     * @param int $statusCode
+     * @return bool
+     */
+    public static function isDeliveredStatus(int $statusCode): bool
+    {
+        return $statusCode === 4;
+    }
+
+    /**
+     * Check if a packet status code represents a returned state
+     *
+     * @param int $statusCode
+     * @return bool
+     */
+    public static function isReturnedStatus(int $statusCode): bool
+    {
+        return $statusCode === 5;
+    }
+
+    /**
+     * Get human-readable status text for a status code
+     *
+     * @param int $statusCode
+     * @return string
+     */
+    public static function getStatusText(int $statusCode): string
+    {
+        return match($statusCode) {
+            1 => 'Přijata',
+            2 => 'Dorazila na depo',
+            3 => 'Připravena k vyzvednutí',
+            4 => 'Doručena',
+            5 => 'Vrácena odesílateli',
+            6 => 'Zrušena',
+            7 => 'Na cestě',
+            8 => 'Předána dopravci',
+            9 => 'Čeká na vyzvednutí',
+            default => 'Neznámý stav',
+        };
     }
 
     /**

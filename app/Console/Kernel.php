@@ -54,6 +54,13 @@ class Kernel extends ConsoleKernel
         // OTHER SCHEDULED TASKS
         // ============================================
 
+        // Update Packeta delivery status (every 4 hours)
+        $schedule->command('packeta:update-delivery-status')
+            ->everyFourHours()
+            ->timezone('Europe/Prague')
+            ->withoutOverlapping(10)
+            ->appendOutputTo($cronLog);
+
         // Send Trustpilot review requests (daily at 10:00 AM)
         $schedule->command('reviews:send')
             ->dailyAt('10:00')
