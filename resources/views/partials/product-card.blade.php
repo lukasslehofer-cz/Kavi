@@ -29,9 +29,9 @@
         Káva měsíce
       </span>
       @elseif($historical ?? false)
-      <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500 text-white">
+      <!--<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500 text-white">
         Historická
-      </span>
+      </span>-->
       @else
       @php
         $categoryLabels = [
