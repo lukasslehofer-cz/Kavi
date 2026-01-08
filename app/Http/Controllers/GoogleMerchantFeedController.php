@@ -21,8 +21,9 @@ class GoogleMerchantFeedController extends Controller
         $baseUrl = $isEur ? 'https://kavibox.com' : 'https://kavi.cz';
         $shopName = $isEur ? 'Kavibox' : 'Kavi';
         
-        // Set locale for translations
+        // Set locale for translations and currency for price calculations
         app()->setLocale($locale);
+        session(['currency' => $currency, 'region' => $isEur ? 'com' : 'cz']);
 
         // Get active products with stock > 0, valid price in currency, excluding coffee of month
         $products = Product::with('roastery')
@@ -124,9 +125,15 @@ class GoogleMerchantFeedController extends Controller
             }
         }
 
-        // g:price - Product price with currency
-        $price = $currency === 'EUR' ? $product->price_eur : $product->price;
-        $this->addGoogleElement($dom, $item, 'price', number_format((float) $price, 2, '.', '') . ' ' . $currency);
+        // g:price - Original product price with currency
+        $originalPrice = $currency === 'EUR' ? $product->price_eur : $product->price;
+        $this->addGoogleElement($dom, $item, 'price', number_format((float) $originalPrice, 2, '.', '') . ' ' . $currency);
+
+        // g:sale_price - Sale price if product is on sale
+        if ($product->isOnSale()) {
+            $salePrice = $product->getSalePrice();
+            $this->addGoogleElement($dom, $item, 'sale_price', number_format((float) $salePrice, 2, '.', '') . ' ' . $currency);
+        }
 
         // g:availability - Stock status
         $this->addGoogleElement($dom, $item, 'availability', 'in_stock');
