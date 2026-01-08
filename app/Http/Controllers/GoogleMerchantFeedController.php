@@ -24,10 +24,11 @@ class GoogleMerchantFeedController extends Controller
         // Set locale for translations
         app()->setLocale($locale);
 
-        // Get active products with stock > 0 and valid price in currency
+        // Get active products with stock > 0, valid price in currency, excluding coffee of month
         $products = Product::with('roastery')
             ->where('is_active', true)
             ->where('stock', '>', 0)
+            ->where('is_coffee_of_month', false)
             ->when($isEur, function ($query) {
                 return $query->whereNotNull('price_eur')->where('price_eur', '>', 0);
             }, function ($query) {
@@ -88,8 +89,15 @@ class GoogleMerchantFeedController extends Controller
         // g:id - Unique product identifier
         $this->addGoogleElement($dom, $item, 'id', (string) $product->id);
 
-        // g:title - Product name
-        $title = $locale === 'en' && !empty($product->name_en) ? $product->name_en : $product->name;
+        // g:title - Product name with roastery
+        $productName = $locale === 'en' && !empty($product->name_en) ? $product->name_en : $product->name;
+        $title = $productName;
+        if ($product->roastery) {
+            $roasteryName = $locale === 'en' && !empty($product->roastery->name_en) 
+                ? $product->roastery->name_en 
+                : $product->roastery->name;
+            $title = $productName . ' - ' . $roasteryName;
+        }
         $this->addGoogleElement($dom, $item, 'title', $title);
 
         // g:description - Product description
