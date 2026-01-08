@@ -77,6 +77,11 @@ return [
 
     // Product related
     'view_detail' => 'Zobrazit detail',
+    'coffee_no_longer_available' => 'Tato káva již není v nabídce',
+    'coffee_of_the_month' => 'Káva měsíce',
+    'in_stock' => 'Skladem',
+    'out_of_stock' => 'Vyprodáno',
+    'historical' => 'Historická',
     'category_espresso' => 'Espresso',
     'category_filter' => 'Filtr',
     'category_decaf' => 'Bezkofeinová',

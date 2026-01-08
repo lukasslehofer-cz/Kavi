@@ -26,19 +26,19 @@
         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
-        Káva měsíce
+        {{ __('messages.coffee_of_the_month') }}
       </span>
       @elseif($historical ?? false)
       <!--<span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500 text-white">
-        Historická
+        {{ __('messages.historical') }}
       </span>-->
       @else
       @php
         $categoryLabels = [
-          'espresso' => ['label' => 'Espresso', 'color' => 'bg-amber-500'],
-          'filter' => ['label' => 'Filtr', 'color' => 'bg-blue-500'],
-          'decaf' => ['label' => 'Bezkofeinová', 'color' => 'bg-green-500'],
-          'accessories' => ['label' => 'Příslušenství', 'color' => 'bg-purple-500'],
+          'espresso' => ['label' => __('messages.category_espresso'), 'color' => 'bg-amber-500'],
+          'filter' => ['label' => __('messages.category_filter'), 'color' => 'bg-blue-500'],
+          'decaf' => ['label' => __('messages.category_decaf'), 'color' => 'bg-green-500'],
+          'accessories' => ['label' => __('messages.category_accessories'), 'color' => 'bg-purple-500'],
         ];
         
         // Pro kávy zobrazíme preparation methods
@@ -76,12 +76,12 @@
       <div class="absolute right-3 top-3 bg-green-500 rounded-full px-2.5 py-1">
         <span class="text-xs font-medium text-white flex items-center gap-1">
           <span class="w-1.5 h-1.5 bg-white rounded-full"></span>
-          Skladem
+          {{ __('messages.in_stock') }}
         </span>
       </div>
       @else
       <div class="absolute right-3 top-3 bg-red-500 rounded-full px-2.5 py-1">
-        <span class="text-xs font-medium text-white">Vyprodáno</span>
+        <span class="text-xs font-medium text-white">{{ __('messages.out_of_stock') }}</span>
       </div>
       @endif
     @endif
@@ -158,7 +158,7 @@
     @elseif($historical ?? false)
     <!-- Historical Product - No Price/Cart -->
     <div class="pt-4 border-t border-gray-100">
-      <p class="text-sm text-gray-500 italic font-light">Tato káva již není v nabídce</p>
+      <p class="text-sm text-gray-500 italic font-light">{{ __('messages.coffee_no_longer_available') }}</p>
     </div>
     @endif
   </div>

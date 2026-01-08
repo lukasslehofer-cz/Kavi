@@ -77,6 +77,11 @@ return [
 
     // Product related
     'view_detail' => 'View Detail',
+    'coffee_no_longer_available' => 'This coffee is no longer available',
+    'coffee_of_the_month' => 'Coffee of the Month',
+    'in_stock' => 'In Stock',
+    'out_of_stock' => 'Out of Stock',
+    'historical' => 'Historical',
     'category_espresso' => 'Espresso',
     'category_filter' => 'Filter',
     'category_decaf' => 'Decaf',
