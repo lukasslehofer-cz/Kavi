@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $product->getName() . ' - ' . ($currentLocale === 'en' ? 'KAVI' : 'KAVI.cz'))
+@section('title', $product->getName() . ($product->roastery ? ' – ' . $product->roastery->getName() : '') . ' | ' . ($currentLocale === 'en' ? 'KAVI' : 'KAVI.cz'))
 
 @section('content')
 <!-- Minimal Breadcrumb -->
