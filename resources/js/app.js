@@ -1,7 +1,84 @@
 import './bootstrap';
+import * as CookieConsent from 'vanilla-cookieconsent';
+import 'vanilla-cookieconsent/dist/cookieconsent.css';
+
+// Initialize Cookie Consent
+function initCookieConsent() {
+    // Get config from window (injected by Laravel)
+    if (typeof window.cookieConsentConfig === 'undefined') {
+        console.warn('Cookie consent config not found');
+        return;
+    }
+
+    console.log('Initializing cookie consent with config:', window.cookieConsentConfig);
+    
+    CookieConsent.run(window.cookieConsentConfig);
+
+    // Handle consent changes
+    CookieConsent.onChange(({ changedCategories, changedServices }) => {
+        console.log('Cookie consent changed:', changedCategories);
+        
+        if (changedCategories.includes('analytics')) {
+            if (CookieConsent.acceptedCategory('analytics')) {
+                // Load GTM if analytics accepted
+                loadGTM();
+            } else {
+                // Reload page to remove GTM if analytics was declined
+                window.location.reload();
+            }
+        }
+    });
+
+    // Load GTM immediately if analytics already accepted
+    if (CookieConsent.acceptedCategory('analytics')) {
+        console.log('Analytics already accepted, loading GTM');
+        loadGTM();
+    } else {
+        console.log('Analytics not accepted yet');
+    }
+}
+
+// Load Google Tag Manager
+function loadGTM() {
+    // Check if GTM is already loaded
+    if (window.gtmLoaded) {
+        return;
+    }
+
+    const gtmId = window.gtmId || 'GTM-PPG54L4R';
+    
+    // Initialize dataLayer
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+    });
+
+    // Load GTM script
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtm.js?id=${gtmId}`;
+    document.head.appendChild(script);
+
+    // Load GTM noscript iframe
+    const noscript = document.createElement('noscript');
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.googletagmanager.com/ns.html?id=${gtmId}`;
+    iframe.height = '0';
+    iframe.width = '0';
+    iframe.style.display = 'none';
+    iframe.style.visibility = 'hidden';
+    noscript.appendChild(iframe);
+    document.body.insertBefore(noscript, document.body.firstChild);
+
+    window.gtmLoaded = true;
+    console.log('GTM loaded after consent');
+}
 
 // Mobile menu toggle
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize cookie consent
+    initCookieConsent();
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
 
