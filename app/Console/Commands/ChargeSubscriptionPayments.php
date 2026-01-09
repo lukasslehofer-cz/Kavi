@@ -44,6 +44,7 @@ class ChargeSubscriptionPayments extends Command
         }
         
         // Find subscriptions to process
+        // Only 'active' subscriptions require billing, not 'complimentary'
         $query = Subscription::where('status', 'active')
             ->whereNotNull('next_billing_date')
             ->with('user');

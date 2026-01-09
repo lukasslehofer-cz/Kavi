@@ -246,7 +246,7 @@ class SubscriptionController extends Controller
         // Also get subscriptions that SHOULD ship on this date but don't have a record yet
         // Exclude paused subscriptions with active pause (billing_date < paused_until_date)
         $allSubscriptions = Subscription::with(['user', 'plan'])
-            ->whereIn('status', ['active', 'paused', 'pending', 'cancelled'])
+            ->whereIn('status', ['active', 'paused', 'pending', 'cancelled', 'complimentary'])
             ->whereNotIn('id', $subscriptionIds)
             ->where(function($q) use ($billingDate) {
                 // Include if: not paused OR no pause date OR billing_date >= paused_until_date

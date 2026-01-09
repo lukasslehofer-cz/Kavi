@@ -2473,16 +2473,23 @@ class StripeService
                     ]);
                 }
 
-                // Create Fakturoid invoice
-                try {
-                    $fakturoidService = app(\App\Services\FakturoidService::class);
-                    $fakturoidService->processInvoiceForSubscriptionPayment($payment);
-                } catch (\Exception $e) {
-                    \Log::error('Failed to create Fakturoid invoice', [
+                // Create Fakturoid invoice (skip for complimentary subscriptions)
+                if (!$subscription->isComplimentary()) {
+                    try {
+                        $fakturoidService = app(\App\Services\FakturoidService::class);
+                        $fakturoidService->processInvoiceForSubscriptionPayment($payment);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to create Fakturoid invoice', [
+                            'payment_id' => $payment->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        // Don't fail the whole payment if Fakturoid fails
+                    }
+                } else {
+                    \Log::info('Skipping Fakturoid invoice for complimentary subscription', [
+                        'subscription_id' => $subscription->id,
                         'payment_id' => $payment->id,
-                        'error' => $e->getMessage(),
                     ]);
-                    // Don't fail the whole payment if Fakturoid fails
                 }
 
                 // Send success confirmation email

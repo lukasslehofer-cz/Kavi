@@ -117,9 +117,9 @@ class StockReservationService
      */
     private function getSubscriptionsForShipment(ShipmentSchedule $schedule): \Illuminate\Support\Collection
     {
-        // Get all active or paused subscriptions
+        // Get all active, paused, or complimentary subscriptions
         $allSubscriptions = Subscription::with(['user', 'plan'])
-            ->whereIn('status', ['active', 'paused'])
+            ->whereIn('status', ['active', 'paused', 'complimentary'])
             ->get();
 
         // Filter by shipment date

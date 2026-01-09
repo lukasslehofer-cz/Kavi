@@ -126,6 +126,21 @@ class Subscription extends Model
         return $this->isUnpaid() || $this->payment_failure_count > 0;
     }
 
+    public function isComplimentary(): bool
+    {
+        return $this->status === 'complimentary';
+    }
+
+    public function scopeComplimentary($query)
+    {
+        return $query->where('status', 'complimentary');
+    }
+
+    public function requiresBilling(): bool
+    {
+        return !$this->isComplimentary();
+    }
+
     public function cancel()
     {
         // Check if there's paid coverage for any future shipments

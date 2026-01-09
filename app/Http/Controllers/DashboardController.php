@@ -46,9 +46,9 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        // Get all active and paused subscriptions (visible subscriptions)
+        // Get all active, paused, and complimentary subscriptions (visible subscriptions)
         $activeSubscriptions = $user->subscriptions()
-            ->whereIn('status', ['active', 'paused'])
+            ->whereIn('status', ['active', 'paused', 'complimentary'])
             ->orderBy('created_at', 'desc')
             ->get();
         $activeSubscription = $activeSubscriptions->first(); // For backward compatibility
@@ -90,12 +90,12 @@ class DashboardController extends Controller
     public function subscription()
     {
         $subscriptions = $this->getViewingUser()->subscriptions()
-            ->whereIn('status', ['active', 'unpaid', 'paused', 'pending', 'cancelled', 'completed'])
+            ->whereIn('status', ['active', 'unpaid', 'paused', 'pending', 'cancelled', 'completed', 'complimentary'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->filter(function ($subscription) {
-                // Always show active, unpaid, paused, and pending (for one-time boxes awaiting payment)
-                if (in_array($subscription->status, ['active', 'unpaid', 'paused', 'pending'])) {
+                // Always show active, unpaid, paused, pending, and complimentary
+                if (in_array($subscription->status, ['active', 'unpaid', 'paused', 'pending', 'complimentary'])) {
                     return true;
                 }
                 

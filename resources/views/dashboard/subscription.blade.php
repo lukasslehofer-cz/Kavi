@@ -97,6 +97,11 @@
                                     <span class="ml-2 text-yellow-700">{{ __('dashboard.status_paused_until', ['date' => $subscription->paused_until_date->format('d.m.Y')]) }}</span>
                                 @endif
                             </span>
+                        @elseif($subscription->status === 'complimentary')
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                                <span class="mr-2">🎁</span>
+                                Bezplatné předplatné
+                            </span>
                         @elseif($subscription->status === 'cancelled')
                             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-200">
                                 {{ __('dashboard.status_cancelled') }}
@@ -294,8 +299,8 @@
                             </div>
                             @endif
                             
-                            <!-- Pricing breakdown -->
-                            @if($subscription->configured_price)
+                            <!-- Pricing breakdown (hidden for complimentary subscriptions) -->
+                            @if(!$subscription->isComplimentary() && $subscription->configured_price)
                             <div class="pt-3 border-t-2 border-gray-300">
                                 <div class="flex justify-between mb-2">
                                     <span class="text-gray-600">{{ __('dashboard.subscription_price') }}:</span>
@@ -322,8 +327,8 @@
                     </div>
                     @endif
 
-                    <!-- Active Discount Information -->
-                    @if($subscription->discount_amount > 0 && $subscription->coupon_id)
+                    <!-- Active Discount Information (hidden for complimentary) -->
+                    @if(!$subscription->isComplimentary() && $subscription->discount_amount > 0 && $subscription->coupon_id)
                     <div>                        
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                             <div class="flex items-center justify-between mb-3">
@@ -452,8 +457,8 @@
                         @endif
                     </div>
 
-                    <!-- Payment Issue Warning -->
-                    @if($subscription->status === 'unpaid')
+                    <!-- Payment Issue Warning (not shown for complimentary) -->
+                    @if(!$subscription->isComplimentary() && $subscription->status === 'unpaid')
                     <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6">
                         <div class="flex items-start gap-3">
                             <svg class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -496,9 +501,9 @@
                     </div>
                     @endif
 
-                    <!-- Actions -->
-                    @if($subscription->frequency_months != 0)
-                    {{-- Only show actions for regular subscriptions, not one-time boxes --}}
+                    <!-- Actions (hidden for complimentary subscriptions) -->
+                    @if(!$subscription->isComplimentary() && $subscription->frequency_months != 0)
+                    {{-- Only show actions for regular subscriptions, not one-time boxes or complimentary --}}
                     <div>
                     @if($subscription->status === 'active' || $subscription->status === 'paused')
                         <h3 class="text-lg font-medium text-gray-900 mb-3">{{ __('dashboard.actions') }}</h3>                    
