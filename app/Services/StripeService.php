@@ -827,6 +827,32 @@ class StripeService
                     ]);
                 }
                 
+                // Create affiliate reward if applicable
+                if ($order->coupon_id) {
+                    try {
+                        $coupon = $order->coupon;
+                        if ($coupon && $coupon->hasAffiliateOrderReward()) {
+                            $affiliateService = app(\App\Services\AffiliateService::class);
+                            $reward = $affiliateService->createOrderReward($order, $coupon);
+                            
+                            if ($reward) {
+                                \Log::info('Affiliate reward created for order', [
+                                    'order_id' => $order->id,
+                                    'reward_id' => $reward->id,
+                                    'reward_amount' => $reward->reward_amount,
+                                    'partner_id' => $reward->affiliate_partner_id,
+                                ]);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to create affiliate reward for order', [
+                            'order_id' => $order->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        // Don't fail the webhook if affiliate reward creation fails
+                    }
+                }
+                
                 // Notify admins about new order
                 try {
                     \App\Mail\AdminOrderNotification::notifyAdmins($order);
@@ -1239,6 +1265,33 @@ class StripeService
                 ]);
             }
             
+            // Create affiliate reward for first payment (if applicable)
+            if ($subscription->coupon_id) {
+                try {
+                    $coupon = $subscription->coupon;
+                    if ($coupon && $coupon->hasAffiliateSubscriptionReward()) {
+                        $affiliateService = app(\App\Services\AffiliateService::class);
+                        $reward = $affiliateService->createSubscriptionReward($subscription, $coupon, 1);
+                        
+                        if ($reward) {
+                            \Log::info('Affiliate reward created for first subscription payment', [
+                                'subscription_id' => $subscription->id,
+                                'payment_number' => 1,
+                                'reward_id' => $reward->id,
+                                'reward_amount' => $reward->reward_amount,
+                                'partner_id' => $reward->affiliate_partner_id,
+                            ]);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create affiliate reward for first subscription payment', [
+                        'subscription_id' => $subscription->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Don't fail the webhook if affiliate reward creation fails
+                }
+            }
+            
             // Decrement discount months for first payment (if applicable)
             if ($subscription->discount_months_remaining > 0) {
                 $couponService = app(\App\Services\CouponService::class);
@@ -1528,6 +1581,39 @@ class StripeService
                         'subscription_id' => $subscription->id,
                         'error' => $e->getMessage(),
                     ]);
+                }
+
+                // Create affiliate reward if applicable
+                if ($subscription->coupon_id) {
+                    try {
+                        $coupon = $subscription->coupon;
+                        if ($coupon && $coupon->hasAffiliateSubscriptionReward()) {
+                            $affiliateService = app(\App\Services\AffiliateService::class);
+                            
+                            // Zjisti, kolikátá platba to je (včetně první)
+                            $paymentNumber = \App\Models\SubscriptionPayment::where('subscription_id', $subscription->id)
+                                ->where('status', 'paid')
+                                ->count();
+                            
+                            $reward = $affiliateService->createSubscriptionReward($subscription, $coupon, $paymentNumber);
+                            
+                            if ($reward) {
+                                \Log::info('Affiliate reward created for subscription payment', [
+                                    'subscription_id' => $subscription->id,
+                                    'payment_number' => $paymentNumber,
+                                    'reward_id' => $reward->id,
+                                    'reward_amount' => $reward->reward_amount,
+                                    'partner_id' => $reward->affiliate_partner_id,
+                                ]);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to create affiliate reward for subscription', [
+                            'subscription_id' => $subscription->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        // Don't fail the webhook if affiliate reward creation fails
+                    }
                 }
 
                 // Handle coupon discount countdown

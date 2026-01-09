@@ -145,6 +145,115 @@
         </div>
     </div>
 
+    <!-- Affiliate nastavení -->
+    <div class="bg-white rounded-lg shadow-sm border border-purple-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">💼 {{ __('affiliate.affiliate_settings') }}</h3>
+        
+        <div class="mb-4">
+            <label class="flex items-center cursor-pointer">
+                <input type="checkbox" name="affiliate_code_enabled" id="affiliate_code_enabled" value="1"
+                    {{ old('affiliate_code_enabled', $coupon->affiliate_code_enabled ?? false) ? 'checked' : '' }}
+                    class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                    onchange="toggleAffiliateFields()">
+                <span class="ml-2 text-sm font-medium text-gray-700">{{ __('affiliate.enable_affiliate') }}</span>
+            </label>
+        </div>
+
+        <div id="affiliate_fields" style="display: none;">
+            <!-- Select Partner -->
+            <div class="mb-4">
+                <label for="affiliate_partner_id" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.select_partner') }} *</label>
+                <select name="affiliate_partner_id" id="affiliate_partner_id" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <option value="">-- Vyberte partnera --</option>
+                    @foreach(\App\Models\User::where('is_affiliate_partner', true)->orderBy('name')->get() as $partner)
+                    <option value="{{ $partner->id }}" {{ old('affiliate_partner_id', $coupon->affiliate_partner_id ?? '') == $partner->id ? 'selected' : '' }}>
+                        {{ $partner->name }} ({{ $partner->email }})
+                    </option>
+                    @endforeach
+                </select>
+                @error('affiliate_partner_id')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Order Reward -->
+            <div class="border-t border-gray-200 pt-4 mb-4">
+                <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('affiliate.order_reward') }}</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label for="affiliate_reward_order_type" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_type') }}</label>
+                        <select name="affiliate_reward_order_type" id="affiliate_reward_order_type" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            onchange="toggleAffiliateOrderEurField()">
+                            <option value="none" {{ old('affiliate_reward_order_type', $coupon->affiliate_reward_order_type ?? 'none') == 'none' ? 'selected' : '' }}>{{ __('affiliate.none') }}</option>
+                            <option value="percentage" {{ old('affiliate_reward_order_type', $coupon->affiliate_reward_order_type ?? '') == 'percentage' ? 'selected' : '' }}>{{ __('affiliate.percentage') }}</option>
+                            <option value="fixed" {{ old('affiliate_reward_order_type', $coupon->affiliate_reward_order_type ?? '') == 'fixed' ? 'selected' : '' }}>{{ __('affiliate.fixed_amount') }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="affiliate_reward_order_value" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_value_czk') }}</label>
+                        <input type="number" name="affiliate_reward_order_value" id="affiliate_reward_order_value" 
+                            value="{{ old('affiliate_reward_order_value', $coupon->affiliate_reward_order_value ?? '') }}" 
+                            step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="50">
+                    </div>
+                    <div id="affiliate_order_eur_field" style="display: none;">
+                        <label for="affiliate_reward_order_value_eur" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_value_eur') }}</label>
+                        <input type="number" name="affiliate_reward_order_value_eur" id="affiliate_reward_order_value_eur" 
+                            value="{{ old('affiliate_reward_order_value_eur', $coupon->affiliate_reward_order_value_eur ?? '') }}" 
+                            step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="2">
+                    </div>
+                    <div>
+                        <label for="affiliate_reward_order_min_value" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.min_order_value') }} (Kč)</label>
+                        <input type="number" name="affiliate_reward_order_min_value" id="affiliate_reward_order_min_value" 
+                            value="{{ old('affiliate_reward_order_min_value', $coupon->affiliate_reward_order_min_value ?? '') }}" 
+                            step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="500">
+                        <p class="text-xs text-gray-500 mt-1">Pro odměnu</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subscription Reward -->
+            <div class="border-t border-gray-200 pt-4">
+                <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('affiliate.subscription_reward') }}</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="affiliate_reward_subscription_value" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_value_czk') }}</label>
+                        <input type="number" name="affiliate_reward_subscription_value" id="affiliate_reward_subscription_value" 
+                            value="{{ old('affiliate_reward_subscription_value', $coupon->affiliate_reward_subscription_value ?? '') }}" 
+                            step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="200">
+                        <p class="text-xs text-gray-500 mt-1">Pevná částka za každou platbu</p>
+                    </div>
+                    <div>
+                        <label for="affiliate_reward_subscription_value_eur" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_value_eur') }}</label>
+                        <input type="number" name="affiliate_reward_subscription_value_eur" id="affiliate_reward_subscription_value_eur" 
+                            value="{{ old('affiliate_reward_subscription_value_eur', $coupon->affiliate_reward_subscription_value_eur ?? '') }}" 
+                            step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="8">
+                    </div>
+                    <div>
+                        <label for="affiliate_reward_subscription_months" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_months') }}</label>
+                        <input type="number" name="affiliate_reward_subscription_months" id="affiliate_reward_subscription_months" 
+                            value="{{ old('affiliate_reward_subscription_months', $coupon->affiliate_reward_subscription_months ?? '') }}" 
+                            min="1"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="3">
+                        <p class="text-xs text-gray-500 mt-1">{{ __('affiliate.reward_months_help') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Platnost a limity -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">⏰ Platnost a limity</h3>
@@ -271,10 +380,32 @@ function toggleSubscriptionEurField() {
     }
 }
 
+function toggleAffiliateFields() {
+    const checkbox = document.getElementById('affiliate_code_enabled');
+    const fields = document.getElementById('affiliate_fields');
+    if (checkbox.checked) {
+        fields.style.display = 'block';
+    } else {
+        fields.style.display = 'none';
+    }
+}
+
+function toggleAffiliateOrderEurField() {
+    const typeSelect = document.getElementById('affiliate_reward_order_type');
+    const eurField = document.getElementById('affiliate_order_eur_field');
+    if (typeSelect && typeSelect.value === 'fixed') {
+        eurField.style.display = 'block';
+    } else if (eurField) {
+        eurField.style.display = 'none';
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleOrderEurField();
     toggleSubscriptionEurField();
+    toggleAffiliateFields();
+    toggleAffiliateOrderEurField();
 });
 </script>
 

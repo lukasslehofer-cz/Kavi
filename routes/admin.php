@@ -27,6 +27,9 @@ Route::get('/feed/google-merchant.xml', [GoogleMerchantFeedController::class, 'i
 // Coupon activation from link (code is universal)
 Route::get('/code/{code}', [CouponController::class, 'activateFromLink'])->name('coupon.activate');
 
+// Affiliate link redirect (short URL)
+Route::get('/r/{slug}', [\App\Http\Controllers\AffiliateLinkController::class, 'redirect'])->name('affiliate.link.redirect');
+
 // API endpoints
 Route::post('/api/calculate-shipping', [\App\Http\Controllers\CheckoutController::class, 'calculateShipping'])->name('api.calculate-shipping');
 
@@ -72,6 +75,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Coupons
     Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
     Route::get('/coupons/{coupon}/stats', [\App\Http\Controllers\Admin\CouponController::class, 'stats'])->name('coupons.stats');
+    
+    // Affiliate
+    Route::get('/affiliate/partners', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'index'])->name('affiliate.partners.index');
+    Route::post('/affiliate/partners/{user}/activate', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'activate'])->name('affiliate.partners.activate');
+    Route::post('/affiliate/partners/{user}/deactivate', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'deactivate'])->name('affiliate.partners.deactivate');
+    Route::post('/affiliate/partners/activate-by-email', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'activateByEmail'])->name('affiliate.partners.activate-by-email');
+    Route::get('/affiliate/rewards', [\App\Http\Controllers\Admin\AffiliateRewardController::class, 'index'])->name('affiliate.rewards.index');
+    Route::post('/affiliate/rewards/{reward}/approve', [\App\Http\Controllers\Admin\AffiliateRewardController::class, 'approve'])->name('affiliate.rewards.approve');
+    Route::post('/affiliate/rewards/{reward}/mark-paid', [\App\Http\Controllers\Admin\AffiliateRewardController::class, 'markPaid'])->name('affiliate.rewards.mark-paid');
+    Route::post('/affiliate/rewards/{reward}/cancel', [\App\Http\Controllers\Admin\AffiliateRewardController::class, 'cancel'])->name('affiliate.rewards.cancel');
     
     // Newsletter
     Route::get('/newsletter', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'index'])->name('newsletter.index');

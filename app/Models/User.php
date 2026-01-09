@@ -21,6 +21,8 @@ class User extends Authenticatable
         'postal_code',
         'country',
         'is_admin',
+        'is_affiliate_partner',
+        'affiliate_activated_at',
         'stripe_customer_id',
         'fakturoid_subject_id',
         'packeta_point_id',
@@ -40,6 +42,8 @@ class User extends Authenticatable
         'password' => 'hashed',
         'password_set_by_user' => 'boolean',
         'is_admin' => 'boolean',
+        'is_affiliate_partner' => 'boolean',
+        'affiliate_activated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'anonymized_at' => 'datetime',
     ];
@@ -66,6 +70,32 @@ class User extends Authenticatable
         return $this->hasMany(Subscription::class)
             ->where('status', 'active')
             ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Affiliate vztahy
+     */
+    public function affiliateLinks()
+    {
+        return $this->hasMany(AffiliateLink::class, 'affiliate_partner_id');
+    }
+
+    public function affiliateRewards()
+    {
+        return $this->hasMany(AffiliateReward::class, 'affiliate_partner_id');
+    }
+
+    public function affiliateCoupons()
+    {
+        return $this->hasMany(Coupon::class, 'affiliate_partner_id');
+    }
+
+    /**
+     * Zkontroluje, zda je uživatel affiliate partner
+     */
+    public function isAffiliatePartner(): bool
+    {
+        return $this->is_affiliate_partner === true;
     }
 
     /**

@@ -31,6 +31,16 @@ class Coupon extends Model
         'usage_limit_per_user',
         'times_used',
         'is_active',
+        'affiliate_partner_id',
+        'affiliate_code_enabled',
+        'affiliate_reward_order_type',
+        'affiliate_reward_order_value',
+        'affiliate_reward_order_value_eur',
+        'affiliate_reward_order_min_value',
+        'affiliate_reward_order_min_value_eur',
+        'affiliate_reward_subscription_value',
+        'affiliate_reward_subscription_value_eur',
+        'affiliate_reward_subscription_months',
     ];
 
     protected $casts = [
@@ -44,6 +54,13 @@ class Coupon extends Model
         'valid_until' => 'datetime',
         'free_shipping' => 'boolean',
         'is_active' => 'boolean',
+        'affiliate_code_enabled' => 'boolean',
+        'affiliate_reward_order_value' => 'decimal:2',
+        'affiliate_reward_order_value_eur' => 'decimal:2',
+        'affiliate_reward_order_min_value' => 'decimal:2',
+        'affiliate_reward_order_min_value_eur' => 'decimal:2',
+        'affiliate_reward_subscription_value' => 'decimal:2',
+        'affiliate_reward_subscription_value_eur' => 'decimal:2',
     ];
 
     /**
@@ -95,6 +112,24 @@ class Coupon extends Model
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * Affiliate vztahy
+     */
+    public function affiliatePartner()
+    {
+        return $this->belongsTo(User::class, 'affiliate_partner_id');
+    }
+
+    public function affiliateLinks()
+    {
+        return $this->hasMany(AffiliateLink::class);
+    }
+
+    public function affiliateRewards()
+    {
+        return $this->hasMany(AffiliateReward::class);
     }
 
     /**
@@ -296,6 +331,95 @@ class Coupon extends Model
         } else {
             return "měsíců";
         }
+    }
+
+    /**
+     * Má kupón aktivní affiliate odměny?
+     */
+    public function hasAffiliateRewards(): bool
+    {
+        return $this->affiliate_code_enabled && $this->affiliate_partner_id !== null;
+    }
+
+    /**
+     * Má affiliate odměnu pro objednávky?
+     */
+    public function hasAffiliateOrderReward(): bool
+    {
+        return $this->hasAffiliateRewards() && $this->affiliate_reward_order_type !== 'none';
+    }
+
+    /**
+     * Má affiliate odměnu pro předplatné?
+     */
+    public function hasAffiliateSubscriptionReward(): bool
+    {
+        return $this->hasAffiliateRewards() && $this->affiliate_reward_subscription_value > 0;
+    }
+
+    /**
+     * Získá hodnotu affiliate odměny pro objednávky v aktuální měně
+     */
+    public function getAffiliateOrderRewardValue(): float
+    {
+        return CurrencyHelper::price($this->affiliate_reward_order_value, $this->affiliate_reward_order_value_eur);
+    }
+
+    /**
+     * Získá minimální hodnotu objednávky pro affiliate odměnu v aktuální měně
+     */
+    public function getAffiliateOrderMinValue(): ?float
+    {
+        if ($this->affiliate_reward_order_min_value === null && $this->affiliate_reward_order_min_value_eur === null) {
+            return null;
+        }
+        return CurrencyHelper::price($this->affiliate_reward_order_min_value ?? 0, $this->affiliate_reward_order_min_value_eur ?? 0);
+    }
+
+    /**
+     * Získá hodnotu affiliate odměny pro předplatné v aktuální měně
+     */
+    public function getAffiliateSubscriptionRewardValue(): float
+    {
+        return CurrencyHelper::price($this->affiliate_reward_subscription_value, $this->affiliate_reward_subscription_value_eur);
+    }
+
+    /**
+     * Vypočítá affiliate odměnu pro objednávku
+     */
+    public function calculateAffiliateOrderReward(float $orderValue): float
+    {
+        if (!$this->hasAffiliateOrderReward()) {
+            return 0;
+        }
+
+        // Kontrola minimální hodnoty
+        $minValue = $this->getAffiliateOrderMinValue();
+        if ($minValue !== null && $orderValue < $minValue) {
+            return 0;
+        }
+
+        if ($this->affiliate_reward_order_type === 'percentage') {
+            return round($orderValue * ($this->affiliate_reward_order_value / 100), 2);
+        }
+
+        if ($this->affiliate_reward_order_type === 'fixed') {
+            return $this->getAffiliateOrderRewardValue();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Vypočítá affiliate odměnu za jedno opakování předplatného
+     */
+    public function calculateAffiliateSubscriptionReward(): float
+    {
+        if (!$this->hasAffiliateSubscriptionReward()) {
+            return 0;
+        }
+
+        return $this->getAffiliateSubscriptionRewardValue();
     }
 }
 

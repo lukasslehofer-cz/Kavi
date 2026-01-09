@@ -247,6 +247,15 @@
                                 </svg>
                                 <span class="text-sm font-medium">{{ ($currentLocale ?? 'cs') === 'en' ? 'Subscription' : 'Předplatné' }}</span>
                             </a>
+
+                            @if($displayUser->isAffiliatePartner())
+                            <a href="{{ localizedRoute('dashboard.affiliate') . $viewAsParam }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ localizedRouteIs('dashboard.affiliate') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                                <span class="text-sm font-medium">{{ ($currentLocale ?? 'cs') === 'en' ? 'Affiliate' : 'Affiliate' }}</span>
+                            </a>
+                            @endif
                             <!--
                             <a href="{{ localizedRoute('dashboard.notifications') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 {{ localizedRouteIs('dashboard.notifications') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

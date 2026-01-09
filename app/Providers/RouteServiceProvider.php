@@ -165,6 +165,9 @@ class RouteServiceProvider extends ServiceProvider
                 Route::get('/' . $this->replaceParams($routes['dashboard-subscription-invoice']), [\App\Http\Controllers\DashboardController::class, 'downloadSubscriptionInvoice'])->name($this->routeName('subscription.payment.invoice', $locale, $isPrimary, false));
                 Route::post('/' . $routes['dashboard-subscription-packeta'], [\App\Http\Controllers\DashboardController::class, 'updatePacketaPoint'])->name($this->routeName('subscription.update-packeta', $locale, $isPrimary, false));
                 Route::get('/' . $routes['dashboard-notifications'], [\App\Http\Controllers\DashboardController::class, 'notifications'])->name($this->routeName('notifications', $locale, $isPrimary, false));
+                
+                // Affiliate dashboard
+                Route::get('/affiliate', [\App\Http\Controllers\Dashboard\AffiliateController::class, 'index'])->name($this->routeName('affiliate', $locale, $isPrimary, false));
             });
         });
     }

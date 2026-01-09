@@ -105,14 +105,19 @@ class CheckoutController extends Controller
             return redirect()->localizedRoute('checkout.index');
         }
         
-        // Zpracovat kupón z query parametru (pokud byl zadán v formuláři)
+        // Zpracovat kupón z query parametru (ručně zadaný)
+        $manualCouponCode = null;
         if (request()->has('coupon_code') && request('coupon_code')) {
-            $couponCode = strtoupper(trim(request('coupon_code')));
-            session(['coupon_code' => $couponCode]);
+            $manualCouponCode = strtoupper(trim(request('coupon_code')));
+            session(['coupon_code' => $manualCouponCode]);
+            // Vymazat affiliate kód, protože uživatel zadal vlastní
+            session()->forget('affiliate_code');
         }
         
-        // Zkusit načíst kupón ze session nebo cookie
+        // Zkusit načíst kupón - priorita: ručně zadaný > session > affiliate
         $couponCode = $this->couponService->getCouponFromStorage();
+        $isAffiliateCoupon = !$manualCouponCode && session('affiliate_code') && $couponCode === session('affiliate_code');
+        
         $appliedCoupon = null;
         $discount = 0;
         $errorMessage = null;
@@ -131,9 +136,18 @@ class CheckoutController extends Controller
                 $totalWithoutVat = $couponResult['total_without_vat'];
                 $vat = $couponResult['vat'];
             } else {
-                // Kupón není platný, vymazat ho a zobrazit chybu
-                $errorMessage = $result['message'];
-                $this->couponService->clearCouponFromStorage();
+                // Pokud je to affiliate kód a není platný pro order, ticho ignorovat
+                if ($isAffiliateCoupon) {
+                    // Nevymazávat, nehlásit chybu - prostě ignorovat pro tento typ
+                    \Log::debug('Affiliate coupon not valid for orders, ignoring silently', [
+                        'code' => $couponCode,
+                        'reason' => $result['message']
+                    ]);
+                } else {
+                    // Ručně zadaný kód - zobrazit chybu
+                    $errorMessage = $result['message'];
+                    $this->couponService->clearCouponFromStorage();
+                }
             }
         }
         

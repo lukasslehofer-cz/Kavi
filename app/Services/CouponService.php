@@ -177,12 +177,17 @@ class CouponService
      */
     public function getCouponFromStorage(): ?string
     {
-        // Nejprve zkusit session (aktuální požadavek)
+        // 1. Nejprve ručně zadaný kód (nejvyšší priorita)
         $code = session('coupon_code');
         
         if (!$code) {
-            // Zkusit cookie (uložené z linku)
+            // 2. Zkusit cookie (uložené z linku)
             $code = request()->cookie('coupon_code');
+        }
+        
+        if (!$code) {
+            // 3. Fallback na affiliate kód ze session
+            $code = session('affiliate_code');
         }
 
         return $code;

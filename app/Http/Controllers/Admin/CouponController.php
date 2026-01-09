@@ -67,6 +67,18 @@ class CouponController extends Controller
             'usage_limit_total' => 'nullable|integer|min:1',
             'usage_limit_per_user' => 'nullable|integer|min:1',
             
+            // Affiliate
+            'affiliate_code_enabled' => 'boolean',
+            'affiliate_partner_id' => 'nullable|exists:users,id',
+            'affiliate_reward_order_type' => 'nullable|in:percentage,fixed,none',
+            'affiliate_reward_order_value' => 'nullable|numeric|min:0',
+            'affiliate_reward_order_value_eur' => 'nullable|numeric|min:0',
+            'affiliate_reward_order_min_value' => 'nullable|numeric|min:0',
+            'affiliate_reward_order_min_value_eur' => 'nullable|numeric|min:0',
+            'affiliate_reward_subscription_value' => 'nullable|numeric|min:0',
+            'affiliate_reward_subscription_value_eur' => 'nullable|numeric|min:0',
+            'affiliate_reward_subscription_months' => 'nullable|integer|min:1',
+            
             'is_active' => 'boolean',
         ]);
 
@@ -76,8 +88,15 @@ class CouponController extends Controller
         // Výchozí hodnoty
         $validated['free_shipping'] = $request->has('free_shipping');
         $validated['is_active'] = $request->has('is_active');
+        $validated['affiliate_code_enabled'] = $request->has('affiliate_code_enabled');
 
-        Coupon::create($validated);
+        $coupon = Coupon::create($validated);
+        
+        // Vytvořit affiliate link pokud je affiliate enabled
+        if ($coupon->affiliate_code_enabled && $coupon->affiliate_partner_id) {
+            $affiliateService = app(\App\Services\AffiliateService::class);
+            $affiliateService->createAffiliateLink($coupon);
+        }
 
         return redirect()->route('admin.coupons.index')
             ->with('success', 'Kupón byl úspěšně vytvořen!');
@@ -127,6 +146,18 @@ class CouponController extends Controller
             'usage_limit_total' => 'nullable|integer|min:1',
             'usage_limit_per_user' => 'nullable|integer|min:1',
             
+            // Affiliate
+            'affiliate_code_enabled' => 'boolean',
+            'affiliate_partner_id' => 'nullable|exists:users,id',
+            'affiliate_reward_order_type' => 'nullable|in:percentage,fixed,none',
+            'affiliate_reward_order_value' => 'nullable|numeric|min:0',
+            'affiliate_reward_order_value_eur' => 'nullable|numeric|min:0',
+            'affiliate_reward_order_min_value' => 'nullable|numeric|min:0',
+            'affiliate_reward_order_min_value_eur' => 'nullable|numeric|min:0',
+            'affiliate_reward_subscription_value' => 'nullable|numeric|min:0',
+            'affiliate_reward_subscription_value_eur' => 'nullable|numeric|min:0',
+            'affiliate_reward_subscription_months' => 'nullable|integer|min:1',
+            
             'is_active' => 'boolean',
         ]);
 
@@ -136,8 +167,15 @@ class CouponController extends Controller
         // Výchozí hodnoty
         $validated['free_shipping'] = $request->has('free_shipping');
         $validated['is_active'] = $request->has('is_active');
+        $validated['affiliate_code_enabled'] = $request->has('affiliate_code_enabled');
 
         $coupon->update($validated);
+        
+        // Vytvořit affiliate link pokud je affiliate enabled a ještě neexistuje
+        if ($coupon->affiliate_code_enabled && $coupon->affiliate_partner_id) {
+            $affiliateService = app(\App\Services\AffiliateService::class);
+            $affiliateService->getOrCreateAffiliateLink($coupon);
+        }
 
         return redirect()->route('admin.coupons.index')
             ->with('success', 'Kupón byl úspěšně aktualizován!');

@@ -420,13 +420,24 @@ class SubscriptionController extends Controller
         
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
+            $this->couponService->clearCouponFromStorage();
             return redirect()->localizedRoute('subscriptions.checkout');
         }
         
-        // Zpracovat kupón z query parametru
+        // Zpracovat kupón z query parametru (ručně zadaný)
+        $manualCouponCode = null;
         if (request()->has('coupon_code') && request('coupon_code')) {
-            $couponCode = strtoupper(trim(request('coupon_code')));
-            
+            $manualCouponCode = strtoupper(trim(request('coupon_code')));
+            session(['coupon_code' => $manualCouponCode]);
+            // Vymazat affiliate kód, protože uživatel zadal vlastní
+            session()->forget('affiliate_code');
+        }
+        
+        // Zkusit načíst kupón - priorita: ručně zadaný > session > affiliate
+        $couponCode = $manualCouponCode ?: $this->couponService->getCouponFromStorage();
+        $isAffiliateCoupon = !$manualCouponCode && session('affiliate_code') && $couponCode === session('affiliate_code');
+        
+        if ($couponCode) {
             $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'subscription', $price);
             
             if ($result['valid']) {
@@ -445,12 +456,20 @@ class SubscriptionController extends Controller
                     'final_price' => $price,
                 ]);
             } else {
-                // Kupón není platný - zobrazit chybu
-                $errorMessage = $result['message'];
-                \Log::warning('Invalid coupon in checkout', [
-                    'coupon_code' => $couponCode,
-                    'error' => $errorMessage,
-                ]);
+                // Pokud je to affiliate kód a není platný pro subscription, ticho ignorovat
+                if ($isAffiliateCoupon) {
+                    \Log::debug('Affiliate coupon not valid for subscriptions, ignoring silently', [
+                        'code' => $couponCode,
+                        'reason' => $result['message']
+                    ]);
+                } else {
+                    // Ručně zadaný kód - zobrazit chybu
+                    $errorMessage = $result['message'];
+                    \Log::warning('Invalid coupon in checkout', [
+                        'coupon_code' => $couponCode,
+                        'error' => $errorMessage,
+                    ]);
+                }
             }
         }
 
