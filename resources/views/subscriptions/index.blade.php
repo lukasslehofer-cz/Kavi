@@ -600,6 +600,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentLocale = '{{ $currentLocale }}';
     const currencySymbol = currentLocale === 'en' ? '€' : 'Kč';
     
+    // Load availability data from backend
+    const availability = @json($availability);
+    
     let selectedAmount = null;
     let selectedType = null;
     let selectedFrequency = null;
@@ -763,6 +766,160 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Function to update UI based on availability
+    function updateAvailabilityUI() {
+        console.log('Updating availability UI:', availability);
+        
+        // Find radio buttons by their name/value attributes
+        const espressoRadio = document.querySelector('input[name="type"][value="espresso"]');
+        const filterRadio = document.querySelector('input[name="type"][value="filter"]');
+        const mixRadio = document.querySelector('input[name="type"][value="mix"]');
+        
+        // Get parent label elements
+        const espressoLabel = espressoRadio?.closest('label.group');
+        const filterLabel = filterRadio?.closest('label.group');
+        const mixLabel = mixRadio?.closest('label.group');
+        
+        // Find all decaf checkboxes (there are 3 - one for each type)
+        const decafCheckboxes = document.querySelectorAll('input[name="isDecaf"]');
+
+        // Handle Espresso availability
+        if (!availability.espresso && espressoLabel) {
+            console.log('Disabling espresso option');
+            espressoLabel.classList.add('cursor-not-allowed');
+            espressoLabel.style.pointerEvents = 'none';
+            espressoLabel.style.position = 'relative';
+            espressoLabel.style.backgroundColor = '#f3f4f6'; // gray-100
+            
+            // Add opacity for content
+            const contentDivs = espressoLabel.querySelectorAll('div:not(.sold-out-label)');
+            contentDivs.forEach(div => {
+                div.style.opacity = '0.5';
+            });
+            
+            // Disable the radio button
+            if (espressoRadio) {
+                espressoRadio.disabled = true;
+                if (espressoRadio.checked) {
+                    espressoRadio.checked = false;
+                    selectedType = null;
+                }
+            }
+            
+            // Add sold out badge if not already present
+            if (!espressoLabel.querySelector('.sold-out-label')) {
+                const badge = document.createElement('div');
+                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
+                badge.style.opacity = '1'; // Ensure full opacity
+                badge.textContent = currentLocale === 'en' ? 'Sold out this month' : 'Tento měsíc vyprodáno';
+                espressoLabel.appendChild(badge);
+            }
+        }
+
+        // Handle Filter availability
+        if (!availability.filter && filterLabel) {
+            console.log('Disabling filter option');
+            filterLabel.classList.add('cursor-not-allowed');
+            filterLabel.style.pointerEvents = 'none';
+            filterLabel.style.position = 'relative';
+            filterLabel.style.backgroundColor = '#f3f4f6'; // gray-100
+            
+            // Add opacity for content
+            const contentDivs = filterLabel.querySelectorAll('div:not(.sold-out-label)');
+            contentDivs.forEach(div => {
+                div.style.opacity = '0.5';
+            });
+            
+            // Disable the radio button
+            if (filterRadio) {
+                filterRadio.disabled = true;
+                if (filterRadio.checked) {
+                    filterRadio.checked = false;
+                    selectedType = null;
+                }
+            }
+            
+            // Add sold out badge if not already present
+            if (!filterLabel.querySelector('.sold-out-label')) {
+                const badge = document.createElement('div');
+                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
+                badge.style.opacity = '1'; // Ensure full opacity
+                badge.textContent = currentLocale === 'en' ? 'Sold out this month' : 'Tento měsíc vyprodáno';
+                filterLabel.appendChild(badge);
+            }
+        }
+
+        // Handle Mix availability
+        if (!availability.mix && mixLabel) {
+            console.log('Disabling mix option');
+            mixLabel.classList.add('cursor-not-allowed');
+            mixLabel.style.pointerEvents = 'none';
+            mixLabel.style.position = 'relative';
+            mixLabel.style.backgroundColor = '#f3f4f6'; // gray-100
+            
+            // Add opacity for content
+            const contentDivs = mixLabel.querySelectorAll('div:not(.sold-out-label)');
+            contentDivs.forEach(div => {
+                div.style.opacity = '0.5';
+            });
+            
+            // Disable the radio button
+            if (mixRadio) {
+                mixRadio.disabled = true;
+                if (mixRadio.checked) {
+                    mixRadio.checked = false;
+                    selectedType = null;
+                }
+            }
+            
+            // Add sold out badge if not already present
+            if (!mixLabel.querySelector('.sold-out-label')) {
+                const badge = document.createElement('div');
+                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
+                badge.style.opacity = '1'; // Ensure full opacity
+                badge.textContent = currentLocale === 'en' ? 'Sold out this month' : 'Tento měsíc vyprodáno';
+                mixLabel.appendChild(badge);
+            }
+        }
+
+        // Handle Decaf availability - disable ALL decaf checkboxes
+        if (!availability.decaf && decafCheckboxes.length > 0) {
+            console.log('Disabling decaf options, found checkboxes:', decafCheckboxes.length);
+            decafCheckboxes.forEach((checkbox) => {
+                // Find the parent label container for this checkbox
+                const decafContainer = checkbox.closest('label');
+                
+                if (decafContainer) {
+                    decafContainer.classList.add('opacity-50', 'cursor-not-allowed');
+                    decafContainer.style.pointerEvents = 'none';
+                }
+                
+                // Disable and uncheck the checkbox
+                checkbox.disabled = true;
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    isDecaf = false;
+                }
+            });
+            
+            // Add note after the type options container (only once)
+            const typeOptionsContainer = document.querySelector('.space-y-3');
+            if (typeOptionsContainer && !typeOptionsContainer.querySelector('.decaf-unavailable-note')) {
+                const note = document.createElement('div');
+                note.className = 'decaf-unavailable-note mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700';
+                note.innerHTML = currentLocale === 'en' 
+                    ? '<strong>Notice:</strong> Decaf coffee is not available this month'
+                    : '<strong>Upozornění:</strong> Bezkofeinová káva již není tento měsíc k dispozici';
+                
+                // Insert after the last coffee type option
+                const lastTypeOption = typeOptionsContainer.querySelector('label.group:last-child');
+                if (lastTypeOption) {
+                    lastTypeOption.insertAdjacentElement('afterend', note);
+                }
+            }
+        }
+    }
+    
     function updateSummary() {
         // Množství
         if (selectedAmount) {
@@ -878,6 +1035,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 100);
         }
     }
+    
+    // Apply availability restrictions on page load
+    updateAvailabilityUI();
 });
 </script>
 @endsection
