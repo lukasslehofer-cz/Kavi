@@ -31,7 +31,13 @@ class ResetPasswordNotification extends BaseResetPassword
                 'user' => $notifiable,
                 'count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire'),
                 'locale' => $locale,
-            ]);
+            ])
+            ->withSymfonyMessage(function ($message) use ($notifiable, $locale) {
+                $headers = $message->getHeaders();
+                $headers->addTextHeader('X-Mailable-Class', static::class);
+                $headers->addTextHeader('X-Mailable-Locale', $locale);
+                $headers->addTextHeader('X-User-ID', (string) $notifiable->id);
+            });
     }
 }
 
