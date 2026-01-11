@@ -3,7 +3,6 @@
 namespace App\Listeners;
 
 use App\Models\EmailLog;
-use App\Mail\LocalizedMailable;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Log;
 
@@ -24,54 +23,37 @@ class LogSentEmail
     {
         try {
             $message = $event->message;
-            $mailable = $event->data['__laravel_notification'] ?? null;
+            $headers = $message->getHeaders();
             
-            // Get the original mailable from the event
-            $originalMailable = $event->data['mailable'] ?? null;
+            // Extract recipient from Symfony Address objects
+            $toAddresses = $message->getTo();
+            $recipient = null;
+            if (!empty($toAddresses)) {
+                $firstTo = reset($toAddresses);
+                $recipient = $firstTo->getAddress();
+            }
             
-            // Extract recipient - get first TO address
-            $to = $message->getTo();
-            $recipient = !empty($to) ? array_key_first($to) : null;
-            
-            // Extract sender
-            $from = $message->getFrom();
-            $sender = !empty($from) ? array_key_first($from) : null;
+            // Extract sender from Symfony Address objects
+            $fromAddresses = $message->getFrom();
+            $sender = null;
+            if (!empty($fromAddresses)) {
+                $firstFrom = reset($fromAddresses);
+                $sender = $firstFrom->getAddress();
+            }
             
             // Extract subject
             $subject = $message->getSubject() ?? 'No Subject';
             
-            // Get mailable class name
-            $mailableClass = $originalMailable ? get_class($originalMailable) : 'Unknown';
+            // Get mailable class from custom header
+            $mailableClass = $this->getHeader($headers, 'X-Mailable-Class') ?? 'Unknown';
             
-            // Extract related models and region from mailable
-            $orderId = null;
-            $subscriptionId = null;
-            $userId = null;
-            $region = null;
+            // Get region from custom header
+            $region = $this->getHeader($headers, 'X-Mailable-Locale');
             
-            if ($originalMailable) {
-                // Try to extract order
-                if (isset($originalMailable->order)) {
-                    $orderId = $originalMailable->order->id ?? null;
-                    $userId = $originalMailable->order->user_id ?? null;
-                }
-                
-                // Try to extract subscription
-                if (isset($originalMailable->subscription)) {
-                    $subscriptionId = $originalMailable->subscription->id ?? null;
-                    $userId = $userId ?? ($originalMailable->subscription->user_id ?? null);
-                }
-                
-                // Try to extract user directly
-                if (isset($originalMailable->user)) {
-                    $userId = $userId ?? ($originalMailable->user->id ?? null);
-                }
-                
-                // Try to get region from LocalizedMailable
-                if ($originalMailable instanceof LocalizedMailable) {
-                    $region = $originalMailable->emailLocale ?? null;
-                }
-            }
+            // Get related model IDs from custom headers
+            $orderId = $this->getHeader($headers, 'X-Order-ID');
+            $subscriptionId = $this->getHeader($headers, 'X-Subscription-ID');
+            $userId = $this->getHeader($headers, 'X-User-ID');
             
             // Create email log
             EmailLog::create([
@@ -81,9 +63,9 @@ class LogSentEmail
                 'subject' => $subject,
                 'mailable_class' => $mailableClass,
                 'status' => 'sent',
-                'order_id' => $orderId,
-                'subscription_id' => $subscriptionId,
-                'user_id' => $userId,
+                'order_id' => $orderId ? (int) $orderId : null,
+                'subscription_id' => $subscriptionId ? (int) $subscriptionId : null,
+                'user_id' => $userId ? (int) $userId : null,
                 'region' => $region,
             ]);
         } catch (\Exception $e) {
@@ -93,5 +75,17 @@ class LogSentEmail
                 'trace' => $e->getTraceAsString(),
             ]);
         }
+    }
+    
+    /**
+     * Get a header value from the message headers.
+     */
+    private function getHeader($headers, string $name): ?string
+    {
+        if ($headers->has($name)) {
+            $header = $headers->get($name);
+            return $header ? $header->getBodyAsString() : null;
+        }
+        return null;
     }
 }

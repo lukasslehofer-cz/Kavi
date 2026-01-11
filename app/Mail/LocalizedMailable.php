@@ -55,7 +55,23 @@ abstract class LocalizedMailable extends Mailable
     {
         return $this
             ->mailer(EmailService::getMailer($this->emailLocale))
-            ->from($this->getFromAddress());
+            ->from($this->getFromAddress())
+            ->withSymfonyMessage(function ($message) {
+                $headers = $message->getHeaders();
+                $headers->addTextHeader('X-Mailable-Class', static::class);
+                $headers->addTextHeader('X-Mailable-Locale', $this->emailLocale);
+                
+                // Add related model IDs if available
+                if (isset($this->order) && $this->order) {
+                    $headers->addTextHeader('X-Order-ID', (string) $this->order->id);
+                }
+                if (isset($this->subscription) && $this->subscription) {
+                    $headers->addTextHeader('X-Subscription-ID', (string) $this->subscription->id);
+                }
+                if (isset($this->user) && $this->user) {
+                    $headers->addTextHeader('X-User-ID', (string) $this->user->id);
+                }
+            });
     }
 
     /**

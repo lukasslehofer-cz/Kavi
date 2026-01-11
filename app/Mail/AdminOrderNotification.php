@@ -75,6 +75,25 @@ class AdminOrderNotification extends Mailable
     }
 
     /**
+     * Build the message with custom headers for email logging.
+     */
+    public function build()
+    {
+        return $this->withSymfonyMessage(function ($message) {
+            $headers = $message->getHeaders();
+            $headers->addTextHeader('X-Mailable-Class', static::class);
+            $headers->addTextHeader('X-Mailable-Locale', 'cs'); // Admin notifications are always in Czech
+            
+            if ($this->order) {
+                $headers->addTextHeader('X-Order-ID', (string) $this->order->id);
+            }
+            if ($this->subscription) {
+                $headers->addTextHeader('X-Subscription-ID', (string) $this->subscription->id);
+            }
+        });
+    }
+
+    /**
      * Send notification to all admin users.
      * 
      * @param Order|Subscription $entity
