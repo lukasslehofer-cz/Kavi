@@ -12,30 +12,42 @@ function initCookieConsent() {
 
     console.log('Initializing cookie consent with config:', window.cookieConsentConfig);
     
-    CookieConsent.run(window.cookieConsentConfig);
-
-    // Handle consent changes
-    CookieConsent.onChange(({ changedCategories, changedServices }) => {
-        console.log('Cookie consent changed:', changedCategories);
+    // Add callbacks to config
+    const config = {
+        ...window.cookieConsentConfig,
         
-        if (changedCategories.includes('analytics')) {
+        onFirstConsent: ({ cookie }) => {
+            console.log('First consent given:', cookie);
+            // Load GTM if analytics accepted
             if (CookieConsent.acceptedCategory('analytics')) {
-                // Load GTM if analytics accepted
                 loadGTM();
-            } else {
-                // Reload page to remove GTM if analytics was declined
-                window.location.reload();
+            }
+        },
+        
+        onConsent: ({ cookie }) => {
+            console.log('Consent loaded:', cookie);
+            // Load GTM if analytics accepted (for returning visitors)
+            if (CookieConsent.acceptedCategory('analytics')) {
+                loadGTM();
+            }
+        },
+        
+        onChange: ({ cookie, changedCategories }) => {
+            console.log('Cookie consent changed:', changedCategories);
+            
+            if (changedCategories.includes('analytics')) {
+                if (CookieConsent.acceptedCategory('analytics')) {
+                    // Load GTM if analytics accepted
+                    loadGTM();
+                } else {
+                    // Reload page to remove GTM if analytics was declined
+                    window.location.reload();
+                }
             }
         }
-    });
-
-    // Load GTM immediately if analytics already accepted
-    if (CookieConsent.acceptedCategory('analytics')) {
-        console.log('Analytics already accepted, loading GTM');
-        loadGTM();
-    } else {
-        console.log('Analytics not accepted yet');
-    }
+    };
+    
+    CookieConsent.run(config);
 }
 
 // Load Google Tag Manager
