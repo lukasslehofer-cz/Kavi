@@ -32,13 +32,9 @@ class ForgotPasswordController extends Controller
             $request->only('email')
         );
 
-        if ($status === Password::RESET_LINK_SENT) {
-            return back()->with('status', 'Pokud je email zaregistrován v našem systému, odeslali jsme vám odkaz pro reset hesla.');
-        }
-
         // For security reasons, we don't want to reveal whether the email exists or not
         // So we'll show success message anyway
-        return back()->with('status', 'Pokud je email zaregistrován v našem systému, odeslali jsme vám odkaz pro reset hesla.');
+        return back()->with('status', __('passwords.sent'));
     }
 }
 

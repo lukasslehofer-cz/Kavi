@@ -49,12 +49,41 @@ class DetectRegion
         config(['app.currency' => $region['currency']]);
         config(['app.region' => $region['region_code'] ?? 'cz']);
         
+        // Configure email settings based on locale/domain
+        $this->configureMailSettings($region['locale'], $host);
+        
         // Share with all views
         view()->share('currentCurrency', $region['currency']);
         view()->share('currentRegion', $region['region_code'] ?? 'cz');
         view()->share('currentLocale', $region['locale']);
         
         return $next($request);
+    }
+    
+    /**
+     * Configure mail settings based on locale and domain.
+     */
+    protected function configureMailSettings(string $locale, string $host): void
+    {
+        // Set mail from address and name based on locale/domain
+        if ($locale === 'en' || str_contains($host, 'kavibox.com')) {
+            // English domain - use kavibox.com email
+            config([
+                'mail.from.address' => env('MAIL_FROM_ADDRESS_EN', 'info@kavibox.com'),
+                'mail.from.name' => env('MAIL_FROM_NAME_EN', 'KAVIbox'),
+            ]);
+            
+            // Use EN mailer if configured
+            if (config('mail.mailers.smtp_en')) {
+                config(['mail.default' => 'smtp_en']);
+            }
+        } else {
+            // Czech domain - use kavi.cz email (default)
+            config([
+                'mail.from.address' => env('MAIL_FROM_ADDRESS', 'info@kavi.cz'),
+                'mail.from.name' => env('MAIL_FROM_NAME', 'KAVI.cz'),
+            ]);
+        }
     }
 }
 

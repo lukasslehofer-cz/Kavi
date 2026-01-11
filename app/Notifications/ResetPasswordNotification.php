@@ -9,6 +9,9 @@ class ResetPasswordNotification extends BaseResetPassword
 {
     public function toMail($notifiable): MailMessage
     {
+        // Get current locale for proper localization
+        $locale = app()->getLocale();
+        
         // Generate password reset URL
         // If password.reset route doesn't exist, use a fallback URL
         try {
@@ -22,11 +25,12 @@ class ResetPasswordNotification extends BaseResetPassword
         }
 
         return (new MailMessage)
-            ->subject('Reset hesla - KAVI.cz')
+            ->subject(__('emails.reset_password.subject', [], $locale))
             ->view('emails.reset-password', [
                 'url' => $url,
                 'user' => $notifiable,
-                'count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')
+                'count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire'),
+                'locale' => $locale,
             ]);
     }
 }
