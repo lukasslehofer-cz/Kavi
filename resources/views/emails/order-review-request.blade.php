@@ -104,10 +104,10 @@
                             
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="{{ $trustpilotLink }}" class="button" target="_blank" rel="noopener">
-                                    {{ $locale === 'cs' ? 'Hodnotit na Trustpilot' : 'Review on Trustpilot' }}
+                                    {{ $locale === 'cs' ? 'Hodnotit na Google' : 'Review on Trustpilot' }}
                                 </a>
                                 <p style="font-size: 12px; color: #6b7280; margin-top: 12px; font-weight: 300;">
-                                    {{ $locale === 'cs' ? 'Budete přesměrováni na Trustpilot.com' : 'You will be redirected to Trustpilot.com' }}
+                                    {{ $locale === 'cs' ? 'Budete přesměrováni na Google.com' : 'You will be redirected to Trustpilot.com' }}
                                 </p>
                             </div>
                             

@@ -23,9 +23,10 @@
     </script>
     <!-- End Cookie Consent Configuration -->
     
-    <!-- TrustBox script -->
+    @if(($currentLocale ?? 'cs') === 'en')
+    <!-- TrustBox script - only for EN version -->
     <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-    <!-- End TrustBox script -->
+    @endif
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Top Announcement Banner - Dark Minimal -->

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class ReviewRequestController extends Controller
 {
     /**
-     * Track click and redirect to Trustpilot
+     * Track click and redirect to review page (Google for CZ, Trustpilot for EN)
      */
     public function track(Request $request, string $token)
     {
@@ -20,7 +20,20 @@ class ReviewRequestController extends Controller
             $reviewRequest->markAsClicked($request->ip());
         }
 
-        // Redirect to Trustpilot review page
+        // Determine currency from order or subscription
+        $currency = null;
+        if ($reviewRequest->order) {
+            $currency = $reviewRequest->order->currency;
+        } elseif ($reviewRequest->subscription) {
+            $currency = $reviewRequest->subscription->currency;
+        }
+
+        // Redirect based on currency: CZK = Google Business, EUR = Trustpilot
+        if ($currency === 'CZK') {
+            return redirect()->away('https://g.page/r/CUKHHPAV65MnEBM/review');
+        }
+
+        // Default to Trustpilot for EUR/international
         return redirect()->away('https://www.trustpilot.com/review/kavi.cz');
     }
 }
