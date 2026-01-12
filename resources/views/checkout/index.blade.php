@@ -105,23 +105,20 @@
 
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('checkout.fields.phone') }} @guest<span class="text-gray-500">{{ __('checkout.fields.notes_optional') }}</span>@else<span class="text-red-500">*</span>@endguest
+                                {{ __('checkout.fields.phone') }} <span class="text-red-500">*</span>
                             </label>
                             <input 
                                 type="tel" 
                                 id="phone" 
                                 name="phone" 
                                 value="{{ old('phone', auth()->user()->phone ?? '') }}" 
-                                @auth required @endauth
+                                required
                                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="+420 123 456 789"
                             >
                             @error('phone')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                             @enderror
-                            @guest
-                            <p class="text-xs text-gray-600 mt-1">{{ __('checkout.phone_helps') }}</p>
-                            @endguest
                         </div>
                     </div>
                 </div>

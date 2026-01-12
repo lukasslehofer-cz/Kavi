@@ -187,9 +187,9 @@
                         </dd>
                     </div>
                     
-                    <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                    <div class="flex justify-between items-start py-3 border-b border-gray-100">
                         <dt class="text-gray-600 font-light flex-shrink-0">{{ __('cart.shipping') }}</dt>
-                        <dd class="font-bold text-right flex-shrink-0 ml-4">
+                        <dd class="font-bold text-right ml-4 min-w-0">
                             @if($shipping !== null)
                                 @if($shipping == 0)
                                     <span class="text-green-600 inline-flex items-center gap-1">
@@ -208,7 +208,7 @@
                                     </span>
                                 @endif
                             @else
-                                <span class="text-gray-500 text-sm whitespace-nowrap">{{ $shippingMessage ?? __('cart.at_checkout') }}</span>
+                                <span class="text-gray-500 text-sm">{{ $shippingMessage ?? __('cart.at_checkout') }}</span>
                             @endif
                         </dd>
                     </div>
