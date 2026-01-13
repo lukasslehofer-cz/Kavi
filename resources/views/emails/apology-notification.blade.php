@@ -61,7 +61,7 @@
                             </div>
                             
                             <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 24px 0;">
-                                Vaše <strong>lednová rozesílka proběhne dle standardního harmonogramu</strong> a o jejím odeslání vás budeme informovat jako obvykle.
+                                Vaše <strong>lednová rozesílka proběhne dle standardního harmonogramu (platba 15.1. a odeslání 20.1.)</strong> a o jejím odeslání vás budeme informovat jako obvykle.
                             </p>
                             
                             <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 24px 0;">
