@@ -80,7 +80,7 @@
                                         Mix Espresso & {{ $locale === 'cs' ? 'Filtr' : 'Filter' }}
                                     @endif
                                     <br>
-                                    <strong>{{ $locale === 'cs' ? 'Množství' : 'Quantity' }}:</strong> {{ $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2 }} {{ $locale === 'cs' ? 'vzorky' : 'samples' }}
+                                    <strong>{{ $locale === 'cs' ? 'Množství' : 'Quantity' }}:</strong> {{ $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2 }} {{ $locale === 'cs' ? 'balení' : 'packages' }}
                                 </p>
                             </div>
                             

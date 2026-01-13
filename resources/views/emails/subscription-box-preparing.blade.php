@@ -63,7 +63,7 @@
                                 <p class="info-text" style="color: #78350f;">
                                     @if($locale === 'cs')
                                     <strong>1. ✓ Výběr kávy</strong> - Pečlivě jsme vybrali kávy z nejlepších pražíren<br>
-                                    <strong>2. ✓ Káva dorazila</strong> - Vzorky z celé Evropy jsou na místě<br>
+                                    <strong>2. ✓ Káva dorazila</strong> - Balíčky z celé Evropy jsou na místě<br>
                                     <strong>3. → Balení boxu</strong> - Právě teď balíme váš unikátní box<br>
                                     <strong>4. Expedice</strong> - Za cca 5 dní odešleme k vám
                                     @else
@@ -89,7 +89,7 @@
                                     @endif
                                     <br>
                                     
-                                    <strong>{{ $locale === 'cs' ? 'Množství' : 'Quantity' }}:</strong> {{ $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2 }} {{ $locale === 'cs' ? 'vzorky' : 'samples' }}<br>
+                                    <strong>{{ $locale === 'cs' ? 'Množství' : 'Quantity' }}:</strong> {{ $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2 }} {{ $locale === 'cs' ? 'balíčky' : 'packages' }}<br>
                                 </p>
                             </div>
                             
@@ -114,7 +114,7 @@
                                     @if($locale === 'cs')
                                     • <strong>Čerstvě pražená káva</strong> z malých pražíren<br>
                                     • <strong>Vybrána speciálně</strong> podle vašich preferencí<br>
-                                    • <strong>Vzorky z celé Evropy</strong> - objevujte nové chutě<br>
+                                    • <strong>Káva z celé Evropy</strong> - objevujte nové chutě<br>
                                     • <strong>Baleno s láskou</strong> náš tým pro vás
                                     @else
                                     • <strong>Freshly roasted coffee</strong> from small roasteries<br>

@@ -41,7 +41,7 @@ return [
         'step1_title' => 'Prozkoumejte náš sortiment',
         'step1_text' => 'Nabízíme čerstvě praženou kávu z nejlepších pražíren po celé Evropě.',
         'step2_title' => 'Vyzkoušejte předplatné',
-        'step2_text' => 'Každý měsíc vám doručíme vybrané vzorky káv přímo domů.',
+        'step2_text' => 'Každý měsíc vám doručíme vybrané balíčky káv přímo domů.',
         'step3_title' => 'Objevujte nové chutě',
         'step3_text' => 'Každá káva má svůj příběh. Těšte se na objevování!',
         'explore_subscription' => 'Prozkoumat předplatné',
