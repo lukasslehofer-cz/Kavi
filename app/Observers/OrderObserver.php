@@ -80,6 +80,18 @@ class OrderObserver
     protected function sendOrderDeliveredEmail(Order $order): void
     {
         try {
+            // Don't send email for old orders (shipped more than 7 days ago)
+            // This prevents mass emails when fixing bugs or doing data migrations
+            if ($order->shipped_at && $order->shipped_at->lt(now()->subDays(7))) {
+                \Log::info('Skipping delivered email for old order', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'shipped_at' => $order->shipped_at->toDateTimeString(),
+                    'reason' => 'Order shipped more than 7 days ago',
+                ]);
+                return;
+            }
+
             // Get email from shipping address or user
             $email = $order->shipping_address['email'] ?? $order->user?->email ?? null;
             

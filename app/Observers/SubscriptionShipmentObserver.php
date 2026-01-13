@@ -25,6 +25,18 @@ class SubscriptionShipmentObserver
     protected function sendSubscriptionBoxDeliveredEmail(SubscriptionShipment $shipment): void
     {
         try {
+            // Don't send email for old shipments (sent more than 7 days ago)
+            // This prevents mass emails when fixing bugs or doing data migrations
+            if ($shipment->sent_at && $shipment->sent_at->lt(now()->subDays(7))) {
+                \Log::info('Skipping delivered email for old subscription shipment', [
+                    'shipment_id' => $shipment->id,
+                    'subscription_id' => $shipment->subscription_id,
+                    'sent_at' => $shipment->sent_at->toDateTimeString(),
+                    'reason' => 'Shipment sent more than 7 days ago',
+                ]);
+                return;
+            }
+
             $subscription = $shipment->subscription;
             
             if (!$subscription) {
