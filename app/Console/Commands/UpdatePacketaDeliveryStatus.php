@@ -75,10 +75,26 @@ class UpdatePacketaDeliveryStatus extends Command
                 $status = $packetaService->getPacketStatus($order->packeta_packet_id);
                 
                 if ($status === null) {
+                    Log::warning('Packeta API returned null for order', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'packeta_packet_id' => $order->packeta_packet_id,
+                    ]);
                     $stats['errors']++;
                     $this->output->progressAdvance();
                     continue;
                 }
+
+                // Debug logging for every status check
+                Log::debug('Packeta status check result', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'packeta_packet_id' => $order->packeta_packet_id,
+                    'status_code' => $status['statusCode'],
+                    'code_text' => $status['codeText'],
+                    'is_delivered' => $status['isDelivered'],
+                    'is_returned' => $status['isReturned'],
+                ]);
 
                 if ($status['isDelivered']) {
                     // Update order as delivered

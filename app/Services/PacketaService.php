@@ -301,6 +301,16 @@ class PacketaService
                         $isDelivered = $statusCode === 4;
                         $isReturned = $statusCode === 5;
                         
+                        // Log the API response for audit trail
+                        Log::info('Packeta packetStatus API response', [
+                            'packet_id' => $packetId,
+                            'status_code' => $statusCode,
+                            'code_text' => $codeText,
+                            'is_delivered' => $isDelivered,
+                            'is_returned' => $isReturned,
+                            'raw_response' => $response->body(),
+                        ]);
+                        
                         return [
                             'statusCode' => $statusCode,
                             'codeText' => $codeText,

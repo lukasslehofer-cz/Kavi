@@ -233,9 +233,9 @@ return [
 
     // Order Delivered
     'order_delivered' => [
-        'subject' => 'Your Order :order_number Is Ready for Pickup - KAVI',
-        'title' => 'Your Order Is Ready! 📦',
-        'subtitle' => 'Your order is ready for pickup.',
+        'subject' => 'Your Order :order_number Has Been Delivered - KAVI',
+        'title' => 'Your Order Has Been Delivered! 📦',
+        'subtitle' => 'Your order has been successfully delivered.',
         'order_number' => 'Order Number',
         'pickup_point' => 'Pickup Point',
         'pickup_code' => 'Pickup Code',

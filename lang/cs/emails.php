@@ -233,9 +233,9 @@ return [
 
     // Order Delivered
     'order_delivered' => [
-        'subject' => 'Vaše objednávka :order_number čeká na vyzvednutí - KAVI.cz',
-        'title' => 'Vaše objednávka je připravena! 📦',
-        'subtitle' => 'Vaše objednávka čeká na vyzvednutí.',
+        'subject' => 'Vaše objednávka :order_number byla doručena - KAVI.cz',
+        'title' => 'Vaše objednávka byla doručena! 📦',
+        'subtitle' => 'Vaše objednávka byla úspěšně doručena.',
         'order_number' => 'Číslo objednávky',
         'pickup_point' => 'Výdejní místo',
         'pickup_code' => 'Kód pro vyzvednutí',
