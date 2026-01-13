@@ -25,6 +25,7 @@ class SubscriptionShipment extends Model
         'status',
         'notes',
         'sent_at',
+        'delivered_at',
     ];
 
     protected $casts = [
@@ -34,6 +35,7 @@ class SubscriptionShipment extends Model
         'package_width' => 'integer',
         'package_height' => 'integer',
         'sent_at' => 'datetime',
+        'delivered_at' => 'datetime',
     ];
 
     /**

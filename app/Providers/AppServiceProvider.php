@@ -5,8 +5,10 @@ namespace App\Providers;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Subscription;
+use App\Models\SubscriptionShipment;
 use App\Observers\OrderObserver;
 use App\Observers\ProductObserver;
+use App\Observers\SubscriptionShipmentObserver;
 use App\Observers\SubscriptionStockObserver;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Routing\Redirector;
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         Order::observe(OrderObserver::class);
         Product::observe(ProductObserver::class);
         Subscription::observe(SubscriptionStockObserver::class);
+        SubscriptionShipment::observe(SubscriptionShipmentObserver::class);
 
         // Add localizedRoute macro to Redirector for redirect()->localizedRoute() support
         Redirector::macro('localizedRoute', function (string $route, $parameters = [], $status = 302, $headers = []) {

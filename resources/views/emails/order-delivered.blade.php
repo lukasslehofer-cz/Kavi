@@ -48,7 +48,7 @@
                         <td class="content">
                             <div style="text-align: center; margin-bottom: 24px;">
                                 <div style="width: 64px; height: 64px; background-color: #10b981 !important; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; line-height: 64px;">
-                                    📍
+                                    ✓
                                 </div>
                             </div>
                             
@@ -60,48 +60,21 @@
                                 <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $order->order_number }}</div>
                             </div>
                             
-                            <!-- Pickup Point -->
+                            <!-- Thank You Message -->
                             <div class="info-box" style="background-color: #d1fae5 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#d1fae5">
-                                <h3 class="info-title" style="color: #065f46;">📍 {{ __('emails.order_delivered.pickup_point', [], $locale) }}</h3>
-                                @if(isset($order->shipping_address['packeta_point_name']))
+                                <h3 class="info-title" style="color: #065f46;">🎉 {{ $locale === 'cs' ? 'Děkujeme za nákup!' : 'Thank you for your purchase!' }}</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    <strong style="font-size: 16px;">{{ $order->shipping_address['packeta_point_name'] }}</strong>
-                                </p>
-                                @if(isset($order->shipping_address['packeta_point_address']))
-                                <p class="info-text" style="color: #047857;">
-                                    {{ $order->shipping_address['packeta_point_address'] }}
-                                </p>
-                                @endif
-                                @endif
-                                
-                                @if($order->packeta_packet_id)
-                                <p class="info-text" style="color: #047857; margin-top: 12px;">
-                                    <strong>{{ __('emails.order_delivered.pickup_code', [], $locale) }}:</strong> {{ $order->packeta_packet_id }}
-                                </p>
-                                @endif
-                            </div>
-                            
-                            <!-- Important Info -->
-                            <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e;">⚠️ {{ $locale === 'cs' ? 'Důležité' : 'Important' }}</h3>
-                                <p class="info-text" style="color: #78350f;">
                                     @if($locale === 'cs')
-                                    <strong>Zásilku vyzvedněte do 7 dnů</strong> od doručení, jinak bude vrácena zpět.<br><br>
-                                    Pro vyzvednutí potřebujete:<br>
-                                    • SMS kód od Zásilkovny<br>
-                                    • Občanský průkaz
+                                    Doufáme, že si kávu vychutnáte! Pokud budete mít jakékoli dotazy nebo připomínky, neváhejte nás kontaktovat.
                                     @else
-                                    <strong>Pick up within 7 days</strong> of delivery, otherwise it will be returned.<br><br>
-                                    For pickup you need:<br>
-                                    • SMS code from the carrier<br>
-                                    • ID card
+                                    We hope you enjoy your coffee! If you have any questions or feedback, don't hesitate to contact us.
                                     @endif
                                 </p>
                             </div>
                             
                             <!-- Order Items -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">☕ {{ $locale === 'cs' ? 'Obsah balíku' : 'Package contents' }}</h3>
+                                <h3 class="info-title">☕ {{ $locale === 'cs' ? 'Co jste si vyzvedli' : 'What you picked up' }}</h3>
                                 @foreach($order->items as $item)
                                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
                                     <tr>

@@ -242,6 +242,14 @@ return [
         'pickup_deadline' => 'Pickup By',
     ],
 
+    // Subscription Box Delivered
+    'subscription_box_delivered' => [
+        'subject' => 'Your Coffee Box Has Been Delivered ✓ - :subscription_number',
+        'title' => 'Your Coffee Box Has Been Delivered! ☕',
+        'subtitle' => 'Thank you for picking up your coffee box.',
+        'subscription_number' => 'Subscription Number',
+    ],
+
     // Subscription Cancelled
     'subscription_cancelled' => [
         'subject' => 'Subscription Cancelled - We Hope to See You Again! - KAVI',

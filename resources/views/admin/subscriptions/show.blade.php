@@ -482,6 +482,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Packeta tracking</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faktura</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poznámka</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akce</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -563,6 +564,23 @@
                                 </div>
                                 @else
                                 <span class="text-sm text-gray-500">-</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($shipment->status === 'sent')
+                                <form action="{{ route('admin.subscription-shipments.mark-delivered', $shipment) }}" method="POST" class="inline" onsubmit="return confirm('Opravdu chcete označit zásilku jako doručenou?\n\nTato akce odešle zákazníkovi email o doručení.');">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Doručeno
+                                    </button>
+                                </form>
+                                @elseif($shipment->status === 'delivered')
+                                <span class="text-xs text-gray-500">✓ Doručeno</span>
+                                @else
+                                <span class="text-xs text-gray-400">-</span>
                                 @endif
                             </td>
                         </tr>

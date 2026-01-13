@@ -242,6 +242,14 @@ return [
         'pickup_deadline' => 'Vyzvednout do',
     ],
 
+    // Subscription Box Delivered
+    'subscription_box_delivered' => [
+        'subject' => 'Váš kávový box byl doručen ✓ - :subscription_number',
+        'title' => 'Váš kávový box byl doručen! ☕',
+        'subtitle' => 'Děkujeme, že jste si vyzvedli svůj kávový box.',
+        'subscription_number' => 'Číslo předplatného',
+    ],
+
     // Subscription Cancelled
     'subscription_cancelled' => [
         'subject' => 'Předplatné zrušeno - Budeme se těšit na viděnou! - KAVI.cz',

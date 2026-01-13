@@ -784,4 +784,50 @@ class SubscriptionController extends Controller
 
         return view('admin.subscriptions.shipments-history', compact('shipments', 'stats', 'availableMonths'));
     }
+
+    /**
+     * Manually mark a single shipment as delivered (triggers delivery email via observer)
+     */
+    public function markAsDelivered(\App\Models\SubscriptionShipment $shipment)
+    {
+        // Check if already delivered
+        if ($shipment->status === 'delivered') {
+            return redirect()->route('admin.subscriptions.show', $shipment->subscription_id)
+                ->with('info', 'Zásilka již byla označena jako doručená.');
+        }
+
+        try {
+            // Mark shipment as delivered - observer will send the email
+            $shipment->update([
+                'status' => 'delivered',
+                'delivered_at' => now(),
+                // If not sent yet, also set sent_at
+                'sent_at' => $shipment->sent_at ?? now(),
+            ]);
+
+            // Update subscription for backward compatibility
+            $shipment->subscription->update([
+                'packeta_shipment_status' => 'delivered',
+            ]);
+
+            Log::info('Subscription shipment manually marked as delivered', [
+                'shipment_id' => $shipment->id,
+                'subscription_id' => $shipment->subscription_id,
+                'subscription_number' => $shipment->subscription->subscription_number,
+                'admin_user_id' => auth()->id(),
+            ]);
+
+            return redirect()->route('admin.subscriptions.show', $shipment->subscription_id)
+                ->with('success', 'Zásilka byla označena jako doručená a email byl odeslán.');
+
+        } catch (\Exception $e) {
+            Log::error('Failed to manually mark shipment as delivered', [
+                'shipment_id' => $shipment->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('admin.subscriptions.show', $shipment->subscription_id)
+                ->with('error', 'Nepodařilo se označit zásilku jako doručenou: ' . $e->getMessage());
+        }
+    }
 }

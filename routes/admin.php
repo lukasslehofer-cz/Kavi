@@ -70,6 +70,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/subscriptions-shipments/history', [\App\Http\Controllers\Admin\SubscriptionController::class, 'shipmentsHistory'])->name('subscriptions.shipments.history');
     Route::post('/subscriptions-shipments/send-to-packeta', [\App\Http\Controllers\Admin\SubscriptionController::class, 'sendToPacketa'])->name('subscriptions.send-to-packeta');
     Route::post('/subscriptions-shipments/send-preparing-emails', [\App\Http\Controllers\Admin\SubscriptionController::class, 'sendPreparingEmails'])->name('subscriptions.send-preparing-emails');
+    Route::post('/subscription-shipments/{shipment}/mark-delivered', [\App\Http\Controllers\Admin\SubscriptionController::class, 'markAsDelivered'])->name('subscription-shipments.mark-delivered');
     Route::put('/subscription-shipments/{shipment}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'updateShipment'])->name('subscription-shipments.update');
     
     // Coupons

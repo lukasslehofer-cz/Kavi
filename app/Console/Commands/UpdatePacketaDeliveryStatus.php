@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Order;
+use App\Models\SubscriptionShipment;
 use App\Services\PacketaService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -16,14 +17,14 @@ class UpdatePacketaDeliveryStatus extends Command
      */
     protected $signature = 'packeta:update-delivery-status 
                             {--dry-run : Show what would be updated without making changes}
-                            {--limit=100 : Maximum number of orders to check}';
+                            {--limit=100 : Maximum number of items to check per type}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Check Packeta API for delivery status and update orders accordingly';
+    protected $description = 'Check Packeta API for delivery status and update orders and subscription shipments accordingly';
 
     /**
      * Execute the console command.
@@ -39,6 +40,38 @@ class UpdatePacketaDeliveryStatus extends Command
             $this->warn('DRY RUN MODE - No changes will be made');
         }
 
+        // Check Orders
+        $orderStats = $this->checkOrders($packetaService, $dryRun, $limit);
+        
+        // Check Subscription Shipments
+        $shipmentStats = $this->checkSubscriptionShipments($packetaService, $dryRun, $limit);
+
+        // Combined Summary
+        $this->newLine();
+        $this->info('=== Combined Summary ===');
+        $this->line("Orders checked: {$orderStats['checked']}, delivered: {$orderStats['delivered']}, returned: {$orderStats['returned']}");
+        $this->line("Shipments checked: {$shipmentStats['checked']}, delivered: {$shipmentStats['delivered']}, returned: {$shipmentStats['returned']}");
+        
+        if ($dryRun) {
+            $this->warn('DRY RUN - No changes were made');
+        }
+
+        Log::info('Packeta delivery status check completed', [
+            'orders' => $orderStats,
+            'shipments' => $shipmentStats,
+        ]);
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Check and update order delivery statuses
+     */
+    protected function checkOrders(PacketaService $packetaService, bool $dryRun, int $limit): array
+    {
+        $this->newLine();
+        $this->info('=== Checking Orders ===');
+
         // Find orders that:
         // 1. Have packeta_packet_id (were sent to Packeta)
         // 2. Have status 'submitted' (not yet delivered)
@@ -50,14 +83,6 @@ class UpdatePacketaDeliveryStatus extends Command
             ->limit($limit)
             ->get();
 
-        if ($orders->isEmpty()) {
-            $this->info('No orders pending delivery status check.');
-            Log::info('Packeta delivery status check: No orders to check');
-            return Command::SUCCESS;
-        }
-
-        $this->info("Found {$orders->count()} orders to check.");
-        
         $stats = [
             'checked' => 0,
             'delivered' => 0,
@@ -66,6 +91,12 @@ class UpdatePacketaDeliveryStatus extends Command
             'unchanged' => 0,
         ];
 
+        if ($orders->isEmpty()) {
+            $this->info('No orders pending delivery status check.');
+            return $stats;
+        }
+
+        $this->info("Found {$orders->count()} orders to check.");
         $this->output->progressStart($orders->count());
 
         foreach ($orders as $order) {
@@ -86,7 +117,7 @@ class UpdatePacketaDeliveryStatus extends Command
                 }
 
                 // Debug logging for every status check
-                Log::debug('Packeta status check result', [
+                Log::debug('Packeta status check result for order', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
                     'packeta_packet_id' => $order->packeta_packet_id,
@@ -158,22 +189,142 @@ class UpdatePacketaDeliveryStatus extends Command
 
         $this->output->progressFinish();
 
-        // Summary
+        $this->info("Orders - Checked: {$stats['checked']}, Delivered: {$stats['delivered']}, Returned: {$stats['returned']}, Errors: {$stats['errors']}");
+
+        return $stats;
+    }
+
+    /**
+     * Check and update subscription shipment delivery statuses
+     */
+    protected function checkSubscriptionShipments(PacketaService $packetaService, bool $dryRun, int $limit): array
+    {
         $this->newLine();
-        $this->info('=== Summary ===');
-        $this->line("Checked: {$stats['checked']}");
-        $this->line("Delivered: {$stats['delivered']}");
-        $this->line("Returned: {$stats['returned']}");
-        $this->line("Unchanged: {$stats['unchanged']}");
-        $this->line("Errors: {$stats['errors']}");
-        
-        if ($dryRun) {
-            $this->warn('DRY RUN - No changes were made');
+        $this->info('=== Checking Subscription Shipments ===');
+
+        // Find subscription shipments that:
+        // 1. Have packeta_packet_id (were sent to Packeta)
+        // 2. Have status 'sent' (not yet delivered)
+        // 3. Were sent in last 30 days
+        $shipments = SubscriptionShipment::with('subscription')
+            ->whereNotNull('packeta_packet_id')
+            ->where('status', 'sent')
+            ->where('sent_at', '>=', now()->subDays(30))
+            ->orderBy('sent_at', 'asc')
+            ->limit($limit)
+            ->get();
+
+        $stats = [
+            'checked' => 0,
+            'delivered' => 0,
+            'returned' => 0,
+            'errors' => 0,
+            'unchanged' => 0,
+        ];
+
+        if ($shipments->isEmpty()) {
+            $this->info('No subscription shipments pending delivery status check.');
+            return $stats;
         }
 
-        Log::info('Packeta delivery status check completed', $stats);
+        $this->info("Found {$shipments->count()} subscription shipments to check.");
+        $this->output->progressStart($shipments->count());
 
-        return Command::SUCCESS;
+        foreach ($shipments as $shipment) {
+            $stats['checked']++;
+            
+            try {
+                $status = $packetaService->getPacketStatus($shipment->packeta_packet_id);
+                
+                if ($status === null) {
+                    Log::warning('Packeta API returned null for subscription shipment', [
+                        'shipment_id' => $shipment->id,
+                        'subscription_id' => $shipment->subscription_id,
+                        'packeta_packet_id' => $shipment->packeta_packet_id,
+                    ]);
+                    $stats['errors']++;
+                    $this->output->progressAdvance();
+                    continue;
+                }
+
+                // Debug logging for every status check
+                Log::debug('Packeta status check result for subscription shipment', [
+                    'shipment_id' => $shipment->id,
+                    'subscription_id' => $shipment->subscription_id,
+                    'subscription_number' => $shipment->subscription?->subscription_number,
+                    'packeta_packet_id' => $shipment->packeta_packet_id,
+                    'status_code' => $status['statusCode'],
+                    'code_text' => $status['codeText'],
+                    'is_delivered' => $status['isDelivered'],
+                    'is_returned' => $status['isReturned'],
+                ]);
+
+                if ($status['isDelivered']) {
+                    // Update shipment as delivered
+                    if (!$dryRun) {
+                        $shipment->update([
+                            'status' => 'delivered',
+                            'delivered_at' => now(),
+                        ]);
+                        
+                        Log::info('Subscription shipment marked as delivered from Packeta', [
+                            'shipment_id' => $shipment->id,
+                            'subscription_id' => $shipment->subscription_id,
+                            'subscription_number' => $shipment->subscription?->subscription_number,
+                            'packeta_packet_id' => $shipment->packeta_packet_id,
+                            'packeta_status_code' => $status['statusCode'],
+                            'packeta_status_text' => $status['codeText'],
+                        ]);
+                    }
+                    
+                    $stats['delivered']++;
+                    $subscriptionNumber = $shipment->subscription?->subscription_number ?? $shipment->subscription_id;
+                    $this->line(" ✓ Subscription #{$subscriptionNumber} - DELIVERED");
+                    
+                } elseif ($status['isReturned']) {
+                    // Update shipment as returned
+                    if (!$dryRun) {
+                        $shipment->update([
+                            'status' => 'returned',
+                        ]);
+                        
+                        Log::warning('Subscription shipment marked as returned from Packeta', [
+                            'shipment_id' => $shipment->id,
+                            'subscription_id' => $shipment->subscription_id,
+                            'subscription_number' => $shipment->subscription?->subscription_number,
+                            'packeta_packet_id' => $shipment->packeta_packet_id,
+                            'packeta_status_code' => $status['statusCode'],
+                            'packeta_status_text' => $status['codeText'],
+                        ]);
+                    }
+                    
+                    $stats['returned']++;
+                    $subscriptionNumber = $shipment->subscription?->subscription_number ?? $shipment->subscription_id;
+                    $this->line(" ⚠ Subscription #{$subscriptionNumber} - RETURNED");
+                    
+                } else {
+                    $stats['unchanged']++;
+                }
+
+            } catch (\Exception $e) {
+                $stats['errors']++;
+                Log::error('Error checking Packeta status for subscription shipment', [
+                    'shipment_id' => $shipment->id,
+                    'subscription_id' => $shipment->subscription_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+            
+            $this->output->progressAdvance();
+            
+            // Small delay to avoid overwhelming the API
+            usleep(100000); // 100ms
+        }
+
+        $this->output->progressFinish();
+
+        $this->info("Shipments - Checked: {$stats['checked']}, Delivered: {$stats['delivered']}, Returned: {$stats['returned']}, Errors: {$stats['errors']}");
+
+        return $stats;
     }
 }
-
