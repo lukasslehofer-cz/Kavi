@@ -291,7 +291,7 @@
   <!-- Organic shape decoration -->
   <div class="absolute top-1/2 right-0 w-80 h-80 bg-gray-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
 
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
+  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8" style="z-index: 100;">
     <!-- Section Header - Minimal -->
     <div class="mb-16 sm:mb-20 max-w-2xl mx-auto text-center">
       <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">{{ $currentLocale === 'en' ? 'Choose your ideal coffee box' : 'Vyberte si ideální kávový box' }}</h2>
