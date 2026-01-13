@@ -254,17 +254,19 @@ class PacketaService
     /**
      * Get packet status via XML API
      * 
-     * Status codes:
-     * - 1: received (přijata)
-     * - 2: arrived at depot (dorazila na depo)
-     * - 3: ready for pickup (připravena k vyzvednutí)
-     * - 4: delivered/picked up (doručena/vyzvednuta)
-     * - 5: returned to sender (vrácena odesílateli)
-     * - 6: cancelled (zrušena)
-     * - 7: on the way (na cestě)
-     * - 8: handed over to carrier (předána dopravci)
-     * - 9: awaiting pickup (čeká na vyzvednutí u dopravce)
-     * - 10: unknown
+     * Status codes (from https://docs.packeta.com/docs/packet-tracking/status-codes):
+     * - 1: received data (přijata data)
+     * - 2: arrived (dorazila na pobočku)
+     * - 3: prepared for departure (připravena k odeslání)
+     * - 4: departed (na cestě mezi depoty)
+     * - 5: ready for pickup (připravena k vyzvednutí, zákazník informován SMS)
+     * - 6: handed to carrier (předána externímu dopravci)
+     * - 7: delivered (vyzvednuta zákazníkem) ← DORUČENO
+     * - 9: posted back (na cestě zpět k odesílateli)
+     * - 10: returned (vrácena odesílateli) ← VRÁCENO
+     * - 11: cancelled (zrušena)
+     * - 12: collected (vyzvednuta, na cestě do depa)
+     * - 999: unknown (neznámý stav)
      *
      * @param string $packetId
      * @return array|null Returns ['statusCode' => int, 'codeText' => string, 'isDelivered' => bool, 'isReturned' => bool] or null on error
@@ -296,10 +298,10 @@ class PacketaService
                         $codeText = (string)($responseXml->result->codeText ?? '');
                         
                         // Determine if delivered or returned based on status code
-                        // Status 4 = delivered/picked up
-                        // Status 5 = returned to sender
-                        $isDelivered = $statusCode === 4;
-                        $isReturned = $statusCode === 5;
+                        // Status 7 = delivered (picked up by customer)
+                        // Status 10 = returned to sender
+                        $isDelivered = $statusCode === 7;
+                        $isReturned = $statusCode === 10;
                         
                         // Log the API response for audit trail
                         Log::info('Packeta packetStatus API response', [
@@ -345,28 +347,31 @@ class PacketaService
 
     /**
      * Check if a packet status code represents a delivered state
+     * Status 7 = delivered (picked up by customer)
      *
      * @param int $statusCode
      * @return bool
      */
     public static function isDeliveredStatus(int $statusCode): bool
     {
-        return $statusCode === 4;
+        return $statusCode === 7;
     }
 
     /**
      * Check if a packet status code represents a returned state
+     * Status 10 = returned to sender
      *
      * @param int $statusCode
      * @return bool
      */
     public static function isReturnedStatus(int $statusCode): bool
     {
-        return $statusCode === 5;
+        return $statusCode === 10;
     }
 
     /**
      * Get human-readable status text for a status code
+     * Based on https://docs.packeta.com/docs/packet-tracking/status-codes
      *
      * @param int $statusCode
      * @return string
@@ -374,16 +379,24 @@ class PacketaService
     public static function getStatusText(int $statusCode): string
     {
         return match($statusCode) {
-            1 => 'Přijata',
-            2 => 'Dorazila na depo',
-            3 => 'Připravena k vyzvednutí',
-            4 => 'Doručena',
-            5 => 'Vrácena odesílateli',
-            6 => 'Zrušena',
-            7 => 'Na cestě',
-            8 => 'Předána dopravci',
-            9 => 'Čeká na vyzvednutí',
-            default => 'Neznámý stav',
+            1 => 'Přijata data',
+            2 => 'Dorazila na pobočku',
+            3 => 'Připravena k odeslání',
+            4 => 'Na cestě',
+            5 => 'Připravena k vyzvednutí',
+            6 => 'Předána dopravci',
+            7 => 'Doručena',
+            9 => 'Na cestě zpět',
+            10 => 'Vrácena odesílateli',
+            11 => 'Zrušena',
+            12 => 'Vyzvednuta (na cestě do depa)',
+            14 => 'Celní odbavení',
+            16 => 'Pokus o doručení',
+            17 => 'Odmítnuto příjemcem',
+            18 => 'Odmítnuto příjemcem',
+            20 => 'Vypršela doba uložení',
+            999 => 'Neznámý stav',
+            default => 'Neznámý stav (' . $statusCode . ')',
         };
     }
 
