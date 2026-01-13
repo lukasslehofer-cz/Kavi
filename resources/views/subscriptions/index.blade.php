@@ -2,6 +2,18 @@
 
 @section('title', $currentLocale === 'en' ? 'Coffee Subscription - KAVI' : 'Kávové předplatné - KAVI.cz')
 
+@section('meta_description')
+{{ $currentLocale === 'en' ? 'Build your custom coffee subscription box. Choose quantity, coffee type and delivery frequency. Flexible, no commitment, free shipping. Premium specialty coffee from Europe.' : 'Sestavte si vlastní kávový box. Vyberte množství, typ kávy a frekvenci dodání. Flexibilní, bez závazků, doprava zdarma. Prémiová výběrová káva z Evropy.' }}
+@endsection
+
+@section('og_title')
+{{ $currentLocale === 'en' ? 'Build Your Coffee Subscription Box | KAVI' : 'Sestavte si svůj kávový box | KAVI.cz' }}
+@endsection
+
+@section('og_description')
+{{ $currentLocale === 'en' ? 'Flexible coffee subscription with free shipping. Choose your box size, coffee type, and delivery frequency. Cancel anytime.' : 'Flexibilní kávové předplatné s dopravou zdarma. Vyberte si velikost boxu, typ kávy a frekvenci dodání. Zrušte kdykoliv.' }}
+@endsection
+
 @section('content')
 <!-- Hero Header Section - Minimal -->
 <div class="relative bg-gray-100 py-10 sm:py-12 md:py-16 overflow-hidden">

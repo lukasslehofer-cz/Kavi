@@ -2,6 +2,18 @@
 
 @section('title', ($currentLocale === 'en' ? 'Shop' : 'Obchod') . ' - ' . ($currentLocale === 'en' ? 'KAVI' : 'KAVI.cz'))
 
+@section('meta_description')
+{{ $currentLocale === 'en' ? 'Shop specialty coffee from the best European roasteries. Espresso, filter, decaf and accessories. Fresh, quality, exceptional. Free shipping available.' : 'Nakupujte výběrovou kávu z nejlepších evropských pražíren. Espresso, filtr, bezkofeinová káva a příslušenství. Čerstvá, kvalitní, výjimečná. Doprava zdarma.' }}
+@endsection
+
+@section('og_title')
+{{ $currentLocale === 'en' ? 'Coffee Shop | KAVI' : 'Kávový obchod | KAVI.cz' }}
+@endsection
+
+@section('og_description')
+{{ $currentLocale === 'en' ? 'Carefully selected specialty coffee from the best European roasteries. Fresh, quality, exceptional.' : 'Pečlivě vybraná výběrová káva z nejlepších evropských pražíren. Čerstvá, kvalitní, výjimečná.' }}
+@endsection
+
 @section('content')
 <!-- Hero Header Section - Minimal -->
 <div class="relative bg-gray-100 py-12 sm:py-16 md:py-20 overflow-hidden">

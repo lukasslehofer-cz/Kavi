@@ -2,6 +2,24 @@
 
 @section('title', $roastery->getName() . ' - ' . __('roasteries.page_title') . ' - ' . (app()->getLocale() === 'en' ? 'KAVI' : 'KAVI.cz'))
 
+@php
+    $currentLocale = app()->getLocale();
+    $roasteryDescription = Str::limit(strip_tags($roastery->getDescription()), 160);
+    $siteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+@endphp
+
+@section('meta_description', $roasteryDescription ?: ($currentLocale === 'en' ? 'Discover ' . $roastery->getName() . ' - premium coffee roaster from ' . $roastery->country . '. Explore their exceptional coffees at KAVI.' : 'Objevte ' . $roastery->getName() . ' - prémiovou pražírnu z ' . $roastery->country . '. Prozkoumejte jejich výjimečné kávy na KAVI.cz.'))
+
+@section('og_title')
+{{ $roastery->getName() }} {{ $roastery->country_flag }} | {{ $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz' }}
+@endsection
+
+@section('og_description', $roasteryDescription ?: ($currentLocale === 'en' ? 'Premium coffee roaster from ' . $roastery->country . '. Discover their exceptional specialty coffees.' : 'Prémiová pražírna z ' . $roastery->country . '. Objevte jejich výjimečné výběrové kávy.'))
+
+@section('og_image')
+{{ $roastery->image ? url($roastery->image) : $siteUrl . '/images/og-image.jpg' }}
+@endsection
+
 @section('content')
 <!-- Minimal Breadcrumb -->
 <div class="bg-white py-3 border-b border-gray-100">

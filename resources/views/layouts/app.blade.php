@@ -6,6 +6,34 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', ($currentLocale ?? 'cs') === 'en' ? 'Coffee Subscription | Specialty Coffee | KAVI' : 'Kávové předplatné | Výběrová káva | KAVI.cz')</title>
     
+    <!-- Meta Description -->
+    @php
+        $defaultMetaDescription = ($currentLocale ?? 'cs') === 'en' 
+            ? 'Premium specialty coffee subscription. Freshly roasted, carefully selected coffee from the best European roasteries delivered to your door.'
+            : 'Prémiové kávové předplatné s výběrovou kávou. Čerstvě pražená káva z nejlepších evropských pražíren doručená přímo k vám domů.';
+        $defaultOgTitle = ($currentLocale ?? 'cs') === 'en' 
+            ? 'KAVI - Specialty Coffee Subscription'
+            : 'KAVI.cz - Kávové předplatné s výběrovou kávou';
+        $siteUrl = ($currentLocale ?? 'cs') === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+        $defaultOgImage = $siteUrl . '/images/og-image.jpg';
+    @endphp
+    <meta name="description" content="@yield('meta_description', $defaultMetaDescription)">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="@yield('og_title', $defaultOgTitle)">
+    <meta property="og:description" content="@yield('og_description', $defaultMetaDescription)">
+    <meta property="og:image" content="@yield('og_image', $defaultOgImage)">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:site_name" content="{{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}">
+    <meta property="og:locale" content="{{ ($currentLocale ?? 'cs') === 'en' ? 'en_US' : 'cs_CZ' }}">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('og_title', $defaultOgTitle)">
+    <meta name="twitter:description" content="@yield('og_description', $defaultMetaDescription)">
+    <meta name="twitter:image" content="@yield('og_image', $defaultOgImage)">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">

@@ -2,6 +2,25 @@
 
 @section('title', $product->getName() . ($product->roastery ? ' – ' . $product->roastery->getName() : '') . ' | ' . ($currentLocale === 'en' ? 'KAVI' : 'KAVI.cz'))
 
+@php
+    $productDescription = Str::limit(strip_tags($product->getDescription()), 160);
+    $siteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+@endphp
+
+@section('meta_description', $productDescription)
+
+@section('og_title')
+{{ $product->getName() }}{{ $product->roastery ? ' – ' . $product->roastery->getName() : '' }} | {{ $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz' }}
+@endsection
+
+@section('og_description', $productDescription)
+
+@section('og_image')
+{{ $product->image ? url($product->image) : $siteUrl . '/images/og-image.jpg' }}
+@endsection
+
+@section('og_type', 'product')
+
 @section('content')
 <!-- Minimal Breadcrumb -->
 <div class="bg-white py-3 border-b border-gray-100">

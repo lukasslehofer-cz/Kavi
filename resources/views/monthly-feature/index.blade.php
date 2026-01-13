@@ -2,6 +2,18 @@
 
 @section('title', ($currentLocale === 'en' ? 'Coffee of the Month ' : 'Káva měsíce ') . $monthNameWithYear)
 
+@section('meta_description')
+{{ $currentLocale === 'en' ? 'Discover our coffee selection for ' . $monthNameWithYear . '. Exceptional specialty coffees from the best European roasters, freshly roasted and delivered to your door.' : 'Objevte náš kávový výběr na ' . $monthNameWithYear . '. Výjimečné výběrové kávy z nejlepších evropských pražíren, čerstvě pražené a doručené až k vám.' }}
+@endsection
+
+@section('og_title')
+{{ $currentLocale === 'en' ? 'Coffee of the Month ' . $monthNameWithYear . ' | KAVI' : 'Káva měsíce ' . $monthNameWithYear . ' | KAVI.cz' }}
+@endsection
+
+@section('og_description')
+{{ $currentLocale === 'en' ? 'Every month we select exceptional coffees from the best European roasters. Discover what awaits you in ' . $monthNameWithYear . '.' : 'Každý měsíc pro vás vybíráme výjimečné kávy z nejlepších evropských pražíren. Objevte, co vás čeká v ' . $monthNameWithYear . '.' }}
+@endsection
+
 @section('content')
 <!-- Hero Header Section - Minimal -->
 <div class="relative bg-gray-100 py-12 sm:py-16 md:py-20 overflow-hidden">

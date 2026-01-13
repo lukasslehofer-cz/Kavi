@@ -2,6 +2,18 @@
 
 @section('title', $currentLocale === 'en' ? 'Our Roasters - KAVI' : 'Naše pražírny - KAVI.cz')
 
+@section('meta_description')
+{{ $currentLocale === 'en' ? 'Discover our partner roasters from across Europe. Premium specialty coffee from Belgium, Poland, Germany and more. Quality, tradition and love for coffee.' : 'Objevte naše partnerské pražírny z celé Evropy. Prémiová výběrová káva z Belgie, Polska, Německa a dalších zemí. Kvalita, tradice a láska ke kávě.' }}
+@endsection
+
+@section('og_title')
+{{ $currentLocale === 'en' ? 'Our Partner Roasters | KAVI' : 'Naše partnerské pražírny | KAVI.cz' }}
+@endsection
+
+@section('og_description')
+{{ $currentLocale === 'en' ? 'We work with the best roasters from all over Europe. Discover premium specialty coffee from Belgium, Poland, Germany and more.' : 'Spolupracujeme s nejlepšími pražírnami z celé Evropy. Objevte prémiovou výběrovou kávu z Belgie, Polska, Německa a dalších zemí.' }}
+@endsection
+
 @section('content')
 <!-- Hero Header Section - Minimal -->
 <div class="relative bg-gray-100 py-12 sm:py-16 md:py-20 overflow-hidden">

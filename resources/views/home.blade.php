@@ -2,6 +2,18 @@
 
 @section('title', $currentLocale === 'en' ? 'Coffee Subscription | Specialty Coffee | KAVI' : 'Kávové předplatné | Výběrová káva | KAVI.cz')
 
+@section('meta_description')
+{{ $currentLocale === 'en' ? 'Discover the best specialty coffee from all over Europe. Freshly roasted, carefully selected, delivered to your door. Flexible subscription with free shipping.' : 'Objevte tu nejlepší výběrovou kávu z celé Evropy. Čerstvě pražená, pečlivě vybraná, doručená přímo k vám. Flexibilní předplatné s dopravou zdarma.' }}
+@endsection
+
+@section('og_title')
+{{ $currentLocale === 'en' ? 'KAVI - Specialty Coffee Subscription from Europe' : 'KAVI.cz - Kávové předplatné s výběrovou kávou z Evropy' }}
+@endsection
+
+@section('og_description')
+{{ $currentLocale === 'en' ? 'Premium specialty coffee delivered monthly. Discover unique flavors from the best European roasteries. Free shipping, cancel anytime.' : 'Prémiová výběrová káva doručovaná měsíčně. Objevte jedinečné chutě z nejlepších evropských pražíren. Doprava zdarma, zrušení kdykoliv.' }}
+@endsection
+
 @section('content')
 <div class="overflow-hidden">
 
