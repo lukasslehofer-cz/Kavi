@@ -227,16 +227,20 @@ class SubscriptionController extends Controller
         $billingDate = \App\Models\ShipmentSchedule::getBillingDateForMonth($targetDate->year, $targetDate->month);
         
         // Get subscriptions with pending shipments for this date
-        // Exclude paused subscriptions where billing_date < paused_until_date
+        // Include: shipments with payment (already paid) OR non-paused subscriptions
         $pendingShipments = \App\Models\SubscriptionShipment::with(['subscription.user', 'subscription.plan', 'payment'])
             ->whereDate('shipment_date', $targetDate->toDateString())
             ->whereIn('status', ['pending', 'sent'])
-            ->whereHas('subscription', function($q) use ($billingDate) {
-                // Include if: not paused OR no pause date OR billing_date >= paused_until_date
-                $q->where(function($q2) use ($billingDate) {
-                    $q2->where('status', '!=', 'paused')
-                       ->orWhereNull('paused_until_date')
-                       ->orWhere('paused_until_date', '<=', $billingDate);
+            ->where(function($q) use ($billingDate) {
+                // 1. Shipment has payment (customer already paid) - always show
+                $q->whereNotNull('subscription_payment_id')
+                // 2. OR subscription meets pause criteria
+                ->orWhereHas('subscription', function($q2) use ($billingDate) {
+                    $q2->where(function($q3) use ($billingDate) {
+                        $q3->where('status', '!=', 'paused')
+                           ->orWhereNull('paused_until_date')
+                           ->orWhere('paused_until_date', '<=', $billingDate);
+                    });
                 });
             })
             ->get();
