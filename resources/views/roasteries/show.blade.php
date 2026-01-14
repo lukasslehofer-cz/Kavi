@@ -20,6 +20,71 @@
 {{ $roastery->image ? url($roastery->image) : $siteUrl . '/images/og-image.jpg' }}
 @endsection
 
+@section('structured_data')
+@php
+    $roasteryImageUrl = $roastery->image ? url($roastery->image) : $siteUrl . '/images/og-image.jpg';
+    $roasteryDescriptionFull = strip_tags($roastery->getShortDescription() ?: $roastery->getFullDescription());
+@endphp
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Organization",
+            "@id": "{{ url()->current() }}#organization",
+            "name": "{{ $roastery->getName() }}",
+            "description": "{{ Str::limit($roasteryDescriptionFull, 300) }}",
+            "image": "{{ $roasteryImageUrl }}",
+            "logo": "{{ $roasteryImageUrl }}"
+            @if($roastery->website_url)
+            ,"url": "{{ $roastery->website_url }}"
+            @endif
+            @if($roastery->instagram)
+            ,"sameAs": ["https://instagram.com/{{ str_replace('@', '', $roastery->instagram) }}"]
+            @endif
+            @if($roastery->getCountry() || $roastery->getCity())
+            ,"address": {
+                "@type": "PostalAddress"
+                @if($roastery->getCity())
+                ,"addressLocality": "{{ $roastery->getCity() }}"
+                @endif
+                @if($roastery->getCountry())
+                ,"addressCountry": "{{ $roastery->getCountry() }}"
+                @endif
+                @if($roastery->address)
+                ,"streetAddress": "{{ $roastery->address }}"
+                @endif
+            }
+            @endif
+        },
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "{{ $currentLocale === 'en' ? 'Home' : 'Domů' }}",
+                    "item": "{{ $siteUrl }}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "{{ __('roasteries.page_title') }}",
+                    "item": "{{ localizedRoute('roasteries.index') }}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": "{{ $roastery->getName() }}",
+                    "item": "{{ url()->current() }}"
+                }
+            ]
+        }
+    ]
+}
+</script>
+@endsection
+
 @section('content')
 <!-- Minimal Breadcrumb -->
 <div class="bg-white py-3 border-b border-gray-100">

@@ -37,6 +37,12 @@
     <meta name="twitter:description" content="@yield('og_description', $defaultMetaDescription)">
     <meta name="twitter:image" content="@yield('og_image', $defaultOgImage)">
     
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url()->current() }}">
+    
+    <!-- Structured Data (JSON-LD) -->
+    @yield('structured_data')
+    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">

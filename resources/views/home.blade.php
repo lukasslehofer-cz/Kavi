@@ -14,6 +14,108 @@
 {{ $currentLocale === 'en' ? 'Premium specialty coffee delivered monthly. Discover unique flavors from the best European roasteries. Free shipping, cancel anytime.' : 'Prémiová výběrová káva doručovaná měsíčně. Objevte jedinečné chutě z nejlepších evropských pražíren. Doprava zdarma, zrušení kdykoliv.' }}
 @endsection
 
+@section('structured_data')
+@php
+    $siteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+    $siteName = $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz';
+    $siteDescription = $currentLocale === 'en' 
+        ? 'Premium specialty coffee subscription. Freshly roasted coffee from the best European roasteries delivered to your door.'
+        : 'Prémiové kávové předplatné s výběrovou kávou. Čerstvě pražená káva z nejlepších evropských pražíren doručená přímo k vám.';
+@endphp
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Organization",
+            "@id": "{{ $siteUrl }}/#organization",
+            "name": "{{ $siteName }}",
+            "url": "{{ $siteUrl }}",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ $siteUrl }}/images/kavi-logo-black.png",
+                "width": 200,
+                "height": 60
+            },
+            "description": "{{ $siteDescription }}",
+            "sameAs": [
+                "https://www.instagram.com/kavi.cz",
+                "https://www.facebook.com/kavovepredplatne"
+            ],
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "email": "{{ $currentLocale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}",
+                "availableLanguage": ["{{ $currentLocale === 'en' ? 'English' : 'Czech' }}"]
+            }
+        },
+        {
+            "@type": "WebSite",
+            "@id": "{{ $siteUrl }}/#website",
+            "url": "{{ $siteUrl }}",
+            "name": "{{ $siteName }}",
+            "description": "{{ $siteDescription }}",
+            "publisher": {
+                "@id": "{{ $siteUrl }}/#organization"
+            },
+            "inLanguage": "{{ $currentLocale === 'en' ? 'en-US' : 'cs-CZ' }}"
+        },
+        {
+            "@type": "WebPage",
+            "@id": "{{ $siteUrl }}/#webpage",
+            "url": "{{ $siteUrl }}",
+            "name": "{{ $currentLocale === 'en' ? 'Coffee Subscription | Specialty Coffee | KAVI' : 'Kávové předplatné | Výběrová káva | KAVI.cz' }}",
+            "isPartOf": {
+                "@id": "{{ $siteUrl }}/#website"
+            },
+            "about": {
+                "@id": "{{ $siteUrl }}/#organization"
+            },
+            "description": "{{ $siteDescription }}",
+            "inLanguage": "{{ $currentLocale === 'en' ? 'en-US' : 'cs-CZ' }}"
+        },
+        {
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "{{ $currentLocale === 'en' ? 'How do I choose a subscription plan?' : 'Jak si vyberu plán předplatného?' }}",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "{{ $currentLocale === 'en' ? 'Select coffee quantity and delivery frequency according to your needs. We offer M Box (500g), L Box (750g), and XL Box (1000g).' : 'Zvolte množství kávy a frekvenci dodání podle vašich potřeb. Nabízíme M Box (500g), L Box (750g) a XL Box (1000g).' }}"
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "{{ $currentLocale === 'en' ? 'Can I personalize my coffee subscription?' : 'Mohu si předplatné personalizovat?' }}",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "{{ $currentLocale === 'en' ? 'Yes! Choose your preferred coffee type (espresso, filter, decaf), brewing method, and delivery address.' : 'Ano! Vyberte si preferovaný typ kávy (espresso, filtr, bezkofeinová), způsob přípravy a doručovací adresu.' }}"
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "{{ $currentLocale === 'en' ? 'How is the coffee delivered?' : 'Jak je káva doručována?' }}",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "{{ $currentLocale === 'en' ? 'We deliver freshly roasted coffee to your chosen location. Shipping is free for all subscriptions.' : 'Čerstvě praženou kávu doručíme na vámi vybrané místo. Doprava je pro všechna předplatná zdarma.' }}"
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "{{ $currentLocale === 'en' ? 'Can I cancel my subscription anytime?' : 'Mohu předplatné kdykoliv zrušit?' }}",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "{{ $currentLocale === 'en' ? 'Yes, you can cancel or pause your subscription at any time without any fees.' : 'Ano, předplatné můžete kdykoliv zrušit nebo pozastavit bez jakýchkoliv poplatků.' }}"
+                    }
+                }
+            ]
+        }
+    ]
+}
+</script>
+@endsection
+
 @section('content')
 <div class="overflow-hidden">
 

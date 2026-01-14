@@ -21,6 +21,82 @@
 
 @section('og_type', 'product')
 
+@section('structured_data')
+@php
+    $productPrice = $product->isOnSale() ? $product->sale_price : $product->price;
+    $currency = $currentLocale === 'en' ? 'EUR' : 'CZK';
+    $availability = $product->stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
+    $productImageUrl = $product->image ? url($product->image) : $siteUrl . '/images/og-image.jpg';
+    $brandName = $product->roastery ? $product->roastery->getName() : ($product->attributes['roaster'] ?? ($product->attributes['manufacturer'] ?? 'KAVI'));
+@endphp
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Product",
+            "@id": "{{ url()->current() }}#product",
+            "name": "{{ $product->getName() }}",
+            "description": "{{ Str::limit(strip_tags($product->getDescription()), 500) }}",
+            "image": "{{ $productImageUrl }}",
+            "sku": "{{ $product->sku ?? 'KAVI-' . $product->id }}",
+            "brand": {
+                "@type": "Brand",
+                "name": "{{ $brandName }}"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": "{{ url()->current() }}",
+                "priceCurrency": "{{ $currency }}",
+                "price": "{{ number_format($productPrice, 2, '.', '') }}",
+                "availability": "{{ $availability }}",
+                "seller": {
+                    "@type": "Organization",
+                    "name": "{{ $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz' }}"
+                }
+            }
+            @if($product->roastery)
+            ,"manufacturer": {
+                "@type": "Organization",
+                "name": "{{ $product->roastery->getName() }}",
+                "url": "{{ localizedRoute('roasteries.show', $product->roastery) }}"
+            }
+            @endif
+            @if(!empty($product->attributes['origin']))
+            ,"countryOfOrigin": {
+                "@type": "Country",
+                "name": "{{ $product->getTranslatedAttribute('origin') }}"
+            }
+            @endif
+        },
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "{{ $currentLocale === 'en' ? 'Home' : 'Domů' }}",
+                    "item": "{{ $siteUrl }}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}",
+                    "item": "{{ localizedRoute('products.index') }}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": "{{ $product->getName() }}",
+                    "item": "{{ url()->current() }}"
+                }
+            ]
+        }
+    ]
+}
+</script>
+@endsection
+
 @section('content')
 <!-- Minimal Breadcrumb -->
 <div class="bg-white py-3 border-b border-gray-100">
