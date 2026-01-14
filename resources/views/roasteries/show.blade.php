@@ -4,7 +4,7 @@
 
 @php
     $currentLocale = app()->getLocale();
-    $roasteryDescription = Str::limit(strip_tags($roastery->getDescription()), 160);
+    $roasteryDescription = Str::limit(strip_tags($roastery->getShortDescription() ?: $roastery->getFullDescription()), 160);
     $siteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
 @endphp
 

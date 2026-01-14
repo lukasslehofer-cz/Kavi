@@ -27,6 +27,9 @@
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:site_name" content="{{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}">
     <meta property="og:locale" content="{{ ($currentLocale ?? 'cs') === 'en' ? 'en_US' : 'cs_CZ' }}">
+    @if(config('services.facebook.app_id'))
+    <meta property="fb:app_id" content="{{ config('services.facebook.app_id') }}">
+    @endif
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">

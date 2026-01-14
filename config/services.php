@@ -64,6 +64,10 @@ return [
         'api_url' => env('DEEPL_API_URL', 'https://api-free.deepl.com/v2'),
     ],
 
+    'facebook' => [
+        'app_id' => env('FACEBOOK_APP_ID'),
+    ],
+
 ];
 
 
