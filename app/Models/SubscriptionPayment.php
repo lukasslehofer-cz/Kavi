@@ -52,10 +52,14 @@ class SubscriptionPayment extends Model
     /**
      * Get the expected shipment date for this payment
      * Returns the shipment date from subscription_shipments if linked,
-     * otherwise calculates based on period_start (billing date determines shipment month)
+     * otherwise calculates based on period_end (billing date determines shipment month)
      * 
      * Logic: Payment on 15.01. covers January shipment (20.01.)
      *        Payment on 15.02. covers February shipment (20.02.)
+     * 
+     * Note: period_end IS the billing date (e.g., 2026-01-15), and the shipment
+     * happens in the same month (e.g., 2026-01-20). period_start is the previous
+     * billing date, which would incorrectly point to the previous month's shipment.
      */
     public function getExpectedShipmentDateAttribute(): ?\Carbon\Carbon
     {
@@ -64,12 +68,12 @@ class SubscriptionPayment extends Model
             return $this->shipment->shipment_date;
         }
 
-        // Calculate from period_start - billing date determines the shipment month
+        // Calculate from period_end - billing date determines the shipment month
         // Payment on 15.01. → shipment on 20.01. (same month)
-        if ($this->period_start) {
+        if ($this->period_end) {
             $schedule = \App\Models\ShipmentSchedule::getForMonth(
-                $this->period_start->year,
-                $this->period_start->month
+                $this->period_end->year,
+                $this->period_end->month
             );
             
             if ($schedule) {
@@ -77,7 +81,7 @@ class SubscriptionPayment extends Model
             }
             
             // Fallback to 20th of the same month
-            return $this->period_start->copy()->day(20)->startOfDay();
+            return $this->period_end->copy()->day(20)->startOfDay();
         }
 
         // Fallback based on paid_at

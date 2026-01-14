@@ -398,4 +398,111 @@
         </div>
     </div>
 </div>
+
+{{-- Google Ads Conversion Tracking --}}
+@if($order->payment_status === 'paid' && !($cancelled ?? false))
+<script>
+    // Send purchase event to Google Tag Manager dataLayer
+    // This event is used for Google Ads conversion tracking and Google Analytics 4 Enhanced Ecommerce
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'purchase',
+        'ecommerce': {
+            'transaction_id': '{{ $order->order_number ?? $order->id }}',
+            'value': {{ $order->total }},
+            'currency': '{{ $order->currency }}',
+            'tax': {{ $order->tax }},
+            'shipping': {{ $order->shipping }},
+            @if($order->discount_amount > 0)
+            'coupon': '{{ $order->coupon_code }}',
+            'discount': {{ $order->discount_amount }},
+            @endif
+            'items': [
+                @foreach($order->items as $item)
+                {
+                    'item_name': '{{ addslashes($item->product_name) }}',
+                    'item_id': '{{ $item->product_id }}',
+                    'price': {{ $item->price }},
+                    'quantity': {{ $item->quantity }}
+                }@if(!$loop->last),@endif
+                @endforeach
+            ]
+        }
+    });
+    
+    console.log('Google Ads conversion event sent:', {
+        transaction_id: '{{ $order->order_number ?? $order->id }}',
+        value: {{ $order->total }},
+        currency: '{{ $order->currency }}'
+    });
+</script>
+@endif
+
+{{--
+===================================================================================
+GOOGLE TAG MANAGER SETUP INSTRUCTIONS
+===================================================================================
+
+To complete the Google Ads conversion tracking setup, configure the following
+in your Google Tag Manager account (GTM-PPG54L4R):
+
+1. CREATE VARIABLES (Variables → New)
+-------------------
+   a) transaction_id
+      - Type: Data Layer Variable
+      - Data Layer Variable Name: ecommerce.transaction_id
+
+   b) transaction_value
+      - Type: Data Layer Variable
+      - Data Layer Variable Name: ecommerce.value
+
+   c) transaction_currency
+      - Type: Data Layer Variable
+      - Data Layer Variable Name: ecommerce.currency
+
+2. CREATE TRIGGER (Triggers → New)
+-------------------
+   - Trigger Name: Purchase Event
+   - Trigger Type: Custom Event
+   - Event name: purchase
+   - This trigger fires on: All Custom Events
+
+3. CREATE GOOGLE ADS CONVERSION TAG (Tags → New)
+-------------------
+   - Tag Type: Google Ads Conversion Tracking
+   - Conversion ID: [GET FROM GOOGLE ADS - format: AW-123456789]
+   - Conversion Label: [GET FROM GOOGLE ADS - format: abc123DEF456]
+   - Conversion Value: {{transaction_value}}
+   - Transaction ID: {{transaction_id}}
+   - Currency Code: {{transaction_currency}}
+   - Triggering: Purchase Event (trigger created above)
+
+4. HOW TO GET CONVERSION ID & LABEL FROM GOOGLE ADS
+-------------------
+   a) Go to Google Ads account
+   b) Navigate to: Tools & Settings → Measurement → Conversions
+   c) Click: + New conversion action
+   d) Select: Website
+   e) Create conversion type: Purchase
+   f) In setup, choose: "Use Google Tag Manager"
+   g) Copy the Conversion ID (AW-XXXXXXXXXX) and Conversion Label
+   h) Paste these into your GTM tag configuration
+
+5. TESTING
+-------------------
+   a) In GTM, click "Preview" to enter preview mode
+   b) Visit your website in the preview window
+   c) Complete a test order with card payment
+   d) On the confirmation page, verify in GTM preview:
+      - Event "purchase" appears in the event stream
+      - Variables show correct values (transaction_id, value, currency)
+      - Google Ads Conversion tag fires
+   e) Check Google Ads after 24 hours to see conversion data
+
+6. PUBLISH
+-------------------
+   Once testing is successful, click "Submit" in GTM to publish your changes.
+
+===================================================================================
+--}}
 @endsection
