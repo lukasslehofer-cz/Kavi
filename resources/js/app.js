@@ -2,6 +2,30 @@ import './bootstrap';
 import * as CookieConsent from 'vanilla-cookieconsent';
 import 'vanilla-cookieconsent/dist/cookieconsent.css';
 
+// Google Consent Mode v2 - Update consent state
+function updateGoogleConsent() {
+    // Ensure gtag is available
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    
+    // Check accepted categories
+    const analyticsAccepted = CookieConsent.acceptedCategory('analytics');
+    const marketingAccepted = CookieConsent.acceptedCategory('marketing');
+    
+    // Update consent state
+    gtag('consent', 'update', {
+        'analytics_storage': analyticsAccepted ? 'granted' : 'denied',
+        'ad_storage': marketingAccepted ? 'granted' : 'denied',
+        'ad_user_data': marketingAccepted ? 'granted' : 'denied',
+        'ad_personalization': marketingAccepted ? 'granted' : 'denied'
+    });
+    
+    console.log('Google Consent Mode updated:', {
+        analytics_storage: analyticsAccepted ? 'granted' : 'denied',
+        ad_storage: marketingAccepted ? 'granted' : 'denied'
+    });
+}
+
 // Initialize Cookie Consent
 function initCookieConsent() {
     // Get config from window (injected by Laravel)
@@ -18,73 +42,24 @@ function initCookieConsent() {
         
         onFirstConsent: ({ cookie }) => {
             console.log('First consent given:', cookie);
-            // Load GTM if analytics accepted
-            if (CookieConsent.acceptedCategory('analytics')) {
-                loadGTM();
-            }
+            // Update Google Consent Mode
+            updateGoogleConsent();
         },
         
         onConsent: ({ cookie }) => {
             console.log('Consent loaded:', cookie);
-            // Load GTM if analytics accepted (for returning visitors)
-            if (CookieConsent.acceptedCategory('analytics')) {
-                loadGTM();
-            }
+            // Update Google Consent Mode (for returning visitors)
+            updateGoogleConsent();
         },
         
         onChange: ({ cookie, changedCategories }) => {
             console.log('Cookie consent changed:', changedCategories);
-            
-            if (changedCategories.includes('analytics')) {
-                if (CookieConsent.acceptedCategory('analytics')) {
-                    // Load GTM if analytics accepted
-                    loadGTM();
-                } else {
-                    // Reload page to remove GTM if analytics was declined
-                    window.location.reload();
-                }
-            }
+            // Update Google Consent Mode on any change
+            updateGoogleConsent();
         }
     };
     
     CookieConsent.run(config);
-}
-
-// Load Google Tag Manager
-function loadGTM() {
-    // Check if GTM is already loaded
-    if (window.gtmLoaded) {
-        return;
-    }
-
-    const gtmId = window.gtmId || 'GTM-PPG54L4R';
-    
-    // Initialize dataLayer
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'gtm.start': new Date().getTime(),
-        event: 'gtm.js'
-    });
-
-    // Load GTM script
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${gtmId}`;
-    document.head.appendChild(script);
-
-    // Load GTM noscript iframe
-    const noscript = document.createElement('noscript');
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://www.googletagmanager.com/ns.html?id=${gtmId}`;
-    iframe.height = '0';
-    iframe.width = '0';
-    iframe.style.display = 'none';
-    iframe.style.visibility = 'hidden';
-    noscript.appendChild(iframe);
-    document.body.insertBefore(noscript, document.body.firstChild);
-
-    window.gtmLoaded = true;
-    console.log('GTM loaded after consent');
 }
 
 // Mobile menu toggle
