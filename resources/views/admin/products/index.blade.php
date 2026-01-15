@@ -27,7 +27,7 @@
     </div>
 
     <!-- Statistics Overview -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
         <!-- Total Active -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Aktivních celkem</div>
@@ -41,22 +41,42 @@
         <!-- Espresso -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Espresso</div>
-            <div class="text-2xl font-bold text-gray-900">{{ $stats['categories']['espresso']['active'] }}</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['espresso']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['espresso']['stock'] }} ks)</span>
+            </div>
+        </div>
+        <!-- Omni -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="text-sm text-gray-500 mb-1">Omni</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['omni']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['omni']['stock'] }} ks)</span>
+            </div>
         </div>
         <!-- Filter -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Filtr</div>
-            <div class="text-2xl font-bold text-gray-900">{{ $stats['categories']['filter']['active'] }}</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['filter']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['filter']['stock'] }} ks)</span>
+            </div>
         </div>
         <!-- Decaf -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Decaf</div>
-            <div class="text-2xl font-bold text-gray-900">{{ $stats['categories']['decaf']['active'] }}</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['decaf']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['decaf']['stock'] }} ks)</span>
+            </div>
         </div>
         <!-- Accessories -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Příslušenství</div>
-            <div class="text-2xl font-bold text-gray-900">{{ $stats['categories']['accessories']['active'] }}</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['accessories']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['accessories']['stock'] }} ks)</span>
+            </div>
         </div>
     </div>
 
@@ -69,6 +89,7 @@
                 <select name="category" id="category" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm focus:ring-gray-500 focus:border-gray-500">
                     <option value="all" {{ request('category', 'all') === 'all' ? 'selected' : '' }}>Vše</option>
                     <option value="espresso" {{ request('category') === 'espresso' ? 'selected' : '' }}>Espresso</option>
+                    <option value="omni" {{ request('category') === 'omni' ? 'selected' : '' }}>Omni</option>
                     <option value="filter" {{ request('category') === 'filter' ? 'selected' : '' }}>Filtr</option>
                     <option value="decaf" {{ request('category') === 'decaf' ? 'selected' : '' }}>Decaf</option>
                     <option value="accessories" {{ request('category') === 'accessories' ? 'selected' : '' }}>Příslušenství</option>

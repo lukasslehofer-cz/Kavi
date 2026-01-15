@@ -20,7 +20,24 @@ class ProductController extends Controller
 
         // Filtr podle kategorie
         if ($request->filled('category') && $request->category !== 'all') {
-            $query->whereJsonContains('category', $request->category);
+            $category = $request->category;
+            
+            if ($category === 'omni') {
+                // Omni = has both espresso AND filter
+                $query->whereJsonContains('category', 'espresso')
+                      ->whereJsonContains('category', 'filter');
+            } elseif ($category === 'espresso') {
+                // Espresso only (not filter)
+                $query->whereJsonContains('category', 'espresso')
+                      ->whereRaw("NOT JSON_CONTAINS(category, '\"filter\"')");
+            } elseif ($category === 'filter') {
+                // Filter only (not espresso)
+                $query->whereJsonContains('category', 'filter')
+                      ->whereRaw("NOT JSON_CONTAINS(category, '\"espresso\"')");
+            } else {
+                // Decaf, accessories - standard filter
+                $query->whereJsonContains('category', $category);
+            }
         }
 
         // Řazení - neaktivní vždy na konci
@@ -55,18 +72,59 @@ class ProductController extends Controller
      */
     private function getProductStats(): array
     {
-        $categories = ['espresso', 'filter', 'decaf', 'accessories'];
         $stats = [
             'total_active' => Product::where('is_active', true)->count(),
             'total_stock' => Product::where('is_digital', false)->sum('stock'),
             'categories' => []
         ];
 
-        foreach ($categories as $cat) {
-            $stats['categories'][$cat] = [
-                'active' => Product::where('is_active', true)->whereJsonContains('category', $cat)->count(),
-            ];
-        }
+        // Espresso only (has espresso, NOT filter)
+        $stats['categories']['espresso'] = [
+            'active' => Product::where('is_active', true)
+                ->whereJsonContains('category', 'espresso')
+                ->whereRaw("NOT JSON_CONTAINS(category, '\"filter\"')")
+                ->count(),
+            'stock' => Product::where('is_digital', false)
+                ->whereJsonContains('category', 'espresso')
+                ->whereRaw("NOT JSON_CONTAINS(category, '\"filter\"')")
+                ->sum('stock'),
+        ];
+
+        // Filter only (has filter, NOT espresso)
+        $stats['categories']['filter'] = [
+            'active' => Product::where('is_active', true)
+                ->whereJsonContains('category', 'filter')
+                ->whereRaw("NOT JSON_CONTAINS(category, '\"espresso\"')")
+                ->count(),
+            'stock' => Product::where('is_digital', false)
+                ->whereJsonContains('category', 'filter')
+                ->whereRaw("NOT JSON_CONTAINS(category, '\"espresso\"')")
+                ->sum('stock'),
+        ];
+
+        // Omni (has BOTH espresso AND filter)
+        $stats['categories']['omni'] = [
+            'active' => Product::where('is_active', true)
+                ->whereJsonContains('category', 'espresso')
+                ->whereJsonContains('category', 'filter')
+                ->count(),
+            'stock' => Product::where('is_digital', false)
+                ->whereJsonContains('category', 'espresso')
+                ->whereJsonContains('category', 'filter')
+                ->sum('stock'),
+        ];
+
+        // Decaf
+        $stats['categories']['decaf'] = [
+            'active' => Product::where('is_active', true)->whereJsonContains('category', 'decaf')->count(),
+            'stock' => Product::where('is_digital', false)->whereJsonContains('category', 'decaf')->sum('stock'),
+        ];
+
+        // Accessories
+        $stats['categories']['accessories'] = [
+            'active' => Product::where('is_active', true)->whereJsonContains('category', 'accessories')->count(),
+            'stock' => Product::where('is_digital', false)->whereJsonContains('category', 'accessories')->sum('stock'),
+        ];
 
         return $stats;
     }
