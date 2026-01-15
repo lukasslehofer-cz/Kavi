@@ -98,7 +98,7 @@ return [
         'used_slot' => 'Used slot',
         'cart_slot' => 'Cart',
         'free_slot' => 'Free slot',
-        'planned_delivery' => '📦 Planned delivery:',
+        'planned_delivery' => '📦 Planned shipment:',
         'capacity_warning' => '❌ Add-on capacity is full for this subscription.',
         'try_another' => 'Try selecting another subscription.',
         'cart_has' => 'Cart contains',

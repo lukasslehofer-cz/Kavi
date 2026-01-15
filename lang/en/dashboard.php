@@ -92,7 +92,7 @@ return [
     'pay' => 'Pay',
     'detail' => 'Detail →',
     'shipped_with_subscription' => 'Will be shipped with subscription',
-    'planned_delivery' => 'Planned delivery:',
+    'planned_delivery' => 'Planned shipment:',
     'no_orders' => 'No orders',
     'no_orders_yet' => 'You haven\'t placed any orders yet.',
     'browse_products' => 'Browse products',

@@ -98,7 +98,7 @@ return [
         'used_slot' => 'Použitý slot',
         'cart_slot' => 'Košík',
         'free_slot' => 'Volný slot',
-        'planned_delivery' => '📦 Plánované doručení:',
+        'planned_delivery' => '📦 Plánované odeslání:',
         'capacity_warning' => '❌ Kapacita doplňkového zboží byla naplněna pro toto předplatné.',
         'try_another' => 'Zkuste vybrat jiné předplatné.',
         'cart_has' => 'Košík obsahuje',

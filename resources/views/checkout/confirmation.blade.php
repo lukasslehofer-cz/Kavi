@@ -80,7 +80,7 @@
                                     {{ $order->subscription->subscription_number ?? '#' . $order->subscription->id }}
                                 </a>
                             @endif
-                            a doručeno společně dne 
+                            a odesláno společně dne 
                             <strong>{{ $order->shipmentSchedule ? $order->shipmentSchedule->shipment_date->format('d.m.Y') : 'dle plánu rozesílky' }}</strong>.
                         </p>
                         <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-purple-200">

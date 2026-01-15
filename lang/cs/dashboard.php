@@ -92,7 +92,7 @@ return [
     'pay' => 'Zaplatit',
     'detail' => 'Detail →',
     'shipped_with_subscription' => 'Bude odesláno s předplatným',
-    'planned_delivery' => 'Plánované doručení:',
+    'planned_delivery' => 'Plánované odeslání:',
     'no_orders' => 'Žádné objednávky',
     'no_orders_yet' => 'Zatím jste neprovedli žádnou objednávku.',
     'browse_products' => 'Prohlédnout produkty',
