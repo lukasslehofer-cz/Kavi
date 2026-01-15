@@ -107,7 +107,31 @@ class ChargeSubscriptionPayments extends Command
                     continue;
                 }
                 
-                // Check 2: User has Stripe customer ID?
+                // Check 2: Safety check against subscription_shipments (single source of truth)
+                // This respects pauses - skipped shipments are in the table, so they're correctly skipped
+                $nextPendingShipment = $subscription->shipments()
+                    ->where('status', 'pending')
+                    ->whereNull('subscription_payment_id')
+                    ->orderBy('shipment_date', 'asc')
+                    ->first();
+
+                if ($nextPendingShipment) {
+                    $schedule = \App\Models\ShipmentSchedule::getForMonth(
+                        $nextPendingShipment->shipment_date->year,
+                        $nextPendingShipment->shipment_date->month
+                    );
+
+                    $billingDateForShipment = $schedule?->billing_date
+                        ?? $nextPendingShipment->shipment_date->copy()->day(15);
+
+                    if (today()->lt($billingDateForShipment)) {
+                        $this->warn("  ⚠️ Would skip - Shipment schedule says too soon (billing date: {$billingDateForShipment->format('d.m.Y')})");
+                        $skippedCount++;
+                        continue;
+                    }
+                }
+                
+                // Check 3: User has Stripe customer ID?
                 $customerId = $subscription->user->stripe_customer_id ?? null;
                 if (!$customerId) {
                     $this->error("  ✗ Would fail - User has no Stripe customer ID");
@@ -143,6 +167,37 @@ class ChargeSubscriptionPayments extends Command
                 }
                 $successCount++;
                 continue;
+            }
+            
+            // Safety check against subscription_shipments (single source of truth)
+            // This respects pauses - skipped shipments are in the table, so they're correctly skipped
+            $nextPendingShipment = $subscription->shipments()
+                ->where('status', 'pending')
+                ->whereNull('subscription_payment_id')
+                ->orderBy('shipment_date', 'asc')
+                ->first();
+
+            if ($nextPendingShipment) {
+                $schedule = \App\Models\ShipmentSchedule::getForMonth(
+                    $nextPendingShipment->shipment_date->year,
+                    $nextPendingShipment->shipment_date->month
+                );
+
+                $billingDateForShipment = $schedule?->billing_date
+                    ?? $nextPendingShipment->shipment_date->copy()->day(15);
+
+                if (today()->lt($billingDateForShipment)) {
+                    \Log::warning('Billing safety check failed - too early based on shipment schedule', [
+                        'subscription_id' => $subscription->id,
+                        'subscription_number' => $subscription->subscription_number,
+                        'next_billing_date' => $subscription->next_billing_date?->toDateString(),
+                        'shipment_billing_date' => $billingDateForShipment->toDateString(),
+                        'next_pending_shipment' => $nextPendingShipment->shipment_date->toDateString(),
+                    ]);
+                    $this->warn("  ⚠️ Safety check failed - shipment schedule says too soon");
+                    $skippedCount++;
+                    continue;
+                }
             }
             
             try {

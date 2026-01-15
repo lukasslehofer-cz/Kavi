@@ -18,9 +18,11 @@ class Kernel extends ConsoleKernel
         // SUBSCRIPTION BILLING (Custom Billing System)
         // ============================================
         
-        // Charge subscription payments (primary run at midnight)
+        // Charge subscription payments (primary run at 1:00 AM Prague time)
+        // Note: Using 01:00 instead of 00:00 to avoid timezone issues with UTC
+        // (00:00 Prague = 23:00 UTC previous day, which could cause idempotency check issues)
         $schedule->command('subscriptions:charge-payments')
-            ->dailyAt('00:00')
+            ->dailyAt('01:00')
             ->timezone('Europe/Prague')
             ->withoutOverlapping(10) // Prevent concurrent runs
             ->appendOutputTo($cronLog);
