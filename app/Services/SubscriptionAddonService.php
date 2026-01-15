@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\ShipmentSchedule;
 use App\Models\Subscription;
 use App\Models\User;
+use Carbon\Carbon;
 
 class SubscriptionAddonService
 {
@@ -103,6 +104,8 @@ class SubscriptionAddonService
 
     /**
      * Získat příští rozesílku pro předplatné
+     * 
+     * Po uzávěrce (billing_date) se zobrazí následující rozesílka podle frekvence předplatného.
      *
      * @param Subscription $subscription
      * @return ShipmentSchedule|null
@@ -115,7 +118,23 @@ class SubscriptionAddonService
             return null;
         }
 
-        return ShipmentSchedule::where('shipment_date', $nextShipmentDate->format('Y-m-d'))->first();
+        $schedule = ShipmentSchedule::where('shipment_date', $nextShipmentDate->format('Y-m-d'))->first();
+        
+        if (!$schedule) {
+            return null;
+        }
+        
+        // Check if we're past the billing cutoff for this shipment
+        $today = Carbon::now()->startOfDay();
+        if ($today->gt($schedule->billing_date)) {
+            // Past billing cutoff - show the NEXT shipment based on subscription frequency
+            $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+            $followingMonth = $nextShipmentDate->copy()->addMonths($frequencyMonths);
+            
+            return ShipmentSchedule::getForMonth($followingMonth->year, $followingMonth->month);
+        }
+
+        return $schedule;
     }
 
     /**
