@@ -58,14 +58,13 @@ class ProductController extends Controller
         $categories = ['espresso', 'filter', 'decaf', 'accessories'];
         $stats = [
             'total_active' => Product::where('is_active', true)->count(),
-            'total_stock' => Product::sum('stock'),
+            'total_stock' => Product::where('is_digital', false)->sum('stock'),
             'categories' => []
         ];
 
         foreach ($categories as $cat) {
             $stats['categories'][$cat] = [
                 'active' => Product::where('is_active', true)->whereJsonContains('category', $cat)->count(),
-                'stock' => Product::whereJsonContains('category', $cat)->sum('stock'),
             ];
         }
 

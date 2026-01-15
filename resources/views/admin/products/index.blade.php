@@ -41,34 +41,22 @@
         <!-- Espresso -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Espresso</div>
-            <div class="flex items-baseline gap-2">
-                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['espresso']['active'] }}</span>
-                <span class="text-sm text-gray-500">({{ $stats['categories']['espresso']['stock'] }} ks)</span>
-            </div>
+            <div class="text-2xl font-bold text-gray-900">{{ $stats['categories']['espresso']['active'] }}</div>
         </div>
         <!-- Filter -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Filtr</div>
-            <div class="flex items-baseline gap-2">
-                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['filter']['active'] }}</span>
-                <span class="text-sm text-gray-500">({{ $stats['categories']['filter']['stock'] }} ks)</span>
-            </div>
+            <div class="text-2xl font-bold text-gray-900">{{ $stats['categories']['filter']['active'] }}</div>
         </div>
         <!-- Decaf -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Decaf</div>
-            <div class="flex items-baseline gap-2">
-                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['decaf']['active'] }}</span>
-                <span class="text-sm text-gray-500">({{ $stats['categories']['decaf']['stock'] }} ks)</span>
-            </div>
+            <div class="text-2xl font-bold text-gray-900">{{ $stats['categories']['decaf']['active'] }}</div>
         </div>
         <!-- Accessories -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="text-sm text-gray-500 mb-1">Příslušenství</div>
-            <div class="flex items-baseline gap-2">
-                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['accessories']['active'] }}</span>
-                <span class="text-sm text-gray-500">({{ $stats['categories']['accessories']['stock'] }} ks)</span>
-            </div>
+            <div class="text-2xl font-bold text-gray-900">{{ $stats['categories']['accessories']['active'] }}</div>
         </div>
     </div>
 
