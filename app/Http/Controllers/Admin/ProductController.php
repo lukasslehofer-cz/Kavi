@@ -14,13 +14,62 @@ class ProductController extends Controller
         $this->middleware(['auth', 'admin']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::orderBy('sort_order')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = Product::query();
 
-        return view('admin.products.index', compact('products'));
+        // Filtr podle kategorie
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->whereJsonContains('category', $request->category);
+        }
+
+        // Řazení - neaktivní vždy na konci
+        $query->orderBy('is_active', 'desc');
+
+        // Sekundární řazení podle vybraného kritéria
+        $sort = $request->get('sort', 'default');
+        switch ($sort) {
+            case 'name':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'stock':
+                $query->orderBy('stock', 'desc');
+                break;
+            case 'roast_date':
+                $query->orderByRaw("JSON_UNQUOTE(JSON_EXTRACT(attributes, '$.roast_date')) DESC");
+                break;
+            default:
+                $query->orderBy('sort_order')->orderBy('created_at', 'desc');
+        }
+
+        $products = $query->paginate(20)->withQueryString();
+
+        // Statistiky pro přehled
+        $stats = $this->getProductStats();
+
+        return view('admin.products.index', compact('products', 'stats'));
+    }
+
+    /**
+     * Get product statistics for admin overview
+     */
+    private function getProductStats(): array
+    {
+        $categories = ['espresso', 'filter', 'decaf', 'accessories'];
+        $stats = [
+            'total_active' => Product::where('is_active', true)->count(),
+            'total_stock' => Product::sum('stock'),
+            'categories' => []
+        ];
+
+        foreach ($categories as $cat) {
+            $stats['categories'][$cat] = [
+                'active' => Product::where('is_active', true)->whereJsonContains('category', $cat)->count(),
+                'stock' => Product::whereJsonContains('category', $cat)->sum('stock'),
+            ];
+        }
+
+        return $stats;
     }
 
     public function create()

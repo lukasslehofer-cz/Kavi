@@ -26,6 +26,86 @@
         </div>
     </div>
 
+    <!-- Statistics Overview -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <!-- Total Active -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="text-sm text-gray-500 mb-1">Aktivních celkem</div>
+            <div class="text-2xl font-bold text-gray-900">{{ $stats['total_active'] }}</div>
+        </div>
+        <!-- Total Stock -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="text-sm text-gray-500 mb-1">Kusů skladem</div>
+            <div class="text-2xl font-bold text-gray-900">{{ $stats['total_stock'] }}</div>
+        </div>
+        <!-- Espresso -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="text-sm text-gray-500 mb-1">Espresso</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['espresso']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['espresso']['stock'] }} ks)</span>
+            </div>
+        </div>
+        <!-- Filter -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="text-sm text-gray-500 mb-1">Filtr</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['filter']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['filter']['stock'] }} ks)</span>
+            </div>
+        </div>
+        <!-- Decaf -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="text-sm text-gray-500 mb-1">Decaf</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['decaf']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['decaf']['stock'] }} ks)</span>
+            </div>
+        </div>
+        <!-- Accessories -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div class="text-sm text-gray-500 mb-1">Příslušenství</div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-lg font-bold text-gray-900">{{ $stats['categories']['accessories']['active'] }}</span>
+                <span class="text-sm text-gray-500">({{ $stats['categories']['accessories']['stock'] }} ks)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-wrap items-center gap-4">
+            <!-- Category Filter -->
+            <div class="flex items-center gap-2">
+                <label for="category" class="text-sm font-medium text-gray-700">Kategorie:</label>
+                <select name="category" id="category" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm focus:ring-gray-500 focus:border-gray-500">
+                    <option value="all" {{ request('category', 'all') === 'all' ? 'selected' : '' }}>Vše</option>
+                    <option value="espresso" {{ request('category') === 'espresso' ? 'selected' : '' }}>Espresso</option>
+                    <option value="filter" {{ request('category') === 'filter' ? 'selected' : '' }}>Filtr</option>
+                    <option value="decaf" {{ request('category') === 'decaf' ? 'selected' : '' }}>Decaf</option>
+                    <option value="accessories" {{ request('category') === 'accessories' ? 'selected' : '' }}>Příslušenství</option>
+                </select>
+            </div>
+
+            <!-- Sort Filter -->
+            <div class="flex items-center gap-2">
+                <label for="sort" class="text-sm font-medium text-gray-700">Řazení:</label>
+                <select name="sort" id="sort" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm focus:ring-gray-500 focus:border-gray-500">
+                    <option value="default" {{ request('sort', 'default') === 'default' ? 'selected' : '' }}>Výchozí (pořadí vložení)</option>
+                    <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Abecedně</option>
+                    <option value="stock" {{ request('sort') === 'stock' ? 'selected' : '' }}>Podle skladu</option>
+                    <option value="roast_date" {{ request('sort') === 'roast_date' ? 'selected' : '' }}>Podle data pražení</option>
+                </select>
+            </div>
+
+            @if(request('category') && request('category') !== 'all' || request('sort') && request('sort') !== 'default')
+            <a href="{{ route('admin.products.index') }}" class="text-sm text-gray-500 hover:text-gray-700">
+                Zrušit filtry
+            </a>
+            @endif
+        </form>
+    </div>
+
     <!-- Products Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
         <div class="overflow-x-auto">
