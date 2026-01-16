@@ -72,6 +72,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/subscriptions-shipments/send-preparing-emails', [\App\Http\Controllers\Admin\SubscriptionController::class, 'sendPreparingEmails'])->name('subscriptions.send-preparing-emails');
     Route::post('/subscription-shipments/{shipment}/mark-delivered', [\App\Http\Controllers\Admin\SubscriptionController::class, 'markAsDelivered'])->name('subscription-shipments.mark-delivered');
     Route::put('/subscription-shipments/{shipment}', [\App\Http\Controllers\Admin\SubscriptionController::class, 'updateShipment'])->name('subscription-shipments.update');
+    Route::post('/subscriptions-shipments/recalculate-reservations', [\App\Http\Controllers\Admin\SubscriptionController::class, 'recalculateReservations'])->name('subscriptions.recalculate-reservations');
     
     // Coupons
     Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);

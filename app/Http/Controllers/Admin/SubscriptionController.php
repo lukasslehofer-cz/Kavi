@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subscription;
+use App\Models\ShipmentSchedule;
 use App\Services\PacketaService;
+use App\Services\StockReservationService;
 use App\Services\SubscriptionShipmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -267,9 +269,15 @@ class SubscriptionController extends Controller
                     $subscription->last_shipment_date->format('Y-m-d') === $targetDate->format('Y-m-d'));
         });
 
-        // Create pending shipments for new subscriptions
-        foreach ($newSubscriptions as $subscription) {
-            $shipmentService->getOrCreateShipment($subscription, $targetDate);
+        // Determine if this is the current shipment period or a future preview
+        $nextShippingDate = \App\Helpers\SubscriptionHelper::getNextShippingDate();
+        $isCurrentPeriod = $targetDate->lte($nextShippingDate);
+
+        // Create pending shipments ONLY for current period (not future previews)
+        if ($isCurrentPeriod) {
+            foreach ($newSubscriptions as $subscription) {
+                $shipmentService->getOrCreateShipment($subscription, $targetDate);
+            }
         }
         
         // Combine all subscription IDs
@@ -832,6 +840,48 @@ class SubscriptionController extends Controller
 
             return redirect()->route('admin.subscriptions.show', $shipment->subscription_id)
                 ->with('error', 'Nepodařilo se označit zásilku jako doručenou: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Recalculate stock reservations for the given month
+     * Can be triggered manually from admin panel if automatic cron fails
+     */
+    public function recalculateReservations(Request $request, StockReservationService $reservationService)
+    {
+        $year = $request->input('year', now()->year);
+        $month = $request->input('month', now()->month);
+
+        try {
+            $schedule = ShipmentSchedule::getForMonth($year, $month);
+            
+            if (!$schedule) {
+                return redirect()->back()
+                    ->with('error', "Harmonogram pro {$month}/{$year} neexistuje.");
+            }
+
+            $reservationService->updateReservationsForSchedule($schedule);
+
+            Log::info('Stock reservations manually recalculated by admin', [
+                'year' => $year,
+                'month' => $month,
+                'schedule_id' => $schedule->id,
+                'admin_user_id' => auth()->id(),
+            ]);
+
+            return redirect()->back()
+                ->with('success', "Rezervace káv pro {$month}/{$year} byly úspěšně přepočítány.");
+
+        } catch (\Exception $e) {
+            Log::error('Failed to recalculate stock reservations', [
+                'year' => $year,
+                'month' => $month,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Nepodařilo se přepočítat rezervace: ' . $e->getMessage());
         }
     }
 }

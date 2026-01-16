@@ -838,9 +838,10 @@ class SubscriptionShipmentService
      * Used for coffee reservation calculations
      * 
      * Includes:
-     * - Active subscriptions with pending shipment for this date
+     * - Subscriptions with existing pending shipment for this date
+     * - Active/complimentary subscriptions matching cadence for this date
      * - Paused subscriptions whose pause ends ON or BEFORE the billing_date
-     *   (they will be active when billing occurs)
+     * - Cancelled subscriptions with paid coverage for this date
      */
     public function shouldShipOn(Subscription $subscription, Carbon $date): bool
     {
@@ -863,6 +864,19 @@ class SubscriptionShipmentService
             if ($subscription->paused_until_date->lte($billingDate)) {
                 return $this->wouldShipOnDateIfActive($subscription, $date);
             }
+            return false;
+        }
+
+        // 3. For active/complimentary subscriptions, check cadence
+        if (in_array($subscription->status, ['active', 'complimentary'])) {
+            return $this->wouldShipOnDateIfActive($subscription, $date);
+        }
+
+        // 4. For cancelled subscriptions with paid coverage
+        if ($subscription->status === 'cancelled') {
+            if ($this->hasPaidCoverageForDate($subscription, $date)) {
+                return $this->wouldShipOnDateIfActive($subscription, $date);
+            }
         }
 
         return false;
@@ -871,22 +885,46 @@ class SubscriptionShipmentService
     /**
      * Check if subscription WOULD ship on date if it were active
      * Used to determine if paused subscription should be counted in reservations
+     * 
+     * Takes into account pending shipments before the target date to correctly
+     * calculate cadence for future shipments.
      */
     protected function wouldShipOnDateIfActive(Subscription $subscription, Carbon $date): bool
     {
         // One-time boxes
         if ($subscription->frequency_months == 0) {
             // Would ship only if not yet shipped
-            return !$subscription->last_shipment_date;
+            if ($subscription->last_shipment_date) {
+                return false;
+            }
+            // Check if there's already a pending shipment for an earlier date
+            $pendingShipment = $subscription->shipments()
+                ->where('status', 'pending')
+                ->whereDate('shipment_date', '<', $date->toDateString())
+                ->first();
+            return !$pendingShipment;
         }
 
         // Recurring subscription - check frequency alignment
         $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
         
-        // Get last shipment or start date
-        $lastShipment = $subscription->last_shipment_date ?? $subscription->starts_at ?? $subscription->created_at;
+        // Find pending shipment BEFORE target date (more recent than last_shipment_date)
+        // This ensures we calculate cadence from the most recent planned shipment
+        $pendingBeforeTarget = $subscription->shipments()
+            ->where('status', 'pending')
+            ->whereDate('shipment_date', '<', $date->toDateString())
+            ->orderBy('shipment_date', 'desc')
+            ->first();
         
-        // Calculate expected next shipment dates
+        if ($pendingBeforeTarget) {
+            $lastShipment = $pendingBeforeTarget->shipment_date;
+        } else {
+            $lastShipment = $subscription->last_shipment_date 
+                ?? $subscription->starts_at 
+                ?? $subscription->created_at;
+        }
+        
+        // Calculate expected next shipment dates from the base
         $candidate = $lastShipment->copy();
         
         for ($i = 0; $i < 24; $i++) { // Max 2 years
