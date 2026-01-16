@@ -55,16 +55,12 @@ class SubscriptionController extends Controller
         // Get coffees of the month for next shipment - use correct method with month logic
         $coffeesOfMonth = \App\Models\Product::getCoffeesOfMonth();
 
-        // Get promo image for current/next month
-        $currentSchedule = \App\Models\ShipmentSchedule::getForMonth(now()->year, now()->month);
-        $nextSchedule = \App\Models\ShipmentSchedule::getNextShipment();
-        
-        // Use next schedule if current month is past, otherwise use current
-        $activeSchedule = $currentSchedule && !$currentSchedule->isPast() ? $currentSchedule : $nextSchedule;
-        $promoImage = $activeSchedule?->promo_image ?? 'images/kavi-november-25.jpg';
-        
         // Calculate display month and year using billing_date cutoff logic
         $displayMonth = \App\Helpers\SubscriptionHelper::getOrderingTargetMonth();
+        
+        // Get schedule for the target month (used for promo image and availability check)
+        $schedule = \App\Models\ShipmentSchedule::getForMonth($displayMonth->year, $displayMonth->month);
+        $promoImage = $schedule?->promo_image ?? 'images/kavi-november-25.jpg';
         
         // Get month name in nominative case based on locale
         $months = app()->getLocale() === 'en' ? [
@@ -80,8 +76,6 @@ class SubscriptionController extends Controller
         $displayYear = $displayMonth->year;
         
         // Check availability for displaying sold out message
-        // Use displayMonth (based on billing_date cutoff) to check the correct month's schedule
-        $schedule = \App\Models\ShipmentSchedule::getForMonth($displayMonth->year, $displayMonth->month);
         
         if (!$schedule || !$schedule->hasCoffeeSlotsConfigured()) {
             // No schedule or coffee slots not configured = sold out

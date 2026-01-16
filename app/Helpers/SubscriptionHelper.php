@@ -348,23 +348,38 @@ class SubscriptionHelper
     }
     /**
      * Get formatted shipping date info for display
+     * Uses billing_date cutoff logic to determine the correct shipping date
      */
     public static function getShippingDateInfo(): array
     {
-        $nextShipping = self::getNextShippingDate();
-        $nextBilling = self::getNextBillingDate();
         $today = Carbon::now();
         
-        // Check if we're after the billing cutoff for this month's shipment
-        $currentYear = $today->year;
-        $currentMonth = $today->month;
-        $currentSchedule = ShipmentSchedule::getForMonth($currentYear, $currentMonth);
+        // Use billing_date cutoff to determine the target month
+        $targetMonth = self::getOrderingTargetMonth();
+        $targetSchedule = ShipmentSchedule::getForMonth($targetMonth->year, $targetMonth->month);
         
+        // Get shipping date from target month's schedule, or fallback to 20th
+        if ($targetSchedule && $targetSchedule->shipment_date) {
+            $nextShipping = $targetSchedule->shipment_date->copy()->startOfDay();
+        } else {
+            // Fallback: 20th of target month
+            $nextShipping = $targetMonth->copy()->day(20)->startOfDay();
+        }
+        
+        // Get billing date from target month's schedule, or fallback to 15th
+        if ($targetSchedule && $targetSchedule->billing_date) {
+            $nextBilling = $targetSchedule->billing_date->copy()->startOfDay();
+        } else {
+            // Fallback: 15th of target month
+            $nextBilling = $targetMonth->copy()->day(15)->startOfDay();
+        }
+        
+        // Check if we're after the billing cutoff for current month
+        $currentSchedule = ShipmentSchedule::getForMonth($today->year, $today->month);
         $isAfterCutoff = false;
-        if ($currentSchedule) {
+        if ($currentSchedule && $currentSchedule->billing_date) {
             $isAfterCutoff = $today->greaterThan($currentSchedule->billing_date);
         } else {
-            // Fallback to old logic
             $isAfterCutoff = $today->day > 15;
         }
         
