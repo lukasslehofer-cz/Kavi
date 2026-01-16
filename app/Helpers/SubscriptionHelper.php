@@ -82,6 +82,32 @@ class SubscriptionHelper
     }
 
     /**
+     * Get the target month for new subscription orders based on billing_date cutoff
+     * 
+     * This determines which month's coffee boxes a new order will receive:
+     * - Before billing_date cutoff: order gets current month's box
+     * - After billing_date cutoff: order gets next month's box
+     * 
+     * @return Carbon The target month (year and month components are relevant)
+     */
+    public static function getOrderingTargetMonth(): Carbon
+    {
+        $today = Carbon::now();
+        $currentSchedule = ShipmentSchedule::getForMonth($today->year, $today->month);
+        
+        if ($currentSchedule && $currentSchedule->billing_date) {
+            $cutoffDate = $currentSchedule->billing_date->copy()->addDay();
+        } else {
+            // Fallback to 16th if no schedule configured
+            $cutoffDate = $today->copy()->day(16);
+        }
+        
+        return $today->greaterThanOrEqualTo($cutoffDate) 
+            ? $today->copy()->addMonthNoOverflow() 
+            : $today->copy();
+    }
+
+    /**
      * Calculate when a subscription should have its next shipment
      * based on frequency (1, 2, or 3 months)
      */
