@@ -354,174 +354,141 @@
   </div>
 </div>
 
-<!-- Subscription Plans Section - Quiet Luxury -->
-<div class="relative py-20 sm:py-24 md:py-28 lg:py-36 overflow-hidden" style="background-color: #F5F5F0;">
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <!-- Section Header -->
-    <div class="mb-16 sm:mb-20 max-w-2xl mx-auto text-center">
+<!-- Subscription Plans Section - Horizontal Tiers -->
+<div class="relative overflow-hidden" style="background-color: rgb(245 245 244);">
+  
+  <!-- Section Header -->
+  <div class="pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 border-b border-dark-800/10">
+    <div class="max-w-screen-xl mx-auto px-4 md:px-8 text-center">
       <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'Choose your ideal coffee box' : 'Vyberte si ideální kávový box' }}</h2>
-      <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}</p>
+      <p class="text-lg text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}</p>
     </div>
+  </div>
 
-    <div class="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- plan - start -->
-      <div class="group flex flex-col bg-white p-8 border border-warm-300 hover:border-primary-500 transition-all duration-200">
-        <div class="mb-8">
-          <div class="mb-6">
-            <span class="text-sm font-medium text-warm-500 mb-2 block uppercase tracking-widest">500g</span>
-            <div class="font-display text-4xl font-normal text-dark-800 uppercase">M Box</div>
+  <!-- Tier 1: M Box - Light background -->
+  <div class="border-b border-dark-800/10" style="background-color: rgb(245 245 244);">
+    <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <!-- Left: Large title + price -->
+        <div class="lg:w-1/3">
+          <div class="flex items-baseline gap-2">
+            <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">M</span>
+            <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
           </div>
-
-          <p class="text-warm-500 mb-8 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Ideal for individuals or households with lower coffee consumption' : 'Ideální pro jednotlivce nebo domácnosti s&nbsp;menší spotřebou kávy' }}</p>
-
-          <div class="space-y-3">
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-warm-400"></span>
-              <span class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '2 bags of 250g' : '2 balíčky po 250g' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-warm-400"></span>
-              <span class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '2 types of specialty coffee' : '2 druhy výběrové kávy' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-warm-400"></span>
-              <span class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Roasted to order' : 'Doprava zdarma' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-warm-400"></span>
-              <span class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</span>
-            </div>
-          </div>
+          <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">500g · 2 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
         </div>
-
-        <div class="mt-auto pt-8 border-t border-warm-200">
-          <div class="flex items-baseline gap-1 mb-6">
+        
+        <!-- Middle: Features -->
+        <div class="lg:w-1/3 space-y-2">
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '2 types of specialty coffee' : '2 druhy výběrové kávy' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
+        </div>
+        
+        <!-- Right: Price + CTA -->
+        <div class="lg:w-1/3 lg:text-right">
+          <div class="flex items-baseline gap-1 lg:justify-end mb-4">
             @if($currentLocale === 'en')
-              <span class="text-lg text-warm-500 font-light">€</span><span class="font-display text-4xl font-normal text-dark-800">{{ number_format($subscriptionPricing['2'], 0, '.', ' ') }}</span><span class="text-lg text-warm-500 font-light">/box</span>
+              <span class="font-display text-3xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['2'], 0, '.', ' ') }}</span>
             @else
-              <span class="font-display text-4xl font-normal text-dark-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span><span class="text-lg text-warm-500 font-light">Kč/box</span>
+              <span class="font-display text-3xl font-normal text-dark-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }} Kč</span>
             @endif
+            <span class="text-warm-500 font-light">/box</span>
           </div>
-
-          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 2]) }}" class="block w-full border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800 font-medium px-6 py-3 transition-all duration-200 text-center">
-            {{ $currentLocale === 'en' ? 'Select M Box' : 'Vybrat M Box' }}
+          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 2]) }}" class="inline-block border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800 font-medium px-8 py-3 transition-all duration-200">
+            {{ $currentLocale === 'en' ? 'Select M Box' : 'Vybrat M Box' }} →
           </a>
         </div>
       </div>
-      <!-- plan - end -->
+    </div>
+  </div>
 
-      <!-- plan - start - POPULAR -->
-      <div class="group relative flex flex-col bg-primary-500 p-8 transition-all duration-200">
-        <!-- Popular Badge -->
-        <div class="absolute left-0 top-0 bg-dark-800 px-4 py-2">
-          <span class="text-xs font-medium text-white uppercase tracking-widest">
+  <!-- Tier 2: L Box - Subtle highlight (Most Popular) -->
+  <div class="border-b border-dark-800/10 relative" style="background-color: rgb(245 245 244);">
+    <!-- Subtle left accent -->
+    <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-500"></div>
+    <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <!-- Left: Large title + price -->
+        <div class="lg:w-1/3">
+          <span class="inline-block bg-primary-500 text-white text-xs font-medium uppercase tracking-widest px-3 py-1 mb-4">
             {{ $currentLocale === 'en' ? 'Most Popular' : 'Nejoblíbenější' }}
           </span>
-        </div>
-
-        <div class="mb-8 pt-8">
-          <div class="mb-6">
-            <span class="text-sm font-medium text-white/80 mb-2 block uppercase tracking-widest">750g</span>
-            <div class="font-display text-4xl font-normal text-white uppercase">L Box</div>
+          <div class="flex items-baseline gap-2">
+            <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">L</span>
+            <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
           </div>
-
-          <p class="text-white/80 mb-8 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Most popular choice for specialty coffee lovers' : 'Nejpopulárnější volba pro milovníky výběrové kávy' }}</p>
-
-          <div class="space-y-3">
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-white"></span>
-              <span class="text-white/90 font-light">{{ $currentLocale === 'en' ? '3 bags of 250g' : '3 balíčky po 250g' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-white"></span>
-              <span class="text-white/90 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-white"></span>
-              <span class="text-white/90 font-light">{{ $currentLocale === 'en' ? 'Roasted to order' : 'Doprava zdarma' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-white"></span>
-              <span class="text-white/90 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</span>
-            </div>
-            
-          </div>
+          <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">750g · 3 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
         </div>
-
-        <div class="mt-auto pt-8 border-t border-white/20">
-          <div class="flex items-baseline gap-1 mb-6">
+        
+        <!-- Middle: Features -->
+        <div class="lg:w-1/3 space-y-2">
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
+        </div>
+        
+        <!-- Right: Price + CTA -->
+        <div class="lg:w-1/3 lg:text-right">
+          <div class="flex items-baseline gap-1 lg:justify-end mb-4">
             @if($currentLocale === 'en')
-              <span class="text-lg text-white/80 font-light">€</span><span class="font-display text-4xl font-normal text-white">{{ number_format($subscriptionPricing['3'], 0, '.', ' ') }}</span><span class="text-lg text-white/80 font-light">/box</span>
+              <span class="font-display text-3xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['3'], 0, '.', ' ') }}</span>
             @else
-              <span class="font-display text-4xl font-normal text-white">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span><span class="text-lg text-white/80 font-light">Kč/box</span>
+              <span class="font-display text-3xl font-normal text-dark-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }} Kč</span>
             @endif
+            <span class="text-warm-500 font-light">/box</span>
           </div>
-
-          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 3]) }}" class="group/btn flex items-center justify-center gap-3 w-full bg-white hover:bg-warm-200 text-dark-800 font-medium px-6 py-3 transition-all duration-200 text-center">
-            <span>{{ $currentLocale === 'en' ? 'Select L Box' : 'Vybrat L Box' }}</span>
-            <span class="group-hover/btn:translate-x-1 transition-transform">&rarr;</span>
+          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 3]) }}" class="inline-block bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 transition-all duration-200">
+            {{ $currentLocale === 'en' ? 'Select L Box' : 'Vybrat L Box' }} →
           </a>
         </div>
       </div>
-      <!-- plan - end -->
-
-      <!-- plan - start -->
-      <div class="group flex flex-col bg-white p-8 border border-warm-300 hover:border-primary-500 transition-all duration-200">
-        <div class="mb-8">
-          <div class="mb-6">
-            <span class="text-sm font-medium text-warm-500 mb-2 block uppercase tracking-widest">1000 g</span>
-            <div class="font-display text-4xl font-normal text-dark-800 uppercase">XL Box</div>
-          </div>
-
-          <p class="text-warm-500 mb-8 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'For coffee enthusiasts and larger households' : 'Pro kávové nadšence a větší domácnosti' }}</p>
-
-          <div class="space-y-3">
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-warm-400"></span>
-              <span class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '4 bags of 250g' : '4 balíčky po 250g' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-warm-400"></span>
-              <span class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-warm-400"></span>
-              <span class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Roasted to order' : 'Doprava zdarma' }}</span>
-            </div>
-
-            <div class="flex gap-3 items-center">
-              <span class="w-1.5 h-1.5 bg-warm-400"></span>
-              <span class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-auto pt-8 border-t border-warm-200">
-          <div class="flex items-baseline gap-1 mb-6">
-            @if($currentLocale === 'en')
-              <span class="text-lg text-warm-500 font-light">€</span><span class="font-display text-4xl font-normal text-dark-800">{{ number_format($subscriptionPricing['4'], 0, '.', ' ') }}</span><span class="text-lg text-warm-500 font-light">/box</span>
-            @else
-              <span class="font-display text-4xl font-normal text-dark-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span><span class="text-lg text-warm-500 font-light">Kč/box</span>
-            @endif
-          </div>
-
-          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 4]) }}" class="block w-full border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800 font-medium px-6 py-3 transition-all duration-200 text-center">
-            {{ $currentLocale === 'en' ? 'Select XL Box' : 'Vybrat XL Box' }}
-          </a>
-        </div>
-      </div>
-      <!-- plan - end -->
     </div>
+  </div>
 
-    <div class="text-center text-warm-500 font-light mt-8">{{ $currentLocale === 'en' ? 'Further customization of your coffee subscription follows in the next step.' : 'Další nastavení vašeho kávového předplatného následuje v dalším kroku.' }}</div>
+  <!-- Tier 3: XL Box -->
+  <div style="background-color: rgb(245 245 244);">
+    <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <!-- Left: Large title + price -->
+        <div class="lg:w-1/3">
+          <div class="flex items-baseline gap-2">
+            <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">XL</span>
+            <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
+          </div>
+          <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">1000g · 4 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
+        </div>
+        
+        <!-- Middle: Features -->
+        <div class="lg:w-1/3 space-y-2">
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
+        </div>
+        
+        <!-- Right: Price + CTA -->
+        <div class="lg:w-1/3 lg:text-right">
+          <div class="flex items-baseline gap-1 lg:justify-end mb-4">
+            @if($currentLocale === 'en')
+              <span class="font-display text-3xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['4'], 0, '.', ' ') }}</span>
+            @else
+              <span class="font-display text-3xl font-normal text-dark-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }} Kč</span>
+            @endif
+            <span class="text-warm-500 font-light">/box</span>
+          </div>
+          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 4]) }}" class="inline-block border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800 font-medium px-8 py-3 transition-all duration-200">
+            {{ $currentLocale === 'en' ? 'Select XL Box' : 'Vybrat XL Box' }} →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom note -->
+  <div class="py-8 border-t border-dark-800/10" style="background-color: rgb(245 245 244);">
+    <div class="max-w-screen-xl mx-auto px-4 md:px-8">
+      <p class="text-center text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Further customization of your coffee subscription follows in the next step.' : 'Další nastavení vašeho kávového předplatného následuje v dalším kroku.' }}</p>
+    </div>
   </div>
 </div>
 
@@ -534,7 +501,7 @@
       
       <!-- Section Header -->
       <div class="text-center mb-12 sm:mb-16">
-        <p class="text-xs uppercase tracking-widest text-warm-500 mb-4">{{ $currentLocale === 'en' ? 'Testimonials' : 'Reference' }}</p>
+        <!-- <p class="text-xs uppercase tracking-widest text-warm-500 mb-4">{{ $currentLocale === 'en' ? 'Testimonials' : 'Reference' }}</p> -->
         <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 tracking-tight uppercase">
           {{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}
         </h2>
@@ -707,7 +674,7 @@
 @endphp
 
 <!-- Coffee of the Month - Editorial Grid Layout -->
-<div class="relative py-12 sm:py-16 lg:py-20 overflow-hidden" style="background-color: rgb(245, 245, 244);">
+<div class="relative pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 lg:pb-20 overflow-hidden" style="background-color: rgb(245, 245, 244);">
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     
@@ -936,52 +903,44 @@
 </div>
 @endif
 
-<!-- How It Works Section - Olive Background -->
-<div class="relative py-20 sm:py-24 md:py-28 lg:py-36 overflow-hidden bg-olive-500">
+<!-- How It Works Section - Same style as Features -->
+<div class="relative py-20 sm:py-24 md:py-28 lg:py-36 overflow-hidden" style="background-color: rgb(245, 245, 244);">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
-    <div class="mb-12 sm:mb-16 text-center">
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-white mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'How it works' : 'Jak to funguje' }}</h2>
-      <p class="text-lg sm:text-xl text-white/80 font-light max-w-2xl mx-auto">{{ $currentLocale === 'en' ? 'Four simple steps to perfect coffee' : 'Čtyři jednoduché kroky k perfektní kávě' }}</p>
+    <div class="mb-16 sm:mb-20 max-w-2xl">
+      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'How it works' : 'Jak to funguje' }}</h2>
+      <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Four simple steps to perfect coffee' : 'Čtyři jednoduché kroky k perfektní kávě' }}</p>
     </div>
 
     <!-- Steps Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
       
       <!-- Step 1 -->
-      <div class="relative border-t border-white/30 pt-8">
-        <div class="text-left">
-          <span class="text-white font-display text-5xl font-normal mb-4 block">01</span>
-          <h3 class="text-xl font-normal text-white mb-3 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Choose your plan' : 'Vyberte si plán' }}</h3>
-          <p class="text-white/70 font-light leading-relaxed">{{ $currentLocale === 'en' ? 'Select coffee quantity and delivery frequency according to your needs' : 'Zvolte množství kávy a frekvenci dodání podle vašich potřeb' }}</p>
-        </div>
+      <div class="group border-t-2 border-primary-500 pt-8">
+        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">01</span>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Choose your plan' : 'Vyberte si plán' }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Select coffee quantity and delivery frequency according to your needs' : 'Zvolte množství kávy a frekvenci dodání podle vašich potřeb' }}</p>
       </div>
 
       <!-- Step 2 -->
-      <div class="relative border-t border-white/30 pt-8">
-        <div class="text-left">
-          <span class="text-white font-display text-5xl font-normal mb-4 block">02</span>
-          <h3 class="text-xl font-normal text-white mb-3 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Personalize' : 'Personalizujte' }}</h3>
-          <p class="text-white/70 font-light leading-relaxed">{{ $currentLocale === 'en' ? 'Choose coffee type, brewing method and delivery address' : 'Vyberte typ kávy, způsob přípravy a doručovací adresu' }}</p>
-        </div>
+      <div class="group border-t-2 border-primary-500 pt-8">
+        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">02</span>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Personalize' : 'Personalizujte' }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Choose coffee type, brewing method and delivery address' : 'Vyberte typ kávy, způsob přípravy a doručovací adresu' }}</p>
       </div>
 
       <!-- Step 3 -->
-      <div class="relative border-t border-white/30 pt-8">
-        <div class="text-left">
-          <span class="text-white font-display text-5xl font-normal mb-4 block">03</span>
-          <h3 class="text-xl font-normal text-white mb-3 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Pick up your box' : 'Vyzvedněte si box' }}</h3>
-          <p class="text-white/70 font-light leading-relaxed">{{ $currentLocale === 'en' ? 'We deliver freshly roasted coffee to your chosen location' : 'Čerstvě praženou kávu doručíme na vámi vybrané místo' }}</p>
-        </div>
+      <div class="group border-t-2 border-primary-500 pt-8">
+        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">03</span>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Pick up your box' : 'Vyzvedněte si box' }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'We deliver freshly roasted coffee to your chosen location' : 'Čerstvě praženou kávu doručíme na vámi vybrané místo' }}</p>
       </div>
 
       <!-- Step 4 -->
-      <div class="relative border-t border-white/30 pt-8">
-        <div class="text-left">
-          <span class="text-white font-display text-5xl font-normal mb-4 block">04</span>
-          <h3 class="text-xl font-normal text-white mb-3 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Enjoy' : 'Vychutnejte si' }}</h3>
-          <p class="text-white/70 font-light leading-relaxed">{{ $currentLocale === 'en' ? 'Enjoy great specialty coffee and look forward to your next coffee box' : 'Užijte si skvělou výběrovou kávu a těšte se na další kávový box' }}</p>
-        </div>
+      <div class="group border-t-2 border-primary-500 pt-8">
+        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">04</span>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Enjoy' : 'Vychutnejte si' }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Enjoy great specialty coffee and look forward to your next coffee box' : 'Užijte si skvělou výběrovou kávu a těšte se na další kávový box' }}</p>
       </div>
 
     </div>
@@ -1104,27 +1063,28 @@
 </div>
 
 <!-- Final CTA Section - Terracotta Background -->
-<div class="relative bg-primary-500 py-24 sm:py-32 lg:py-40">
+<div class="relative py-20 sm:py-24 lg:py-32" style="background-color: rgb(245, 245, 244);">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->
-      <h2 class="font-display mb-8 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-white leading-[0.95] tracking-tight uppercase">
+      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
         {{ $currentLocale === 'en' ? 'Start your coffee journey today' : 'Začněte svou kávovou cestu ještě dnes' }}
       </h2>
 
-      <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-white/80 max-w-2xl leading-relaxed font-light">
+      <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
         {{ $currentLocale === 'en' ? 'Get access to the best coffee from all over Europe. Flexible subscription, no commitment.' : 'Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.' }}
       </p>
 
-      <!-- CTA Buttons -->
-      <div class="flex flex-col sm:flex-row gap-4">
-        <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-3 bg-white hover:bg-warm-200 text-dark-800 font-medium px-10 py-5 text-lg transition-all duration-200">
+      <!-- CTA Links -->
+      <div class="flex flex-col sm:flex-row gap-6 sm:gap-10">
+        <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
           <span>{{ $currentLocale === 'en' ? 'Choose subscription' : 'Vybrat předplatné' }}</span>
           <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
 
-        <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center justify-center gap-3 border-2 border-white hover:bg-white hover:text-dark-800 text-white font-medium px-10 py-5 text-lg transition-all duration-200">
+        <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-warm-400 font-display uppercase tracking-widest hover:text-dark-800 transition-all">
           <span>{{ $currentLocale === 'en' ? 'Browse coffees' : 'Procházet kávy' }}</span>
+          <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
       </div>
     </div>

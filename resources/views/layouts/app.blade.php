@@ -106,7 +106,7 @@
     <!-- Banner - end -->
 
     <!-- Navigation - Quiet Luxury -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-warm-200">
+    <header class="sticky top-0 z-50 border-b border-black" style="background-color: rgb(245, 245, 244);">
         <div class="mx-auto max-w-screen-xl px-4 md:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
@@ -116,24 +116,24 @@
 
                 <!-- Desktop Navigation -->
                 <nav class="hidden lg:flex items-center gap-8">
-                    <a href="{{ route('home') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide transition-colors duration-200">
+                    <!-- <a href="{{ route('home') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Home' : 'Úvod' }}
-                    </a>
-                    <a href="{{ localizedRoute('subscriptions.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide transition-colors duration-200">
+                    </a> -->
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee Boxes' : 'Kávové boxy' }}
                     </a>
-                    <a href="{{ localizedRoute('monthly-feature.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide transition-colors duration-200">
+                    <a href="{{ localizedRoute('monthly-feature.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}
                     </a>
-                    <a href="{{ localizedRoute('products.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide transition-colors duration-200">
+                    <a href="{{ localizedRoute('products.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Shop' : 'Obchod' }}
                     </a>
-                    <a href="{{ localizedRoute('roasteries.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide transition-colors duration-200">
+                    <a href="{{ localizedRoute('roasteries.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Our Roasteries' : 'Naše pražírny' }}
                     </a>
                     @auth
                     @if(auth()->user()->is_admin)
-                    <a href="{{ route('admin.dashboard') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide transition-colors duration-200">
+                    <a href="{{ route('admin.dashboard') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
                         Admin
                     </a>
                     @endif
@@ -145,17 +145,17 @@
 
                     <!-- User Account -->
                     @auth
-                    <a href="{{ localizedRoute('dashboard.index') }}" class="text-sm text-dark-800 hover:text-primary-500 transition-colors duration-200" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'My Account' : 'Můj účet' }}">
+                    <a href="{{ localizedRoute('dashboard.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'My Account' : 'Můj účet' }}">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Account' : 'Účet' }}
                     </a>
                     @else
-                    <a href="{{ localizedRoute('login') }}" class="hidden md:inline-flex text-sm text-dark-800 hover:text-primary-500 transition-colors duration-200">
+                    <a href="{{ localizedRoute('login') }}" class="hidden md:inline-flex text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Sign In' : 'Přihlásit' }}
                     </a>
                     @endauth
 
                     <!-- Cart -->
-                    <a href="{{ localizedRoute('cart.index') }}" class="relative text-sm text-dark-800 hover:text-primary-500 transition-colors duration-200 group" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}">
+                    <a href="{{ localizedRoute('cart.index') }}" class="relative text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200 group" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}</span>
                         @if(session('cart') && count(session('cart')) > 0)
                         <span class="ml-1 text-primary-500 font-medium">({{ array_sum(session('cart')) }})</span>
@@ -163,7 +163,7 @@
                     </a>
                     
                     <!-- CTA Button - Desktop -->
-                    <a href="{{ localizedRoute('subscriptions.index') }}" class="hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm px-5 py-2.5 transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm px-5 py-2.5 uppercase tracking-wide transition-all duration-200">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Build Your Box' : 'Sestavte si box' }}</span>
                         <span>&rarr;</span>
                     </a>
@@ -179,28 +179,28 @@
         </div>
 
         <!-- Mobile Navigation -->
-        <div id="mobile-menu" class="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-warm-200" style="display: none;">
+        <div id="mobile-menu" class="lg:hidden absolute top-full left-0 right-0 border-t border-black" style="display: none; background-color: rgb(245, 245, 244);">
             <div class="px-6 py-6 space-y-1">
                 <!-- Navigation Links -->
-                <a href="{{ route('home') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 transition-colors duration-200">
+                <a href="{{ route('home') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 uppercase tracking-wide transition-colors duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Home' : 'Domů' }}
                 </a>
-                <a href="{{ localizedRoute('subscriptions.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 transition-colors duration-200">
+                <a href="{{ localizedRoute('subscriptions.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 uppercase tracking-wide transition-colors duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee Boxes' : 'Kávové boxy' }}
                 </a>
-                <a href="{{ localizedRoute('monthly-feature.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 transition-colors duration-200">
+                <a href="{{ localizedRoute('monthly-feature.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 uppercase tracking-wide transition-colors duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}
                 </a>
-                <a href="{{ localizedRoute('products.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 transition-colors duration-200">
+                <a href="{{ localizedRoute('products.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 uppercase tracking-wide transition-colors duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Shop' : 'Obchod' }}
                 </a>
-                <a href="{{ localizedRoute('roasteries.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 transition-colors duration-200">
+                <a href="{{ localizedRoute('roasteries.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 uppercase tracking-wide transition-colors duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Our Roasteries' : 'Naše pražírny' }}
                 </a>
                 
                 <!-- Mobile CTA Button -->
                 <div class="pt-6">
-                    <a href="{{ localizedRoute('subscriptions.index') }}" class="flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-4 transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-4 uppercase tracking-wide transition-all duration-200">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Build Your Box' : 'Sestavte si box' }}</span>
                         <span>&rarr;</span>
                     </a>

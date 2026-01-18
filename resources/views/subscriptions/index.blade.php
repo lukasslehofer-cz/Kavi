@@ -15,45 +15,31 @@
 @endsection
 
 @section('content')
-<!-- Hero Header Section - Quiet Luxury -->
-<div class="relative py-16 sm:py-20 md:py-24" style="background-color: #F5F5F0;">
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <div class="text-center max-w-3xl mx-auto">
-      <!-- Badge -->
-      <div class="inline-flex items-center bg-olive-500 px-5 py-2.5 mb-8">
-        <span class="text-sm font-light text-white uppercase tracking-widest">{{ $currentLocale === 'en' ? 'Coffee Subscription' : 'Kávové předplatné' }}</span>
-      </div>
-
-      <!-- Heading - Editorial Typography -->
-      <h1 class="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-dark-800 leading-tight tracking-tight uppercase mb-6">
-        {{ $currentLocale === 'en' ? 'Build your coffee box' : 'Sestavte si svůj kávový box' }}
-      </h1>
-      
-      <p class="mx-auto max-w-2xl text-base sm:text-lg text-warm-500 font-light mb-10">
-        {{ $currentLocale === 'en' ? 'Choose the quantity, coffee type and delivery frequency. Simple and no commitment.' : 'Vyberte si množství, typ kávy a frekvenci dodání. Jednoduše a bez závazků.' }}
+<!-- Hero Header Section - Editorial Layout -->
+<div class="relative" style="background-color: rgb(245, 245, 244);">
+  <!-- Red vertical stripe on left edge -->
+  <div class="absolute left-0 top-0 bottom-0 w-5 bg-primary-500"></div>
+  
+  <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
+    
+    <!-- Main Heading - Large Editorial Typography, Left aligned -->
+    <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
+      <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Build your' : 'Sestavte si' }}</span><br>
+      <span class="text-primary-500">{{ $currentLocale === 'en' ? 'coffee box' : 'kávový box' }}</span>
+    </h1>
+    
+    <!-- Description - Right aligned -->
+    <div class="flex justify-end">
+      <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
+        {{ $currentLocale === 'en' ? 'Choose the quantity, coffee type and delivery frequency. Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Vyberte si množství, typ kávy a frekvenci dodání. Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}
       </p>
-
-      <!-- Features - Clean Text -->
-      <div class="flex flex-wrap items-center justify-center gap-8">
-        <div class="flex items-center gap-3">
-          <span class="w-1.5 h-1.5 bg-primary-500"></span>
-          <span class="text-sm font-light text-dark-700">{{ $currentLocale === 'en' ? 'Like clockwork' : 'Doprava zdarma' }}</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="w-1.5 h-1.5 bg-primary-500"></span>
-          <span class="text-sm font-light text-dark-700">{{ $currentLocale === 'en' ? 'Flexible payment' : 'Flexibilní platba' }}</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="w-1.5 h-1.5 bg-primary-500"></span>
-          <span class="text-sm font-light text-dark-700">{{ $currentLocale === 'en' ? 'Cancel anytime' : 'Zrušení kdykoliv' }}</span>
-        </div>
-      </div>
     </div>
+    
   </div>
 </div>
 
 <!-- Main Content Container - 2 Column Layout -->
-<div class="bg-white py-12 sm:py-16 lg:py-20">
+<div class="py-12 sm:py-16 lg:py-20" style="background-color: rgb(245, 245, 244);">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
     <!-- Error Messages -->

@@ -15,45 +15,31 @@
 @endsection
 
 @section('content')
-<!-- Hero Header Section - Minimal -->
-<div class="relative bg-gray-100 py-12 sm:py-16 md:py-20 overflow-hidden">
-  <!-- Subtle Organic Shapes -->
-  <div class="absolute inset-0 overflow-hidden">
-    <div class="absolute -top-32 -right-32 w-96 h-96 bg-primary-100 rounded-full"></div>
-    <div class="absolute -bottom-32 -left-32 w-[36rem] h-[36rem] bg-primary-50 rounded-full hidden md:block"></div>
-  </div>
+<!-- Hero Header Section - Editorial Layout -->
+<div class="relative" style="background-color: rgb(245, 245, 244);">
+  <!-- Red vertical stripe on left edge -->
+  <div class="absolute left-0 top-0 bottom-0 w-5 bg-primary-500"></div>
   
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <div class="text-center max-w-3xl mx-auto">
-      <!-- Minimal Badge -->
-      <div class="inline-flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 mb-6">
-        <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-        <span class="text-sm font-medium text-gray-900">{{ $currentLocale === 'en' ? 'Premium Roasters' : 'Prémiové pražírny' }}</span>
-      </div>
-
-      <!-- Clean Heading -->
-      <h1 class="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-        {{ $currentLocale === 'en' ? 'Our Roasters' : 'Naše pražírny' }}
-      </h1>
-      
-      <p class="mx-auto max-w-2xl text-base sm:text-lg text-gray-600 font-light">
+  <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
+    
+    <!-- Main Heading - Large Editorial Typography, Left aligned -->
+    <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
+      <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Our' : 'Naše' }}</span><br>
+      <span class="text-primary-500">{{ $currentLocale === 'en' ? 'roasters' : 'pražírny' }}</span>
+    </h1>
+    
+    <!-- Description - Right aligned -->
+    <div class="flex justify-end">
+      <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
         {{ $currentLocale === 'en' ? 'We work with the best roasters from all over Europe. Quality, tradition and love for coffee.' : 'Spolupracujeme s těmi nejlepšími pražírnami z celé Evropy. Kvalita, tradice a láska ke kávě.' }}
       </p>
     </div>
-  </div>
-  
-  <!-- Wave Divider -->
-  <div class="absolute bottom-[-1px] left-0 right-0">
-    <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
-      <path d="M0 80L60 73C120 67 240 53 360 48C480 43 600 47 720 53C840 59 960 67 1080 69C1200 71 1320 67 1380 65L1440 63V80H1380C1320 80 1200 80 1080 80C960 80 840 80 720 80C600 80 480 80 360 80C240 80 120 80 60 80H0Z" fill="#ffffff"/>
-    </svg>
+    
   </div>
 </div>
 
 <!-- Main Content -->
-<div class="bg-white py-10 sm:py-12 md:py-16 lg:py-20">
+<div class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: rgb(245, 245, 244);">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
     <!-- Country Filters - Minimal -->
