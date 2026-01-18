@@ -16,10 +16,7 @@
 
 @section('content')
 <!-- Hero Header Section - Editorial Layout -->
-<div class="relative" style="background-color: rgb(245, 245, 244);">
-  <!-- Red vertical stripe on left edge -->
-  <div class="absolute left-0 top-0 bottom-0 w-5 bg-primary-500"></div>
-  
+<div style="background-color: rgb(245, 245, 244);">
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
@@ -67,47 +64,64 @@
     <!-- 2-Column Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
       
-      <!-- LEFT COLUMN - Product Photo + Link -->
+      <!-- LEFT COLUMN - Editorial Profile Card Style -->
       <div class="lg:col-span-5">
-        <div class="lg:sticky lg:top-24">
-          <!-- Product Photo -->
-          <div class="relative aspect-[1/1] sm:aspect-square overflow-hidden mb-6">
-            @php
-              // For backward compatibility: old images start with 'promo-images/' (storage), new ones with 'images/promo-images/' (public)
-              $imageSrc = str_starts_with($promoImage, 'promo-images/') 
-                  ? asset('storage/' . $promoImage) 
-                  : asset($promoImage);
-            @endphp
-            <img src="{{ $imageSrc }}" 
-                 alt="Kávový box" 
-                 class="w-full h-full object-cover">
-          </div>
+        <div class="lg:sticky lg:top-16">
           
-          <!-- Roasteries for Current Month -->
-          <div class="p-5 bg-stone-100">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="w-2 h-2 bg-primary-500"></span>
-              <h3 class="font-display text-sm font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Roasters for ' . $monthName . ' ' . $displayYear : 'Pražírny na ' . $monthName . ' ' . $displayYear }}</h3>
+          <!-- Photo Section with Red Stripe overlapping -->
+          <div class="relative">
+            <!-- Product Photo - Square, Grayscale with grain -->
+            <div class="relative aspect-square overflow-hidden">
+              @php
+                $imageSrc = str_starts_with($promoImage, 'promo-images/') 
+                    ? asset('storage/' . $promoImage) 
+                    : asset($promoImage);
+              @endphp
+              <img src="{{ $imageSrc }}" 
+                   alt="Kávový box" 
+                   class="w-full h-full object-cover">
+              
+              <!-- Grain overlay using SVG filter -->
+              <svg class="absolute inset-0 w-full h-full pointer-events-none" style="mix-blend-mode: overlay; opacity: 0.35;">
+                <filter id="grain-predplatne">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="5" stitchTiles="stitch"/>
+                </filter>
+                <rect width="100%" height="100%" filter="url(#grain-predplatne)"/>
+              </svg>
             </div>
             
+            <!-- Red vertical stripe with rotated text - top-left corner, ~40% height -->
+            <div class="absolute left-0 top-0 w-10 sm:w-12 bg-primary-500 flex items-center justify-center z-10" style="height: 40%;">
+              <span class="font-display text-dark-800 text-xs sm:text-sm uppercase tracking-[0.2em] transform -rotate-90 whitespace-nowrap">
+                {{ $monthName }} {{ $displayYear }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Info Section Below Photo - Roastery List -->
+          <div class="bg-stone-100">
+            
+            <!-- Roastery Rows -->
             @if($roasteriesOfMonth && $roasteriesOfMonth->count() > 0)
-              <div class="space-y-2 mb-4">
-                @foreach($roasteriesOfMonth as $roastery)
-                  <div class="flex items-center gap-2">
-                    <span class="text-lg">{{ $roastery->country_flag }}</span>
-                    <div class="flex-1">
-                      <span class="text-sm text-dark-700 font-medium">{{ $roastery->getName() }}</span>
-                      <span class="text-xs text-warm-500 font-light ml-1">{{ $roastery->getCity() ? $roastery->getCity() . ', ' : '' }}{{ $roastery->getCountry() }}</span>
-                    </div>
-                  </div>
-                @endforeach
-              </div>
+              @foreach($roasteriesOfMonth->take(3) as $index => $roastery)
+                <div class="flex items-center justify-between py-3 px-6 @if($index < $roasteriesOfMonth->count() - 1) border-b border-warm-300 @endif">
+                  <span class="font-display text-lg sm:text-xl md:text-2xl font-normal text-dark-800 uppercase tracking-tight">{{ $roastery->getName() }}</span>
+                  <span class="font-display text-lg sm:text-xl md:text-2xl font-normal text-warm-500 uppercase tracking-tight">{{ $roastery->getCountry() }}</span>
+                </div>
+              @endforeach
             @endif
             
-            <a href="{{ localizedRoute('monthly-feature.index') }}" 
-               class="block w-full py-2.5 bg-dark-800 text-white font-medium hover:bg-dark-700 transition-all duration-200 text-sm text-center">
-              {{ $currentLocale === 'en' ? 'View detailed information' : 'Zobrazit detailní informace' }}
-            </a>
+            <!-- Bottom Row: Description + Link -->
+            <div class="flex items-end justify-between gap-4 px-6 py-5 border-t border-warm-300">
+              <p class="text-xs text-warm-500 max-w-[60%] leading-relaxed font-light">
+                {{ $currentLocale === 'en' ? 'Premium specialty coffees from European micro-roasteries, freshly roasted and delivered to your door.' : 'Prémiové výběrové kávy z evropských mikropražíren, čerstvě pražené a doručené až k vašim dveřím.' }}
+              </p>
+              <a href="{{ localizedRoute('monthly-feature.index') }}" 
+                 class="text-sm text-dark-800 hover:text-primary-500 transition-colors whitespace-nowrap flex items-center gap-1">
+                {{ $currentLocale === 'en' ? 'View More' : 'Více info' }} <span class="text-lg">→</span>
+              </a>
+            </div>
+            
           </div>
         </div>
       </div>
@@ -160,130 +174,140 @@
           <input type="hidden" name="mix[filter]" id="mix-filter-value" value="0">
           
           <!-- KROK 1 - Množství kávy -->
-          <div class="mb-12 border-t border-warm-300 pt-8">
+          <div class="mb-12 border-t-2 border-primary-500 pt-6 pr-[5px]">
             <div class="mb-6">
-              <span class="font-display text-5xl font-normal text-dark-800 mb-4 block">01</span>
-              <h2 class="font-display text-2xl font-normal text-dark-800 uppercase tracking-wide mb-2">{{ $currentLocale === 'en' ? 'Coffee quantity' : 'Množství kávy' }}</h2>
+              <div class="flex items-baseline gap-4 mb-1">
+                <span class="text-primary-500 font-display text-4xl font-normal">01</span>
+                <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Coffee quantity' : 'Množství kávy' }}</h2>
+              </div>
               <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Choose the package that suits you' : 'Vyberte balíček, který vám vyhovuje' }}</p>
             </div>
 
-            <div class="divide-y divide-stone-200">
-              <!-- 500g plán -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+            <div class="space-y-0">
+              <!-- M Box -->
+              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative">
                 <input type="radio" name="amount" value="2" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-2xl font-normal text-dark-800 uppercase">M Box</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? '2 bags of 250g' : '2 balíčky po 250g' }}</p>
-                  </div>
-                  <div class="hidden sm:block flex-1">
-                    <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Ideal for individuals or couples' : 'Ideální pro jednotlivce nebo páry' }}</p>
-                  </div>
+                <!-- Left accent when selected -->
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex items-baseline gap-2 pl-4 w-[140px] sm:w-[160px] flex-shrink-0">
+                  <span class="font-display text-5xl sm:text-6xl font-normal text-dark-800 leading-none tracking-tight">M</span>
+                  <span class="font-display text-2xl font-normal text-dark-800 uppercase">Box</span>
                 </div>
-                <div class="text-right">
+                <div class="pl-4 sm:pl-0 sm:flex-1 sm:pl-6">
+                  <p class="text-warm-500 uppercase tracking-widest text-xs">500g · 2 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
+                  <p class="text-sm text-dark-700 font-light hidden sm:block">{{ $currentLocale === 'en' ? 'Ideal for individuals or couples' : 'Ideální pro jednotlivce nebo páry' }}</p>
+                </div>
+                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex items-baseline gap-1">
                   @if($currentLocale === 'en')
-                    <span class="text-sm text-warm-500 mr-1">€</span><span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['2'], 0, '.', ' ') }}</span>
+                    <span class="font-display text-2xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['2'], 0, '.', ' ') }}</span>
                   @else
-                    <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }}</span><span class="text-sm text-warm-500 ml-1">Kč</span>
+                    <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }} Kč</span>
                   @endif
+                  <span class="text-warm-500 font-light text-sm">/box</span>
                 </div>
               </label>
 
-              <!-- 750g plán -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <!-- L Box - Most Popular -->
+              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative">
                 <input type="radio" name="amount" value="3" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-2xl font-normal text-dark-800 uppercase">L Box</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? '3 bags of 250g' : '3 balíčky po 250g' }}</p>
-                  </div>
-                  <div class="hidden sm:block flex-1">
-                    <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Most popular choice' : 'Nejpopulárnější volba' }}</p>
-                  </div>
+                <!-- Left accent when selected -->
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex items-baseline gap-2 pl-4 w-[140px] sm:w-[160px] flex-shrink-0">
+                  <span class="font-display text-5xl sm:text-6xl font-normal text-dark-800 leading-none tracking-tight">L</span>
+                  <span class="font-display text-2xl font-normal text-dark-800 uppercase">Box</span>
                 </div>
-                <div class="text-right">
+                <div class="pl-4 sm:pl-0 sm:flex-1 sm:pl-6">
+                  <p class="text-warm-500 uppercase tracking-widest text-xs flex items-center gap-3">
+                    750g · 3 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}
+                    <span class="px-2 py-0.5 bg-primary-500 text-white text-xs uppercase tracking-wider">{{ $currentLocale === 'en' ? 'Popular' : 'Oblíbené' }}</span>
+                  </p>
+                  <p class="text-sm text-dark-700 font-light hidden sm:block">{{ $currentLocale === 'en' ? 'Most popular choice' : 'Nejpopulárnější volba' }}</p>
+                </div>
+                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex items-baseline gap-1">
                   @if($currentLocale === 'en')
-                    <span class="text-sm text-warm-500 mr-1">€</span><span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['3'], 0, '.', ' ') }}</span>
+                    <span class="font-display text-2xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['3'], 0, '.', ' ') }}</span>
                   @else
-                    <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }}</span><span class="text-sm text-warm-500 ml-1">Kč</span>
+                    <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }} Kč</span>
                   @endif
+                  <span class="text-warm-500 font-light text-sm">/box</span>
                 </div>
               </label>
 
-              <!-- 1000g plán -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <!-- XL Box -->
+              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative">
                 <input type="radio" name="amount" value="4" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-2xl font-normal text-dark-800 uppercase">XL Box</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? '4 bags of 250g' : '4 balíčky po 250g' }}</p>
-                  </div>
-                  <div class="hidden sm:block flex-1">
-                    <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'For coffee enthusiasts' : 'Pro kávové nadšence' }}</p>
-                  </div>
+                <!-- Left accent when selected -->
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex items-baseline gap-2 pl-4 w-[140px] sm:w-[160px] flex-shrink-0">
+                  <span class="font-display text-5xl sm:text-6xl font-normal text-dark-800 leading-none tracking-tight">XL</span>
+                  <span class="font-display text-2xl font-normal text-dark-800 uppercase">Box</span>
                 </div>
-                <div class="text-right">
+                <div class="pl-4 sm:pl-0 sm:flex-1 sm:pl-6">
+                  <p class="text-warm-500 uppercase tracking-widest text-xs">1000g · 4 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
+                  <p class="text-sm text-dark-700 font-light hidden sm:block">{{ $currentLocale === 'en' ? 'For coffee enthusiasts' : 'Pro kávové nadšence' }}</p>
+                </div>
+                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex items-baseline gap-1">
                   @if($currentLocale === 'en')
-                    <span class="text-sm text-warm-500 mr-1">€</span><span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['4'], 0, '.', ' ') }}</span>
+                    <span class="font-display text-2xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['4'], 0, '.', ' ') }}</span>
                   @else
-                    <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }}</span><span class="text-sm text-warm-500 ml-1">Kč</span>
+                    <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }} Kč</span>
                   @endif
+                  <span class="text-warm-500 font-light text-sm">/box</span>
                 </div>
               </label>
             </div>
           </div>
 
           <!-- KROK 2 - Typ kávy -->
-          <div class="mb-12 border-t border-warm-300 pt-8">
+          <div class="mb-12 border-t-2 border-primary-500 pt-6 pr-[5px]">
             <div class="mb-6">
-              <span class="font-display text-5xl font-normal text-dark-800 mb-4 block">02</span>
-              <h2 class="font-display text-2xl font-normal text-dark-800 uppercase tracking-wide mb-2">{{ $currentLocale === 'en' ? 'Preferred coffee type' : 'Preferovaný typ kávy' }}</h2>
+              <div class="flex items-baseline gap-4 mb-1">
+                <span class="text-primary-500 font-display text-4xl font-normal">02</span>
+                <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Preferred coffee type' : 'Preferovaný typ kávy' }}</h2>
+              </div>
               <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Choose your favorite brewing method' : 'Vyberte si váš oblíbený způsob přípravy' }}</p>
             </div>
 
-            <div class="divide-y divide-stone-200">
+            <div class="space-y-0">
               <!-- Espresso -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
                 <input type="radio" name="type" value="espresso" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-xl font-normal text-dark-800 uppercase">Espresso</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Full body, darker roast' : 'Plné tělo, tmavší pražení' }}</p>
-                  </div>
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex-1">
+                  <div class="font-display text-2xl font-normal text-dark-800 uppercase">Espresso</div>
+                  <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Full body, darker roast' : 'Plné tělo, tmavší pražení' }}</p>
                 </div>
                 <label class="flex items-center gap-2 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
-                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }}<br class="sm:hidden"> (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
+                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                 </label>
               </label>
 
               <!-- Filtr -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
                 <input type="radio" name="type" value="filter" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Filter' : 'Filtr' }}</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Lighter body, lighter roast' : 'Lehčí tělo, světlejší pražení' }}</p>
-                  </div>
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex-1">
+                  <div class="font-display text-2xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Filter' : 'Filtr' }}</div>
+                  <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Lighter body, lighter roast' : 'Lehčí tělo, světlejší pražení' }}</p>
                 </div>
                 <label class="flex items-center gap-2 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
-                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }}<br class="sm:hidden"> (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
+                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                 </label>
               </label>
 
               <!-- Kombinace -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
                 <input type="radio" name="type" value="mix" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Mix' : 'Kombinace' }}</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Espresso and filter' : 'Espresso i filtr' }}</p>
-                  </div>
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex-1">
+                  <div class="font-display text-2xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Mix' : 'Kombinace' }}</div>
+                  <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Espresso and filter' : 'Espresso i filtr' }}</p>
                 </div>
                 <label class="flex items-center gap-2 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
-                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }}<br class="sm:hidden"> (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
+                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                 </label>
               </label>
             </div>
@@ -333,102 +357,99 @@
           </div>
 
           <!-- KROK 3 - Frekvence -->
-          <div class="mb-12 border-t border-warm-300 pt-8">
+          <div class="mb-12 border-t-2 border-primary-500 pt-6 pr-[5px]">
             <div class="mb-6">
-              <span class="font-display text-5xl font-normal text-dark-800 mb-4 block">03</span>
-              <h2 class="font-display text-2xl font-normal text-dark-800 uppercase tracking-wide mb-2">{{ $currentLocale === 'en' ? 'Delivery frequency' : 'Frekvence dodání' }}</h2>
+              <div class="flex items-baseline gap-4 mb-1">
+                <span class="text-primary-500 font-display text-4xl font-normal">03</span>
+                <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Delivery frequency' : 'Frekvence dodání' }}</h2>
+              </div>
               <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'How often do you want to receive coffee?' : 'Jak často chcete kávu dostávat?' }}</p>
             </div>
 
-            <div class="divide-y divide-stone-200">
+            <div class="space-y-0">
               <!-- Každý měsíc -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
                 <input type="radio" name="frequency" value="1" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Every month' : 'Každý měsíc' }}</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'For regular consumption' : 'Pro pravidelnou spotřebu' }}</p>
-                  </div>
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex-1">
+                  <div class="font-display text-2xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Every month' : 'Každý měsíc' }}</div>
+                  <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'For regular consumption' : 'Pro pravidelnou spotřebu' }}</p>
                 </div>
               </label>
 
               <!-- Jednou za 2 měsíce -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
                 <input type="radio" name="frequency" value="2" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Every 2 months' : 'Jednou za 2 měsíce' }}</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'For medium consumption' : 'Pro střední spotřebu' }}</p>
-                  </div>
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex-1">
+                  <div class="font-display text-2xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Every 2 months' : 'Jednou za 2 měsíce' }}</div>
+                  <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'For medium consumption' : 'Pro střední spotřebu' }}</p>
                 </div>
               </label>
 
               <!-- Jednou za 3 měsíce -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
                 <input type="radio" name="frequency" value="3" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="font-display text-xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Every 3 months' : 'Jednou za 3 měsíce' }}</div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'For occasional drinking' : 'Pro občasné pití' }}</p>
-                  </div>
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex-1">
+                  <div class="font-display text-2xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Every 3 months' : 'Jednou za 3 měsíce' }}</div>
+                  <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'For occasional drinking' : 'Pro občasné pití' }}</p>
                 </div>
               </label>
 
               <!-- Jednorázově (bez předplatného) -->
-              <label class="group flex items-center justify-between py-6 cursor-pointer transition-all border-l-4 border-l-transparent has-[:checked]:border-l-dark-800 has-[:checked]:bg-stone-50 px-4 -mx-4">
+              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
                 <input type="radio" name="frequency" value="0" class="hidden" required>
-                <div class="flex items-center gap-4 flex-1">
-                  <div class="flex-shrink-0">
-                    <div class="flex items-center gap-2">
-                      <span class="font-display text-xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'One-time' : 'Jednorázově' }}</span>
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-olive-500 text-white text-xs font-medium">
-                        <span>{{ $currentLocale === 'en' ? 'Try it' : 'Zkuste to' }}</span>
-                      </span>
-                    </div>
-                    <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'No subscription' : 'Bez předplatného' }}</p>
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-3">
+                    <span class="font-display text-2xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'One-time' : 'Jednorázově' }}</span>
+                    <span class="px-2 py-0.5 bg-olive-500 text-white text-xs uppercase tracking-wider">{{ $currentLocale === 'en' ? 'Try it' : 'Zkuste to' }}</span>
                   </div>
+                  <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'No subscription' : 'Bez předplatného' }}</p>
                 </div>
-                <span class="px-3 py-1.5 bg-stone-100 text-sm font-medium text-dark-700">+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }}</span>
+                <span class="font-display text-lg text-dark-800">+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }}</span>
               </label>
             </div>
           </div>
 
           <!-- Shrnutí a Submit -->
-          <div class="p-5 sm:p-6 bg-stone-100 mt-8">
-            <h3 id="summary-title" class="font-display text-lg sm:text-xl font-normal text-dark-800 mb-4 uppercase">{{ $currentLocale === 'en' ? 'Order summary' : 'Shrnutí objednávky' }}</h3>
+          <div class="border-t-2 border-primary-500 pt-6 mt-8">
+            <h3 id="summary-title" class="font-display text-4xl font-normal text-dark-800 mb-6 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Order summary' : 'Shrnutí objednávky' }}</h3>
             
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between text-sm">
-                <span class="text-warm-500">{{ $currentLocale === 'en' ? 'Quantity:' : 'Množství:' }}</span>
-                <span class="font-medium text-dark-800" id="summary-amount">-</span>
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between py-2 border-b border-dark-800/10">
+                <span class="text-warm-500 uppercase tracking-widest text-xs">{{ $currentLocale === 'en' ? 'Quantity:' : 'Množství:' }}</span>
+                <span class="font-display text-lg text-dark-800" id="summary-amount">-</span>
               </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-warm-500">{{ $currentLocale === 'en' ? 'Coffee type:' : 'Typ kávy:' }}</span>
-                <span class="font-medium text-dark-800" id="summary-type">-</span>
+              <div class="flex justify-between py-2 border-b border-dark-800/10">
+                <span class="text-warm-500 uppercase tracking-widest text-xs">{{ $currentLocale === 'en' ? 'Coffee type:' : 'Typ kávy:' }}</span>
+                <span class="font-display text-lg text-dark-800" id="summary-type">-</span>
               </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-warm-500">{{ $currentLocale === 'en' ? 'Frequency:' : 'Frekvence:' }}</span>
-                <span class="font-medium text-dark-800" id="summary-frequency">-</span>
+              <div class="flex justify-between py-2 border-b border-dark-800/10">
+                <span class="text-warm-500 uppercase tracking-widest text-xs">{{ $currentLocale === 'en' ? 'Frequency:' : 'Frekvence:' }}</span>
+                <span class="font-display text-lg text-dark-800" id="summary-frequency">-</span>
               </div>
-              <div id="onetime-surcharge" class="hidden flex justify-between text-sm">
-                <span class="text-warm-500">{{ $currentLocale === 'en' ? 'One-time surcharge:' : 'Příplatek jednorázový:' }}</span>
-                <span class="font-medium text-dark-800">+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }}</span>
+              <div id="onetime-surcharge" class="hidden flex justify-between py-2 border-b border-dark-800/10">
+                <span class="text-warm-500 uppercase tracking-widest text-xs">{{ $currentLocale === 'en' ? 'One-time surcharge:' : 'Příplatek jednorázový:' }}</span>
+                <span class="font-display text-lg text-dark-800">+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }}</span>
               </div>
-              <div class="flex justify-between items-center pt-4 border-t border-stone-300">
-                <span class="font-display text-lg font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Total price:' : 'Celková cena:' }}</span>
-                <div class="text-right">
-                  @if($currentLocale === 'en')
-                    <span class="text-sm text-warm-500 mr-1">€</span><span class="font-display text-3xl font-normal text-dark-800" id="summary-price">-</span>
-                  @else
-                    <span class="font-display text-3xl font-normal text-dark-800" id="summary-price">-</span><span class="text-sm text-warm-500 ml-1">Kč</span>
-                  @endif
-                  <p id="summary-price-note" class="text-xs text-warm-500 mt-1">{{ $currentLocale === 'en' ? 'per delivery' : 'při každé dodávce' }}</p>
-                </div>
+            </div>
+
+            <div class="flex justify-between items-end py-4 border-t-2 border-primary-500 mb-6">
+              <span class="text-primary-500 font-display text-xl font-normal uppercase">{{ $currentLocale === 'en' ? 'Total price:' : 'Celková cena:' }}</span>
+              <div class="text-right">
+                @if($currentLocale === 'en')
+                  <span class="font-display text-5xl font-normal text-dark-800" id="summary-price">-</span><span class="text-lg text-warm-500 ml-1">€</span>
+                @else
+                  <span class="font-display text-5xl font-normal text-dark-800" id="summary-price">-</span><span class="text-lg text-warm-500 ml-1">Kč</span>
+                @endif
+                <p id="summary-price-note" class="text-xs text-warm-500 mt-1 uppercase tracking-widest">{{ $currentLocale === 'en' ? 'per delivery' : 'při každé dodávce' }}</p>
               </div>
             </div>
 
             <button type="submit" id="submit-button" 
-                    class="w-full py-3 bg-dark-800 text-white font-medium hover:bg-dark-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
+                    class="w-full py-4 bg-primary-500 text-white font-display text-lg uppercase tracking-wide hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3" 
                     disabled>
               <span>{{ $currentLocale === 'en' ? 'Continue to checkout' : 'Pokračovat k objednávce' }}</span>
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -436,7 +457,7 @@
               </svg>
             </button>
 
-            <div class="flex items-center justify-center gap-6 mt-4 text-xs text-warm-500">
+            <div class="flex items-center justify-center gap-6 mt-4 text-xs text-warm-500 uppercase tracking-widest">
               <span class="flex items-center gap-2">
                 <span class="w-1.5 h-1.5 bg-primary-500"></span>
                 {{ $currentLocale === 'en' ? 'No commitment' : 'Bez závazků' }}
