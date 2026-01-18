@@ -449,7 +449,7 @@
             </div>
 
             <button type="submit" id="submit-button" 
-                    class="w-full py-4 bg-primary-500 text-white font-display text-lg uppercase tracking-wide hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3" 
+                    class="w-full py-4 bg-dark-800 text-white font-display text-lg uppercase tracking-wide hover:bg-dark-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3" 
                     disabled>
               <span>{{ $currentLocale === 'en' ? 'Continue to checkout' : 'Pokračovat k objednávce' }}</span>
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
