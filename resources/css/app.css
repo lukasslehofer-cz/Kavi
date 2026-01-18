@@ -1,5 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
 
+/* Tex Gyre Heros - Quiet Luxury Display Font */
+@font-face {
+    font-family: 'TexGyreHeros';
+    src: url('/fonts/texgyreheros-regular.woff2') format('woff2'),
+         url('/fonts/texgyreheros-regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TexGyreHeros';
+    src: url('/fonts/texgyreheros-bold.woff2') format('woff2'),
+         url('/fonts/texgyreheros-bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TexGyreHeros';
+    src: url('/fonts/texgyreheros-italic.woff2') format('woff2'),
+         url('/fonts/texgyreheros-italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TexGyreHeros';
+    src: url('/fonts/texgyreheros-bolditalic.woff2') format('woff2'),
+         url('/fonts/texgyreheros-bolditalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,51 +47,51 @@
     }
     
     h1, h2, h3, h4, h5, h6 {
-        @apply font-display font-bold;
+        @apply font-display font-normal tracking-tight;
     }
 }
 
 @layer components {
     .btn {
-        @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg;
+        @apply inline-flex items-center justify-center px-6 py-3 font-semibold transition-all duration-200;
     }
     
     .btn-primary {
-        @apply bg-gradient-to-r from-primary-500 to-pink-600 hover:from-primary-600 hover:to-pink-700 text-white transform hover:-translate-y-0.5;
+        @apply bg-primary-500 hover:bg-primary-600 text-white;
     }
     
     .card {
-        @apply bg-white rounded-2xl shadow-lg;
+        @apply bg-white;
     }
     
     .input {
-        @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all;
+        @apply w-full px-4 py-3 border border-warm-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all;
     }
 }
 
-/* Cookie Consent Customization */
+/* Cookie Consent Customization - Quiet Luxury */
 :root {
     --cc-bg: #fff;
-    --cc-text: #222222;
-    --cc-btn-primary-bg: #FF476D;
+    --cc-text: #1a1a1a;
+    --cc-btn-primary-bg: #CA4136;
     --cc-btn-primary-text: #fff;
-    --cc-btn-primary-hover-bg: #e6305a;
-    --cc-btn-secondary-bg: #f3f4f6;
-    --cc-btn-secondary-text: #222222;
-    --cc-btn-secondary-hover-bg: #e5e7eb;
-    --cc-toggle-bg-off: #e5e7eb;
-    --cc-toggle-bg-on: #FF476D;
+    --cc-btn-primary-hover-bg: #b53a30;
+    --cc-btn-secondary-bg: #E5E6DF;
+    --cc-btn-secondary-text: #1a1a1a;
+    --cc-btn-secondary-hover-bg: #BCBEB1;
+    --cc-toggle-bg-off: #BCBEB1;
+    --cc-toggle-bg-on: #CA4136;
     --cc-toggle-bg-readonly: #d1d5db;
     --cc-toggle-knob-bg: #fff;
-    --cc-toggle-knob-icon-color: #222222;
-    --cc-cookie-category-block-bg: #f8f9fb;
-    --cc-cookie-category-block-bg-hover: #f1f3f7;
-    --cc-section-border: #E1E6EF;
-    --cc-cookie-table-border: #E1E6EF;
-    --cc-overlay-bg: rgba(0, 0, 0, 0.6);
-    --cc-webkit-scrollbar-bg: #f3f4f6;
-    --cc-webkit-scrollbar-thumb-bg: #d1d5db;
-    --cc-webkit-scrollbar-thumb-hover-bg: #9ca3af;
+    --cc-toggle-knob-icon-color: #1a1a1a;
+    --cc-cookie-category-block-bg: #E5E6DF;
+    --cc-cookie-category-block-bg-hover: #BCBEB1;
+    --cc-section-border: #BCBEB1;
+    --cc-cookie-table-border: #BCBEB1;
+    --cc-overlay-bg: rgba(0, 0, 0, 0.7);
+    --cc-webkit-scrollbar-bg: #E5E6DF;
+    --cc-webkit-scrollbar-thumb-bg: #BCBEB1;
+    --cc-webkit-scrollbar-thumb-hover-bg: #76716C;
 }
 
 #cc-main {
@@ -63,34 +100,36 @@
 
 #cc-main .cm {
     max-width: 600px;
-    border-radius: 1rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-radius: 0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
 }
 
 #cc-main .pm {
     max-width: 700px;
-    border-radius: 1rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-radius: 0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
 }
 
 #cc-main .cm__title,
 #cc-main .pm__title {
+    font-family: 'TexGyreHeros', 'Helvetica Neue', Arial, sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
+    letter-spacing: -0.025em;
 }
 
 #cc-main .cm__desc,
 #cc-main .section__desc {
     font-size: 0.95rem;
     line-height: 1.6;
-    color: #6b7280;
+    color: #76716C;
 }
 
 #cc-main .cm__btn,
 #cc-main .pm__btn {
     padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
+    border-radius: 0;
     font-weight: 600;
     font-size: 0.95rem;
     transition: all 0.2s;
@@ -98,26 +137,26 @@
 
 #cc-main .cm__btn:hover,
 #cc-main .pm__btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: none;
+    box-shadow: none;
 }
 
 #cc-main button.cm__btn--primary,
 #cc-main button.pm__btn--primary {
-    background: linear-gradient(135deg, #FF476D 0%, #e6305a 100%);
+    background: #CA4136;
 }
 
 #cc-main .section__toggle {
-    border-radius: 1rem;
+    border-radius: 0;
 }
 
 #cc-main .cc-link {
-    color: #FF476D;
+    color: #CA4136;
     text-decoration: underline;
 }
 
 #cc-main .cc-link:hover {
-    color: #e6305a;
+    color: #b53a30;
 }
 
 /* Responsive adjustments */
@@ -141,6 +180,7 @@
     #cc-main .pm {
         margin: 1rem;
         max-width: calc(100% - 2rem);
+        border-radius: 0 !important;
     }
     
     /* Adjust buttons for mobile */
@@ -159,4 +199,14 @@
     #cc-main .cm__btn {
         width: 100%;
     }
+}
+
+/* Quiet Luxury utility classes */
+.luxury-border {
+    border: 1px solid #BCBEB1;
+}
+
+.luxury-heading {
+    font-family: 'TexGyreHeros', 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: -0.025em;
 }

@@ -18,18 +18,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Kavi brand colors
+        // Quiet Luxury brand colors
         primary: {
-          50: '#fff1f4',
-          100: '#ffe3e9',
-          200: '#ffc7d4',
-          300: '#ffa0b8',
-          400: '#ff6990',
-          500: '#FF476D', // Main brand pink
-          600: '#e6305a',
-          700: '#c61f47',
-          800: '#a0193a',
-          900: '#7d1530',
+          50: '#fef7f6',
+          100: '#fceeed',
+          200: '#f9d5d2',
+          300: '#f3aea8',
+          400: '#e07a71',
+          500: '#CA4136', // Main terracotta red
+          600: '#b53a30',
+          700: '#972f27',
+          800: '#7d2820',
+          900: '#68251f',
+        },
+        olive: {
+          50: '#f6f7f4',
+          100: '#eaebe4',
+          200: '#d5d8ca',
+          300: '#b8bda8',
+          400: '#969c82',
+          500: '#636747', // Main olive green
+          600: '#565a3e',
+          700: '#464934',
+          800: '#3a3c2c',
+          900: '#323427',
+        },
+        warm: {
+          50: '#fafaf8',
+          100: '#f5f5f2',
+          200: '#E5E6DF', // Light warm background
+          300: '#BCBEB1', // Warm neutral
+          400: '#9a9c8f',
+          500: '#76716C', // Warm gray
+          600: '#5f5b57',
+          700: '#4d4a47',
+          800: '#403e3b',
+          900: '#363433',
         },
         dark: {
           50: '#f5f5f5',
@@ -40,25 +64,13 @@ export default {
           500: '#616161',
           600: '#424242',
           700: '#2d2d2d',
-          800: '#222222', // Main text color
-          900: '#1a1a1a',
-        },
-        bluegray: {
-          50: '#f8f9fb',
-          100: '#f1f3f7',
-          200: '#E1E6EF', // Main background for blocks
-          300: '#c5cdd9',
-          400: '#a3aebf',
-          500: '#8290a5',
-          600: '#67748a',
-          700: '#515c6f',
-          800: '#3f4754',
-          900: '#2f3642',
+          800: '#1a1a1a',
+          900: '#000000', // Pure black
         },
       },
       fontFamily: {
         sans: ['Roboto', 'system-ui', 'sans-serif'],
-        display: ['Roboto', 'system-ui', 'sans-serif'],
+        display: ['TexGyreHeros', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       keyframes: {
         float: {
