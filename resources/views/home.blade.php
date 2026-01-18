@@ -706,151 +706,231 @@
   $displayYear = $displayMonth->year;
 @endphp
 
-<div class="relative py-20 sm:py-24 md:py-28 lg:py-36 bg-white">
-  <div class="mx-auto max-w-screen-xl px-4 md:px-8">
+<!-- Coffee of the Month - Editorial Grid Layout -->
+<div class="relative py-12 sm:py-16 lg:py-20 overflow-hidden" style="background-color: rgb(245, 245, 244);">
+  
+  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     
-    <!-- Section Header -->
-    <div class="mb-12 sm:mb-16 text-center">
-      <div class="inline-flex items-center gap-2 border border-warm-300 px-4 py-2 mb-6">
-        <span class="w-2 h-2 bg-primary-500"></span>
-        <span class="text-sm font-light text-dark-800 uppercase tracking-widest">{{ $monthName }} {{ $displayYear }}</span>
-      </div>
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}</h2>
-      <p class="text-lg sm:text-xl text-warm-500 font-light max-w-2xl mx-auto">{{ $currentLocale === 'en' ? 'Every month we bring a selection of coffees from chosen roasters' : 'Každý měsíc přinášíme výběr káv od vybraných pražíren' }}</p>
-    </div>
-
-    <div class="grid lg:grid-cols-2 gap-16">
+    <!-- Top Section: Heading + Date on left, CTA on right -->
+    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-16 mb-8 sm:mb-10">
       
-      <!-- Left Side: Roasteries - Zigzag Layout -->
-      @if($roasteriesOfMonth->count() > 0)
-      <div class="flex flex-col justify-between h-[400px]">
-        @foreach($roasteriesOfMonth as $index => $roastery)
-        @php
-          // Zigzag pattern: 1st and 3rd offset right, 2nd stays left (only on desktop)
-          $offsetClass = ($index % 2 === 0) ? 'lg:ml-16' : 'ml-0';
-          // Middle roastery (index 1) reversed layout
-          $flexDirection = ($index === 1) ? 'flex-row-reverse' : '';
-          // Text alignment for middle roastery
-          $textAlign = ($index === 1) ? 'text-right' : '';
-          $flexJustify = ($index === 1) ? 'justify-end' : '';
-        @endphp
-        
-        <div class="flex items-center gap-6 {{ $offsetClass }} {{ $flexDirection }}">
-          <!-- Roastery Image -->
-          <div class="relative w-28 h-28 flex-shrink-0 overflow-hidden">
-            @if($roastery->image)
-            <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->name }}" class="w-full h-full object-cover" />
-            @else
-            <div class="w-full h-full bg-warm-300 flex items-center justify-center">
-              <span class="text-warm-500 font-display text-2xl">{{ substr($roastery->name, 0, 1) }}</span>
-            </div>
-            @endif
-          </div>
-
-          <!-- Roastery Info -->
-          <div class="flex-1 min-w-0 {{ $textAlign }}">
-            <div class="flex items-center gap-3 mb-2 {{ $flexJustify }}">
-              @if($index === 1 && $roastery->country_flag)
-              <span class="text-3xl flex-shrink-0">{{ $roastery->country_flag }}</span>
-              @endif
-              <h3 class="font-display text-2xl font-normal text-dark-800">{{ $roastery->name }}</h3>
-              @if($index !== 1 && $roastery->country_flag)
-              <span class="text-3xl flex-shrink-0">{{ $roastery->country_flag }}</span>
-              @endif
-            </div>
-            <p class="text-sm text-warm-500 font-light">
-              @if($roastery->getCity() && $roastery->getCountry())
-                {{ $roastery->getCity() }}, {{ $roastery->getCountry() }}
-              @elseif($roastery->getCity())
-                {{ $roastery->getCity() }}
-              @elseif($roastery->getCountry())
-                {{ $roastery->getCountry() }}
-              @endif
-            </p>
+      <!-- Left: Heading + Date -->
+      <div>
+        <h2 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-primary-500 leading-[0.9] tracking-tight uppercase">
+          {{ $currentLocale === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}
+        </h2>
+        <p class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal leading-[0.9] tracking-tight uppercase mt-2" style="color: #BCBEB1;">
+          {{ $monthName }} {{ $displayYear }}
+        </p>
+      </div>
+      
+      <!-- Right: CTA Link -->
+      <div class="lg:pt-4">
+        <a href="{{ localizedRoute('monthly-feature.index') }}" class="group inline-flex items-center gap-3 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all text-sm">
+          <span>{{ $currentLocale === 'en' ? 'Explore coffees for ' . $monthName : 'Prozkoumat kávy na ' . $monthName }}</span>
+          <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+        </a>
+      </div>
+      
+    </div>
+    
+    @if($coffeesOfMonth->count() > 0)
+    @php
+      // Don't shuffle - use consistent order
+      $allCoffees = $coffeesOfMonth->take(7);
+      $coffeeCount = $allCoffees->count();
+      
+      // Collect unique roasteries (max 3)
+      $roasteries = $allCoffees->pluck('roastery')->filter()->unique('id')->take(3);
+    @endphp
+    
+    <!-- Mobile: Roasteries + Coffee Grid -->
+    <div class="lg:hidden">
+      <!-- Mobile roasteries with images -->
+      <div class="mb-6 grid grid-cols-3 gap-3">
+        @foreach($roasteries as $roastery)
+        <div class="relative overflow-hidden">
+          @if($roastery->image)
+          <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
+          @else
+          <div class="w-full aspect-[4/5] bg-warm-300"></div>
+          @endif
+          <!-- Overlay text at top -->
+          <div class="absolute top-0 left-0 right-0 p-2">
+            <span class="inline-block bg-primary-500 px-1.5 py-0.5 font-display text-xs font-normal text-black uppercase tracking-tight leading-tight">{{ $roastery->name }}</span>
+            <br>
+            <span class="inline-block bg-primary-500 px-1.5 py-0.5 text-[10px] text-black uppercase tracking-widest mt-0.5">{{ $roastery->getCountry() ?? '' }}</span>
           </div>
         </div>
         @endforeach
       </div>
-      @endif
-
-      <!-- Right Side: Coffee Grid -->
-      @if($coffeesOfMonth->count() > 0)
-      @php
-        // Shuffle coffees randomly
-        $shuffledCoffees = $coffeesOfMonth->shuffle();
-        $coffeeCount = $shuffledCoffees->count();
-      @endphp
-      
-      <div class="relative lg:h-[400px]">
-        @if($coffeeCount >= 6)
-          <!-- Grid 3x2 for 6+ photos -->
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            @foreach($shuffledCoffees->take(6) as $coffee)
-            <div class="relative aspect-square overflow-hidden bg-warm-200">
-              @if($coffee->image)
-              <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-full object-cover" />
-              @else
-              <div class="w-full h-full bg-warm-300 flex items-center justify-center">
-                <span class="text-warm-500 font-display text-xl">{{ substr($coffee->name, 0, 1) }}</span>
-              </div>
-              @endif
-            </div>
-            @endforeach
-          </div>
-        @else
-          <!-- Layout for less than 6: one large (2x2) + 2 small (1x1 stacked) -->
-          <div class="grid grid-cols-3 gap-3 auto-rows-fr">
-            <!-- Large photo (2x2) -->
-            @if($shuffledCoffees->count() > 0)
-            <div class="col-span-2 row-span-2 relative aspect-square overflow-hidden bg-warm-200">
-              @if($shuffledCoffees[0]->image)
-              <img src="{{ asset($shuffledCoffees[0]->image) }}" alt="{{ $shuffledCoffees[0]->name }}" class="w-full h-full object-cover" />
-              @else
-              <div class="w-full h-full bg-warm-300 flex items-center justify-center">
-                <span class="text-warm-500 font-display text-3xl">{{ substr($shuffledCoffees[0]->name, 0, 1) }}</span>
-              </div>
-              @endif
-            </div>
-            @endif
-            
-            <!-- Small photo 1 (1x1) -->
-            @if($shuffledCoffees->count() > 1)
-            <div class="relative aspect-square overflow-hidden bg-warm-200">
-              @if($shuffledCoffees[1]->image)
-              <img src="{{ asset($shuffledCoffees[1]->image) }}" alt="{{ $shuffledCoffees[1]->name }}" class="w-full h-full object-cover" />
-              @else
-              <div class="w-full h-full bg-warm-300 flex items-center justify-center">
-                <span class="text-warm-500 font-display text-xl">{{ substr($shuffledCoffees[1]->name, 0, 1) }}</span>
-              </div>
-              @endif
-            </div>
-            @endif
-            
-            <!-- Small photo 2 (1x1) -->
-            @if($shuffledCoffees->count() > 2)
-            <div class="relative aspect-square overflow-hidden bg-warm-200">
-              @if($shuffledCoffees[2]->image)
-              <img src="{{ asset($shuffledCoffees[2]->image) }}" alt="{{ $shuffledCoffees[2]->name }}" class="w-full h-full object-cover" />
-              @else
-              <div class="w-full h-full bg-warm-300 flex items-center justify-center">
-                <span class="text-warm-500 font-display text-xl">{{ substr($shuffledCoffees[2]->name, 0, 1) }}</span>
-              </div>
-              @endif
+      <!-- Mobile coffee grid -->
+      <div class="grid grid-cols-3 gap-4">
+        @foreach($allCoffees as $index => $coffee)
+        @php $num = str_pad($index + 1, 2, '0', STR_PAD_LEFT); @endphp
+        <div class="flex flex-col">
+          <span class="text-xs text-warm-400 tracking-widest mb-1">{{ $num }}</span>
+          <div class="w-full">
+            @if($coffee->image)
+            <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
+            @else
+            <div class="w-full aspect-[3/4] bg-warm-300 flex items-center justify-center">
+              <span class="text-warm-500 font-display text-lg">{{ substr($coffee->name, 0, 1) }}</span>
             </div>
             @endif
           </div>
-        @endif
+          <p class="mt-1 text-[10px] font-medium text-dark-800 uppercase tracking-wide leading-tight">{{ $coffee->name }}</p>
+        </div>
+        @endforeach
       </div>
-      @endif
     </div>
-
-    <!-- CTA Button -->
-    <div class="mt-16 text-center">
-      <a href="{{ localizedRoute('monthly-feature.index') }}" class="group inline-flex items-center gap-3 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 transition-all duration-200">
-        <span>{{ $currentLocale === 'en' ? 'Explore coffees for ' . $monthName : 'Prozkoumat kávy na ' . $monthName }}</span>
-        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-      </a>
+    
+    <!-- Desktop: Scattered grid layout -->
+    <div class="hidden lg:block">
+      <div class="grid grid-cols-10 gap-x-6 gap-y-2">
+        
+        <!-- Row 1: Coffee 01 + Roastery 1 + Coffee 02 -->
+        <div class="col-span-2 col-start-1">
+          @php $coffee = $allCoffees->get(0); $num = '01'; @endphp
+          @if($coffee)
+          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
+          @if($coffee->image)
+          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
+          @else
+          <div class="w-full aspect-[3/4] bg-warm-300"></div>
+          @endif
+          @endif
+        </div>
+        
+        <!-- Roastery 1 - offset down -->
+        @if($roasteries->count() >= 1)
+        @php $r1 = $roasteries->first(); @endphp
+        <div class="col-span-2 col-start-4 mt-16 relative">
+          @if($r1->image)
+          <img src="{{ asset($r1->image) }}" alt="{{ $r1->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
+          @else
+          <div class="w-full aspect-[4/5] bg-warm-300"></div>
+          @endif
+          <div class="absolute top-0 left-0 right-0 p-3">
+            <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r1->name }}</span>
+            <br>
+            <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r1->getCountry() ?? '' }}</span>
+          </div>
+        </div>
+        @endif
+        
+        <div class="col-span-2 col-start-7 mt-8">
+          @php $coffee = $allCoffees->get(1); $num = '02'; @endphp
+          @if($coffee)
+          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
+          @if($coffee->image)
+          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
+          @else
+          <div class="w-full aspect-[3/4] bg-warm-300"></div>
+          @endif
+          @endif
+        </div>
+        
+        <div class="col-span-2 col-start-9">
+          @php $coffee = $allCoffees->get(2); $num = '03'; @endphp
+          @if($coffee)
+          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
+          @if($coffee->image)
+          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
+          @else
+          <div class="w-full aspect-[3/4] bg-warm-300"></div>
+          @endif
+          @endif
+        </div>
+        
+        <!-- Row 2: Coffee 04 + Roastery 2 + Coffees 05-06 -->
+        <div class="col-span-2 col-start-2 -mt-24">
+          @php $coffee = $allCoffees->get(3); $num = '04'; @endphp
+          @if($coffee)
+          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
+          @if($coffee->image)
+          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
+          @else
+          <div class="w-full aspect-[3/4] bg-warm-300"></div>
+          @endif
+          @endif
+        </div>
+        
+        <div class="col-span-2 col-start-5 -mt-8">
+          @php $coffee = $allCoffees->get(4); $num = '05'; @endphp
+          @if($coffee)
+          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
+          @if($coffee->image)
+          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
+          @else
+          <div class="w-full aspect-[3/4] bg-warm-300"></div>
+          @endif
+          @endif
+        </div>
+        
+        <!-- Roastery 2 -->
+        @if($roasteries->count() >= 2)
+        @php $r2 = $roasteries->skip(1)->first(); @endphp
+        <div class="col-span-2 col-start-8 -mt-32 relative">
+          @if($r2->image)
+          <img src="{{ asset($r2->image) }}" alt="{{ $r2->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
+          @else
+          <div class="w-full aspect-[4/5] bg-warm-300"></div>
+          @endif
+          <div class="absolute top-0 left-0 right-0 p-3">
+            <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r2->name }}</span>
+            <br>
+            <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r2->getCountry() ?? '' }}</span>
+          </div>
+        </div>
+        @endif
+        
+        <!-- Row 3: Coffees 06-07 + Roastery 3 -->
+        <div class="col-span-2 col-start-1 -mt-16">
+          @php $coffee = $allCoffees->get(5); $num = '06'; @endphp
+          @if($coffee)
+          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
+          @if($coffee->image)
+          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
+          @else
+          <div class="w-full aspect-[3/4] bg-warm-300"></div>
+          @endif
+          @endif
+        </div>
+        
+        <!-- Roastery 3 -->
+        @if($roasteries->count() >= 3)
+        @php $r3 = $roasteries->skip(2)->first(); @endphp
+        <div class="col-span-2 col-start-4 -mt-8 relative">
+          @if($r3->image)
+          <img src="{{ asset($r3->image) }}" alt="{{ $r3->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
+          @else
+          <div class="w-full aspect-[4/5] bg-warm-300"></div>
+          @endif
+          <div class="absolute top-0 left-0 right-0 p-3">
+            <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r3->name }}</span>
+            <br>
+            <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r3->getCountry() ?? '' }}</span>
+          </div>
+        </div>
+        @endif
+        
+        <div class="col-span-2 col-start-7 -mt-24">
+          @php $coffee = $allCoffees->get(6); $num = '07'; @endphp
+          @if($coffee)
+          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
+          @if($coffee->image)
+          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
+          @else
+          <div class="w-full aspect-[3/4] bg-warm-300"></div>
+          @endif
+          @endif
+        </div>
+        
+      </div>
     </div>
+    @endif
+    
 
   </div>
 </div>
