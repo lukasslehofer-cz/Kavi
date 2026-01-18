@@ -119,16 +119,16 @@
 @section('content')
 <div class="overflow-hidden">
 
-<!-- Hero Section - Quiet Luxury -->
-<div class="relative h-[85vh] sm:h-[85vh] lg:h-[90vh] min-h-[600px] sm:min-h-[600px] max-h-[900px] overflow-hidden bg-warm-500">
+<!-- Hero Section - Editorial Magazine Style -->
+<div class="relative h-[85vh] sm:h-[90vh] overflow-hidden bg-dark-800">
     <!-- Background Image/Video -->
     <div class="absolute inset-0">
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/images/kavi-intro-video.jpg');"></div>
+        <div class="absolute inset-0 bg-cover bg-center grayscale" style="background-image: url('/images/kavi-intro-video.jpg');"></div>
         
         <style>
-            /* Hide play button and video controls on iOS Safari */
             #hero-video {
                 pointer-events: none;
+                filter: grayscale(100%);
             }
             #hero-video::-webkit-media-controls {
                 display: none !important;
@@ -136,6 +136,15 @@
             #hero-video::-webkit-media-controls-start-playback-button {
                 display: none !important;
                 -webkit-appearance: none;
+            }
+            /* Grain overlay */
+            .grain-overlay {
+                position: absolute;
+                inset: 0;
+                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+                opacity: 0.35;
+                pointer-events: none;
+                mix-blend-mode: overlay;
             }
         </style>
         
@@ -146,28 +155,22 @@
             muted 
             playsinline
             preload="auto"
-            class="absolute inset-0 w-full h-full object-cover"
+            class="absolute inset-0 w-full h-full object-cover grayscale"
         >
             <source src="/images/kavi-intro-video.mp4" type="video/mp4">
         </video>
         
         <script>
-            // iOS Safari autoplay fix
             document.addEventListener('DOMContentLoaded', function() {
                 const video = document.getElementById('hero-video');
                 if (video) {
-                    // Set attributes again to ensure they're recognized
                     video.setAttribute('playsinline', '');
                     video.setAttribute('muted', '');
                     video.muted = true;
                     video.playsInline = true;
-                    
-                    // Try to play
                     const playPromise = video.play();
                     if (playPromise !== undefined) {
                         playPromise.catch(error => {
-                            // Auto-play was prevented, try again on user interaction
-                            console.log('Autoplay prevented:', error);
                             document.body.addEventListener('touchstart', function() {
                                 video.play();
                             }, { once: true });
@@ -179,153 +182,175 @@
     </div>
     
     <!-- Dark Overlay -->
-    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="absolute inset-0 bg-black/60"></div>
+    
+    <!-- Grain texture overlay -->
+    <div class="grain-overlay"></div>
 
-    <!-- Content -->
-    <div class="relative h-full flex items-center px-4 md:px-8">
-        <div class="max-w-screen-xl mx-auto w-full">
-            <div class="max-w-3xl space-y-8">
-                <!-- Small Badge -->
-                <div class="inline-flex items-center gap-3 border border-white/30 px-5 py-2.5">
-                    <span class="w-2 h-2 bg-primary-500"></span>
-                    <span class="text-sm font-light text-white uppercase tracking-widest">{{ $currentLocale === 'en' ? 'Something new every month' : 'Každý měsíc něco nového' }}</span>
-                </div>
-
-                <!-- Heading - Editorial Typography -->
-                <div class="space-y-6">
-                    <h1 class="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal leading-[1.1] text-white uppercase tracking-tight">
-                        {{ $currentLocale === 'en' ? 'Discover the best coffee from all over Europe' : 'Objevte tu nejlepší kávu z celé Evropy' }}
-                    </h1>
-                    <p class="text-lg sm:text-xl text-white/80 leading-relaxed font-light max-w-2xl">
-                        @if($currentLocale === 'en')
-                        Premium coffee with regular subscription.<br/>
-                        Freshly roasted, carefully selected, delivered to you.
-                        @else
-                        Prémiová káva s pravidelným předplatným.<br/>
-                        Čerstvě pražená, pečlivě vybraná, doručená přímo k vám.
-                        @endif
-                    </p>
-                </div>
-
-                <!-- CTA Buttons - Sharp edges -->
-                <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                    <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-3 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 transition-all duration-200">
-                        <span>{{ $currentLocale === 'en' ? 'Build your own box' : 'Sestavte si vlastní box' }}</span>
-                        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                    </a>
-                    <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center justify-center gap-3 bg-white hover:bg-warm-200 text-black font-medium px-8 py-4 transition-all duration-200">
-                        <span>{{ $currentLocale === 'en' ? 'Coffee Shop' : 'Kávový obchod' }}</span>
-                        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                    </a>
-                </div>
+    <!-- Content - Full screen editorial layout -->
+    <div class="relative h-full flex flex-col justify-between p-6 sm:p-8 lg:p-10">
+        
+        <!-- Top row - only right side text -->
+        <div class="flex justify-end">
+            <div class="text-xs uppercase tracking-widest text-white/60 text-right max-w-[200px]">
+                {{ $currentLocale === 'en' ? 'Specialty coffee subscription from Europe\'s finest roasters.' : 'Předplatné výběrové kávy z nejlepších evropských pražíren.' }}
             </div>
         </div>
-      </div>
+        
+        <!-- Center - Main typography -->
+        <div class="flex-1 flex flex-col justify-center py-6">
+            <!-- Large headline -->
+            <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-white uppercase leading-[0.9] tracking-tight">
+                @if($currentLocale === 'en')
+                Discover<br/>
+                <span class="text-primary-500">the best</span> coffee<br/>
+                from Europe
+                @else
+                Objevte<br/>
+                <span class="text-primary-500">tu nejlepší</span> kávu<br/>
+                z Evropy
+                @endif
+            </h1>
+            
+            <!-- Side description -->
+            <div class="mt-6 flex flex-col sm:flex-row gap-6 sm:gap-12">
+                <p class="text-xs uppercase tracking-widest text-white/60 max-w-[250px] leading-relaxed">
+                    {{ $currentLocale === 'en' ? 'Premium coffee with regular subscription. Freshly roasted, carefully selected.' : 'Prémiová káva s pravidelným předplatným. Čerstvě pražená, pečlivě vybraná.' }}
+                </p>
+                <p class="text-xs uppercase tracking-widest text-white/60 max-w-[250px] leading-relaxed">
+                    {{ $currentLocale === 'en' ? 'Each month a new selection from exceptional European roasteries.' : 'Každý měsíc nový výběr z výjimečných evropských pražíren.' }}
+                </p>
+            </div>
+        </div>
+        
+        <!-- Bottom row - CTAs -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
+            <div class="flex flex-col sm:flex-row gap-4 sm:gap-8">
+                <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-white font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+                    <span>{{ $currentLocale === 'en' ? 'Start subscription' : 'Začít předplatné' }}</span>
+                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </a>
+                <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-white/60 font-display uppercase tracking-widest hover:text-white transition-all">
+                    <span>{{ $currentLocale === 'en' ? 'Shop coffee' : 'Obchod' }}</span>
+                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </a>
+            </div>
+            
+            
+        </div>
+        
+    </div>
 </div>
 
-<!-- Features Section - Olive Background -->
-<div class="relative py-20 sm:py-24 md:py-28 lg:py-36 bg-olive-500">
+<!-- Features Section -->
+<div class="relative py-20 sm:py-24 md:py-28 lg:py-36" style="background-color: rgb(245, 245, 244);">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
     <div class="mb-16 sm:mb-20 max-w-2xl">
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-white mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'Why choose KAVI?' : 'Proč si vybrat KAVI?' }}</h2>
-      <p class="text-lg sm:text-xl text-white/80 font-light">{{ $currentLocale === 'en' ? 'We know what makes coffee exceptional. And we love to share it with you.' : 'Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.' }}</p>
+      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'Why choose KAVI?' : 'Proč si vybrat KAVI?' }}</h2>
+      <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'We know what makes coffee exceptional. And we love to share it with you.' : 'Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.' }}</p>
     </div>
 
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
       <!-- feature - start -->
-      <div class="group border-t border-white/30 pt-8">
-        <span class="text-white font-display text-5xl font-normal mb-4 block">01</span>
-        <h3 class="mb-3 text-xl font-normal text-white uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Fresh Coffee' : 'Čerstvá káva' }}</h3>
-        <p class="text-white/70 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Every roastery delivers freshly roasted coffee to your coffee boxes.' : 'Každá pražírna nám dodává čerstvě praženou kávu do vašich kávových boxů.' }}</p>
+      <div class="group border-t-2 border-primary-500 pt-8">
+        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">01</span>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Fresh Coffee' : 'Čerstvá káva' }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Every roastery delivers freshly roasted coffee to your coffee boxes.' : 'Každá pražírna nám dodává čerstvě praženou kávu do vašich kávových boxů.' }}</p>
       </div>
       <!-- feature - end -->
 
       <!-- feature - start -->
-      <div class="group border-t border-white/30 pt-8">
-        <span class="text-white font-display text-5xl font-normal mb-4 block">02</span>
-        <h3 class="mb-3 text-xl font-normal text-white uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Exceptional Flavors' : 'Výjimečné chutě' }}</h3>
-        <p class="text-white/70 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'No boring and monotonous coffees. Every month you discover new flavors from different corners of the world.' : 'Žádné nudné a monotonní kávy. Každý měsíc objevíte nové chutě z různých koutů světa.' }}</p>        
+      <div class="group border-t-2 border-primary-500 pt-8">
+        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">02</span>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Exceptional Flavors' : 'Výjimečné chutě' }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'No boring and monotonous coffees. Every month you discover new flavors from different corners of the world.' : 'Žádné nudné a monotonní kávy. Každý měsíc objevíte nové chutě z různých koutů světa.' }}</p>        
       </div>
       <!-- feature - end -->
 
       <!-- feature - start -->
-      <div class="group border-t border-white/30 pt-8">
-        <span class="text-white font-display text-5xl font-normal mb-4 block">03</span>
-        <h3 class="mb-3 text-xl font-normal text-white uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Shipped with Care' : 'Doprava zdarma' }}</h3>
-        <p class="text-white/70 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Like a clockwork, coffee is lovingly packed by our team, and delivered right to your door.' : 'Doprava zdarma pro všechna předplatná. Ať už si vyberete jakoukoluv velikost boxu.' }}</p>
+      <div class="group border-t-2 border-primary-500 pt-8">
+        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">03</span>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Shipped with Care' : 'Doprava zdarma' }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Like a clockwork, coffee is lovingly packed by our team, and delivered right to your door.' : 'Doprava zdarma pro všechna předplatná. Ať už si vyberete jakoukoliv velikost boxu.' }}</p>
       </div>
       <!-- feature - end -->
     </div>
   </div>
 </div>
 
-<!-- Love Your Coffee Section - Quiet Luxury -->
-<div class="relative bg-white py-20 sm:py-24 md:py-28 lg:py-36 overflow-hidden">
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <div class="grid lg:grid-cols-2 gap-16 items-center">
-      <!-- Image Side -->
-      <div class="relative order-2 lg:order-1">
-        <div class="relative h-[550px] overflow-hidden">
-          <img src="/images/kavi-box.jpg" loading="lazy" alt="KAVI box" class="h-full w-full object-cover" />
-        </div>
-        
-        <!-- Stat card with sharp edges -->
-        <div class="absolute -bottom-6 -right-6 bg-primary-500 p-6">
-          <div class="flex items-center gap-4">
-            <div>
-              <div class="text-3xl font-display font-normal text-white">98%</div>
-              <div class="text-sm text-white/80">{{ $currentLocale === 'en' ? 'satisfied customers' : 'spokojených zákazníků' }}</div>
-            </div>
-          </div>
+<!-- Love Your Coffee Section - Editorial Magazine Style -->
+<div class="relative overflow-hidden">
+  
+  <!-- Two-tone background -->
+  <div class="grid lg:grid-cols-2">
+    
+    <!-- Left Side - Image with Red Accent -->
+    <div class="relative bg-primary-500">
+      <!-- Top metadata -->
+      <div class="flex items-center justify-between text-xs uppercase tracking-widest px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 text-dark-800">
+        <span class="font-display">{{ $currentLocale === 'en' ? 'Subscription' : 'Předplatné' }}</span>
+        <span>{{ now()->format('m/Y') }}</span>
+      </div>
+      
+      <!-- Photo container - reduced height, grayscale with grain -->
+      <div class="px-4 sm:px-6 lg:px-10 py-4 pb-6 sm:pb-8">
+        <div class="relative aspect-[5/4] overflow-hidden">
+          <img src="/images/kavi-box.jpg" loading="lazy" alt="KAVI box" class="h-full w-full object-cover grayscale" />
+          <!-- Grain overlay for image -->
+          <div class="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noise%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%275%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noise)%27/%3E%3C/svg%3E');"></div>
         </div>
       </div>
-
-      <!-- Content Side -->
-      <div class="space-y-8 order-1 lg:order-2">
+    </div>
+    
+    <!-- Right Side - Content on light background -->
+    <div class="bg-stone-100 flex flex-col justify-between p-6 sm:p-8 lg:p-12 xl:p-16">
+      
+      <!-- Main content -->
+      <div class="space-y-8">
         <div>
           <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-6 leading-tight tracking-tight uppercase">
             {{ $currentLocale === 'en' ? 'Coffee you will love' : 'Káva, kterou budete milovat' }}
           </h2>
           
-          <p class="text-lg sm:text-xl text-warm-500 leading-relaxed font-light mb-6">
+          <p class="text-lg sm:text-xl text-warm-500 leading-relaxed font-light">
             {{ $currentLocale === 'en' ? 'We carefully select the highest quality coffee from trusted roasteries. Discover new flavors every month right at your home.' : 'Pečlivě vybíráme nejkvalitnější kávu z ověřených pražíren. Každý měsíc objevte nové chutě přímo u vás doma.' }}
           </p>
         </div>
 
         <!-- Benefits List -->
-        <div class="space-y-6">
-          <div class="flex gap-4 items-start border-l-2 border-primary-500 pl-4">
-            <div>
-              <h3 class="font-normal text-dark-800 mb-1 uppercase tracking-wide text-sm">{{ $currentLocale === 'en' ? 'Exclusive European roasters' : 'Nikde v ČR nekoupíte' }}</h3>
-              <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'We deliver coffee from roasteries that are not available elsewhere.' : 'Dodáváme vám kávu z pražíren, které nejsou dostupné v ČR.' }}</p>
-            </div>
+        <div class="space-y-4">
+          <div class="flex gap-3 items-start">
+            <span class="text-primary-500">→</span>
+            <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Exclusive European roasters not available elsewhere' : 'Exkluzivní evropské pražírny nedostupné jinde' }}</p>
           </div>
-
-          <div class="flex gap-4 items-start border-l-2 border-olive-500 pl-4">
-            <div>
-              <h3 class="font-normal text-dark-800 mb-1 uppercase tracking-wide text-sm">{{ $currentLocale === 'en' ? 'Unbeatable price' : 'Bezkonkurenční cena' }}</h3>
-              <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Coffees in our boxes are more affordable than anywhere else.' : 'Kávy v našich boxech jsou výhodnější než kdekoliv jinde.' }}</p>
-            </div>
+          <div class="flex gap-3 items-start">
+            <span class="text-primary-500">→</span>
+            <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Unbeatable value for specialty coffee' : 'Bezkonkurenční cena za výběrovou kávu' }}</p>
           </div>
-
-          <div class="flex gap-4 items-start border-l-2 border-primary-500 pl-4">
-            <div>
-              <h3 class="font-normal text-dark-800 mb-1 uppercase tracking-wide text-sm">{{ $currentLocale === 'en' ? 'Flexible subscription' : 'Flexibilní předplatné' }}</h3>
-              <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Adjust the amount and frequency according to your needs.' : 'Přizpůsobte množství a frekvenci podle svých potřeb.' }}</p>
-            </div>
+          <div class="flex gap-3 items-start">
+            <span class="text-primary-500">→</span>
+            <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription, cancel anytime' : 'Flexibilní předplatné, zrušení kdykoliv' }}</p>
           </div>
         </div>
-
-        <!-- CTA Button -->
-        <div class="pt-4">
-          <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-3 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-4 transition-all duration-200">
-            <span>{{ $currentLocale === 'en' ? 'Start subscription' : 'Začít předplatné' }}</span>
+      </div>
+      
+      <!-- Bottom section with links -->
+      <div class="mt-auto pt-12 border-t border-stone-300">
+        <div class="flex items-center justify-between">
+          <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+            <span>{{ $currentLocale === 'en' ? 'Subscription' : 'Předplatné' }}</span>
+            <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+          </a>
+          <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+            <span>{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}</span>
             <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
           </a>
         </div>
       </div>
+      
     </div>
+    
   </div>
 </div>
 
@@ -500,121 +525,152 @@
   </div>
 </div>
 
-<!-- Testimonials Section - Black Background -->
-<div class="relative bg-black py-20 sm:py-24 md:py-28 lg:py-36">
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <!-- Section Header -->
-    <div class="mb-16 sm:mb-20">
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 max-w-full">
-        <div class="max-w-2xl">
-          <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-white mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}</h2>
-          <p class="text-lg sm:text-xl text-white/70 font-light">{{ $currentLocale === 'en' ? 'Join our satisfied coffee lovers' : 'Přidejte se k řadě spokojených milovníků kávy' }}</p>
+<!-- Testimonials Section - Card Style -->
+<div class="relative">
+  
+  <!-- Top section with cards -->
+  <div class="pt-16 sm:pt-20 lg:pt-24" style="background-color: rgb(245, 245, 244);">
+    <div class="max-w-screen-xl mx-auto px-4 md:px-8">
+      
+      <!-- Section Header -->
+      <div class="text-center mb-12 sm:mb-16">
+        <p class="text-xs uppercase tracking-widest text-warm-500 mb-4">{{ $currentLocale === 'en' ? 'Testimonials' : 'Reference' }}</p>
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 tracking-tight uppercase">
+          {{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}
+        </h2>
+      </div>
+      
+      <!-- 3 Testimonial Cards -->
+      <div class="grid lg:grid-cols-3 gap-6">
+        
+        <!-- Card 1 -->
+        <div class="flex flex-col relative z-10">
+          <!-- Dark section with label + quote + beak -->
+          <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative">
+            <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Customer review' : 'Recenze zákazníka' }}</p>
+            <p class="text-white text-lg sm:text-xl leading-relaxed font-light">
+              "{{ $currentLocale === 'en' ? 'I\'ve been a KAVI subscriber for almost a year and every single coffee delivery has been amazing!' : 'Jsem členkou KAVI předplatného už skoro rok a každá jedna zásilka kávy byla skvělá!' }}"
+            </p>
+            <!-- Beak/triangle -->
+            <div class="absolute -bottom-4 left-6 w-8 h-4 bg-dark-800" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
+          </div>
+          <!-- Light section with photo -->
+          <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
+              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Eva V." class="h-full w-full object-cover grayscale" />
+            </div>
+            <div>
+              <div class="font-display text-dark-800 uppercase tracking-wide">Eva V.</div>
+              <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 1 year' : 'Zákaznice 1 rok' }}</p>
+            </div>
+          </div>
+          <!-- Stars - positioned to overlap red bar -->
+          <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
+            <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
+              <div class="flex gap-0.5 text-lg">
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <!-- Review Widget -->
-        <div class="w-full md:w-auto md:flex-shrink-0">
-          @if($currentLocale === 'en')
-            <!-- TrustBox widget for EN -->
-            <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="69092043c7aae452ccbb5a2e" data-style-height="52px" data-style-width="100%" data-token="8f005bc4-b948-4d5e-84f8-7a589f14404d">
-              <a href="https://www.trustpilot.com/review/kavi.cz" target="_blank" rel="noopener" class="text-white">Trustpilot</a>
+        <!-- Card 2 -->
+        <div class="flex flex-col relative z-10">
+          <!-- Dark section with label + quote + beak -->
+          <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative">
+            <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Customer review' : 'Recenze zákazníka' }}</p>
+            <p class="text-white text-lg sm:text-xl leading-relaxed font-light">
+              "{{ $currentLocale === 'en' ? 'Great service and top-notch coffee. The flexibility is great - I can change the quantity anytime.' : 'Skvělý servis a prvotřídní káva. Flexibilita je skvělá - můžu kdykoli změnit množství.' }}"
+            </p>
+            <!-- Beak/triangle -->
+            <div class="absolute -bottom-4 left-6 w-8 h-4 bg-dark-800" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
+          </div>
+          <!-- Light section with photo -->
+          <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
+              <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Petr D." class="h-full w-full object-cover grayscale" />
             </div>
-          @else
-            <!-- Google Business Reviews for CZ -->
-            <a href="https://g.page/r/CUKHHPAV65MnEBM/review" target="_blank" rel="noopener" class="inline-flex items-center gap-3 px-6 py-3 border border-white/30 hover:border-primary-500 transition-all duration-300 group">
-              <svg class="w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              <div class="text-left">
-                <div class="text-sm font-normal text-white group-hover:text-primary-500 transition-colors">Ohodnoťte nás na Google</div>
-                <div class="text-xs text-white/60">Vaše recenze nám pomáhá</div>
+            <div>
+              <div class="font-display text-dark-800 uppercase tracking-wide">Petr D.</div>
+              <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 6 months' : 'Zákazník 6 měsíců' }}</p>
+            </div>
+          </div>
+          <!-- Stars - positioned to overlap red bar -->
+          <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
+            <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
+              <div class="flex gap-0.5 text-lg">
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
               </div>
-              <span class="text-white/60 group-hover:text-primary-500 group-hover:translate-x-1 transition-all">&rarr;</span>
-            </a>
-          @endif
+            </div>
+          </div>
         </div>
+        
+        <!-- Card 3 -->
+        <div class="flex flex-col relative z-10">
+          <!-- Dark section with label + quote + beak -->
+          <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative">
+            <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Customer review' : 'Recenze zákazníka' }}</p>
+            <p class="text-white text-lg sm:text-xl leading-relaxed font-light">
+              "{{ $currentLocale === 'en' ? 'I love tasting coffees from European roasters! The freshness and selection are amazing.' : 'Miluju ochutnávat kávy z evropských pražíren! Čerstvost a výběr jsou skvělé.' }}"
+            </p>
+            <!-- Beak/triangle -->
+            <div class="absolute -bottom-4 left-6 w-8 h-4 bg-dark-800" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
+          </div>
+          <!-- Light section with photo -->
+          <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Marie H." class="h-full w-full object-cover grayscale" />
+            </div>
+            <div>
+              <div class="font-display text-dark-800 uppercase tracking-wide">Marie H.</div>
+              <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 6+ months' : 'Zákaznice 6+ měsíců' }}</p>
+            </div>
+          </div>
+          <!-- Stars - positioned to overlap red bar -->
+          <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
+            <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
+              <div class="flex gap-0.5 text-lg">
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+                <span class="text-dark-800">★</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
       </div>
-    </div>
-
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- quote - start -->
-      <div class="border-t border-white/20 pt-8">
-        <div class="mb-6">
-          <div class="flex gap-0.5 mb-4">
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-          </div>
-          <p class="text-lg text-white/80 leading-relaxed font-light mb-6">"{{ $currentLocale === 'en' ? 'I\'ve been a KAVI subscriber for almost a year and every single coffee delivery has been amazing!' : 'Jsem členem KAVI předplatného už skoro rok a každá jedna zásilka kávy byla skvělá!' }}"</p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="h-12 w-12 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Eva V." class="h-full w-full object-cover object-center grayscale" />
-          </div>
-          <div>
-            <div class="font-normal text-white">Eva V.</div>
-            <p class="text-sm text-white/60 font-light">{{ $currentLocale === 'en' ? 'Customer for 1 year' : 'Zákaznice 1 rok' }}</p>
-          </div>
-        </div>
-      </div>
-      <!-- quote - end -->
-
-      <!-- quote - start -->
-      <div class="border-t border-white/20 pt-8">
-        <div class="mb-6">
-          <div class="flex gap-0.5 mb-4">
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-          </div>
-          <p class="text-lg text-white/80 leading-relaxed font-light mb-6">"{{ $currentLocale === 'en' ? 'Great service and top-notch coffee. The subscription flexibility is great - I can change the quantity or coffee type anytime.' : 'Skvělý servis a prvotřídní káva. Flexibilita předplatného je skvělá - můžu kdykoli změnit množství nebo typ kávy.' }}"</p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="h-12 w-12 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Petr D." class="h-full w-full object-cover object-center grayscale" />
-          </div>
-          <div>
-            <div class="font-normal text-white">Petr D.</div>
-            <p class="text-sm text-white/60 font-light">{{ $currentLocale === 'en' ? 'Customer for 6 months' : 'Zákazník 6 měsíců' }}</p>
-          </div>
-        </div>
-      </div>
-      <!-- quote - end -->
-
-      <!-- quote - start -->
-      <div class="border-t border-white/20 pt-8">
-        <div class="mb-6">
-          <div class="flex gap-0.5 mb-4">
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-            <span class="text-primary-500">★</span>
-          </div>
-          <p class="text-lg text-white/80 leading-relaxed font-light mb-6">"{{ $currentLocale === 'en' ? 'I love tasting coffees from European roasters! The freshness and selection are amazing.' : 'Miluju ochutnávat kávy z Evropských pražíren! Čerstvost kávy a výběr jsou skvělé.' }}"</p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="h-12 w-12 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=75&fit=crop&w=112" loading="lazy" alt="Marie H." class="h-full w-full object-cover object-center grayscale" />
-          </div>
-          <div>
-            <div class="font-normal text-white">Marie H.</div>
-            <p class="text-sm text-white/60 font-light">{{ $currentLocale === 'en' ? 'Customer for 6+ months' : 'Zákaznice 6+ měsíců' }}</p>
-          </div>
-        </div>
-      </div>
-      <!-- quote - end -->
+      
     </div>
   </div>
+  
+  <!-- Full-width red bar with CTA - overlaps with stars -->
+  <div class="bg-primary-500 pt-16 pb-8 sm:pt-20 sm:pb-10">
+    <div class="max-w-screen-xl mx-auto px-4 md:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <p class="text-xs uppercase tracking-widest text-dark-800">
+        {{ $currentLocale === 'en' ? 'Join our community of coffee lovers' : 'Přidejte se k řadě spokojených milovníků kávy' }}
+      </p>
+      @if($currentLocale === 'en')
+        <a href="https://www.trustpilot.com/review/kavi.cz" target="_blank" rel="noopener" class="text-xs uppercase tracking-widest text-dark-800 hover:text-white transition-colors">
+          Trustpilot →
+        </a>
+      @else
+        <a href="https://g.page/r/CUKHHPAV65MnEBM/review" target="_blank" rel="noopener" class="text-xs uppercase tracking-widest text-dark-800 hover:text-white transition-colors">
+          Google Reviews →
+        </a>
+      @endif
+    </div>
+  </div>
+  
 </div>
 
 <!-- Coffee of the Month Teaser -->
