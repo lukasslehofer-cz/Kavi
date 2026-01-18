@@ -16,11 +16,11 @@ class RoasteryController extends Controller
             $query->where('country', $request->country);
         }
         
-        $roasteries = $query->get();
+        $roasteries = $query->paginate(9)->withQueryString();
         
-        // Get all unique countries for filter with translations
+        // Get all unique countries for filter with translations and count
         $countriesRaw = Roastery::active()
-            ->select('country', 'country_flag')
+            ->selectRaw('country, country_flag, COUNT(*) as roastery_count')
             ->groupBy('country', 'country_flag')
             ->orderBy('country')
             ->get();
@@ -29,13 +29,17 @@ class RoasteryController extends Controller
             return [$item->country => [
                 'flag' => $item->country_flag,
                 'name' => __('countries.' . $item->country, [], app()->getLocale()),
+                'count' => $item->roastery_count,
             ]];
         });
+        
+        // Total count for "All" filter
+        $totalRoasteriesCount = Roastery::active()->count();
         
         $selectedCountry = $request->country;
         $selectedCountryName = $selectedCountry ? __('countries.' . $selectedCountry, [], app()->getLocale()) : null;
         
-        return view('roasteries.index', compact('roasteries', 'countries', 'selectedCountry', 'selectedCountryName'));
+        return view('roasteries.index', compact('roasteries', 'countries', 'selectedCountry', 'selectedCountryName', 'totalRoasteriesCount'));
     }
 
     public function show(Roastery $roastery)

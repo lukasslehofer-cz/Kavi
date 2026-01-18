@@ -17,8 +17,7 @@
 @section('content')
 <!-- Hero Header Section - Editorial Layout -->
 <div class="relative" style="background-color: rgb(245, 245, 244);">
-  <!-- Red vertical stripe on left edge -->
-  <div class="absolute left-0 top-0 bottom-0 w-5 bg-primary-500"></div>
+  
   
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     
@@ -42,7 +41,7 @@
 <div class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: rgb(245, 245, 244);">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
-    <!-- Filters - Minimal -->
+    <!-- Filters - Minimalist Tab Bar -->
     @php
       $categoryLabelsLocalized = $currentLocale === 'en' ? [
         'espresso' => 'Espresso',
@@ -56,155 +55,116 @@
         'accessories' => 'Příslušenství',
       ];
     @endphp
-    <div class="mb-8 sm:mb-10">
-      <div class="flex flex-wrap justify-center gap-2">
-        <a href="{{ localizedRoute('products.index') }}" 
-           class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 {{ !request('category') ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300' }}">
-          @if(!request('category'))
-          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          @endif
-          <span>{{ $currentLocale === 'en' ? 'All' : 'Vše' }}</span>
-        </a>
-        @foreach($categories as $key => $label)
-        <a href="{{ localizedRoute('products.index', ['category' => $key]) }}" 
-           class="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 {{ request('category') == $key ? 'bg-primary-500 text-white hover:bg-primary-600' : 'bg-white border border-gray-200 text-gray-700 hover:border-gray-300' }}">
-          @if(request('category') == $key)
-          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          @endif
-          <span>{{ $categoryLabelsLocalized[$key] ?? $label }}</span>
-        </a>
-        @endforeach
+    <div class="mb-10 sm:mb-12">
+      <div class="border-t border-b border-dark-800 py-4">
+        <div class="flex flex-wrap items-center gap-x-8 gap-y-2">
+          <a href="{{ localizedRoute('products.index') }}" 
+             class="text-sm uppercase tracking-widest transition-colors {{ !request('category') ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
+            {{ $currentLocale === 'en' ? 'All' : 'Vše' }}
+          </a>
+          @foreach($categories as $key => $label)
+          <a href="{{ localizedRoute('products.index', ['category' => $key]) }}" 
+             class="text-sm uppercase tracking-widest transition-colors {{ request('category') == $key ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
+            {{ $categoryLabelsLocalized[$key] ?? $label }}
+          </a>
+          @endforeach
+        </div>
       </div>
     </div>
     <!-- Filters - end -->
 
-    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div class="grid gap-x-4 sm:gap-x-8 lg:gap-x-10 gap-y-8 sm:gap-y-10 lg:gap-y-12 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       @forelse($products as $product)
       <!-- product - start -->
-      <div class="group relative bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-200">
-        <!-- Image Container -->
-        <a href="{{ localizedRoute('products.show', $product) }}" class="relative block h-64 overflow-hidden bg-gray-50">
+      <a href="{{ localizedRoute('products.show', $product) }}" class="group block">
+        <!-- Image Container - No Frame -->
+        <div class="relative aspect-square overflow-hidden bg-warm-100 mb-4">
           @if($product->image)
           <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105" />
           @else
-          <div class="h-full w-full flex flex-col items-center justify-center p-8 bg-gray-100">
-            <svg class="w-16 h-16 text-gray-300 mb-3" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
-            </svg>
-            <p class="text-center text-xs font-light text-gray-500">{{ $product->getName() }}</p>
+          <div class="h-full w-full flex flex-col items-center justify-center p-8">
+            <span class="font-display text-4xl text-warm-300">{{ substr($product->getName(), 0, 1) }}</span>
           </div>
           @endif
 
-          <!-- Category Tags - Minimal -->
-          <div class="absolute left-3 top-3 flex flex-wrap gap-1.5">
-            @php
-              $categoryBadges = $currentLocale === 'en' ? [
-                'espresso' => ['label' => 'Espresso', 'color' => 'bg-amber-500'],
-                'filter' => ['label' => 'Filter', 'color' => 'bg-blue-500'],
-                'decaf' => ['label' => 'Decaf', 'color' => 'bg-green-500'],
-                'accessories' => ['label' => 'Accessories', 'color' => 'bg-purple-500'],
-              ] : [
-                'espresso' => ['label' => 'Espresso', 'color' => 'bg-amber-500'],
-                'filter' => ['label' => 'Filtr', 'color' => 'bg-blue-500'],
-                'decaf' => ['label' => 'Bezkofeinová', 'color' => 'bg-green-500'],
-                'accessories' => ['label' => 'Příslušenství', 'color' => 'bg-purple-500'],
-              ];
-              
-              if (is_array($product->category) && !empty($product->category)) {
-                foreach ($product->category as $cat) {
-                  if (isset($categoryBadges[$cat])) {
-                    $catData = $categoryBadges[$cat];
-                    echo '<span class="px-2.5 py-1 rounded-full text-xs font-medium ' . $catData['color'] . ' text-white">' . $catData['label'] . '</span>';
-                  }
-                }
-              }
-            @endphp
+          <!-- Category Tag - Museum Catalog Code -->
+          @php
+            $categoryTags = [
+              'espresso' => 'ESP',
+              'filter' => 'FLT',
+              'decaf' => 'DCF',
+              'accessories' => 'ACC',
+            ];
+          @endphp
+          @if(is_array($product->category) && !empty($product->category))
+          <div class="absolute top-0 left-0 flex flex-col gap-1">
+            @foreach($product->category as $cat)
+              @if(isset($categoryTags[$cat]))
+                @php
+                  $tagColors = [
+                    'espresso' => 'border-amber-500',
+                    'filter' => 'border-blue-500',
+                    'decaf' => 'border-green-500',
+                    'accessories' => 'border-purple-500',
+                  ];
+                @endphp
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-2 py-1 border-b-2 {{ $tagColors[$cat] ?? 'border-dark-800' }}">{{ $categoryTags[$cat] }}</span>
+              @endif
+            @endforeach
           </div>
+          @endif
 
-          <!-- Discount Badge - Minimal -->
+          <!-- Discount Badge -->
           @if($product->shouldShowDiscountPercentage())
-          <div class="absolute right-3 top-3 bg-red-500 rounded-full px-2.5 py-1">
-            <span class="text-xs font-medium text-white">-{{ $product->getDiscountPercentage() }}%</span>
+          <div class="absolute top-0 right-0">
+            <span class="text-[10px] uppercase tracking-widest text-white bg-primary-500 px-2 py-1">-{{ $product->getDiscountPercentage() }}%</span>
           </div>
           @endif
-        </a>
+        </div>
 
-        <!-- Product Info - Minimal -->
-        <div class="p-4">
-          <div class="mb-2.5">
-            <a href="{{ localizedRoute('products.show', $product) }}" class="block">
-              <h3 class="text-base font-semibold text-gray-900 group-hover:text-gray-600 transition-colors mb-2 line-clamp-2">{{ $product->getName() }}</h3>
-            </a>
+        <!-- Product Info - Minimal Typography -->
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1 min-w-0">
+            <!-- Price - Technical Label Above Name -->
+            <p class="text-xs uppercase tracking-widest text-warm-500 mb-1">
+              @if($product->isOnSale())
+              <span class="text-primary-500">{{ $product->getFormattedPrice() }}</span> —
+              @else
+              {{ $product->getFormattedPrice() }} —
+              @endif
+            </p>
             
-            <!-- Roaster / Manufacturer -->
-            @if($product->roastery)
-            <p class="text-sm text-gray-500 font-light mb-2 flex items-center gap-1">
-              <span class="text-base">{{ $product->roastery->country_flag }}</span>
-              <a href="{{ localizedRoute('roasteries.show', $product->roastery) }}" class="hover:text-gray-900 transition-colors">
+            <!-- Product Name -->
+            <h3 class="font-display text-base sm:text-lg font-normal text-dark-800 uppercase tracking-tight pt-[5px] pb-[8px] group-hover:text-primary-500 transition-colors line-clamp-2" style="line-height: 1.25;">{{ $product->getName() }}</h3>
+            
+            <!-- Technical Info: Roastery · Flavor -->
+            <p class="text-xs uppercase tracking-widest text-warm-500 leading-tight">
+              @if($product->roastery)
                 {{ $product->roastery->getName() }}
-              </a>
-            </p>
-            @elseif(!empty($product->attributes['roaster']))
-            <p class="text-sm text-gray-500 font-light mb-2 flex items-center gap-1">
-              <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              {{ $product->attributes['roaster'] }}
-            </p>
-            @elseif(!empty($product->attributes['manufacturer']))
-            <p class="text-sm text-gray-500 font-light mb-2 flex items-center gap-1">
-              <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
-              {{ $product->attributes['manufacturer'] }}
-            </p>
-            @endif
-            
-            <!-- Flavor Tones / Short Description -->
-            @if(is_array($product->category) && in_array('accessories', $product->category))
-              <!-- For accessories, show short description -->
-              @if($product->getShortDescription())
-              <div class="text-xs">              
-                <span class="text-gray-600 font-light">{{ $product->getShortDescription() }}</span>
-              </div>
-              @endif
-            @else
-              <!-- For coffee products, show flavor tones -->
-              @php
-                $flavorNotes = $product->getTranslatedAttribute('flavor_notes') ?? $product->getTranslatedAttribute('flavor_profile');
-              @endphp
-              @if($flavorNotes)
-              <div class="text-xs">              
-                <span class="text-gray-600 font-light">{{ $flavorNotes }}</span>
-              </div>
-              @endif
-            @endif
-          </div>
-
-          <!-- Price - Minimal -->
-          <div class="pt-2.5 border-t border-gray-100">
-            <div class="flex items-center justify-between mb-3">
-              <div>
-                @if($product->isOnSale())
-                <span class="text-lg font-bold text-red-600">{{ $product->getFormattedPrice() }}</span>
-                <div class="text-xs text-gray-500 line-through font-light">{{ $product->getFormattedOriginalPrice() }}</div>
-                @else
-                <span class="text-lg font-bold text-gray-900">{{ $product->getFormattedPrice() }}</span>
+                @php
+                  $flavorNotes = $product->getTranslatedAttribute('flavor_notes') ?? $product->getTranslatedAttribute('flavor_profile');
+                @endphp
+                @if($flavorNotes)
+                  · {{ $flavorNotes }}
                 @endif
-              </div>
-            </div>
-            
-            <!-- View Detail Button -->
-            <a href="{{ localizedRoute('products.show', $product) }}" class="w-full py-2 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 text-sm flex items-center justify-center">
-              {{ $currentLocale === 'en' ? 'View details' : 'Zobrazit detail' }}
-            </a>
+              @elseif(!empty($product->attributes['roaster']))
+                {{ $product->attributes['roaster'] }}
+              @elseif(!empty($product->attributes['manufacturer']))
+                {{ $product->attributes['manufacturer'] }}
+              @elseif(is_array($product->category) && in_array('accessories', $product->category) && $product->getShortDescription())
+                {{ $product->getShortDescription() }}
+              @endif
+            </p>
+          </div>
+          
+          <!-- Arrow - Minimalist -->
+          <div class="flex-shrink-0 mt-[26px]">
+            <svg class="w-5 h-5 text-warm-400 group-hover:text-dark-800 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </div>
         </div>
-      </div>
+      </a>
       <!-- product - end -->
       @empty
       <div class="col-span-full text-center py-16">
@@ -218,96 +178,63 @@
       @endforelse
     </div>
 
-    <!-- Pagination -->
+    <!-- Pagination - Technical Indexing -->
     @if($products->hasPages())
-    <div class="mt-12 flex flex-col items-center gap-4">
-      <!-- <p class="text-sm text-gray-500">
-        {{ $currentLocale === 'en' ? 'Showing' : 'Zobrazeno' }} {{ $products->firstItem() }} - {{ $products->lastItem() }} {{ $currentLocale === 'en' ? 'of' : 'z' }} {{ $products->total() }} {{ $currentLocale === 'en' ? 'products' : 'produktů' }}
-      </p> -->
-      <nav class="flex items-center gap-1">
-        {{-- Previous Page Link --}}
-        @if($products->onFirstPage())
-          <span class="px-4 py-2 text-sm text-gray-400 bg-white border border-gray-200 rounded-full cursor-not-allowed">
-            &laquo; {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
-          </span>
-        @else
-          <a href="{{ $products->previousPageUrl() }}" class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
-            &laquo; {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
-          </a>
-        @endif
-
-        {{-- Page Numbers --}}
-        @foreach($products->getUrlRange(1, $products->lastPage()) as $page => $url)
-          @if($page == $products->currentPage())
-            <span class="px-4 py-2 text-sm font-medium text-white bg-primary-500 border border-primary-500 rounded-full">
-              {{ $page }}
+    <div class="mt-16 border-t border-dark-800 pt-6">
+      <div class="flex items-center justify-end gap-6">
+        <!-- Page Counter -->
+        <span class="text-xs uppercase tracking-widest text-warm-500">
+          {{ $currentLocale === 'en' ? 'Page' : 'Strana' }} {{ str_pad($products->currentPage(), 2, '0', STR_PAD_LEFT) }} / {{ str_pad($products->lastPage(), 2, '0', STR_PAD_LEFT) }}
+        </span>
+        
+        <!-- Navigation -->
+        <div class="flex items-center">
+          @if($products->onFirstPage())
+            <span class="text-xs uppercase tracking-widest text-warm-300 cursor-not-allowed">
+              {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
             </span>
           @else
-            <a href="{{ $url }}" class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
-              {{ $page }}
+            <a href="{{ $products->previousPageUrl() }}" class="text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 transition-colors">
+              {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
             </a>
           @endif
-        @endforeach
-
-        {{-- Next Page Link --}}
-        @if($products->hasMorePages())
-          <a href="{{ $products->nextPageUrl() }}" class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
-            {{ $currentLocale === 'en' ? 'Next' : 'Další' }} &raquo;
-          </a>
-        @else
-          <span class="px-4 py-2 text-sm text-gray-400 bg-white border border-gray-200 rounded-full cursor-not-allowed">
-            {{ $currentLocale === 'en' ? 'Next' : 'Další' }} &raquo;
-          </span>
-        @endif
-      </nav>
+          
+          <span class="mx-4 text-warm-300">—</span>
+          
+          @if($products->hasMorePages())
+            <a href="{{ $products->nextPageUrl() }}" class="text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 transition-colors">
+              {{ $currentLocale === 'en' ? 'Next' : 'Další' }}
+            </a>
+          @else
+            <span class="text-xs uppercase tracking-widest text-warm-300 cursor-not-allowed">
+              {{ $currentLocale === 'en' ? 'Next' : 'Další' }}
+            </span>
+          @endif
+        </div>
+      </div>
     </div>
     @endif
   </div>
 </div>
 
-<!-- CTA Section - Minimal -->
-<div class="relative bg-gray-100 py-16 sm:py-20 overflow-hidden">
-  <!-- Organic shape -->
-  <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2"></div>
-
+<!-- CTA Section - Editorial Style -->
+<div class="relative pt-12 sm:pt-16 lg:pt-20 pb-20 sm:pb-24 lg:pb-28" style="background-color: rgb(245, 245, 244);">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <div class="mx-auto flex max-w-2xl flex-col items-center text-center">
-      <h2 class="mb-4 text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
+    <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
+      <!-- Large Editorial Heading -->
+      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
         {{ $currentLocale === 'en' ? 'Want regular coffee delivery?' : 'Chcete pravidelnou dodávku kávy?' }}
       </h2>
-      
-      <p class="text-base sm:text-lg text-gray-600 mb-8 max-w-xl font-light">
+
+      <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
         {{ $currentLocale === 'en' ? 'With our subscription, you save time and money. Fresh coffee delivered to your door, cancel anytime.' : 'S naším předplatným ušetříte čas i peníze. Čerstvá káva přímo k vám domů, kdykoliv zrušitelné.' }}
       </p>
 
-      <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 rounded-full transition-all duration-200 mb-8">
+      <!-- CTA Link -->
+      <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
         <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
-        <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        </svg>
+        <span class="text-primary-500 group-hover:translate-x-1 transition-transform">→</span>
       </a>
-
-      <!-- Trust Indicators - Minimal -->
-      <div class="flex flex-wrap items-center justify-center gap-4">
-        <div class="flex items-center gap-1.5 text-gray-600">
-          <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <span class="text-sm font-light">{{ $currentLocale === 'en' ? 'Freshly roasted' : 'Doprava zdarma' }}</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-gray-600">
-          <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <span class="text-sm font-light">{{ $currentLocale === 'en' ? 'No commitment' : 'Bez závazků' }}</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-gray-600">
-          <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <span class="text-sm font-light">{{ $currentLocale === 'en' ? 'Premium quality' : 'Prémiová kvalita' }}</span>
-        </div>
-      </div>
     </div>
   </div>
 </div>

@@ -151,7 +151,7 @@
                 <!-- Coffee Index - Horizontal Rows -->
                 <div class="mb-6">
                     @foreach($coffees as $coffee)
-                    <div class="group py-6 sm:py-8 cursor-pointer hover:bg-warm-50 transition-colors border-b border-dark-800 {{ $loop->first ? 'border-t' : '' }}" onclick="openCoffeeModal{{ $coffee->id }}()">
+                    <div class="group py-6 sm:py-8 cursor-pointer hover:bg-warm-50 transition-colors border-b border-warm-300 {{ $loop->first ? 'border-t border-t-warm-300' : '' }}" onclick="openCoffeeModal{{ $coffee->id }}()">
                         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
                             <!-- Coffee Image - Small, Crisp -->
                             <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden bg-warm-100">
@@ -196,22 +196,16 @@
                                 </div>
                             </div>
 
-                            <!-- Category Labels - Minimal with colored underline -->
+                            <!-- Category Labels - Museum Catalog Codes -->
                             <div class="flex flex-wrap gap-3 sm:flex-shrink-0">
                                 @if(is_array($coffee->category))
                                     @foreach($coffee->category as $cat)
                                         @if($cat === 'espresso')
-                                        <span class="text-xs uppercase tracking-widest text-dark-800 pb-1 border-b-2 border-amber-500">
-                                            {{ __('messages.category_espresso') }}
-                                        </span>
+                                        <span class="text-[10px] uppercase tracking-widest text-dark-800 pb-1 border-b-2 border-amber-500">ESP</span>
                                         @elseif($cat === 'filter')
-                                        <span class="text-xs uppercase tracking-widest text-dark-800 pb-1 border-b-2 border-blue-500">
-                                            {{ __('messages.category_filter') }}
-                                        </span>
+                                        <span class="text-[10px] uppercase tracking-widest text-dark-800 pb-1 border-b-2 border-blue-500">FLT</span>
                                         @elseif($cat === 'decaf')
-                                        <span class="text-xs uppercase tracking-widest text-dark-800 pb-1 border-b-2 border-green-500">
-                                            {{ __('messages.category_decaf') }}
-                                        </span>
+                                        <span class="text-[10px] uppercase tracking-widest text-dark-800 pb-1 border-b-2 border-green-500">DCF</span>
                                         @endif
                                     @endforeach
                                 @endif
