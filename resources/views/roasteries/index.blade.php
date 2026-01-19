@@ -23,15 +23,15 @@
     <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
       <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Our' : 'Naše' }}</span><br>
       <span class="text-primary-500">{{ $currentLocale === 'en' ? 'roasters' : 'pražírny' }}</span>
-    </h1>
-    
+      </h1>
+      
     <!-- Description - Right aligned -->
     <div class="flex justify-end">
       <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
         {{ $currentLocale === 'en' ? 'We work with the best roasters from all over Europe. Quality, tradition and love for coffee.' : 'Spolupracujeme s těmi nejlepšími pražírnami z celé Evropy. Kvalita, tradice a láska ke kávě.' }}
       </p>
-    </div>
-    
+  </div>
+  
   </div>
 </div>
 
@@ -43,16 +43,16 @@
     <div class="mb-10 sm:mb-12">
       <div class="border-t border-b border-dark-800 py-4">
         <div class="flex flex-wrap items-center gap-x-8 gap-y-2">
-          <a href="{{ localizedRoute('roasteries.index') }}" 
+        <a href="{{ localizedRoute('roasteries.index') }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ !$selectedCountry ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
             {{ $currentLocale === 'en' ? 'All' : 'Vše' }}<sup class="ml-0.5 text-[10px]">{{ str_pad($totalRoasteriesCount, 2, '0', STR_PAD_LEFT) }}</sup>
-          </a>
-          @foreach($countries as $country => $countryData)
-          <a href="{{ localizedRoute('roasteries.index', ['country' => $country]) }}" 
+        </a>
+        @foreach($countries as $country => $countryData)
+        <a href="{{ localizedRoute('roasteries.index', ['country' => $country]) }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ $selectedCountry == $country ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
             {{ $countryData['name'] }}<sup class="ml-0.5 text-[10px]">{{ str_pad($countryData['count'], 2, '0', STR_PAD_LEFT) }}</sup>
-          </a>
-          @endforeach
+        </a>
+        @endforeach
         </div>
       </div>
     </div>
@@ -91,7 +91,7 @@
               }
             @endphp
             <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-2 py-1 border-b-2 border-dark-800">
-              {{ $coffeeCount }} {{ $coffeeWord }}
+            {{ $coffeeCount }} {{ $coffeeWord }}
             </span>
           </div>
         </a>
@@ -124,19 +124,19 @@
             </a>
 
             <div class="flex items-center gap-4">
-              @if($roastery->website_url)
-              <a href="{{ $roastery->website_url }}" target="_blank" rel="noopener noreferrer"
+            @if($roastery->website_url)
+            <a href="{{ $roastery->website_url }}" target="_blank" rel="noopener noreferrer"
                  class="text-xs uppercase tracking-widest text-warm-400 hover:text-dark-800 transition-colors">
                 WWW
-              </a>
-              @endif
+            </a>
+            @endif
 
-              @if($roastery->instagram)
-              <a href="https://instagram.com/{{ str_replace('@', '', $roastery->instagram) }}" target="_blank" rel="noopener noreferrer"
+            @if($roastery->instagram)
+            <a href="https://instagram.com/{{ str_replace('@', '', $roastery->instagram) }}" target="_blank" rel="noopener noreferrer"
                  class="text-xs uppercase tracking-widest text-warm-400 hover:text-dark-800 transition-colors">
                 IG
-              </a>
-              @endif
+            </a>
+            @endif
             </div>
           </div>
         </div>

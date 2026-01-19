@@ -67,8 +67,8 @@ return [
         'country' => 'Country',
         'select_country' => 'Select country',
         'notes' => 'Note',
-        'notes_optional' => '(optional)',
-        'notes_placeholder' => 'e.g. "Please ring 2nd floor" or "Leave at reception"',
+        'notes_optional' => '/ OPTIONAL',
+        'notes_placeholder' => 'E.G. PLEASE RING 2ND FLOOR OR LEAVE AT RECEPTION',
     ],
     
     // Pickup point
@@ -90,8 +90,8 @@ return [
     'subscription_addon' => [
         'title' => 'Ship with subscription option',
         'checkbox_label' => 'Include in next subscription shipment',
-        'free_shipping' => 'Ships with your box 🎉',
-        'capacity_full' => '⚠️ Add-on capacity is exhausted for all your subscriptions.',
+        'free_shipping' => 'FREE SHIPPING',
+        'capacity_full' => 'CAPACITY FULL',
         'select_subscription' => 'Select subscription:',
         'capacity_label' => 'Add-on capacity:',
         'slots_available' => 'available slots',
@@ -115,6 +115,8 @@ return [
         'card' => 'Credit/Debit card',
         'card_description' => 'After submitting your order, you\'ll be redirected to a secure payment gateway',
         'we_accept' => 'We accept:',
+        'card_info' => 'CARD PAYMENT. AFTER SUBMITTING YOUR ORDER, YOU WILL BE REDIRECTED TO A SECURE PAYMENT GATEWAY. WE ACCEPT VISA, MASTERCARD, APPLE PAY AND GOOGLE PAY.',
+        'card_description_full' => 'AFTER SUBMITTING YOUR ORDER, YOU WILL BE REDIRECTED TO A SECURE PAYMENT GATEWAY. WE ACCEPT VISA, MASTERCARD, APPLE PAY AND GOOGLE PAY.',
     ],
     
     // Coupon

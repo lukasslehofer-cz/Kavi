@@ -24,8 +24,8 @@
     <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
       <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Coffee of' : 'Pražírny a kávy' }}</span><br>
       <span class="text-primary-500">{{ $currentLocale === 'en' ? 'the month' : 'měsíce' }}</span>
-    </h1>
-    
+            </h1>
+            
     <!-- Description - Right aligned -->
     <div class="flex justify-end">
       <div class="max-w-md text-right">
@@ -34,11 +34,11 @@
         </p>
         <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 leading-relaxed">
           {{ $currentLocale === 'en' ? 'Every month we select exceptional coffees from the best European roasters. Discover what awaits you.' : 'Každý měsíc pro vás vybíráme výjimečné kávy z nejlepších evropských pražíren. Objevte, co vás čeká.' }}
-        </p>
-      </div>
+            </p>
+        </div>
     </div>
     
-  </div>
+    </div>
 </div>
 
 <!-- Main Content -->
@@ -50,7 +50,7 @@
             <!-- Roasteries Section - Editorial Grid -->
             <div class="mb-16 sm:mb-24">
                 <!-- Section Header - Large Editorial Typography -->
-                <div class="mb-12 sm:mb-16">
+            <div class="mb-12 sm:mb-16">
                     <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight">
                         @if($currentLocale === 'en')
                             {{ $roasteries->count() === 1 ? 'Roaster of the Month' : 'Roasters of the Month' }}
@@ -155,11 +155,11 @@
                         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
                             <!-- Coffee Image - Small, Crisp -->
                             <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden bg-warm-100">
-                                @if($coffee->image)
-                                <img src="{{ asset($coffee->image) }}" 
-                                     alt="{{ $coffee->name }}"
+                            @if($coffee->image)
+                            <img src="{{ asset($coffee->image) }}" 
+                                 alt="{{ $coffee->name }}"
                                      class="w-full h-full object-cover">
-                                @else
+                            @else
                                 <div class="w-full h-full flex items-center justify-center">
                                     <span class="font-display text-2xl text-warm-400">{{ substr($coffee->getName(), 0, 1) }}</span>
                                 </div>
@@ -188,8 +188,8 @@
                                     @if(!empty($coffee->attributes['flavor_notes']))
                                     <span>{{ $coffee->getTranslatedAttribute('flavor_notes') ?? $coffee->attributes['flavor_notes'] }}</span>
                                     <span class="text-warm-300">·</span>
-                                    @endif
-                                    
+                            @endif
+
                                     @if(!empty($coffee->attributes['altitude']))
                                     <span>{{ $coffee->attributes['altitude'] }}</span>
                                     @endif
@@ -209,7 +209,7 @@
                                         @endif
                                     @endforeach
                                 @endif
-                            </div>
+                        </div>
 
                             <!-- Detail Icon - Minimalist -->
                             <div class="hidden sm:flex items-center flex-shrink-0">
@@ -250,14 +250,14 @@
                                 <!-- Coffee Name & Roastery -->
                                 <div class="border-b border-dark-800 pb-6 mb-6">
                                     <h3 class="font-display text-3xl sm:text-4xl font-normal text-dark-800 uppercase tracking-tight mb-2">
-                                        {{ $coffee->getName() }}
-                                    </h3>
+                                    {{ $coffee->getName() }}
+                                </h3>
 
-                                    @if($coffee->roastery)
+                                @if($coffee->roastery)
                                     <a href="{{ localizedRoute('roasteries.show', $coffee->roastery) }}" class="font-display text-xl sm:text-2xl font-normal text-warm-400 uppercase tracking-tight hover:text-primary-500 transition-colors">
                                         {{ $coffee->roastery->getName() }}
                                     </a>
-                                    @endif
+                                @endif
                                 </div>
 
                                 @if($coffee->getShortDescription())

@@ -67,8 +67,8 @@ return [
         'country' => 'Země',
         'select_country' => 'Vyberte zemi',
         'notes' => 'Poznámka',
-        'notes_optional' => '(volitelné)',
-        'notes_placeholder' => 'Např. \'Prosím zvonit na 2. patro\' nebo \'Nechat u vrátnice\'',
+        'notes_optional' => '/ VOLITELNÉ',
+        'notes_placeholder' => 'NAPŘ. PROSÍM ZVONIT NA 2. PATRO NEBO NECHAT U VRÁTNICE',
     ],
     
     // Pickup point
@@ -88,10 +88,10 @@ return [
     
     // Subscription addon
     'subscription_addon' => [
-        'title' => 'Možnost dopravy s předplatným',
+        'title' => 'Doprava s předplatným',
         'checkbox_label' => 'Zařadit do příští rozesílky předplatného',
-        'free_shipping' => 'Doprava zdarma 🎉',
-        'capacity_full' => '⚠️ Kapacita doplňkového zboží je vyčerpána pro všechna vaše předplatná.',
+        'free_shipping' => 'DOPRAVA ZDARMA',
+        'capacity_full' => 'KAPACITA VYČERPÁNA',
         'select_subscription' => 'Vyberte předplatné:',
         'capacity_label' => 'Kapacita doplňkového zboží:',
         'slots_available' => 'volných slotů',
@@ -115,6 +115,8 @@ return [
         'card' => 'Platební kartou',
         'card_description' => 'Po odeslání objednávky budete přesměrováni na bezpečnou platební bránu',
         'we_accept' => 'Akceptujeme:',
+        'card_info' => 'PLATBA KARTOU. PO ODESLÁNÍ OBJEDNÁVKY BUDETE PŘESMĚROVÁNI NA BEZPEČNOU PLATEBNÍ BRÁNU. AKCEPTUJEME VISA, MASTERCARD, APPLE PAY A GOOGLE PAY.',
+        'card_description_full' => 'PO ODESLÁNÍ OBJEDNÁVKY BUDETE PŘESMĚROVÁNI NA BEZPEČNOU PLATEBNÍ BRÁNU. AKCEPTUJEME VISA, MASTERCARD, APPLE PAY A GOOGLE PAY.',
     ],
     
     // Coupon

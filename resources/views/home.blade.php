@@ -183,7 +183,7 @@
     
     <!-- Dark Overlay -->
     <div class="absolute inset-0 bg-black/60"></div>
-    
+
     <!-- Grain texture overlay -->
     <div class="grain-overlay"></div>
 
@@ -195,21 +195,21 @@
             <div class="text-xs uppercase tracking-widest text-white/60 text-right max-w-[200px]">
                 {{ $currentLocale === 'en' ? 'Specialty coffee subscription from Europe\'s finest roasters.' : 'Předplatné výběrové kávy z nejlepších evropských pražíren.' }}
             </div>
-        </div>
-        
+                </div>
+
         <!-- Center - Main typography -->
         <div class="flex-1 flex flex-col justify-center py-6">
             <!-- Large headline -->
             <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-white uppercase leading-[0.9] tracking-tight">
-                @if($currentLocale === 'en')
+                        @if($currentLocale === 'en')
                 Discover<br/>
                 <span class="text-primary-500">the best</span> coffee<br/>
                 from Europe
-                @else
+                        @else
                 Objevte<br/>
                 <span class="text-primary-500">tu nejlepší</span> kávu<br/>
                 z Evropy
-                @endif
+                        @endif
             </h1>
             
             <!-- Side description -->
@@ -221,24 +221,24 @@
                     {{ $currentLocale === 'en' ? 'Each month a new selection from exceptional European roasteries.' : 'Každý měsíc nový výběr z výjimečných evropských pražíren.' }}
                 </p>
             </div>
-        </div>
-        
+                </div>
+
         <!-- Bottom row - CTAs -->
         <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-8">
                 <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-white font-display uppercase tracking-widest hover:text-primary-500 transition-all">
                     <span>{{ $currentLocale === 'en' ? 'Start subscription' : 'Začít předplatné' }}</span>
                     <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                </a>
+                    </a>
                 <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-white/60 font-display uppercase tracking-widest hover:text-white transition-all">
                     <span>{{ $currentLocale === 'en' ? 'Shop coffee' : 'Obchod' }}</span>
                     <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                </a>
-            </div>
+                    </a>
+                </div>
             
             
-        </div>
-        
+      </div>
+
     </div>
 </div>
 
@@ -291,18 +291,18 @@
       <div class="flex items-center justify-between text-xs uppercase tracking-widest px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 text-dark-800">
         <span class="font-display">{{ $currentLocale === 'en' ? 'Subscription' : 'Předplatné' }}</span>
         <span>{{ now()->format('m/Y') }}</span>
-      </div>
-      
+        </div>
+        
       <!-- Photo container - reduced height, grayscale with grain -->
       <div class="px-4 sm:px-6 lg:px-10 py-4 pb-6 sm:pb-8">
         <div class="relative aspect-[5/4] overflow-hidden">
           <img src="/images/kavi-box.jpg" loading="lazy" alt="KAVI box" class="h-full w-full object-cover grayscale" />
           <!-- Grain overlay for image -->
           <div class="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noise%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%275%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noise)%27/%3E%3C/svg%3E');"></div>
+          </div>
         </div>
       </div>
-    </div>
-    
+
     <!-- Right Side - Content on light background -->
     <div class="bg-stone-100 flex flex-col justify-between p-6 sm:p-8 lg:p-12 xl:p-16">
       
@@ -323,18 +323,18 @@
           <div class="flex gap-3 items-start">
             <span class="text-primary-500">→</span>
             <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Exclusive European roasters not available elsewhere' : 'Exkluzivní evropské pražírny nedostupné jinde' }}</p>
-          </div>
+            </div>
           <div class="flex gap-3 items-start">
             <span class="text-primary-500">→</span>
             <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Unbeatable value for specialty coffee' : 'Bezkonkurenční cena za výběrovou kávu' }}</p>
-          </div>
+            </div>
           <div class="flex gap-3 items-start">
             <span class="text-primary-500">→</span>
             <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription, cancel anytime' : 'Flexibilní předplatné, zrušení kdykoliv' }}</p>
           </div>
-        </div>
-      </div>
-      
+            </div>
+          </div>
+
       <!-- Bottom section with links -->
       <div class="mt-auto pt-12 border-t border-stone-300">
         <div class="flex items-center justify-between">
@@ -346,11 +346,11 @@
             <span>{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}</span>
             <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
           </a>
+          </div>
         </div>
-      </div>
-      
-    </div>
-    
+
+  </div>
+  
   </div>
 </div>
 
@@ -363,7 +363,7 @@
       <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'Choose your ideal coffee box' : 'Vyberte si ideální kávový box' }}</h2>
       <p class="text-lg text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}</p>
     </div>
-  </div>
+          </div>
 
   <!-- Tier 1: M Box - Light background -->
   <div class="border-b border-dark-800/10" style="background-color: rgb(245 245 244);">
@@ -374,17 +374,17 @@
           <div class="flex items-baseline gap-2">
             <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">M</span>
             <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
-          </div>
+            </div>
           <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">500g · 2 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
-        </div>
-        
+            </div>
+
         <!-- Middle: Features -->
         <div class="lg:w-1/3 space-y-2">
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '2 types of specialty coffee' : '2 druhy výběrové kávy' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
-        </div>
-        
+            </div>
+
         <!-- Right: Price + CTA -->
         <div class="lg:w-1/3 lg:text-right">
           <div class="flex items-baseline gap-1 lg:justify-end mb-4">
@@ -417,17 +417,17 @@
           <div class="flex items-baseline gap-2">
             <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">L</span>
             <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
-          </div>
-          <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">750g · 3 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
         </div>
-        
+          <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">750g · 3 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
+          </div>
+
         <!-- Middle: Features -->
         <div class="lg:w-1/3 space-y-2">
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
-        </div>
-        
+            </div>
+
         <!-- Right: Price + CTA -->
         <div class="lg:w-1/3 lg:text-right">
           <div class="flex items-baseline gap-1 lg:justify-end mb-4">
@@ -443,8 +443,8 @@
           </a>
         </div>
       </div>
-    </div>
-  </div>
+          </div>
+            </div>
 
   <!-- Tier 3: XL Box -->
   <div style="background-color: rgb(245 245 244);">
@@ -455,17 +455,17 @@
           <div class="flex items-baseline gap-2">
             <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">XL</span>
             <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
-          </div>
+            </div>
           <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">1000g · 4 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
-        </div>
-        
+            </div>
+
         <!-- Middle: Features -->
         <div class="lg:w-1/3 space-y-2">
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
         </div>
-        
+
         <!-- Right: Price + CTA -->
         <div class="lg:w-1/3 lg:text-right">
           <div class="flex items-baseline gap-1 lg:justify-end mb-4">
@@ -483,7 +483,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Bottom note -->
   <div class="py-8 border-t border-dark-800/10" style="background-color: rgb(245 245 244);">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8">
@@ -505,8 +505,8 @@
         <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 tracking-tight uppercase">
           {{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}
         </h2>
-      </div>
-      
+        </div>
+        
       <!-- 3 Testimonial Cards -->
       <div class="grid lg:grid-cols-3 gap-6">
         
@@ -520,17 +520,17 @@
             </p>
             <!-- Beak/triangle -->
             <div class="absolute -bottom-4 left-6 w-8 h-4 bg-dark-800" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
-          </div>
+            </div>
           <!-- Light section with photo -->
           <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
             <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
               <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Eva V." class="h-full w-full object-cover grayscale" />
-            </div>
+              </div>
             <div>
               <div class="font-display text-dark-800 uppercase tracking-wide">Eva V.</div>
               <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 1 year' : 'Zákaznice 1 rok' }}</p>
-            </div>
-          </div>
+        </div>
+      </div>
           <!-- Stars - positioned to overlap red bar -->
           <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
             <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
@@ -540,11 +540,11 @@
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
-              </div>
-            </div>
+    </div>
+          </div>
           </div>
         </div>
-        
+
         <!-- Card 2 -->
         <div class="flex flex-col relative z-10">
           <!-- Dark section with label + quote + beak -->
@@ -560,12 +560,12 @@
           <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
             <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
               <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Petr D." class="h-full w-full object-cover grayscale" />
-            </div>
-            <div>
+          </div>
+          <div>
               <div class="font-display text-dark-800 uppercase tracking-wide">Petr D.</div>
               <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 6 months' : 'Zákazník 6 měsíců' }}</p>
-            </div>
           </div>
+        </div>
           <!-- Stars - positioned to overlap red bar -->
           <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
             <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
@@ -575,11 +575,11 @@
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
-              </div>
-            </div>
+      </div>
+          </div>
           </div>
         </div>
-        
+
         <!-- Card 3 -->
         <div class="flex flex-col relative z-10">
           <!-- Dark section with label + quote + beak -->
@@ -595,12 +595,12 @@
           <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
             <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
               <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Marie H." class="h-full w-full object-cover grayscale" />
-            </div>
-            <div>
+          </div>
+          <div>
               <div class="font-display text-dark-800 uppercase tracking-wide">Marie H.</div>
               <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 6+ months' : 'Zákaznice 6+ měsíců' }}</p>
-            </div>
           </div>
+        </div>
           <!-- Stars - positioned to overlap red bar -->
           <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
             <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
@@ -610,15 +610,15 @@
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
-              </div>
-            </div>
+      </div>
+          </div>
           </div>
         </div>
-        
-      </div>
+
+          </div>
       
-    </div>
-  </div>
+          </div>
+        </div>
   
   <!-- Full-width red bar with CTA - overlaps with stars -->
   <div class="bg-primary-500 pt-16 pb-8 sm:pt-20 sm:pb-10">
@@ -697,10 +697,10 @@
           <span>{{ $currentLocale === 'en' ? 'Explore coffees for ' . $monthName : 'Prozkoumat kávy na ' . $monthName }}</span>
           <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
-      </div>
-      
     </div>
-    
+
+    </div>
+      
     @if($coffeesOfMonth->count() > 0)
     @php
       // Don't shuffle - use consistent order
@@ -709,26 +709,26 @@
       
       // Collect unique roasteries (max 3)
       $roasteries = $allCoffees->pluck('roastery')->filter()->unique('id')->take(3);
-    @endphp
-    
+        @endphp
+        
     <!-- Mobile: Roasteries + Coffee Grid -->
     <div class="lg:hidden">
       <!-- Mobile roasteries with images -->
       <div class="mb-6 grid grid-cols-3 gap-3">
         @foreach($roasteries as $roastery)
         <div class="relative overflow-hidden">
-          @if($roastery->image)
+            @if($roastery->image)
           <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
-          @else
+            @else
           <div class="w-full aspect-[4/5] bg-warm-300"></div>
-          @endif
+            @endif
           <!-- Overlay text at top -->
           <div class="absolute top-0 left-0 right-0 p-2">
             <span class="inline-block bg-primary-500 px-1.5 py-0.5 font-display text-xs font-normal text-black uppercase tracking-tight leading-tight">{{ $roastery->name }}</span>
             <br>
             <span class="inline-block bg-primary-500 px-1.5 py-0.5 text-[10px] text-black uppercase tracking-widest mt-0.5">{{ $roastery->getCountry() ?? '' }}</span>
           </div>
-        </div>
+            </div>
         @endforeach
       </div>
       <!-- Mobile coffee grid -->
@@ -744,7 +744,7 @@
             <div class="w-full aspect-[3/4] bg-warm-300 flex items-center justify-center">
               <span class="text-warm-500 font-display text-lg">{{ substr($coffee->name, 0, 1) }}</span>
             </div>
-            @endif
+              @endif
           </div>
           <p class="mt-1 text-[10px] font-medium text-dark-800 uppercase tracking-wide leading-tight">{{ $coffee->name }}</p>
         </div>
@@ -761,13 +761,13 @@
           @php $coffee = $allCoffees->get(0); $num = '01'; @endphp
           @if($coffee)
           <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
-          @if($coffee->image)
+              @if($coffee->image)
           <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-          @else
+              @else
           <div class="w-full aspect-[3/4] bg-warm-300"></div>
           @endif
-          @endif
-        </div>
+              @endif
+            </div>
         
         <!-- Roastery 1 - offset down -->
         @if($roasteries->count() >= 1)
@@ -775,27 +775,27 @@
         <div class="col-span-2 col-start-4 mt-16 relative">
           @if($r1->image)
           <img src="{{ asset($r1->image) }}" alt="{{ $r1->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
-          @else
+        @else
           <div class="w-full aspect-[4/5] bg-warm-300"></div>
-          @endif
+              @endif
           <div class="absolute top-0 left-0 right-0 p-3">
             <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r1->name }}</span>
             <br>
             <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r1->getCountry() ?? '' }}</span>
           </div>
-        </div>
-        @endif
-        
+            </div>
+            @endif
+            
         <div class="col-span-2 col-start-7 mt-8">
           @php $coffee = $allCoffees->get(1); $num = '02'; @endphp
           @if($coffee)
           <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
           @if($coffee->image)
           <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-          @else
+              @else
           <div class="w-full aspect-[3/4] bg-warm-300"></div>
-          @endif
-          @endif
+              @endif
+            @endif
         </div>
         
         <div class="col-span-2 col-start-9">
@@ -804,11 +804,11 @@
           <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
           @if($coffee->image)
           <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-          @else
+              @else
           <div class="w-full aspect-[3/4] bg-warm-300"></div>
-          @endif
-          @endif
-        </div>
+              @endif
+            @endif
+          </div>
         
         <!-- Row 2: Coffee 04 + Roastery 2 + Coffees 05-06 -->
         <div class="col-span-2 col-start-2 -mt-24">
@@ -819,10 +819,10 @@
           <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
           @else
           <div class="w-full aspect-[3/4] bg-warm-300"></div>
-          @endif
-          @endif
-        </div>
-        
+        @endif
+      @endif
+    </div>
+
         <div class="col-span-2 col-start-5 -mt-8">
           @php $coffee = $allCoffees->get(4); $num = '05'; @endphp
           @if($coffee)
@@ -833,8 +833,8 @@
           <div class="w-full aspect-[3/4] bg-warm-300"></div>
           @endif
           @endif
-        </div>
-        
+    </div>
+
         <!-- Roastery 2 -->
         @if($roasteries->count() >= 2)
         @php $r2 = $roasteries->skip(1)->first(); @endphp
@@ -848,10 +848,10 @@
             <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r2->name }}</span>
             <br>
             <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r2->getCountry() ?? '' }}</span>
-          </div>
-        </div>
-        @endif
-        
+  </div>
+</div>
+@endif
+
         <!-- Row 3: Coffees 06-07 + Roastery 3 -->
         <div class="col-span-2 col-start-1 -mt-16">
           @php $coffee = $allCoffees->get(5); $num = '06'; @endphp
@@ -863,8 +863,8 @@
           <div class="w-full aspect-[3/4] bg-warm-300"></div>
           @endif
           @endif
-        </div>
-        
+  </div>
+
         <!-- Roastery 3 -->
         @if($roasteries->count() >= 3)
         @php $r3 = $roasteries->skip(2)->first(); @endphp
@@ -878,8 +878,8 @@
             <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r3->name }}</span>
             <br>
             <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r3->getCountry() ?? '' }}</span>
+    </div>
           </div>
-        </div>
         @endif
         
         <div class="col-span-2 col-start-7 -mt-24">
@@ -894,13 +894,13 @@
           @endif
         </div>
         
+        </div>
       </div>
-    </div>
     @endif
     
 
-  </div>
-</div>
+        </div>
+        </div>
 @endif
 
 <!-- How It Works Section - Same style as Features -->
@@ -910,8 +910,8 @@
     <div class="mb-16 sm:mb-20 max-w-2xl">
       <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'How it works' : 'Jak to funguje' }}</h2>
       <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Four simple steps to perfect coffee' : 'Čtyři jednoduché kroky k perfektní kávě' }}</p>
-    </div>
-
+          </div>
+          
     <!-- Steps Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
       
@@ -920,14 +920,14 @@
         <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">01</span>
         <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Choose your plan' : 'Vyberte si plán' }}</h3>
         <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Select coffee quantity and delivery frequency according to your needs' : 'Zvolte množství kávy a frekvenci dodání podle vašich potřeb' }}</p>
-      </div>
-
+        </div>
+        
       <!-- Step 2 -->
       <div class="group border-t-2 border-primary-500 pt-8">
         <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">02</span>
         <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Personalize' : 'Personalizujte' }}</h3>
         <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Choose coffee type, brewing method and delivery address' : 'Vyberte typ kávy, způsob přípravy a doručovací adresu' }}</p>
-      </div>
+        </div>
 
       <!-- Step 3 -->
       <div class="group border-t-2 border-primary-500 pt-8">
@@ -941,12 +941,12 @@
         <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">04</span>
         <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Enjoy' : 'Vychutnejte si' }}</h3>
         <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Enjoy great specialty coffee and look forward to your next coffee box' : 'Užijte si skvělou výběrovou kávu a těšte se na další kávový box' }}</p>
-      </div>
-
+          </div>
+          
+        </div>
     </div>
   </div>
-</div>
-
+  
 <!-- Featured Products Section - Quiet Luxury -->
 @if($featuredProducts->count() > 0)
 <div class="relative bg-white py-20 sm:py-24 md:py-28 lg:py-36">
@@ -1028,14 +1028,14 @@
     <!-- Top Text - Mission Statement -->
     <div class="max-w-3xl">
       <p class="text-primary-500 text-xs sm:text-sm font-display uppercase leading-relaxed tracking-wide">
-        @if($currentLocale === 'en')
+            @if($currentLocale === 'en')
         At KAVI, we believe specialty coffee can change the world. From every coffee box, we donate to Water.org, which provides access to clean water in developing countries.
-        @else
+            @else
         V KAVI věříme, že výběrová káva může měnit svět. Z každého kávového boxu věnujeme 5 Kč organizaci Water.org, která zajišťuje přístup k čisté vodě v rozvojových zemích.
-        @endif
-      </p>
-    </div>
-    
+            @endif
+          </p>
+        </div>
+
     <!-- Center - Large Headline -->
     <div class="my-auto py-8 sm:py-12">
       <h2 class="font-display text-primary-500 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal uppercase leading-[0.95] tracking-tight max-w-3xl">
@@ -1045,8 +1045,8 @@
         Každý box poskytne jednomu člověku vodu na půl roku
         @endif
       </h2>
-    </div>
-    
+      </div>
+
     <!-- Bottom Bar - Metadata -->
     <div class="flex flex-wrap items-center justify-between gap-4 border-t-2 border-primary-500 pt-4">
       <div class="flex flex-wrap items-center gap-6 sm:gap-10 text-xs uppercase tracking-widest text-primary-500">
@@ -1056,9 +1056,9 @@
       </div>
       <div class="flex items-center gap-6 sm:gap-10 text-xs uppercase tracking-widest text-primary-500">
         <span>kavi.cz</span>
-      </div>
     </div>
-    
+  </div>
+  
   </div>
 </div>
 

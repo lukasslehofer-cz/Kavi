@@ -195,17 +195,17 @@
             </div>
         </div>
 
-        <!-- Order Summary - Receipt Style -->
+        <!-- Order Summary - Olive Background Style -->
         <div class="lg:col-span-5">
-            <div class="sticky top-24">
+            <div class="sticky top-24 bg-olive-100 p-8">
                 <h3 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-8">
                     {{ __('cart.order_summary') }}
                 </h3>
                 
-                <dl class="space-y-0">
+                <dl class="space-y-3 mb-6">
                     <!-- Subtotal -->
-                    <div class="flex justify-between items-baseline py-4 border-t border-warm-300">
-                        <dt class="text-xs uppercase tracking-widest text-warm-500">{{ __('cart.subtotal') }}</dt>
+                    <div class="flex justify-between items-baseline">
+                        <dt class="text-xs uppercase tracking-widest text-olive-600">{{ __('cart.subtotal') }}</dt>
                         <dd class="text-sm text-dark-800 uppercase tracking-wide">
                             @if($currentLocale === 'en')
                                 €{{ number_format($totalEur ?? 0, 2, '.', ' ') }}
@@ -216,8 +216,8 @@
                     </div>
                     
                     <!-- Shipping -->
-                    <div class="flex justify-between items-baseline py-4 border-t border-warm-300">
-                        <dt class="text-xs uppercase tracking-widest text-warm-500">{{ __('cart.shipping') }}</dt>
+                    <div class="flex justify-between items-baseline">
+                        <dt class="text-xs uppercase tracking-widest text-olive-600">{{ __('cart.shipping') }}</dt>
                         <dd class="text-sm uppercase tracking-wide">
                             @if($shipping !== null)
                                 @if($shipping == 0)
@@ -232,27 +232,27 @@
                                     </span>
                                 @endif
                             @else
-                                <span class="text-warm-400">{{ $shippingMessage ?? __('cart.at_checkout') }}</span>
-                            @endif
-                        </dd>
-                    </div>
-
-                    <!-- Total -->
-                    <div class="flex justify-between items-baseline py-6 border-t-2 border-dark-800 mt-4">
-                        <dt class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight">{{ __('cart.grand_total') }}</dt>
-                        <dd class="font-display text-2xl sm:text-3xl text-dark-800 uppercase tracking-tight">
-                            @if($shipping !== null)
-                                @if($currentLocale === 'en')
-                                    €{{ number_format(($totalEur ?? 0) + ($shippingEur ?? 0), 2, '.', ' ') }} —
-                                @else
-                                    {{ number_format($total + $shipping, 0, ',', ' ') }} Kč —
-                                @endif
-                            @else
-                                <span class="text-warm-400 text-sm">{{ __('cart.at_checkout') }}</span>
+                                <span class="text-olive-500">{{ $shippingMessage ?? __('cart.at_checkout') }}</span>
                             @endif
                         </dd>
                     </div>
                 </dl>
+
+                <!-- Total -->
+                <div class="flex justify-between items-baseline py-6 border-t border-dark-800">
+                    <dt class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight">{{ __('cart.grand_total') }}</dt>
+                    <dd class="font-display text-2xl sm:text-3xl text-dark-800 uppercase tracking-tight">
+                        @if($shipping !== null)
+                            @if($currentLocale === 'en')
+                                €{{ number_format(($totalEur ?? 0) + ($shippingEur ?? 0), 2, '.', ' ') }} —
+                            @else
+                                {{ number_format($total + $shipping, 0, ',', ' ') }} Kč —
+                            @endif
+                        @else
+                            <span class="text-olive-500 text-sm">{{ __('cart.at_checkout') }}</span>
+                        @endif
+                    </dd>
+                </div>
 
                 <!-- CTA Buttons -->
                 <div class="mt-8 space-y-4">
@@ -264,20 +264,20 @@
                     </a>
                     
                     <div class="text-center">
-                        <a href="{{ localizedRoute('products.index') }}" class="inline-block text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 border-b border-warm-300 hover:border-dark-800 pb-1 transition-colors">
+                        <a href="{{ localizedRoute('products.index') }}" class="inline-block text-xs uppercase tracking-widest text-olive-600 hover:text-dark-800 pb-1 transition-colors">
                             {{ __('cart.continue_shopping') }}
                         </a>
                     </div>
                 </div>
 
-                <!-- Trust Indicators - Minimal -->
-                <div class="mt-10 pt-6 border-t border-warm-300 space-y-2">
-                    <div class="text-xs uppercase tracking-widest text-warm-400">
-                        <span class="inline-block w-1 h-1 bg-warm-400 rounded-full mr-1"></span>
+                <!-- Trust Indicators - On Olive -->
+                <div class="mt-10 pt-6 border-t border-dark-800 space-y-2">
+                    <div class="text-xs uppercase tracking-widest text-olive-600">
+                        <span class="inline-block w-1 h-1 bg-olive-500 rounded-full mr-1"></span>
                         {{ __('cart.secure_payment') }}
                     </div>
-                    <div class="text-xs uppercase tracking-widest text-warm-400">
-                        <span class="inline-block w-1 h-1 bg-warm-400 rounded-full mr-1"></span>
+                    <div class="text-xs uppercase tracking-widest text-olive-600">
+                        <span class="inline-block w-1 h-1 bg-olive-500 rounded-full mr-1"></span>
                         {{ __('cart.eco_packaging') }}
                     </div>
                 </div>

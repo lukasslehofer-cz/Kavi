@@ -25,15 +25,15 @@
     <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
       <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Coffee' : 'Objevte naši' }}</span><br>
       <span class="text-primary-500">{{ $currentLocale === 'en' ? 'shop' : 'kávovou kolekci' }}</span>
-    </h1>
-    
+      </h1>
+      
     <!-- Description - Right aligned -->
     <div class="flex justify-end">
       <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
         {{ $currentLocale === 'en' ? 'Carefully selected specialty coffee from the best European roasteries. Fresh, quality, exceptional.' : 'Pečlivě vybraná výběrová káva z nejlepších evropských pražíren. Čerstvá, kvalitní, výjimečná.' }}
       </p>
-    </div>
-    
+  </div>
+  
   </div>
 </div>
 
@@ -58,16 +58,16 @@
     <div class="mb-10 sm:mb-12">
       <div class="border-t border-b border-dark-800 py-4">
         <div class="flex flex-wrap items-center gap-x-8 gap-y-2">
-          <a href="{{ localizedRoute('products.index') }}" 
+        <a href="{{ localizedRoute('products.index') }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ !request('category') ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
             {{ $currentLocale === 'en' ? 'All' : 'Vše' }}
-          </a>
-          @foreach($categories as $key => $label)
-          <a href="{{ localizedRoute('products.index', ['category' => $key]) }}" 
+        </a>
+        @foreach($categories as $key => $label)
+        <a href="{{ localizedRoute('products.index', ['category' => $key]) }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ request('category') == $key ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
             {{ $categoryLabelsLocalized[$key] ?? $label }}
-          </a>
-          @endforeach
+        </a>
+        @endforeach
         </div>
       </div>
     </div>
@@ -88,7 +88,7 @@
           @endif
 
           <!-- Category Tag - Museum Catalog Code -->
-          @php
+            @php
             $categoryTags = [
               'espresso' => 'ESP',
               'filter' => 'FLT',
@@ -107,7 +107,7 @@
                     'decaf' => 'border-green-500',
                     'accessories' => 'border-purple-500',
                   ];
-                @endphp
+            @endphp
                 <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-2 py-1 border-b-2 {{ $tagColors[$cat] ?? 'border-dark-800' }}">{{ $categoryTags[$cat] }}</span>
               @endif
             @endforeach
@@ -139,12 +139,12 @@
             
             <!-- Technical Info: Roastery · Flavor -->
             <p class="text-xs uppercase tracking-widest text-warm-500 leading-tight">
-              @if($product->roastery)
+            @if($product->roastery)
                 {{ $product->roastery->getName() }}
-                @php
-                  $flavorNotes = $product->getTranslatedAttribute('flavor_notes') ?? $product->getTranslatedAttribute('flavor_profile');
-                @endphp
-                @if($flavorNotes)
+              @php
+                $flavorNotes = $product->getTranslatedAttribute('flavor_notes') ?? $product->getTranslatedAttribute('flavor_profile');
+              @endphp
+              @if($flavorNotes)
                   · {{ $flavorNotes }}
                 @endif
               @elseif(!empty($product->attributes['roaster']))
@@ -156,7 +156,7 @@
               @endif
             </p>
           </div>
-          
+
           <!-- Arrow - Minimalist -->
           <div class="flex-shrink-0 mt-[26px]">
             <svg class="w-5 h-5 text-warm-400 group-hover:text-dark-800 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -185,7 +185,7 @@
         <!-- Page Counter -->
         <span class="text-xs uppercase tracking-widest text-warm-500">
           {{ $currentLocale === 'en' ? 'Page' : 'Strana' }} {{ str_pad($products->currentPage(), 2, '0', STR_PAD_LEFT) }} / {{ str_pad($products->lastPage(), 2, '0', STR_PAD_LEFT) }}
-        </span>
+          </span>
         
         <!-- Navigation -->
         <div class="flex items-center">
@@ -200,16 +200,16 @@
           @endif
           
           <span class="mx-4 text-warm-300">—</span>
-          
-          @if($products->hasMorePages())
+
+        @if($products->hasMorePages())
             <a href="{{ $products->nextPageUrl() }}" class="text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 transition-colors">
               {{ $currentLocale === 'en' ? 'Next' : 'Další' }}
-            </a>
-          @else
+          </a>
+        @else
             <span class="text-xs uppercase tracking-widest text-warm-300 cursor-not-allowed">
               {{ $currentLocale === 'en' ? 'Next' : 'Další' }}
-            </span>
-          @endif
+          </span>
+        @endif
         </div>
       </div>
     </div>
@@ -225,7 +225,7 @@
       <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
         {{ $currentLocale === 'en' ? 'Want regular coffee delivery?' : 'Chcete pravidelnou dodávku kávy?' }}
       </h2>
-
+      
       <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
         {{ $currentLocale === 'en' ? 'With our subscription, you save time and money. Fresh coffee delivered to your door, cancel anytime.' : 'S naším předplatným ušetříte čas i peníze. Čerstvá káva přímo k vám domů, kdykoliv zrušitelné.' }}
       </p>
