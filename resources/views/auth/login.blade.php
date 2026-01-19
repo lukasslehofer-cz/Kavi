@@ -3,115 +3,172 @@
 @section('title', __('auth.login_title') . ' - KAVI')
 
 @section('content')
-<div class="min-h-[calc(100vh-20rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-    <div class="max-w-md w-full">
-        <div class="bg-white rounded-2xl p-10 border border-gray-200">
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ __('auth.welcome_back') }}</h2>
-                <p class="text-gray-600 font-light">{{ __('auth.login_subtitle') }}</p>
-            </div>
-            
-            <form method="POST" action="{{ localizedRoute('login') }}" class="space-y-6">
-                @csrf
+<style>
+.swiss-auth-field {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px solid #e5e5e5;
+    transition: border-color 0.2s;
+}
+.swiss-auth-field:focus-within {
+    border-bottom-color: #636747;
+}
+.swiss-auth-input {
+    flex-grow: 1;
+    padding: 0.75rem 0;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    color: #1c1917;
+    -webkit-appearance: none;
+}
+.swiss-auth-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+.swiss-auth-input::placeholder {
+    color: #a8a29e;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+}
+.swiss-auth-label {
+    flex-shrink: 0;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #78716c;
+    padding-right: 1rem;
+    min-width: 80px;
+}
+</style>
 
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-900 mb-2">{{ __('auth.email') }}</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 transition-all @error('email') border-red-500 @enderror"
-                           placeholder="{{ __('auth.email_placeholder') }}">
-                    @error('email')
-                    <p class="text-red-600 text-sm mt-2 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        {{ $message }}
+<!-- Hero Header - Swiss Style -->
+<div class="pt-8 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20" style="background-color: rgb(245, 245, 244);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-tight leading-[0.9] text-dark-800">
+            {{ $currentLocale === 'en' ? 'LOGIN' : 'PŘIHLÁŠENÍ' }}
+        </h1>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div style="background-color: rgb(245, 245, 244);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-16">
+            <!-- Left Column - Form -->
+            <div class="lg:col-span-7">
+                <!-- Login Form Section -->
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <h2 class="font-display text-4xl font-normal uppercase tracking-tight mb-8">
+                        <span class="text-dark-800">{{ $currentLocale === 'en' ? 'LOGIN ' : 'PŘIHLAŠOVACÍ ' }}</span><span class="text-primary-500">{{ $currentLocale === 'en' ? 'CREDENTIALS' : 'ÚDAJE' }}</span>
+                    </h2>
+                    
+                    <form method="POST" action="{{ localizedRoute('login') }}" class="space-y-6" id="login-form">
+                        @csrf
+
+                        <!-- Email -->
+                        <div>
+                            <div class="swiss-auth-field">
+                                <label for="email" class="swiss-auth-label">{{ __('auth.email') }}</label>
+                                <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                                       class="swiss-auth-input @error('email') border-red-500 @enderror"
+                                       placeholder="{{ strtoupper(__('auth.email_placeholder')) }}">
+                            </div>
+                            @error('email')
+                            <p class="text-xs uppercase tracking-widest text-red-600 mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Password -->
+                        <div>
+                            <div class="swiss-auth-field">
+                                <label for="password" class="swiss-auth-label">{{ __('auth.password') }}</label>
+                                <input id="password" type="password" name="password" required
+                                       class="swiss-auth-input @error('password') border-red-500 @enderror"
+                                       placeholder="••••••••">
+                            </div>
+                            @error('password')
+                            <p class="text-xs uppercase tracking-widest text-red-600 mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Remember & Forgot -->
+                        <div class="flex items-center justify-between py-4">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" name="remember" class="w-4 h-4 text-dark-800 border-dark-800 focus:ring-olive-500 mr-3">
+                                <span class="text-xs uppercase tracking-widest text-dark-800">{{ __('auth.remember_me') }}</span>
+                            </label>
+                            <a href="{{ localizedRoute('password.request') }}" class="text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 transition-colors">
+                                {{ __('auth.forgot_password') }}
+                            </a>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="group w-full flex items-center justify-center gap-3 bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all duration-200">
+                            <span>{{ __('auth.login_button') }}</span>
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Magic Link Section -->
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <h2 class="font-display text-4xl font-normal uppercase tracking-tight mb-8">
+                        <span class="text-dark-800">{{ $currentLocale === 'en' ? 'PASSWORDLESS ' : 'PŘIHLÁŠENÍ ' }}</span><span class="text-primary-500">{{ $currentLocale === 'en' ? 'LOGIN' : 'BEZ HESLA' }}</span>
+                    </h2>
+
+                    <p class="text-xs uppercase tracking-widest text-warm-500 mb-6">
+                        {{ __('auth.magic_link_info') }}
                     </p>
-                    @enderror
+
+                    <form method="POST" action="{{ localizedRoute('magic-link.send') }}" id="magic-link-form">
+                        @csrf
+                        <input type="hidden" name="email" id="magic-link-email">
+                        <button type="button" onclick="sendMagicLink()" class="group flex items-center gap-3 text-dark-800 hover:text-primary-500 transition-colors">
+                            <span class="text-xs uppercase tracking-widest border-b border-dark-800 group-hover:border-primary-500 pb-0.5">{{ __('auth.magic_link_button') }}</span>
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-900 mb-2">{{ __('auth.password') }}</label>
-                    <input id="password" type="password" name="password" required
-                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 transition-all @error('password') border-red-500 @enderror"
-                           placeholder="{{ __('auth.password_placeholder') }}">
-                    @error('password')
-                    <p class="text-red-600 text-sm mt-2 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        {{ $message }}
-                    </p>
-                    @enderror
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" name="remember" class="rounded border-gray-300 text-primary-500 focus:ring-primary-500">
-                        <span class="ml-2 text-sm text-gray-700 font-light">{{ __('auth.remember_me') }}</span>
-                    </label>
-                    <a href="{{ localizedRoute('password.request') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                        {{ __('auth.forgot_password') }}
-                    </a>
-                </div>
-
-                <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
-                    {{ __('auth.login_button') }}
-                </button>
-            </form>
-
-            <!-- Magic Link Section -->
-            <div class="mt-6">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-200"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-4 bg-white text-gray-600 font-light">{{ __('auth.or') }}</span>
-                    </div>
-                </div>
-
-                <form method="POST" action="{{ localizedRoute('magic-link.send') }}" class="mt-6" id="magic-link-form">
-                    @csrf
-                    <input type="hidden" name="email" id="magic-link-email">
-                    <button type="button" onclick="sendMagicLink()" class="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-full text-gray-700 bg-white hover:bg-gray-50 font-medium transition-all">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        {{ __('auth.magic_link_button') }}
-                    </button>
-                </form>
-
-                <p class="mt-3 text-xs text-center text-gray-600 font-light">
-                    {{ __('auth.magic_link_info') }}
-                </p>
             </div>
 
-            <div class="mt-8 pt-6 border-t border-gray-200 text-center">
-                <p class="text-gray-600 font-light">
-                    {{ __('auth.no_account') }}
-                    <a href="{{ localizedRoute('register') }}" class="text-primary-600 hover:text-primary-700 font-medium ml-1">
-                        {{ __('auth.register_free') }}
-                    </a>
-                </p>
-            </div>
-        </div>
+            <!-- Right Column - Info -->
+            <div class="lg:col-span-5">
+                <div class="sticky top-24 bg-olive-100 p-8">
+                    <h3 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-8">
+                        {{ __('auth.why_account') }}
+                    </h3>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-primary-500">●</span>
+                            <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('auth.benefit_orders') }}</span>
+                        </div>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-primary-500">●</span>
+                            <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('auth.benefit_subscription') }}</span>
+                        </div>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-primary-500">●</span>
+                            <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('auth.benefit_faster') }}</span>
+                        </div>
+                    </div>
 
-        <!-- Benefits -->
-        <div class="mt-8 text-center">
-            <div class="flex justify-center items-center gap-6 text-sm text-gray-600 font-light">
-                <span class="flex items-center">
-                    <svg class="w-4 h-4 text-primary-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    {{ __('auth.secure') }}
-                </span>
-                <span class="flex items-center">
-                    <svg class="w-4 h-4 text-primary-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    {{ __('auth.fast') }}
-                </span>
+                    <div class="pt-6 border-t border-dark-800">
+                        <p class="text-xs uppercase tracking-widest text-olive-600 mb-4">{{ __('auth.no_account') }}</p>
+                        <a href="{{ localizedRoute('register') }}" class="group flex items-center gap-3 text-dark-800 hover:text-primary-500 transition-colors">
+                            <span class="font-display text-lg uppercase tracking-tight">{{ __('auth.register_free') }}</span>
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

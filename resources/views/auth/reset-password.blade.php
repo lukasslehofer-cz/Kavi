@@ -3,119 +3,170 @@
 @section('title', __('auth.reset_password_title') . ' - KAVI')
 
 @section('content')
-<div class="min-h-[calc(100vh-20rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-    <div class="max-w-md w-full">
-        <div class="bg-white rounded-2xl p-10 border border-gray-200">
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ __('auth.set_new_password') }}</h2>
-                <p class="text-gray-600 font-light">{{ __('auth.set_new_password_subtitle') }}</p>
-            </div>
-            
-            <form method="POST" action="{{ localizedRoute('password.update') }}" class="space-y-6">
-                @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
+<style>
+.swiss-auth-field {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px solid #e5e5e5;
+    transition: border-color 0.2s;
+}
+.swiss-auth-field:focus-within {
+    border-bottom-color: #636747;
+}
+.swiss-auth-input {
+    flex-grow: 1;
+    padding: 0.75rem 0;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    color: #1c1917;
+    -webkit-appearance: none;
+}
+.swiss-auth-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+.swiss-auth-input::placeholder {
+    color: #a8a29e;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+}
+.swiss-auth-label {
+    flex-shrink: 0;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #78716c;
+    padding-right: 1rem;
+    min-width: 80px;
+}
+.swiss-auth-input-readonly {
+    flex-grow: 1;
+    padding: 0.75rem 0;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    color: #78716c;
+    -webkit-appearance: none;
+}
+</style>
 
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-900 mb-2">{{ __('auth.email') }}</label>
-                    <input id="email" type="email" name="email" value="{{ old('email', $email) }}" required autofocus
-                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 transition-all bg-gray-50 @error('email') border-red-500 @enderror"
-                           readonly>
-                    @error('email')
-                    <p class="text-red-600 text-sm mt-2 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+<!-- Hero Header - Swiss Style -->
+<div class="pt-8 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20" style="background-color: rgb(245, 245, 244);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-tight leading-[0.9] text-dark-800">
+            {{ $currentLocale === 'en' ? 'NEW PASSWORD' : 'NOVÉ HESLO' }}
+        </h1>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div style="background-color: rgb(245, 245, 244);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-16">
+            <!-- Left Column - Form -->
+            <div class="lg:col-span-7">
+                <!-- Reset Form Section -->
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <h2 class="font-display text-4xl font-normal uppercase tracking-tight mb-8">
+                        <span class="text-dark-800">{{ $currentLocale === 'en' ? 'SET NEW ' : 'NASTAVTE NOVÉ ' }}</span><span class="text-primary-500">{{ $currentLocale === 'en' ? 'PASSWORD' : 'HESLO' }}</span>
+                    </h2>
+                    
+                    <form method="POST" action="{{ localizedRoute('password.update') }}" class="space-y-6">
+                        @csrf
+                        <input type="hidden" name="token" value="{{ $token }}">
+
+                        <!-- Email (readonly) -->
+                        <div>
+                            <div class="swiss-auth-field">
+                                <label for="email" class="swiss-auth-label">{{ __('auth.email') }}</label>
+                                <input id="email" type="email" name="email" value="{{ old('email', $email) }}" required
+                                       class="swiss-auth-input-readonly" readonly>
+                            </div>
+                            @error('email')
+                            <p class="text-xs uppercase tracking-widest text-red-600 mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- New Password -->
+                        <div>
+                            <div class="swiss-auth-field">
+                                <label for="password" class="swiss-auth-label">{{ __('auth.new_password') }}</label>
+                                <input id="password" type="password" name="password" required autofocus
+                                       class="swiss-auth-input @error('password') border-red-500 @enderror"
+                                       placeholder="{{ strtoupper(__('auth.password_placeholder_min')) }}">
+                            </div>
+                            @error('password')
+                            <p class="text-xs uppercase tracking-widest text-red-600 mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div>
+                            <div class="swiss-auth-field">
+                                <label for="password_confirmation" class="swiss-auth-label">{{ __('auth.confirm_password') }}</label>
+                                <input id="password_confirmation" type="password" name="password_confirmation" required
+                                       class="swiss-auth-input"
+                                       placeholder="{{ strtoupper(__('auth.confirm_password_placeholder')) }}">
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="group w-full flex items-center justify-center gap-3 bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all duration-200">
+                            <span>{{ __('auth.set_password_button') }}</span>
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Back to login -->
+                <div class="border-t border-warm-300 pt-6">
+                    <p class="text-xs uppercase tracking-widest text-warm-500 mb-4">{{ __('auth.remembered_password') }}</p>
+                    <a href="{{ localizedRoute('login') }}" class="group flex items-center gap-3 text-dark-800 hover:text-primary-500 transition-colors">
+                        <span class="font-display text-lg uppercase tracking-tight">{{ __('auth.login_button') }}</span>
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
-                        {{ $message }}
-                    </p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-900 mb-2">{{ __('auth.new_password') }}</label>
-                    <input id="password" type="password" name="password" required
-                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 transition-all @error('password') border-red-500 @enderror"
-                           placeholder="{{ __('auth.password_placeholder_min') }}">
-                    @error('password')
-                    <p class="text-red-600 text-sm mt-2 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        {{ $message }}
-                    </p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="password_confirmation" class="block text-sm font-medium text-gray-900 mb-2">{{ __('auth.confirm_password') }}</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" required
-                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 transition-all"
-                           placeholder="{{ __('auth.confirm_password_placeholder') }}">
-                </div>
-
-                <!-- Password requirements -->
-                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                    <p class="text-sm font-medium text-gray-900 mb-2">{{ __('auth.password_requirements') }}</p>
-                    <ul class="space-y-1 text-xs text-gray-600 font-light">
-                        <li class="flex items-center">
-                            <svg class="w-3 h-3 text-primary-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            {{ __('auth.password_min_8') }}
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-3 h-3 text-primary-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            {{ __('auth.password_recommendation') }}
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-3 h-3 text-primary-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            {{ __('auth.password_unique') }}
-                        </li>
-                    </ul>
-                </div>
-
-                <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 inline-flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {{ __('auth.set_password_button') }}
-                </button>
-            </form>
-
-            <div class="mt-8 pt-6 border-t border-gray-200 text-center">
-                <p class="text-gray-600 font-light">
-                    {{ __('auth.remembered_password') }}
-                    <a href="{{ localizedRoute('login') }}" class="text-primary-600 hover:text-primary-700 font-medium ml-1">
-                        {{ __('auth.login_button') }}
                     </a>
-                </p>
+                </div>
             </div>
-        </div>
 
-        <!-- Security info -->
-        <div class="mt-8 text-center">
-            <div class="flex justify-center items-center gap-6 text-sm text-gray-600 font-light">
-                <span class="flex items-center">
-                    <svg class="w-4 h-4 text-primary-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    {{ __('auth.secure_encryption') }}
-                </span>
-                <span class="flex items-center">
-                    <svg class="w-4 h-4 text-primary-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    {{ __('auth.ssl_protected') }}
-                </span>
+            <!-- Right Column - Requirements -->
+            <div class="lg:col-span-5 mt-12 lg:mt-0">
+                <div class="sticky top-24 bg-olive-100 p-8">
+                    <h3 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-8">
+                        {{ __('auth.password_requirements') }}
+                    </h3>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-primary-500">●</span>
+                            <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('auth.password_min_8') }}</span>
+                        </div>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-primary-500">●</span>
+                            <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('auth.password_recommendation') }}</span>
+                        </div>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-primary-500">●</span>
+                            <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('auth.password_unique') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-dark-800 space-y-2">
+                        <div class="text-xs uppercase tracking-widest text-olive-600">
+                            <span class="inline-block w-1 h-1 bg-olive-500 rounded-full mr-1"></span>
+                            {{ __('auth.secure_encryption') }}
+                        </div>
+                        <div class="text-xs uppercase tracking-widest text-olive-600">
+                            <span class="inline-block w-1 h-1 bg-olive-500 rounded-full mr-1"></span>
+                            {{ __('auth.ssl_protected') }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
