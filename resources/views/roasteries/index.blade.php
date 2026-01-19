@@ -90,7 +90,7 @@
                 };
               }
             @endphp
-            <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-2 py-1 border-b-2 border-dark-800">
+            <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[#e5e6df] px-2 py-1 border-b-2 border-dark-800">
             {{ $coffeeCount }} {{ $coffeeWord }}
             </span>
           </div>

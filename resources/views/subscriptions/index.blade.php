@@ -71,7 +71,7 @@
           <!-- Photo Section with Red Stripe overlapping -->
           <div class="relative">
             <!-- Product Photo - Square, Grayscale with grain -->
-            <div class="relative aspect-square overflow-hidden">
+            <div class="relative aspect-square overflow-hidden" style="background-color: #e5e6df;">
               @php
               $imageSrc = str_starts_with($promoImage, 'promo-images/') 
                   ? asset('storage/' . $promoImage) 
@@ -80,14 +80,6 @@
             <img src="{{ $imageSrc }}" 
                  alt="Kávový box" 
                  class="w-full h-full object-cover">
-          
-              <!-- Grain overlay using SVG filter -->
-              <svg class="absolute inset-0 w-full h-full pointer-events-none" style="mix-blend-mode: overlay; opacity: 0.35;">
-                <filter id="grain-predplatne">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="5" stitchTiles="stitch"/>
-                </filter>
-                <rect width="100%" height="100%" filter="url(#grain-predplatne)"/>
-              </svg>
             </div>
             
             <!-- Red vertical stripe with rotated text - top-left corner, ~40% height -->

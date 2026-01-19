@@ -137,7 +137,7 @@
           <!-- Discount Badge -->
           @if($product->shouldShowDiscountPercentage())
           <div class="absolute top-4 right-4 lg:top-8 lg:right-8">
-            <span class="text-xs uppercase tracking-widest text-primary-500 bg-[rgb(245,245,244)] px-2 py-1">-{{ $product->getDiscountPercentage() }}%</span>
+            <span class="text-xs uppercase tracking-widest text-primary-500 bg-[#e5e6df] px-2 py-1">-{{ $product->getDiscountPercentage() }}%</span>
           </div>
           @endif
         </div>
@@ -364,13 +364,13 @@
             @if(is_array($relatedProduct->category))
               @foreach($relatedProduct->category as $cat)
                 @if($cat === 'espresso')
-                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-1 pb-1 border-b-2 border-amber-500">ESP</span>
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[#e5e6df] px-1 pb-1 border-b-2 border-amber-500">ESP</span>
                 @elseif($cat === 'filter')
-                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-1 pb-1 border-b-2 border-blue-500">FLT</span>
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[#e5e6df] px-1 pb-1 border-b-2 border-blue-500">FLT</span>
                 @elseif($cat === 'decaf')
-                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-1 pb-1 border-b-2 border-green-500">DCF</span>
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[#e5e6df] px-1 pb-1 border-b-2 border-green-500">DCF</span>
                 @elseif($cat === 'accessories')
-                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-1 pb-1 border-b-2 border-purple-500">ACC</span>
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[#e5e6df] px-1 pb-1 border-b-2 border-purple-500">ACC</span>
                 @endif
               @endforeach
             @endif

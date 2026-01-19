@@ -108,7 +108,7 @@
                     'accessories' => 'border-purple-500',
                   ];
             @endphp
-                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-2 py-1 border-b-2 {{ $tagColors[$cat] ?? 'border-dark-800' }}">{{ $categoryTags[$cat] }}</span>
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[#e5e6df] px-2 py-1 border-b-2 {{ $tagColors[$cat] ?? 'border-dark-800' }}">{{ $categoryTags[$cat] }}</span>
               @endif
             @endforeach
           </div>
