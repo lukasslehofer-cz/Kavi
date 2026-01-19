@@ -240,6 +240,7 @@
     </header>
 
     <!-- Flash Messages -->
+    @section('flash-messages')
     @if(session('success'))
     <div class="bg-olive-500 text-white px-4 py-3 mx-4 mt-4">
         {{ session('success') }}
@@ -251,6 +252,7 @@
         {{ session('error') }}
     </div>
     @endif
+    @show
 
     <!-- Main Content -->
     <main class="flex-grow">

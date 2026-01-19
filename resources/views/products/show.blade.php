@@ -121,8 +121,8 @@
   <div class="relative">
     <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[80vh]">
       
-      <!-- Left Side - Product Photo (sticky, edge-to-edge) -->
-      <div class="lg:col-span-6 relative lg:sticky lg:top-0 lg:h-screen">
+      <!-- Left Side - Product Photo (sticky to menu bottom) -->
+      <div class="lg:col-span-6 relative lg:sticky lg:top-[64px] lg:h-[calc(100vh-64px)]">
         <div class="h-full w-full overflow-hidden" style="background-color: rgb(245, 245, 244);">
           @if($product->image)
           <img src="{{ asset($product->image) }}" 
@@ -184,7 +184,7 @@
             {{ $product->roastery->getName() }}
           </a>
           @if($countryCode)
-          <span class="text-dark-800">[ {{ $countryCode }} ]</span>
+          <span class="text-primary-500">[</span> <span class="text-dark-800">{{ $countryCode }}</span> <span class="text-primary-500">]</span>
           @endif
         </p>
         @elseif(!empty($product->attributes['roaster']))

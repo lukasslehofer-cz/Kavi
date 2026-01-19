@@ -127,7 +127,7 @@
         
         <!-- Country Code -->
         <div class="mb-4">
-          <span class="text-xs uppercase tracking-widest text-warm-500">[ {{ $countryCode }} ]</span>
+          <span class="text-xs uppercase tracking-widest"><span class="text-primary-500">[</span> <span class="text-warm-500">{{ $countryCode }}</span> <span class="text-primary-500">]</span></span>
         </div>
         
         <!-- Giant Roastery Name -->
