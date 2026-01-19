@@ -173,7 +173,7 @@
         </div>
         
         <!-- Product Name - Large -->
-        <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-dark-800 uppercase tracking-tight leading-[0.9] mb-4">
+        <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-dark-800 uppercase tracking-tight leading-[0.95] sm:leading-[0.9] mb-4">
           {{ $product->getName() }}
         </h1>
         
@@ -338,7 +338,7 @@
   <div class="max-w-screen-xl mx-auto px-6 md:px-8 pb-16 lg:pb-24">
     
     <!-- Section Heading -->
-    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight mb-10">
+    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight leading-tight sm:leading-[0.95] mb-10">
       {{ $currentLocale === 'en' ? 'You might also like' : 'Mohlo by vás také zajímat' }}
     </h2>
     
@@ -407,7 +407,7 @@
   <div class="relative pt-8 sm:pt-10 lg:pt-14 pb-20 sm:pb-24 lg:pb-28" style="background-color: #e5e6df;">
     <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
       <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
-        <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
+        <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
           {{ $currentLocale === 'en' ? 'Want regular coffee delivery?' : 'Chcete pravidelnou dodávku kávy?' }}
         </h2>
 

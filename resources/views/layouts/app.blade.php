@@ -158,7 +158,7 @@
                     <a href="{{ localizedRoute('cart.index') }}" class="relative text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200 group" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}</span>
                         @if(session('cart') && count(session('cart')) > 0)
-                        <span class="ml-1 text-primary-500 font-medium">({{ array_sum(session('cart')) }})</span>
+                        <span class="text-primary-500 font-medium">({{ array_sum(session('cart')) }})</span>
                         @endif
                     </a>
                     

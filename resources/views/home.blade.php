@@ -200,7 +200,7 @@
         <!-- Center - Main typography -->
         <div class="flex-1 flex flex-col justify-center py-6">
             <!-- Large headline -->
-            <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-white uppercase leading-[0.9] tracking-tight">
+            <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-white uppercase leading-[0.95] sm:leading-[0.9] tracking-tight">
                         @if($currentLocale === 'en')
                 Discover<br/>
                 <span class="text-primary-500">the best</span> coffee<br/>
@@ -247,7 +247,7 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
     <div class="mb-16 sm:mb-20 max-w-2xl">
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'Why choose KAVI?' : 'Proč si vybrat KAVI?' }}</h2>
+      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ $currentLocale === 'en' ? 'Why choose KAVI?' : 'Proč si vybrat KAVI?' }}</h2>
       <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'We know what makes coffee exceptional. And we love to share it with you.' : 'Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.' }}</p>
     </div>
 
@@ -360,7 +360,7 @@
   <!-- Section Header -->
   <div class="pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 border-b border-dark-800/10">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8 text-center">
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'Choose your ideal coffee box' : 'Vyberte si ideální kávový box' }}</h2>
+      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ $currentLocale === 'en' ? 'Choose your ideal coffee box' : 'Vyberte si ideální kávový box' }}</h2>
       <p class="text-lg text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}</p>
     </div>
           </div>
@@ -502,7 +502,7 @@
       <!-- Section Header -->
       <div class="text-center mb-12 sm:mb-16">
         <!-- <p class="text-xs uppercase tracking-widest text-warm-500 mb-4">{{ $currentLocale === 'en' ? 'Testimonials' : 'Reference' }}</p> -->
-        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 tracking-tight uppercase">
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 tracking-tight uppercase leading-tight sm:leading-[0.95]">
           {{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}
         </h2>
         </div>
@@ -908,7 +908,7 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
     <div class="mb-16 sm:mb-20 max-w-2xl">
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'How it works' : 'Jak to funguje' }}</h2>
+      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ $currentLocale === 'en' ? 'How it works' : 'Jak to funguje' }}</h2>
       <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Four simple steps to perfect coffee' : 'Čtyři jednoduché kroky k perfektní kávě' }}</p>
           </div>
           
@@ -954,7 +954,7 @@
     <!-- Section Header -->
     <div class="mb-12 sm:mb-16 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
       <div>
-        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-2 tracking-tight uppercase">{{ $currentLocale === 'en' ? 'Our Coffees' : 'Naše kávy' }}</h2>
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-2 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ $currentLocale === 'en' ? 'Our Coffees' : 'Naše kávy' }}</h2>
         <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Hand-picked from the best European roasters' : 'Ručně vybrané z nejlepších pražíren Evropy' }}</p>
       </div>
       <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-3 border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800 font-medium px-6 py-3 transition-all duration-200">
@@ -1067,7 +1067,7 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->
-      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
+      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
         {{ $currentLocale === 'en' ? 'Start your coffee journey today' : 'Začněte svou kávovou cestu ještě dnes' }}
       </h2>
 

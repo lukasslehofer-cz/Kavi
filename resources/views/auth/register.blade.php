@@ -60,7 +60,7 @@
             <div class="lg:col-span-7">
                 <!-- Registration Form Section -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
-                    <h2 class="font-display text-4xl font-normal uppercase tracking-tight mb-8">
+                    <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal uppercase tracking-tight mb-8">
                         <span class="text-dark-800">{{ $currentLocale === 'en' ? 'YOUR ' : 'VAŠE ' }}</span><span class="text-primary-500">{{ $currentLocale === 'en' ? 'DETAILS' : 'ÚDAJE' }}</span>
                     </h2>
                     

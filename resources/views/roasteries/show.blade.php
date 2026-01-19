@@ -131,7 +131,7 @@
         </div>
         
         <!-- Giant Roastery Name -->
-        <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-dark-800 uppercase tracking-tight leading-[0.9] mb-6">
+        <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-dark-800 uppercase tracking-tight leading-[0.95] sm:leading-[0.9] mb-6">
           {{ $roastery->getName() }}
         </h1>
         
@@ -250,7 +250,7 @@
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pb-16 lg:pb-24">
     
     <!-- Section Heading -->
-    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight mb-10">
+    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight leading-tight sm:leading-[0.95] mb-10">
       {{ $currentLocale === 'en' ? 'Coffees from' : 'Kávy od' }} <span class="text-primary-500">{{ $roastery->getName() }}</span>
     </h2>
 
@@ -550,7 +550,7 @@
     <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
       <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
         <!-- Large Editorial Heading -->
-        <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
+        <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
           {{ $currentLocale === 'en' ? 'Want to taste coffees from ' . $roastery->getName() . '?' : 'Chcete ochutnat kávy od ' . $roastery->getName() . '?' }}
         </h2>
 

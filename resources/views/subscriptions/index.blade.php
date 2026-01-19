@@ -20,7 +20,7 @@
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
-    <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
+    <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
       <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Build your' : 'Sestavte si' }}</span><br>
       <span class="text-primary-500">{{ $currentLocale === 'en' ? 'coffee box' : 'kávový box' }}</span>
       </h1>
@@ -177,8 +177,8 @@
           <div class="mb-12 border-t-2 border-primary-500 pt-6 pr-[5px]">
             <div class="mb-6">
               <div class="flex items-baseline gap-4 mb-1">
-                <span class="text-primary-500 font-display text-4xl font-normal">01</span>
-                <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Coffee quantity' : 'Množství kávy' }}</h2>
+                <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">01</span>
+                <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Coffee quantity' : 'Množství kávy' }}</h2>
               </div>
               <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Choose the package that suits you' : 'Vyberte balíček, který vám vyhovuje' }}</p>
             </div>
@@ -262,8 +262,8 @@
           <div class="mb-12 border-t-2 border-primary-500 pt-6 pr-[5px]">
             <div class="mb-6">
               <div class="flex items-baseline gap-4 mb-1">
-                <span class="text-primary-500 font-display text-4xl font-normal">02</span>
-                <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Preferred coffee type' : 'Preferovaný typ kávy' }}</h2>
+                <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">02</span>
+                <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Preferred coffee type' : 'Preferovaný typ kávy' }}</h2>
               </div>
               <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Choose your favorite brewing method' : 'Vyberte si váš oblíbený způsob přípravy' }}</p>
             </div>
@@ -360,8 +360,8 @@
           <div class="mb-12 border-t-2 border-primary-500 pt-6 pr-[5px]">
             <div class="mb-6">
               <div class="flex items-baseline gap-4 mb-1">
-                <span class="text-primary-500 font-display text-4xl font-normal">03</span>
-                <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Delivery frequency' : 'Frekvence dodání' }}</h2>
+                <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">03</span>
+                <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $currentLocale === 'en' ? 'Delivery frequency' : 'Frekvence dodání' }}</h2>
               </div>
               <p class="text-sm text-warm-500 font-light">{{ $currentLocale === 'en' ? 'How often do you want to receive coffee?' : 'Jak často chcete kávu dostávat?' }}</p>
             </div>

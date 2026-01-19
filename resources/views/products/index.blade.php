@@ -22,7 +22,7 @@
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
-    <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
+    <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
       <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Coffee' : 'Objevte naši' }}</span><br>
       <span class="text-primary-500">{{ $currentLocale === 'en' ? 'shop' : 'kávovou kolekci' }}</span>
       </h1>
@@ -60,12 +60,12 @@
         <div class="flex flex-wrap items-center gap-x-8 gap-y-2">
         <a href="{{ localizedRoute('products.index') }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ !request('category') ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
-            {{ $currentLocale === 'en' ? 'All' : 'Vše' }}
+            {{ $currentLocale === 'en' ? 'All' : 'Vše' }}<sup class="ml-0.5 text-[10px]">{{ str_pad($totalCount, 2, '0', STR_PAD_LEFT) }}</sup>
         </a>
-        @foreach($categories as $key => $label)
+        @foreach($categories as $key => $categoryData)
         <a href="{{ localizedRoute('products.index', ['category' => $key]) }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ request('category') == $key ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
-            {{ $categoryLabelsLocalized[$key] ?? $label }}
+            {{ $categoryLabelsLocalized[$key] ?? $categoryData['name'] }}<sup class="ml-0.5 text-[10px]">{{ str_pad($categoryData['count'], 2, '0', STR_PAD_LEFT) }}</sup>
         </a>
         @endforeach
         </div>
@@ -222,7 +222,7 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->
-      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
+      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
         {{ $currentLocale === 'en' ? 'Want regular coffee delivery?' : 'Chcete pravidelnou dodávku kávy?' }}
       </h2>
       

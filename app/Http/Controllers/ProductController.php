@@ -26,14 +26,37 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        $categories = [
+        $categoryNames = [
             'espresso' => 'Espresso káva',
             'filter' => 'Filtrovaná káva',
             'decaf' => 'Bezkofeinová káva',
             'accessories' => 'Příslušenství'
         ];
 
-        return view('products.index', compact('products', 'categories'));
+        // Get category counts
+        $categoryCounts = [];
+        foreach ($categoryNames as $key => $name) {
+            $categoryCounts[$key] = Product::forShop()
+                ->withPriceInCurrentCurrency()
+                ->category($key)
+                ->count();
+        }
+
+        // Get total count for "All"
+        $totalCount = Product::forShop()
+            ->withPriceInCurrentCurrency()
+            ->count();
+
+        // Build categories array with counts
+        $categories = [];
+        foreach ($categoryNames as $key => $name) {
+            $categories[$key] = [
+                'name' => $name,
+                'count' => $categoryCounts[$key]
+            ];
+        }
+
+        return view('products.index', compact('products', 'categories', 'totalCount'));
     }
 
     public function show(Product $product)

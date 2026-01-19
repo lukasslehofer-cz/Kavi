@@ -242,6 +242,7 @@ class SubscriptionConfigController extends Controller
             'billing_date' => 'required|date',
             'shipment_date' => 'required|date',
             'notes' => 'nullable|string',
+            'promo_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'coffee_slot_e1' => 'nullable|exists:products,id',
             'coffee_slot_e2' => 'nullable|exists:products,id',
             'coffee_slot_e3' => 'nullable|exists:products,id',

@@ -140,8 +140,8 @@
                 <!-- Contact Information - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-4xl font-normal">01</span>
-                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.contact_info') }}</h2>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">01</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.contact_info') }}</h2>
                     </div>
                     
                     @guest
@@ -219,8 +219,8 @@
                 <!-- Billing Address - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-4xl font-normal">02</span>
-                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.billing_address') }}</h2>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">02</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.billing_address') }}</h2>
                     </div>
                     
                     <div class="space-y-4">
@@ -309,8 +309,8 @@
                 @if($canShipWithSubscription && !empty($availableSubscriptions))
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-4xl font-normal">03</span>
-                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.subscription_addon.title') }}</h2>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">03</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.subscription_addon.title') }}</h2>
                     </div>
                     
                     <div class="space-y-4">
@@ -706,8 +706,8 @@
                 @if(!$cartContainsOnlyDigitalProducts)
                 <div class="mb-16 border-t-2 border-primary-500 pt-6" id="packeta-section">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-4xl font-normal">04</span>
-                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.pickup_point.title') }}</h2>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">04</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.pickup_point.title') }}</h2>
                     </div>
                     
                     <div class="space-y-6">
@@ -774,8 +774,8 @@
                 <!-- Payment Method - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-4xl font-normal">05</span>
-                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.payment.title') }}</h2>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">05</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.payment.title') }}</h2>
                     </div>
                     
                     <input type="hidden" name="payment_method" value="card">
@@ -790,8 +790,8 @@
                 <!-- Additional Notes - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-4xl font-normal">06</span>
-                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.fields.notes') }}</h2>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">06</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.fields.notes') }}</h2>
                         <span class="text-warm-400 text-xs uppercase tracking-widest">{{ __('checkout.fields.notes_optional') }}</span>
                     </div>
                     

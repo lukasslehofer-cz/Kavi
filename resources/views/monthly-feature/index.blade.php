@@ -21,7 +21,7 @@
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
-    <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
+    <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
       <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Coffee of' : 'Pražírny a kávy' }}</span><br>
       <span class="text-primary-500">{{ $currentLocale === 'en' ? 'the month' : 'měsíce' }}</span>
             </h1>
@@ -51,7 +51,7 @@
             <div class="mb-16 sm:mb-24">
                 <!-- Section Header - Large Editorial Typography -->
             <div class="mb-12 sm:mb-16">
-                    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight">
+                    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight leading-tight sm:leading-[0.95]">
                         @if($currentLocale === 'en')
                             {{ $roasteries->count() === 1 ? 'Roaster of the Month' : 'Roasters of the Month' }}
                         @else
@@ -140,7 +140,7 @@
             <div class="pt-12 sm:pt-16">
                 <!-- Section Header - Large Editorial Typography -->
                 <div class="mb-12 sm:mb-16">
-                    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight">
+                    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight leading-tight sm:leading-[0.95]">
                         {{ $currentLocale === 'en' ? 'Coffees of the Month' : 'Kávy měsíce' }}
                     </h2>
                     <p class="text-sm uppercase tracking-widest text-warm-500 mt-3">
@@ -400,7 +400,7 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->
-      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
+      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
         {{ $currentLocale === 'en' ? 'Want to receive similar coffees regularly?' : 'Chcete dostávat podobné kávy pravidelně?' }}
       </h2>
 
