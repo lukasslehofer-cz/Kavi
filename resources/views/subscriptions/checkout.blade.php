@@ -3,229 +3,291 @@
 @section('title', __('checkout.page_title_subscription'))
 
 @section('content')
-<!-- Hero Header - Minimal -->
-<div class="relative bg-gray-100 py-12 border-b border-gray-200">
+<style>
+/* Swiss Style Form Inputs - Inline Labels with Light Lines */
+.swiss-field {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px solid #BCBEB1;
+    transition: border-color 0.2s;
+}
+.swiss-field:focus-within {
+    border-bottom: 1px solid #636747;
+}
+.swiss-field-label {
+    flex-shrink: 0;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #78716c;
+    padding-right: 1rem;
+    white-space: nowrap;
+}
+.swiss-field-label-required::after {
+    content: ' *';
+    color: #dc2626;
+}
+.swiss-field-input {
+    flex-grow: 1;
+    padding: 0.75rem 0;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    color: #1c1c1c;
+    -webkit-appearance: none;
+}
+.swiss-field-input:focus {
+    outline: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+.swiss-field-input::placeholder {
+    color: #a8a29e;
+}
+.swiss-field-select {
+    flex-grow: 1;
+    padding: 0.75rem 0;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    color: #1c1c1c;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2378716c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0 center;
+    background-size: 1.25rem;
+    padding-right: 1.5rem;
+}
+.swiss-field-select:focus {
+    outline: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+.swiss-textarea {
+    width: 100%;
+    padding: 0.75rem 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #BCBEB1;
+    font-size: 0.875rem;
+    color: #1c1c1c;
+    resize: none;
+    -webkit-appearance: none;
+}
+.swiss-textarea:focus {
+    outline: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border-bottom: 1px solid #636747;
+}
+.swiss-textarea::placeholder {
+    color: #a8a29e;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+}
+</style>
+<div style="background-color: #e5e6df;">
+<!-- Hero Header - Swiss Style -->
+<div class="relative py-16 sm:py-20 lg:py-24 border-b border-dark-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2 tracking-tight">{{ __('checkout.title_subscription') }}</h1>
-                <p class="text-lg text-gray-600 font-light">{{ __('checkout.subtitle_subscription') }}</p>
-            </div>
-            <div class="hidden md:block">
-                <div class="w-14 h-14 rounded-full bg-gray-900 flex items-center justify-center">
-                    <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                    </svg>
-                </div>
-            </div>
+        <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-tight leading-[0.9]">
+            <span class="text-dark-800">{{ $currentLocale === 'en' ? 'SUBSCRIPTION CHECKOUT' : 'POKLADNA' }}</span>
+        </h1>
+        <div class="mt-6">
+            <span class="text-xs uppercase tracking-widest text-warm-500">{{ __('checkout.subtitle_subscription') }}</span>
         </div>
     </div>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
         <!-- Checkout Form -->
-        <div class="lg:col-span-2">
-            <form action="{{ localizedRoute('subscriptions.checkout.process') }}" method="POST" id="subscription-checkout-form" class="lg:pt-0">
+        <div class="lg:col-span-7">
+            <form action="{{ localizedRoute('subscriptions.checkout.process') }}" method="POST" id="subscription-checkout-form">
                 @csrf
                 
                 <!-- Hidden input for coupon code -->
                 <input type="hidden" name="coupon_code" value="{{ $appliedCoupon ? $appliedCoupon->code : '' }}" id="coupon_code_input">
                 
-                <!-- Contact Information -->
-                <div class="bg-white rounded-2xl p-6 border border-gray-200">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-900">{{ __('checkout.contact_info') }}</h2>
+                <!-- Contact Information - Swiss Style -->
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-6">
+                        <span class="text-primary-500 font-display text-4xl font-normal">01</span>
+                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.contact_info') }}</h2>
                     </div>
                     
                     @guest
-                    <!-- Login option for guests - Minimal -->
-                    <div class="mb-6 bg-blue-50 p-5 rounded-xl border border-blue-200">
-                        <div class="flex items-start">
-                            <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0 mr-3">
-                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-medium text-gray-900 mb-1.5">{{ __('checkout.have_account') }}</h3>
-                                <p class="text-sm text-gray-600 mb-3 font-light">{{ __('checkout.login_faster_subscription') }}</p>
-                                <a href="{{ localizedRoute('login') }}?redirect={{ urlencode(localizedRoute('subscriptions.checkout')) }}" class="inline-block bg-white hover:bg-gray-50 text-blue-600 font-medium px-5 py-2 rounded-full border border-blue-200 hover:border-blue-300 transition-all text-sm">
-                                    {{ __('checkout.login') }}
-                                </a>
-                            </div>
+                    <!-- Login option for guests - Swiss Style -->
+                    <div class="mb-8 py-4 border-b border-warm-300">
+                        <div class="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+                            <span class="text-xs uppercase tracking-widest text-warm-500">{{ __('checkout.have_account') }}</span>
+                            <a href="{{ localizedRoute('login') }}?redirect={{ urlencode(localizedRoute('subscriptions.checkout')) }}" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 border-b border-dark-800 hover:border-primary-500 pb-0.5 transition-colors">
+                                {{ __('checkout.login') }}
+                            </a>
                         </div>
                     </div>
                     @endguest
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('checkout.fields.name') }} <span class="text-red-500">*</span>
-                            </label>
-                            <input 
-                                type="text" 
-                                id="name" 
-                                name="name" 
-                                value="{{ old('name', auth()->user()->name ?? '') }}" 
-                                required
-                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                            >
+                    <div class="space-y-4">
+                        <div>
+                            <div class="swiss-field">
+                                <label for="name" class="swiss-field-label swiss-field-label-required">{{ __('checkout.fields.name') }}</label>
+                                <input 
+                                    type="text" 
+                                    id="name" 
+                                    name="name" 
+                                    value="{{ old('name', auth()->user()->name ?? '') }}" 
+                                    required
+                                    class="swiss-field-input"
+                                >
+                            </div>
                             @error('name')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                Email <span class="text-red-500">*</span>
-                            </label>
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email" 
-                                value="{{ old('email', auth()->user()->email ?? '') }}" 
-                                required
-                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                            >
-                            @error('email')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                            @guest
-                            <p class="text-xs text-gray-600 mt-1">{{ __('checkout.email_confirmation_note') }}</p>
-                            @endguest
-                        </div>
-
-                        <div>
-                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('checkout.fields.phone') }} <span class="text-red-500">*</span>
-                            </label>
-                            <input 
-                                type="tel" 
-                                id="phone" 
-                                name="phone" 
-                                value="{{ old('phone', auth()->user()->phone ?? '') }}" 
-                                required
-                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                                placeholder="+420 123 456 789"
-                            >
-                            @error('phone')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Billing Address -->
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-900">{{ __('checkout.billing_address') }}</h2>
-                    </div>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <label for="billing_address" class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('checkout.fields.street') }} <span class="text-red-500">*</span>
-                            </label>
-                            <input 
-                                type="text" 
-                                id="billing_address" 
-                                name="billing_address" 
-                                value="{{ old('billing_address', auth()->user()->address ?? '') }}" 
-                                required
-                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                                placeholder="{{ __('checkout.fields.street_placeholder') }}"
-                            >
-                            @error('billing_address')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="billing_city" class="block text-sm font-medium text-gray-700 mb-2">
-                                    {{ __('checkout.fields.city') }} <span class="text-red-500">*</span>
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="billing_city" 
-                                    name="billing_city" 
-                                    value="{{ old('billing_city', auth()->user()->city ?? '') }}" 
-                                    required
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                                    placeholder="{{ __('checkout.fields.city_placeholder') }}"
-                                >
-                                @error('billing_city')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                <div class="swiss-field">
+                                    <label for="email" class="swiss-field-label swiss-field-label-required">Email</label>
+                                    <input 
+                                        type="email" 
+                                        id="email" 
+                                        name="email" 
+                                        value="{{ old('email', auth()->user()->email ?? '') }}" 
+                                        required
+                                        class="swiss-field-input"
+                                    >
+                                </div>
+                                @error('email')
+                                    <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
                                 @enderror
+                                @guest
+                                <p class="text-xs text-warm-500 mt-2 uppercase tracking-widest">{{ __('checkout.email_confirmation_note') }}</p>
+                                @endguest
                             </div>
 
                             <div>
-                                <label for="billing_postal_code" class="block text-sm font-medium text-gray-700 mb-2">
-                                    {{ __('checkout.fields.postal_code') }} <span class="text-red-500">*</span>
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="billing_postal_code" 
-                                    name="billing_postal_code" 
-                                    value="{{ old('billing_postal_code', auth()->user()->postal_code ?? '') }}" 
-                                    required
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                                    placeholder="{{ __('checkout.fields.postal_code_placeholder') }}"
-                                >
-                                @error('billing_postal_code')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label for="billing_country" class="block text-sm font-medium text-gray-700 mb-2">
-                                    {{ __('checkout.fields.country') }} <span class="text-red-500">*</span>
-                                </label>
-                                <select 
-                                    id="billing_country" 
-                                    name="billing_country" 
-                                    required
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                                >
-                                    <option value="">{{ __('checkout.fields.select_country') }}</option>
-                                    @foreach($availableCountries as $code => $name)
-                                        <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? ($code === 'CZ' ? 'CZ' : '')) == $code ? 'selected' : '' }}>
-                                            {{ $name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('billing_country')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                <div class="swiss-field">
+                                    <label for="phone" class="swiss-field-label swiss-field-label-required">{{ __('checkout.fields.phone') }}</label>
+                                    <input 
+                                        type="tel" 
+                                        id="phone" 
+                                        name="phone" 
+                                        value="{{ old('phone', auth()->user()->phone ?? '') }}" 
+                                        required
+                                        class="swiss-field-input"
+                                        placeholder="+420 123 456 789"
+                                    >
+                                </div>
+                                @error('phone')
+                                    <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Packeta Pickup Point -->
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-900">{{ __('checkout.pickup_point.title') }}</h2>
+                <!-- Billing Address - Swiss Style -->
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-6">
+                        <span class="text-primary-500 font-display text-4xl font-normal">02</span>
+                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.billing_address') }}</h2>
                     </div>
                     
                     <div class="space-y-4">
+                        <div>
+                            <div class="swiss-field">
+                                <label for="billing_address" class="swiss-field-label swiss-field-label-required">{{ __('checkout.fields.street') }}</label>
+                                <input 
+                                    type="text" 
+                                    id="billing_address" 
+                                    name="billing_address" 
+                                    value="{{ old('billing_address', auth()->user()->address ?? '') }}" 
+                                    required
+                                    class="swiss-field-input"
+                                    placeholder="{{ __('checkout.fields.street_placeholder') }}"
+                                >
+                            </div>
+                            @error('billing_address')
+                                <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <div class="swiss-field">
+                                    <label for="billing_city" class="swiss-field-label swiss-field-label-required">{{ __('checkout.fields.city') }}</label>
+                                    <input 
+                                        type="text" 
+                                        id="billing_city" 
+                                        name="billing_city" 
+                                        value="{{ old('billing_city', auth()->user()->city ?? '') }}" 
+                                        required
+                                        class="swiss-field-input"
+                                        placeholder="{{ __('checkout.fields.city_placeholder') }}"
+                                    >
+                                </div>
+                                @error('billing_city')
+                                    <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <div class="swiss-field">
+                                    <label for="billing_postal_code" class="swiss-field-label swiss-field-label-required">{{ __('checkout.fields.postal_code') }}</label>
+                                    <input 
+                                        type="text" 
+                                        id="billing_postal_code" 
+                                        name="billing_postal_code" 
+                                        value="{{ old('billing_postal_code', auth()->user()->postal_code ?? '') }}" 
+                                        required
+                                        class="swiss-field-input"
+                                        placeholder="{{ __('checkout.fields.postal_code_placeholder') }}"
+                                    >
+                                </div>
+                                @error('billing_postal_code')
+                                    <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <div class="swiss-field">
+                                    <label for="billing_country" class="swiss-field-label swiss-field-label-required">{{ __('checkout.fields.country') }}</label>
+                                    <select 
+                                        id="billing_country" 
+                                        name="billing_country" 
+                                        required
+                                        class="swiss-field-select"
+                                    >
+                                        <option value="">{{ __('checkout.fields.select_country') }}</option>
+                                        @foreach($availableCountries as $code => $name)
+                                            <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? ($code === 'CZ' ? 'CZ' : '')) == $code ? 'selected' : '' }}>
+                                                {{ $name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @error('billing_country')
+                                    <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Packeta Pickup Point - Swiss Style -->
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-6">
+                        <span class="text-primary-500 font-display text-4xl font-normal">03</span>
+                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.pickup_point.title') }}</h2>
+                    </div>
+                    
+                    <div class="space-y-6">
                         <!-- Hidden fields for Packeta data -->
                         <input type="hidden" id="packeta_point_id" name="packeta_point_id" value="{{ old('packeta_point_id', auth()->user()->packeta_point_id ?? '') }}">
                         <input type="hidden" id="packeta_point_name" name="packeta_point_name" value="{{ old('packeta_point_name', auth()->user()->packeta_point_name ?? '') }}">
@@ -236,127 +298,85 @@
                         <!-- Packeta selection display -->
                         <div id="packeta-selection">
                             @if(old('packeta_point_id', auth()->user()->packeta_point_id ?? ''))
-                            <!-- Selected point display - Minimal -->
-                            <div id="selected-point" class="p-4 bg-primary-50 border border-primary-300 rounded-xl">
+                            <!-- Selected point display - Swiss Style -->
+                            <div id="selected-point" class="py-6">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
-                                        <div class="flex items-center mb-1.5">
-                                            <svg class="w-4 h-4 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                            </svg>
-                                            <span class="font-medium text-gray-900 text-sm">{{ __('checkout.pickup_point.selected') }}</span>
-                                        </div>
-                                        <p class="text-gray-900 font-medium ml-6" id="selected-point-name">{{ old('packeta_point_name', auth()->user()->packeta_point_name ?? '') }}</p>
-                                        <p class="text-sm text-gray-600 ml-6 font-light" id="selected-point-address">{{ old('packeta_point_address', auth()->user()->packeta_point_address ?? '') }}</p>
+                                        <span class="text-xs uppercase tracking-widest text-olive-500 block mb-2">{{ __('checkout.pickup_point.selected') }}</span>
+                                        <p class="font-display text-lg text-dark-800 uppercase tracking-tight" id="selected-point-name">{{ old('packeta_point_name', auth()->user()->packeta_point_name ?? '') }}</p>
+                                        <p class="text-xs uppercase tracking-widest text-warm-500 mt-1" id="selected-point-address">{{ old('packeta_point_address', auth()->user()->packeta_point_address ?? '') }}</p>
                                     </div>
-                                    <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-[#ba1b02] font-medium px-4 py-2 rounded-full border border-gray-200 whitespace-nowrap ml-4 transition-colors">
+                                    <button type="button" id="change-point-btn" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 border-b border-dark-800 hover:border-primary-500 pb-0.5 transition-colors whitespace-nowrap ml-4">
                                         {{ __('checkout.pickup_point.change') }}
                                     </button>
                                 </div>
                             </div>
                             @else
-                            <!-- Select button - Minimal -->
-                            <button type="button" id="select-point-btn" class="w-full flex items-center justify-center gap-2 bg-[#ba1b02] hover:bg-[#a01701] text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                            <!-- Select button - Swiss Style -->
+                            <button type="button" id="select-point-btn" class="group flex items-center gap-3 text-dark-800 hover:text-primary-500 transition-colors">
+                                <span class="text-xs uppercase tracking-widest border-b border-dark-800 group-hover:border-primary-500 pb-0.5">{{ __('checkout.pickup_point.select') }}</span>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                 </svg>
-                                <span>{{ __('checkout.pickup_point.select') }}</span>
                             </button>
                             @endif
                         </div>
 
                         @error('packeta_point_id')
-                            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                            <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
                         @enderror
 
-                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-start gap-2">
-                            <svg class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                            </svg>
-                            <p class="text-sm text-blue-700 font-light">
-                                {{ __('checkout.pickup_point.info') }}
-                            </p>
-                        </div>
+                        <p class="text-xs uppercase tracking-widest text-warm-400">
+                            {{ __('checkout.pickup_point.info') }}
+                        </p>
                     </div>
                 </div>
 
-                <!-- Payment Method - Minimal -->
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-900">{{ __('checkout.payment.title') }}</h2>
+                <!-- Payment Method - Swiss Style -->
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-6">
+                        <span class="text-primary-500 font-display text-4xl font-normal">04</span>
+                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.payment.title') }}</h2>
                     </div>
                     
-                    <!-- Single Payment Method Info - Minimal -->
-                    <div class="p-4 border border-primary-400 bg-primary-50 rounded-xl">
-                        <input type="hidden" name="payment_method" value="card">
-                        <div class="flex items-start gap-3">
-                            
-                            <div class="flex-1">
-                                <div class="font-bold text-gray-900 mb-1">{{ __('checkout.payment.card') }}</div>
-                                <div class="text-sm text-gray-600 mb-3 font-light">{{ __('checkout.payment.card_description') }}</div>
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-xs text-gray-500 font-medium">{{ __('checkout.payment.we_accept') }}</span>
-                                    <div class="flex items-center gap-2">
-                                        <div class="px-2.5 py-1 bg-white rounded-lg border border-gray-200">
-                                            <span class="text-xs font-semibold text-blue-700">Visa</span>
-                                        </div>
-                                        <div class="px-2.5 py-1 bg-white rounded-lg border border-gray-200">
-                                            <span class="text-xs font-semibold text-orange-600">Mastercard</span>
-                                        </div>
-                                        <div class="px-2.5 py-1 bg-white rounded-lg border border-gray-200">
-                                            <span class="text-xs font-semibold text-gray-700">Apple Pay</span>
-                                        </div>
-                                        <div class="px-2.5 py-1 bg-white rounded-lg border border-gray-200">
-                                            <span class="text-xs font-semibold text-blue-600">Google Pay</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <input type="hidden" name="payment_method" value="card">
+                    
+                    <div class="py-6">
+                        <p class="text-xs uppercase tracking-widest text-dark-800 mb-4">{{ __('checkout.payment.card') }}</p>
+                        <p class="text-xs uppercase tracking-widest text-warm-500">
+                            {{ __('checkout.payment.card_description_full') ?? __('checkout.payment.card_description') . ' ' . __('checkout.payment.we_accept') . ' VISA, MASTERCARD, APPLE PAY, GOOGLE PAY.' }}
+                        </p>
                     </div>
                 </div>
 
-                <!-- Additional Notes - Minimal -->
-                <div class="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-900">{{ __('checkout.fields.notes') }} <span class="text-base font-light text-gray-500">{{ __('checkout.fields.notes_optional') }}</span></h2>
+                <!-- Additional Notes - Swiss Style -->
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-6">
+                        <span class="text-primary-500 font-display text-4xl font-normal">05</span>
+                        <h2 class="font-display text-4xl font-normal text-dark-800 uppercase tracking-tight">
+                            {{ __('checkout.fields.notes') }}
+                            <span class="text-xs uppercase tracking-widest text-warm-500 ml-2">/ {{ __('checkout.fields.notes_optional') }}</span>
+                        </h2>
                     </div>
                     
                     <textarea 
                         id="delivery_notes" 
                         name="delivery_notes" 
                         rows="4" 
-                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        class="swiss-textarea"
                         placeholder="{{ __('checkout.fields.notes_placeholder') }}"
                     >{{ old('delivery_notes') }}</textarea>
                     @error('delivery_notes')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
                     @enderror
                 </div>
             </form>
         </div>
 
-        <!-- Order Summary Sidebar -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-2xl p-6 sticky top-24 border border-gray-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900">{{ __('checkout.subscription_summary') }}</h3>
-                </div>
+        <!-- Order Summary - On Olive Background -->
+        <div class="lg:col-span-5">
+            <div class="sticky top-24 bg-[#BCBEB1] p-8">
+                <h3 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-8">{{ __('checkout.subscription_summary') }}</h3>
                 
                 @php
                 $frequencyTexts = [
@@ -368,115 +388,79 @@
                 @endphp
                 
                 <!-- Subscription Details -->
-                <div class="bg-gray-100 p-6 rounded-xl mb-6 border border-gray-200">
-                    <div class="space-y-4 text-sm">
-                        <div class="flex justify-between items-start">
-                            <span class="text-gray-700 font-semibold">{{ __('checkout.subscription.quantity') }}</span>
-                            <span class="font-bold text-gray-900 text-right">{{ $configuration['amount'] }} {{ __('checkout.subscription.bags') }} ({{ $configuration['amount'] * 250 }}g)</span>
-                        </div>
-                        
-                        <div class="border-t border-gray-200 pt-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-gray-700 font-semibold">{{ __('checkout.subscription.coffee_type') }}</span>
-                                <span class="font-bold text-gray-900 text-right">
-                                    @if($configuration['type'] === 'espresso')
-                                        {{ __('checkout.subscription.espresso') }} @if($configuration['isDecaf']){{ __('checkout.subscription.incl_decaf') }}@endif
-                                    @elseif($configuration['type'] === 'filter')
-                                        {{ __('checkout.subscription.filter') }} @if($configuration['isDecaf']){{ __('checkout.subscription.incl_decaf') }}@endif
-                                    @else
-                                        {{ __('checkout.subscription.mix') }} @if($configuration['isDecaf']){{ __('checkout.subscription.incl_decaf') }}@endif
-                                    @endif
-                                </span>
-                            </div>
-                            
-                            @if($configuration['type'] === 'mix')
-                            <div class="mt-2 pl-4 space-y-1 text-xs text-gray-700">
-                                @if(isset($configuration['mix']['espresso']) && $configuration['mix']['espresso'] > 0)
-                                <div class="flex items-center">
-                                    <span class="text-primary-500 mr-2 font-bold">•</span>
-                                    {{ $configuration['mix']['espresso'] }}× Espresso
-                                </div>
-                                @endif
-                                @if(isset($configuration['mix']['filter']) && $configuration['mix']['filter'] > 0)
-                                <div class="flex items-center">
-                                    <span class="text-primary-500 mr-2 font-bold">•</span>
-                                    {{ $configuration['mix']['filter'] }}× Filtr
-                                </div>
-                                @endif
-                            </div>
+                <div class="mb-8 space-y-4">
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.subscription.quantity') }}</span>
+                        <span class="text-sm text-dark-800 uppercase tracking-wide text-right">{{ $configuration['amount'] }} {{ __('checkout.subscription.bags') }} ({{ $configuration['amount'] * 250 }}g)</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.subscription.coffee_type') }}</span>
+                        <span class="text-sm text-dark-800 uppercase tracking-wide text-right">
+                            @if($configuration['type'] === 'espresso')
+                                {{ __('checkout.subscription.espresso') }} @if($configuration['isDecaf']){{ __('checkout.subscription.incl_decaf') }}@endif
+                            @elseif($configuration['type'] === 'filter')
+                                {{ __('checkout.subscription.filter') }} @if($configuration['isDecaf']){{ __('checkout.subscription.incl_decaf') }}@endif
+                            @else
+                                {{ __('checkout.subscription.mix') }} @if($configuration['isDecaf']){{ __('checkout.subscription.incl_decaf') }}@endif
                             @endif
-                        </div>
-                        
-                        <div class="flex justify-between items-center border-t border-gray-200 pt-4">
-                            <span class="text-gray-700 font-semibold">{{ __('checkout.subscription.frequency') }}</span>
-                            <span class="font-bold text-gray-900">{{ $frequencyText }}</span>
-                        </div>
+                        </span>
+                    </div>
+                    
+                    @if($configuration['type'] === 'mix')
+                    <div class="text-xs text-olive-600 uppercase tracking-widest text-right">
+                        @if(isset($configuration['mix']['espresso']) && $configuration['mix']['espresso'] > 0)
+                        <div>{{ $configuration['mix']['espresso'] }}× ESPRESSO</div>
+                        @endif
+                        @if(isset($configuration['mix']['filter']) && $configuration['mix']['filter'] > 0)
+                        <div>{{ $configuration['mix']['filter'] }}× FILTR</div>
+                        @endif
+                    </div>
+                    @endif
+                    
+                    <div class="flex justify-between items-baseline">
+                        <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.subscription.frequency') }}</span>
+                        <span class="text-sm text-dark-800 uppercase tracking-wide">{{ $frequencyText }}</span>
                     </div>
                 </div>
 
-                <!-- Shipping Date Info - Minimal -->
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
-                    <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0 mr-3">
-                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-medium text-gray-900 mb-2">{{ __('checkout.delivery_info.title') }}</h3>
-                            <p class="text-sm text-gray-800 mb-2 font-medium">
-                                {{ $shippingInfo['cutoff_message'] }}
-                            </p>
-                            <p class="text-xs text-gray-600 leading-relaxed font-light">
-                                {!! __('checkout.delivery_info.shipping_note') !!}
-                            </p>
-                        </div>
-                    </div>
+                <!-- Shipping Date Info - Swiss Style -->
+                <div class="mb-8">
+                    <p class="text-xs uppercase tracking-widest text-olive-600 mb-2">{{ __('checkout.delivery_info.title') }}</p>
+                    <p class="text-sm text-dark-800">
+                        {{ $shippingInfo['cutoff_message'] }}
+                    </p>
                 </div>
 
-                <!-- Coupon Section -->
-                <div class="mb-6 pb-6 border-b border-gray-200">
+                <!-- Coupon Section - On Olive -->
+                <div class="mb-8">
                     @if(session('coupon_error'))
-                        <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-3">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                </svg>
-                                <span class="text-sm text-red-800">{{ session('coupon_error') }}</span>
-                            </div>
-                        </div>
+                        <p class="text-xs uppercase tracking-widest text-red-600 mb-4">STATUS / {{ strtoupper(session('coupon_error')) }}</p>
                     @endif
                     
                     @if($appliedCoupon ?? null)
-                        <div class="bg-green-50 border border-green-200 rounded-xl p-4" id="applied-coupon-display">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span class="text-sm font-medium text-green-800">{{ __('checkout.coupon.applied') }}</span>
-                                </div>
-                                <a href="{{ localizedRoute('subscriptions.checkout', ['remove_coupon' => 1]) }}" class="text-xs text-red-600 hover:text-red-800 hover:underline" onclick="document.getElementById('coupon_code_input').value = '';">
-                                    {{ __('checkout.coupon.remove') }}
-                                </a>
-                            </div>
-                            <p class="text-sm text-green-700 font-mono font-bold">{{ $appliedCoupon->code }}</p>
-                            <p class="text-xs text-green-600 mt-1">{{ $appliedCoupon->getSubscriptionDiscountDescription() }}</p>
+                        <div class="flex items-baseline justify-between mb-2">
+                            <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.coupon.applied') }}</span>
+                            <a href="{{ localizedRoute('subscriptions.checkout', ['remove_coupon' => 1]) }}" class="text-xs uppercase tracking-widest text-olive-500 hover:text-primary-500 transition-colors" onclick="document.getElementById('coupon_code_input').value = '';">
+                                {{ __('checkout.coupon.remove') }}
+                            </a>
                         </div>
+                        <p class="font-display text-lg text-dark-800 uppercase tracking-tight">{{ $appliedCoupon->code }}</p>
+                        <p class="text-xs uppercase tracking-widest text-olive-600 mt-1">{{ $appliedCoupon->getSubscriptionDiscountDescription() }}</p>
                     @else
                         <details class="group" {{ request()->has('coupon_code') ? 'open' : '' }}>
-                            <summary class="flex items-center justify-between cursor-pointer p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                                <span class="text-sm font-medium text-gray-700">{{ __('checkout.coupon.title') }}</span>
-                                <svg class="w-5 h-5 text-gray-600 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <summary class="flex items-center justify-between cursor-pointer py-2 hover:text-primary-500 transition-colors">
+                                <span class="text-xs uppercase tracking-widest text-dark-800 group-hover:text-primary-500">{{ __('checkout.coupon.title') }}</span>
+                                <svg class="w-4 h-4 text-olive-500 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </summary>
-                            <form method="GET" action="{{ localizedRoute('subscriptions.checkout') }}" class="mt-3">
-                                <div class="flex gap-2">
+                            <form method="GET" action="{{ localizedRoute('subscriptions.checkout') }}" class="mt-4">
+                                <div class="flex gap-3">
                                     <input type="text" name="coupon_code" placeholder="{{ __('checkout.coupon.placeholder') }}" 
-                                        class="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-primary-500 focus:border-primary-500 uppercase text-sm"
+                                        class="flex-1 uppercase py-2 bg-white border-none text-sm text-dark-800 px-3"
                                         value="{{ request('coupon_code') }}">
-                                    <button type="submit" class="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
+                                    <button type="submit" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 border-b border-dark-800 hover:border-primary-500 pb-0.5 transition-colors whitespace-nowrap">
                                         {{ __('checkout.coupon.apply') }}
                                     </button>
                                 </div>
@@ -487,133 +471,105 @@
 
                 <!-- 100% Discount Notice -->
                 @if($price <= 0 && ($discount ?? 0) > 0)
-                <div class="bg-green-50 border-2 border-green-300 rounded-xl p-5 mb-6">
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-green-900 mb-1 text-base">{{ __('checkout.full_discount.title') }}</h3>
-                            <p class="text-sm text-green-800">
-                                {!! __('checkout.full_discount.description', ['code' => $appliedCoupon->code]) !!}
-                            </p>
-                        </div>
-                    </div>
+                <div class="mb-8">
+                    <p class="text-xs uppercase tracking-widest text-olive-600 mb-2">{{ __('checkout.full_discount.title') }}</p>
+                    <p class="text-sm text-dark-800">
+                        {!! __('checkout.full_discount.description', ['code' => $appliedCoupon->code]) !!}
+                    </p>
                 </div>
                 @endif
 
-                <!-- Price Summary -->
-                <dl class="space-y-3 mb-6">
-                    <!-- Doprava (first) -->
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <dt class="text-gray-600 text-sm">{{ __('checkout.shipping') }}:</dt>
-                        <dd class="font-bold" id="shipping-cost">
-                            @if(isset($shipping) && $shipping == 0)
-                                <span class="text-green-600 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    {{ __('checkout.shipping_free') }}
-                                </span>
-                            @elseif(isset($shipping) && $shipping > 0)
-                                <span class="text-gray-900">{{ \App\Helpers\CurrencyHelper::formatAmount($shipping) }}</span>
-                            @else
-                                <span class="text-gray-500 text-sm">{{ __('checkout.shipping_at_checkout') }}</span>
-                            @endif
+                <!-- Price Summary - Clean on Olive -->
+                <dl class="space-y-3">
+                    <!-- Shipping -->
+                    <div class="flex justify-between items-baseline">
+                        <dt class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.shipping') }}</dt>
+                        <dd class="text-sm uppercase tracking-wide">
+                            <span id="shipping-cost">
+                                @if(isset($shipping) && $shipping == 0)
+                                <span class="text-dark-800">{{ $currentLocale === 'en' ? 'FREE' : 'ZDARMA' }}</span>
+                                @elseif(isset($shipping) && $shipping > 0)
+                                <span class="text-dark-800">{{ \App\Helpers\CurrencyHelper::formatAmount($shipping) }}</span>
+                                @else
+                                <span class="text-olive-500">{{ __('checkout.shipping_at_checkout') }}</span>
+                                @endif
+                            </span>
                         </dd>
                     </div>
                     
-                    <!-- Coupon discount (prominently displayed) -->
+                    <!-- Coupon discount -->
                     @if(($adjustedDiscount ?? 0) > 0)
-                    <div class="flex justify-between items-center py-3 border-b-2 border-green-200 bg-green-50 -mx-6 px-6">
-                        <dt class="text-green-700 font-semibold flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                            </svg>
-                            <span>{{ __('checkout.discount') }} {{ $appliedCoupon->code ?? '' }}:</span>
-                        </dt>
-                        <dd class="font-bold text-green-600 text-lg">-{{ \App\Helpers\CurrencyHelper::formatAmount($adjustedDiscount) }}</dd>
+                    <div class="flex justify-between items-baseline">
+                        <dt class="text-xs uppercase tracking-widest text-olive-700">{{ __('checkout.discount') }} {{ $appliedCoupon->code ?? '' }}</dt>
+                        <dd class="text-sm text-olive-700 uppercase tracking-wide">-{{ \App\Helpers\CurrencyHelper::formatAmount($adjustedDiscount) }}</dd>
                     </div>
                     @endif
                     
                     <!-- Subtotal without VAT -->
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <dt class="text-gray-600 text-sm">{{ $configuration['amount'] }}× {{ __('checkout.subscription.bags_without_vat') }}</dt>
-                        <dd class="font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::formatAmount($priceWithoutVat, 2) }}</dd>
+                    <div class="flex justify-between items-baseline">
+                        <dt class="text-xs uppercase tracking-widest text-olive-600">{{ $configuration['amount'] }}× {{ __('checkout.subscription.bags_without_vat') }}</dt>
+                        <dd class="text-sm text-dark-800 uppercase tracking-wide">{{ \App\Helpers\CurrencyHelper::formatAmount($priceWithoutVat, 2) }}</dd>
                     </div>
                     
                     <!-- VAT -->
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <dt class="text-gray-600 text-sm">{{ __('checkout.vat') }}:</dt>
-                        <dd class="font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::formatAmount($vat, 2) }}</dd>
+                    <div class="flex justify-between items-baseline">
+                        <dt class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.vat') }}</dt>
+                        <dd class="text-sm text-dark-800 uppercase tracking-wide">{{ \App\Helpers\CurrencyHelper::formatAmount($vat, 2) }}</dd>
                     </div>
 
                     <!-- Total -->
-                    <div class="border-t border-gray-200 pt-5 mt-2">
-                        <div class="flex justify-between items-center mb-1">
-                            <dt class="font-bold text-gray-900 text-lg">{{ __('checkout.total_per_month') }}:</dt>
-                            <dd class="text-3xl font-bold text-gray-900" id="total-cost">
-                                {{ \App\Helpers\CurrencyHelper::formatAmount($price + ($shipping ?? 0)) }}
-                            </dd>
-                        </div>
-                        <p class="text-xs text-gray-500 text-right mt-1" id="total-note">
-                            ({{ $frequencyText }}, {{ __('checkout.incl_vat') }}{{ isset($shipping) && $shipping > 0 ? ' ' . __('checkout.plus_shipping') : '' }})
-                        </p>
+                    <div class="flex justify-between items-baseline pt-6 mt-4 border-t border-dark-800">
+                        <dt class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.total_per_month') }}</dt>
+                        <dd class="font-display text-2xl sm:text-3xl text-dark-800 uppercase tracking-tight" id="total-cost">
+                            {{ \App\Helpers\CurrencyHelper::formatAmount($price + ($shipping ?? 0)) }}
+                        </dd>
                     </div>
+                    <p class="text-xs uppercase tracking-widest text-olive-500 text-right">{{ $frequencyText }} / {{ __('checkout.incl_vat') }}</p>
                 </dl>
 
-                <button type="submit" form="subscription-checkout-form" class="group w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200 mb-3">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span>{{ __('checkout.buttons.complete_order') }}</span>
-                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                </button>
+                <!-- CTA Buttons -->
+                <div class="mt-8 space-y-4">
+                    <button type="submit" form="subscription-checkout-form" class="group w-full flex items-center justify-center gap-3 bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all duration-200">
+                        <span>{{ __('checkout.buttons.complete_order') }}</span>
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </button>
 
-                <div class="flex items-start mb-4 p-3 bg-gray-50 rounded-xl">
-                    <input type="checkbox" id="terms" required form="subscription-checkout-form" class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mr-2.5 mt-0.5 flex-shrink-0">
-                    <label for="terms" class="text-xs text-gray-600 font-light">
-                        {{ __('checkout.terms.agree') }} <a href="{{ localizedRoute('terms-of-service') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium underline">{{ __('checkout.terms.terms_of_service') }}</a> 
-                        {{ __('checkout.terms.and') }} <a href="{{ localizedRoute('privacy-policy') }}" target="_blank" class="text-primary-600 hover:text-primary-700 font-medium underline">{{ __('checkout.terms.privacy_policy') }}</a>
-                    </label>
+                    <div class="flex items-start py-4">
+                        <input type="checkbox" id="terms" required form="subscription-checkout-form" class="w-4 h-4 text-dark-800 border-dark-800 focus:ring-olive-500 mr-3 mt-0.5 flex-shrink-0">
+                        <label for="terms" class="text-xs uppercase tracking-widest text-olive-600">
+                            {{ __('checkout.terms.agree') }} <a href="{{ localizedRoute('terms-of-service') }}" target="_blank" class="text-dark-800 hover:text-primary-500 border-b border-dark-800 hover:border-primary-500 transition-colors">{{ __('checkout.terms.terms_of_service') }}</a> 
+                            {{ __('checkout.terms.and') }} <a href="{{ localizedRoute('privacy-policy') }}" target="_blank" class="text-dark-800 hover:text-primary-500 border-b border-dark-800 hover:border-primary-500 transition-colors">{{ __('checkout.terms.privacy_policy') }}</a>
+                        </label>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="{{ localizedRoute('subscriptions.index') }}" class="inline-block text-xs uppercase tracking-widest text-olive-600 hover:text-dark-800 border-b border-olive-400 hover:border-dark-800 pb-1 transition-colors">
+                            {{ __('checkout.buttons.back_to_configurator') }}
+                        </a>
+                    </div>
                 </div>
 
-                <a href="{{ localizedRoute('subscriptions.index') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200 flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span>{{ __('checkout.buttons.back_to_configurator') }}</span>
-                </a>
-
-                <!-- Trust Badges - Minimal -->
-                <div class="mt-6 pt-6 border-t border-gray-100 space-y-2.5">
-                    <div class="flex items-center text-sm text-gray-600 font-light">
-                        <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>{{ __('checkout.trust.no_commitment') }}</span>
+                <!-- Trust Indicators - On Olive -->
+                <div class="mt-10 pt-6 border-t border-dark-800 space-y-2">
+                    <div class="text-xs uppercase tracking-widest text-olive-600">
+                        <span class="inline-block w-1 h-1 bg-olive-500 rounded-full mr-1"></span>
+                        {{ __('checkout.trust.no_commitment') }}
                     </div>
-                    <div class="flex items-center text-sm text-gray-600 font-light">
-                        <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>{{ __('checkout.trust.fresh_coffee') }}</span>
+                    <div class="text-xs uppercase tracking-widest text-olive-600">
+                        <span class="inline-block w-1 h-1 bg-olive-500 rounded-full mr-1"></span>
+                        {{ __('checkout.trust.fresh_coffee') }}
                     </div>
-                    <div class="flex items-center text-sm text-gray-600 font-light">
-                        <svg class="w-4 h-4 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>{{ __('checkout.trust.free_shipping_always') }}</span>
+                    <div class="text-xs uppercase tracking-widest text-olive-600">
+                        <span class="inline-block w-1 h-1 bg-olive-500 rounded-full mr-1"></span>
+                        {{ __('checkout.trust.free_shipping_always') }}
                     </div>
                 </div>
             </div>
         </div>
-        </div>
     </div>
+</div>
 </div>
 
 <script src="https://widget.packeta.com/v6/www/js/library.js"></script>
@@ -653,12 +609,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedPoint = document.getElementById('selected-point');
         if (selectedPoint) {
             selectionDiv.innerHTML = `
-                <button type="button" id="select-point-btn" class="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
+                <button type="button" id="select-point-btn" class="group flex items-center gap-3 text-dark-800 hover:text-primary-500 transition-colors">
+                    <span class="text-xs uppercase tracking-widest border-b border-dark-800 group-hover:border-primary-500 pb-0.5">{{ __('checkout.pickup_point.select') }}</span>
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
-                    {{ __('checkout.pickup_point.select') }}
                 </button>
             `;
             // Re-attach event listener
@@ -668,10 +623,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show loading state
         const shippingCostElement = document.getElementById('shipping-cost');
         const totalCostElement = document.getElementById('total-cost');
-        const totalNoteElement = document.getElementById('total-note');
         
         if (shippingCostElement) {
-            shippingCostElement.innerHTML = '<span class="text-gray-500">{{ __('checkout.shipping_calculating') }}</span>';
+            shippingCostElement.innerHTML = '<span class="text-xs uppercase tracking-widest text-olive-500">{{ __('checkout.shipping_calculating') }}</span>';
         }
         
         // AJAX request to get carrier and shipping cost for this country
@@ -697,16 +651,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const shippingCost = parseFloat(data.shipping) || 0;
                 if (shippingCostElement) {
                     if (shippingCost === 0) {
-                        shippingCostElement.innerHTML = `
-                            <span class="text-green-600 flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                </svg>
-                                {{ __('checkout.shipping_free') }}
-                            </span>
-                        `;
+                        shippingCostElement.innerHTML = '<span class="text-dark-800">{{ $currentLocale === "en" ? "FREE" : "ZDARMA" }}</span>';
                     } else {
-                        shippingCostElement.innerHTML = `<span class="text-gray-900">${data.shipping_formatted}</span>`;
+                        shippingCostElement.innerHTML = `<span class="text-dark-800">${data.shipping_formatted}</span>`;
                     }
                 }
                 
@@ -716,23 +663,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (totalCostElement) {
                     totalCostElement.textContent = formatCurrency(newTotal);
                 }
-                
-                // Update total note
-                if (totalNoteElement) {
-                    const shippingNote = shippingCost > 0 ? ' {{ __('checkout.plus_shipping') }}' : '';
-                    totalNoteElement.textContent = `(${frequencyText}, {{ __('checkout.incl_vat') }}${shippingNote})`;
-                }
             } else {
                 alert('{{ __('checkout.errors.subscription_country_unavailable') }}');
                 if (shippingCostElement) {
-                    shippingCostElement.innerHTML = '<span class="text-gray-500 text-sm">{{ __('checkout.shipping_unavailable') }}</span>';
+                    shippingCostElement.innerHTML = '<span class="text-xs uppercase tracking-widest text-olive-500">{{ __('checkout.shipping_unavailable') }}</span>';
                 }
             }
         })
         .catch(error => {
             console.error('Error getting carrier info:', error);
             if (shippingCostElement) {
-                shippingCostElement.innerHTML = '<span class="text-red-500">{{ __('checkout.shipping_error') }}</span>';
+                shippingCostElement.innerHTML = '<span class="text-xs uppercase tracking-widest text-red-500">{{ __('checkout.shipping_error') }}</span>';
             }
         });
     });
@@ -781,22 +722,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 document.getElementById('packeta_point_address').value = address;
 
-                // Update UI to show selected point - Minimal
+                // Update UI to show selected point - Swiss Style
                 const selectionDiv = document.getElementById('packeta-selection');
                 selectionDiv.innerHTML = `
-                    <div id="selected-point" class="p-4 bg-primary-50 border border-primary-300 rounded-xl">
+                    <div id="selected-point" class="py-6">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <div class="flex items-center mb-1.5">
-                                    <svg class="w-4 h-4 text-primary-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span class="font-medium text-gray-900 text-sm">{{ __('checkout.pickup_point.selected') }}</span>
-                                </div>
-                                <p class="text-gray-900 font-medium ml-6">${point.name}</p>
-                                <p class="text-sm text-gray-600 ml-6 font-light">${address}</p>
+                                <span class="text-xs uppercase tracking-widest text-olive-500 block mb-2">{{ __('checkout.pickup_point.selected') }}</span>
+                                <p class="font-display text-lg text-dark-800 uppercase tracking-tight">${point.name}</p>
+                                <p class="text-xs uppercase tracking-widest text-warm-500 mt-1">${address}</p>
                             </div>
-                            <button type="button" id="change-point-btn" class="text-sm bg-white hover:bg-gray-50 text-[#ba1b02] font-medium px-4 py-2 rounded-full border border-gray-200 whitespace-nowrap ml-4 transition-colors">
+                            <button type="button" id="change-point-btn" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 border-b border-dark-800 hover:border-primary-500 pb-0.5 transition-colors whitespace-nowrap ml-4">
                                 {{ __('checkout.pickup_point.change') }}
                             </button>
                         </div>
@@ -822,4 +758,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
-

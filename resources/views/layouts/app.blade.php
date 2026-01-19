@@ -106,7 +106,7 @@
     <!-- Banner - end -->
 
     <!-- Navigation - Quiet Luxury -->
-    <header class="sticky top-0 z-50 border-b border-black" style="background-color: rgb(245, 245, 244);">
+    <header class="sticky top-0 z-50 border-b border-black" style="background-color: #e5e6df;">
         <div class="mx-auto max-w-screen-xl px-4 md:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
@@ -179,7 +179,7 @@
         </div>
 
         <!-- Mobile Navigation -->
-        <div id="mobile-menu" class="lg:hidden absolute top-full left-0 right-0 border-t border-black" style="display: none; background-color: rgb(245, 245, 244);">
+        <div id="mobile-menu" class="lg:hidden absolute top-full left-0 right-0 border-t border-black" style="display: none; background-color: #e5e6df;">
             <div class="px-6 py-6 space-y-1">
                 <!-- Navigation Links -->
                 <a href="{{ route('home') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 uppercase tracking-wide transition-colors duration-200">

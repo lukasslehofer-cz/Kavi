@@ -8,7 +8,7 @@
 .swiss-field {
     display: flex;
     align-items: baseline;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #BCBEB1;
     transition: border-color 0.2s;
 }
 .swiss-field:focus-within {
@@ -33,7 +33,7 @@
     background: transparent;
     border: none;
     font-size: 0.875rem;
-    color: #1c1917;
+    color: #1c1c1c;
     -webkit-appearance: none;
 }
 .swiss-field-input:focus {
@@ -50,7 +50,7 @@
     background: transparent;
     border: none;
     font-size: 0.875rem;
-    color: #1c1917;
+    color: #1c1c1c;
     cursor: pointer;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -71,9 +71,9 @@
     padding: 0.75rem 0;
     background: transparent;
     border: none;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #BCBEB1;
     font-size: 0.875rem;
-    color: #1c1917;
+    color: #1c1c1c;
     resize: none;
     -webkit-appearance: none;
 }
@@ -95,9 +95,9 @@
     padding: 0.75rem 0;
     background: transparent;
     border: none;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #BCBEB1;
     font-size: 0.875rem;
-    color: #1c1917;
+    color: #1c1c1c;
     -webkit-appearance: none;
 }
 .swiss-input:focus {
@@ -117,7 +117,7 @@
     color: #dc2626;
 }
 </style>
-<div style="background-color: rgb(245, 245, 244);">
+<div style="background-color: #e5e6df;">
 <!-- Hero Header - Swiss Style -->
 <div class="relative py-16 sm:py-20 lg:py-24 border-b border-dark-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -315,7 +315,7 @@
                     
                     <div class="space-y-4">
                         <!-- Checkbox row styled like terms checkbox -->
-                        <div class="flex items-start py-4 border-b border-[#e5e5e5]" id="subscription-addon-checkbox-wrapper">
+                        <div class="flex items-start py-4 border-b border-[#BCBEB1]" id="subscription-addon-checkbox-wrapper">
                             <input 
                                 type="checkbox" 
                                 id="ship_with_subscription_checkbox" 
@@ -808,7 +808,7 @@
 
         <!-- Order Summary - On Olive Background -->
         <div class="lg:col-span-5">
-            <div class="sticky top-24 bg-olive-100 p-8">
+            <div class="sticky top-24 bg-[#BCBEB1] p-8">
                 <h3 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-8">{{ __('checkout.order_summary') }}</h3>
                 
                 <!-- Order Items - Clean on Olive -->
@@ -959,7 +959,7 @@
 
 <!-- Magic Link Modal - Swiss Style -->
 <div id="magic-link-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="max-w-md w-full p-8" style="background-color: rgb(245, 245, 244);">
+    <div class="max-w-md w-full p-8" style="background-color: #e5e6df;">
         <div class="flex items-center justify-between mb-6">
             <h3 class="font-display text-2xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.magic_link_title') }}</h3>
             <button onclick="closeMagicLinkModal()" class="text-warm-400 hover:text-dark-800 transition-colors">

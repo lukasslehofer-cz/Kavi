@@ -115,7 +115,7 @@
 @endsection
 
 @section('content')
-<div style="background-color: rgb(245, 245, 244);">
+<div style="background-color: #e5e6df;">
 
   <!-- Hero Section - Split Screen -->
   <div class="relative">
@@ -123,11 +123,11 @@
       
       <!-- Left Side - Product Photo (sticky to menu bottom) -->
       <div class="lg:col-span-6 relative lg:sticky lg:top-[64px] lg:h-[calc(100vh-64px)]">
-        <div class="h-full w-full overflow-hidden" style="background-color: rgb(245, 245, 244);">
+        <div class="h-full w-full overflow-hidden" style="background-color: #e5e6df;">
           @if($product->image)
           <img src="{{ asset($product->image) }}" 
                alt="{{ $product->getName() }}" 
-               class="w-full h-full object-contain lg:object-cover lg:object-center p-8 lg:p-0 lg:pl-0">
+               class="w-full h-full object-contain p-8 lg:p-12">
           @else
           <div class="w-full h-full flex items-center justify-center">
             <span class="font-display text-4xl text-warm-400 uppercase tracking-tight">{{ $product->getName() }}</span>
@@ -348,11 +348,11 @@
       <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="group block">
         
         <!-- Product Image -->
-        <div class="relative aspect-square overflow-hidden bg-warm-100 mb-4">
+        <div class="relative aspect-square overflow-hidden mb-4">
           @if($relatedProduct->image)
           <img src="{{ asset($relatedProduct->image) }}" 
                alt="{{ $relatedProduct->getName() }}" 
-               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+               class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
           @else
           <div class="w-full h-full flex items-center justify-center">
             <span class="text-warm-400 text-sm">{{ $relatedProduct->getName() }}</span>
@@ -404,7 +404,7 @@
   @endif
 
   <!-- Bottom CTA -->
-  <div class="relative pt-8 sm:pt-10 lg:pt-14 pb-20 sm:pb-24 lg:pb-28" style="background-color: rgb(245, 245, 244);">
+  <div class="relative pt-8 sm:pt-10 lg:pt-14 pb-20 sm:pb-24 lg:pb-28" style="background-color: #e5e6df;">
     <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
       <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
         <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">

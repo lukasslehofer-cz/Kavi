@@ -16,7 +16,7 @@
 
 @section('content')
 <!-- Hero Header Section - Editorial Layout -->
-<div class="relative" style="background-color: rgb(245, 245, 244);">
+<div class="relative" style="background-color: #e5e6df;">
   
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     
@@ -42,7 +42,7 @@
 </div>
 
 <!-- Main Content -->
-<div class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: rgb(245, 245, 244);">
+<div class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: #e5e6df;">
     <div class="mx-auto max-w-screen-xl px-4 md:px-8">
         
         @if($roasteries->count() > 0 && $coffees->count() > 0)
@@ -151,14 +151,14 @@
                 <!-- Coffee Index - Horizontal Rows -->
                 <div class="mb-6">
                     @foreach($coffees as $coffee)
-                    <div class="group py-6 sm:py-8 cursor-pointer hover:bg-warm-50 transition-colors border-b border-warm-300 {{ $loop->first ? 'border-t border-t-warm-300' : '' }}" onclick="openCoffeeModal{{ $coffee->id }}()">
+                    <div class="group py-6 sm:py-8 cursor-pointer hover:bg-warm-300/30 transition-colors border-b border-warm-300 {{ $loop->first ? 'border-t border-t-warm-300' : '' }}" onclick="openCoffeeModal{{ $coffee->id }}()">
                         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
                             <!-- Coffee Image - Small, Crisp -->
-                            <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden bg-warm-100">
+                            <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden">
                             @if($coffee->image)
                             <img src="{{ asset($coffee->image) }}" 
                                  alt="{{ $coffee->name }}"
-                                     class="w-full h-full object-cover">
+                                     class="w-full h-full object-contain">
                             @else
                                 <div class="w-full h-full flex items-center justify-center">
                                     <span class="font-display text-2xl text-warm-400">{{ substr($coffee->getName(), 0, 1) }}</span>
@@ -222,18 +222,18 @@
 
                     <!-- Modal for Coffee Detail - Editorial Style -->
                     <div id="coffeeModal{{ $coffee->id }}" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onclick="closeCoffeeModal{{ $coffee->id }}(event)">
-                        <div class="bg-[rgb(245,245,244)] max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                        <div class="bg-[#e5e6df] max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
                             <div class="relative">
                                 @if($coffee->image)
-                                <div class="aspect-[4/3] w-full overflow-hidden bg-warm-100">
+                                <div class="aspect-[4/3] w-full overflow-hidden">
                                   <img src="{{ asset($coffee->image) }}" 
                                        alt="{{ $coffee->name }}"
-                                       class="w-full h-full object-cover">
+                                       class="w-full h-full object-contain">
                                 </div>
                                 @endif
                                 
                                 <button onclick="closeCoffeeModal{{ $coffee->id }}()" 
-                                        class="absolute top-4 right-4 bg-[rgb(245,245,244)] p-2 hover:bg-warm-200 transition-colors">
+                                        class="absolute top-4 right-4 bg-[#e5e6df] p-2 hover:bg-warm-200 transition-colors">
                                     <svg class="w-6 h-6 text-dark-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -396,7 +396,7 @@
 
 <!-- Final CTA Section - Clean Typographic Block -->
 @if($roasteries->count() > 0 && $coffees->count() > 0)
-<div class="relative pt-10 sm:pt-12 lg:pt-16 pb-16 sm:pb-20 lg:pb-24" style="background-color: rgb(245, 245, 244);">
+<div class="relative pt-10 sm:pt-12 lg:pt-16 pb-16 sm:pb-20 lg:pb-24" style="background-color: #e5e6df;">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->

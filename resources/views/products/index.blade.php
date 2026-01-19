@@ -16,7 +16,7 @@
 
 @section('content')
 <!-- Hero Header Section - Editorial Layout -->
-<div class="relative" style="background-color: rgb(245, 245, 244);">
+<div class="relative" style="background-color: #e5e6df;">
   
   
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
@@ -38,7 +38,7 @@
 </div>
 
 <!-- Main Content -->
-<div class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: rgb(245, 245, 244);">
+<div class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: #e5e6df;">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
     <!-- Filters - Minimalist Tab Bar -->
@@ -78,9 +78,9 @@
       <!-- product - start -->
       <a href="{{ localizedRoute('products.show', $product) }}" class="group block">
         <!-- Image Container - No Frame -->
-        <div class="relative aspect-square overflow-hidden bg-warm-100 mb-4">
+        <div class="relative aspect-square overflow-hidden mb-4">
           @if($product->image)
-          <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105" />
+          <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-contain object-center transition duration-500 group-hover:scale-105" />
           @else
           <div class="h-full w-full flex flex-col items-center justify-center p-8">
             <span class="font-display text-4xl text-warm-300">{{ substr($product->getName(), 0, 1) }}</span>
@@ -218,7 +218,7 @@
 </div>
 
 <!-- CTA Section - Editorial Style -->
-<div class="relative pt-12 sm:pt-16 lg:pt-20 pb-20 sm:pb-24 lg:pb-28" style="background-color: rgb(245, 245, 244);">
+<div class="relative pt-12 sm:pt-16 lg:pt-20 pb-20 sm:pb-24 lg:pb-28" style="background-color: #e5e6df;">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->

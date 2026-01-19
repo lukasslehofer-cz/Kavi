@@ -243,7 +243,7 @@
 </div>
 
 <!-- Features Section -->
-<div class="relative py-20 sm:py-24 md:py-28 lg:py-36" style="background-color: rgb(245, 245, 244);">
+<div class="relative py-20 sm:py-24 md:py-28 lg:py-36" style="background-color: #e5e6df;">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
     <div class="mb-16 sm:mb-20 max-w-2xl">
@@ -304,7 +304,7 @@
       </div>
 
     <!-- Right Side - Content on light background -->
-    <div class="bg-stone-100 flex flex-col justify-between p-6 sm:p-8 lg:p-12 xl:p-16">
+    <div class="bg-[#e5e6df] flex flex-col justify-between p-6 sm:p-8 lg:p-12 xl:p-16">
       
       <!-- Main content -->
       <div class="space-y-8">
@@ -355,7 +355,7 @@
 </div>
 
 <!-- Subscription Plans Section - Horizontal Tiers -->
-<div class="relative overflow-hidden" style="background-color: rgb(245 245 244);">
+<div class="relative overflow-hidden" style="background-color: #e5e6df;">
   
   <!-- Section Header -->
   <div class="pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 border-b border-dark-800/10">
@@ -366,7 +366,7 @@
           </div>
 
   <!-- Tier 1: M Box - Light background -->
-  <div class="border-b border-dark-800/10" style="background-color: rgb(245 245 244);">
+  <div class="border-b border-dark-800/10" style="background-color: #e5e6df;">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
         <!-- Left: Large title + price -->
@@ -404,7 +404,7 @@
   </div>
 
   <!-- Tier 2: L Box - Subtle highlight (Most Popular) -->
-  <div class="border-b border-dark-800/10 relative" style="background-color: rgb(245 245 244);">
+  <div class="border-b border-dark-800/10 relative" style="background-color: #e5e6df;">
     <!-- Subtle left accent -->
     <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-500"></div>
     <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
@@ -447,7 +447,7 @@
             </div>
 
   <!-- Tier 3: XL Box -->
-  <div style="background-color: rgb(245 245 244);">
+  <div style="background-color: #e5e6df;">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
         <!-- Left: Large title + price -->
@@ -485,7 +485,7 @@
   </div>
   
   <!-- Bottom note -->
-  <div class="py-8 border-t border-dark-800/10" style="background-color: rgb(245 245 244);">
+  <div class="py-8 border-t border-dark-800/10" style="background-color: #e5e6df;">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8">
       <p class="text-center text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Further customization of your coffee subscription follows in the next step.' : 'Další nastavení vašeho kávového předplatného následuje v dalším kroku.' }}</p>
     </div>
@@ -496,7 +496,7 @@
 <div class="relative">
   
   <!-- Top section with cards -->
-  <div class="pt-16 sm:pt-20 lg:pt-24" style="background-color: rgb(245, 245, 244);">
+  <div class="pt-16 sm:pt-20 lg:pt-24" style="background-color: #e5e6df;">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8">
       
       <!-- Section Header -->
@@ -533,7 +533,7 @@
       </div>
           <!-- Stars - positioned to overlap red bar -->
           <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
-            <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
+            <div class="inline-flex px-4 py-3" style="background-color: #e5e6df;">
               <div class="flex gap-0.5 text-lg">
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
@@ -568,7 +568,7 @@
         </div>
           <!-- Stars - positioned to overlap red bar -->
           <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
-            <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
+            <div class="inline-flex px-4 py-3" style="background-color: #e5e6df;">
               <div class="flex gap-0.5 text-lg">
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
@@ -603,7 +603,7 @@
         </div>
           <!-- Stars - positioned to overlap red bar -->
           <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
-            <div class="inline-flex px-4 py-3" style="background-color: rgb(245, 245, 244);">
+            <div class="inline-flex px-4 py-3" style="background-color: #e5e6df;">
               <div class="flex gap-0.5 text-lg">
                 <span class="text-dark-800">★</span>
                 <span class="text-dark-800">★</span>
@@ -674,7 +674,7 @@
 @endphp
 
 <!-- Coffee of the Month - Editorial Grid Layout -->
-<div class="relative pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 lg:pb-20 overflow-hidden" style="background-color: rgb(245, 245, 244);">
+<div class="relative pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 lg:pb-20 overflow-hidden" style="background-color: #e5e6df;">
   
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     
@@ -904,7 +904,7 @@
 @endif
 
 <!-- How It Works Section - Same style as Features -->
-<div class="relative py-20 sm:py-24 md:py-28 lg:py-36 overflow-hidden" style="background-color: rgb(245, 245, 244);">
+<div class="relative py-20 sm:py-24 md:py-28 lg:py-36 overflow-hidden" style="background-color: #e5e6df;">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
     <div class="mb-16 sm:mb-20 max-w-2xl">
@@ -949,7 +949,7 @@
   
 <!-- Featured Products Section - Quiet Luxury -->
 @if($featuredProducts->count() > 0)
-<div class="relative bg-white py-20 sm:py-24 md:py-28 lg:py-36">
+<div class="relative py-20 sm:py-24 md:py-28 lg:py-36" style="background-color: #e5e6df;">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
     <div class="mb-12 sm:mb-16 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
@@ -1063,7 +1063,7 @@
 </div>
 
 <!-- Final CTA Section - Terracotta Background -->
-<div class="relative py-20 sm:py-24 lg:py-32" style="background-color: rgb(245, 245, 244);">
+<div class="relative py-20 sm:py-24 lg:py-32" style="background-color: #e5e6df;">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->

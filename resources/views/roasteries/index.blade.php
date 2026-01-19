@@ -16,7 +16,7 @@
 
 @section('content')
 <!-- Hero Header Section - Editorial Layout -->
-<div class="relative" style="background-color: rgb(245, 245, 244);">
+<div class="relative" style="background-color: #e5e6df;">
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
@@ -36,7 +36,7 @@
 </div>
 
 <!-- Main Content -->
-<div class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: rgb(245, 245, 244);">
+<div class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: #e5e6df;">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
     <!-- Country Filters - Swiss Style -->
@@ -208,7 +208,7 @@
 </div>
 
 <!-- CTA Banner - Editorial Style -->
-<div class="relative pt-12 sm:pt-16 lg:pt-20 pb-20 sm:pb-24 lg:pb-28" style="background-color: rgb(245, 245, 244);">
+<div class="relative pt-12 sm:pt-16 lg:pt-20 pb-20 sm:pb-24 lg:pb-28" style="background-color: #e5e6df;">
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->

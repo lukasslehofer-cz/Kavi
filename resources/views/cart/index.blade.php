@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-<div style="background-color: rgb(245, 245, 244);">
+<div style="background-color: #e5e6df;">
 <!-- Hero Header - Swiss Style -->
 <div class="relative py-16 sm:py-20 lg:py-24 border-b border-dark-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,9 +96,9 @@
                 <div class="py-6 border-b border-warm-300">
                     <div class="flex gap-4 sm:gap-6">
                         <!-- Product Image - Small and Sharp -->
-                        <a href="{{ localizedRoute('products.show', $item['product']) }}" class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-warm-100 overflow-hidden">
+                        <a href="{{ localizedRoute('products.show', $item['product']) }}" class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden">
                             @if($item['product']->image)
-                            <img src="{{ asset($item['product']->image) }}" alt="{{ $item['product']->getName() }}" class="w-full h-full object-cover">
+                            <img src="{{ asset($item['product']->image) }}" alt="{{ $item['product']->getName() }}" class="w-full h-full object-contain">
                             @else
                             <div class="w-full h-full flex items-center justify-center">
                                 <span class="text-warm-400 text-xs uppercase">{{ Str::limit($item['product']->getName(), 10) }}</span>
@@ -197,7 +197,7 @@
 
         <!-- Order Summary - Olive Background Style -->
         <div class="lg:col-span-5">
-            <div class="sticky top-24 bg-olive-100 p-8">
+            <div class="sticky top-24 bg-[#BCBEB1] p-8">
                 <h3 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-8">
                     {{ __('cart.order_summary') }}
                 </h3>
@@ -300,9 +300,9 @@
             @foreach($recommendedProducts as $index => $product)
                 <a href="{{ localizedRoute('products.show', $product) }}" class="group block {{ $index >= 2 ? 'hidden lg:block' : '' }}">
                     <!-- Image Container - No Frame -->
-                    <div class="relative aspect-square overflow-hidden bg-warm-100 mb-4">
+                    <div class="relative aspect-square overflow-hidden mb-4">
                         @if($product->image)
-                        <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105" />
+                        <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-contain object-center transition duration-500 group-hover:scale-105" />
                         @else
                         <div class="h-full w-full flex flex-col items-center justify-center p-8">
                             <span class="font-display text-4xl text-warm-300">{{ substr($product->getName(), 0, 1) }}</span>

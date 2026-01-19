@@ -64,7 +64,7 @@ export default {
           500: '#616161',
           600: '#424242',
           700: '#2d2d2d',
-          800: '#1a1a1a',
+          800: '#1c1c1c', // Main text color
           900: '#000000', // Pure black
         },
       },

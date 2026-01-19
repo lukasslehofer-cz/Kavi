@@ -16,7 +16,7 @@
 
 @section('content')
 <!-- Hero Header Section - Editorial Layout -->
-<div style="background-color: rgb(245, 245, 244);">
+<div style="background-color: #e5e6df;">
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
@@ -36,7 +36,7 @@
 </div>
 
 <!-- Main Content Container - 2 Column Layout -->
-<div class="py-12 sm:py-16 lg:py-20" style="background-color: rgb(245, 245, 244);">
+<div class="py-12 sm:py-16 lg:py-20" style="background-color: #e5e6df;">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
 
     <!-- Error Messages -->
@@ -99,7 +99,7 @@
                   </div>
           
           <!-- Info Section Below Photo - Roastery List -->
-          <div class="bg-stone-100">
+          <div class="bg-warm-200">
             
             <!-- Roastery Rows -->
             @if($roasteriesOfMonth && $roasteriesOfMonth->count() > 0)
@@ -185,7 +185,7 @@
 
             <div class="space-y-0">
               <!-- M Box -->
-              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative">
+              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative">
                 <input type="radio" name="amount" value="2" class="hidden" required>
                 <!-- Left accent when selected -->
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
@@ -208,7 +208,7 @@
               </label>
 
               <!-- L Box - Most Popular -->
-              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative">
+              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative">
                 <input type="radio" name="amount" value="3" class="hidden" required>
                 <!-- Left accent when selected -->
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
@@ -234,7 +234,7 @@
               </label>
 
               <!-- XL Box -->
-              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative">
+              <label class="group flex flex-col sm:flex-row sm:items-center justify-between py-6 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative">
                 <input type="radio" name="amount" value="4" class="hidden" required>
                 <!-- Left accent when selected -->
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
@@ -270,42 +270,42 @@
 
             <div class="space-y-0">
               <!-- Espresso -->
-              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
+              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative pl-4">
                 <input type="radio" name="type" value="espresso" class="hidden" required>
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
                 <div class="flex-1">
                   <div class="font-display text-2xl font-normal text-dark-800 uppercase">Espresso</div>
                   <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Full body, darker roast' : 'Plné tělo, tmavší pražení' }}</p>
                   </div>
-                <label class="flex items-center gap-2 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 transition-colors text-sm" onclick="event.stopPropagation();">
+                <label class="flex items-center gap-2 px-3 py-1.5 bg-[#BCBEB1] hover:bg-[#a8ab9e] transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
                   <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                   </label>
               </label>
 
               <!-- Filtr -->
-              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
+              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative pl-4">
                 <input type="radio" name="type" value="filter" class="hidden" required>
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
                 <div class="flex-1">
                   <div class="font-display text-2xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Filter' : 'Filtr' }}</div>
                   <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Lighter body, lighter roast' : 'Lehčí tělo, světlejší pražení' }}</p>
                   </div>
-                <label class="flex items-center gap-2 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 transition-colors text-sm" onclick="event.stopPropagation();">
+                <label class="flex items-center gap-2 px-3 py-1.5 bg-[#BCBEB1] hover:bg-[#a8ab9e] transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
                   <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                   </label>
               </label>
 
               <!-- Kombinace -->
-              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
+              <label class="group flex items-center justify-between py-5 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative pl-4">
                 <input type="radio" name="type" value="mix" class="hidden" required>
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
                 <div class="flex-1">
                   <div class="font-display text-2xl font-normal text-dark-800 uppercase">{{ $currentLocale === 'en' ? 'Mix' : 'Kombinace' }}</div>
                   <p class="text-xs text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Espresso and filter' : 'Espresso i filtr' }}</p>
                   </div>
-                <label class="flex items-center gap-2 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 transition-colors text-sm" onclick="event.stopPropagation();">
+                <label class="flex items-center gap-2 px-3 py-1.5 bg-[#BCBEB1] hover:bg-[#a8ab9e] transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
                   <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
                   </label>
@@ -313,7 +313,7 @@
             </div>
 
             <!-- Rozdělení kávy pro mix -->
-            <div id="caffeine-distribution" class="hidden mt-6 p-5 bg-stone-100">
+            <div id="caffeine-distribution" class="hidden mt-6 p-5 bg-warm-200">
               <h4 class="font-display text-lg font-normal text-dark-800 mb-4 uppercase">{{ $currentLocale === 'en' ? 'Coffee distribution' : 'Rozdělení kávy' }}</h4>
               
               <div id="mix-no-decaf-distribution" class="hidden grid grid-cols-2 gap-4">
@@ -368,7 +368,7 @@
 
             <div class="space-y-0">
               <!-- Každý měsíc -->
-              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
+              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative pl-4">
                 <input type="radio" name="frequency" value="1" class="hidden" required>
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
                 <div class="flex-1">
@@ -378,7 +378,7 @@
               </label>
 
               <!-- Jednou za 2 měsíce -->
-              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
+              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative pl-4">
                 <input type="radio" name="frequency" value="2" class="hidden" required>
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
                 <div class="flex-1">
@@ -388,7 +388,7 @@
               </label>
 
               <!-- Jednou za 3 měsíce -->
-              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
+              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative pl-4">
                 <input type="radio" name="frequency" value="3" class="hidden" required>
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
                 <div class="flex-1">
@@ -398,7 +398,7 @@
               </label>
 
               <!-- Jednorázově (bez předplatného) -->
-              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-stone-50 has-[:checked]:bg-stone-50 relative pl-4">
+              <label class="group flex items-center justify-between py-5 pr-2 cursor-pointer transition-all border-b border-dark-800/10 hover:bg-warm-300/30 has-[:checked]:bg-warm-300/40 relative pl-4">
                 <input type="radio" name="frequency" value="0" class="hidden" required>
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors"></div>
                 <div class="flex-1">
@@ -472,7 +472,7 @@
         @endif
 
         <!-- Shipping Date Info -->
-        <div class="mt-8 p-5 bg-stone-100">
+        <div class="mt-8 p-5 bg-warm-200">
           <h3 class="font-display text-lg font-normal text-dark-800 mb-2 uppercase">{{ $currentLocale === 'en' ? 'Next shipping date' : 'Termín následující rozesílky' }}</h3>
           <p class="text-sm text-dark-800 font-medium mb-2">{{ $shippingInfo['cutoff_message'] }}</p>
           <p class="text-sm text-warm-500 font-light">

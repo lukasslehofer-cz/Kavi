@@ -7,7 +7,7 @@
 .swiss-auth-field {
     display: flex;
     align-items: baseline;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #BCBEB1;
     transition: border-color 0.2s;
 }
 .swiss-auth-field:focus-within {
@@ -19,7 +19,7 @@
     background: transparent;
     border: none;
     font-size: 0.875rem;
-    color: #1c1917;
+    color: #1c1c1c;
     -webkit-appearance: none;
 }
 .swiss-auth-input:focus {
@@ -44,7 +44,7 @@
 </style>
 
 <!-- Hero Header - Swiss Style -->
-<div class="pt-8 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20" style="background-color: rgb(245, 245, 244);">
+<div class="pt-8 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20" style="background-color: #e5e6df;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-tight leading-[0.9] text-dark-800">
             {{ $currentLocale === 'en' ? 'RESET PASSWORD' : 'OBNOVA HESLA' }}
@@ -53,7 +53,7 @@
 </div>
 
 <!-- Main Content -->
-<div style="background-color: rgb(245, 245, 244);">
+<div style="background-color: #e5e6df;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-16">
             <!-- Left Column - Form -->
@@ -117,7 +117,7 @@
 
             <!-- Right Column - Info -->
             <div class="lg:col-span-5 mt-12 lg:mt-0">
-                <div class="sticky top-24 bg-olive-100 p-8">
+                <div class="sticky top-24 bg-[#BCBEB1] p-8">
                     <h3 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-8">
                         {{ __('auth.how_it_works') }}
                     </h3>

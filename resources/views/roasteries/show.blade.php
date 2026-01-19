@@ -103,7 +103,7 @@
 @endsection
 
 @section('content')
-<div style="background-color: rgb(245, 245, 244);">
+<div style="background-color: #e5e6df;">
 
   <!-- Microscopic Breadcrumbs -->
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-4">
@@ -269,12 +269,12 @@
       <!-- Linear Coffee Index -->
       <div class="border-t border-dark-800">
         @foreach($coffeeOfMonthProducts as $product)
-        <div class="border-b border-warm-300 py-6 flex flex-col sm:flex-row sm:items-center gap-4 cursor-pointer group" onclick="openCoffeeModal{{ $product->id }}()">
+        <div class="border-b border-warm-300 py-6 flex flex-col sm:flex-row sm:items-center gap-4 cursor-pointer group hover:bg-warm-300/30 transition-colors" onclick="openCoffeeModal{{ $product->id }}()">
           
           <!-- Coffee Image -->
-          <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-warm-100 overflow-hidden">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden">
             @if($product->image)
-            <img src="{{ asset($product->image) }}" alt="{{ $product->getName() }}" class="w-full h-full object-cover">
+            <img src="{{ asset($product->image) }}" alt="{{ $product->getName() }}" class="w-full h-full object-contain">
             @endif
           </div>
           
@@ -319,18 +319,18 @@
 
         <!-- Modal for Coffee Detail -->
         <div id="coffeeModal{{ $product->id }}" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="closeCoffeeModal{{ $product->id }}(event)">
-          <div class="bg-[rgb(245,245,244)] max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+          <div class="bg-[#e5e6df] max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <div class="relative">
               @if($product->image)
-              <div class="aspect-[4/3] w-full overflow-hidden bg-warm-100">
+              <div class="aspect-[4/3] w-full overflow-hidden">
                 <img src="{{ asset($product->image) }}" 
                      alt="{{ $product->getName() }}"
-                     class="w-full h-full object-cover">
+                     class="w-full h-full object-contain">
               </div>
               @endif
               
               <button onclick="closeCoffeeModal{{ $product->id }}()" 
-                      class="absolute top-4 right-4 bg-[rgb(245,245,244)] p-2 hover:bg-warm-200 transition-colors">
+                      class="absolute top-4 right-4 bg-[#e5e6df] p-2 hover:bg-warm-200 transition-colors">
                 <svg class="w-6 h-6 text-dark-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -424,12 +424,12 @@
       <!-- Linear Coffee Index -->
       <div class="border-t border-dark-800">
         @foreach($activeProducts as $product)
-        <a href="{{ localizedRoute('products.show', $product) }}" class="border-b border-warm-300 py-6 flex flex-col sm:flex-row sm:items-center gap-4 group block">
+        <a href="{{ localizedRoute('products.show', $product) }}" class="border-b border-warm-300 py-6 flex flex-col sm:flex-row sm:items-center gap-4 group block hover:bg-warm-300/30 transition-colors">
           
           <!-- Coffee Image -->
-          <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-warm-100 overflow-hidden">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden">
             @if($product->image)
-            <img src="{{ asset($product->image) }}" alt="{{ $product->getName() }}" class="w-full h-full object-cover">
+            <img src="{{ asset($product->image) }}" alt="{{ $product->getName() }}" class="w-full h-full object-contain">
             @endif
           </div>
           
@@ -495,9 +495,9 @@
         <div class="border-b border-warm-300 py-6 flex flex-col sm:flex-row sm:items-center gap-4 opacity-60">
           
           <!-- Coffee Image -->
-          <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-warm-100 overflow-hidden grayscale">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden grayscale">
             @if($product->image)
-            <img src="{{ asset($product->image) }}" alt="{{ $product->getName() }}" class="w-full h-full object-cover">
+            <img src="{{ asset($product->image) }}" alt="{{ $product->getName() }}" class="w-full h-full object-contain">
             @endif
           </div>
           
@@ -546,7 +546,7 @@
   </div>
 
   <!-- Bottom CTA - Same style as /produkty -->
-  <div class="relative pt-8 sm:pt-10 lg:pt-14 pb-20 sm:pb-24 lg:pb-28" style="background-color: rgb(245, 245, 244);">
+  <div class="relative pt-8 sm:pt-10 lg:pt-14 pb-20 sm:pb-24 lg:pb-28" style="background-color: #e5e6df;">
     <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
       <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
         <!-- Large Editorial Heading -->
