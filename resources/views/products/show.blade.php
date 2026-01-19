@@ -5,6 +5,23 @@
 @php
     $productDescription = Str::limit(strip_tags($product->getDescription()), 160);
     $siteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+    
+    // Country codes mapping
+    $countryCodes = [
+        'Belgie' => 'BE', 'Belgium' => 'BE',
+        'Německo' => 'DE', 'Germany' => 'DE',
+        'Polsko' => 'PL', 'Poland' => 'PL',
+        'Portugalsko' => 'PT', 'Portugal' => 'PT',
+        'Rakousko' => 'AT', 'Austria' => 'AT',
+        'Nizozemsko' => 'NL', 'Netherlands' => 'NL',
+        'Francie' => 'FR', 'France' => 'FR',
+        'Španělsko' => 'ES', 'Spain' => 'ES',
+        'Chorvatsko' => 'HR', 'Croatia' => 'HR',
+        'Rumunsko' => 'RO', 'Romania' => 'RO',
+        'Lotyšsko' => 'LV', 'Latvia' => 'LV',
+        'Velká Británie' => 'GB', 'United Kingdom' => 'GB',
+    ];
+    $countryCode = $product->roastery ? ($countryCodes[$product->roastery->country] ?? strtoupper(substr($product->roastery->country, 0, 2))) : null;
 @endphp
 
 @section('meta_description', $productDescription)
@@ -98,374 +115,313 @@
 @endsection
 
 @section('content')
-<!-- Minimal Breadcrumb -->
-<div class="bg-white py-3 border-b border-gray-100">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <nav class="text-sm">
-        <ol class="flex items-center space-x-2 text-gray-500">
-            <li><a href="{{ route('home') }}" class="hover:text-gray-900 transition-colors font-light">{{ $currentLocale === 'en' ? 'Home' : 'Domů' }}</a></li>
-            <li class="text-gray-300">
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </li>
-            <li><a href="{{ localizedRoute('products.index') }}" class="hover:text-gray-900 transition-colors font-light">{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}</a></li>
-            <li class="text-gray-300">
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </li>
-            <li class="text-gray-900 font-medium truncate max-w-xs">{{ $product->getName() }}</li>
-        </ol>
-    </nav>
-  </div>
-</div>
+<div style="background-color: rgb(245, 245, 244);">
 
-<div class="bg-white">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-
-    <!-- Product Detail -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
-        <!-- Product Image - Minimal -->
-        <div class="lg:sticky lg:top-24 h-fit">
-            <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-200 bg-gray-50">
-                @if($product->image)
-                <img src="{{ asset($product->image) }}" alt="{{ $product->getName() }}" class="w-full h-full object-cover">
-                @else
-                <div class="w-full h-full flex flex-col items-center justify-center p-12 bg-gray-100">
-                    <svg class="w-24 h-24 text-gray-300 mb-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
-                    </svg>
-                    <p class="text-center text-gray-500 font-light text-sm">{{ $product->getName() }}</p>
-                </div>
-                @endif
-                
-                <!-- Category Tags - Minimal -->
-                <div class="absolute left-3 top-3 flex flex-wrap gap-1.5">
-                  @php
-                    $categoryLabels = [
-                      'espresso' => ['label' => 'Espresso', 'color' => 'bg-amber-500'],
-                      'filter' => ['label' => $currentLocale === 'en' ? 'Filter' : 'Filtr', 'color' => 'bg-blue-500'],
-                      'decaf' => ['label' => $currentLocale === 'en' ? 'Decaf' : 'Bezkofeinová', 'color' => 'bg-green-500'],
-                      'accessories' => ['label' => $currentLocale === 'en' ? 'Accessories' : 'Příslušenství', 'color' => 'bg-purple-500'],
-                    ];
-                    
-                    if (is_array($product->category) && !empty($product->category)) {
-                      foreach ($product->category as $cat) {
-                        if (isset($categoryLabels[$cat])) {
-                          $catData = $categoryLabels[$cat];
-                          echo '<span class="px-2.5 py-1 rounded-full text-xs font-medium ' . $catData['color'] . ' text-white">' . $catData['label'] . '</span>';
-                        }
-                      }
-                    }
-                  @endphp
-                </div>
-
-                <!-- Discount Badge - Minimal -->
-                @if($product->shouldShowDiscountPercentage())
-                <div class="absolute top-3 right-3 bg-red-500 rounded-full px-3 py-1">
-                  <span class="text-xs font-medium text-white">-{{ $product->getDiscountPercentage() }}%</span>
-                </div>
-                @elseif($product->is_featured)
-                <!-- Featured Badge - Minimal -->
-                <div class="absolute top-3 right-3 bg-gray-900 rounded-full px-3 py-1">
-                  <span class="text-xs font-medium text-white flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    Featured
-                  </span>
-                </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Product Info -->
-        <div>
-            <!-- Stock Status - Minimal -->
-            <div class="flex flex-wrap items-center gap-2 mb-5">
-              @if($product->stock > 0)
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                {{ $currentLocale === 'en' ? 'In Stock' : 'Na skladě' }}
-              </span>
-              @else
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
-                {{ $currentLocale === 'en' ? 'Out of Stock' : 'Vyprodáno' }}
-              </span>
-              @endif
-            </div>
-            
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight tracking-tight">
-                {{ $product->getName() }}
-            </h1>
-            
-            <!-- Roaster / Manufacturer - Minimal -->
-            @if($product->roastery)
-            <p class="text-base text-gray-600 font-light mb-5 flex items-center gap-2">
-              <span class="text-xl">{{ $product->roastery->country_flag }}</span>
-              <a href="{{ localizedRoute('roasteries.show', $product->roastery) }}" class="hover:text-gray-900 transition-colors">
-                {{ $product->roastery->getName() }}
-              </a>
-            </p>
-            @elseif(!empty($product->attributes['roaster']))
-            <p class="text-base text-gray-600 font-light mb-5 flex items-center gap-2">
-              <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              {{ $product->attributes['roaster'] }}
-            </p>
-            @elseif(!empty($product->attributes['manufacturer']))
-            <p class="text-base text-gray-600 font-light mb-5 flex items-center gap-2">
-              <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
-              {{ $product->attributes['manufacturer'] }}
-            </p>
-            @endif
-            
-            @if($product->getShortDescription())
-            <p class="text-lg text-gray-600 mb-8 leading-relaxed font-light">{{ $product->getShortDescription() }}</p>
-            @endif
-            
-            <!-- Flavor Profile - Minimal -->
-            @if(!empty($product->attributes['flavor_profile']))
-            <div class="bg-gray-50 rounded-2xl p-5 mb-8 border border-gray-200">
-              <div class="flex items-start gap-3">
-                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                  <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">{{ $currentLocale === 'en' ? 'Flavor Profile' : 'Chuťový profil' }}</h3>
-                  <p class="text-base font-medium text-gray-900">{{ $product->attributes['flavor_profile'] }}</p>
-                </div>
-              </div>
-            </div>
-            @endif
-
-            <div class="mb-8 pb-8 border-b border-gray-200">
-                @if($product->isOnSale())
-                <div class="flex flex-wrap items-baseline gap-3">
-                    <span class="text-5xl font-bold text-red-600">{{ $product->getFormattedPrice() }}</span>
-                    <span class="text-2xl text-gray-400 line-through font-light">{{ $product->getFormattedOriginalPrice() }}</span>
-                    @if($product->shouldShowDiscountPercentage())
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-700">
-                        {{ $currentLocale === 'en' ? 'Save' : 'Ušetříte' }} {{ $product->getDiscountPercentage() }}%
-                    </span>
-                    @endif
-                </div>
-                @else
-                <span class="text-5xl font-bold text-gray-900">{{ $product->getFormattedPrice() }}</span>
-                @endif
-            </div>
-
-            @if($product->isInStock())
-            <form action="{{ localizedRoute('cart.add', $product) }}" method="POST" class="mb-10">
-                @csrf
-                <div class="bg-gray-50 rounded-2xl p-5 mb-5 border border-gray-200">
-                    <label class="block text-gray-900 font-semibold mb-3 text-sm">
-                      {{ $currentLocale === 'en' ? 'Quantity:' : 'Množství:' }}
-                    </label>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center border border-gray-300 rounded-full overflow-hidden bg-white">
-                            <button type="button" class="px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors font-medium">-</button>
-                            <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}" 
-                                   class="w-16 text-center font-medium border-0 focus:ring-0 bg-transparent text-gray-900" data-quantity-input>
-                            <button type="button" class="px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors font-medium">+</button>
-                        </div>
-                        <span class="text-gray-500 font-light text-sm">
-                            @if($product->stock >= 5)
-                              <span class="font-medium text-gray-900">{{ $currentLocale === 'en' ? 'More than 5' : 'Více než 5 ks' }}</span> {{ $currentLocale === 'en' ? 'in stock' : 'skladem' }}
-                            @elseif($product->stock >= 2)
-                              <span class="font-medium text-gray-900">{{ $currentLocale === 'en' ? 'Last few items' : 'Poslední kusy' }}</span> {{ $currentLocale === 'en' ? 'in stock' : 'skladem' }}
-                            @else
-                              <span class="font-medium text-gray-900">{{ $currentLocale === 'en' ? 'Last one' : 'Poslední kus' }}</span> {{ $currentLocale === 'en' ? 'in stock' : 'skladem' }}
-                            @endif
-                        </span>
-                    </div>
-                </div>
-                
-                <button type="submit" class="group w-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-8 py-3.5 rounded-full transition-all duration-200 mb-5 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                    </svg>
-                    <span>{{ $currentLocale === 'en' ? 'Add to Cart' : 'Přidat do košíku' }}</span>
-                    <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                </button>
-
-            </form>
-            @else
-            <div class="bg-red-50 border border-red-200 rounded-2xl text-red-700 px-5 py-4 mb-8 flex items-center gap-3">
-                <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <div>
-                  <p class="font-semibold text-base">{{ $currentLocale === 'en' ? 'Currently out of stock' : 'Momentálně vyprodáno' }}</p>
-                  <p class="text-sm text-red-600 font-light">{{ $currentLocale === 'en' ? 'This product will be back in stock soon.' : 'Tento produkt se brzy vrátí na sklad.' }}</p>
-                </div>
-            </div>
-            @endif
-
-            <!-- Product Description - Minimal -->
-            <div class="mb-8 bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                <div class="flex items-center gap-2.5 mb-4">
-                  <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 class="text-xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'About the Product' : 'O produktu' }}</h3>
-                </div>
-                <div class="text-gray-700 leading-relaxed prose max-w-none font-light">
-                    {!! nl2br(strip_tags($product->getDescription(), '<a><strong><em><i><b><br><p><ul><ol><li>')) !!}
-                </div>
-            </div>
-
-            <!-- Product Attributes - Minimal -->
-            @if($product->attributes)
-            <div class="bg-white rounded-2xl p-6 border border-gray-200">
-                <div class="flex items-center gap-2.5 mb-4">
-                  <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                  </div>
-                  <h3 class="text-xl font-bold text-gray-900">{{ $currentLocale === 'en' ? 'Specifications' : 'Specifikace' }}</h3>
-                </div>
-                
-                @php
-                    $mainAttributes = $currentLocale === 'en' 
-                        ? ['origin' => 'Origin', 'altitude' => 'Altitude', 'processing' => 'Processing', 'variety' => 'Variety', 'flavor_notes' => 'Flavor Notes']
-                        : ['origin' => 'Původ', 'altitude' => 'Nadmořská výška', 'processing' => 'Zpracování', 'variety' => 'Odrůda', 'flavor_notes' => 'Chuťové tóny'];
-                    $additionalInfo = $currentLocale === 'en'
-                        ? ['weight' => 'Weight', 'roast_date' => 'Roast Date']
-                        : ['weight' => 'Hmotnost', 'roast_date' => 'Datum pražení'];
-                @endphp
-                
-                <!-- Main Coffee Attributes -->
-                <dl class="grid grid-cols-1 gap-3 mb-4">
-                    @foreach($mainAttributes as $key => $label)
-                        @php
-                            $attrValue = $product->getTranslatedAttribute($key);
-                        @endphp
-                        @if(!empty($attrValue))
-                        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
-                            <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">{{ $label }}</dt>
-                            <dd class="text-gray-900 font-semibold">{{ $attrValue }}</dd>
-                        </div>
-                        @endif
-                    @endforeach
-                    
-                    <!-- Other attributes not in main or additional lists -->
-                    @foreach($product->attributes as $key => $value)
-                        @if(!in_array($key, ['roaster', 'flavor_profile', 'preparation_methods', 'origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date']) && !str_ends_with($key, '_en'))
-                        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
-                            <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">{{ str_replace('_', ' ', ucfirst($key)) }}</dt>
-                            <dd class="text-gray-900 font-semibold">
-                              @if(is_array($value))
-                                {{ implode(', ', $value) }}
-                              @else
-                                {{ $value }}
-                              @endif
-                            </dd>
-                        </div>
-                        @endif
-                    @endforeach
-                </dl>
-                
-                <!-- Additional Info Section -->
-                @if(isset($product->attributes['weight']) || isset($product->attributes['roast_date']))
-                <div class="pt-4 border-t border-gray-200">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ $currentLocale === 'en' ? 'Additional Information' : 'Doplňkové informace' }}</h4>
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        @if(isset($product->attributes['weight']) && !empty($product->attributes['weight']))
-                        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
-                            <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">{{ $currentLocale === 'en' ? 'Weight' : 'Hmotnost' }}</dt>
-                            <dd class="text-gray-900 font-semibold">{{ $product->attributes['weight'] }} g</dd>
-                        </div>
-                        @endif
-                        
-                        @if(isset($product->attributes['roast_date']) && !empty($product->attributes['roast_date']))
-                        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100">
-                            <dt class="text-gray-600 font-medium text-xs uppercase tracking-wide mb-1">{{ $currentLocale === 'en' ? 'Roast Date' : 'Datum pražení' }}</dt>
-                            <dd class="text-gray-900 font-semibold">
-                                {{ \Carbon\Carbon::parse($product->attributes['roast_date'])->format($currentLocale === 'en' ? 'M d, Y' : 'd.m.Y') }}
-                            </dd>
-                        </div>
-                        @endif
-                    </dl>
-                </div>
-                @endif
-            </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- Related Products - Minimal -->
-    @if($relatedProducts->count() > 0)
-    <section class="mt-20 pt-16 border-t border-gray-100">
-        <div class="text-center mb-10">
-          <div class="inline-flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5 mb-3">
-            <svg class="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-            <span class="text-xs font-medium text-gray-900">{{ $currentLocale === 'en' ? 'More recommendations' : 'Další doporučení' }}</span>
+  <!-- Hero Section - Split Screen -->
+  <div class="relative">
+    <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[80vh]">
+      
+      <!-- Left Side - Product Photo (sticky, edge-to-edge) -->
+      <div class="lg:col-span-6 relative lg:sticky lg:top-0 lg:h-screen">
+        <div class="h-full w-full overflow-hidden" style="background-color: rgb(245, 245, 244);">
+          @if($product->image)
+          <img src="{{ asset($product->image) }}" 
+               alt="{{ $product->getName() }}" 
+               class="w-full h-full object-contain lg:object-cover lg:object-center p-8 lg:p-0 lg:pl-0">
+          @else
+          <div class="w-full h-full flex items-center justify-center">
+            <span class="font-display text-4xl text-warm-400 uppercase tracking-tight">{{ $product->getName() }}</span>
           </div>
-          <h2 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-            {{ $currentLocale === 'en' ? 'You might also like' : 'Mohlo by vás také zajímat' }}
-          </h2>
+          @endif
+          
+          <!-- Discount Badge -->
+          @if($product->shouldShowDiscountPercentage())
+          <div class="absolute top-4 right-4 lg:top-8 lg:right-8">
+            <span class="text-xs uppercase tracking-widest text-primary-500 bg-[rgb(245,245,244)] px-2 py-1">-{{ $product->getDiscountPercentage() }}%</span>
+          </div>
+          @endif
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            @foreach($relatedProducts as $relatedProduct)
-            <div class="group relative bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="relative block h-56 overflow-hidden bg-gray-50">
-                    @if($relatedProduct->image)
-                    <img src="{{ asset($relatedProduct->image) }}" alt="{{ $relatedProduct->getName() }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    @else
-                    <div class="w-full h-full flex flex-col items-center justify-center p-6 bg-gray-100">
-                        <svg class="w-12 h-12 text-gray-300 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M2 21h19v-3H2v3zM20 8H4V5h16v3zm0-6H4c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM12 15c1.66 0 3-1.34 3-3H9c0 1.66 1.34 3 3 3z"/>
-                        </svg>
-                        <p class="text-center text-xs font-light text-gray-500">{{ $relatedProduct->getName() }}</p>
-                    </div>
-                    @endif
-                    @if($relatedProduct->shouldShowDiscountPercentage())
-                    <div class="absolute top-2 right-2 bg-red-500 rounded-full px-2 py-0.5">
-                      <span class="text-xs font-medium text-white">-{{ $relatedProduct->getDiscountPercentage() }}%</span>
-                    </div>
-                    @endif
-                </a>
-                <div class="p-4">
-                    <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="block">
-                      <h3 class="text-base font-semibold text-gray-900 group-hover:text-gray-600 transition-colors mb-2 line-clamp-2">
-                          {{ $relatedProduct->getName() }}
-                      </h3>
-                    </a>
-                    <div class="flex items-center justify-between pt-2.5 border-t border-gray-100">
-                      <div>
-                        @if($relatedProduct->isOnSale())
-                        <span class="text-lg font-bold text-red-600">{{ $relatedProduct->getFormattedPrice() }}</span>
-                        <div class="text-xs text-gray-500 line-through">{{ $relatedProduct->getFormattedOriginalPrice() }}</div>
-                        @else
-                        <span class="text-lg font-bold text-gray-900">{{ $relatedProduct->getFormattedPrice() }}</span>
-                        @endif
-                      </div>
-                      <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </a>
-                    </div>
-                </div>
+      </div>
+      
+      <!-- Right Side - Content -->
+      <div class="lg:col-span-6 flex flex-col px-6 md:px-12 lg:px-16 xl:px-20 pt-4 pb-12 lg:pt-4 lg:pb-20">
+        
+        <!-- Microscopic Breadcrumbs - at top -->
+        <nav class="mb-24">
+          <ol class="flex items-center gap-1 text-warm-400" style="font-size: 10px; letter-spacing: 0.1em;">
+            <li><a href="{{ route('home') }}" class="uppercase hover:text-dark-800 transition-colors">{{ $currentLocale === 'en' ? 'Home' : 'Domů' }}</a></li>
+            <li>/</li>
+            <li><a href="{{ localizedRoute('products.index') }}" class="uppercase hover:text-dark-800 transition-colors">{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}</a></li>
+            <li>/</li>
+            <li class="text-dark-800 uppercase">{{ Str::limit($product->getName(), 30) }}</li>
+          </ol>
+        </nav>
+        
+        <!-- Availability Status -->
+        <div class="mb-4">
+          @if($product->stock > 0)
+          <span class="text-xs uppercase tracking-widest text-dark-800">
+            <span class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
+            {{ $currentLocale === 'en' ? 'AVAILABILITY: IN STOCK' : 'DOSTUPNOST: SKLADEM' }}
+          </span>
+          @else
+          <span class="text-xs uppercase tracking-widest text-dark-800">
+            <span class="inline-block w-1.5 h-1.5 bg-red-500 rounded-full mr-1"></span>
+            {{ $currentLocale === 'en' ? 'AVAILABILITY: OUT OF STOCK' : 'DOSTUPNOST: VYPRODÁNO' }}
+          </span>
+          @endif
+        </div>
+        
+        <!-- Product Name - Large -->
+        <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-dark-800 uppercase tracking-tight leading-[0.9] mb-4">
+          {{ $product->getName() }}
+        </h1>
+        
+        <!-- Roastery / Manufacturer -->
+        @if($product->roastery)
+        <p class="text-xs uppercase tracking-widest text-warm-500 mb-6">
+          <a href="{{ localizedRoute('roasteries.show', $product->roastery) }}" class="hover:text-dark-800 transition-colors">
+            {{ $product->roastery->getName() }}
+          </a>
+          @if($countryCode)
+          <span class="text-dark-800">[ {{ $countryCode }} ]</span>
+          @endif
+        </p>
+        @elseif(!empty($product->attributes['roaster']))
+        <p class="text-xs uppercase tracking-widest text-warm-500 mb-6">
+          {{ $product->attributes['roaster'] }}
+        </p>
+        @elseif(!empty($product->attributes['manufacturer']))
+        <p class="text-xs uppercase tracking-widest text-warm-500 mb-6">
+          {{ $product->attributes['manufacturer'] }}
+        </p>
+        @endif
+        
+        <!-- Price - Prominent Technical Style -->
+        <div class="mb-8">
+          @if($product->isOnSale())
+          <div class="flex flex-wrap items-baseline gap-3">
+            <span class="font-display text-2xl sm:text-3xl uppercase tracking-tight text-dark-800">{{ $product->getFormattedPrice() }} —</span>
+            <span class="text-sm uppercase tracking-widest text-warm-400 line-through">{{ $product->getFormattedOriginalPrice() }}</span>
+          </div>
+          @else
+          <span class="font-display text-2xl sm:text-3xl uppercase tracking-tight text-dark-800">{{ $product->getFormattedPrice() }} —</span>
+          @endif
+        </div>
+        
+        <!-- Short Description -->
+        @if($product->getShortDescription())
+        <p class="text-base text-dark-700 font-light leading-relaxed mb-10 max-w-lg">
+          {{ $product->getShortDescription() }}
+        </p>
+        @endif
+        
+        <!-- Purchase Configuration -->
+        @if($product->isInStock())
+        <form action="{{ localizedRoute('cart.add', $product) }}" method="POST" class="mb-12">
+          @csrf
+          
+          <!-- Quantity Selector - Simple Row -->
+          <div class="mb-6">
+            <span class="block text-xs uppercase tracking-widest text-warm-500 mb-3">
+              {{ $currentLocale === 'en' ? 'Quantity' : 'Množství' }}
+            </span>
+            <div class="flex items-center gap-4">
+              @for($i = 1; $i <= min(5, $product->stock); $i++)
+              <label class="cursor-pointer">
+                <input type="radio" name="quantity" value="{{ $i }}" class="sr-only peer" {{ $i === 1 ? 'checked' : '' }}>
+                <span class="text-sm uppercase tracking-widest text-warm-500 peer-checked:text-dark-800 peer-checked:border-b peer-checked:border-dark-800 pb-1 transition-all hover:text-dark-800">
+                  {{ $i }}
+                </span>
+              </label>
+              @endfor
             </div>
-            @endforeach
+          </div>
+          
+          <!-- Add to Cart - Black Button -->
+          <button type="submit" class="inline-flex items-center justify-center gap-2 bg-dark-800 text-white font-display uppercase tracking-widest px-8 py-4 hover:bg-dark-900 transition-all">
+            <span>{{ $currentLocale === 'en' ? 'Add to Cart' : 'Přidat do košíku' }}</span>
+            <span>→</span>
+          </button>
+        </form>
+        @else
+        <div class="mb-12">
+          <p class="text-xs uppercase tracking-widest text-warm-500">
+            {{ $currentLocale === 'en' ? 'This product is currently unavailable.' : 'Tento produkt je momentálně nedostupný.' }}
+          </p>
         </div>
-    </section>
-    @endif
-</div>
+        @endif
+        
+        <!-- Specifications - Vertical Index -->
+        <div class="border-t border-dark-800">
+          <!-- Category/Roast Type - First Item -->
+          @if(is_array($product->category) && !empty($product->category))
+          <div class="border-b border-dark-800 py-4 flex items-baseline">
+            <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $currentLocale === 'en' ? 'Roast' : 'Pražení' }}</span>
+            <span class="text-xs uppercase tracking-widest text-dark-800">— 
+              @php
+                $categoryLabels = [
+                  'espresso' => 'Espresso',
+                  'filter' => $currentLocale === 'en' ? 'Filter' : 'Filtr',
+                  'decaf' => $currentLocale === 'en' ? 'Decaf' : 'Bezkofeinová',
+                  'accessories' => $currentLocale === 'en' ? 'Accessories' : 'Příslušenství',
+                ];
+                $cats = array_map(fn($c) => $categoryLabels[$c] ?? $c, $product->category);
+                echo implode(', ', $cats);
+              @endphp
+            </span>
+          </div>
+          @endif
+          
+          @if($product->attributes)
+          @php
+            $mainAttributes = $currentLocale === 'en' 
+              ? ['origin' => 'Origin', 'processing' => 'Processing', 'flavor_notes' => 'Flavor', 'altitude' => 'Altitude', 'variety' => 'Variety']
+              : ['origin' => 'Původ', 'processing' => 'Zpracování', 'flavor_notes' => 'Chuť', 'altitude' => 'Nadm. výška', 'variety' => 'Odrůda'];
+          @endphp
+          
+          @foreach($mainAttributes as $key => $label)
+            @php $attrValue = $product->getTranslatedAttribute($key); @endphp
+            @if(!empty($attrValue))
+            <div class="border-b border-dark-800 py-4 flex items-baseline">
+              <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $label }}</span>
+              <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $attrValue }}</span>
+            </div>
+            @endif
+          @endforeach
+          
+          @if(!empty($product->attributes['weight']))
+          <div class="border-b border-dark-800 py-4 flex items-baseline">
+            <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $currentLocale === 'en' ? 'Weight' : 'Hmotnost' }}</span>
+            <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $product->attributes['weight'] }}g</span>
+          </div>
+          @endif
+          @endif
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  <!-- Product Description - Editorial Two Columns -->
+  @if($product->getDescription())
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-16 lg:py-24">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+      @php
+        $description = strip_tags($product->getDescription());
+        $midpoint = strlen($description) / 2;
+        $breakpoint = strpos($description, '. ', $midpoint);
+        if ($breakpoint === false) $breakpoint = $midpoint;
+        $firstHalf = substr($description, 0, $breakpoint + 1);
+        $secondHalf = substr($description, $breakpoint + 1);
+      @endphp
+      
+      <div>
+        <p class="text-base text-dark-700 font-light leading-relaxed">
+          {{ trim($firstHalf) }}
+        </p>
+      </div>
+      
+      @if(trim($secondHalf))
+      <div>
+        <p class="text-base text-dark-600 font-light leading-relaxed">
+          {{ trim($secondHalf) }}
+        </p>
+      </div>
+      @endif
+    </div>
+  </div>
+  @endif
+
+  <!-- Related Products -->
+  @if($relatedProducts->count() > 0)
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8 pb-16 lg:pb-24">
+    
+    <!-- Section Heading -->
+    <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight mb-10">
+      {{ $currentLocale === 'en' ? 'You might also like' : 'Mohlo by vás také zajímat' }}
+    </h2>
+    
+    <!-- Products Grid -->
+    <div class="grid gap-x-4 sm:gap-x-8 lg:gap-x-10 gap-y-8 sm:gap-y-10 lg:gap-y-12 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      @foreach($relatedProducts as $relatedProduct)
+      <a href="{{ localizedRoute('products.show', $relatedProduct) }}" class="group block">
+        
+        <!-- Product Image -->
+        <div class="relative aspect-square overflow-hidden bg-warm-100 mb-4">
+          @if($relatedProduct->image)
+          <img src="{{ asset($relatedProduct->image) }}" 
+               alt="{{ $relatedProduct->getName() }}" 
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          @else
+          <div class="w-full h-full flex items-center justify-center">
+            <span class="text-warm-400 text-sm">{{ $relatedProduct->getName() }}</span>
+          </div>
+          @endif
+          
+          <!-- Category Tags -->
+          <div class="absolute top-3 left-3 flex flex-wrap gap-1">
+            @if(is_array($relatedProduct->category))
+              @foreach($relatedProduct->category as $cat)
+                @if($cat === 'espresso')
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-1 pb-1 border-b-2 border-amber-500">ESP</span>
+                @elseif($cat === 'filter')
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-1 pb-1 border-b-2 border-blue-500">FLT</span>
+                @elseif($cat === 'decaf')
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-1 pb-1 border-b-2 border-green-500">DCF</span>
+                @elseif($cat === 'accessories')
+                <span class="text-[10px] uppercase tracking-widest text-dark-800 bg-[rgb(245,245,244)] px-1 pb-1 border-b-2 border-purple-500">ACC</span>
+                @endif
+              @endforeach
+            @endif
+          </div>
+        </div>
+        
+        <!-- Price -->
+        <div class="text-xs uppercase tracking-widest text-dark-800 mb-1">
+          <span>{{ $relatedProduct->getFormattedPrice() }} —</span>
+        </div>
+        
+        <!-- Product Name -->
+        <h3 class="font-display text-base sm:text-lg font-normal text-dark-800 uppercase tracking-tight pt-[5px] pb-[8px] group-hover:text-primary-500 transition-colors line-clamp-2" style="line-height: 1.25;">
+          {{ $relatedProduct->getName() }}
+        </h3>
+        
+        <!-- Roastery & Flavor -->
+        @php
+          $relFlavorNotes = $relatedProduct->getTranslatedAttribute('flavor_notes');
+          $relRoasteryName = $relatedProduct->roastery ? $relatedProduct->roastery->getName() : null;
+        @endphp
+        <p class="text-xs uppercase tracking-widest text-warm-500 leading-tight">
+          @if($relRoasteryName){{ $relRoasteryName }}@endif
+          @if($relRoasteryName && $relFlavorNotes) · @endif
+          @if($relFlavorNotes){{ $relFlavorNotes }}@endif
+        </p>
+      </a>
+      @endforeach
+    </div>
+  </div>
+  @endif
+
+  <!-- Bottom CTA -->
+  <div class="relative pt-8 sm:pt-10 lg:pt-14 pb-20 sm:pb-24 lg:pb-28" style="background-color: rgb(245, 245, 244);">
+    <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
+      <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
+        <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase">
+          {{ $currentLocale === 'en' ? 'Want regular coffee delivery?' : 'Chcete pravidelnou dodávku kávy?' }}
+        </h2>
+
+        <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
+          {{ $currentLocale === 'en' ? 'With our subscription, you save time and money. Fresh coffee delivered to your door, cancel anytime.' : 'S naším předplatným ušetříte čas i peníze. Čerstvá káva přímo k vám domů, kdykoliv zrušitelné.' }}
+        </p>
+
+        <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+          <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
+          <span class="text-primary-500 group-hover:translate-x-1 transition-transform">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
 </div>
 @endsection
