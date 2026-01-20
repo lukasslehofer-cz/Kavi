@@ -117,5 +117,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/translate/batch', [TranslationController::class, 'translateBatch'])->name('translate.batch');
     Route::get('/translate/usage', [TranslationController::class, 'usage'])->name('translate.usage');
     Route::get('/translate/status', [TranslationController::class, 'status'])->name('translate.status');
+    
+    // Email Preview (development only)
+    Route::get('/email-preview/order-confirmation/{order?}', function ($orderId = null) {
+        $order = $orderId 
+            ? \App\Models\Order::with('items')->findOrFail($orderId)
+            : \App\Models\Order::with('items')->latest()->firstOrFail();
+        
+        $locale = 'cs';
+        $siteName = 'KAVI.cz';
+        $contactEmail = 'info@kavi.cz';
+        
+        return view('emails.order-confirmation', compact('order', 'locale', 'siteName', 'contactEmail'));
+    })->name('email-preview.order-confirmation');
 });
 

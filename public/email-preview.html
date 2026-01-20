@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ $locale }}">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>{{ __('emails.order_confirmation.title', [], $locale) }}</title>
+    <title>Děkujeme za vaši objednávku!</title>
     <style>
         /* Reset styles */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
@@ -372,7 +372,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header" style="background-color: #ffffff; padding: 40px 40px 24px 40px; text-align: left; border-bottom: 2px solid #1c1c1c;">
-                            <img src="{{ asset('images/kavi-logo-black.png') }}" alt="{{ $siteName }}" class="logo" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
+                            <img src="http://localhost/images/kavi-logo-black.png" alt="KAVI.cz" class="logo" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
@@ -382,156 +382,129 @@
                             
                             <!-- Title -->
                             <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
-                                {{ __('emails.order_confirmation.title', [], $locale) }}
+                                Děkujeme za vaši objednávku!
                             </h1>
                             <p class="subtitle" style="font-size: 14px; color: #BCBEB1; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
-                                {{ __('emails.order_confirmation.subtitle', [], $locale) }}
+                                Vaše objednávka byla úspěšně přijata a bude brzy expedována.
                             </p>
                             
                             <!-- Order Number -->
                             <div class="order-number" style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
                                 <div class="order-number-label" style="font-size: 11px; color: #BCBEB1; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ __('emails.order_confirmation.order_number', [], $locale) }}
+                                    Číslo objednávky
                                 </div>
                                 <div class="order-number-value" style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
-                                    {{ $order->order_number }}
+                                    KV-2026-0007
                                 </div>
                             </div>
                             
                             <!-- Order Items -->
                             <div class="section-title" style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                {{ __('emails.order_confirmation.order_contents', [], $locale) }}
+                                Obsah objednávky
                             </div>
                             
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #e5e6df;">
-                                @foreach($order->items as $index => $item)
-                                <tr>
+                                                                <tr>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top; width: 32px;">
-                                        <span style="font-size: 11px; color: #CA4136; font-weight: 400;">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                                        <span style="font-size: 11px; color: #CA4136; font-weight: 400;">01</span>
                                     </td>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top;">
-                                        <div style="font-weight: 400; color: #1c1c1c; margin-bottom: 4px; font-size: 15px;">{{ $item->product_name }}</div>
-                                        <div style="font-size: 13px; color: #BCBEB1; font-weight: 400;">{{ $item->quantity }}× {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency, 0) }}</div>
+                                        <div style="font-weight: 400; color: #1c1c1c; margin-bottom: 4px; font-size: 15px;">Ribang Gayo, Indonésie</div>
+                                        <div style="font-size: 13px; color: #BCBEB1; font-weight: 400;">1× 380 Kč</div>
                                     </td>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top; text-align: right;">
-                                        <span style="font-weight: 400; color: #1c1c1c; white-space: nowrap; font-size: 15px;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($item->total, $order->currency, 0) }}</span>
+                                        <span style="font-weight: 400; color: #1c1c1c; white-space: nowrap; font-size: 15px;">380 Kč</span>
                                     </td>
                                 </tr>
-                                @endforeach
-                            </table>
+                                                            </table>
                             
                             <!-- Totals -->
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #1c1c1c;">
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">{{ __('emails.order_confirmation.subtotal_without_vat', [], $locale) }}:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->subtotal / 1.21, $order->currency, 2) }}</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">Mezisoučet (bez DPH):</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">314,05 Kč</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">{{ __('emails.order_confirmation.vat', [], $locale) }}:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->tax, $order->currency, 2) }}</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">DPH (21%):</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">65,95 Kč</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">{{ __('emails.order_confirmation.shipping', [], $locale) }}:</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">Doprava:</td>
                                     <td style="padding: 6px 0; font-size: 13px; text-align: right;">
-                                        @if($order->shipping == 0)
-                                        <span style="color: #636747; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em;">{{ __('emails.common.free', [], $locale) }}</span>
-                                        @else
-                                        <span style="color: #1c1c1c;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->shipping, $order->currency, 0) }}</span>
-                                        @endif
-                                    </td>
+                                                                                <span style="color: #636747; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em;">Zdarma</span>
+                                                                            </td>
                                 </tr>
-                                @if($order->discount_amount > 0)
-                                <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #636747; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency, 0) }}</td>
-                                </tr>
-                                @endif
-                                <tr>
-                                    <td style="padding: 20px 0 6px 0; font-size: 11px; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em;">{{ __('emails.order_confirmation.total', [], $locale) }}:</td>
-                                    <td style="padding: 20px 0 6px 0; font-size: 28px; color: #1c1c1c; text-align: right; letter-spacing: -0.02em;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency, 0) }}</td>
+                                                                <tr>
+                                    <td style="padding: 20px 0 6px 0; font-size: 11px; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em;">Celkem:</td>
+                                    <td style="padding: 20px 0 6px 0; font-size: 28px; color: #1c1c1c; text-align: right; letter-spacing: -0.02em;">380 Kč</td>
                                 </tr>
                             </table>
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 40px 0;">
-                                <a href="{{ route('dashboard.order.detail', $order->id) }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                                    {{ __('emails.order_confirmation.view_order', [], $locale) }} →
+                                <a href="http://localhost/nastenka/objednavka/13" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                                    Zobrazit detail objednávky →
                                 </a>
                             </div>
                             
                             <!-- Delivery Info -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ __('emails.order_confirmation.delivery', [], $locale) }}
+                                    Doručení
                                 </div>
-                                @if(isset($order->shipping_address['packeta_point_name']))
-                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> {{ $order->shipping_address['packeta_point_name'] }}
+                                                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
+                                    <span style="color: #CA4136;">→</span> Praha 7, Holešovice, Dukelských hrdinů 359/21 (Praha Thrift Store)
                                 </p>
-                                @if(isset($order->shipping_address['packeta_point_address']))
-                                <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 4px 0 4px 18px;">{{ $order->shipping_address['packeta_point_address'] }}</p>
-                                @endif
-                                @endif
-                            </div>
+                                                                <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 4px 0 4px 18px;">Dukelských hrdinů 359/21, 170 00 Praha</p>
+                                                                                            </div>
                             
                             <!-- Billing Info -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ __('emails.order_confirmation.billing_info', [], $locale) }}
+                                    Fakturační údaje
                                 </div>
                                 <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> {{ $order->shipping_address['name'] }}
+                                    <span style="color: #CA4136;">→</span> Lukáš Šlehofer
                                 </p>
                                 <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 4px 0 4px 18px;">
-                                    {{ $order->shipping_address['billing_address'] }}<br>
-                                    {{ $order->shipping_address['billing_postal_code'] }} {{ $order->shipping_address['billing_city'] }}
+                                    Muchova 242/2<br>
+                                    15500 Praha 6
                                 </p>
                                 <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 12px 0 4px 18px;">
-                                    {{ $order->shipping_address['email'] }}<br>
-                                    {{ $order->shipping_address['phone'] }}
+                                    lukas.slehofer@gmail.com<br>
+                                    +420777110957
                                 </p>
                             </div>
                             
                             <!-- Payment Status -->
-                            @if($order->payment_status === 'paid')
-                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #636747; background-color: #fafaf8;">
+                                                        <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #636747; background-color: #fafaf8;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ __('emails.order_confirmation.payment', [], $locale) }}
+                                    Platba
                                 </div>
                                 <p style="font-size: 14px; color: #636747; margin: 0;">
-                                    {{ __('emails.order_confirmation.payment_received', [], $locale) }}
+                                    Platba byla úspěšně přijata.
                                 </p>
                             </div>
-                            @else
-                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #fafaf8;">
-                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ __('emails.order_confirmation.payment', [], $locale) }}
-                                </div>
-                                <p style="font-size: 14px; color: #76716C; margin: 0;">
-                                    {{ __('emails.order_confirmation.payment_pending', [], $locale) }}
-                                </p>
-                            </div>
-                            @endif
-                            
+                                                        
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #e5e6df;">
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #76716C;">
-                                    <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
+                                    <span style="color: #CA4136;">→</span> Čerstvě pražená káva
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #76716C;">
-                                    <span style="color: #CA4136;">→</span> {{ __('emails.common.delivery_time', [], $locale) }}
+                                    <span style="color: #CA4136;">→</span> Doprava do 3 dnů
                                 </span>
                             </div>
                             
                             <!-- Help Text -->
                             <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin-top: 32px;">
-                                {{ __('emails.order_confirmation.help_text', [], $locale) }} 
-                                <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>                                 
+                                Pokud máte jakékoliv dotazy ohledně vaší objednávky, neváhejte nás kontaktovat na 
+                                <a href="mailto:info@kavi.cz" style="color: #CA4136; text-decoration: none;">info@kavi.cz</a>                                 
                             </p>
                             
                             <p style="font-size: 13px; color: #76716C; margin-top: 24px;">
-                                {{ __('emails.common.regards', [], $locale) }},<br>
-                                <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
+                                S pozdravem,<br>
+                                <span style="color: #1c1c1c;">Tým KAVI.cz</span>
                             </p>
                         </td>
                     </tr>
@@ -540,19 +513,19 @@
                     <tr>
                         <td class="footer" style="background-color: #fafaf8; padding: 40px; text-align: center; color: #BCBEB1; font-size: 12px;">
                             <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">
-                                {{ $siteName }}
+                                KAVI.cz
                             </p>
                             <p style="font-size: 12px; color: #BCBEB1; margin: 0 0 24px 0;">
-                                {{ __('emails.common.tagline', [], $locale) }}
+                                Prémiová káva s předplatným
                             </p>
                             <div style="margin: 20px 0;">
-                                <a href="{{ route('home') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('products.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ route('dashboard.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.my_account', [], $locale) }}</a>
+                                <a href="http://localhost" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Domů</a>
+                                <a href="http://localhost/produkty" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Obchod</a>
+                                <a href="http://localhost/nastenka" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Můj účet</a>
                             </div>
                             <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e6df; font-size: 11px; color: #BCBEB1;">
-                                <p style="margin: 0 0 8px 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
-                                <p style="margin: 0;">{{ __('emails.order_confirmation.footer_text', ['email' => $order->shipping_address['email']], $locale) }}</p>
+                                <p style="margin: 0 0 8px 0;">© 2026 KAVI.cz. Všechna práva vyhrazena.</p>
+                                <p style="margin: 0;">Tento e-mail byl odeslán na adresu lukas.slehofer@gmail.com protože jste si vytvořili objednávku na našem e-shopu.</p>
                             </div>
                         </td>
                     </tr>

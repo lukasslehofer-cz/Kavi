@@ -556,51 +556,93 @@ class SubscriptionShipmentService
             'pause_reason' => null,
         ]);
 
-        // 7. Create new pending shipment for the nearest available date (if not already paid)
-        $this->ensurePendingShipmentExists($subscription);
-
-        // 8. Get the next pending shipment and set billing date
-        $nextPending = $subscription->shipments()
-            ->where('status', 'pending')
-            ->orderBy('shipment_date', 'asc')
+        // 7. Calculate next shipment date and ensure pending shipment exists
+        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+        $nextShipmentDate = $this->calculateNextShipmentDate($subscription);
+        
+        if (!$nextShipmentDate) {
+            $nextShipmentDate = $this->getFirstShipmentDate($subscription);
+        }
+        
+        // Check what exists for this date
+        $existingShipment = $subscription->shipments()
+            ->whereDate('shipment_date', $nextShipmentDate->toDateString())
             ->first();
-
-        $nextBillingDate = null;
-        if ($nextPending) {
-            $schedule = ShipmentSchedule::getForMonth(
-                $nextPending->shipment_date->year,
-                $nextPending->shipment_date->month
-            );
-            $nextBillingDate = $schedule?->billing_date ?? $nextPending->shipment_date->copy()->day(15);
+        
+        // Get billing date for this shipment
+        $schedule = ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
+        $billingDate = $schedule?->billing_date ?? $nextShipmentDate->copy()->day(15);
+        
+        // If the shipment is skipped OR billing date has passed, we need to skip to next month
+        $needsToSkipToNextMonth = ($existingShipment && $existingShipment->status === 'skipped') 
+            || $billingDate->lte(today());
+        
+        if ($needsToSkipToNextMonth) {
+            // Calculate next month's shipment
+            $nextMonth = $nextShipmentDate->copy()->addMonths($frequencyMonths);
+            $nextSchedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
+            $nextShipmentDate = $nextSchedule?->shipment_date ?? $nextMonth->copy()->day(20);
+            $billingDate = $nextSchedule?->billing_date ?? $nextMonth->copy()->day(15);
+            $schedule = $nextSchedule;
             
-            $subscription->update([
-                'next_billing_date' => $nextBillingDate,
+            \Log::info('Skipped to next month after resume (skipped shipment or past billing date)', [
+                'subscription_id' => $subscription->id,
+                'new_shipment_date' => $nextShipmentDate->toDateString(),
+                'new_billing_date' => $billingDate->toDateString(),
+            ]);
+        }
+        
+        // Ensure pending shipment exists for the correct date
+        $existingForNewDate = $subscription->shipments()
+            ->whereDate('shipment_date', $nextShipmentDate->toDateString())
+            ->first();
+        
+        $nextPending = null;
+        if (!$existingForNewDate) {
+            // Create new pending shipment
+            $nextPending = $subscription->shipments()->create([
+                'shipment_date' => $nextShipmentDate,
+                'shipment_schedule_id' => $schedule?->id,
+                'status' => 'pending',
+                ...$this->getPackageDimensions($subscription),
             ]);
             
-            // 9. Update coffee reservations for this schedule
-            if ($schedule) {
-                try {
-                    $reservationService = app(\App\Services\StockReservationService::class);
-                    $reservationService->updateReservationsForSchedule($schedule);
-                } catch (\Exception $e) {
-                    \Log::error('Failed to update reservations after resume', [
-                        'subscription_id' => $subscription->id,
-                        'error' => $e->getMessage(),
-                    ]);
-                }
+            \Log::info('Created pending shipment after resume', [
+                'subscription_id' => $subscription->id,
+                'shipment_date' => $nextShipmentDate->toDateString(),
+            ]);
+        } elseif ($existingForNewDate->status === 'pending') {
+            $nextPending = $existingForNewDate;
+        }
+        
+        // 8. Set next_billing_date
+        $subscription->update([
+            'next_billing_date' => $billingDate,
+        ]);
+        
+        // 9. Update coffee reservations for this schedule
+        if ($schedule) {
+            try {
+                $reservationService = app(\App\Services\StockReservationService::class);
+                $reservationService->updateReservationsForSchedule($schedule);
+            } catch (\Exception $e) {
+                \Log::error('Failed to update reservations after resume', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 
         \Log::info('Subscription resumed', [
             'subscription_id' => $subscription->id,
-            'next_shipment' => $nextPending?->shipment_date?->toDateString(),
-            'next_billing_date' => $nextBillingDate?->toDateString(),
+            'next_shipment' => $nextShipmentDate?->toDateString(),
+            'next_billing_date' => $billingDate?->toDateString(),
         ]);
 
         return [
             'success' => true,
             'message' => __('flash.subscription.resumed'),
-            'next_shipment' => $nextPending?->shipment_date,
+            'next_shipment' => $nextShipmentDate,
         ];
     }
 
@@ -845,14 +887,15 @@ class SubscriptionShipmentService
      */
     public function shouldShipOn(Subscription $subscription, Carbon $date): bool
     {
-        // 1. Check for existing pending shipment
+        // 1. Check for existing shipment record (pending or skipped)
         $shipment = $subscription->shipments()
             ->whereDate('shipment_date', $date->toDateString())
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'skipped'])
             ->first();
 
         if ($shipment) {
-            return true;
+            // If skipped, don't ship. If pending, ship.
+            return $shipment->status === 'pending';
         }
 
         // 2. For paused subscriptions: check if pause ends before/on billing_date
