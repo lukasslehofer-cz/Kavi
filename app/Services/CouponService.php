@@ -46,6 +46,16 @@ class CouponService
             return ['valid' => false, 'message' => 'Tento kupón nelze použít pro předplatné.'];
         }
 
+        // Kontrola, zda uživatel již někdy použil jakýkoliv kupón na předplatné
+        if ($type === 'subscription' && $user !== null) {
+            if ($this->hasUserEverUsedSubscriptionCoupon($user->id)) {
+                return [
+                    'valid' => false,
+                    'message' => 'Slevový kód pro předplatné lze použít pouze jednou. Již jste v minulosti využili slevu na předplatné.'
+                ];
+            }
+        }
+
         // Kontrola minimální hodnoty objednávky
         if ($orderValue !== null && !$coupon->meetsMinimumOrderValue($orderValue)) {
             return [
@@ -263,6 +273,16 @@ class CouponService
         }
 
         return $basePrice;
+    }
+
+    /**
+     * Zkontroluje, zda uživatel již někdy použil jakýkoliv kupón na předplatné
+     */
+    public function hasUserEverUsedSubscriptionCoupon(int $userId): bool
+    {
+        return CouponUsage::where('user_id', $userId)
+            ->where('usage_type', 'subscription')
+            ->exists();
     }
 }
 
