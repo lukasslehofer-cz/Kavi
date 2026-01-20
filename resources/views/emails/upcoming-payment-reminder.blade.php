@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>{{ __('emails.upcoming_payment_reminder.title', [], $locale) }}</title>
+    <title>{{ __('emails.upcoming_payment.title', [], $locale) }}</title>
     <style>
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -34,10 +34,10 @@
                         <td style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
                             
                             <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
-                                {{ __('emails.upcoming_payment_reminder.title', [], $locale) }}
+                                {{ __('emails.upcoming_payment.title', [], $locale) }}
                             </h1>
                             <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
-                                {{ __('emails.upcoming_payment_reminder.subtitle', [], $locale) }}
+                                {{ __('emails.upcoming_payment.subtitle', [], $locale) }}
                             </p>
                             
                             <!-- Subscription Number -->
