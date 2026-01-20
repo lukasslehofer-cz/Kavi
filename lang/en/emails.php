@@ -109,7 +109,7 @@ return [
     // Subscription Confirmation
     'subscription_confirmation' => [
         'subject' => 'Subscription Confirmation - KAVI',
-        'title' => 'Welcome to KAVI! ☕',
+        'title' => 'Subscription Confirmation',
         'subtitle' => 'Thank you for subscribing to our coffee service.',
         'greeting' => 'Hello :name,',
         'intro' => 'Thank you for subscribing to our coffee service. Here are your subscription details:',
@@ -208,7 +208,7 @@ return [
     // Subscription Box Shipped
     'subscription_box_shipped' => [
         'subject' => 'Your Coffee Box Has Been Shipped - :subscription_number',
-        'title' => 'Your Coffee Box Is On Its Way! ☕',
+        'title' => 'Your Coffee Box Is On Its Way',
         'subtitle' => 'Great news! We\'ve prepared a new coffee box for you.',
         'subscription_number' => 'Subscription Number',
         'tracking_number' => 'Tracking Number',
@@ -222,8 +222,8 @@ return [
 
     // Subscription Box Preparing
     'subscription_box_preparing' => [
-        'subject' => 'Preparing Your Coffee Box ☕ - :subscription_number',
-        'title' => 'We\'re Preparing Your Coffee Box! ☕',
+        'subject' => 'Preparing Your Coffee Box - :subscription_number',
+        'title' => 'We\'re Preparing Your Coffee Box',
         'subtitle' => 'Your new coffee box is currently being prepared.',
         'subscription_number' => 'Subscription Number',
         'preparing_text' => 'We\'re carefully selecting the best coffees for your box. We\'ll send you shipping information soon.',
@@ -244,8 +244,8 @@ return [
 
     // Subscription Box Delivered
     'subscription_box_delivered' => [
-        'subject' => 'Your Coffee Box Has Been Delivered ✓ - :subscription_number',
-        'title' => 'Your Coffee Box Has Been Delivered! ☕',
+        'subject' => 'Your Coffee Box Has Been Delivered - :subscription_number',
+        'title' => 'Your Coffee Box Has Been Delivered',
         'subtitle' => 'Thank you for picking up your coffee box.',
         'subscription_number' => 'Subscription Number',
     ],

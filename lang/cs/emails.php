@@ -109,7 +109,7 @@ return [
     // Subscription Confirmation
     'subscription_confirmation' => [
         'subject' => 'Potvrzení předplatného - KAVI.cz',
-        'title' => 'Vítejte v KAVI! ☕',
+        'title' => 'Potvrzení předplatného',
         'subtitle' => 'Děkujeme za objednání kávového předplatného.',
         'greeting' => 'Dobrý den :name,',
         'intro' => 'Děkujeme za objednání kávového předplatného. Zde jsou detaily vašeho předplatného:',
@@ -208,7 +208,7 @@ return [
     // Subscription Box Shipped
     'subscription_box_shipped' => [
         'subject' => 'Váš kávový box byl expedován - :subscription_number',
-        'title' => 'Váš kávový box je na cestě! ☕',
+        'title' => 'Váš kávový box je na cestě',
         'subtitle' => 'Skvělá zpráva! Připravili jsme pro vás nový kávový box.',
         'subscription_number' => 'Číslo předplatného',
         'tracking_number' => 'Sledovací číslo',
@@ -222,8 +222,8 @@ return [
 
     // Subscription Box Preparing
     'subscription_box_preparing' => [
-        'subject' => 'Připravujeme váš kávový box ☕ - :subscription_number',
-        'title' => 'Připravujeme váš kávový box! ☕',
+        'subject' => 'Připravujeme váš kávový box - :subscription_number',
+        'title' => 'Připravujeme váš kávový box',
         'subtitle' => 'Váš nový kávový box je právě v přípravě.',
         'subscription_number' => 'Číslo předplatného',
         'preparing_text' => 'Pečlivě vybíráme ty nejlepší kávy pro váš box. Brzy vám pošleme informace o odeslání.',
@@ -244,8 +244,8 @@ return [
 
     // Subscription Box Delivered
     'subscription_box_delivered' => [
-        'subject' => 'Váš kávový box byl doručen ✓ - :subscription_number',
-        'title' => 'Váš kávový box byl doručen! ☕',
+        'subject' => 'Váš kávový box byl doručen - :subscription_number',
+        'title' => 'Váš kávový box byl doručen',
         'subtitle' => 'Děkujeme, že jste si vyzvedli svůj kávový box.',
         'subscription_number' => 'Číslo předplatného',
     ],

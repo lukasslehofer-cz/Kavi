@@ -86,8 +86,8 @@
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #bcbeb1;">
                                 <tr>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1;">
-                                        <span style="font-size: 13px; color: #76716C;">{{ $locale === 'cs' ? 'Typ kávy' : 'Coffee Type' }}</span><br>
-                                        <span style="font-size: 15px; color: #1c1c1c;">
+                                        <span style="font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Typ kávy' : 'Coffee Type' }}</span><br>
+                                        <span style="font-size: 16px; color: #1c1c1c;">
                                             @if($subscription->configuration['type'] === 'espresso')
                                                 Espresso
                                             @elseif($subscription->configuration['type'] === 'filter')
@@ -103,14 +103,14 @@
                                 </tr>
                                 <tr>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1;">
-                                        <span style="font-size: 13px; color: #76716C;">{{ __('emails.subscription_confirmation.bags_count', [], $locale) }}</span><br>
-                                        <span style="font-size: 15px; color: #1c1c1c;">{{ $subscription->configuration['amount'] }}x 250g</span>
+                                        <span style="font-size: 14px; color: #76716C;">{{ __('emails.subscription_confirmation.bags_count', [], $locale) }}</span><br>
+                                        <span style="font-size: 16px; color: #1c1c1c;">{{ $subscription->configuration['amount'] }}x 250g</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1;">
-                                        <span style="font-size: 13px; color: #76716C;">{{ __('emails.subscription_confirmation.frequency', [], $locale) }}</span><br>
-                                        <span style="font-size: 15px; color: #1c1c1c;">
+                                        <span style="font-size: 14px; color: #76716C;">{{ __('emails.subscription_confirmation.frequency', [], $locale) }}</span><br>
+                                        <span style="font-size: 16px; color: #1c1c1c;">
                                             @if($subscription->frequency_months == 1)
                                                 {{ __('emails.frequency.monthly', [], $locale) }}
                                             @elseif($subscription->frequency_months == 2)
@@ -132,11 +132,11 @@
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #1c1c1c;">
                                 @if($activeDiscount > 0)
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.subscription_confirmation.price', [], $locale) }}:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a; text-align: right; text-decoration: line-through;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency, 0) }}</td>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a;">{{ __('emails.subscription_confirmation.price', [], $locale) }}:</td>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a; text-align: right; text-decoration: line-through;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency, 0) }}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}:</td>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a;">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}:</td>
                                     <td style="padding: 6px 0; font-size: 13px; color: #4a6741; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($activeDiscount, $subscription->currency, 0) }}</td>
                                 </tr>
                                 @endif
@@ -151,7 +151,7 @@
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
                                     {{ __('emails.subscription_confirmation.next_delivery', [], $locale) }}
                                 </div>
-                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     <span style="color: #CA4136;">→</span> {{ $subscription->next_shipment_date ? $subscription->next_shipment_date->format('j. n. Y') : ($locale === 'cs' ? 'Brzy' : 'Soon') }}
                                 </p>
                                 @if($subscription->next_billing_date && $subscription->frequency_months > 0)
@@ -160,7 +160,7 @@
                                     $nextShipmentSchedule = \App\Models\ShipmentSchedule::getForMonth($nextBillingDate->year, $nextBillingDate->month);
                                     $nextShipmentAfterBilling = $nextShipmentSchedule ? $nextShipmentSchedule->shipment_date : $nextBillingDate->copy()->day(20);
                                 @endphp
-                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
                                     {{ $locale === 'cs' ? 'Další platba' : 'Next payment' }}: {{ $nextBillingDate->format('j. n. Y') }}<br>
                                     {{ $locale === 'cs' ? 'Další doručení' : 'Next delivery' }}: {{ $locale === 'cs' ? 'cca' : 'approx.' }} {{ $nextShipmentAfterBilling->format('j. n. Y') }}
                                 </p>
@@ -173,15 +173,15 @@
                                     {{ __('emails.order_confirmation.delivery', [], $locale) }}
                                 </div>
                                 @if(isset($subscription->packeta_point_name))
-                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     <span style="color: #CA4136;">→</span> {{ $subscription->packeta_point_name }}
                                 </p>
                                 @if(isset($subscription->packeta_point_address))
-                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">{{ $subscription->packeta_point_address }}</p>
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">{{ $subscription->packeta_point_address }}</p>
                                 @endif
                                 @endif
                                 @if($subscription->delivery_notes)
-                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
                                     {{ $locale === 'cs' ? 'Poznámka' : 'Note' }}: {{ $subscription->delivery_notes }}
                                 </p>
                                 @endif
@@ -192,14 +192,14 @@
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
                                     {{ __('emails.order_confirmation.billing_info', [], $locale) }}
                                 </div>
-                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     <span style="color: #CA4136;">→</span> {{ $subscription->shipping_address['name'] }}
                                 </p>
-                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
                                     {{ $subscription->shipping_address['billing_address'] }}<br>
                                     {{ $subscription->shipping_address['billing_postal_code'] }} {{ $subscription->shipping_address['billing_city'] }}
                                 </p>
-                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
                                     {{ $subscription->shipping_address['email'] }}
                                     @if(isset($subscription->shipping_address['phone']))
                                     <br>{{ $subscription->shipping_address['phone'] }}
@@ -213,7 +213,7 @@
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
                                     {{ $locale === 'cs' ? 'Stav předplatného' : 'Subscription Status' }}
                                 </div>
-                                <p style="font-size: 14px; color: #4a6741; margin: 0;">
+                                <p style="font-size: 15px; color: #4a6741; margin: 0;">
                                     {{ $locale === 'cs' ? 'Vaše předplatné je aktivní. Další platba proběhne automaticky.' : 'Your subscription is active. The next payment will be processed automatically.' }}
                                 </p>
                             </div>
@@ -222,7 +222,7 @@
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
                                     {{ $locale === 'cs' ? 'Stav předplatného' : 'Subscription Status' }}
                                 </div>
-                                <p style="font-size: 14px; color: #5a5a5a; margin: 0;">
+                                <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
                                     {{ $locale === 'cs' ? 'Vaše předplatné čeká na aktivaci. Po potvrzení platby bude automaticky aktivováno.' : 'Your subscription is pending activation. It will be activated automatically once payment is confirmed.' }}
                                 </p>
                             </div>
@@ -249,12 +249,12 @@
                             </div>
                             
                             <!-- Help Text -->
-                            <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
+                            <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
                                 {{ __('emails.subscription_confirmation.manage_subscription', [], $locale) }} {{ __('emails.subscription_confirmation.help_text', [], $locale) }} 
                                 <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             
-                            <p style="font-size: 13px; color: #5a5a5a; margin-top: 24px;">
+                            <p style="font-size: 14px; color: #5a5a5a; margin-top: 24px;">
                                 {{ __('emails.common.regards', [], $locale) }},<br>
                                 <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>

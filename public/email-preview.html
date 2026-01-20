@@ -1,255 +1,144 @@
 <!DOCTYPE html>
 <html lang="cs">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>Vaše objednávka je na cestě!</title>
+    <title>Připravujeme váš kávový box</title>
     <style>
-        /* Reset styles */
-        body,
-        table,
-        td,
-        a {
-            -webkit-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
-        }
-
-        table,
-        td {
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
-        }
-
-        img {
-            -ms-interpolation-mode: bicubic;
-            border: 0;
-            height: auto;
-            line-height: 100%;
-            outline: none;
-            text-decoration: none;
-        }
-
-        /* Swiss Style Base */
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            background-color: #bcbeb1;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #e5e6df;
-        }
-
-        /* Responsive */
-        @media only screen and (max-width: 600px) {
-            .content {
-                padding: 32px 24px !important;
-            }
-
-            h1 {
-                font-size: 26px !important;
-            }
-
-            .header,
-            .footer {
-                padding: 32px 24px !important;
-            }
-        }
-
-        /* Dark mode override */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #bcbeb1 !important;
-            }
-
-            .email-container {
-                background-color: #e5e6df !important;
-            }
-        }
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        body { margin: 0; padding: 0; width: 100%; background-color: #bcbeb1; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #e5e6df; }
+        @media only screen and (max-width: 600px) { .content { padding: 32px 24px !important; } h1 { font-size: 26px !important; } .header, .footer { padding: 32px 24px !important; } }
+        @media (prefers-color-scheme: dark) { body { background-color: #bcbeb1 !important; } .email-container { background-color: #e5e6df !important; } }
     </style>
 </head>
-
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-        style="background-color: #bcbeb1; padding: 32px 16px;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
-                <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container"
-                    width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;"
-                    bgcolor="#e5e6df">
-
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
+                    
                     <!-- Header -->
                     <tr>
                         <td style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
-                            <img src="http://localhost/images/kavi-logo-white.png" alt="KAVI.cz" width="80"
-                                style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
+                            <img src="http://localhost/images/kavi-logo-white.png" alt="KAVI.cz" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
-
+                    
                     <!-- Content -->
                     <tr>
                         <td style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
-
-                            <!-- Title -->
-                            <h1
-                                style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
-                                Vaše objednávka je na cestě!
+                            
+                            <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
+                                Připravujeme váš kávový box
                             </h1>
-                            <p
-                                style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
-                                Skvělá zpráva! Vaše objednávka byla odeslána.
+                            <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                                Váš nový kávový box je právě v přípravě.
                             </p>
-
-                            <!-- Order Number -->
+                            
+                            <!-- Subscription Number -->
                             <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
-                                <div
-                                    style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    Číslo objednávky
+                                <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    Předplatné
                                 </div>
-                                <div
-                                    style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
-                                    KV-2026-0007
+                                <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
+                                    KVS-2026-0003
                                 </div>
                             </div>
-
-                            <!-- Tracking Info -->
-
-                            <!-- Pickup Point -->
+                            
+                            <!-- Timeline -->
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
+                                    Postup přípravy
+                                </div>
+                                <p style="font-size: 15px; color: #5a5a5a; margin: 0; line-height: 1.8;">
+                                                                        <span style="color: #4a6741;">01</span> Výběr kávy – Pečlivě jsme vybrali kávy z nejlepších pražíren<br>
+                                    <span style="color: #4a6741;">02</span> Káva dorazila – Balíčky z celé Evropy jsou na místě<br>
+                                    <span style="color: #CA4136;">03</span> <strong>Balení boxu</strong> – Právě teď balíme váš unikátní box<br>
+                                    <span style="color: #76716C;">04</span> Expedice – Za cca 5 dní odešleme k vám
+                                                                    </p>
+                            </div>
+                            
+                            <!-- What's inside -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
-                                <div
-                                    style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    Výdejní místo
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    Co vás čeká v boxu
                                 </div>
-                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> Praha 7, Holešovice, Dukelských hrdinů 359/21
-                                    (Praha Thrift Store)
-                                </p>
-                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
-                                    Dukelských hrdinů 359/21, 170 00 Praha</p>
-                            </div>
-
-                            <!-- Order Items -->
-                            <div
-                                style="font-size: 11px; font-weight: 400; color: #76716C; margin: 32px 0 20px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                Obsah objednávky
-                            </div>
-
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-                                style="border-top: 1px solid #bcbeb1;">
-                                <tr>
-                                    <td
-                                        style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; width: 32px;">
-                                        <span style="font-size: 11px; color: #CA4136; font-weight: 400;">01</span>
-                                    </td>
-                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top;">
-                                        <div
-                                            style="font-weight: 400; color: #1c1c1c; margin-bottom: 2px; font-size: 15px;">
-                                            Ribang Gayo, Indonésie</div>
-                                        <div
-                                            style="font-size: 12px; color: #5a5a5a; font-weight: 400; margin-bottom: 4px;">
-                                            Ripsnorter Coffee</div>
-                                        <div style="font-size: 13px; color: #76716C; font-weight: 400;">1× 380 Kč</div>
-                                    </td>
-                                    <td
-                                        style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; text-align: right;">
-                                        <span
-                                            style="font-weight: 400; color: #1c1c1c; white-space: nowrap; font-size: 15px;">380
-                                            Kč</span>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- What's Next -->
-                            <div
-                                style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
-                                <div
-                                    style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    Co se stane dále
-                                </div>
-                                <p style="font-size: 14px; color: #5a5a5a; margin: 0; line-height: 1.8;">
-                                    <span style="color: #CA4136;">01</span> Zásilka dorazí na výdejní místo během 1-2
-                                    dnů<br>
-                                    <span style="color: #CA4136;">02</span> Dostanete SMS s kódem pro vyzvednutí<br>
-                                    <span style="color: #CA4136;">03</span> Vyzvedněte si balík na výdejním místě<br>
-                                    <span style="color: #CA4136;">04</span> Vychutnejte si čerstvou kávu
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
+                                    <span style="color: #CA4136;">→</span> 
+                                                                            Espresso
+                                                                    </p>
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
+                                    2 balíčky × 250g
                                 </p>
                             </div>
-
+                            
+                            <!-- Expected shipment -->
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    Očekávaná expedice
+                                </div>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
+                                                                        <span style="color: #CA4136;">→</span> Váš box odešleme přibližně za <strong>5 dní</strong>
+                                                                    </p>
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
+                                    O expedici vás budeme informovat dalším e-mailem s tracking číslem.
+                                </p>
+                            </div>
+                            
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 40px 0;">
-                                <a href="http://localhost/nastenka/objednavka/13"
-                                    style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                                    Zobrazit detail objednávky →
+                                <a href="http://localhost/nastenka/predplatne" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                                    Spravovat předplatné →
                                 </a>
                             </div>
-
+                            
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
-                                <span
-                                    style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
                                     <span style="color: #CA4136;">→</span> Čerstvě pražená káva
                                 </span>
-                                <span
-                                    style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> Doprava do 3 dnů
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> Baleno s láskou
                                 </span>
                             </div>
-
+                            
                             <!-- Help Text -->
-                            <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
+                            <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
                                 Pokud máte jakékoli dotazy, neváhejte nás kontaktovat.
-                                <a href="mailto:info@kavi.cz"
-                                    style="color: #CA4136; text-decoration: none;">info@kavi.cz</a>
+                                <a href="mailto:info@kavi.cz" style="color: #CA4136; text-decoration: none;">info@kavi.cz</a>
                             </p>
-
-                            <p style="font-size: 13px; color: #5a5a5a; margin-top: 24px;">
-                                S pozdravem,<br>
+                            
+                            <p style="font-size: 14px; color: #5a5a5a; margin-top: 24px;">
+                                S láskou k dobré kávě,<br>
                                 <span style="color: #1c1c1c;">Tým KAVI.cz</span>
                             </p>
                         </td>
                     </tr>
-
+                    
                     <!-- Footer -->
                     <tr>
-                        <td
-                            style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
-                            <p
-                                style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">
-                                KAVI.cz
-                            </p>
-                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">
-                                Prémiová káva s předplatným
-                            </p>
+                        <td style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
+                            <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">KAVI.cz</p>
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">Prémiová káva s předplatným</p>
                             <div style="margin: 20px 0;">
-                                <a href="http://localhost"
-                                    style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Domů</a>
-                                <a href="http://localhost/produkty"
-                                    style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Obchod</a>
-                                <a href="http://localhost/nastenka"
-                                    style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Můj
-                                    účet</a>
+                                <a href="http://localhost" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Domů</a>
+                                <a href="http://localhost/produkty" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Obchod</a>
+                                <a href="http://localhost/nastenka/predplatne" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Moje předplatné</a>
                             </div>
-                            <div
-                                style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
                                 <p style="margin: 0;">© 2026 KAVI.cz. Všechna práva vyhrazena.</p>
                             </div>
                         </td>
                     </tr>
-
+                    
                 </table>
-                <!--[if mso]></td></tr></table><![endif]-->
             </td>
         </tr>
     </table>
 </body>
-
 </html>

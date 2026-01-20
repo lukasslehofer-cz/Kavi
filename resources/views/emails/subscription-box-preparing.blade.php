@@ -10,84 +10,73 @@
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-        body { margin: 0; padding: 0; width: 100%; background-color: #bcbeb1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+        body { margin: 0; padding: 0; width: 100%; background-color: #bcbeb1; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
         .email-container { max-width: 600px; margin: 0 auto; background-color: #e5e6df; }
-        .header { background-color: #1c1c1c; padding: 32px 40px 24px 40px; text-align: left; border-bottom: 2px solid #CA4136; }
-        .logo { max-width: 100px !important; width: 100px !important; height: auto !important; display: block !important; margin: 0 !important; border: 0; outline: none; }
-        .content { padding: 40px; color: #1c1c1c; }
-        h1 { font-size: 24px; font-weight: 700; color: #1c1c1c; margin: 0 0 12px 0; line-height: 1.3; text-transform: uppercase; letter-spacing: 1px; }
-        .subtitle { font-size: 15px; color: #5a5a5a; margin: 0 0 32px 0; font-weight: 400; }
-        .section-title { font-size: 13px; font-weight: 700; color: #1c1c1c; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid #1c1c1c; padding-bottom: 8px; display: inline-block; }
-        .info-box { background-color: #d5d7ca; border-radius: 0; padding: 20px; margin: 24px 0; }
-        .info-title { font-size: 13px; font-weight: 700; color: #1c1c1c; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 1px; }
-        .info-text { font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 8px 0; }
-        .highlight-box { background-color: #1c1c1c; color: #ffffff; padding: 20px; margin: 24px 0; }
-        .accent-box { border-left: 4px solid #CA4136; background-color: #d5d7ca; padding: 20px; margin: 24px 0; }
-        .success-box { border-left: 4px solid #4a6741; background-color: #d5d7ca; padding: 20px; margin: 24px 0; }
-        .warning-box { border-left: 4px solid #b8860b; background-color: #d5d7ca; padding: 20px; margin: 24px 0; }
-        .button { display: inline-block; background-color: #CA4136; color: #ffffff !important; text-decoration: none; padding: 14px 32px; font-weight: 600; font-size: 13px; margin: 24px 0; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
-        .footer { background-color: #d5d7ca; padding: 32px 40px; text-align: center; color: #5a5a5a; font-size: 13px; border-top: 1px solid #bcbeb1; }
-        .footer-text { margin: 8px 0; font-weight: 400; }
-        .footer-links { margin: 16px 0; }
-        .footer-link { color: #CA4136; text-decoration: none; margin: 0 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; font-weight: 600; }
-        .step-number { display: inline-block; width: 24px; height: 24px; background-color: #CA4136; color: #ffffff; text-align: center; line-height: 24px; font-size: 12px; font-weight: 700; margin-right: 12px; }
-        .step-done { background-color: #4a6741; }
-        .step-current { background-color: #CA4136; }
-        .step-pending { background-color: #bcbeb1; color: #5a5a5a; }
-        @media only screen and (max-width: 600px) { 
-            .content { padding: 24px !important; } 
-            h1 { font-size: 20px !important; } 
-            .header, .footer { padding: 24px !important; } 
-            .logo { max-width: 80px !important; width: 80px !important; } 
-        }
+        @media only screen and (max-width: 600px) { .content { padding: 32px 24px !important; } h1 { font-size: 26px !important; } .header, .footer { padding: 32px 24px !important; } }
+        @media (prefers-color-scheme: dark) { body { background-color: #bcbeb1 !important; } .email-container { background-color: #e5e6df !important; } }
     </style>
 </head>
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 20px 0;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
                     
+                    <!-- Header -->
                     <tr>
-                        <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="100">
+                        <td style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
+                    <!-- Content -->
                     <tr>
-                        <td class="content">
-                            <h1>{{ __('emails.subscription_box_preparing.title', [], $locale) }}</h1>
-                            <p class="subtitle">{{ __('emails.subscription_box_preparing.subtitle', [], $locale) }}</p>
+                        <td style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
+                            
+                            <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
+                                {{ __('emails.subscription_box_preparing.title', [], $locale) }}
+                            </h1>
+                            <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                                {{ __('emails.subscription_box_preparing.subtitle', [], $locale) }}
+                            </p>
                             
                             <!-- Subscription Number -->
-                            <div class="highlight-box">
-                                <div style="font-size: 11px; color: #bcbeb1; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">{{ __('emails.common.subscription', [], $locale) }}</div>
-                                <div style="font-size: 24px; font-weight: 700; color: #ffffff; letter-spacing: 2px;">{{ $subscription->subscription_number }}</div>
+                            <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
+                                <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ __('emails.common.subscription', [], $locale) }}
+                                </div>
+                                <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
+                                    {{ $subscription->subscription_number }}
+                                </div>
                             </div>
                             
                             <!-- Timeline -->
-                            <div class="section-title">{{ $locale === 'cs' ? 'Postup přípravy' : 'Preparation progress' }}</div>
-                            <div class="warning-box">
-                                <p class="info-text" style="color: #1c1c1c; margin: 0;">
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
+                                    {{ $locale === 'cs' ? 'Postup přípravy' : 'Preparation progress' }}
+                                </div>
+                                <p style="font-size: 15px; color: #5a5a5a; margin: 0; line-height: 1.8;">
                                     @if($locale === 'cs')
-                                    <span class="step-number step-done">1</span> <strong>Výběr kávy</strong> – Pečlivě jsme vybrali kávy z nejlepších pražíren<br><br>
-                                    <span class="step-number step-done">2</span> <strong>Káva dorazila</strong> – Balíčky z celé Evropy jsou na místě<br><br>
-                                    <span class="step-number step-current">3</span> <strong>Balení boxu</strong> – Právě teď balíme váš unikátní box<br><br>
-                                    <span class="step-number step-pending">4</span> <strong>Expedice</strong> – Za cca 5 dní odešleme k vám
+                                    <span style="color: #4a6741;">01</span> Výběr kávy – Pečlivě jsme vybrali kávy z nejlepších pražíren<br>
+                                    <span style="color: #4a6741;">02</span> Káva dorazila – Balíčky z celé Evropy jsou na místě<br>
+                                    <span style="color: #CA4136;">03</span> <strong>Balení boxu</strong> – Právě teď balíme váš unikátní box<br>
+                                    <span style="color: #76716C;">04</span> Expedice – Za cca 5 dní odešleme k vám
                                     @else
-                                    <span class="step-number step-done">1</span> <strong>Coffee selection</strong> – We carefully selected coffees from the best roasteries<br><br>
-                                    <span class="step-number step-done">2</span> <strong>Coffee arrived</strong> – Samples from across Europe are here<br><br>
-                                    <span class="step-number step-current">3</span> <strong>Packing your box</strong> – We're packing your unique box right now<br><br>
-                                    <span class="step-number step-pending">4</span> <strong>Shipping</strong> – We'll ship to you in about 5 days
+                                    <span style="color: #4a6741;">01</span> Coffee selection – We carefully selected coffees from the best roasteries<br>
+                                    <span style="color: #4a6741;">02</span> Coffee arrived – Samples from across Europe are here<br>
+                                    <span style="color: #CA4136;">03</span> <strong>Packing your box</strong> – We're packing your unique box right now<br>
+                                    <span style="color: #76716C;">04</span> Shipping – We'll ship to you in about 5 days
                                     @endif
                                 </p>
                             </div>
                             
                             <!-- What's inside -->
-                            <div class="info-box">
-                                <div class="info-title">{{ $locale === 'cs' ? 'Co vás čeká v boxu' : 'What\'s in your box' }}</div>
-                                <p class="info-text" style="color: #1c1c1c;">
-                                    <strong>{{ $locale === 'cs' ? 'Typ kávy' : 'Coffee type' }}:</strong> 
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ $locale === 'cs' ? 'Co vás čeká v boxu' : 'What\'s in your box' }}
+                                </div>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
+                                    <span style="color: #CA4136;">→</span> 
                                     @if($subscription->configuration['type'] === 'espresso')
                                         Espresso
                                     @elseif($subscription->configuration['type'] === 'filter')
@@ -95,75 +84,72 @@
                                     @else
                                         Mix Espresso & {{ $locale === 'cs' ? 'Filtr' : 'Filter' }}
                                     @endif
-                                    <br>
-                                    <strong>{{ $locale === 'cs' ? 'Množství' : 'Quantity' }}:</strong> {{ $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2 }} {{ $locale === 'cs' ? 'balíčky' : 'packages' }}
+                                </p>
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
+                                    {{ $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2 }} {{ $locale === 'cs' ? 'balíčky × 250g' : 'packages × 250g' }}
                                 </p>
                             </div>
                             
                             <!-- Expected shipment -->
-                            <div class="accent-box">
-                                <div class="info-title">{{ $locale === 'cs' ? 'Očekávaná expedice' : 'Expected shipment' }}</div>
-                                <p class="info-text" style="color: #1c1c1c;">
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ $locale === 'cs' ? 'Očekávaná expedice' : 'Expected shipment' }}
+                                </div>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     @if($locale === 'cs')
-                                    Váš box odešleme přibližně za <strong>5 dní</strong>.<br>
-                                    O expedici vás budeme informovat dalším e-mailem s tracking číslem.
+                                    <span style="color: #CA4136;">→</span> Váš box odešleme přibližně za <strong>5 dní</strong>
                                     @else
-                                    Your box will be shipped in approximately <strong>5 days</strong>.<br>
-                                    We'll notify you with another email containing the tracking number.
+                                    <span style="color: #CA4136;">→</span> Your box will be shipped in approximately <strong>5 days</strong>
                                     @endif
+                                </p>
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
+                                    {{ $locale === 'cs' ? 'O expedici vás budeme informovat dalším e-mailem s tracking číslem.' : 'We\'ll notify you with another email containing the tracking number.' }}
                                 </p>
                             </div>
                             
-                            <!-- What makes it special -->
-                            <div class="success-box">
-                                <div class="info-title" style="color: #4a6741;">{{ $locale === 'cs' ? 'Proč je váš box výjimečný' : 'Why your box is special' }}</div>
-                                <p class="info-text" style="color: #1c1c1c;">
-                                    @if($locale === 'cs')
-                                    <strong>Čerstvě pražená káva</strong> z malých pražíren<br>
-                                    <strong>Vybrána speciálně</strong> podle vašich preferencí<br>
-                                    <strong>Káva z celé Evropy</strong> – objevujte nové chutě<br>
-                                    <strong>Baleno s láskou</strong> náš tým pro vás
-                                    @else
-                                    <strong>Freshly roasted coffee</strong> from small roasteries<br>
-                                    <strong>Selected especially</strong> according to your preferences<br>
-                                    <strong>Samples from all over Europe</strong> – discover new flavors<br>
-                                    <strong>Packed with love</strong> by our team for you
-                                    @endif
-                                </p>
-                            </div>
-                            
-                            <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('dashboard.subscription') }}" class="button">
-                                    {{ __('emails.subscription_paused.manage_subscription', [], $locale) }}
+                            <!-- CTA Button -->
+                            <div style="text-align: center; margin: 40px 0;">
+                                <a href="{{ route('dashboard.subscription') }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                                    {{ __('emails.subscription_paused.manage_subscription', [], $locale) }} →
                                 </a>
                             </div>
                             
-                            <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
+                            <!-- Features -->
+                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
+                                </span>
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Baleno s láskou' : 'Packed with love' }}
+                                </span>
+                            </div>
+                            
+                            <!-- Help Text -->
+                            <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
                                 {{ __('emails.common.questions', [], $locale) }}
-                                <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none; font-weight: 600;">{{ $contactEmail }}</a>
+                                <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             
-                            <p style="font-size: 13px; color: #5a5a5a; margin-top: 24px;">
+                            <p style="font-size: 14px; color: #5a5a5a; margin-top: 24px;">
                                 {{ __('emails.welcome.with_love', [], $locale) }},<br>
-                                <strong style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</strong>
+                                <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>
                         </td>
                     </tr>
                     
+                    <!-- Footer -->
                     <tr>
-                        <td class="footer">
-                            <p class="footer-text">
-                                <strong style="color: #1c1c1c;">{{ $siteName }}</strong><br>
-                                {{ __('emails.common.tagline', [], $locale) }}
-                            </p>
-                            <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('products.index') }}" class="footer-link">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link">{{ __('emails.common.my_subscription', [], $locale) }}</a>
+                        <td style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
+                            <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">{{ $siteName }}</p>
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">{{ __('emails.common.tagline', [], $locale) }}</p>
+                            <div style="margin: 20px 0;">
+                                <a href="{{ route('home') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('dashboard.subscription') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.my_subscription', [], $locale) }}</a>
                             </div>
-                            <p class="footer-text" style="font-size: 11px; margin-top: 16px; color: #76716c;">
-                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
-                            </p>
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
+                                <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
+                            </div>
                         </td>
                     </tr>
                     
