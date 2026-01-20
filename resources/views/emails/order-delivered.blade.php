@@ -7,63 +7,83 @@
     <meta name="supported-color-schemes" content="light">
     <title>{{ __('emails.order_delivered.title', [], $locale) }}</title>
     <style>
+        /* Reset styles */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-        body { margin: 0; padding: 0; width: 100%; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
-        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-        .header { background-color: #111827; padding: 32px 40px; text-align: center; }
-        .logo { max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; }
-        .content { padding: 40px; color: #374151; }
-        h1 { font-size: 28px; font-weight: 700; color: #111827; margin: 0 0 12px 0; line-height: 1.2; }
-        .subtitle { font-size: 16px; color: #6b7280; margin: 0 0 32px 0; font-weight: 300; }
-        .info-box { background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 24px 0; }
-        .info-title { font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0; }
-        .info-text { font-size: 14px; color: #4b5563; line-height: 1.6; margin: 4px 0; }
-        .item-name { font-weight: 600; color: #111827; font-size: 14px; }
-        .item-quantity { font-size: 13px; color: #6b7280; margin-top: 2px; }
-        .item-price { font-weight: 700; color: #111827; white-space: nowrap; margin-left: 16px; }
-        .button { display: inline-block; background-color: #e6305a; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 9999px; font-weight: 600; font-size: 15px; margin: 24px 0; text-align: center; }
-        .footer { background-color: #f9fafb; padding: 32px 40px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
-        .footer-text { margin: 8px 0; font-weight: 300; }
-        .footer-links { margin: 16px 0; }
-        .footer-link { color: #e6305a; text-decoration: none; margin: 0 8px; }
-        @media only screen and (max-width: 600px) { .content { padding: 24px !important; } h1 { font-size: 24px !important; } .header, .footer { padding: 24px !important; } .logo { max-width: 100px !important; width: 100px !important; } }
+        
+        /* Swiss Style Base */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            background-color: #bcbeb1; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .email-container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background-color: #e5e6df; 
+        }
+        
+        /* Responsive */
+        @media only screen and (max-width: 600px) { 
+            .content { padding: 32px 24px !important; } 
+            h1 { font-size: 26px !important; } 
+            .header, .footer { padding: 32px 24px !important; } 
+        }
+        
+        /* Dark mode override */
+        @media (prefers-color-scheme: dark) { 
+            body { background-color: #bcbeb1 !important; } 
+            .email-container { background-color: #e5e6df !important; } 
+        }
     </style>
 </head>
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6 !important; padding: 20px 0;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
                 <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
                     
+                    <!-- Header -->
                     <tr>
-                        <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                        <td style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
+                    <!-- Content -->
                     <tr>
-                        <td class="content">
-                            <div style="text-align: center; margin-bottom: 24px;">
-                                <div style="width: 64px; height: 64px; background-color: #10b981 !important; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; line-height: 64px;">
-                                    ✓
+                        <td style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
+                            
+                            <!-- Title -->
+                            <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
+                                {{ __('emails.order_delivered.title', [], $locale) }}
+                            </h1>
+                            <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                                {{ __('emails.order_delivered.subtitle', [], $locale) }}
+                            </p>
+                            
+                            <!-- Order Number -->
+                            <div style="border-top: 2px solid #4a6741; padding: 24px 0; margin: 32px 0;">
+                                <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ __('emails.order_delivered.order_number', [], $locale) }}
+                                </div>
+                                <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
+                                    {{ $order->order_number }}
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">{{ __('emails.order_delivered.title', [], $locale) }}</h1>
-                            <p class="subtitle" style="text-align: center;">{{ __('emails.order_delivered.subtitle', [], $locale) }}</p>
-                            
-                            <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
-                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">{{ __('emails.order_delivered.order_number', [], $locale) }}</div>
-                                <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $order->order_number }}</div>
-                            </div>
-                            
                             <!-- Thank You Message -->
-                            <div class="info-box" style="background-color: #d1fae5 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#d1fae5">
-                                <h3 class="info-title" style="color: #065f46;">🎉 {{ $locale === 'cs' ? 'Děkujeme za nákup!' : 'Thank you for your purchase!' }}</h3>
-                                <p class="info-text" style="color: #047857;">
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
+                                    {{ $locale === 'cs' ? 'Děkujeme za nákup' : 'Thank you for your purchase' }}
+                                </div>
+                                <p style="font-size: 14px; color: #4a6741; margin: 0;">
                                     @if($locale === 'cs')
                                     Doufáme, že si kávu vychutnáte! Pokud budete mít jakékoli dotazy nebo připomínky, neváhejte nás kontaktovat.
                                     @else
@@ -73,55 +93,77 @@
                             </div>
                             
                             <!-- Order Items -->
-                            <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">☕ {{ $locale === 'cs' ? 'Co jste si vyzvedli' : 'What you picked up' }}</h3>
-                                @foreach($order->items as $item)
-                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="padding: 12px 0; border-bottom: 1px solid #e5e7eb;">
-                                    <tr>
-                                        <td style="padding: 0; vertical-align: top;">
-                                            <div class="item-name" style="font-weight: 600; color: #111827; font-size: 14px;">{{ $item->product_name }}</div>
-                                            <div class="item-quantity" style="font-size: 13px; color: #6b7280; margin-top: 2px;">{{ $item->quantity }}× {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency, 0) }}</div>
-                                        </td>
-                                        <td align="right" valign="top" style="padding: 0 0 0 16px; white-space: nowrap;">
-                                            <div class="item-price" style="font-weight: 700; color: #111827;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($item->quantity * $item->price, $order->currency, 0) }}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-                                @endforeach
+                            <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 32px 0 20px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                {{ $locale === 'cs' ? 'Co jste si vyzvedli' : 'What you picked up' }}
                             </div>
                             
-                            <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('dashboard.order.detail', $order->id) }}" class="button">
-                                    {{ __('emails.order_confirmation.view_order', [], $locale) }}
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #bcbeb1;">
+                                @foreach($order->items as $index => $item)
+                                <tr>
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; width: 32px;">
+                                        <span style="font-size: 11px; color: #CA4136; font-weight: 400;">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                                    </td>
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top;">
+                                        <div style="font-weight: 400; color: #1c1c1c; margin-bottom: 2px; font-size: 15px;">{{ $item->product_name }}</div>
+                                        @if($item->product && $item->product->roastery)
+                                        <div style="font-size: 12px; color: #5a5a5a; font-weight: 400; margin-bottom: 4px;">{{ $item->product->roastery->name }}</div>
+                                        @endif
+                                        <div style="font-size: 13px; color: #76716C; font-weight: 400;">{{ $item->quantity }}× {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency, 0) }}</div>
+                                    </td>
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; text-align: right;">
+                                        <span style="font-weight: 400; color: #1c1c1c; white-space: nowrap; font-size: 15px;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($item->quantity * $item->price, $order->currency, 0) }}</span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </table>
+                            
+                            <!-- CTA Button -->
+                            <div style="text-align: center; margin: 40px 0;">
+                                <a href="{{ route('dashboard.order.detail', $order->id) }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                                    {{ __('emails.order_confirmation.view_order', [], $locale) }} →
                                 </a>
                             </div>
                             
-                            <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
+                            <!-- Features -->
+                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
+                                </span>
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.common.delivery_time', [], $locale) }}
+                                </span>
+                            </div>
+                            
+                            <!-- Help Text -->
+                            <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
                                 {{ __('emails.common.questions', [], $locale) }} 
-                                <a href="mailto:{{ $contactEmail }}" style="color: #e6305a; text-decoration: none;">{{ $contactEmail }}</a>
+                                <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             
-                            <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
+                            <p style="font-size: 13px; color: #5a5a5a; margin-top: 24px;">
                                 {{ __('emails.common.regards', [], $locale) }},<br>
-                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
+                                <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>
                         </td>
                     </tr>
                     
+                    <!-- Footer -->
                     <tr>
-                        <td class="footer">
-                            <p class="footer-text">
-                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
+                        <td style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
+                            <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">
+                                {{ $siteName }}
+                            </p>
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">
                                 {{ __('emails.common.tagline', [], $locale) }}
                             </p>
-                            <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ route('dashboard.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.my_account', [], $locale) }}</a>
+                            <div style="margin: 20px 0;">
+                                <a href="{{ route('home') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('dashboard.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.my_account', [], $locale) }}</a>
                             </div>
-                            <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
-                            </p>
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
+                                <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
+                            </div>
                         </td>
                     </tr>
                     

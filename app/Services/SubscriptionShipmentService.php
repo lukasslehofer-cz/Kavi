@@ -337,7 +337,7 @@ class SubscriptionShipmentService
         $paidPendingShipments = $subscription->shipments()
             ->where('status', 'pending')
             ->whereNotNull('subscription_payment_id')
-            ->where('shipment_date', '>', now())
+            ->where('shipment_date', '>=', today())
             ->orderBy('shipment_date', 'asc')
             ->get();
 
@@ -374,8 +374,23 @@ class SubscriptionShipmentService
             $candidate = $candidate->copy()->addMonths($frequencyMonths);
         }
 
-        // 4. Mark these dates as skipped
+        // 4. Mark these dates as skipped (but preserve already paid shipments)
         foreach ($skippedDates as $date) {
+            // Check if this shipment already has a payment - if so, don't skip it
+            $existingShipment = $subscription->shipments()
+                ->whereDate('shipment_date', $date->toDateString())
+                ->first();
+            
+            if ($existingShipment && $existingShipment->subscription_payment_id) {
+                \Log::info('Preserving paid shipment during pause', [
+                    'subscription_id' => $subscription->id,
+                    'shipment_id' => $existingShipment->id,
+                    'shipment_date' => $date->toDateString(),
+                    'payment_id' => $existingShipment->subscription_payment_id,
+                ]);
+                continue; // Skip this one, it's already paid
+            }
+            
             $subscription->shipments()->updateOrCreate(
                 ['shipment_date' => $date],
                 [

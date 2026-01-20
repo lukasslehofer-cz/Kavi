@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
-    <title>Děkujeme za vaši objednávku!</title>
+    <title>Vaše objednávka je na cestě! 📦</title>
     <style>
         /* Reset styles */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
@@ -17,7 +17,7 @@
             margin: 0; 
             padding: 0; 
             width: 100%; 
-            background-color: #e5e6df; 
+            background-color: #bcbeb1; 
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
         }
@@ -25,318 +25,7 @@
         .email-container { 
             max-width: 600px; 
             margin: 0 auto; 
-            background-color: #ffffff; 
-        }
-        
-        /* Header - Clean with black line */
-        .header { 
-            background-color: #ffffff; 
-            padding: 40px 40px 24px 40px; 
-            text-align: left;
-            border-bottom: 2px solid #1c1c1c;
-        }
-        
-        .logo { 
-            max-width: 100px !important; 
-            width: 100px !important; 
-            height: auto !important; 
-            display: block !important; 
-            margin: 0 auto !important; 
-        }
-        
-        /* Content Area */
-        .content { 
-            padding: 48px 40px; 
-            color: #76716C; 
-        }
-        
-        /* Typography - Swiss Style */
-        h1 { 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 32px; 
-            font-weight: 400; 
-            color: #1c1c1c; 
-            margin: 0 0 8px 0; 
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-            text-transform: uppercase;
-        }
-        
-        .subtitle { 
-            font-size: 14px; 
-            color: #BCBEB1; 
-            margin: 0 0 40px 0; 
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-        
-        /* Order Number - Prominent Display */
-        .order-number { 
-            border-top: 2px solid #CA4136;
-            padding: 24px 0; 
-            margin: 32px 0; 
-        }
-        
-        .order-number-label { 
-            font-size: 11px; 
-            color: #BCBEB1; 
-            font-weight: 400; 
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-        }
-        
-        .order-number-value { 
-            font-size: 28px; 
-            font-weight: 400; 
-            color: #1c1c1c;
-            letter-spacing: -0.02em;
-        }
-        
-        /* Section Title */
-        .section-title { 
-            font-size: 11px; 
-            font-weight: 400; 
-            color: #BCBEB1; 
-            margin: 0 0 20px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-        }
-        
-        /* Order Items - Swiss Grid Style */
-        .order-items { 
-            margin: 32px 0;
-            border-top: 1px solid #e5e6df;
-        }
-        
-        .item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-start;
-            padding: 16px 0; 
-            border-bottom: 1px solid #e5e6df; 
-        }
-        
-        .item-number {
-            font-size: 11px;
-            color: #CA4136;
-            font-weight: 400;
-            min-width: 32px;
-            padding-top: 2px;
-        }
-        
-        .item-content {
-            flex: 1;
-        }
-        
-        .item-name { 
-            font-weight: 400; 
-            color: #1c1c1c; 
-            margin-bottom: 4px;
-            font-size: 15px;
-        }
-        
-        .item-details { 
-            font-size: 13px; 
-            color: #BCBEB1; 
-            font-weight: 400; 
-        }
-        
-        .item-price { 
-            font-weight: 400; 
-            color: #1c1c1c; 
-            white-space: nowrap; 
-            margin-left: 16px;
-            font-size: 15px;
-        }
-        
-        /* Totals - Clean Lines */
-        .totals { 
-            margin: 32px 0; 
-            padding-top: 24px;
-            border-top: 2px solid #1c1c1c;
-        }
-        
-        .total-row { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 6px 0; 
-            font-size: 13px; 
-        }
-        
-        .total-row.highlight { 
-            padding-top: 16px; 
-            margin-top: 12px; 
-        }
-        
-        .total-label { 
-            color: #76716C; 
-            font-weight: 400; 
-        }
-        
-        .total-value { 
-            font-weight: 400; 
-            color: #1c1c1c; 
-        }
-        
-        .total-row.highlight .total-label { 
-            font-weight: 400; 
-            color: #1c1c1c; 
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-        }
-        
-        .total-row.highlight .total-value { 
-            font-size: 28px;
-            letter-spacing: -0.02em;
-        }
-        
-        /* Info Sections - Swiss Grid */
-        .info-section {
-            margin: 32px 0;
-            padding-top: 24px;
-            border-top: 2px solid #CA4136;
-        }
-        
-        .info-title { 
-            font-size: 11px; 
-            font-weight: 400; 
-            color: #BCBEB1; 
-            margin: 0 0 16px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-        }
-        
-        .info-text { 
-            font-size: 14px; 
-            color: #1c1c1c; 
-            line-height: 1.6; 
-            margin: 4px 0; 
-        }
-        
-        .info-text-secondary {
-            font-size: 13px;
-            color: #76716C;
-            line-height: 1.6;
-            margin: 4px 0;
-        }
-        
-        /* Payment Status */
-        .payment-status {
-            margin: 32px 0;
-            padding: 20px 24px;
-            border-left: 3px solid #CA4136;
-            background-color: #fafaf8;
-        }
-        
-        .payment-status.success {
-            border-left-color: #636747;
-        }
-        
-        .payment-status-title {
-            font-size: 11px;
-            font-weight: 400;
-            color: #1c1c1c;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            margin-bottom: 8px;
-        }
-        
-        .payment-status-text {
-            font-size: 14px;
-            color: #76716C;
-        }
-        
-        /* CTA Button - Swiss Square */
-        .button { 
-            display: inline-block; 
-            background-color: #1c1c1c; 
-            color: #ffffff !important; 
-            text-decoration: none; 
-            padding: 16px 32px; 
-            font-weight: 400; 
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            margin: 32px 0;
-        }
-        
-        .button:hover {
-            background-color: #CA4136;
-        }
-        
-        .button-arrow {
-            margin-left: 8px;
-        }
-        
-        /* Features - Swiss Style */
-        .features {
-            margin: 40px 0 32px 0;
-            padding-top: 24px;
-            border-top: 1px solid #e5e6df;
-        }
-        
-        .feature {
-            display: inline-block;
-            margin: 0 24px 8px 0;
-            font-size: 12px;
-            color: #76716C;
-        }
-        
-        .feature-arrow {
-            color: #CA4136;
-            margin-right: 6px;
-        }
-        
-        /* Footer - Minimal */
-        .footer { 
-            background-color: #fafaf8; 
-            padding: 40px; 
-            text-align: center; 
-            color: #BCBEB1; 
-            font-size: 12px;
-        }
-        
-        .footer-brand {
-            font-size: 11px;
-            font-weight: 400;
-            color: #1c1c1c;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            margin-bottom: 4px;
-        }
-        
-        .footer-tagline {
-            font-size: 12px;
-            color: #BCBEB1;
-            margin-bottom: 24px;
-        }
-        
-        .footer-links { 
-            margin: 20px 0; 
-        }
-        
-        .footer-link { 
-            color: #1c1c1c; 
-            text-decoration: none; 
-            margin: 0 12px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-        
-        .footer-link:hover {
-            color: #CA4136;
-        }
-        
-        .footer-copyright { 
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid #e5e6df;
-            font-size: 11px;
-            color: #BCBEB1;
+            background-color: #e5e6df; 
         }
         
         /* Responsive */
@@ -344,101 +33,97 @@
             .content { padding: 32px 24px !important; } 
             h1 { font-size: 26px !important; } 
             .header, .footer { padding: 32px 24px !important; } 
-            .logo { max-width: 80px !important; width: 80px !important; }
-            .order-number-value { font-size: 24px !important; }
-            .total-row.highlight .total-value { font-size: 24px !important; }
         }
         
-        /* Dark mode override - keep light */
+        /* Dark mode override */
         @media (prefers-color-scheme: dark) { 
-            body { background-color: #e5e6df !important; } 
-            .email-container { background-color: #ffffff !important; } 
-            .header { background-color: #ffffff !important; border-bottom: 2px solid #1c1c1c !important; }
-            h1, .item-name, .total-value, .info-text { color: #1c1c1c !important; }
-            .footer { background-color: #fafaf8 !important; }
+            body { background-color: #bcbeb1 !important; } 
+            .email-container { background-color: #e5e6df !important; } 
         }
-        
-        [data-ogsc] .email-container { background-color: #ffffff !important; }
-        [data-ogsc] .header { background-color: #ffffff !important; }
     </style>
 </head>
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #e5e6df; padding: 32px 16px;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
                 <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important;" bgcolor="#ffffff">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
                     
                     <!-- Header -->
                     <tr>
-                        <td class="header" style="background-color: #ffffff; padding: 40px 40px 24px 40px; text-align: left; border-bottom: 2px solid #1c1c1c;">
-                            <img src="http://localhost/images/kavi-logo-black.png" alt="KAVI.cz" class="logo" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
+                        <td style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
+                            <img src="http://localhost/images/kavi-logo-white.png" alt="KAVI.cz" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
                     <!-- Content -->
                     <tr>
-                        <td class="content" style="padding: 48px 40px; color: #76716C;">
+                        <td style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
                             
                             <!-- Title -->
                             <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
-                                Děkujeme za vaši objednávku!
+                                Vaše objednávka je na cestě! 📦
                             </h1>
-                            <p class="subtitle" style="font-size: 14px; color: #BCBEB1; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
-                                Vaše objednávka byla úspěšně přijata a bude brzy expedována.
+                            <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                                Skvělá zpráva! Vaše objednávka byla odeslána.
                             </p>
                             
                             <!-- Order Number -->
-                            <div class="order-number" style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
-                                <div class="order-number-label" style="font-size: 11px; color: #BCBEB1; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
+                            <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
+                                <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
                                     Číslo objednávky
                                 </div>
-                                <div class="order-number-value" style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
+                                <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
                                     KV-2026-0007
                                 </div>
                             </div>
                             
+                            <!-- Tracking Info -->
+                                                        
+                            <!-- Pickup Point -->
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    Výdejní místo
+                                </div>
+                                                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
+                                    <span style="color: #CA4136;">→</span> Praha 7, Holešovice, Dukelských hrdinů 359/21 (Praha Thrift Store)
+                                </p>
+                                                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">Dukelských hrdinů 359/21, 170 00 Praha</p>
+                                                                                            </div>
+                            
                             <!-- Order Items -->
-                            <div class="section-title" style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                            <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 32px 0 20px 0; text-transform: uppercase; letter-spacing: 0.15em;">
                                 Obsah objednávky
                             </div>
                             
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #e5e6df;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #bcbeb1;">
                                                                 <tr>
-                                    <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top; width: 32px;">
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; width: 32px;">
                                         <span style="font-size: 11px; color: #CA4136; font-weight: 400;">01</span>
                                     </td>
-                                    <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top;">
-                                        <div style="font-weight: 400; color: #1c1c1c; margin-bottom: 4px; font-size: 15px;">Ribang Gayo, Indonésie</div>
-                                        <div style="font-size: 13px; color: #BCBEB1; font-weight: 400;">1× 380 Kč</div>
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top;">
+                                        <div style="font-weight: 400; color: #1c1c1c; margin-bottom: 2px; font-size: 15px;">Ribang Gayo, Indonésie</div>
+                                                                                <div style="font-size: 12px; color: #5a5a5a; font-weight: 400; margin-bottom: 4px;">Ripsnorter Coffee</div>
+                                                                                <div style="font-size: 13px; color: #76716C; font-weight: 400;">1× 380 Kč</div>
                                     </td>
-                                    <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top; text-align: right;">
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; text-align: right;">
                                         <span style="font-weight: 400; color: #1c1c1c; white-space: nowrap; font-size: 15px;">380 Kč</span>
                                     </td>
                                 </tr>
                                                             </table>
                             
-                            <!-- Totals -->
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #1c1c1c;">
-                                <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">Mezisoučet (bez DPH):</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">314,05 Kč</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">DPH (21%):</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">65,95 Kč</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">Doprava:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; text-align: right;">
-                                                                                <span style="color: #636747; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em;">Zdarma</span>
-                                                                            </td>
-                                </tr>
-                                                                <tr>
-                                    <td style="padding: 20px 0 6px 0; font-size: 11px; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em;">Celkem:</td>
-                                    <td style="padding: 20px 0 6px 0; font-size: 28px; color: #1c1c1c; text-align: right; letter-spacing: -0.02em;">380 Kč</td>
-                                </tr>
-                            </table>
+                            <!-- What's Next -->
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
+                                    Co se stane dále
+                                </div>
+                                <p style="font-size: 14px; color: #5a5a5a; margin: 0; line-height: 1.8;">
+                                                                        <span style="color: #CA4136;">01</span> Zásilka dorazí na výdejní místo během 1-2 dnů<br>
+                                    <span style="color: #CA4136;">02</span> Dostanete SMS s kódem pro vyzvednutí<br>
+                                    <span style="color: #CA4136;">03</span> Vyzvedněte si balík na výdejním místě<br>
+                                    <span style="color: #CA4136;">04</span> Vychutnejte si čerstvou kávu
+                                                                    </p>
+                            </div>
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 40px 0;">
@@ -447,62 +132,23 @@
                                 </a>
                             </div>
                             
-                            <!-- Delivery Info -->
-                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
-                                <div style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    Doručení
-                                </div>
-                                                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> Praha 7, Holešovice, Dukelských hrdinů 359/21 (Praha Thrift Store)
-                                </p>
-                                                                <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 4px 0 4px 18px;">Dukelských hrdinů 359/21, 170 00 Praha</p>
-                                                                                            </div>
-                            
-                            <!-- Billing Info -->
-                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
-                                <div style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    Fakturační údaje
-                                </div>
-                                <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> Lukáš Šlehofer
-                                </p>
-                                <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 4px 0 4px 18px;">
-                                    Muchova 242/2<br>
-                                    15500 Praha 6
-                                </p>
-                                <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 12px 0 4px 18px;">
-                                    lukas.slehofer@gmail.com<br>
-                                    +420777110957
-                                </p>
-                            </div>
-                            
-                            <!-- Payment Status -->
-                                                        <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #636747; background-color: #fafaf8;">
-                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    Platba
-                                </div>
-                                <p style="font-size: 14px; color: #636747; margin: 0;">
-                                    Platba byla úspěšně přijata.
-                                </p>
-                            </div>
-                                                        
                             <!-- Features -->
-                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #e5e6df;">
-                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #76716C;">
+                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
                                     <span style="color: #CA4136;">→</span> Čerstvě pražená káva
                                 </span>
-                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #76716C;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
                                     <span style="color: #CA4136;">→</span> Doprava do 3 dnů
                                 </span>
                             </div>
                             
                             <!-- Help Text -->
-                            <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin-top: 32px;">
-                                Pokud máte jakékoliv dotazy ohledně vaší objednávky, neváhejte nás kontaktovat na 
-                                <a href="mailto:info@kavi.cz" style="color: #CA4136; text-decoration: none;">info@kavi.cz</a>                                 
+                            <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
+                                Pokud máte jakékoli dotazy, neváhejte nás kontaktovat. 
+                                <a href="mailto:info@kavi.cz" style="color: #CA4136; text-decoration: none;">info@kavi.cz</a>
                             </p>
                             
-                            <p style="font-size: 13px; color: #76716C; margin-top: 24px;">
+                            <p style="font-size: 13px; color: #5a5a5a; margin-top: 24px;">
                                 S pozdravem,<br>
                                 <span style="color: #1c1c1c;">Tým KAVI.cz</span>
                             </p>
@@ -511,11 +157,11 @@
                     
                     <!-- Footer -->
                     <tr>
-                        <td class="footer" style="background-color: #fafaf8; padding: 40px; text-align: center; color: #BCBEB1; font-size: 12px;">
+                        <td style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
                             <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">
                                 KAVI.cz
                             </p>
-                            <p style="font-size: 12px; color: #BCBEB1; margin: 0 0 24px 0;">
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">
                                 Prémiová káva s předplatným
                             </p>
                             <div style="margin: 20px 0;">
@@ -523,9 +169,8 @@
                                 <a href="http://localhost/produkty" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Obchod</a>
                                 <a href="http://localhost/nastenka" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Můj účet</a>
                             </div>
-                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e6df; font-size: 11px; color: #BCBEB1;">
-                                <p style="margin: 0 0 8px 0;">© 2026 KAVI.cz. Všechna práva vyhrazena.</p>
-                                <p style="margin: 0;">Tento e-mail byl odeslán na adresu lukas.slehofer@gmail.com protože jste si vytvořili objednávku na našem e-shopu.</p>
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
+                                <p style="margin: 0;">© 2026 KAVI.cz. Všechna práva vyhrazena.</p>
                             </div>
                         </td>
                     </tr>

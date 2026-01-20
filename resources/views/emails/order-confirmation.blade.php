@@ -17,7 +17,7 @@
             margin: 0; 
             padding: 0; 
             width: 100%; 
-            background-color: #e5e6df; 
+            background-color: #bcbeb1; 
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
         }
@@ -25,15 +25,14 @@
         .email-container { 
             max-width: 600px; 
             margin: 0 auto; 
-            background-color: #ffffff; 
+            background-color: #e5e6df; 
         }
         
-        /* Header - Clean with black line */
+        /* Header - Dark with white logo */
         .header { 
-            background-color: #ffffff; 
-            padding: 40px 40px 24px 40px; 
+            background-color: #1c1c1c; 
+            padding: 32px 40px; 
             text-align: left;
-            border-bottom: 2px solid #1c1c1c;
         }
         
         .logo { 
@@ -47,7 +46,7 @@
         /* Content Area */
         .content { 
             padding: 48px 40px; 
-            color: #76716C; 
+            color: #4a4a4a; 
         }
         
         /* Typography - Swiss Style */
@@ -64,7 +63,7 @@
         
         .subtitle { 
             font-size: 14px; 
-            color: #BCBEB1; 
+            color: #76716C; 
             margin: 0 0 40px 0; 
             font-weight: 400;
             text-transform: uppercase;
@@ -80,7 +79,7 @@
         
         .order-number-label { 
             font-size: 11px; 
-            color: #BCBEB1; 
+            color: #76716C; 
             font-weight: 400; 
             margin-bottom: 8px;
             text-transform: uppercase;
@@ -98,7 +97,7 @@
         .section-title { 
             font-size: 11px; 
             font-weight: 400; 
-            color: #BCBEB1; 
+            color: #76716C; 
             margin: 0 0 20px 0;
             text-transform: uppercase;
             letter-spacing: 0.15em;
@@ -107,7 +106,7 @@
         /* Order Items - Swiss Grid Style */
         .order-items { 
             margin: 32px 0;
-            border-top: 1px solid #e5e6df;
+            border-top: 1px solid #bcbeb1;
         }
         
         .item { 
@@ -115,7 +114,7 @@
             justify-content: space-between; 
             align-items: flex-start;
             padding: 16px 0; 
-            border-bottom: 1px solid #e5e6df; 
+            border-bottom: 1px solid #bcbeb1; 
         }
         
         .item-number {
@@ -139,7 +138,7 @@
         
         .item-details { 
             font-size: 13px; 
-            color: #BCBEB1; 
+            color: #76716C; 
             font-weight: 400; 
         }
         
@@ -171,7 +170,7 @@
         }
         
         .total-label { 
-            color: #76716C; 
+            color: #5a5a5a; 
             font-weight: 400; 
         }
         
@@ -203,7 +202,7 @@
         .info-title { 
             font-size: 11px; 
             font-weight: 400; 
-            color: #BCBEB1; 
+            color: #76716C; 
             margin: 0 0 16px 0;
             text-transform: uppercase;
             letter-spacing: 0.15em;
@@ -218,7 +217,7 @@
         
         .info-text-secondary {
             font-size: 13px;
-            color: #76716C;
+            color: #5a5a5a;
             line-height: 1.6;
             margin: 4px 0;
         }
@@ -228,7 +227,7 @@
             margin: 32px 0;
             padding: 20px 24px;
             border-left: 3px solid #CA4136;
-            background-color: #fafaf8;
+            background-color: #d5d7ca;
         }
         
         .payment-status.success {
@@ -246,7 +245,7 @@
         
         .payment-status-text {
             font-size: 14px;
-            color: #76716C;
+            color: #5a5a5a;
         }
         
         /* CTA Button - Swiss Square */
@@ -275,14 +274,14 @@
         .features {
             margin: 40px 0 32px 0;
             padding-top: 24px;
-            border-top: 1px solid #e5e6df;
+            border-top: 1px solid #bcbeb1;
         }
         
         .feature {
             display: inline-block;
             margin: 0 24px 8px 0;
             font-size: 12px;
-            color: #76716C;
+            color: #5a5a5a;
         }
         
         .feature-arrow {
@@ -292,10 +291,10 @@
         
         /* Footer - Minimal */
         .footer { 
-            background-color: #fafaf8; 
+            background-color: #d5d7ca; 
             padding: 40px; 
             text-align: center; 
-            color: #BCBEB1; 
+            color: #5a5a5a; 
             font-size: 12px;
         }
         
@@ -310,7 +309,7 @@
         
         .footer-tagline {
             font-size: 12px;
-            color: #BCBEB1;
+            color: #5a5a5a;
             margin-bottom: 24px;
         }
         
@@ -334,9 +333,9 @@
         .footer-copyright { 
             margin-top: 24px;
             padding-top: 24px;
-            border-top: 1px solid #e5e6df;
+            border-top: 1px solid #bcbeb1;
             font-size: 11px;
-            color: #BCBEB1;
+            color: #76716C;
         }
         
         /* Responsive */
@@ -351,46 +350,46 @@
         
         /* Dark mode override - keep light */
         @media (prefers-color-scheme: dark) { 
-            body { background-color: #e5e6df !important; } 
-            .email-container { background-color: #ffffff !important; } 
-            .header { background-color: #ffffff !important; border-bottom: 2px solid #1c1c1c !important; }
+            body { background-color: #bcbeb1 !important; } 
+            .email-container { background-color: #e5e6df !important; } 
+            .header { background-color: #1c1c1c !important; }
             h1, .item-name, .total-value, .info-text { color: #1c1c1c !important; }
-            .footer { background-color: #fafaf8 !important; }
+            .footer { background-color: #d5d7ca !important; }
         }
         
-        [data-ogsc] .email-container { background-color: #ffffff !important; }
-        [data-ogsc] .header { background-color: #ffffff !important; }
+        [data-ogsc] .email-container { background-color: #e5e6df !important; }
+        [data-ogsc] .header { background-color: #1c1c1c !important; }
     </style>
 </head>
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #e5e6df; padding: 32px 16px;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
                 <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important;" bgcolor="#ffffff">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
                     
                     <!-- Header -->
                     <tr>
-                        <td class="header" style="background-color: #ffffff; padding: 40px 40px 24px 40px; text-align: left; border-bottom: 2px solid #1c1c1c;">
-                            <img src="{{ asset('images/kavi-logo-black.png') }}" alt="{{ $siteName }}" class="logo" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
+                        <td class="header" style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
                     <!-- Content -->
                     <tr>
-                        <td class="content" style="padding: 48px 40px; color: #76716C;">
+                        <td class="content" style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
                             
                             <!-- Title -->
                             <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
                                 {{ __('emails.order_confirmation.title', [], $locale) }}
                             </h1>
-                            <p class="subtitle" style="font-size: 14px; color: #BCBEB1; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                            <p class="subtitle" style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
                                 {{ __('emails.order_confirmation.subtitle', [], $locale) }}
                             </p>
                             
                             <!-- Order Number -->
                             <div class="order-number" style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
-                                <div class="order-number-label" style="font-size: 11px; color: #BCBEB1; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
+                                <div class="order-number-label" style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
                                     {{ __('emails.order_confirmation.order_number', [], $locale) }}
                                 </div>
                                 <div class="order-number-value" style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
@@ -399,21 +398,24 @@
                             </div>
                             
                             <!-- Order Items -->
-                            <div class="section-title" style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                            <div class="section-title" style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 0.15em;">
                                 {{ __('emails.order_confirmation.order_contents', [], $locale) }}
                             </div>
                             
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #e5e6df;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #bcbeb1;">
                                 @foreach($order->items as $index => $item)
                                 <tr>
-                                    <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top; width: 32px;">
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; width: 32px;">
                                         <span style="font-size: 11px; color: #CA4136; font-weight: 400;">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
                                     </td>
-                                    <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top;">
-                                        <div style="font-weight: 400; color: #1c1c1c; margin-bottom: 4px; font-size: 15px;">{{ $item->product_name }}</div>
-                                        <div style="font-size: 13px; color: #BCBEB1; font-weight: 400;">{{ $item->quantity }}× {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency, 0) }}</div>
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top;">
+                                        <div style="font-weight: 400; color: #1c1c1c; margin-bottom: 2px; font-size: 15px;">{{ $item->product_name }}</div>
+                                        @if($item->product && $item->product->roastery)
+                                        <div style="font-size: 12px; color: #5a5a5a; font-weight: 400; margin-bottom: 4px;">{{ $item->product->roastery->name }}</div>
+                                        @endif
+                                        <div style="font-size: 13px; color: #76716C; font-weight: 400;">{{ $item->quantity }}× {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency, 0) }}</div>
                                     </td>
-                                    <td style="padding: 16px 0; border-bottom: 1px solid #e5e6df; vertical-align: top; text-align: right;">
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; text-align: right;">
                                         <span style="font-weight: 400; color: #1c1c1c; white-space: nowrap; font-size: 15px;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($item->total, $order->currency, 0) }}</span>
                                     </td>
                                 </tr>
@@ -423,18 +425,18 @@
                             <!-- Totals -->
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #1c1c1c;">
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">{{ __('emails.order_confirmation.subtotal_without_vat', [], $locale) }}:</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.order_confirmation.subtotal_without_vat', [], $locale) }}:</td>
                                     <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->subtotal / 1.21, $order->currency, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">{{ __('emails.order_confirmation.vat', [], $locale) }}:</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.order_confirmation.vat', [], $locale) }}:</td>
                                     <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->tax, $order->currency, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">{{ __('emails.order_confirmation.shipping', [], $locale) }}:</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.order_confirmation.shipping', [], $locale) }}:</td>
                                     <td style="padding: 6px 0; font-size: 13px; text-align: right;">
                                         @if($order->shipping == 0)
-                                        <span style="color: #636747; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em;">{{ __('emails.common.free', [], $locale) }}</span>
+                                        <span style="color: #4a6741; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em;">{{ __('emails.common.free', [], $locale) }}</span>
                                         @else
                                         <span style="color: #1c1c1c;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->shipping, $order->currency, 0) }}</span>
                                         @endif
@@ -442,8 +444,8 @@
                                 </tr>
                                 @if($order->discount_amount > 0)
                                 <tr>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #76716C;">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #636747; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency, 0) }}</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}:</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #4a6741; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency, 0) }}</td>
                                 </tr>
                                 @endif
                                 <tr>
@@ -461,7 +463,7 @@
                             
                             <!-- Delivery Info -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
-                                <div style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
                                     {{ __('emails.order_confirmation.delivery', [], $locale) }}
                                 </div>
                                 @if(isset($order->shipping_address['packeta_point_name']))
@@ -469,24 +471,24 @@
                                     <span style="color: #CA4136;">→</span> {{ $order->shipping_address['packeta_point_name'] }}
                                 </p>
                                 @if(isset($order->shipping_address['packeta_point_address']))
-                                <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 4px 0 4px 18px;">{{ $order->shipping_address['packeta_point_address'] }}</p>
+                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">{{ $order->shipping_address['packeta_point_address'] }}</p>
                                 @endif
                                 @endif
                             </div>
                             
                             <!-- Billing Info -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
-                                <div style="font-size: 11px; font-weight: 400; color: #BCBEB1; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
                                     {{ __('emails.order_confirmation.billing_info', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     <span style="color: #CA4136;">→</span> {{ $order->shipping_address['name'] }}
                                 </p>
-                                <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 4px 0 4px 18px;">
+                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
                                     {{ $order->shipping_address['billing_address'] }}<br>
                                     {{ $order->shipping_address['billing_postal_code'] }} {{ $order->shipping_address['billing_city'] }}
                                 </p>
-                                <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin: 12px 0 4px 18px;">
+                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
                                     {{ $order->shipping_address['email'] }}<br>
                                     {{ $order->shipping_address['phone'] }}
                                 </p>
@@ -494,42 +496,42 @@
                             
                             <!-- Payment Status -->
                             @if($order->payment_status === 'paid')
-                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #636747; background-color: #fafaf8;">
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
                                     {{ __('emails.order_confirmation.payment', [], $locale) }}
                                 </div>
-                                <p style="font-size: 14px; color: #636747; margin: 0;">
+                                <p style="font-size: 14px; color: #4a6741; margin: 0;">
                                     {{ __('emails.order_confirmation.payment_received', [], $locale) }}
                                 </p>
                             </div>
                             @else
-                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #fafaf8;">
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
                                     {{ __('emails.order_confirmation.payment', [], $locale) }}
                                 </div>
-                                <p style="font-size: 14px; color: #76716C; margin: 0;">
+                                <p style="font-size: 14px; color: #5a5a5a; margin: 0;">
                                     {{ __('emails.order_confirmation.payment_pending', [], $locale) }}
                                 </p>
                             </div>
                             @endif
                             
                             <!-- Features -->
-                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #e5e6df;">
-                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #76716C;">
+                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
                                     <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
                                 </span>
-                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #76716C;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
                                     <span style="color: #CA4136;">→</span> {{ __('emails.common.delivery_time', [], $locale) }}
                                 </span>
                             </div>
                             
                             <!-- Help Text -->
-                            <p style="font-size: 13px; color: #76716C; line-height: 1.6; margin-top: 32px;">
+                            <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
                                 {{ __('emails.order_confirmation.help_text', [], $locale) }} 
                                 <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>                                 
                             </p>
                             
-                            <p style="font-size: 13px; color: #76716C; margin-top: 24px;">
+                            <p style="font-size: 13px; color: #5a5a5a; margin-top: 24px;">
                                 {{ __('emails.common.regards', [], $locale) }},<br>
                                 <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>
@@ -538,11 +540,11 @@
                     
                     <!-- Footer -->
                     <tr>
-                        <td class="footer" style="background-color: #fafaf8; padding: 40px; text-align: center; color: #BCBEB1; font-size: 12px;">
+                        <td class="footer" style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
                             <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">
                                 {{ $siteName }}
                             </p>
-                            <p style="font-size: 12px; color: #BCBEB1; margin: 0 0 24px 0;">
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">
                                 {{ __('emails.common.tagline', [], $locale) }}
                             </p>
                             <div style="margin: 20px 0;">
@@ -550,7 +552,7 @@
                                 <a href="{{ route('products.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
                                 <a href="{{ route('dashboard.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.my_account', [], $locale) }}</a>
                             </div>
-                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e6df; font-size: 11px; color: #BCBEB1;">
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
                                 <p style="margin: 0 0 8px 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
                                 <p style="margin: 0;">{{ __('emails.order_confirmation.footer_text', ['email' => $order->shipping_address['email']], $locale) }}</p>
                             </div>
