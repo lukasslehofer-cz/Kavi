@@ -194,7 +194,7 @@ return [
     // Order Shipped
     'order_shipped' => [
         'subject' => 'Your Order :order_number Has Been Shipped - KAVI',
-        'title' => 'Your Order Is On Its Way! 📦',
+        'title' => 'Your Order Is On Its Way!',
         'subtitle' => 'Great news! Your order has been shipped.',
         'order_number' => 'Order Number',
         'tracking_number' => 'Tracking Number',
@@ -207,7 +207,7 @@ return [
 
     // Subscription Box Shipped
     'subscription_box_shipped' => [
-        'subject' => 'Your Coffee Box Has Been Shipped 📦 - :subscription_number',
+        'subject' => 'Your Coffee Box Has Been Shipped - :subscription_number',
         'title' => 'Your Coffee Box Is On Its Way! ☕',
         'subtitle' => 'Great news! We\'ve prepared a new coffee box for you.',
         'subscription_number' => 'Subscription Number',
@@ -234,7 +234,7 @@ return [
     // Order Delivered
     'order_delivered' => [
         'subject' => 'Your Order :order_number Has Been Delivered - KAVI',
-        'title' => 'Your Order Has Been Delivered! 📦',
+        'title' => 'Your Order Has Been Delivered!',
         'subtitle' => 'Your order has been successfully delivered.',
         'order_number' => 'Order Number',
         'pickup_point' => 'Pickup Point',

@@ -153,7 +153,7 @@
                             @if($order->shipped_with_subscription)
                                 <div class="flex flex-col gap-1">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                        📦 S předplatným
+                                    S předplatným
                                     </span>
                                     @if($order->subscription)
                                         <a href="{{ route('admin.subscriptions.show', $order->subscription) }}" 
@@ -219,7 +219,7 @@
                                 </a>
                                 @if($order->user)
                                 <a href="{{ route('dashboard.index', ['view_as' => $order->user->id]) }}" class="text-purple-600 hover:text-purple-800 font-medium text-xs" title="Zobrazit dashboard tohoto uživatele">
-                                    👁️ Dashboard
+                                    Dashboard
                                 </a>
                                 @endif
                             </div>

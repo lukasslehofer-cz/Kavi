@@ -59,7 +59,7 @@
             </div>
             <div class="flex-1">
                 <h3 class="text-xl font-bold text-purple-900 mb-2">
-                    📦 Doplňkové zboží k předplatnému
+                    Doplňkové zboží k předplatnému
                 </h3>
                 <div class="space-y-2 text-sm text-purple-800">
                     <p>

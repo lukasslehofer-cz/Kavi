@@ -194,7 +194,7 @@ return [
     // Order Shipped
     'order_shipped' => [
         'subject' => 'Vaše objednávka :order_number byla odeslána - KAVI.cz',
-        'title' => 'Vaše objednávka je na cestě! 📦',
+        'title' => 'Vaše objednávka je na cestě!',
         'subtitle' => 'Skvělá zpráva! Vaše objednávka byla odeslána.',
         'order_number' => 'Číslo objednávky',
         'tracking_number' => 'Sledovací číslo',
@@ -207,7 +207,7 @@ return [
 
     // Subscription Box Shipped
     'subscription_box_shipped' => [
-        'subject' => 'Váš kávový box byl expedován 📦 - :subscription_number',
+        'subject' => 'Váš kávový box byl expedován - :subscription_number',
         'title' => 'Váš kávový box je na cestě! ☕',
         'subtitle' => 'Skvělá zpráva! Připravili jsme pro vás nový kávový box.',
         'subscription_number' => 'Číslo předplatného',
@@ -234,7 +234,7 @@ return [
     // Order Delivered
     'order_delivered' => [
         'subject' => 'Vaše objednávka :order_number byla doručena - KAVI.cz',
-        'title' => 'Vaše objednávka byla doručena! 📦',
+        'title' => 'Vaše objednávka byla doručena!',
         'subtitle' => 'Vaše objednávka byla úspěšně doručena.',
         'order_number' => 'Číslo objednávky',
         'pickup_point' => 'Výdejní místo',
