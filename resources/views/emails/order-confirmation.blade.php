@@ -36,11 +36,11 @@
         }
         
         .logo { 
-            max-width: 100px !important; 
-            width: 100px !important; 
+            max-width: 80px !important; 
+            width: 80px !important; 
             height: auto !important; 
             display: block !important; 
-            margin: 0 auto !important; 
+            margin: 0 !important; 
         }
         
         /* Content Area */
