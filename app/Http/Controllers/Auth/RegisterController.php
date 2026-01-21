@@ -60,6 +60,7 @@ class RegisterController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'locale' => app()->getLocale(),
             'password' => Hash::make($validated['password']),
             'password_set_by_user' => true, // User explicitly set this password
         ]);

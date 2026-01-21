@@ -1063,6 +1063,7 @@ class StripeService
                         $newUser = User::create([
                             'name' => $name,
                             'email' => $guestEmail,
+                            'locale' => EmailService::getLocaleFromSubscription($subscription),
                             'password' => \Hash::make(\Str::random(32)), // Random password
                             'password_set_by_user' => false, // User didn't set this password
                             'phone' => $subscription->shipping_address['phone'] ?? null,
@@ -1367,6 +1368,7 @@ class StripeService
                         $newUser = User::create([
                             'name' => $name,
                             'email' => $guestEmail,
+                            'locale' => EmailService::getLocaleFromSubscription($subscription),
                             'password' => \Hash::make(\Str::random(32)),
                             'password_set_by_user' => false,
                             'phone' => $shippingAddress['phone'] ?? null,

@@ -43,7 +43,7 @@ class TestAccountEmails extends Command
         // 1. Welcome Email
         $this->info('1/6 Sending: Welcome Email...');
         try {
-            Mail::to($email)->send(new WelcomeEmail($user));
+            Mail::to($email)->send(new WelcomeEmail($user, 'cs'));
             $this->info('✓ Sent!');
         } catch (\Exception $e) {
             $this->error('✗ Failed: ' . $e->getMessage());
@@ -86,7 +86,7 @@ class TestAccountEmails extends Command
         try {
             $newEmail = 'new-' . $user->email;
             $confirmationUrl = route('home') . '?confirm_email_change=test_token_456';
-            Mail::to($email)->send(new EmailChangeConfirmation($user, $newEmail, $confirmationUrl));
+            Mail::to($email)->send(new EmailChangeConfirmation($user, $newEmail, $confirmationUrl, 'cs'));
             $this->info('✓ Sent!');
         } catch (\Exception $e) {
             $this->error('✗ Failed: ' . $e->getMessage());
@@ -107,7 +107,7 @@ class TestAccountEmails extends Command
         $this->info('6/6 Sending: Welcome After Migration...');
         try {
             $subscription = $user->activeSubscription ?? \App\Models\Subscription::latest()->first();
-            Mail::to($email)->send(new WelcomeAfterMigration($user, $subscription));
+            Mail::to($email)->send(new WelcomeAfterMigration($user, $subscription, 'cs'));
             $this->info('✓ Sent!');
         } catch (\Exception $e) {
             $this->error('✗ Failed: ' . $e->getMessage());

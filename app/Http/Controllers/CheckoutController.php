@@ -583,6 +583,7 @@ class CheckoutController extends Controller
                         $newUser = \App\Models\User::create([
                             'name' => $request->name,
                             'email' => $request->email,
+                            'locale' => app()->getLocale(),
                             'password' => \Hash::make(\Str::random(32)), // Random password
                             'password_set_by_user' => false, // User didn't set this password
                             'phone' => $request->phone,

@@ -892,6 +892,7 @@ class SubscriptionController extends Controller
                     $newUser = \App\Models\User::create([
                         'name' => $validated['name'],
                         'email' => $validated['email'],
+                        'locale' => app()->getLocale(),
                         'password' => \Hash::make(\Str::random(32)),
                         'password_set_by_user' => false,
                         'phone' => $validated['phone'],
@@ -1134,6 +1135,7 @@ class SubscriptionController extends Controller
                 $user = \App\Models\User::create([
                     'name' => $validated['name'],
                     'email' => $validated['email'],
+                    'locale' => app()->getLocale(),
                     'password' => \Hash::make(\Str::random(32)),
                     'password_set_by_user' => false,
                     'phone' => $validated['phone'],

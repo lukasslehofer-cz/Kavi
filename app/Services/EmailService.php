@@ -38,17 +38,23 @@ class EmailService
     }
     
     /**
-     * Get locale from User (checks their subscriptions/orders for currency)
+     * Get locale from User
+     * Priority: 1) User's stored locale, 2) Subscription currency, 3) Order currency, 4) Default cs
      */
     public static function getLocaleFromUser(User $user): string
     {
-        // Try to get locale from user's most recent subscription
+        // Priority 1: User's explicitly stored locale (set during registration based on domain)
+        if ($user->locale) {
+            return $user->locale;
+        }
+        
+        // Priority 2: Try to get locale from user's most recent subscription
         $subscription = $user->subscriptions()->latest()->first();
         if ($subscription && $subscription->currency) {
             return self::getLocaleFromCurrency($subscription->currency);
         }
         
-        // Try to get locale from user's most recent order
+        // Priority 3: Try to get locale from user's most recent order
         $order = $user->orders()->latest()->first();
         if ($order && $order->currency) {
             return self::getLocaleFromCurrency($order->currency);
