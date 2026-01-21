@@ -3,40 +3,35 @@
 @section('title', 'Potvrzení předplatného - KAVI.cz')
 
 @section('content')
-<!-- Success Hero Header -->
-<div class="relative bg-green-50 py-16 border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="mb-6">
-            <div class="w-20 h-20 mx-auto rounded-full bg-green-500 flex items-center justify-center">
-                <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
-        </div>
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Děkujeme za objednávku!</h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto font-light">
-            Vaše předplatné bylo úspěšně vytvořeno a je nyní aktivní. První zásilku vám odešleme v nejbližším termínu rozesílky.
-        </p>
+
+<!-- Success Header -->
+<div style="background-color: #e5e6df;">
+  <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="w-3 h-3 rounded-full bg-green-500"></span>
+      <span class="text-xs uppercase tracking-widest text-green-600">Předplatné aktivováno</span>
     </div>
+    
+    <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-8">
+      <span class="text-dark-800">Děkujeme za</span><br>
+      <span class="text-primary-500">objednávku</span>
+    </h1>
+    
+    <div class="flex justify-end">
+      <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
+        Vaše předplatné bylo úspěšně vytvořeno a je nyní aktivní. První zásilku vám odešleme v nejbližším termínu rozesílky.
+      </p>
+    </div>
+  </div>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Order Details -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Subscription Configuration -->
-            <div class="bg-white rounded-2xl p-8 border border-gray-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-bold text-gray-900">Vaše předplatné</h2>
-                </div>
+<div class="py-16 lg:py-24" style="background-color: #e5e6df;">
+    <div class="max-w-screen-xl mx-auto px-4 md:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Subscription Details - Left Column -->
+            <div class="lg:col-span-7 space-y-8">
                 
                 @php
-                // Handle double-encoded JSON (string inside string)
                 $config = $subscription->configuration;
                 if (is_string($config)) {
                     $config = json_decode($config, true);
@@ -48,34 +43,34 @@
                 ];
                 $frequencyText = $frequencyTexts[$subscription->frequency_months] ?? '';
                 
-                // Get shipping date info
                 $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
                 
-                // Calculate next payment date (15th of the next billing cycle)
-                // Billing cycle: 16th of one month to 15th of next month
-                // If subscription created between 16th-31st, current cycle ends on 15th of next month
-                // If subscription created between 1st-15th, current cycle ends on 15th of current month
                 $subscriptionDate = \Carbon\Carbon::parse($subscription->starts_at);
                 $currentBillingCycleEnd = $subscriptionDate->day <= 15 
                     ? $subscriptionDate->copy()->setDay(15) 
                     : $subscriptionDate->copy()->addMonthNoOverflow()->setDay(15);
                 
-                // Next payment is frequency_months after current billing cycle end
                 $nextPaymentDate = $currentBillingCycleEnd->copy()->addMonths($subscription->frequency_months);
                 @endphp
-                
-                <div class="bg-gray-100 p-6 rounded-xl border border-gray-200">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Subscription Configuration -->
+                <div class="border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">01</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">Vaše předplatné</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-6 mb-8">
                         <div>
-                            <div class="text-sm text-gray-600 mb-1 font-light">Množství</div>
-                            <div class="text-lg font-medium text-gray-900">
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">Množství</span>
+                            <span class="font-display text-lg text-dark-800 uppercase tracking-tight">
                                 {{ $config['amount'] }} balení ({{ $config['amount'] * 250 }}g)
-                            </div>
+                            </span>
                         </div>
                         
                         <div>
-                            <div class="text-sm text-gray-600 mb-1 font-light">Typ kávy</div>
-                            <div class="text-lg font-medium text-gray-900">
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">Typ kávy</span>
+                            <span class="font-display text-lg text-dark-800 uppercase tracking-tight">
                                 @if($config['type'] === 'espresso')
                                     Espresso @if($config['isDecaf'] ?? false)(vč. 1× decaf)@endif
                                 @elseif($config['type'] === 'filter')
@@ -83,344 +78,214 @@
                                 @else
                                     Kombinace @if($config['isDecaf'] ?? false)(vč. 1× decaf)@endif
                                 @endif
-                            </div>
+                            </span>
                             @if($config['type'] === 'mix' && isset($config['mix']))
-                            <div class="mt-2 space-y-1 text-xs text-gray-700 font-light">
+                            <div class="mt-2 text-xs text-warm-500 uppercase tracking-widest">
                                 @if(($config['mix']['espresso'] ?? 0) > 0)
-                                <div>• {{ $config['mix']['espresso'] }}× Espresso</div>
+                                {{ $config['mix']['espresso'] }}× ESP
                                 @endif
                                 @if(($config['mix']['filter'] ?? 0) > 0)
-                                <div>• {{ $config['mix']['filter'] }}× Filtr</div>
+                                · {{ $config['mix']['filter'] }}× FLT
                                 @endif
                             </div>
                             @endif
                         </div>
                         
                         <div>
-                            <div class="text-sm text-gray-600 mb-1 font-light">Frekvence</div>
-                            <div class="text-lg font-medium text-gray-900">{{ $frequencyText }}</div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">Frekvence</span>
+                            <span class="font-display text-lg text-dark-800 uppercase tracking-tight">{{ $frequencyText }}</span>
                         </div>
                         
                         <div>
-                            <div class="text-sm text-gray-600 mb-1 font-light">Cena</div>
-                            <div class="space-y-2">
-                                <div>
-                                    <div class="text-base text-gray-700 font-medium">Předplatné</div>
-                                    <div class="text-xl font-bold text-gray-900">
-                                        {{ number_format($subscription->configured_price, 0, ',', ' ') }} Kč
-                                    </div>
-                                </div>
-                                @if($subscription->shipping_cost > 0)
-                                <div class="pt-2 border-t border-gray-300">
-                                    <div class="text-base text-gray-700 font-medium">Doprava</div>
-                                    <div class="text-xl font-bold text-gray-900">
-                                        {{ number_format($subscription->shipping_cost, 0, ',', ' ') }} Kč
-                                    </div>
-                                </div>
-                                @endif
-                                <div class="pt-2 border-t-2 border-gray-400">
-                                    <div class="text-base text-gray-700 font-medium">Celkem</div>
-                                    <div class="text-2xl font-bold text-primary-600">
-                                        {{ number_format($subscription->configured_price + ($subscription->shipping_cost ?? 0), 0, ',', ' ') }} Kč
-                                    </div>
-                                    <div class="text-xs text-gray-600 font-light mt-1">{{ $frequencyText }}</div>
-                                </div>
-                            </div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">Cena</span>
+                            <span class="font-display text-2xl text-dark-800">
+                                {{ number_format($subscription->configured_price + ($subscription->shipping_cost ?? 0), 0, ',', ' ') }} Kč —
+                            </span>
+                            <span class="text-xs text-warm-500 uppercase tracking-widest block mt-1">{{ $frequencyText }}</span>
                         </div>
                     </div>
                     
                     @if($subscription->discount_amount > 0 && $subscription->coupon)
                     @php
-                    // configured_price now contains FULL price (without discount)
                     $originalPrice = $subscription->configured_price;
-                    
-                    // Calculate when discount ends
                     $discountEndsAt = $nextPaymentDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);
-                    
-                    // Calculate when full price starts
                     $fullPriceStartsAt = $discountEndsAt->copy()->addMonths($subscription->frequency_months);
                     @endphp
                     
                     <!-- Coupon Discount Info -->
-                    <div class="mt-6 pt-6 border-t-2 border-green-200">
-                        <div class="bg-green-50 p-5 rounded-xl border border-green-200">
-                            <div class="flex items-start gap-3 mb-4">
-                                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                    </svg>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="font-bold text-green-900 mb-1 text-lg">Sleva {{ $subscription->coupon_code }} aktivována!</div>
-                                    <div class="text-sm text-green-700 font-medium">
-                                        Sleva {{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč
-                                        @if($subscription->discount_months_total)
-                                            po dobu {{ $subscription->discount_months_remaining }} {{ $subscription->discount_months_remaining == 1 ? 'platby' : ($subscription->discount_months_remaining < 5 ? 'plateb' : 'plateb') }}
-                                        @else
-                                            permanentně
-                                        @endif
-                                    </div>
-                                </div>
+                    <div class="bg-[#BCBEB1] p-6 mb-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="text-xs uppercase tracking-widest text-dark-800">Sleva {{ $subscription->coupon_code }} aktivována</span>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs uppercase tracking-widest text-dark-800/70">Sleva</span>
+                                <span class="text-dark-800">-{{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč</span>
                             </div>
-                            
-                            <div class="space-y-3 text-sm">
-                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg">
-                                    <span class="text-gray-700">Aktuální cena se slevou:</span>
-                                    <span class="font-bold text-green-700">{{ number_format($subscription->configured_price - $subscription->discount_amount, 0, ',', ' ') }} Kč</span>
-                                </div>
-                                
-                                @if($subscription->discount_months_total)
-                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg">
-                                    <span class="text-gray-700">Sleva platí do:</span>
-                                    <span class="font-bold text-gray-900">{{ $discountEndsAt->format('j. n. Y') }}</span>
-                                </div>
-                                
-                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg">
-                                    <span class="text-gray-700">Od:</span>
-                                    <span class="font-bold text-gray-900">{{ $fullPriceStartsAt->format('j. n. Y') }}</span>
-                                </div>
-                                
-                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded-lg border-2 border-gray-300">
-                                    <span class="text-gray-700">Plná cena od {{ $fullPriceStartsAt->format('j. n.') }}:</span>
-                                    <span class="font-bold text-gray-900 text-lg">{{ number_format($originalPrice, 0, ',', ' ') }} Kč</span>
-                                </div>
-                                @endif
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs uppercase tracking-widest text-dark-800/70">Cena se slevou</span>
+                                <span class="font-display text-dark-800">{{ number_format($subscription->configured_price - $subscription->discount_amount, 0, ',', ' ') }} Kč</span>
                             </div>
+                            @if($subscription->discount_months_total)
+                            <div class="flex justify-between items-center pt-3 border-t border-dark-800/20">
+                                <span class="text-xs uppercase tracking-widest text-dark-800/70">Sleva platí do</span>
+                                <span class="text-dark-800">{{ $discountEndsAt->format('j. n. Y') }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs uppercase tracking-widest text-dark-800/70">Plná cena od</span>
+                                <span class="font-display text-dark-800">{{ number_format($originalPrice, 0, ',', ' ') }} Kč</span>
+                            </div>
+                            @endif
                         </div>
                     </div>
                     @endif
                     
                     <!-- Shipping and Payment Dates -->
-                    <div class="mt-6 pt-6 border-t border-gray-200 space-y-4">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <div class="font-medium text-gray-900 mb-1">První rozesílka</div>
-                                <div class="text-sm text-gray-700 font-light">
-                                    <strong class="text-primary-600 font-medium">{{ $shippingInfo['next_shipping_date']->format('j. n. Y') }}</strong>
-                                    (20. den v měsíci)
-                                </div>
-                                <div class="text-xs text-gray-600 mt-1 font-light">
-                                    {{ $shippingInfo['cutoff_message'] }}
-                                </div>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-warm-300">
+                        <div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">První rozesílka</span>
+                            <span class="font-display text-lg text-primary-500">{{ $shippingInfo['next_shipping_date']->format('j. n. Y') }}</span>
+                            <span class="text-xs text-warm-500 block mt-1">20. den v měsíci</span>
                         </div>
                         
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <div class="font-medium text-gray-900 mb-1">Další platba</div>
-                                <div class="text-sm text-gray-700 font-light">
-                                    <strong class="text-green-600 font-medium">{{ $nextPaymentDate->format('j. n. Y') }}</strong>
-                                    (15. den v měsíci)
-                                </div>
-                                <div class="text-xs text-gray-600 mt-1 font-light">
-                                    Platby se automaticky strhávají z karty vždy 15. den v měsíci
-                                </div>
-                            </div>
+                        <div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">Další platba</span>
+                            <span class="font-display text-lg text-dark-800">{{ $nextPaymentDate->format('j. n. Y') }}</span>
+                            <span class="text-xs text-warm-500 block mt-1">15. den v měsíci</span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Contact & Billing Information -->
-            <div class="bg-white rounded-2xl p-8 border border-gray-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-bold text-gray-900">Kontaktní a fakturační údaje</h2>
-                </div>
-                
+                <!-- Contact & Billing Information -->
                 @if($subscription->shipping_address)
-                <div class="bg-gray-100 p-6 rounded-xl border border-gray-200">
-                    <div class="space-y-3 text-gray-700">
-                        <div class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
+                <div class="border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">02</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">Kontaktní údaje</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
                             <div>
-                                <div class="text-xs text-gray-500 mb-0.5 font-light">Jméno</div>
-                                <div class="font-medium text-gray-900">{{ $subscription->shipping_address['name'] }}</div>
+                                <span class="text-xs uppercase tracking-widest text-warm-400 block mb-1">Jméno</span>
+                                <span class="text-dark-800">{{ $subscription->shipping_address['name'] }}</span>
                             </div>
+                            <div>
+                                <span class="text-xs uppercase tracking-widest text-warm-400 block mb-1">Email</span>
+                                <span class="text-dark-800">{{ $subscription->shipping_address['email'] }}</span>
+                            </div>
+                            @if(!empty($subscription->shipping_address['phone']))
+                            <div>
+                                <span class="text-xs uppercase tracking-widest text-warm-400 block mb-1">Telefon</span>
+                                <span class="text-dark-800">{{ $subscription->shipping_address['phone'] }}</span>
+                            </div>
+                            @endif
                         </div>
-                        
-                        <div class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            <div>
-                                <div class="text-xs text-gray-500 mb-0.5 font-light">Email</div>
-                                <div class="font-medium text-gray-900">{{ $subscription->shipping_address['email'] }}</div>
-                            </div>
-                        </div>
-                        
-                        @if(!empty($subscription->shipping_address['phone']))
-                        <div class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                            <div>
-                                <div class="text-xs text-gray-500 mb-0.5 font-light">Telefon</div>
-                                <div class="font-medium text-gray-900">{{ $subscription->shipping_address['phone'] }}</div>
-                            </div>
-                        </div>
-                        @endif
-                        
-                        <div class="border-t border-gray-200 pt-3 mt-3"></div>
-                        
-                        <div class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            <div>
-                                <div class="text-xs text-gray-500 mb-0.5 font-light">Fakturační adresa</div>
-                                <div class="font-medium text-gray-900">{{ $subscription->shipping_address['billing_address'] }}, {{ $subscription->shipping_address['billing_postal_code'] }} {{ $subscription->shipping_address['billing_city'] }}</div>
-                            </div>
+                        <div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-1">Fakturační adresa</span>
+                            <span class="text-dark-800">
+                                {{ $subscription->shipping_address['billing_address'] }}<br>
+                                {{ $subscription->shipping_address['billing_postal_code'] }} {{ $subscription->shipping_address['billing_city'] }}
+                            </span>
                         </div>
                     </div>
                 </div>
                 @endif
+
+                <!-- Packeta Delivery Point -->
+                @if($subscription->packeta_point_name)
+                <div class="border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">03</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">Výdejní místo</h2>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <span class="text-xs uppercase tracking-widest text-warm-400 block">Zásilkovna</span>
+                        <span class="font-display text-lg text-dark-800 uppercase tracking-tight block">{{ $subscription->packeta_point_name }}</span>
+                        @if($subscription->packeta_point_address)
+                        <span class="text-warm-500 text-sm block">{{ $subscription->packeta_point_address }}</span>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                @if($subscription->delivery_notes)
+                <div class="border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-8">
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">04</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">Poznámka</h2>
+                    </div>
+                    <p class="text-warm-500 text-sm">{{ $subscription->delivery_notes }}</p>
+                </div>
+                @endif
             </div>
 
-            <!-- Packeta Delivery Point -->
-            @if($subscription->packeta_point_name)
-            <div class="bg-white rounded-2xl p-8 border border-gray-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-bold text-gray-900">📦 Výdejní místo zásilky</h2>
-                </div>
-                
-                <div class="bg-primary-50 p-6 rounded-xl border border-primary-200">
-                    <div class="text-sm font-medium text-primary-600 mb-2">Zásilkovna</div>
-                    <div class="text-lg font-medium text-gray-900 mb-1">{{ $subscription->packeta_point_name }}</div>
-                    @if($subscription->packeta_point_address)
-                    <div class="text-sm text-gray-700 flex items-start gap-1 font-light">
-                        <svg class="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {{ $subscription->packeta_point_address }}
-                    </div>
-                    @endif
+            <!-- Next Steps Sidebar - Right Column -->
+            <div class="lg:col-span-5">
+                <div class="bg-[#BCBEB1] p-8 lg:sticky lg:top-24">
+                    <h3 class="font-display text-2xl font-normal text-dark-800 uppercase tracking-tight mb-8">Co dál?</h3>
                     
-                    <div class="mt-4 pt-4 border-t border-primary-200">
-                        <div class="flex items-center gap-2 text-sm text-gray-700">
-                            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="font-medium">Objednávku si vyzvedněte na tomto výdejním místě</span>
+                    <div class="space-y-6 mb-8">
+                        <div class="flex gap-4">
+                            <span class="text-xs uppercase tracking-widest text-primary-500 w-8">01</span>
+                            <div>
+                                <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">Potvrzení emailem</div>
+                                <div class="text-xs text-dark-800/70">Na váš email jsme odeslali potvrzení s detaily předplatného</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <span class="text-xs uppercase tracking-widest text-primary-500 w-8">02</span>
+                            <div>
+                                <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">První zásilka</div>
+                                <div class="text-xs text-dark-800/70">Kávu vám odešleme v nejbližším termínu rozesílky (20. den v měsíci)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <span class="text-xs uppercase tracking-widest text-primary-500 w-8">03</span>
+                            <div>
+                                <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">Správa předplatného</div>
+                                <div class="text-xs text-dark-800/70">
+                                    @auth
+                                    V dashboardu můžete kdykoli upravit nebo zrušit předplatné
+                                    @else
+                                    Pro správu předplatného si vytvořte účet - link jsme vám poslali na email
+                                    @endauth
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            @endif
 
-            @if($subscription->delivery_notes)
-            <div class="bg-white rounded-2xl p-8 border border-gray-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                        </svg>
+                    <div class="space-y-4">
+                        @auth
+                        <a href="{{ localizedRoute('dashboard.subscription') }}" class="block w-full text-center bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all">
+                            Zobrazit předplatné →
+                        </a>
+                        @else
+                        <a href="{{ localizedRoute('login') }}" class="block w-full text-center bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all">
+                            Přihlásit se →
+                        </a>
+                        @endauth
+                        
+                        <a href="{{ route('home') }}" class="group flex items-center justify-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all py-2">
+                            <span>Zpět na homepage</span>
+                            <span class="group-hover:translate-x-1 transition-transform">→</span>
+                        </a>
                     </div>
-                    <h2 class="text-xl font-bold text-gray-900">Poznámka</h2>
-                </div>
-                
-                <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 text-gray-700 font-light">
-                    {{ $subscription->delivery_notes }}
-                </div>
-            </div>
-            @endif
-        </div>
 
-        <!-- Next Steps Sidebar -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-2xl p-8 sticky top-24 border border-gray-200">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900">Co dál?</h3>
-                </div>
-                
-                <div class="space-y-4 mb-6">
-                    <div class="flex gap-3">
-                        <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                            <span class="text-primary-600 font-medium text-sm">1</span>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900 mb-1">Potvrzení emailem</div>
-                            <div class="text-sm text-gray-600 font-light">Na váš email jsme odeslali potvrzení s detaily předplatného</div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-3">
-                        <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                            <span class="text-primary-600 font-medium text-sm">2</span>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900 mb-1">První zásilka</div>
-                            <div class="text-sm text-gray-600 font-light">Kávu vám odešleme v nejbližším termínu rozesílky (20. den v měsíci)</div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-3">
-                        <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-                            <span class="text-primary-600 font-medium text-sm">3</span>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900 mb-1">Správa předplatného</div>
-                            @auth
-                            <div class="text-sm text-gray-600 font-light">V dashboardu můžete kdykoli upravit nebo zrušit předplatné</div>
-                            @else
-                            <div class="text-sm text-gray-600 font-light">Pro správu předplatného si vytvořte účet - link jsme vám poslali na email</div>
-                            @endauth
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-3">
-                    @auth
-                    <a href="{{ localizedRoute('dashboard.subscription') }}" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
-                        Zobrazit předplatné
-                    </a>
-                    @else
-                    <a href="{{ localizedRoute('login') }}" class="block w-full text-center bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-full transition-all duration-200">
-                        Přihlásit se / Vytvořit účet
-                    </a>
-                    @endauth
-                    
-                    <a href="{{ route('home') }}" class="block w-full text-center bg-white hover:bg-gray-50 text-gray-900 font-medium px-6 py-3 rounded-full border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                        Zpět na homepage
-                    </a>
-                </div>
-
-                <!-- Contact Info -->
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <div class="text-center">
-                        <div class="text-sm text-gray-600 mb-2 font-light">Potřebujete pomoc?</div>
-                        <a href="mailto:info@kavi.cz" class="text-primary-600 hover:text-primary-700 font-medium">info@kavi.cz</a>
+                    <!-- Contact Info -->
+                    <div class="mt-8 pt-6 border-t border-dark-800/20 text-center">
+                        <span class="text-xs uppercase tracking-widest text-dark-800/60 block mb-2">Potřebujete pomoc?</span>
+                        <a href="mailto:info@kavi.cz" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 transition-colors">info@kavi.cz</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 @endsection
