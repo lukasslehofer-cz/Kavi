@@ -32,8 +32,8 @@ return [
 
     // Welcome Email
     'welcome' => [
-        'subject' => 'Vítejte v KAVI.cz! ☕ Začněte svou kávovou cestu',
-        'title' => 'Vítejte v KAVI.cz! ☕',
+        'subject' => 'Vítejte v KAVI.cz - Začněte svou kávovou cestu',
+        'title' => 'Vítejte v KAVI',
         'subtitle' => 'Jsme rádi, že jste se k nám přidali. Připravili jsme pro vás několik tipů na začátek.',
         'greeting' => 'Ahoj, :name!',
         'intro' => 'Vítejte v komunitě milovníků kávy! V KAVI.cz věříme, že dobrá káva dokáže rozjasnit každý den. Těšíme se, že společně objevíme ty nejlepší chutě z celého světa.',
@@ -134,7 +134,7 @@ return [
     // One-time Box Confirmation
     'onetime_box' => [
         'subject' => 'Potvrzení objednávky :subscription_number - KAVI.cz',
-        'title' => 'Děkujeme za vaši objednávku! ☕',
+        'title' => 'Děkujeme za vaši objednávku',
         'subtitle' => 'Váš jednorázový kávový box je na cestě.',
         'box_number' => 'Číslo objednávky',
         'price' => 'Cena',
@@ -152,7 +152,7 @@ return [
     // Subscription Payment Success
     'subscription_payment_success' => [
         'subject' => 'Platba proběhla úspěšně - KAVI.cz',
-        'title' => 'Platba přijata! ✓',
+        'title' => 'Platba přijata',
         'subtitle' => 'Děkujeme za vaši platbu.',
         'greeting' => 'Dobrý den :name,',
         'intro' => 'Přijali jsme platbu za vaše předplatné.',
@@ -363,8 +363,8 @@ return [
 
     // Welcome After Migration
     'welcome_migration' => [
-        'subject' => '☕ Představujeme nové KAVI.cz!',
-        'title' => 'Vítejte v novém KAVI.cz! ☕',
+        'subject' => 'Představujeme nové KAVI.cz',
+        'title' => 'Vítejte v novém KAVI.cz',
         'subtitle' => 'Váš účet byl úspěšně přenesen na novou platformu.',
         'intro' => 'S radostí vám oznamujeme, že jsme spustili novou verzi KAVI.cz s vylepšeným designem a novými funkcemi.',
         'whats_new' => 'Co je nového?',

@@ -3,280 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <meta name="supported-color-schemes" content="light">
     <title>{{ __('emails.magic_login.title', [], $locale) }}</title>
     <style>
-        /* Reset styles */
-        body, table, td, a { 
-            -webkit-text-size-adjust: 100%; 
-            -ms-text-size-adjust: 100%; 
-        }
-        table, td { 
-            mso-table-lspace: 0pt; 
-            mso-table-rspace: 0pt; 
-        }
-        img { 
-            -ms-interpolation-mode: bicubic; 
-            border: 0; 
-            height: auto; 
-            line-height: 100%; 
-            outline: none; 
-            text-decoration: none; 
-        }
-        
-        /* Base styles */
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            background-color: #f3f4f6;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
-        
-        /* Container */
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-        }
-        
-        /* Header */
-        .header {
-            background-color: #111827;
-            padding: 32px 40px;
-            text-align: center;
-        }
-        
-        .logo {
-            max-width: 120px !important;
-            width: 120px !important;
-            height: auto !important;
-            display: block !important;
-            margin: 0 auto !important;
-        }
-        
-        /* Content */
-        .content {
-            padding: 40px;
-            color: #374151;
-        }
-        
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #111827;
-            margin: 0 0 12px 0;
-            line-height: 1.2;
-        }
-        
-        .subtitle {
-            font-size: 16px;
-            color: #6b7280;
-            margin: 0 0 32px 0;
-            font-weight: 300;
-        }
-        
-        /* Button */
-        .button {
-            display: inline-block;
-            background-color: #e6305a;
-            color: #ffffff !important;
-            text-decoration: none;
-            padding: 14px 32px;
-            border-radius: 9999px;
-            font-weight: 600;
-            font-size: 15px;
-            margin: 24px 0;
-            text-align: center;
-        }
-        
-        .button:hover {
-            background-color: #d12a51;
-        }
-        
-        /* Info boxes */
-        .info-box {
-            background-color: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 24px 0;
-        }
-        
-        .info-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #92400e;
-            margin: 0 0 8px 0;
-        }
-        
-        .info-text {
-            font-size: 14px;
-            color: #78350f;
-            line-height: 1.6;
-            margin: 4px 0;
-        }
-        
-        .note-box {
-            background-color: #f3f4f6;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 24px 0;
-        }
-        
-        .note-text {
-            font-size: 14px;
-            color: #4b5563;
-            line-height: 1.6;
-            margin: 4px 0;
-        }
-        
-        /* Footer */
-        .footer {
-            background-color: #f9fafb;
-            padding: 32px 40px;
-            text-align: center;
-            color: #6b7280;
-            font-size: 14px;
-            border-top: 1px solid #e5e7eb;
-        }
-        
-        .footer-text {
-            margin: 8px 0;
-            font-weight: 300;
-        }
-        
-        .footer-links {
-            margin: 16px 0;
-        }
-        
-        .footer-link {
-            color: #e6305a;
-            text-decoration: none;
-            margin: 0 8px;
-        }
-        
-        /* Responsive */
-        @media only screen and (max-width: 600px) {
-            .content {
-                padding: 24px !important;
-            }
-            
-            h1 {
-                font-size: 24px !important;
-            }
-            
-            .header {
-                padding: 24px !important;
-            }
-            
-            .footer {
-                padding: 24px !important;
-            }
-            
-            .logo {
-                max-width: 100px !important;
-                width: 100px !important;
-            }
-        }
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        body { margin: 0; padding: 0; width: 100%; background-color: #bcbeb1; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #e5e6df; }
+        @media only screen and (max-width: 600px) { .content { padding: 32px 24px !important; } h1 { font-size: 26px !important; } .header, .footer { padding: 32px 24px !important; } }
+        @media (prefers-color-scheme: dark) { body { background-color: #bcbeb1 !important; } .email-container { background-color: #e5e6df !important; } }
     </style>
 </head>
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 20px 0;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
-                <!-- Main Container -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
                     
                     <!-- Header -->
                     <tr>
-                        <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none; filter: invert(1) brightness(2);">
+                        <td style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
                     <!-- Content -->
                     <tr>
-                        <td class="content">
-                            <!-- Icon -->
-                            <div style="text-align: center; margin-bottom: 24px;">
-                                <div style="width: 64px; height: 64px; background-color: #e6305a; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center;">
-                                    <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#ffffff" style="stroke-width: 2;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                                    </svg>
-                                </div>
-                            </div>
+                        <td style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
                             
-                            <h1 style="text-align: center;">{{ __('emails.magic_login.title', [], $locale) }}</h1>
-                            <p class="subtitle" style="text-align: center;">{{ __('emails.magic_login.subtitle', [], $locale) }}</p>
+                            <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
+                                {{ __('emails.magic_login.title', [], $locale) }}
+                            </h1>
+                            <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                                {{ __('emails.magic_login.subtitle', [], $locale) }}
+                            </p>
                             
                             <!-- CTA Button -->
-                            <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ $loginUrl }}" class="button">
-                                    {{ __('emails.magic_login.login_button', [], $locale) }}
+                            <div style="text-align: center; margin: 40px 0;">
+                                <a href="{{ $loginUrl }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                                    {{ __('emails.magic_login.login_button', [], $locale) }} →
                                 </a>
                             </div>
                             
-                            <!-- Warning Box -->
-                            <div class="info-box">
-                                <p class="info-title">⏱️ {{ __('emails.magic_login.expires_title', [], $locale) }}</p>
-                                <p class="info-text">
+                            <!-- Expiration warning -->
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
+                                    {{ __('emails.magic_login.expires_title', [], $locale) }}
+                                </div>
+                                <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
                                     {{ __('emails.magic_login.expires_text', ['minutes' => $expiresInMinutes], $locale) }}
                                 </p>
                             </div>
                             
-                            <!-- Security Note -->
-                            <div class="note-box">
-                                <p class="note-text" style="margin-bottom: 12px;">
-                                    <strong>🔒 {{ __('emails.magic_login.security_title', [], $locale) }}</strong>
-                                </p>
-                                <p class="note-text">
-                                    • {{ __('emails.magic_login.security_once', [], $locale) }}<br>
-                                    • {{ __('emails.magic_login.security_ignore', [], $locale) }}<br>
-                                    • {{ __('emails.magic_login.security_share', [], $locale) }}
+                            <!-- Security info -->
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ __('emails.magic_login.security_title', [], $locale) }}
+                                </div>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.magic_login.security_once', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.magic_login.security_ignore', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.magic_login.security_share', [], $locale) }}
                                 </p>
                             </div>
                             
-                            <!-- Alternative Link -->
-                            <div style="background-color: #f9fafb; border-radius: 8px; padding: 16px; margin-top: 24px;">
-                                <p style="font-size: 13px; color: #6b7280; margin: 0 0 8px 0; font-weight: 500;">
+                            <!-- Alternative link -->
+                            <div style="margin: 32px 0; padding: 16px 20px; background-color: #d5d7ca;">
+                                <p style="font-size: 11px; color: #76716C; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.1em;">
                                     {{ __('emails.magic_login.button_not_working', [], $locale) }}
                                 </p>
-                                <p style="font-size: 12px; color: #111827; word-break: break-all; margin: 0; font-family: monospace;">
+                                <p style="font-size: 12px; color: #1c1c1c; word-break: break-all; margin: 0; font-family: monospace;">
                                     {{ $loginUrl }}
                                 </p>
                             </div>
                             
-                            <!-- Additional Info -->
-                            <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
-                                {{ __('emails.magic_login.help_text', [], $locale) }} 
-                                <a href="mailto:{{ $contactEmail }}" style="color: #e6305a; text-decoration: none;">{{ $contactEmail }}</a>                                 
+                            <!-- Features -->
+                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Bezpečné přihlášení' : 'Secure login' }}
+                                </span>
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Bez hesla' : 'No password needed' }}
+                                </span>
+                            </div>
+                            
+                            <!-- Help Text -->
+                            <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
+                                {{ __('emails.magic_login.help_text', [], $locale) }}
+                                <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             
-                            <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
+                            <p style="font-size: 14px; color: #5a5a5a; margin-top: 24px;">
                                 {{ __('emails.common.regards', [], $locale) }},<br>
-                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
+                                <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>
                         </td>
                     </tr>
                     
                     <!-- Footer -->
                     <tr>
-                        <td class="footer">
-                            <p class="footer-text">
-                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
-                                {{ __('emails.common.tagline', [], $locale) }}
-                            </p>
-                            <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ route('dashboard.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.my_account', [], $locale) }}</a>
+                        <td style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
+                            <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">{{ $siteName }}</p>
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">{{ __('emails.common.tagline', [], $locale) }}</p>
+                            <div style="margin: 20px 0;">
+                                <a href="{{ route('home') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('dashboard.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.my_account', [], $locale) }}</a>
                             </div>
-                            <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
-                            </p>
-                            <p class="footer-text" style="font-size: 12px;">
-                                {{ __('emails.magic_login.footer_text', [], $locale) }}
-                            </p>
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
+                                <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
+                                <p style="margin: 8px 0 0 0;">{{ __('emails.magic_login.footer_text', [], $locale) }}</p>
+                            </div>
                         </td>
                     </tr>
                     

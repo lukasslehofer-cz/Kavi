@@ -32,8 +32,8 @@ return [
 
     // Welcome Email
     'welcome' => [
-        'subject' => 'Welcome to KAVI! ☕ Start Your Coffee Journey',
-        'title' => 'Welcome to KAVI! ☕',
+        'subject' => 'Welcome to KAVI - Start Your Coffee Journey',
+        'title' => 'Welcome to KAVI',
         'subtitle' => 'We\'re glad you joined us. Here are a few tips to get you started.',
         'greeting' => 'Hi, :name!',
         'intro' => 'Welcome to our community of coffee lovers! At KAVI, we believe that good coffee can brighten any day. We look forward to discovering the best flavors from around the world together.',
@@ -134,7 +134,7 @@ return [
     // One-time Box Confirmation
     'onetime_box' => [
         'subject' => 'Order Confirmation :subscription_number - KAVI',
-        'title' => 'Thank you for your order! ☕',
+        'title' => 'Thank you for your order',
         'subtitle' => 'Your one-time coffee box is on its way.',
         'box_number' => 'Order Number',
         'price' => 'Price',
@@ -152,7 +152,7 @@ return [
     // Subscription Payment Success
     'subscription_payment_success' => [
         'subject' => 'Payment Successful - KAVI',
-        'title' => 'Payment Received! ✓',
+        'title' => 'Payment Received',
         'subtitle' => 'Thank you for your payment.',
         'greeting' => 'Hello :name,',
         'intro' => 'We have received your subscription payment.',
@@ -363,8 +363,8 @@ return [
 
     // Welcome After Migration
     'welcome_migration' => [
-        'subject' => '☕ Introducing the New KAVIbox!',
-        'title' => 'Welcome to the New KAVIbox! ☕',
+        'subject' => 'Introducing the New KAVIbox',
+        'title' => 'Welcome to the New KAVIbox',
         'subtitle' => 'Your account has been successfully migrated to our new platform.',
         'intro' => 'We\'re excited to announce that we\'ve launched a new version of KAVIbox with an improved design and new features.',
         'whats_new' => 'What\'s new?',

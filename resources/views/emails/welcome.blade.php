@@ -10,148 +10,157 @@
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-        body { margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f3f4f6 !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
-        .email-container { max-width: 600px; margin: 0 auto; }
-        .header { background-color: #111827 !important; padding: 32px; text-align: center; }
-        .logo { max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; }
-        .content { padding: 40px 32px; background-color: #ffffff !important; }
-        h1 { font-size: 28px; font-weight: 700; color: #111827; margin: 0 0 16px 0; line-height: 1.3; }
-        .subtitle { font-size: 16px; color: #6b7280; margin: 0 0 32px 0; font-weight: 300; }
-        .info-box { background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 24px 0; }
-        .info-title { font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0; }
-        .info-text { font-size: 14px; color: #4b5563; line-height: 1.6; margin: 8px 0; }
-        .button { display: inline-block; background-color: #e6305a; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 9999px; font-weight: 600; font-size: 15px; margin: 24px 0; text-align: center; }
-        .button:hover { background-color: #d12a51; }
-        .footer { background-color: #f9fafb !important; padding: 32px; text-align: center; }
-        .footer-text { font-size: 14px; color: #6b7280; line-height: 1.6; margin: 8px 0; }
-        .footer-links { margin: 16px 0; }
-        .footer-link { color: #e6305a; text-decoration: none; margin: 0 12px; font-size: 14px; }
-        @media only screen and (max-width: 600px) { .content { padding: 24px !important; } h1 { font-size: 24px !important; } .header { padding: 24px !important; } .footer { padding: 24px !important; } .logo { max-width: 100px !important; width: 100px !important; } }
-        @media (prefers-color-scheme: dark) { body { background-color: #1a1a1a !important; } .email-container { background-color: #ffffff !important; border: 1px solid #d1d5db !important; } .info-box { background-color: #f9fafb !important; border: 1px solid #d1d5db !important; } h1, .info-title { color: #111827 !important; } .subtitle, .info-text { color: #4b5563 !important; } .header { background-color: #111827 !important; } }
-        [data-ogsc] .email-container { background-color: #ffffff !important; border: 1px solid #d1d5db !important; }
-        [data-ogsc] .info-box { background-color: #f9fafb !important; border: 1px solid #d1d5db !important; }
+        body { margin: 0; padding: 0; width: 100%; background-color: #bcbeb1; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #e5e6df; }
+        @media only screen and (max-width: 600px) { .content { padding: 32px 24px !important; } h1 { font-size: 26px !important; } .header, .footer { padding: 32px 24px !important; } }
+        @media (prefers-color-scheme: dark) { body { background-color: #bcbeb1 !important; } .email-container { background-color: #e5e6df !important; } }
     </style>
 </head>
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6 !important; padding: 20px 0;" bgcolor="#f3f4f6">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
-                <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
+                    
+                    <!-- Header -->
                     <tr>
-                        <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                        <td style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
+                    
+                    <!-- Content -->
                     <tr>
-                        <td class="content">
-                            <div style="text-align: center; margin-bottom: 24px;">
-                                <div style="width: 64px; height: 64px; background-color: #10b981 !important; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; line-height: 64px;">
-                                    👋
+                        <td style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
+                            
+                            <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
+                                {{ __('emails.welcome.title', [], $locale) }}
+                            </h1>
+                            <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                                {{ __('emails.welcome.subtitle', [], $locale) }}
+                            </p>
+                            
+                            <!-- Greeting -->
+                            <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
+                                <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ $locale === 'cs' ? 'Dobrý den' : 'Hello' }}
+                                </div>
+                                <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
+                                    {{ $user->name }}
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">{{ __('emails.welcome.title', [], $locale) }}</h1>
-                            <p class="subtitle" style="text-align: center;">{{ __('emails.welcome.subtitle', [], $locale) }}</p>
-                            
                             <!-- Welcome message -->
-                            <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
-                                <h3 class="info-title" style="color: #1e40af;">🎉 {{ __('emails.welcome.greeting', ['name' => $user->name], $locale) }}</h3>
-                                <p class="info-text" style="color: #1e3a8a;">
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
+                                    {{ $locale === 'cs' ? 'Vítejte v KAVI' : 'Welcome to KAVI' }}
+                                </div>
+                                <p style="font-size: 15px; color: #4a6741; margin: 0;">
                                     {{ __('emails.welcome.intro', [], $locale) }}
                                 </p>
                             </div>
                             
-                            <!-- Quick start -->
-                            <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
-                                <h3 class="info-title" style="color: #065f46;">🚀 {{ __('emails.welcome.how_to_start', [], $locale) }}</h3>
-                                <p class="info-text" style="color: #047857;">
-                                    <strong>1. {{ __('emails.welcome.step1_title', [], $locale) }}</strong><br>
-                                    {{ __('emails.welcome.step1_text', [], $locale) }}<br><br>
-                                    
-                                    <strong>2. {{ __('emails.welcome.step2_title', [], $locale) }}</strong><br>
-                                    {{ __('emails.welcome.step2_text', [], $locale) }}<br><br>
-                                    
-                                    <strong>3. {{ __('emails.welcome.step3_title', [], $locale) }}</strong><br>
-                                    {{ __('emails.welcome.step3_text', [], $locale) }}
+                            <!-- How to start -->
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ __('emails.welcome.how_to_start', [], $locale) }}
+                                </div>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
+                                    <span style="color: #CA4136;">01</span> <strong>{{ __('emails.welcome.step1_title', [], $locale) }}</strong><br>
+                                    <span style="font-size: 14px; color: #5a5a5a; margin-left: 24px; display: inline-block;">{{ __('emails.welcome.step1_text', [], $locale) }}</span>
+                                </p>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 16px 0 4px 0;">
+                                    <span style="color: #CA4136;">02</span> <strong>{{ __('emails.welcome.step2_title', [], $locale) }}</strong><br>
+                                    <span style="font-size: 14px; color: #5a5a5a; margin-left: 24px; display: inline-block;">{{ __('emails.welcome.step2_text', [], $locale) }}</span>
+                                </p>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 16px 0 4px 0;">
+                                    <span style="color: #CA4136;">03</span> <strong>{{ __('emails.welcome.step3_title', [], $locale) }}</strong><br>
+                                    <span style="font-size: 14px; color: #5a5a5a; margin-left: 24px; display: inline-block;">{{ __('emails.welcome.step3_text', [], $locale) }}</span>
                                 </p>
                             </div>
                             
-                            <!-- CTA -->
-                            <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('subscriptions.index') }}" class="button">
-                                    {{ __('emails.welcome.explore_subscription', [], $locale) }}
+                            <!-- CTA Button -->
+                            <div style="text-align: center; margin: 40px 0;">
+                                <a href="{{ route('subscriptions.index') }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                                    {{ __('emails.welcome.explore_subscription', [], $locale) }} →
                                 </a>
                             </div>
                             
                             <!-- What we offer -->
-                            <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e;">✨ {{ __('emails.welcome.what_we_offer', [], $locale) }}</h3>
-                                <p class="info-text" style="color: #78350f;">
-                                    ☕ <strong>{{ __('emails.welcome.offer_premium', [], $locale) }}</strong><br>
-                                    🌍 <strong>{{ __('emails.welcome.offer_europe', [], $locale) }}</strong><br>
-                                    📦 <strong>{{ __('emails.welcome.offer_subscription', [], $locale) }}</strong><br>
-                                    🎁 <strong>{{ __('emails.welcome.offer_gift', [], $locale) }}</strong><br>
-                                    💬 <strong>{{ __('emails.welcome.offer_advice', [], $locale) }}</strong>
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ __('emails.welcome.what_we_offer', [], $locale) }}
+                                </div>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.welcome.offer_premium', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.welcome.offer_europe', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.welcome.offer_subscription', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.welcome.offer_gift', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.welcome.offer_advice', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- Account info -->
-                            <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">👤 {{ __('emails.welcome.your_account', [], $locale) }}</h3>
-                                <p class="info-text">
-                                    <strong>{{ __('emails.welcome.email_label', [], $locale) }}:</strong> {{ $user->email }}<br>
-                                    <strong>{{ __('emails.welcome.name_label', [], $locale) }}:</strong> {{ $user->name }}<br><br>
-                                    
-                                    {{ __('emails.welcome.account_info', [], $locale) }}
-                                </p>
-                                <div style="text-align: center; margin-top: 16px;">
-                                    <a href="{{ route('dashboard.profile') }}" style="color: #e6305a; text-decoration: none; font-weight: 600;">
-                                        {{ __('emails.common.edit_profile', [], $locale) }} →
-                                    </a>
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ __('emails.welcome.your_account', [], $locale) }}
                                 </div>
-                            </div>
-                            
-                            <!-- Support -->
-                            <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
-                                <h3 class="info-title" style="color: #065f46;">💬 {{ __('emails.welcome.need_help', [], $locale) }}</h3>
-                                <p class="info-text" style="color: #047857;">
-                                    {{ __('emails.welcome.help_intro', [], $locale) }}<br><br>
-                                    
-                                    📧 <strong>{{ __('emails.welcome.email', [], $locale) }}:</strong> <a href="mailto:{{ $contactEmail }}" style="color: #e6305a;">{{ $contactEmail }}</a><br>
-                                    💬 <strong>{{ __('emails.welcome.chat', [], $locale) }}</strong><br>
-                                    📚 <strong>{{ __('emails.welcome.faq', [], $locale) }}</strong>
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.welcome.email_label', [], $locale) }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">{{ $user->email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.welcome.name_label', [], $locale) }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">{{ $user->name }}</td>
+                                    </tr>
+                                </table>
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 16px 0 4px 0;">
+                                    {{ __('emails.welcome.account_info', [], $locale) }}
+                                    <a href="{{ route('dashboard.profile') }}" style="color: #CA4136; text-decoration: none;">{{ __('emails.common.edit_profile', [], $locale) }} →</a>
                                 </p>
                             </div>
                             
-                            <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300; text-align: center;">
-                                <strong>{{ __('emails.welcome.looking_forward', [], $locale) }}</strong>
+                            <!-- Features -->
+                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
+                                </span>
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Výběrová káva' : 'Specialty coffee' }}
+                                </span>
+                            </div>
+                            
+                            <!-- Help Text -->
+                            <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
+                                {{ __('emails.welcome.help_intro', [], $locale) }}
+                                <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             
-                            <p style="font-size: 14px; color: #6b7280; margin-top: 24px;">
+                            <p style="font-size: 14px; color: #5a5a5a; margin-top: 24px;">
                                 {{ __('emails.welcome.with_love', [], $locale) }},<br>
-                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
+                                <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>
                         </td>
                     </tr>
+                    
+                    <!-- Footer -->
                     <tr>
-                        <td class="footer">
-                            <p class="footer-text">
-                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
-                                {{ __('emails.common.tagline', [], $locale) }}
-                            </p>
-                            <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('products.index') }}" class="footer-link">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ route('subscriptions.index') }}" class="footer-link">{{ __('emails.common.subscription', [], $locale) }}</a>
+                        <td style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
+                            <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">{{ $siteName }}</p>
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">{{ __('emails.common.tagline', [], $locale) }}</p>
+                            <div style="margin: 20px 0;">
+                                <a href="{{ route('home') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('subscriptions.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.subscription', [], $locale) }}</a>
                             </div>
-                            <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
-                            </p>
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
+                                <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
+                            </div>
                         </td>
                     </tr>
+                    
                 </table>
-                <!--[if mso]></td></tr></table><![endif]-->
             </td>
         </tr>
     </table>

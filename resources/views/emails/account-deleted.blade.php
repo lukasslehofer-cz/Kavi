@@ -10,158 +10,162 @@
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-        body { margin: 0; padding: 0; width: 100%; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
-        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-        .header { background-color: #111827; padding: 32px 40px; text-align: center; }
-        .logo { max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; }
-        .content { padding: 40px; color: #374151; }
-        h1 { font-size: 28px; font-weight: 700; color: #111827; margin: 0 0 12px 0; line-height: 1.2; }
-        .subtitle { font-size: 16px; color: #6b7280; margin: 0 0 32px 0; font-weight: 300; }
-        .info-box { background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 24px 0; }
-        .info-title { font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0; }
-        .info-text { font-size: 14px; color: #4b5563; line-height: 1.6; margin: 4px 0; }
-        .info-list { margin: 12px 0; padding-left: 0; list-style: none; }
-        .info-list li { padding: 6px 0; font-size: 14px; color: #4b5563; line-height: 1.6; }
-        .button { display: inline-block; background-color: #e6305a; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 9999px; font-weight: 600; font-size: 15px; margin: 24px 0; text-align: center; }
-        .footer { background-color: #f9fafb; padding: 32px 40px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
-        .footer-text { margin: 8px 0; font-weight: 300; }
-        .footer-links { margin: 16px 0; }
-        .footer-link { color: #e6305a; text-decoration: none; margin: 0 8px; }
-        @media only screen and (max-width: 600px) { .content { padding: 24px !important; } h1 { font-size: 24px !important; } .header, .footer { padding: 24px !important; } .logo { max-width: 100px !important; width: 100px !important; } }
+        body { margin: 0; padding: 0; width: 100%; background-color: #bcbeb1; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #e5e6df; }
+        @media only screen and (max-width: 600px) { .content { padding: 32px 24px !important; } h1 { font-size: 26px !important; } .header, .footer { padding: 32px 24px !important; } }
+        @media (prefers-color-scheme: dark) { body { background-color: #bcbeb1 !important; } .email-container { background-color: #e5e6df !important; } }
     </style>
 </head>
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6; padding: 20px 0;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
-                <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
                     
+                    <!-- Header -->
                     <tr>
-                        <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                        <td style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
+                    <!-- Content -->
                     <tr>
-                        <td class="content">
-                            <div style="text-align: center; margin-bottom: 24px;">
-                                <div style="width: 64px; height: 64px; background-color: #6b7280 !important; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; line-height: 64px;">
-                                    ✓
+                        <td style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
+                            
+                            <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
+                                {{ __('emails.account_deleted.title', [], $locale) }}
+                            </h1>
+                            <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                                {{ __('emails.account_deleted.subtitle', [], $locale) }}
+                            </p>
+                            
+                            <!-- Deleted email -->
+                            <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
+                                <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ $locale === 'cs' ? 'Smazaný email' : 'Deleted email' }}
+                                </div>
+                                <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
+                                    {{ $userEmail }}
                                 </div>
                             </div>
                             
-                            <h1 style="text-align: center;">{{ __('emails.account_deleted.title', [], $locale) }}</h1>
-                            <p class="subtitle" style="text-align: center;">{{ __('emails.account_deleted.subtitle', [], $locale) }}</p>
-                            
-                            <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
-                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">{{ $locale === 'cs' ? 'Smazaný email' : 'Deleted email' }}</div>
-                                <div style="font-size: 16px; font-weight: 600; color: #111827;">{{ $userEmail }}</div>
+                            <!-- Confirmation -->
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #5a5a5a; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
+                                    {{ $locale === 'cs' ? 'Potvrzeno' : 'Confirmed' }}
+                                </div>
+                                <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
+                                    {{ $locale === 'cs' ? 'Váš účet byl úspěšně smazán podle vaší žádosti.' : 'Your account has been successfully deleted as requested.' }}
+                                </p>
                             </div>
                             
                             <!-- What was deleted -->
-                            <div class="info-box" style="background-color: #fee2e2 !important; border: 1px solid #fecaca !important; border-left: 4px solid #dc2626 !important;" bgcolor="#fee2e2">
-                                <h3 class="info-title" style="color: #991b1b;">✗ {{ $locale === 'cs' ? 'Co bylo smazáno' : 'What was deleted' }}</h3>
-                                <ul class="info-list">
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ $locale === 'cs' ? 'Co bylo smazáno' : 'What was deleted' }}
+                                </div>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
                                     @if($locale === 'cs')
-                                    <li style="color: #7f1d1d;">• Všechna osobní data (jméno, telefon, adresa)</li>
-                                    <li style="color: #7f1d1d;">• Přihlašovací údaje - už se nebudete moci přihlásit</li>
-                                    <li style="color: #7f1d1d;">• Všechny uložené platební metody</li>
-                                    <li style="color: #7f1d1d;">• Aktivní předplatná (zrušena)</li>
-                                    <li style="color: #7f1d1d;">• Nezaplacené objednávky</li>
-                                    <li style="color: #7f1d1d;">• Odběr newsletteru</li>
+                                    <span style="color: #CA4136;">→</span> Všechna osobní data (jméno, telefon, adresa)<br>
+                                    <span style="color: #CA4136;">→</span> Přihlašovací údaje<br>
+                                    <span style="color: #CA4136;">→</span> Všechny uložené platební metody<br>
+                                    <span style="color: #CA4136;">→</span> Aktivní předplatná (zrušena)<br>
+                                    <span style="color: #CA4136;">→</span> Nezaplacené objednávky<br>
+                                    <span style="color: #CA4136;">→</span> Odběr newsletteru
                                     @else
-                                    <li style="color: #7f1d1d;">• All personal data (name, phone, address)</li>
-                                    <li style="color: #7f1d1d;">• Login credentials - you won't be able to log in anymore</li>
-                                    <li style="color: #7f1d1d;">• All saved payment methods</li>
-                                    <li style="color: #7f1d1d;">• Active subscriptions (cancelled)</li>
-                                    <li style="color: #7f1d1d;">• Unpaid orders</li>
-                                    <li style="color: #7f1d1d;">• Newsletter subscription</li>
+                                    <span style="color: #CA4136;">→</span> All personal data (name, phone, address)<br>
+                                    <span style="color: #CA4136;">→</span> Login credentials<br>
+                                    <span style="color: #CA4136;">→</span> All saved payment methods<br>
+                                    <span style="color: #CA4136;">→</span> Active subscriptions (cancelled)<br>
+                                    <span style="color: #CA4136;">→</span> Unpaid orders<br>
+                                    <span style="color: #CA4136;">→</span> Newsletter subscription
                                     @endif
-                                </ul>
+                                </p>
                             </div>
                             
                             <!-- What was kept -->
-                            <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
-                                <h3 class="info-title" style="color: #1e40af;">📄 {{ $locale === 'cs' ? 'Co jsme zachovali (zákonná povinnost)' : 'What we retained (legal requirement)' }}</h3>
-                                <ul class="info-list">
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ $locale === 'cs' ? 'Co jsme zachovali (zákonná povinnost)' : 'What we retained (legal requirement)' }}
+                                </div>
+                                <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
                                     @if($locale === 'cs')
-                                    <li style="color: #1e3a8a;"><strong>• Faktury a platební historii</strong> - uchováváme 10 let dle zákona o účetnictví</li>
-                                    <li style="color: #1e3a8a;"><strong>• Anonymizovaná data</strong> - historie objednávek (bez osobních údajů)</li>
-                                    <li style="color: #1e3a8a;"><strong>• Historie předplatných</strong> (anonymizovaná) - pro účetní evidenci</li>
+                                    <span style="color: #4a6741;">→</span> Faktury a platební historii (uchováváme 10 let dle zákona)<br>
+                                    <span style="color: #4a6741;">→</span> Anonymizovaná data objednávek<br>
+                                    <span style="color: #4a6741;">→</span> Historie předplatných (anonymizovaná)
                                     @else
-                                    <li style="color: #1e3a8a;"><strong>• Invoices and payment history</strong> - retained for 10 years as required by law</li>
-                                    <li style="color: #1e3a8a;"><strong>• Anonymized data</strong> - order history (without personal details)</li>
-                                    <li style="color: #1e3a8a;"><strong>• Subscription history</strong> (anonymized) - for accounting records</li>
+                                    <span style="color: #4a6741;">→</span> Invoices and payment history (retained for 10 years by law)<br>
+                                    <span style="color: #4a6741;">→</span> Anonymized order data<br>
+                                    <span style="color: #4a6741;">→</span> Subscription history (anonymized)
                                     @endif
-                                </ul>
-                                <p class="info-text" style="color: #1e3a8a; margin-top: 12px; font-style: italic;">
+                                </p>
+                                <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 16px 0 4px 0; font-style: italic;">
                                     {{ $locale === 'cs' ? 'Všechny zachované údaje jsou plně anonymizované a nelze z nich zjistit vaši totožnost.' : 'All retained data is fully anonymized and cannot be used to identify you.' }}
                                 </p>
                             </div>
                             
-                            <!-- Thank you message -->
-                            <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
-                                <h3 class="info-title" style="color: #065f46;">💙 {{ __('emails.common.thank_you', [], $locale) }}</h3>
-                                <p class="info-text" style="color: #047857;">
+                            <!-- Thank you -->
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
+                                    {{ $locale === 'cs' ? 'Děkujeme' : 'Thank you' }}
+                                </div>
+                                <p style="font-size: 15px; color: #4a6741; margin: 0;">
                                     @if($locale === 'cs')
-                                    <strong>Děkujeme, že jste byli součástí {{ $siteName }} komunity!</strong>
+                                    Děkujeme, že jste byli součástí {{ $siteName }} komunity! Pokud si to někdy rozmyslíte, budeme rádi, když se k nám znovu vrátíte.
                                     @else
-                                    <strong>Thank you for being part of the {{ $siteName }} community!</strong>
-                                    @endif
-                                </p>
-                                <p class="info-text" style="color: #047857; margin-top: 12px;">
-                                    @if($locale === 'cs')
-                                    Pokud si to někdy rozmyslíte, budeme rádi, když se k nám znovu vrátíte. 
-                                    Jednoduše si vytvořte nový účet na našem webu.
-                                    @else
-                                    If you ever change your mind, we'd love to have you back. 
-                                    Simply create a new account on our website.
+                                    Thank you for being part of the {{ $siteName }} community! If you ever change your mind, we'd love to have you back.
                                     @endif
                                 </p>
                             </div>
                             
-                            <!-- Contact info -->
-                            <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">❓ {{ $locale === 'cs' ? 'Máte dotazy?' : 'Questions?' }}</h3>
-                                <p class="info-text">
-                                    {{ __('emails.common.questions', [], $locale) }} 
-                                    <a href="mailto:{{ $contactEmail }}" style="color: #e6305a; text-decoration: none; font-weight: 600;">{{ $contactEmail }}</a>
-                                </p>
-                            </div>
-                            
-                            <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('home') }}" class="button">
-                                    {{ $locale === 'cs' ? 'Přejít na ' . $siteName : 'Go to ' . $siteName }}
+                            <!-- CTA Button -->
+                            <div style="text-align: center; margin: 40px 0;">
+                                <a href="{{ route('home') }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                                    {{ $locale === 'cs' ? 'Přejít na ' . $siteName : 'Go to ' . $siteName }} →
                                 </a>
                             </div>
                             
-                            <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300; text-align: center;">
+                            <!-- Features -->
+                            <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
+                                </span>
+                                <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
+                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Vždy vítáni zpět' : 'Always welcome back' }}
+                                </span>
+                            </div>
+                            
+                            <!-- Help Text -->
+                            <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
+                                {{ __('emails.common.questions', [], $locale) }}
+                                <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
+                            </p>
+                            
+                            <p style="font-size: 14px; color: #5a5a5a; margin-top: 24px;">
                                 {{ __('emails.common.regards', [], $locale) }},<br>
-                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
+                                <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>
                         </td>
                     </tr>
                     
+                    <!-- Footer -->
                     <tr>
-                        <td class="footer">
-                            <p class="footer-text">
-                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
-                                {{ __('emails.common.tagline', [], $locale) }}
-                            </p>
-                            <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('products.index') }}" class="footer-link">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ route('subscriptions.index') }}" class="footer-link">{{ __('emails.common.subscription', [], $locale) }}</a>
+                        <td style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
+                            <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">{{ $siteName }}</p>
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">{{ __('emails.common.tagline', [], $locale) }}</p>
+                            <div style="margin: 20px 0;">
+                                <a href="{{ route('home') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('subscriptions.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.subscription', [], $locale) }}</a>
                             </div>
-                            <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
-                            </p>
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
+                                <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
+                            </div>
                         </td>
                     </tr>
                     
                 </table>
-                <!--[if mso]></td></tr></table><![endif]-->
             </td>
         </tr>
     </table>
