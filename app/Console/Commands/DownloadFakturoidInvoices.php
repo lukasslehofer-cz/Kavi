@@ -267,6 +267,7 @@ class DownloadFakturoidInvoices extends Command
 
         $response = Http::withBasicAuth($this->clientId, $this->clientSecret)
             ->asForm()
+            ->withHeaders(['Accept' => 'application/json'])
             ->post('https://app.fakturoid.cz/api/v3/oauth/token', [
                 'grant_type' => 'client_credentials',
             ]);
