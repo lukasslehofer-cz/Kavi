@@ -41,6 +41,8 @@ database/database.sqlite
 !/storage/framework/sessions/.gitkeep
 /storage/framework/views/*
 !/storage/framework/views/.gitkeep
+/storage/app/invoices/*
+!/storage/app/invoices/.gitkeep
 
 # Temporary files
 test_*.php

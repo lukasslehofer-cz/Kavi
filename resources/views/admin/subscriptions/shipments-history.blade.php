@@ -143,7 +143,7 @@
                                 <div class="text-xs text-gray-500">FID: {{ $shipment->payment->fakturoid_invoice_id }}</div>
                                 @endif
                                 @if($shipment->payment->invoice_pdf_path)
-                                <a href="{{ Storage::url($shipment->payment->invoice_pdf_path) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
+                                <a href="{{ route('admin.subscription-payment.invoice', $shipment->payment) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
                                     Stáhnout PDF →
                                 </a>
                                 @endif

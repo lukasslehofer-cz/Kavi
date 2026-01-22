@@ -10,6 +10,7 @@ use App\Services\StockReservationService;
 use App\Services\SubscriptionShipmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class SubscriptionController extends Controller
 {
@@ -883,5 +884,27 @@ class SubscriptionController extends Controller
             return redirect()->back()
                 ->with('error', 'Nepodařilo se přepočítat rezervace: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Download invoice PDF for a subscription payment
+     */
+    public function downloadInvoice(\App\Models\SubscriptionPayment $payment)
+    {
+        if (!$payment->invoice_pdf_path) {
+            abort(404, 'Faktura není k dispozici.');
+        }
+
+        if (!Storage::exists($payment->invoice_pdf_path)) {
+            abort(404, 'Soubor faktury nebyl nalezen.');
+        }
+
+        $filename = "faktura_predplatne_{$payment->subscription_id}_{$payment->id}.pdf";
+
+        return Storage::download(
+            $payment->invoice_pdf_path,
+            $filename,
+            ['Content-Type' => 'application/pdf']
+        );
     }
 }
