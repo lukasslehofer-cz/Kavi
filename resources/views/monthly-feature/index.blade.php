@@ -101,7 +101,7 @@
                             </p>
                             @endif
 
-                            <div class="flex items-center gap-6">
+                            <div class="flex items-center justify-between">
                                 <a href="{{ localizedRoute('roasteries.show', $roastery) }}" 
                                    class="group/link inline-flex items-center gap-2 text-dark-800 text-sm uppercase tracking-widest hover:text-primary-500 transition-colors">
                                     <span>{{ $currentLocale === 'en' ? 'More about roaster' : 'Více o pražírně' }}</span>
@@ -110,19 +110,21 @@
                                     </svg>
                                 </a>
 
-                                @if($roastery->website_url)
-                                <a href="{{ $roastery->website_url }}" target="_blank" rel="noopener noreferrer"
-                                   class="text-xs uppercase tracking-widest text-warm-400 hover:text-dark-800 transition-colors">
-                                    WWW
-                                </a>
-                                @endif
+                                <div class="flex items-center gap-4">
+                                    @if($roastery->website_url)
+                                    <a href="{{ $roastery->website_url }}" target="_blank" rel="noopener noreferrer"
+                                       class="text-xs uppercase tracking-widest text-warm-400 hover:text-dark-800 transition-colors">
+                                        WWW
+                                    </a>
+                                    @endif
 
-                                @if($roastery->instagram)
-                                <a href="https://instagram.com/{{ str_replace('@', '', $roastery->instagram) }}" target="_blank" rel="noopener noreferrer"
-                                   class="text-xs uppercase tracking-widest text-warm-400 hover:text-dark-800 transition-colors">
-                                    IG
-                                </a>
-                                @endif
+                                    @if($roastery->instagram)
+                                    <a href="https://instagram.com/{{ str_replace('@', '', $roastery->instagram) }}" target="_blank" rel="noopener noreferrer"
+                                       class="text-xs uppercase tracking-widest text-warm-400 hover:text-dark-800 transition-colors">
+                                        IG
+                                    </a>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
