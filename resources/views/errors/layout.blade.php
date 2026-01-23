@@ -1,10 +1,15 @@
+@php
+    // Detect locale from domain for error pages (middleware may not run for some errors)
+    $host = request()->getHost();
+    $detectedLocale = $currentLocale ?? (str_contains($host, 'kavibox.com') ? 'en' : 'cs');
+@endphp
 <!DOCTYPE html>
-<html lang="{{ ($currentLocale ?? 'cs') === 'en' ? 'en' : 'cs' }}">
+<html lang="{{ $detectedLocale === 'en' ? 'en' : 'cs' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', ($currentLocale ?? 'cs') === 'en' ? 'Error | KAVI' : 'Chyba | KAVI.cz')</title>
+    <title>@yield('title', $detectedLocale === 'en' ? 'Error | KAVI' : 'Chyba | KAVI.cz')</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -21,22 +26,22 @@
                 <!-- Navigation -->
                 <nav class="hidden md:flex items-center gap-8">
                     <a href="{{ route('home') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Home' : 'Úvod' }}
+                        {{ $detectedLocale === 'en' ? 'Home' : 'Úvod' }}
                     </a>
                     <a href="{{ localizedRoute('subscriptions.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee Boxes' : 'Kávové boxy' }}
+                        {{ $detectedLocale === 'en' ? 'Coffee Boxes' : 'Kávové boxy' }}
                     </a>
                     <a href="{{ localizedRoute('products.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Shop' : 'Obchod' }}
+                        {{ $detectedLocale === 'en' ? 'Shop' : 'Obchod' }}
                     </a>
                     <a href="{{ localizedRoute('contact') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Contact' : 'Kontakt' }}
+                        {{ $detectedLocale === 'en' ? 'Contact' : 'Kontakt' }}
                     </a>
                 </nav>
 
                 <!-- Mobile menu button -->
                 <a href="{{ route('home') }}" class="md:hidden text-xs uppercase tracking-widest border-b border-[#1c1c1c]">
-                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Home' : 'Úvod' }}
+                    {{ $detectedLocale === 'en' ? 'Home' : 'Úvod' }}
                 </a>
             </div>
         </div>
@@ -54,13 +59,13 @@
                 <p class="text-xs uppercase tracking-widest">© {{ date('Y') }} KAVI</p>
                 <div class="flex gap-6">
                     <a href="{{ localizedRoute('terms-of-service') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Terms' : 'Podmínky' }}
+                        {{ $detectedLocale === 'en' ? 'Terms' : 'Podmínky' }}
                     </a>
                     <a href="{{ localizedRoute('privacy-policy') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Privacy' : 'Ochrana údajů' }}
+                        {{ $detectedLocale === 'en' ? 'Privacy' : 'Ochrana údajů' }}
                     </a>
                     <a href="{{ localizedRoute('contact') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Contact' : 'Kontakt' }}
+                        {{ $detectedLocale === 'en' ? 'Contact' : 'Kontakt' }}
                     </a>
                 </div>
             </div>

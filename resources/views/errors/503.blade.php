@@ -1,6 +1,11 @@
 @extends('errors.layout')
 
-@section('title', ($currentLocale ?? 'cs') === 'en' ? 'Maintenance | KAVI' : 'Údržba | KAVI.cz')
+@php
+    $host = request()->getHost();
+    $locale = $currentLocale ?? (str_contains($host, 'kavibox.com') ? 'en' : 'cs');
+@endphp
+
+@section('title', $locale === 'en' ? 'Maintenance | KAVI' : 'Údržba | KAVI.cz')
 
 @section('content')
 <div class="mx-auto max-w-screen-xl px-4 md:px-8 py-12 md:py-20">
@@ -16,13 +21,13 @@
 
             <!-- Heading -->
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold uppercase tracking-tight mb-6 leading-[0.95]">
-                {{ ($currentLocale ?? 'cs') === 'en' ? 'Under' : 'Probíhá' }}<br>
-                <span class="text-red-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Maintenance' : 'Údržba' }}</span>
+                {{ $locale === 'en' ? 'Under' : 'Probíhá' }}<br>
+                <span class="text-red-600">{{ $locale === 'en' ? 'Maintenance' : 'Údržba' }}</span>
             </h1>
 
             <!-- Description -->
             <p class="text-lg md:text-xl text-[#1c1c1c]/70 mb-10 max-w-xl leading-relaxed">
-                {{ ($currentLocale ?? 'cs') === 'en' 
+                {{ $locale === 'en' 
                     ? 'Our website is currently undergoing maintenance to bring you even better services. We\'ll be back soon with fresh coffee!' 
                     : 'Náš web právě prochází údržbou, abychom vám mohli nabídnout ještě lepší služby. Už brzy budeme zpět s čerstvou kávou!' }}
             </p>
@@ -31,10 +36,10 @@
             <div class="inline-flex items-center gap-4 border border-[#1c1c1c]/20 px-6 py-4 mb-10">
                 <div>
                     <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Estimated Return' : 'Předpokládaný návrat' }}
+                        {{ $locale === 'en' ? 'Estimated Return' : 'Předpokládaný návrat' }}
                     </p>
                     <p class="text-lg font-medium">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Within a few minutes' : 'Během několika minut' }}
+                        {{ $locale === 'en' ? 'Within a few minutes' : 'Během několika minut' }}
                     </p>
                 </div>
             </div>
@@ -42,17 +47,17 @@
             <!-- CTA Button -->
             <div class="flex flex-wrap gap-4 mb-12">
                 <button onclick="window.location.reload()" class="inline-flex items-center justify-center bg-[#1c1c1c] text-white text-xs uppercase tracking-widest px-8 py-4 hover:bg-[#1c1c1c]/80 transition-colors">
-                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Check Availability' : 'Zkontrolovat dostupnost' }}
+                    {{ $locale === 'en' ? 'Check Availability' : 'Zkontrolovat dostupnost' }}
                 </button>
             </div>
 
             <!-- Newsletter Section -->
             <div class="pt-8 border-t border-[#1c1c1c]/20">
                 <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50 mb-4">
-                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Stay Updated' : 'Zůstaňte v obraze' }}
+                    {{ $locale === 'en' ? 'Stay Updated' : 'Zůstaňte v obraze' }}
                 </p>
                 <p class="text-sm text-[#1c1c1c]/70 mb-6 max-w-lg">
-                    {{ ($currentLocale ?? 'cs') === 'en' 
+                    {{ $locale === 'en' 
                         ? 'Subscribe to our newsletter and be the first to know when we\'re back online.' 
                         : 'Přihlaste se k odběru newsletteru a buďte první, kdo se dozví o našem návratu.' }}
                 </p>
@@ -62,12 +67,12 @@
                     <input 
                         type="email" 
                         name="email" 
-                        placeholder="{{ ($currentLocale ?? 'cs') === 'en' ? 'YOUR EMAIL' : 'VÁŠ E-MAIL' }}" 
+                        placeholder="{{ $locale === 'en' ? 'YOUR EMAIL' : 'VÁŠ E-MAIL' }}" 
                         required
                         class="flex-1 px-4 py-3 bg-transparent border-b border-[#1c1c1c] text-sm uppercase tracking-widest placeholder:text-[#1c1c1c]/40 focus:outline-none focus:border-red-600 transition-colors"
                     >
                     <button type="submit" class="px-6 py-3 bg-[#1c1c1c] text-white text-xs uppercase tracking-widest hover:bg-[#1c1c1c]/80 transition-colors whitespace-nowrap">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Subscribe' : 'Odebírat' }}
+                        {{ $locale === 'en' ? 'Subscribe' : 'Odebírat' }}
                     </button>
                 </form>
                 <div id="newsletter-message-maintenance" class="mt-4 text-sm hidden"></div>
@@ -78,7 +83,7 @@
         <div class="lg:col-span-1">
             <div class="bg-[#BCBEB1] p-8 h-full">
                 <h2 class="text-xs uppercase tracking-widest mb-6 border-b border-[#1c1c1c] pb-4">
-                    {{ ($currentLocale ?? 'cs') === 'en' ? 'What\'s Happening?' : 'Co se děje?' }}
+                    {{ $locale === 'en' ? 'What\'s Happening?' : 'Co se děje?' }}
                 </h2>
 
                 <div class="space-y-6">
@@ -87,7 +92,7 @@
                         <span class="text-red-600 mt-1">●</span>
                         <div>
                             <p class="text-sm">
-                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Improving site performance' : 'Vylepšujeme výkon webu' }}
+                                {{ $locale === 'en' ? 'Improving site performance' : 'Vylepšujeme výkon webu' }}
                             </p>
                         </div>
                     </div>
@@ -97,7 +102,7 @@
                         <span class="text-red-600 mt-1">●</span>
                         <div>
                             <p class="text-sm">
-                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Adding new features' : 'Přidáváme nové funkce' }}
+                                {{ $locale === 'en' ? 'Adding new features' : 'Přidáváme nové funkce' }}
                             </p>
                         </div>
                     </div>
@@ -107,7 +112,7 @@
                         <span class="text-red-600 mt-1">●</span>
                         <div>
                             <p class="text-sm">
-                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Updating security' : 'Aktualizujeme zabezpečení' }}
+                                {{ $locale === 'en' ? 'Updating security' : 'Aktualizujeme zabezpečení' }}
                             </p>
                         </div>
                     </div>
@@ -116,19 +121,19 @@
                 <!-- Contact -->
                 <div class="mt-8 pt-6 border-t border-[#1c1c1c]/20">
                     <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50 mb-2">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Questions?' : 'Dotazy?' }}
+                        {{ $locale === 'en' ? 'Questions?' : 'Dotazy?' }}
                     </p>
-                    <a href="mailto:{{ ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}" class="text-sm hover:text-red-600 transition-colors">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}
+                    <a href="mailto:{{ $locale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}" class="text-sm hover:text-red-600 transition-colors">
+                        {{ $locale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}
                     </a>
                 </div>
 
                 <!-- Error Info -->
                 <div class="mt-6 pt-6 border-t border-[#1c1c1c]/20">
                     <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50">
-                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Status' : 'Stav' }}
+                        {{ $locale === 'en' ? 'Status' : 'Stav' }}
                     </p>
-                    <p class="text-sm mt-1">503 / {{ ($currentLocale ?? 'cs') === 'en' ? 'Service Unavailable' : 'Služba nedostupná' }}</p>
+                    <p class="text-sm mt-1">503 / {{ $locale === 'en' ? 'Service Unavailable' : 'Služba nedostupná' }}</p>
                 </div>
             </div>
         </div>
@@ -139,7 +144,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('newsletter-form-maintenance');
     const message = document.getElementById('newsletter-message-maintenance');
-    const locale = '{{ $currentLocale ?? "cs" }}';
+    const locale = '{{ $locale }}';
     
     if (form) {
         form.addEventListener('submit', function(e) {
