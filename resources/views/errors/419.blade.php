@@ -1,65 +1,104 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
 @section('title', ($currentLocale ?? 'cs') === 'en' ? 'Page Expired | KAVI' : 'Platnost stránky vypršela | KAVI.cz')
 
 @section('content')
-<div class="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-white">
-    <!-- Organic shape decorations -->
-    <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2 opacity-60"></div>
-    <div class="absolute bottom-0 left-0 w-80 h-80 bg-gray-100 rounded-full -translate-x-1/2 translate-y-1/2"></div>
-
-    <div class="relative mx-auto max-w-screen-xl px-4 md:px-8 py-16 sm:py-20">
-        <div class="mx-auto max-w-2xl text-center">
-            <!-- Decorative Badge -->
-            <div class="inline-flex items-center gap-2 bg-primary-50 rounded-full px-4 py-2 mb-8">
-                <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-sm font-medium text-primary-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Error 419' : 'Chyba 419' }}</span>
-            </div>
-
-            <!-- Large Clock Icon -->
-            <div class="relative mb-8">
-                <div class="inline-flex items-center justify-center w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-primary-50 to-primary-100">
-                    <svg class="w-24 h-24 sm:w-32 sm:h-32 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
+<div class="mx-auto max-w-screen-xl px-4 md:px-8 py-12 md:py-20">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+        <!-- Left Column - Main Content -->
+        <div class="lg:col-span-2">
+            <!-- Error Code -->
+            <div class="mb-8">
+                <span class="text-[120px] sm:text-[180px] md:text-[220px] font-bold leading-none text-red-600">
+                    419
+                </span>
             </div>
 
             <!-- Heading -->
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                {{ ($currentLocale ?? 'cs') === 'en' ? 'Page Expired' : 'Platnost stránky vypršela' }}
-            </h2>
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold uppercase tracking-tight mb-6 leading-[0.95]">
+                {{ ($currentLocale ?? 'cs') === 'en' ? 'Page' : 'Platnost' }}<br>
+                <span class="text-red-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Expired' : 'Vypršela' }}</span>
+            </h1>
 
             <!-- Description -->
-            <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-10 max-w-xl mx-auto">
+            <p class="text-lg md:text-xl text-[#1c1c1c]/70 mb-10 max-w-xl leading-relaxed">
                 {{ ($currentLocale ?? 'cs') === 'en' 
                     ? 'Your session has expired for security reasons. Please refresh the page and try again.' 
                     : 'Vaše relace vypršela z bezpečnostních důvodů. Obnovte prosím stránku a zkuste to znovu.' }}
             </p>
 
             <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <button onclick="window.location.reload()" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-lg px-8 py-4 rounded-full transition-all duration-200">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Refresh Page' : 'Obnovit stránku' }}</span>
+            <div class="flex flex-wrap gap-4 mb-12">
+                <button onclick="window.location.reload()" class="inline-flex items-center justify-center bg-[#1c1c1c] text-white text-xs uppercase tracking-widest px-8 py-4 hover:bg-[#1c1c1c]/80 transition-colors">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Refresh Page' : 'Obnovit stránku' }}
                 </button>
-                
-                <a href="{{ route('home') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full border border-gray-200 transition-all duration-200">
-                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Back to Home' : 'Zpět na úvodní stránku' }}</span>
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-xs uppercase tracking-widest border-b border-[#1c1c1c] pb-1 hover:text-red-600 hover:border-red-600 transition-colors">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Back to Home' : 'Zpět na úvod' }}
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
                 </a>
             </div>
 
-            <!-- Help Text -->
-            <div class="pt-8 border-t border-gray-100">
-                <p class="text-sm text-gray-600 font-light">
-                    {{ ($currentLocale ?? 'cs') === 'en' 
-                        ? 'This error occurs when a page has been open for too long. Simply refresh the page.' 
-                        : 'K této chybě dochází, když stránka zůstane otevřená příliš dlouho. Stačí stránku obnovit.' }}
+            <!-- Info -->
+            <div class="pt-8 border-t border-[#1c1c1c]/20">
+                <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50 mb-4">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Why did this happen?' : 'Proč se to stalo?' }}
                 </p>
+                <p class="text-sm text-[#1c1c1c]/70 max-w-lg">
+                    {{ ($currentLocale ?? 'cs') === 'en' 
+                        ? 'This error occurs when a page has been open for too long without activity. It\'s a security feature to protect your data. Simply refresh the page to continue.' 
+                        : 'K této chybě dochází, když stránka zůstane otevřená příliš dlouho bez aktivity. Je to bezpečnostní opatření pro ochranu vašich dat. Stačí stránku obnovit a pokračovat.' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Column - Sidebar -->
+        <div class="lg:col-span-1">
+            <div class="bg-[#BCBEB1] p-8 h-full">
+                <h2 class="text-xs uppercase tracking-widest mb-6 border-b border-[#1c1c1c] pb-4">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Quick Fix' : 'Rychlé řešení' }}
+                </h2>
+
+                <div class="space-y-6">
+                    <!-- Step 1 -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">01</span>
+                        <div>
+                            <p class="text-sm">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Click the "Refresh Page" button above' : 'Klikněte na tlačítko "Obnovit stránku" výše' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">02</span>
+                        <div>
+                            <p class="text-sm">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Or press Ctrl+R (Cmd+R on Mac)' : 'Nebo stiskněte Ctrl+R (Cmd+R na Macu)' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">03</span>
+                        <div>
+                            <p class="text-sm">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Fill out the form again' : 'Vyplňte formulář znovu' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Info -->
+                <div class="mt-8 pt-6 border-t border-[#1c1c1c]/20">
+                    <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Error Code' : 'Kód chyby' }}
+                    </p>
+                    <p class="text-sm mt-1">419 / {{ ($currentLocale ?? 'cs') === 'en' ? 'Session Expired' : 'Relace vypršela' }}</p>
+                </div>
             </div>
         </div>
     </div>

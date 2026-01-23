@@ -868,7 +868,7 @@
         <!-- Roastery 3 -->
         @if($roasteries->count() >= 3)
         @php $r3 = $roasteries->skip(2)->first(); @endphp
-        <div class="col-span-2 col-start-4 -mt-8 relative">
+        <div class="col-span-2 col-start-3 -mt-16 relative">
           @if($r3->image)
           <img src="{{ asset($r3->image) }}" alt="{{ $r3->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
           @else

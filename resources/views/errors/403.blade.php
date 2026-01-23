@@ -1,71 +1,124 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
 @section('title', ($currentLocale ?? 'cs') === 'en' ? 'Access Denied | KAVI' : 'Přístup odepřen | KAVI.cz')
 
 @section('content')
-<div class="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-white">
-    <!-- Organic shape decorations -->
-    <div class="absolute top-0 right-0 w-96 h-96 bg-red-100 rounded-full translate-x-1/2 -translate-y-1/2 opacity-60"></div>
-    <div class="absolute bottom-0 left-0 w-80 h-80 bg-gray-100 rounded-full -translate-x-1/2 translate-y-1/2"></div>
-
-    <div class="relative mx-auto max-w-screen-xl px-4 md:px-8 py-16 sm:py-20">
-        <div class="mx-auto max-w-2xl text-center">
-            <!-- Decorative Badge -->
-            <div class="inline-flex items-center gap-2 bg-red-50 rounded-full px-4 py-2 mb-8">
-                <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span class="text-sm font-medium text-red-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Error 403' : 'Chyba 403' }}</span>
-            </div>
-
-            <!-- Large Icon -->
-            <div class="relative mb-8">
-                <div class="inline-flex items-center justify-center w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-red-50 to-red-100">
-                    <svg class="w-24 h-24 sm:w-32 sm:h-32 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                </div>
+<div class="mx-auto max-w-screen-xl px-4 md:px-8 py-12 md:py-20">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+        <!-- Left Column - Main Content -->
+        <div class="lg:col-span-2">
+            <!-- Error Code -->
+            <div class="mb-8">
+                <span class="text-[120px] sm:text-[180px] md:text-[220px] font-bold leading-none text-red-600">
+                    403
+                </span>
             </div>
 
             <!-- Heading -->
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                {{ ($currentLocale ?? 'cs') === 'en' ? 'Access Denied' : 'Přístup odepřen' }}
-            </h2>
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold uppercase tracking-tight mb-6 leading-[0.95]">
+                {{ ($currentLocale ?? 'cs') === 'en' ? 'Access' : 'Přístup' }}<br>
+                <span class="text-red-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Denied' : 'Odepřen' }}</span>
+            </h1>
 
             <!-- Description -->
-            <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-10 max-w-xl mx-auto">
+            <p class="text-lg md:text-xl text-[#1c1c1c]/70 mb-10 max-w-xl leading-relaxed">
                 {{ ($currentLocale ?? 'cs') === 'en' 
                     ? 'You don\'t have permission to access this page. If you believe you should have access, please log in or contact support.' 
-                    : 'K této stránce nemáte oprávnění. Pokud si myslíte, že by jste měli mít přístup, přihlaste se nebo kontaktujte podporu.' }}
+                    : 'K této stránce nemáte oprávnění. Pokud si myslíte, že byste měli mít přístup, přihlaste se nebo kontaktujte podporu.' }}
             </p>
 
             <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div class="flex flex-wrap gap-4 mb-12">
                 @guest
-                <a href="{{ localizedRoute('login') }}" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-lg px-8 py-4 rounded-full transition-all duration-200">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                    </svg>
-                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Sign In' : 'Přihlásit se' }}</span>
+                <a href="{{ localizedRoute('login') }}" class="inline-flex items-center justify-center bg-[#1c1c1c] text-white text-xs uppercase tracking-widest px-8 py-4 hover:bg-[#1c1c1c]/80 transition-colors">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Sign In' : 'Přihlásit se' }}
                 </a>
                 @endguest
-                
-                <a href="{{ route('home') }}" class="group inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-medium text-lg px-8 py-4 rounded-full border border-gray-200 transition-all duration-200">
-                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Back to Home' : 'Zpět na úvodní stránku' }}</span>
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-xs uppercase tracking-widest border-b border-[#1c1c1c] pb-1 hover:text-red-600 hover:border-red-600 transition-colors">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Back to Home' : 'Zpět na úvod' }}
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
                 </a>
             </div>
 
-            <!-- Contact Support -->
-            <div class="pt-8 border-t border-gray-100">
-                <p class="text-sm text-gray-600 font-light mb-4">
-                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Do you think you should have access?' : 'Myslíte si, že by jste měli mít přístup?' }}
+            <!-- Info -->
+            <div class="pt-8 border-t border-[#1c1c1c]/20">
+                <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50 mb-4">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Common reasons for this error' : 'Časté příčiny této chyby' }}
                 </p>
-                <a href="{{ localizedRoute('contact') }}" class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
-                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Contact Support' : 'Kontaktovat podporu' }}</span>
-                </a>
+                <ul class="space-y-2 text-sm text-[#1c1c1c]/70">
+                    <li class="flex items-center gap-2">
+                        <span class="text-red-600">●</span>
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'You need to be logged in' : 'Musíte být přihlášeni' }}
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="text-red-600">●</span>
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Your session has expired' : 'Platnost vaší relace vypršela' }}
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="text-red-600">●</span>
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'The content is restricted' : 'Obsah je omezen' }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Column - Sidebar -->
+        <div class="lg:col-span-1">
+            <div class="bg-[#BCBEB1] p-8 h-full">
+                <h2 class="text-xs uppercase tracking-widest mb-6 border-b border-[#1c1c1c] pb-4">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Need Help?' : 'Potřebujete pomoc?' }}
+                </h2>
+
+                <div class="space-y-6">
+                    <!-- Login -->
+                    @guest
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">●</span>
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/60 mb-1">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Sign In' : 'Přihlášení' }}
+                            </p>
+                            <a href="{{ localizedRoute('login') }}" class="text-sm hover:text-red-600 transition-colors">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Log into your account' : 'Přihlaste se k účtu' }}
+                            </a>
+                        </div>
+                    </div>
+                    @endguest
+
+                    <!-- Email -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">●</span>
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/60 mb-1">Email</p>
+                            <a href="mailto:{{ ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}" class="text-sm hover:text-red-600 transition-colors">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">●</span>
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/60 mb-1">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Contact Form' : 'Kontaktní formulář' }}
+                            </p>
+                            <a href="{{ localizedRoute('contact') }}" class="text-sm hover:text-red-600 transition-colors">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Send us a message' : 'Napište nám' }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Info -->
+                <div class="mt-8 pt-6 border-t border-[#1c1c1c]/20">
+                    <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Error Code' : 'Kód chyby' }}
+                    </p>
+                    <p class="text-sm mt-1">403 / {{ ($currentLocale ?? 'cs') === 'en' ? 'Forbidden' : 'Zakázáno' }}</p>
+                </div>
             </div>
         </div>
     </div>

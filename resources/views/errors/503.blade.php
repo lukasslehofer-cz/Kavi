@@ -1,85 +1,134 @@
-@extends('layouts.app')
+@extends('errors.layout')
 
 @section('title', ($currentLocale ?? 'cs') === 'en' ? 'Maintenance | KAVI' : 'Údržba | KAVI.cz')
 
 @section('content')
-<div class="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-white">
-    <!-- Organic shape decorations -->
-    <div class="absolute top-0 right-0 w-96 h-96 bg-primary-100 rounded-full translate-x-1/2 -translate-y-1/2 opacity-60"></div>
-    <div class="absolute bottom-0 left-0 w-80 h-80 bg-gray-100 rounded-full -translate-x-1/2 translate-y-1/2"></div>
-
-    <div class="relative mx-auto max-w-screen-xl px-4 md:px-8 py-16 sm:py-20">
-        <div class="mx-auto max-w-2xl text-center">
-            <!-- Decorative Badge -->
-            <div class="inline-flex items-center gap-2 bg-primary-50 rounded-full px-4 py-2 mb-8">
-                <svg class="w-5 h-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-                <span class="text-sm font-medium text-primary-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Maintenance in Progress' : 'Probíhá údržba' }}</span>
-            </div>
-
-            <!-- Large Coffee Icon -->
-            <div class="relative mb-8">
-                <div class="inline-flex items-center justify-center w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-gradient-to-br from-primary-50 to-primary-100">
-                    <svg class="w-24 h-24 sm:w-32 sm:h-32 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                    </svg>
-                </div>
+<div class="mx-auto max-w-screen-xl px-4 md:px-8 py-12 md:py-20">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+        <!-- Left Column - Main Content -->
+        <div class="lg:col-span-2">
+            <!-- Error Code -->
+            <div class="mb-8">
+                <span class="text-[120px] sm:text-[180px] md:text-[220px] font-bold leading-none text-red-600">
+                    503
+                </span>
             </div>
 
             <!-- Heading -->
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                {{ ($currentLocale ?? 'cs') === 'en' ? 'Brewing Some Coffee...' : 'Chvíli si vaříme kávu' }}
-            </h2>
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold uppercase tracking-tight mb-6 leading-[0.95]">
+                {{ ($currentLocale ?? 'cs') === 'en' ? 'Under' : 'Probíhá' }}<br>
+                <span class="text-red-600">{{ ($currentLocale ?? 'cs') === 'en' ? 'Maintenance' : 'Údržba' }}</span>
+            </h1>
 
             <!-- Description -->
-            <p class="text-lg sm:text-xl text-gray-600 leading-relaxed font-light mb-10 max-w-xl mx-auto">
+            <p class="text-lg md:text-xl text-[#1c1c1c]/70 mb-10 max-w-xl leading-relaxed">
                 {{ ($currentLocale ?? 'cs') === 'en' 
                     ? 'Our website is currently undergoing maintenance to bring you even better services. We\'ll be back soon with fresh coffee!' 
                     : 'Náš web právě prochází údržbou, abychom vám mohli nabídnout ještě lepší služby. Už brzy budeme zpět s čerstvou kávou!' }}
             </p>
 
-            <!-- Estimated Time (optional - you can remove or customize) -->
-            <div class="inline-flex items-center gap-3 bg-gray-50 rounded-2xl px-6 py-4 mb-10">
-                <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div class="text-left">
-                    <div class="text-sm text-gray-500 font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Estimated return time' : 'Předpokládaný čas návratu' }}</div>
-                    <div class="text-lg font-semibold text-gray-900">{{ ($currentLocale ?? 'cs') === 'en' ? 'Within a few minutes' : 'Během několika minut' }}</div>
+            <!-- Estimated Time -->
+            <div class="inline-flex items-center gap-4 border border-[#1c1c1c]/20 px-6 py-4 mb-10">
+                <div>
+                    <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Estimated Return' : 'Předpokládaný návrat' }}
+                    </p>
+                    <p class="text-lg font-medium">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Within a few minutes' : 'Během několika minut' }}
+                    </p>
                 </div>
             </div>
 
             <!-- CTA Button -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <button onclick="window.location.reload()" class="group inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-medium text-lg px-8 py-4 rounded-full transition-all duration-200">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Check Availability' : 'Zkontrolovat dostupnost' }}</span>
+            <div class="flex flex-wrap gap-4 mb-12">
+                <button onclick="window.location.reload()" class="inline-flex items-center justify-center bg-[#1c1c1c] text-white text-xs uppercase tracking-widest px-8 py-4 hover:bg-[#1c1c1c]/80 transition-colors">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Check Availability' : 'Zkontrolovat dostupnost' }}
                 </button>
             </div>
 
-            <!-- Newsletter Suggestion -->
-            <div class="pt-8 border-t border-gray-100">
-                <p class="text-sm text-gray-600 font-light mb-4">
-                    {{ ($currentLocale ?? 'cs') === 'en' ? 'While you wait, subscribe to our newsletter:' : 'Zatímco čekáte, přihlaste se k odběru našeho newsletteru:' }}
+            <!-- Newsletter Section -->
+            <div class="pt-8 border-t border-[#1c1c1c]/20">
+                <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50 mb-4">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Stay Updated' : 'Zůstaňte v obraze' }}
                 </p>
-                <div class="max-w-md mx-auto">
-                    <form id="newsletter-form-maintenance" class="flex gap-2">
-                        @csrf
-                        <input 
-                            type="email" 
-                            name="email" 
-                            placeholder="{{ ($currentLocale ?? 'cs') === 'en' ? 'Your email' : 'Váš e-mail' }}" 
-                            required
-                            class="flex-1 px-5 py-3 rounded-full bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-300 focus:ring-1 focus:ring-primary-300 transition-all text-sm"
-                        >
-                        <button type="submit" class="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-full transition-all duration-200 whitespace-nowrap text-sm">
-                            {{ ($currentLocale ?? 'cs') === 'en' ? 'Subscribe' : 'Odebírat' }}
-                        </button>
-                    </form>
-                    <div id="newsletter-message-maintenance" class="mt-4 text-sm hidden"></div>
+                <p class="text-sm text-[#1c1c1c]/70 mb-6 max-w-lg">
+                    {{ ($currentLocale ?? 'cs') === 'en' 
+                        ? 'Subscribe to our newsletter and be the first to know when we\'re back online.' 
+                        : 'Přihlaste se k odběru newsletteru a buďte první, kdo se dozví o našem návratu.' }}
+                </p>
+                
+                <form id="newsletter-form-maintenance" class="flex flex-col sm:flex-row gap-3 max-w-md">
+                    @csrf
+                    <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="{{ ($currentLocale ?? 'cs') === 'en' ? 'YOUR EMAIL' : 'VÁŠ E-MAIL' }}" 
+                        required
+                        class="flex-1 px-4 py-3 bg-transparent border-b border-[#1c1c1c] text-sm uppercase tracking-widest placeholder:text-[#1c1c1c]/40 focus:outline-none focus:border-red-600 transition-colors"
+                    >
+                    <button type="submit" class="px-6 py-3 bg-[#1c1c1c] text-white text-xs uppercase tracking-widest hover:bg-[#1c1c1c]/80 transition-colors whitespace-nowrap">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Subscribe' : 'Odebírat' }}
+                    </button>
+                </form>
+                <div id="newsletter-message-maintenance" class="mt-4 text-sm hidden"></div>
+            </div>
+        </div>
+
+        <!-- Right Column - Sidebar -->
+        <div class="lg:col-span-1">
+            <div class="bg-[#BCBEB1] p-8 h-full">
+                <h2 class="text-xs uppercase tracking-widest mb-6 border-b border-[#1c1c1c] pb-4">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'What\'s Happening?' : 'Co se děje?' }}
+                </h2>
+
+                <div class="space-y-6">
+                    <!-- Update 1 -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">●</span>
+                        <div>
+                            <p class="text-sm">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Improving site performance' : 'Vylepšujeme výkon webu' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Update 2 -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">●</span>
+                        <div>
+                            <p class="text-sm">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Adding new features' : 'Přidáváme nové funkce' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Update 3 -->
+                    <div class="flex items-start gap-3">
+                        <span class="text-red-600 mt-1">●</span>
+                        <div>
+                            <p class="text-sm">
+                                {{ ($currentLocale ?? 'cs') === 'en' ? 'Updating security' : 'Aktualizujeme zabezpečení' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="mt-8 pt-6 border-t border-[#1c1c1c]/20">
+                    <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50 mb-2">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Questions?' : 'Dotazy?' }}
+                    </p>
+                    <a href="mailto:{{ ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}" class="text-sm hover:text-red-600 transition-colors">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}
+                    </a>
+                </div>
+
+                <!-- Error Info -->
+                <div class="mt-6 pt-6 border-t border-[#1c1c1c]/20">
+                    <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Status' : 'Stav' }}
+                    </p>
+                    <p class="text-sm mt-1">503 / {{ ($currentLocale ?? 'cs') === 'en' ? 'Service Unavailable' : 'Služba nedostupná' }}</p>
                 </div>
             </div>
         </div>
@@ -101,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const originalText = submitButton.textContent;
             
             submitButton.disabled = true;
-            submitButton.textContent = locale === 'en' ? 'Sending...' : 'Odesílám...';
+            submitButton.textContent = locale === 'en' ? 'SENDING...' : 'ODESÍLÁM...';
             
             fetch('{{ localizedRoute("newsletter.subscribe") }}', {
                 method: 'POST',
@@ -119,11 +168,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 message.classList.remove('hidden');
                 
                 if (data.success) {
-                    message.className = 'mt-4 text-sm p-3 rounded-lg bg-green-100 text-green-800 border border-green-200';
+                    message.className = 'mt-4 text-sm text-green-700';
                     message.textContent = data.message;
                     form.reset();
                 } else {
-                    message.className = 'mt-4 text-sm p-3 rounded-lg bg-red-100 text-red-800 border border-red-200';
+                    message.className = 'mt-4 text-sm text-red-600';
                     message.textContent = data.message;
                 }
                 
@@ -133,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 message.classList.remove('hidden');
-                message.className = 'mt-4 text-sm p-3 rounded-lg bg-red-100 text-red-800 border border-red-200';
+                message.className = 'mt-4 text-sm text-red-600';
                 message.textContent = locale === 'en' ? 'An error occurred. Please try again later.' : 'Došlo k chybě. Zkuste to prosím později.';
             })
             .finally(() => {
