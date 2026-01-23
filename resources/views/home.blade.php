@@ -3,7 +3,7 @@
 @section('title', $currentLocale === 'en' ? 'Coffee Subscription | Specialty Coffee | KAVI' : 'Kávové předplatné | Výběrová káva | KAVI.cz')
 
 @section('meta_description')
-{{ $currentLocale === 'en' ? 'Discover the best specialty coffee from all over Europe. Freshly roasted, carefully selected, delivered to your door. Flexible subscription with free shipping.' : 'Objevte tu nejlepší výběrovou kávu z celé Evropy. Čerstvě pražená, pečlivě vybraná, doručená přímo k vám. Flexibilní předplatné s dopravou zdarma.' }}
+{{ $currentLocale === 'en' ? 'Discover the best specialty coffee from all over Europe. Freshly roasted, carefully selected, delivered to your door. Flexible subscription, shipped with care.' : 'Objevte tu nejlepší výběrovou kávu z celé Evropy. Čerstvě pražená, pečlivě vybraná, doručená přímo k vám. Flexibilní předplatné s dopravou zdarma.' }}
 @endsection
 
 @section('og_title')
@@ -11,7 +11,7 @@
 @endsection
 
 @section('og_description')
-{{ $currentLocale === 'en' ? 'Premium specialty coffee delivered monthly. Discover unique flavors from the best European roasteries. Free shipping, cancel anytime.' : 'Prémiová výběrová káva doručovaná měsíčně. Objevte jedinečné chutě z nejlepších evropských pražíren. Doprava zdarma, zrušení kdykoliv.' }}
+{{ $currentLocale === 'en' ? 'Premium specialty coffee delivered monthly. Discover unique flavors from the best European roasteries. Shipped with care, cancel anytime.' : 'Prémiová výběrová káva doručovaná měsíčně. Objevte jedinečné chutě z nejlepších evropských pražíren. Doprava zdarma, zrušení kdykoliv.' }}
 @endsection
 
 @section('structured_data')
@@ -381,7 +381,7 @@
         <!-- Middle: Features -->
         <div class="lg:w-1/3 space-y-2">
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '2 types of specialty coffee' : '2 druhy výběrové kávy' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Lovingly packed' : 'Doprava zdarma' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
             </div>
 
@@ -424,7 +424,7 @@
         <!-- Middle: Features -->
         <div class="lg:w-1/3 space-y-2">
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Lovingly packed' : 'Doprava zdarma' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
             </div>
 
@@ -462,7 +462,7 @@
         <!-- Middle: Features -->
         <div class="lg:w-1/3 space-y-2">
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Free shipping' : 'Doprava zdarma' }}</p>
+          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Lovingly packed' : 'Doprava zdarma' }}</p>
           <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
         </div>
 
