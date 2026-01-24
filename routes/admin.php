@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\RoasteryController as AdminRoasteryController;
 use App\Http\Controllers\Admin\TranslationController;
+use App\Http\Controllers\FacebookCatalogFeedController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\GoogleMerchantFeedController;
 use App\Http\Controllers\PaymentController;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 // Feeds (technical routes)
 Route::get('/feed/heureka.xml', [FeedController::class, 'heureka'])->name('feed.heureka');
 Route::get('/feed/google-merchant.xml', [GoogleMerchantFeedController::class, 'index'])->name('feed.google-merchant');
+Route::get('/feed/facebook-catalog.xml', [FacebookCatalogFeedController::class, 'index'])->name('feed.facebook-catalog');
 
 // Coupon activation from link (code is universal)
 Route::get('/code/{code}', [CouponController::class, 'activateFromLink'])->name('coupon.activate');
