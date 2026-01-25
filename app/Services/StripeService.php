@@ -1243,6 +1243,8 @@ class StripeService
             }
 
             // Record the first payment
+            // period_end = nearest billing date (end of period this payment covers)
+            // This is different from next_billing_date which is when NEXT payment is due
             $payment = \App\Models\SubscriptionPayment::create([
                 'subscription_id' => $subscription->id,
                 'stripe_payment_intent_id' => $paymentIntent->id,
@@ -1251,7 +1253,7 @@ class StripeService
                 'status' => 'paid',
                 'paid_at' => now(),
                 'period_start' => now(),
-                'period_end' => $subscription->next_billing_date,
+                'period_end' => \App\Models\ShipmentSchedule::getNextBillingDate(now()),
             ]);
             
             // Link payment to pending shipment

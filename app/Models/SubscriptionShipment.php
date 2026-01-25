@@ -165,4 +165,16 @@ class SubscriptionShipment extends Model
             default => $this->status,
         };
     }
+
+    /**
+     * Get the sequence number of this shipment within the subscription
+     * Counts all non-cancelled, non-skipped shipments ordered by date
+     */
+    public function getSequenceNumber(): int
+    {
+        return $this->subscription->shipments()
+            ->whereNotIn('status', ['cancelled', 'skipped'])
+            ->where('shipment_date', '<=', $this->shipment_date)
+            ->count();
+    }
 }

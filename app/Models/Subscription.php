@@ -253,7 +253,7 @@ class Subscription extends Model
             $nextNumber = 1;
         }
         
-        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
 
     /**

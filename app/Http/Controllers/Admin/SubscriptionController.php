@@ -488,7 +488,7 @@ class SubscriptionController extends Controller
                 'value' => $value,
                 'weight' => $weight,
                 'size' => $packageSize, // Package dimensions from shipment
-                'order_number' => ($subscription->subscription_number ?? 'SUB-' . $subscription->id) . '-' . $targetDate->format('m'),
+                'order_number' => ($subscription->subscription_number ?? 'SUB-' . $subscription->id) . '-' . str_pad($shipment->getSequenceNumber(), 3, '0', STR_PAD_LEFT),
                 'note' => $shipment->notes ?? $subscription->delivery_notes ?? null,
                 'currency' => $currency,
                 'country' => $shippingCountry,
