@@ -144,25 +144,23 @@ class Order extends Model
 
     public static function generateOrderNumber(): string
     {
-        $maxAttempts = 10;
-        $attempt = 0;
+        $year = date('Y');
+        $prefix = 'KV-' . $year . '-';
         
-        do {
-            $count = static::whereDate('created_at', today())->count() + 1 + $attempt;
-            $orderNumber = 'KV-' . date('Y') . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
-            
-            // Check if this number already exists
-            $exists = static::where('order_number', $orderNumber)->exists();
-            
-            if (!$exists) {
-                return $orderNumber;
-            }
-            
-            $attempt++;
-        } while ($attempt < $maxAttempts);
+        // Get the highest number for this year
+        $lastOrder = static::where('order_number', 'like', $prefix . '%')
+            ->where('order_number', 'not like', $prefix . '%-____') // Exclude old fallback numbers
+            ->orderByRaw('CAST(SUBSTRING(order_number, ' . (strlen($prefix) + 1) . ') AS UNSIGNED) DESC')
+            ->first();
         
-        // Fallback: use microtime for uniqueness
-        return 'KV-' . date('Y') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT) . '-' . substr(microtime(true) * 10000, -4);
+        if ($lastOrder) {
+            $lastNumber = (int) str_replace($prefix, '', $lastOrder->order_number);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }
 
