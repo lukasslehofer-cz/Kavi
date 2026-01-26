@@ -45,6 +45,71 @@ class PacketaService
      */
     public function createPacket(array $data): ?array
     {
+        $country = strtoupper($data['country'] ?? 'CZ');
+        
+        // First attempt with phone number
+        $result = $this->sendCreatePacketRequest($data, true);
+        
+        // If we got a phone validation error and country is CZ (phone not required),
+        // retry without the phone number
+        if ($result === null && isset($data['phone']) && !empty($data['phone'])) {
+            $lastError = $this->lastApiError ?? [];
+            
+            if ($this->isPhoneValidationError($lastError) && $country === 'CZ') {
+                Log::warning('Packeta phone validation failed, retrying without phone for CZ shipment', [
+                    'order_number' => $data['order_number'] ?? 'N/A',
+                    'original_phone' => $data['phone'],
+                    'country' => $country,
+                ]);
+                
+                $result = $this->sendCreatePacketRequest($data, false);
+                
+                if ($result !== null) {
+                    Log::info('Packeta packet created successfully without phone number', [
+                        'order_number' => $data['order_number'] ?? 'N/A',
+                        'packet_id' => $result['id'],
+                    ]);
+                }
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Store the last API error for retry logic
+     */
+    protected ?array $lastApiError = null;
+    
+    /**
+     * Check if the API error is a phone validation error
+     *
+     * @param array $error
+     * @return bool
+     */
+    protected function isPhoneValidationError(array $error): bool
+    {
+        if (empty($error)) {
+            return false;
+        }
+        
+        // Check if fault type is PacketAttributesFault and phone is mentioned
+        $fault = $error['fault'] ?? '';
+        $detail = $error['detail'] ?? '';
+        
+        return $fault === 'PacketAttributesFault' && 
+               (stripos($detail, 'phone') !== false || stripos($detail, 'telefon') !== false);
+    }
+    
+    /**
+     * Send the actual createPacket request to Packeta API
+     *
+     * @param array $data Shipment data
+     * @param bool $includePhone Whether to include phone number in the request
+     * @return array|null
+     */
+    protected function sendCreatePacketRequest(array $data, bool $includePhone = true): ?array
+    {
         try {
             // Packeta API uses XML format with apiPassword as CHILD ELEMENT (not attribute!)
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><createPacket/>');
@@ -57,7 +122,11 @@ class PacketaService
             $packetAttributes->addChild('name', $data['name']);
             $packetAttributes->addChild('surname', $data['surname'] ?? '');
             $packetAttributes->addChild('email', $data['email']);
-            $packetAttributes->addChild('phone', $data['phone']);
+            
+            // Only add phone if requested and not empty
+            if ($includePhone && !empty($data['phone'])) {
+                $packetAttributes->addChild('phone', $data['phone']);
+            }
             
             // Determine routing based on carrier type
             $country = strtoupper($data['country'] ?? 'CZ');
@@ -159,6 +228,7 @@ class PacketaService
                 'is_external_carrier' => !$isPacketaOwn,
                 'point_id' => $data['packeta_point_id'],
                 'country' => $data['country'] ?? 'N/A',
+                'include_phone' => $includePhone,
                 'api_password_length' => strlen($this->apiPassword),
                 'api_password_start' => substr($this->apiPassword, 0, 8) . '...',
             ]);
@@ -183,15 +253,41 @@ class PacketaService
                     $status = (string)$responseXml->status;
                     
                     if ($status === 'ok') {
+                        // Clear any previous error
+                        $this->lastApiError = null;
+                        
                         return [
                             'id' => (string)$responseXml->result->id,
                             'barcode' => (string)$responseXml->result->barcode ?? null,
                         ];
                     } else {
+                        // Extract detailed error info for phone validation check
+                        $fault = (string)($responseXml->fault ?? 'Unknown error');
+                        $detail = '';
+                        
+                        // Try to get phone-specific error from detail
+                        if (isset($responseXml->detail->attributes->fault)) {
+                            foreach ($responseXml->detail->attributes->fault as $attrFault) {
+                                $name = (string)($attrFault->name ?? '');
+                                $faultMsg = (string)($attrFault->fault ?? '');
+                                if ($name === 'phone') {
+                                    $detail = $faultMsg;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Store error for retry logic
+                        $this->lastApiError = [
+                            'fault' => $fault,
+                            'detail' => $detail,
+                        ];
+                        
                         Log::error('Packeta API returned error', [
                             'status' => $status,
-                            'fault' => (string)($responseXml->fault ?? 'Unknown error'),
-                            'detail' => (string)($responseXml->detail ?? ''),
+                            'fault' => $fault,
+                            'detail' => $detail,
+                            'full_response' => $response->body(),
                         ]);
                         return null;
                     }

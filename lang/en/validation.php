@@ -135,6 +135,8 @@ return [
         'phone' => [
             'regex' => 'The phone number must be valid (e.g. +420 123 456 789 or 123456789).',
             'required' => 'The phone number is required.',
+            'cz_format' => 'Czech phone number must have format +420 followed by 9 digits (e.g. +420 123 456 789).',
+            'sk_format' => 'Slovak phone number must have format +421 followed by 9 digits (e.g. +421 912 345 678).',
         ],
     ],
 

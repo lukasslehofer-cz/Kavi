@@ -206,6 +206,7 @@
                                         required
                                         class="swiss-field-input"
                                         placeholder="+420 123 456 789"
+                                        pattern="[\+]?[0-9\s\-\(\)]{9,20}"
                                     >
                                 </div>
                                 @error('phone')

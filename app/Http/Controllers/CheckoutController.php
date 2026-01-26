@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ShippingRate;
+use App\Rules\PhoneNumber;
 use App\Services\CouponService;
 use App\Services\FakturoidService;
 use App\Services\ShippingService;
@@ -293,7 +294,7 @@ class CheckoutController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'phone' => ['required', 'string', 'max:20', 'regex:/^[\+]?[0-9\s\-\(\)]{9,20}$/'],
+            'phone' => ['required', 'string', 'max:20', new PhoneNumber],
             'billing_address' => 'required|string',
             'billing_city' => 'required|string',
             'billing_postal_code' => 'required|string',
@@ -485,9 +486,38 @@ class CheckoutController extends Controller
                 $carrierPickupPoint = $selectedSubscription->carrier_pickup_point;
             }
 
+            // Create user account for guest orders BEFORE creating the order
+            // This ensures user_id is set and if user creation fails, transaction rolls back
+            $userId = auth()->id();
+            $newUser = null;
+            
+            if (!auth()->check()) {
+                $newUser = \App\Models\User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => \Hash::make(\Str::random(32)), // Random password
+                    'password_set_by_user' => false, // User didn't set this password
+                    'phone' => $request->phone,
+                    'address' => $request->billing_address,
+                    'city' => $request->billing_city,
+                    'postal_code' => $request->billing_postal_code,
+                    'country' => $request->billing_country,
+                    'packeta_point_id' => $request->packeta_point_id,
+                    'packeta_point_name' => $request->packeta_point_name,
+                    'packeta_point_address' => $request->packeta_point_address,
+                ]);
+                
+                $userId = $newUser->id;
+                
+                \Log::info('Created user account for guest checkout', [
+                    'user_id' => $newUser->id,
+                    'email' => $newUser->email,
+                ]);
+            }
+
             $orderData = [
                 'order_number' => Order::generateOrderNumber(),
-                'user_id' => auth()->id() ?? null,
+                'user_id' => $userId,
                 'coupon_id' => $coupon?->id,
                 'coupon_code' => $coupon?->code,
                 'discount_amount' => $discount,
@@ -574,45 +604,18 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // Create user account for guest orders
-            if (!auth()->check()) {
-                try {
-                    $existingUser = \App\Models\User::where('email', $request->email)->first();
-                    
-                    if (!$existingUser) {
-                        $newUser = \App\Models\User::create([
-                            'name' => $request->name,
-                            'email' => $request->email,
-                            'locale' => app()->getLocale(),
-                            'password' => \Hash::make(\Str::random(32)), // Random password
-                            'password_set_by_user' => false, // User didn't set this password
-                            'phone' => $request->phone,
-                            'address' => $request->billing_address,
-                            'city' => $request->billing_city,
-                            'postal_code' => $request->billing_postal_code,
-                            'country' => $request->billing_country,
-                            'packeta_point_id' => $request->packeta_point_id,
-                            'packeta_point_name' => $request->packeta_point_name,
-                            'packeta_point_address' => $request->packeta_point_address,
-                        ]);
-                        
-                        // Link order to the new user
-                        $order->update(['user_id' => $newUser->id]);
-                        
-                        // Store order ID in session for secure auto-login
-                        session(['pending_order_' . $order->id => true]);
-                        
-                        // Auto-login the new user for seamless checkout experience
-                        auth()->login($newUser);
-                        
-                        \Log::info('Created user account for guest order and logged in', [
-                            'user_id' => $newUser->id,
-                            'order_id' => $order->id
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    \Log::error('Failed to create user account for guest order: ' . $e->getMessage());
-                }
+            // Auto-login the new guest user after successful transaction commit
+            if ($newUser) {
+                // Store order ID in session for secure auto-login on confirmation page
+                session(['pending_order_' . $order->id => true]);
+                
+                // Auto-login the new user for seamless checkout experience
+                auth()->login($newUser);
+                
+                \Log::info('Guest user logged in after order creation', [
+                    'user_id' => $newUser->id,
+                    'order_id' => $order->id,
+                ]);
             }
 
             // Store cart in order's admin_notes (internal use only) for potential restoration if payment fails

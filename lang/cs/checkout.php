@@ -48,6 +48,7 @@ return [
     'magic_link_description' => 'Zadejte váš email a my vám pošleme přihlašovací odkaz.',
     'email_confirmation_note' => 'Na tento email vám zašleme potvrzení a odkaz pro dokončení registrace.',
     'phone_helps' => 'Telefon pomůže doručovací službě při řešení případných problémů.',
+    'phone_format_hint' => 'Pro CZ: +420 a 9 číslic, pro SK: +421 a 9 číslic',
     
     // Billing address
     'billing_address' => 'Fakturační adresa',

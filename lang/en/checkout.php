@@ -48,6 +48,7 @@ return [
     'magic_link_description' => 'Enter your email and we\'ll send you a login link.',
     'email_confirmation_note' => 'We\'ll send confirmation and registration link to this email.',
     'phone_helps' => 'Phone helps delivery service resolve any issues.',
+    'phone_format_hint' => 'For CZ: +420 and 9 digits, for SK: +421 and 9 digits',
     
     // Billing address
     'billing_address' => 'Billing address',

@@ -9,6 +9,7 @@ use App\Models\ShippingRate;
 use App\Models\Subscription;
 use App\Models\SubscriptionConfig;
 use App\Models\SubscriptionPlan;
+use App\Rules\PhoneNumber;
 use App\Services\CouponService;
 use App\Services\ShippingService;
 use App\Services\StripeService;
@@ -512,7 +513,7 @@ class SubscriptionController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',
-            'phone' => ['required', 'string', 'max:20', 'regex:/^[\+]?[0-9\s\-\(\)]{9,20}$/'],
+            'phone' => ['required', 'string', 'max:20', new PhoneNumber],
             'billing_address' => 'required|string|max:255',
             'billing_city' => 'required|string|max:100',
             'billing_postal_code' => 'required|string|max:20',

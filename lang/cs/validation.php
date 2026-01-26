@@ -125,6 +125,8 @@ return [
         'phone' => [
             'regex' => 'Telefonní číslo musí být platné (např. +420 123 456 789 nebo 123456789).',
             'required' => 'Telefonní číslo je povinné.',
+            'cz_format' => 'České telefonní číslo musí mít formát +420 a 9 číslic (např. +420 123 456 789).',
+            'sk_format' => 'Slovenské telefonní číslo musí mít formát +421 a 9 číslic (např. +421 912 345 678).',
         ],
     ],
 
