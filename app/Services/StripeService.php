@@ -75,6 +75,36 @@ class StripeService
     }
 
     /**
+     * Create Stripe customer from shipping address (for guest checkout)
+     * This ensures guest customers have a real cus_ ID for recurring payments
+     */
+    public function createCustomerFromAddress(array $shippingAddress): string
+    {
+        $customer = StripeCustomer::create([
+            'email' => $shippingAddress['email'],
+            'name' => $shippingAddress['name'],
+            'phone' => $shippingAddress['phone'] ?? null,
+            'address' => [
+                'line1' => $shippingAddress['billing_address'] ?? null,
+                'city' => $shippingAddress['billing_city'] ?? null,
+                'postal_code' => $shippingAddress['billing_postal_code'] ?? null,
+                'country' => $shippingAddress['billing_country'] ?? $shippingAddress['country'] ?? 'CZ',
+            ],
+            'metadata' => [
+                'source' => 'guest_checkout',
+            ],
+        ]);
+
+        \Log::info('Created Stripe customer for guest checkout', [
+            'customer_id' => $customer->id,
+            'email' => $shippingAddress['email'],
+            'name' => $shippingAddress['name'],
+        ]);
+
+        return $customer->id;
+    }
+
+    /**
      * Create checkout session for one-time payment (order)
      */
     public function createOrderCheckoutSession(Order $order): StripeSession
@@ -411,16 +441,18 @@ class StripeService
             'cancel_url' => route('subscriptions.checkout'),
         ];
 
-        // Add customer to session data
+        // Add customer to session data - ALWAYS create real customer for recurring payments
         if ($user) {
             $sessionData['customer'] = $this->getOrCreateCustomer($user);
         } else {
-            // Guest checkout - use customer email
-            $sessionData['customer_email'] = $shippingAddress['email'];
+            // Guest checkout - create full Stripe customer (not just customer_email!)
+            // This is required for saving payment methods and recurring payments
+            $sessionData['customer'] = $this->createCustomerFromAddress($shippingAddress);
         }
 
         \Log::info('Creating custom billing subscription checkout', [
             'user_id' => $user?->id,
+            'customer' => $sessionData['customer'],
             'price' => $price,
             'next_billing_date' => $nextBillingDate->toDateString(),
             'frequency_months' => $frequencyMonths,
@@ -1055,6 +1087,8 @@ class StripeService
             if (!$userId && $guestEmail) {
                 try {
                     $name = $subscription->shipping_address['name'] ?? 'Zákazník';
+                    // Get Stripe customer ID from subscription data
+                    $stripeCustomerId = $subscriptionData['customer'] ?? null;
                     
                     // Check if user already exists (shouldn't, but just in case)
                     $existingUser = User::where('email', $guestEmail)->first();
@@ -1073,6 +1107,7 @@ class StripeService
                             'packeta_point_id' => $subscription->packeta_point_id ?? null,
                             'packeta_point_name' => $subscription->packeta_point_name ?? null,
                             'packeta_point_address' => $subscription->packeta_point_address ?? null,
+                            'stripe_customer_id' => $stripeCustomerId, // Save Stripe customer ID
                         ]);
                         
                         // Link subscription to the new user
@@ -1080,8 +1115,20 @@ class StripeService
                         
                         \Log::info('Created user account for guest subscription', [
                             'user_id' => $newUser->id,
-                            'subscription_id' => $subscription->id
+                            'subscription_id' => $subscription->id,
+                            'stripe_customer_id' => $stripeCustomerId,
                         ]);
+                    } else {
+                        // Link subscription to existing user and update stripe_customer_id if missing
+                        $subscription->update(['user_id' => $existingUser->id]);
+                        
+                        if (!$existingUser->stripe_customer_id && $stripeCustomerId) {
+                            $existingUser->update(['stripe_customer_id' => $stripeCustomerId]);
+                            \Log::info('Updated existing user with Stripe customer ID', [
+                                'user_id' => $existingUser->id,
+                                'stripe_customer_id' => $stripeCustomerId,
+                            ]);
+                        }
                     }
                 } catch (\Exception $e) {
                     \Log::error('Failed to create user account for guest subscription: ' . $e->getMessage());
@@ -1135,9 +1182,13 @@ class StripeService
      */
     private function handleCustomBillingSubscriptionPayment(array $session): void
     {
+        // Get Stripe customer ID from session (this is the real cus_ ID we created)
+        $stripeCustomerId = $session['customer'] ?? null;
+        
         \Log::info('Handling custom billing subscription payment', [
             'session_id' => $session['id'],
             'payment_intent' => $session['payment_intent'],
+            'stripe_customer_id' => $stripeCustomerId,
         ]);
 
         try {
@@ -1380,24 +1431,28 @@ class StripeService
                             'packeta_point_id' => $subscription->packeta_point_id ?? null,
                             'packeta_point_name' => $subscription->packeta_point_name ?? null,
                             'packeta_point_address' => $subscription->packeta_point_address ?? null,
+                            'stripe_customer_id' => $stripeCustomerId, // Save Stripe customer ID from session
                         ]);
-                        
-                        // Update Stripe customer with user ID
-                        $customerId = $paymentIntent->customer;
-                        if ($customerId) {
-                            $newUser->update(['stripe_customer_id' => $customerId]);
-                        }
                         
                         // Link subscription to the new user
                         $subscription->update(['user_id' => $newUser->id]);
                         
                         \Log::info('Created user account for guest custom billing subscription', [
                             'user_id' => $newUser->id,
-                            'subscription_id' => $subscription->id
+                            'subscription_id' => $subscription->id,
+                            'stripe_customer_id' => $stripeCustomerId,
                         ]);
                     } else {
-                        // Link subscription to existing user
+                        // Link subscription to existing user and update stripe_customer_id if missing
                         $subscription->update(['user_id' => $existingUser->id]);
+                        
+                        if (!$existingUser->stripe_customer_id && $stripeCustomerId) {
+                            $existingUser->update(['stripe_customer_id' => $stripeCustomerId]);
+                            \Log::info('Updated existing user with Stripe customer ID', [
+                                'user_id' => $existingUser->id,
+                                'stripe_customer_id' => $stripeCustomerId,
+                            ]);
+                        }
                     }
                 } catch (\Exception $e) {
                     \Log::error('Failed to create user account for guest subscription: ' . $e->getMessage());
