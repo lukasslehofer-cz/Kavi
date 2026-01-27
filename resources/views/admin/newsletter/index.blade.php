@@ -120,7 +120,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($subscribers as $subscriber)
                     @php
-                        $tags = \App\Services\EcomailService::calculateTags($subscriber->user);
+                        $tags = \App\Services\EcomailService::calculateTags($subscriber->email);
                         $locale = $subscriber->user?->locale ?? 'cs';
                     @endphp
                     <tr class="hover:bg-gray-50 transition-colors">

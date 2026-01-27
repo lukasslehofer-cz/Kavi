@@ -167,9 +167,15 @@ class EcomailService
 
     /**
      * Get tags for display purposes (static method for use in views)
+     * Looks up User by email to handle cases where user_id is not set
      */
-    public static function calculateTags(?User $user): array
+    public static function calculateTags(?string $email): array
     {
+        if (!$email) {
+            return [];
+        }
+
+        $user = User::where('email', $email)->first();
         if (!$user) {
             return [];
         }
