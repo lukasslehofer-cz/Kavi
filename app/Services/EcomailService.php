@@ -111,7 +111,8 @@ class EcomailService
      */
     private function prepareSubscriberData(NewsletterSubscriber $subscriber): ?array
     {
-        $user = $subscriber->user;
+        // Find user by email (not by user_id relation which may be NULL)
+        $user = User::where('email', $subscriber->email)->first();
 
         $data = [
             'email' => $subscriber->email,
