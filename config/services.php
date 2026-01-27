@@ -68,6 +68,11 @@ return [
         'app_id' => env('FACEBOOK_APP_ID'),
     ],
 
+    'ecomail' => [
+        'api_key' => env('ECOMAIL_API_KEY'),
+        'list_id' => env('ECOMAIL_LIST_ID'),
+    ],
+
 ];
 
 

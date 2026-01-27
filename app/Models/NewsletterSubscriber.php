@@ -13,10 +13,12 @@ class NewsletterSubscriber extends Model
         'email',
         'source',
         'user_id',
+        'ecomail_synced_at',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
+        'ecomail_synced_at' => 'datetime',
     ];
 
     /**

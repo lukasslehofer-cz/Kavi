@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NewsletterSubscriber;
 use App\Models\User;
+use App\Services\EcomailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,9 +44,14 @@ class AdminNewsletterController extends Controller
             'this_month' => NewsletterSubscriber::whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->count(),
+            'synced_to_ecomail' => NewsletterSubscriber::whereNotNull('ecomail_synced_at')->count(),
+            'pending_ecomail' => NewsletterSubscriber::whereNull('ecomail_synced_at')->count(),
         ];
 
-        return view('admin.newsletter.index', compact('subscribers', 'stats'));
+        // Check if Ecomail is configured
+        $ecomailConfigured = app(EcomailService::class)->isConfigured();
+
+        return view('admin.newsletter.index', compact('subscribers', 'stats', 'ecomailConfigured'));
     }
 
     /**
@@ -142,5 +148,34 @@ class AdminNewsletterController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Sync all subscribers to Ecomail.
+     */
+    public function syncToEcomail(EcomailService $ecomailService)
+    {
+        if (!$ecomailService->isConfigured()) {
+            return redirect()->route('admin.newsletter.index')
+                ->with('error', 'Ecomail API není nakonfigurováno. Nastavte ECOMAIL_API_KEY a ECOMAIL_LIST_ID v .env souboru.');
+        }
+
+        // Get all subscribers with their user relation
+        $subscribers = NewsletterSubscriber::with('user')->get();
+
+        if ($subscribers->isEmpty()) {
+            return redirect()->route('admin.newsletter.index')
+                ->with('info', 'Nejsou žádní odběratelé k synchronizaci.');
+        }
+
+        $result = $ecomailService->syncSubscribers($subscribers);
+
+        if (!empty($result['errors'])) {
+            return redirect()->route('admin.newsletter.index')
+                ->with('warning', "Synchronizováno {$result['synced']} kontaktů, ale vyskytly se chyby: " . implode(', ', $result['errors']));
+        }
+
+        return redirect()->route('admin.newsletter.index')
+            ->with('success', "Úspěšně synchronizováno {$result['synced']} kontaktů do Ecomailu.");
     }
 }
