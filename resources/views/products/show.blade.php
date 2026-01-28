@@ -296,6 +296,13 @@
             <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $product->attributes['weight'] }}g</span>
           </div>
           @endif
+          
+          @if(!empty($product->attributes['roast_date']))
+          <div class="border-b border-dark-800 py-4 flex items-baseline">
+            <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $currentLocale === 'en' ? 'Roast date' : 'Datum pražení' }}</span>
+            <span class="text-xs uppercase tracking-widest text-dark-800">— {{ \Carbon\Carbon::parse($product->attributes['roast_date'])->format($currentLocale === 'en' ? 'm/d/Y' : 'd.m.Y') }}</span>
+          </div>
+          @endif
           @endif
         </div>
         
