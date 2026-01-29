@@ -442,9 +442,9 @@
                         @php
                             $currentDate = now();
                             for ($i = -2; $i <= 12; $i++) {
-                                $date = $currentDate->copy()->addMonths($i);
+                                $date = $currentDate->copy()->startOfMonth()->addMonths($i);
                                 $value = $date->format('Y-m');
-                                $label = $date->locale('cs')->isoFormat('MMMM YYYY');
+                                $label = $date->locale('cs')->isoFormat('LLLL YYYY');
                                 $selected = old('coffee_of_month_date') == $value ? 'selected' : '';
                                 echo "<option value=\"{$value}\" {$selected}>" . ucfirst($label) . "</option>";
                             }
