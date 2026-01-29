@@ -279,12 +279,14 @@
                                 <option value="">Není pražírnou měsíce</option>
                                 @php
                                     $currentDate = now();
+                                    $czechMonths = ['Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 
+                                                    'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'];
                                     for ($i = -2; $i <= 12; $i++) {
                                         $date = $currentDate->copy()->startOfMonth()->addMonths($i);
                                         $value = $date->format('Y-m');
-                                        $label = $date->locale('cs')->isoFormat('LLLL YYYY');
+                                        $label = $czechMonths[$date->month - 1] . ' ' . $date->year;
                                         $selected = old('featured_month', $roastery->featured_month) == $value ? 'selected' : '';
-                                        echo "<option value=\"{$value}\" {$selected}>" . ucfirst($label) . "</option>";
+                                        echo "<option value=\"{$value}\" {$selected}>{$label}</option>";
                                     }
                                 @endphp
                             </select>

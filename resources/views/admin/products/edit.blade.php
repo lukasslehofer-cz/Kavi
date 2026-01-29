@@ -488,6 +488,8 @@
                         <option value="">Vyberte měsíc rozesílky</option>
                         @php
                             $currentDate = now();
+                            $czechMonths = ['Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 
+                                            'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'];
                             // Get current value - handle both date object and string format
                             $currentValue = old('coffee_of_month_date', $product->coffee_of_month_date);
                             if ($currentValue instanceof \Carbon\Carbon) {
@@ -497,9 +499,9 @@
                             for ($i = -2; $i <= 12; $i++) {
                                 $date = $currentDate->copy()->startOfMonth()->addMonths($i);
                                 $value = $date->format('Y-m');
-                                $label = $date->locale('cs')->isoFormat('LLLL YYYY');
+                                $label = $czechMonths[$date->month - 1] . ' ' . $date->year;
                                 $selected = $currentValue == $value ? 'selected' : '';
-                                echo "<option value=\"{$value}\" {$selected}>" . ucfirst($label) . "</option>";
+                                echo "<option value=\"{$value}\" {$selected}>{$label}</option>";
                             }
                         @endphp
                     </select>
