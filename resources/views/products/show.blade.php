@@ -431,4 +431,28 @@
   </div>
 
 </div>
+
+{{-- Enhanced Ecommerce: view_item event for GTM/FB Pixel --}}
+<script>
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'view_item',
+        'ecommerce': {
+            'currency': '{{ $currentLocale === "en" ? "EUR" : "CZK" }}',
+            'value': {{ $product->isOnSale() ? $product->sale_price : $product->price }},
+            'items': [{
+                'item_id': '{{ $product->id }}',
+                'item_name': '{{ addslashes($product->getName()) }}',
+                'price': {{ $product->isOnSale() ? $product->sale_price : $product->price }},
+                'quantity': 1
+                @if($product->roastery)
+                ,'item_brand': '{{ addslashes($product->roastery->getName()) }}'
+                @endif
+                @if(is_array($product->category) && !empty($product->category))
+                ,'item_category': '{{ $product->category[0] }}'
+                @endif
+            }]
+        }
+    });
+</script>
 @endsection
