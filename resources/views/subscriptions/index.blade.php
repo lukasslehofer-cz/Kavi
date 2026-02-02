@@ -271,7 +271,7 @@
                   </div>
                 <label class="flex items-center gap-2 px-3 py-1.5 bg-[#BCBEB1] hover:bg-[#a8ab9e] transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
-                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
+                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} <span class="block sm:inline">(+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span></span>
                   </label>
               </label>
 
@@ -285,7 +285,7 @@
                   </div>
                 <label class="flex items-center gap-2 px-3 py-1.5 bg-[#BCBEB1] hover:bg-[#a8ab9e] transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
-                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
+                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} <span class="block sm:inline">(+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span></span>
                   </label>
               </label>
 
@@ -299,7 +299,7 @@
                   </div>
                 <label class="flex items-center gap-2 px-3 py-1.5 bg-[#BCBEB1] hover:bg-[#a8ab9e] transition-colors text-sm" onclick="event.stopPropagation();">
                   <input type="checkbox" name="isDecaf" value="1" class="w-4 h-4 text-primary-500">
-                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} (+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span>
+                  <span class="font-medium text-dark-700">{{ $currentLocale === 'en' ? '1x decaf' : '1x bez kofeinu' }} <span class="block sm:inline">(+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }})</span></span>
                   </label>
               </label>
             </div>
