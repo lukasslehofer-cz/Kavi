@@ -927,6 +927,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Apply availability restrictions on page load
     updateAvailabilityUI();
+    
+    // Enhanced Ecommerce: add_to_cart event for GTM/FB Pixel
+    document.getElementById('subscription-configurator')?.addEventListener('submit', function() {
+        var amount = document.querySelector('input[name="amount"]:checked')?.value || '3';
+        var boxNames = {'2': 'M Box', '3': 'L Box', '4': 'XL Box'};
+        var price = pricing[amount] || 0;
+        
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            'event': 'add_to_cart',
+            'ecommerce': {
+                'currency': currentLocale === 'en' ? 'EUR' : 'CZK',
+                'value': price,
+                'items': [{
+                    'item_id': 'subscription-' + amount,
+                    'item_name': 'Subscription ' + boxNames[amount],
+                    'price': price,
+                    'quantity': 1,
+                    'item_category': 'subscription'
+                }]
+            }
+        });
+    });
 });
 </script>
 @endsection

@@ -218,7 +218,7 @@
         
         <!-- Purchase Configuration -->
         @if($product->isInStock())
-        <form action="{{ localizedRoute('cart.add', $product) }}" method="POST" class="mb-12">
+        <form id="add-to-cart-form" action="{{ localizedRoute('cart.add', $product) }}" method="POST" class="mb-12">
           @csrf
           
           <!-- Quantity Selector - Simple Row -->
@@ -431,6 +431,27 @@
   </div>
 
 </div>
+
+{{-- Enhanced Ecommerce: add_to_cart event for GTM/FB Pixel --}}
+<script>
+document.getElementById('add-to-cart-form')?.addEventListener('submit', function() {
+    var quantity = document.querySelector('input[name="quantity"]:checked')?.value || 1;
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'add_to_cart',
+        'ecommerce': {
+            'currency': '{{ $currentLocale === "en" ? "EUR" : "CZK" }}',
+            'value': {{ $product->isOnSale() ? $product->sale_price : $product->price }} * quantity,
+            'items': [{
+                'item_id': '{{ $product->id }}',
+                'item_name': '{{ addslashes($product->getName()) }}',
+                'price': {{ $product->isOnSale() ? $product->sale_price : $product->price }},
+                'quantity': parseInt(quantity)
+            }]
+        }
+    });
+});
+</script>
 
 {{-- Enhanced Ecommerce: view_item event for GTM/FB Pixel --}}
 <script>
