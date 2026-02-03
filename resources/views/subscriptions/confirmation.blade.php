@@ -288,4 +288,26 @@
     </div>
 </div>
 
+{{-- Enhanced Ecommerce: purchase event for GTM/FB Pixel --}}
+@if($subscription->status === 'active')
+<script>
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'purchase',
+        'ecommerce': {
+            'transaction_id': 'SUB-{{ $subscription->id }}',
+            'value': {{ $subscription->configured_price - ($subscription->discount_amount ?? 0) + ($subscription->shipping_cost ?? 0) }},
+            'currency': '{{ $subscription->currency ?? "CZK" }}',
+            'items': [{
+                'item_id': 'subscription-{{ $config["amount"] ?? 3 }}',
+                'item_name': 'Subscription {{ ($config["amount"] ?? 3) == 2 ? "M" : (($config["amount"] ?? 3) == 4 ? "XL" : "L") }} Box',
+                'price': {{ $subscription->configured_price - ($subscription->discount_amount ?? 0) }},
+                'quantity': 1,
+                'item_category': 'subscription'
+            }]
+        }
+    });
+</script>
+@endif
+
 @endsection
