@@ -163,6 +163,80 @@ class EcomailService
             $tags[] = 'jednorazova';
         }
 
+        // Get coffee type tags (filtr, espresso, decaf)
+        $coffeeTypeTags = self::getCoffeeTypeTags($user);
+        $tags = array_merge($tags, $coffeeTypeTags);
+
+        return $tags;
+    }
+
+    /**
+     * Get coffee type tags (filtr, espresso, decaf) based on subscriptions and orders
+     */
+    private static function getCoffeeTypeTags(User $user): array
+    {
+        $tags = [];
+        $hasFilter = false;
+        $hasEspresso = false;
+        $hasDecaf = false;
+
+        // Check subscriptions for coffee type
+        $subscriptions = $user->subscriptions()->get();
+        foreach ($subscriptions as $subscription) {
+            $config = $subscription->configuration;
+            if (is_array($config)) {
+                // Check type (filter/espresso)
+                $type = $config['type'] ?? null;
+                if ($type === 'filter') {
+                    $hasFilter = true;
+                } elseif ($type === 'espresso') {
+                    $hasEspresso = true;
+                }
+                
+                // Check isDecaf
+                if (!empty($config['isDecaf'])) {
+                    $hasDecaf = true;
+                }
+            }
+        }
+
+        // Check order items for coffee type (from product categories)
+        $orderItems = $user->orders()
+            ->with('items.product')
+            ->get()
+            ->pluck('items')
+            ->flatten();
+
+        foreach ($orderItems as $item) {
+            if (!$item->product) {
+                continue;
+            }
+            
+            $category = $item->product->category;
+            if (is_array($category)) {
+                if (in_array('filter', $category)) {
+                    $hasFilter = true;
+                }
+                if (in_array('espresso', $category)) {
+                    $hasEspresso = true;
+                }
+                if (in_array('decaf', $category)) {
+                    $hasDecaf = true;
+                }
+            }
+        }
+
+        // Add tags
+        if ($hasFilter) {
+            $tags[] = 'filtr';
+        }
+        if ($hasEspresso) {
+            $tags[] = 'espresso';
+        }
+        if ($hasDecaf) {
+            $tags[] = 'decaf';
+        }
+
         return $tags;
     }
 
@@ -190,6 +264,10 @@ class EcomailService
         if ($user->orders()->whereNull('subscription_id')->exists()) {
             $tags[] = 'jednorazova';
         }
+
+        // Get coffee type tags (filtr, espresso, decaf)
+        $coffeeTypeTags = self::getCoffeeTypeTags($user);
+        $tags = array_merge($tags, $coffeeTypeTags);
 
         return $tags;
     }

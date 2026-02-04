@@ -150,7 +150,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex gap-1">
+                            <div class="flex flex-wrap gap-1">
                                 @forelse($tags as $tag)
                                     @if($tag === 'predplatne')
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
@@ -159,6 +159,18 @@
                                     @elseif($tag === 'jednorazova')
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700 border border-orange-200">
                                         Jednorázová
+                                    </span>
+                                    @elseif($tag === 'filtr')
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sky-100 text-sky-700 border border-sky-200">
+                                        Filtr
+                                    </span>
+                                    @elseif($tag === 'espresso')
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700 border border-amber-200">
+                                        Espresso
+                                    </span>
+                                    @elseif($tag === 'decaf')
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-teal-100 text-teal-700 border border-teal-200">
+                                        Decaf
                                     </span>
                                     @endif
                                 @empty
