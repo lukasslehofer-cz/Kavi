@@ -313,7 +313,8 @@
             <nav class="space-y-3">
               <a href="{{ localizedRoute('how-it-works') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'How It Works' : 'Jak to funguje' }}</a>
               <a href="{{ localizedRoute('about') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'About Us' : 'O nás' }}</a>
-              <a href="{{ localizedRoute('how-it-works') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">FAQ</a>              
+              <a href="{{ localizedRoute('how-it-works') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">FAQ</a>
+              <a href="{{ localizedRoute('blog.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">Blog</a>
             </nav>
           </div>
 

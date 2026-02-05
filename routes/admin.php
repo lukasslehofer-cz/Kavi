@@ -116,6 +116,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/hlasky/{announcement}', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'destroy'])->name('announcements.destroy');
     Route::post('/hlasky/{announcement}/toggle', [\App\Http\Controllers\Admin\AnnouncementBannerController::class, 'toggle'])->name('announcements.toggle');
     
+    // Blog Posts
+    Route::resource('posts', \App\Http\Controllers\Admin\PostController::class)->except(['show']);
+    
+    // Blog Tags
+    Route::resource('tags', \App\Http\Controllers\Admin\TagController::class)->except(['show']);
+    
     // Translation API (DeepL)
     Route::post('/translate', [TranslationController::class, 'translate'])->name('translate');
     Route::post('/translate/batch', [TranslationController::class, 'translateBatch'])->name('translate.batch');

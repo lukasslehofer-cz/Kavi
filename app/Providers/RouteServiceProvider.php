@@ -30,6 +30,11 @@ class RouteServiceProvider extends ServiceProvider
     protected array $supportedLocales = ['cs', 'en'];
 
     /**
+     * Track registered route paths to avoid duplicates when locales have same URLs.
+     */
+    protected array $registeredPaths = [];
+
+    /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
     public function boot(): void
@@ -42,6 +47,9 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
+
+            // Reset registered paths for each boot
+            $this->registeredPaths = [];
 
             // Register localized routes for each supported locale
             foreach ($this->supportedLocales as $locale) {
@@ -95,6 +103,10 @@ class RouteServiceProvider extends ServiceProvider
 
             // Monthly Feature
             Route::get('/' . $routes['monthly-feature'], [\App\Http\Controllers\MonthlyFeatureController::class, 'index'])->name($this->routeName('monthly-feature.index', $locale, $isPrimary));
+
+            // Blog (uses same URL in all locales, so register only once with primary name)
+            $this->registerUniqueRoute('get', '/' . $routes['blog'], [\App\Http\Controllers\BlogController::class, 'index'], $this->routeName('blog.index', $locale, $isPrimary));
+            $this->registerUniqueRoute('get', '/' . $this->replaceParams($routes['blog-show']), [\App\Http\Controllers\BlogController::class, 'show'], $this->routeName('blog.show', $locale, $isPrimary));
 
             // Subscriptions
             Route::get('/' . $routes['subscription'], [\App\Http\Controllers\SubscriptionController::class, 'index'])->name($this->routeName('subscriptions.index', $locale, $isPrimary));
@@ -209,5 +221,23 @@ class RouteServiceProvider extends ServiceProvider
 
         // Fallback to Czech if translation file doesn't exist
         return require lang_path('cs/routes.php');
+    }
+
+    /**
+     * Register a route only if the path hasn't been registered yet.
+     * Used for routes where multiple locales have identical paths (e.g., "blog").
+     * Returns true if registered, false if skipped.
+     */
+    protected function registerUniqueRoute(string $method, string $path, array $action, string $name): bool
+    {
+        $key = strtoupper($method) . ':' . $path;
+        
+        if (isset($this->registeredPaths[$key])) {
+            return false;
+        }
+        
+        $this->registeredPaths[$key] = $name;
+        Route::match([$method], $path, $action)->name($name);
+        return true;
     }
 }

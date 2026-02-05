@@ -29,6 +29,10 @@ return [
     // Monthly feature
     'monthly-feature' => 'coffee-of-the-month',
 
+    // Blog
+    'blog' => 'blog',
+    'blog-show' => 'blog/{post}',
+
     // Subscriptions
     'subscription' => 'subscription',
     'subscription-configurator-checkout' => 'subscription/configurator/checkout',

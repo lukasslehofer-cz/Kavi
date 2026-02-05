@@ -29,6 +29,10 @@ return [
     // Monthly feature
     'monthly-feature' => 'kava-mesice',
 
+    // Blog
+    'blog' => 'blog',
+    'blog-show' => 'blog/{post}',
+
     // Subscriptions
     'subscription' => 'predplatne',
     'subscription-configurator-checkout' => 'predplatne/konfigurator/checkout',
