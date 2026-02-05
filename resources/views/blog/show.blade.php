@@ -100,17 +100,7 @@
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="max-w-3xl mx-auto">
       <!-- Article Body -->
-      <article class="prose prose-lg max-w-none 
-                      prose-headings:font-display prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-dark-800
-                      prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:mt-12 prose-h2:mb-6
-                      prose-h3:text-xl prose-h3:sm:text-2xl prose-h3:mt-8 prose-h3:mb-4
-                      prose-p:text-warm-600 prose-p:leading-relaxed prose-p:mb-6
-                      prose-a:text-primary-500 prose-a:no-underline hover:prose-a:underline
-                      prose-strong:text-dark-800 prose-strong:font-semibold
-                      prose-blockquote:border-l-4 prose-blockquote:border-primary-500 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-warm-500
-                      prose-ul:text-warm-600 prose-ol:text-warm-600
-                      prose-li:mb-2
-                      prose-img:rounded-lg prose-img:my-8">
+      <article class="blog-article-content">
         {!! $post->getContent() !!}
       </article>
 
@@ -200,4 +190,33 @@
   </div>
 </div>
 @endif
+
+<!-- Promo CTA Section -->
+<div class="relative py-20 sm:py-24 lg:py-32" style="background-color: #e5e6df;">
+  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
+    <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
+      <!-- Large Editorial Heading -->
+      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
+        {{ $currentLocale === 'en' ? 'Start your coffee journey today' : 'Začněte svou kávovou cestu ještě dnes' }}
+      </h2>
+
+      <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
+        {{ $currentLocale === 'en' ? 'Get access to the best coffee from all over Europe. Flexible subscription, no commitment.' : 'Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.' }}
+      </p>
+
+      <!-- CTA Links -->
+      <div class="flex flex-col sm:flex-row gap-6 sm:gap-10">
+        <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+          <span>{{ $currentLocale === 'en' ? 'Choose subscription' : 'Vybrat předplatné' }}</span>
+          <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+        </a>
+
+        <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-warm-400 font-display uppercase tracking-widest hover:text-dark-800 transition-all">
+          <span>{{ $currentLocale === 'en' ? 'Browse coffees' : 'Procházet kávy' }}</span>
+          <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
