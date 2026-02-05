@@ -34,16 +34,28 @@
                 </div>
             </div>
 
-            <!-- Slug -->
-            <div>
-                <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug</label>
-                <input type="text" name="slug" value="{{ old('slug') }}" 
-                       placeholder="Ponechte prázdné pro automatické vygenerování"
-                       class="input @error('slug') border-red-500 @enderror">
-                @error('slug')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-                <p class="text-xs text-coffee-600 mt-1">URL adresa článku (např. "jak-spravne-varit-kavu")</p>
+            <!-- Slugs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇨🇿</label>
+                    <input type="text" name="slug_cs" value="{{ old('slug_cs') }}" 
+                           placeholder="Automaticky z názvu"
+                           class="input @error('slug_cs') border-red-500 @enderror">
+                    @error('slug_cs')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">např. "jak-spravne-varit-kavu"</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇬🇧</label>
+                    <input type="text" name="slug_en" value="{{ old('slug_en') }}" 
+                           placeholder="Automaticky z EN názvu"
+                           class="input @error('slug_en') border-red-500 @enderror">
+                    @error('slug_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">e.g. "how-to-brew-coffee"</p>
+                </div>
             </div>
 
             <!-- Featured Image -->

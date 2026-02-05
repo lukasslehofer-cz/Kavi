@@ -48,7 +48,7 @@
             {{ $currentLocale === 'en' ? 'All' : 'Vše' }}<sup class="ml-0.5 text-[10px]">{{ str_pad($posts->total(), 2, '0', STR_PAD_LEFT) }}</sup>
           </a>
           @foreach($tags as $tag)
-          <a href="{{ localizedRoute('blog.index', ['tag' => $tag->slug]) }}" 
+          <a href="{{ localizedRoute('blog.index', ['tag' => $tag->getSlug()]) }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ $currentTag && $currentTag->id === $tag->id ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
             {{ $tag->getName() }}<sup class="ml-0.5 text-[10px]">{{ str_pad($tag->posts_count, 2, '0', STR_PAD_LEFT) }}</sup>
           </a>
@@ -72,7 +72,7 @@
     <div class="grid gap-x-4 sm:gap-x-8 lg:gap-x-10 gap-y-10 sm:gap-y-12 lg:gap-y-16 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       @forelse($posts as $post)
       <!-- post - start -->
-      <a href="{{ localizedRoute('blog.show', ['post' => $post->slug]) }}" class="group block">
+      <a href="{{ localizedRoute('blog.show', ['post' => $post->getSlug()]) }}" class="group block">
         <!-- Image Container -->
         <div class="relative aspect-[16/10] overflow-hidden mb-4">
           @if($post->featured_image)

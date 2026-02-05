@@ -68,7 +68,8 @@ class PostController extends Controller
         $validated = $request->validate([
             'title_cs' => 'required|string|max:255',
             'title_en' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:posts,slug',
+            'slug_cs' => 'nullable|string|max:255|unique:posts,slug_cs',
+            'slug_en' => 'nullable|string|max:255|unique:posts,slug_en',
             'perex_cs' => 'nullable|string',
             'perex_en' => 'nullable|string',
             'content_cs' => 'required|string',
@@ -81,9 +82,14 @@ class PostController extends Controller
             'tags.*' => 'exists:tags,id',
         ]);
 
-        // Generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Post::generateSlug($validated['title_cs']);
+        // Generate Czech slug if not provided
+        if (empty($validated['slug_cs'])) {
+            $validated['slug_cs'] = Post::generateSlug($validated['title_cs'], 'cs');
+        }
+
+        // Generate English slug if not provided but title_en exists
+        if (empty($validated['slug_en']) && !empty($validated['title_en'])) {
+            $validated['slug_en'] = Post::generateSlug($validated['title_en'], 'en');
         }
 
         // Handle published_at
@@ -127,7 +133,8 @@ class PostController extends Controller
         $validated = $request->validate([
             'title_cs' => 'required|string|max:255',
             'title_en' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:posts,slug,' . $post->id,
+            'slug_cs' => 'nullable|string|max:255|unique:posts,slug_cs,' . $post->id,
+            'slug_en' => 'nullable|string|max:255|unique:posts,slug_en,' . $post->id,
             'perex_cs' => 'nullable|string',
             'perex_en' => 'nullable|string',
             'content_cs' => 'required|string',
@@ -140,9 +147,14 @@ class PostController extends Controller
             'tags.*' => 'exists:tags,id',
         ]);
 
-        // Generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Post::generateSlug($validated['title_cs'], $post->id);
+        // Generate Czech slug if not provided
+        if (empty($validated['slug_cs'])) {
+            $validated['slug_cs'] = Post::generateSlug($validated['title_cs'], 'cs', $post->id);
+        }
+
+        // Generate English slug if not provided but title_en exists
+        if (empty($validated['slug_en']) && !empty($validated['title_en'])) {
+            $validated['slug_en'] = Post::generateSlug($validated['title_en'], 'en', $post->id);
         }
 
         // Handle published_at

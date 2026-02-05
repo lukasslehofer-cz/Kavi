@@ -146,7 +146,7 @@
                         <td class="px-6 py-4 text-sm">
                             <div class="flex items-center gap-3">
                                 @if($post->status === 'published')
-                                <a href="{{ localizedRoute('blog.show', ['post' => $post->slug]) }}" target="_blank" class="text-gray-600 hover:text-gray-800 font-medium">
+                                <a href="{{ localizedRoute('blog.show', ['post' => $post->getSlug()]) }}" target="_blank" class="text-gray-600 hover:text-gray-800 font-medium">
                                     Zobrazit
                                 </a>
                                 @endif

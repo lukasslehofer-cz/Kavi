@@ -32,12 +32,18 @@ class TagController extends Controller
         $validated = $request->validate([
             'name_cs' => 'required|string|max:255',
             'name_en' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:tags,slug',
+            'slug_cs' => 'nullable|string|max:255|unique:tags,slug_cs',
+            'slug_en' => 'nullable|string|max:255|unique:tags,slug_en',
         ]);
 
-        // Generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Tag::generateSlug($validated['name_cs']);
+        // Generate Czech slug if not provided
+        if (empty($validated['slug_cs'])) {
+            $validated['slug_cs'] = Tag::generateSlug($validated['name_cs'], 'cs');
+        }
+
+        // Generate English slug if not provided but name_en exists
+        if (empty($validated['slug_en']) && !empty($validated['name_en'])) {
+            $validated['slug_en'] = Tag::generateSlug($validated['name_en'], 'en');
         }
 
         Tag::create($validated);
@@ -56,12 +62,18 @@ class TagController extends Controller
         $validated = $request->validate([
             'name_cs' => 'required|string|max:255',
             'name_en' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:tags,slug,' . $tag->id,
+            'slug_cs' => 'nullable|string|max:255|unique:tags,slug_cs,' . $tag->id,
+            'slug_en' => 'nullable|string|max:255|unique:tags,slug_en,' . $tag->id,
         ]);
 
-        // Generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Tag::generateSlug($validated['name_cs'], $tag->id);
+        // Generate Czech slug if not provided
+        if (empty($validated['slug_cs'])) {
+            $validated['slug_cs'] = Tag::generateSlug($validated['name_cs'], 'cs', $tag->id);
+        }
+
+        // Generate English slug if not provided but name_en exists
+        if (empty($validated['slug_en']) && !empty($validated['name_en'])) {
+            $validated['slug_en'] = Tag::generateSlug($validated['name_en'], 'en', $tag->id);
         }
 
         $tag->update($validated);

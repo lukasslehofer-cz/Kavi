@@ -35,15 +35,26 @@
                 </div>
             </div>
 
-            <!-- Slug -->
-            <div>
-                <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug</label>
-                <input type="text" name="slug" value="{{ old('slug', $tag->slug) }}" 
-                       class="input @error('slug') border-red-500 @enderror">
-                @error('slug')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-                <p class="text-xs text-coffee-600 mt-1">URL identifikátor tagu (např. "recepty")</p>
+            <!-- Slugs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇨🇿</label>
+                    <input type="text" name="slug_cs" value="{{ old('slug_cs', $tag->slug_cs) }}" 
+                           class="input @error('slug_cs') border-red-500 @enderror">
+                    @error('slug_cs')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">např. "recepty"</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇬🇧</label>
+                    <input type="text" name="slug_en" value="{{ old('slug_en', $tag->slug_en) }}" 
+                           class="input @error('slug_en') border-red-500 @enderror">
+                    @error('slug_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">e.g. "recipes"</p>
+                </div>
             </div>
         </div>
 

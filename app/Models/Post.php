@@ -13,7 +13,8 @@ class Post extends Model
     protected $fillable = [
         'title_cs',
         'title_en',
-        'slug',
+        'slug_cs',
+        'slug_en',
         'perex_cs',
         'perex_en',
         'content_cs',
@@ -62,6 +63,17 @@ class Post extends Model
     }
 
     /**
+     * Get slug based on current locale
+     */
+    public function getSlug(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->slug_en)) {
+            return $this->slug_en;
+        }
+        return $this->slug_cs;
+    }
+
+    /**
      * Relationship with tags
      */
     public function tags()
@@ -88,33 +100,51 @@ class Post extends Model
     }
 
     /**
-     * Scope to filter by tag
+     * Scope to filter by tag (checks both slug_cs and slug_en)
      */
     public function scopeWithTag($query, $tagSlug)
     {
         return $query->whereHas('tags', function ($q) use ($tagSlug) {
-            $q->where('slug', $tagSlug);
+            $q->where('slug_cs', $tagSlug)
+              ->orWhere('slug_en', $tagSlug);
         });
     }
 
     /**
-     * Get the route key name for route model binding
+     * Resolve the route binding for the model (locale-aware)
      */
-    public function getRouteKeyName()
+    public function resolveRouteBinding($value, $field = null)
     {
-        return 'slug';
+        // If value is numeric, find by ID (for admin routes)
+        if (is_numeric($value)) {
+            return $this->where('id', $value)->first();
+        }
+        
+        $locale = app()->getLocale();
+        
+        // Try locale-specific slug first, then fallback to other locale
+        if ($locale === 'en') {
+            return $this->where('slug_en', $value)
+                        ->orWhere('slug_cs', $value)
+                        ->first();
+        }
+        
+        return $this->where('slug_cs', $value)
+                    ->orWhere('slug_en', $value)
+                    ->first();
     }
 
     /**
-     * Generate a unique slug from the title
+     * Generate a unique slug from the title for a specific locale
      */
-    public static function generateSlug(string $title, ?int $excludeId = null): string
+    public static function generateSlug(string $title, string $locale = 'cs', ?int $excludeId = null): string
     {
         $slug = Str::slug($title);
         $originalSlug = $slug;
         $counter = 1;
+        $column = $locale === 'en' ? 'slug_en' : 'slug_cs';
 
-        $query = self::where('slug', $slug);
+        $query = self::where($column, $slug);
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
@@ -122,7 +152,7 @@ class Post extends Model
         while ($query->exists()) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;
-            $query = self::where('slug', $slug);
+            $query = self::where($column, $slug);
             if ($excludeId) {
                 $query->where('id', '!=', $excludeId);
             }

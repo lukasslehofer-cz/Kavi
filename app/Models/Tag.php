@@ -13,7 +13,8 @@ class Tag extends Model
     protected $fillable = [
         'name_cs',
         'name_en',
-        'slug',
+        'slug_cs',
+        'slug_en',
     ];
 
     /**
@@ -28,6 +29,17 @@ class Tag extends Model
     }
 
     /**
+     * Get slug based on current locale
+     */
+    public function getSlug(): string
+    {
+        if (app()->getLocale() === 'en' && !empty($this->slug_en)) {
+            return $this->slug_en;
+        }
+        return $this->slug_cs;
+    }
+
+    /**
      * Relationship with posts
      */
     public function posts()
@@ -36,23 +48,40 @@ class Tag extends Model
     }
 
     /**
-     * Get the route key name for route model binding
+     * Resolve the route binding for the model (locale-aware)
      */
-    public function getRouteKeyName()
+    public function resolveRouteBinding($value, $field = null)
     {
-        return 'slug';
+        // If value is numeric, find by ID (for admin routes)
+        if (is_numeric($value)) {
+            return $this->where('id', $value)->first();
+        }
+        
+        $locale = app()->getLocale();
+        
+        // Try locale-specific slug first, then fallback to other locale
+        if ($locale === 'en') {
+            return $this->where('slug_en', $value)
+                        ->orWhere('slug_cs', $value)
+                        ->first();
+        }
+        
+        return $this->where('slug_cs', $value)
+                    ->orWhere('slug_en', $value)
+                    ->first();
     }
 
     /**
-     * Generate a unique slug from the name
+     * Generate a unique slug from the name for a specific locale
      */
-    public static function generateSlug(string $name, ?int $excludeId = null): string
+    public static function generateSlug(string $name, string $locale = 'cs', ?int $excludeId = null): string
     {
         $slug = Str::slug($name);
         $originalSlug = $slug;
         $counter = 1;
+        $column = $locale === 'en' ? 'slug_en' : 'slug_cs';
 
-        $query = self::where('slug', $slug);
+        $query = self::where($column, $slug);
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }
@@ -60,7 +89,7 @@ class Tag extends Model
         while ($query->exists()) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;
-            $query = self::where('slug', $slug);
+            $query = self::where($column, $slug);
             if ($excludeId) {
                 $query->where('id', '!=', $excludeId);
             }

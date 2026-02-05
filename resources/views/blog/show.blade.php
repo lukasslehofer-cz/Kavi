@@ -70,7 +70,7 @@
       <span class="text-warm-300">·</span>
       <div class="flex flex-wrap gap-2">
         @foreach($post->tags as $tag)
-        <a href="{{ localizedRoute('blog.index', ['tag' => $tag->slug]) }}" 
+        <a href="{{ localizedRoute('blog.index', ['tag' => $tag->getSlug()]) }}" 
            class="text-xs uppercase tracking-widest text-primary-500 hover:text-dark-800 transition-colors">
           {{ $tag->getName() }}
         </a>
@@ -112,7 +112,7 @@
         </p>
         <div class="flex flex-wrap gap-2">
           @foreach($post->tags as $tag)
-          <a href="{{ localizedRoute('blog.index', ['tag' => $tag->slug]) }}" 
+          <a href="{{ localizedRoute('blog.index', ['tag' => $tag->getSlug()]) }}" 
              class="inline-flex items-center px-3 py-1.5 bg-warm-200 text-dark-800 text-xs uppercase tracking-widest hover:bg-primary-500 hover:text-white transition-colors">
             {{ $tag->getName() }}
           </a>
@@ -142,7 +142,7 @@
 
     <div class="grid gap-x-4 sm:gap-x-8 lg:gap-x-10 gap-y-10 sm:gap-y-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       @foreach($relatedPosts as $relatedPost)
-      <a href="{{ localizedRoute('blog.show', ['post' => $relatedPost->slug]) }}" class="group block">
+      <a href="{{ localizedRoute('blog.show', ['post' => $relatedPost->getSlug()]) }}" class="group block">
         <!-- Image Container -->
         <div class="relative aspect-[16/10] overflow-hidden mb-4">
           @if($relatedPost->featured_image)
