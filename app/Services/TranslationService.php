@@ -71,6 +71,7 @@ class TranslationService
                 'text' => [$text],
                 'source_lang' => $sourceLang,
                 'target_lang' => $targetLang,
+                'tag_handling' => 'html',
             ]);
 
             if ($response->successful()) {
@@ -174,6 +175,7 @@ class TranslationService
                 'text' => array_values($texts),
                 'source_lang' => $sourceLang,
                 'target_lang' => $targetLang,
+                'tag_handling' => 'html',
             ]);
 
             if ($response->successful()) {

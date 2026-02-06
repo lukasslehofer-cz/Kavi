@@ -26,7 +26,7 @@ class TranslationController extends Controller
     public function translate(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'text' => 'required|string|max:10000',
+            'text' => 'required|string|max:50000',
             'source_lang' => 'nullable|string|size:2',
             'target_lang' => 'nullable|string|size:2',
         ]);

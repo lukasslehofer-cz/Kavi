@@ -25,7 +25,13 @@
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Article Title 🇬🇧</label>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Article Title 🇬🇧</span>
+                        <button type="button" onclick="translateField('title_cs', 'title_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
                     <input type="text" name="title_en" id="title_en" value="{{ old('title_en', $post->title_en) }}" 
                            placeholder="English article title"
                            class="input @error('title_en') border-red-500 @enderror">
@@ -97,7 +103,13 @@
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Perex 🇬🇧</label>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Perex 🇬🇧</span>
+                        <button type="button" onclick="translateField('perex_cs', 'perex_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
                     <textarea name="perex_en" id="perex_en" rows="3" 
                               placeholder="Short introduction..."
                               class="input @error('perex_en') border-red-500 @enderror">{{ old('perex_en', $post->perex_en) }}</textarea>
@@ -119,7 +131,13 @@
                     <p class="text-xs text-coffee-600 mt-1">Povolené HTML tagy: &lt;a&gt;, &lt;strong&gt;, &lt;b&gt;, &lt;em&gt;, &lt;i&gt;, &lt;br&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;blockquote&gt;, &lt;img&gt;</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-coffee-900 mb-2">Article Content 🇬🇧</label>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Article Content 🇬🇧</span>
+                        <button type="button" onclick="translateField('content_cs', 'content_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
                     <textarea name="content_en" id="content_en" rows="15" 
                               placeholder="English content..."
                               class="input @error('content_en') border-red-500 @enderror">{{ old('content_en', $post->content_en) }}</textarea>
@@ -208,6 +226,72 @@ function previewImage(event) {
             previewContainer.classList.remove('hidden');
         }
         reader.readAsDataURL(file);
+    }
+}
+
+// AI Translation function
+async function translateField(sourceId, targetId) {
+    const sourceElement = document.getElementById(sourceId);
+    const targetElement = document.getElementById(targetId);
+    const button = event.target.closest('button');
+    
+    if (!sourceElement || !targetElement) {
+        alert('Chyba: Nelze najít zdrojové nebo cílové pole.');
+        return;
+    }
+    
+    const sourceText = sourceElement.value.trim();
+    
+    if (!sourceText) {
+        alert('Zdrojové pole je prázdné. Nejprve vyplňte český text.');
+        return;
+    }
+    
+    // Show loading state
+    const originalContent = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = `
+        <svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Překládám...
+    `;
+    
+    try {
+        const response = await fetch('{{ route("admin.translate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                text: sourceText,
+                source_lang: 'CS',
+                target_lang: 'EN'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            targetElement.value = data.translation;
+            // Flash success
+            targetElement.classList.add('ring-2', 'ring-green-500');
+            setTimeout(() => {
+                targetElement.classList.remove('ring-2', 'ring-green-500');
+            }, 1500);
+        } else {
+            alert('Chyba překladu: ' + (data.error || 'Neznámá chyba'));
+        }
+    } catch (error) {
+        console.error('Translation error:', error);
+        alert('Chyba při komunikaci s překladovou službou.');
+    } finally {
+        // Restore button
+        button.disabled = false;
+        button.innerHTML = originalContent;
     }
 }
 </script>
