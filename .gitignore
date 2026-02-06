@@ -55,6 +55,8 @@ deploy.log
 
 # Documentation
 /documentation
+CLAUDE.md
+.claude/
 
 # Uploaded images (user content)
 /public/images/products/*
