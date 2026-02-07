@@ -122,38 +122,29 @@
       <div class="lg:col-span-7">
         @if($availability['allSoldOut'])
         <!-- Sold Out Message -->
-        <div class="bg-white border border-warm-300 p-8 text-center">
-          <div class="mb-6">
-            <span class="font-display text-6xl text-warm-400">☕</span>
-          </div>
-          
-          <h2 class="font-display text-3xl font-normal text-dark-800 mb-4 uppercase">
+        <div class="p-6">
+          <h2 class="font-display text-3xl font-normal text-primary-500 mb-4 uppercase">
             {{ $currentLocale === 'en' ? 'Sorry, our coffees are sold out this month' : 'Omlouváme se, tento měsíc jsou naše kávy vyprodané' }}
           </h2>
-          
-          <p class="text-lg text-warm-500 mb-6 max-w-2xl mx-auto font-light">
+
+          <p class="text-lg text-warm-500 mb-6 max-w-2xl font-light">
             {{ $currentLocale === 'en' ? 'Thank you for your interest! All our coffees for this month are unfortunately already taken.' : 'Děkujeme za velký zájem! Všechny naše kávy pro tento měsíc jsou bohužel již rozebrané.' }}
           </p>
-          
-          <div class="border border-primary-300 p-6 mb-8 max-w-2xl mx-auto" style="background-color: #F5F5F0;">
-            <p class="text-base text-dark-800 font-medium mb-2">
-              {{ $currentLocale === 'en' ? 'New coffees will be available from' : 'Nové kávy budou k dispozici od' }} <strong>{{ $currentLocale === 'en' ? $nextAvailableDate->format('m/d/Y') : $nextAvailableDate->format('d.m.Y') }}</strong>
+
+          <div class="bg-warm-300 p-6 mb-8">
+            <p class="font-display text-lg text-dark-800 uppercase tracking-wide">
+              {{ $currentLocale === 'en' ? 'Subscription for next month available from' : 'Předplatné na další měsíc k dispozici od' }}
             </p>
-            <p class="text-sm text-warm-500 font-light">
-              ({{ $nextAvailableMonthName }} {{ $nextAvailableDate->year }})
+            <p class="font-display text-2xl text-dark-800 uppercase tracking-tight mt-2">
+              {{ $currentLocale === 'en' ? $nextAvailableDate->format('m/d/Y') : $nextAvailableDate->format('d.m.Y') }}
             </p>
           </div>
-          
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ localizedRoute('products.index') }}" 
-               class="inline-flex items-center justify-center px-6 py-3 bg-dark-800 text-white font-medium hover:bg-dark-700 transition-all duration-200">
-              {{ $currentLocale === 'en' ? 'Browse one-time products' : 'Prohlédnout jednorázové produkty' }}
-              <span class="ml-2">&rarr;</span>
-            </a>
-            
-            <a href="{{ route('home') }}" 
-               class="inline-flex items-center justify-center px-6 py-3 bg-white text-dark-800 font-medium border border-warm-400 hover:border-dark-800 transition-all duration-200">
-              {{ $currentLocale === 'en' ? 'Back to homepage' : 'Zpět na hlavní stránku' }}
+
+          <div class="flex flex-col sm:flex-row gap-6">
+            <a href="{{ localizedRoute('products.index') }}"
+               class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+              <span>{{ $currentLocale === 'en' ? 'Browse shop' : 'Prohlédnout obchod' }}</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
             </a>
           </div>
         </div>
@@ -464,19 +455,21 @@
         @endif
 
         <!-- Shipping Date Info -->
+        @if(!$availability['allSoldOut'])
         <div class="mt-8 p-5 bg-warm-200">
           <h3 class="font-display text-lg font-normal text-dark-800 mb-2 uppercase">{{ $currentLocale === 'en' ? 'Next shipping date' : 'Termín následující rozesílky' }}</h3>
           <p class="text-sm text-dark-800 font-medium mb-2">{{ $shippingInfo['cutoff_message'] }}</p>
           <p class="text-sm text-warm-500 font-light">
                 @if($currentLocale === 'en')
-            Orders close on the <strong class="text-dark-800">15th of each month at midnight</strong>. 
-            Coffee shipping usually happens on the <strong class="text-dark-800">20th of each month</strong>. 
+            Orders close on the <strong class="text-dark-800">15th of each month at midnight</strong>.
+            Coffee shipping usually happens on the <strong class="text-dark-800">20th of each month</strong>.
                 @else
-            Objednávky uzavíráme <strong class="text-dark-800">15. dne v měsíci o půlnoci</strong>. 
-            Rozesílka kávy probíhá nejčastěji <strong class="text-dark-800">20. dne v měsíci</strong>. 
+            Objednávky uzavíráme <strong class="text-dark-800">15. dne v měsíci o půlnoci</strong>.
+            Rozesílka kávy probíhá nejčastěji <strong class="text-dark-800">20. dne v měsíci</strong>.
                 @endif
               </p>
         </div>
+        @endif
       </div>
     </div>
 

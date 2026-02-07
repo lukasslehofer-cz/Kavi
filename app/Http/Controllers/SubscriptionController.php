@@ -95,8 +95,23 @@ class SubscriptionController extends Controller
             $availability['allSoldOut'] = !$availability['espresso'] && !$availability['filter'];
         }
         
-        // Calculate next available month (after 16th of next month)
-        $nextAvailableDate = now()->addMonthNoOverflow()->day(16);
+        // Calculate next available month using billing_date cutoff logic
+        // This respects the 15th billing cutoff (same as getOrderingTargetMonth)
+        $today = now();
+        $currentSchedule = \App\Models\ShipmentSchedule::getForMonth($today->year, $today->month);
+
+        if ($currentSchedule && $currentSchedule->billing_date) {
+            $cutoffDate = $currentSchedule->billing_date->copy()->addDay(); // 16th (billing_date + 1)
+        } else {
+            // Fallback to 16th if no schedule configured
+            $cutoffDate = $today->copy()->day(16);
+        }
+
+        // If today is before cutoff (< 16th), next available is 16th of CURRENT month
+        // If today is after cutoff (>= 16th), next available is 16th of NEXT month
+        $nextAvailableDate = $today->greaterThanOrEqualTo($cutoffDate)
+            ? $today->copy()->addMonthNoOverflow()->day(16)
+            : $today->copy()->day(16);
         $nextAvailableMonths = app()->getLocale() === 'en' ? [
             1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
             5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
@@ -841,6 +856,31 @@ class SubscriptionController extends Controller
                 ]);
                 abort(403, 'Nemáte oprávnění zobrazit tuto stránku. Prosím přihlaste se.');
             }
+        }
+
+        // Update stock reservations for the target month
+        // This ensures the order form immediately reflects the new subscription
+        try {
+            $targetMonth = \App\Helpers\SubscriptionHelper::getOrderingTargetMonth();
+            $targetSchedule = \App\Models\ShipmentSchedule::getForMonth($targetMonth->year, $targetMonth->month);
+
+            if ($targetSchedule) {
+                $reservationService = app(\App\Services\StockReservationService::class);
+                $reservationService->updateReservationsForSchedule($targetSchedule);
+
+                \Log::info('Stock reservations updated from subscription confirmation page', [
+                    'subscription_id' => $subscription->id,
+                    'schedule_id' => $targetSchedule->id,
+                    'schedule_year' => $targetSchedule->year,
+                    'schedule_month' => $targetSchedule->month,
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Only log the error, don't break the confirmation page
+            \Log::error('Failed to update stock reservations from confirmation page', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return view('subscriptions.confirmation', compact('subscription'));
