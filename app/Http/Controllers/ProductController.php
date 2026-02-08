@@ -24,7 +24,8 @@ class ProductController extends Controller
 
         $products = $query->orderBy('sort_order')
             ->orderBy('created_at', 'desc')
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
         $categoryNames = [
             'espresso' => 'Espresso káva',
