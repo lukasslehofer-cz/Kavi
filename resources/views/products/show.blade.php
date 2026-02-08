@@ -291,11 +291,13 @@
         
         <!-- Specifications - Vertical Index -->
         <div class="border-t border-dark-800">
-          <!-- Category/Roast Type - First Item -->
+          <!-- Category -->
           @if(is_array($product->category) && !empty($product->category))
           <div class="border-b border-dark-800 py-4 flex items-baseline">
-            <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $currentLocale === 'en' ? 'Roast' : 'Pražení' }}</span>
-            <span class="text-xs uppercase tracking-widest text-dark-800">— 
+            <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">
+              {{ $currentLocale === 'en' ? 'Category' : 'Kategorie' }}
+            </span>
+            <span class="text-xs uppercase tracking-widest text-dark-800">—
               @php
                 $categoryLabels = [
                   'espresso' => 'Espresso',
@@ -309,37 +311,70 @@
             </span>
           </div>
           @endif
-          
+
+          <!-- Attributes - CATEGORY-BASED RENDERING -->
           @if($product->attributes)
-          @php
-            $mainAttributes = $currentLocale === 'en' 
-              ? ['origin' => 'Origin', 'processing' => 'Processing', 'flavor_notes' => 'Flavor', 'altitude' => 'Altitude', 'variety' => 'Variety']
-              : ['origin' => 'Původ', 'processing' => 'Zpracování', 'flavor_notes' => 'Chuť', 'altitude' => 'Nadm. výška', 'variety' => 'Odrůda'];
-          @endphp
-          
-          @foreach($mainAttributes as $key => $label)
-            @php $attrValue = $product->getTranslatedAttribute($key); @endphp
-            @if(!empty($attrValue))
-            <div class="border-b border-dark-800 py-4 flex items-baseline">
-              <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $label }}</span>
-              <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $attrValue }}</span>
-            </div>
+            @if($product->isCoffee())
+              {{-- Coffee: Fixed attributes --}}
+              @php
+                $mainAttributes = $currentLocale === 'en'
+                  ? ['origin' => 'Origin', 'processing' => 'Processing', 'flavor_notes' => 'Flavor', 'altitude' => 'Altitude', 'variety' => 'Variety']
+                  : ['origin' => 'Původ', 'processing' => 'Zpracování', 'flavor_notes' => 'Chuť', 'altitude' => 'Nadm. výška', 'variety' => 'Odrůda'];
+              @endphp
+
+              @foreach($mainAttributes as $key => $label)
+                @php $attrValue = $product->getTranslatedAttribute($key); @endphp
+                @if(!empty($attrValue))
+                <div class="border-b border-dark-800 py-4 flex items-baseline">
+                  <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $label }}</span>
+                  <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $attrValue }}</span>
+                </div>
+                @endif
+              @endforeach
+
+              @if(!empty($product->attributes['weight']))
+              <div class="border-b border-dark-800 py-4 flex items-baseline">
+                <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">
+                  {{ $currentLocale === 'en' ? 'Weight' : 'Hmotnost' }}
+                </span>
+                <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $product->attributes['weight'] }}g</span>
+              </div>
+              @endif
+
+              @if(!empty($product->attributes['roast_date']))
+              <div class="border-b border-dark-800 py-4 flex items-baseline">
+                <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">
+                  {{ $currentLocale === 'en' ? 'Roast date' : 'Datum pražení' }}
+                </span>
+                <span class="text-xs uppercase tracking-widest text-dark-800">
+                  — {{ \Carbon\Carbon::parse($product->attributes['roast_date'])->format($currentLocale === 'en' ? 'm/d/Y' : 'd.m.Y') }}
+                </span>
+              </div>
+              @endif
+
+            @elseif($product->isAccessory())
+              {{-- Accessories: Custom attributes --}}
+              @php $customAttrs = $product->getCustomAttributes(); @endphp
+
+              @foreach($customAttrs as $attr)
+                @php
+                  // Get translated label and value
+                  $label = $currentLocale === 'en' && !empty($attr['label_en'])
+                    ? $attr['label_en']
+                    : $attr['label_cs'];
+                  $value = $currentLocale === 'en' && !empty($attr['value_en'])
+                    ? $attr['value_en']
+                    : $attr['value_cs'];
+                @endphp
+
+                @if(!empty($value))
+                <div class="border-b border-dark-800 py-4 flex items-baseline">
+                  <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $label }}</span>
+                  <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $value }}</span>
+                </div>
+                @endif
+              @endforeach
             @endif
-          @endforeach
-          
-          @if(!empty($product->attributes['weight']))
-          <div class="border-b border-dark-800 py-4 flex items-baseline">
-            <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $currentLocale === 'en' ? 'Weight' : 'Hmotnost' }}</span>
-            <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $product->attributes['weight'] }}g</span>
-          </div>
-          @endif
-          
-          @if(!empty($product->attributes['roast_date']))
-          <div class="border-b border-dark-800 py-4 flex items-baseline">
-            <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">{{ $currentLocale === 'en' ? 'Roast date' : 'Datum pražení' }}</span>
-            <span class="text-xs uppercase tracking-widest text-dark-800">— {{ \Carbon\Carbon::parse($product->attributes['roast_date'])->format($currentLocale === 'en' ? 'm/d/Y' : 'd.m.Y') }}</span>
-          </div>
-          @endif
           @endif
         </div>
         

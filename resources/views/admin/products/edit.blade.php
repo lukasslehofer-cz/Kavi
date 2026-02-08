@@ -218,8 +218,14 @@
             </div>
 
             <!-- Coffee Attributes Section -->
-            <div class="bg-gray-50 border-2 border-gray-200 p-6 rounded-lg space-y-4">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Informace o kávě (volitelné)</h3>
+            @php
+                $isCoffee = is_array($product->category) && !empty(array_intersect($product->category, ['espresso', 'filter', 'decaf']));
+            @endphp
+            <div id="coffee-attributes-section" class="bg-gray-50 border-2 border-gray-200 p-6 rounded-lg space-y-4" style="display: {{ $isCoffee ? 'block' : 'none' }}">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">Informace o kávě</h3>
+                    <span class="text-xs text-gray-600 italic">Zobrazeno pro kategorii: Espresso, Filtr, Bezkofeinová</span>
+                </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -362,6 +368,72 @@
                         <p class="text-xs text-gray-600 mt-1">Kdy byla káva upražena</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- Custom Attributes Section -->
+            @php
+                $isAccessory = is_array($product->category) && in_array('accessories', $product->category);
+            @endphp
+            <div id="custom-attributes-section" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-lg space-y-4" style="display: {{ $isAccessory ? 'block' : 'none' }}">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Vlastní parametry produktu</h3>
+                        <p class="text-xs text-gray-600 mt-1">Pro příslušenství můžete definovat libovolné parametry</p>
+                    </div>
+                    <span class="text-xs text-gray-600 italic">Zobrazeno pro kategorii: Příslušenství</span>
+                </div>
+
+                <div id="custom-attributes-container">
+                    @php $customAttrs = $product->getCustomAttributes(); @endphp
+
+                    @if(count($customAttrs) > 0)
+                        @foreach($customAttrs as $index => $attr)
+                            <!-- Pre-filled custom attribute row -->
+                            <div class="grid grid-cols-12 gap-2 p-4 bg-white rounded-lg border border-blue-200 mb-3" id="custom-attr-{{ $index }}">
+                                <div class="col-span-3">
+                                    <label class="block text-xs font-medium text-gray-900 mb-1">Název 🇨🇿</label>
+                                    <input type="text" name="custom_attributes[{{ $index }}][label_cs]" value="{{ $attr['label_cs'] }}" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required placeholder="Materiál">
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-medium text-gray-900 mb-1 flex items-center justify-between">
+                                        <span>Name 🇬🇧</span>
+                                        <button type="button"
+                                                onclick="translateCustomLabel({{ $index }})"
+                                                class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
+                                            →
+                                        </button>
+                                    </label>
+                                    <input type="text" name="custom_attributes[{{ $index }}][label_en]" value="{{ $attr['label_en'] }}" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="custom-attr-label-en-{{ $index }}" placeholder="Material">
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block text-xs font-medium text-gray-900 mb-1">Hodnota 🇨🇿</label>
+                                    <input type="text" name="custom_attributes[{{ $index }}][value_cs]" value="{{ $attr['value_cs'] }}" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required placeholder="Nerezová ocel" id="custom-attr-value-cs-{{ $index }}">
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block text-xs font-medium text-gray-900 mb-1 flex items-center justify-between">
+                                        <span>Value 🇬🇧</span>
+                                        <button type="button"
+                                                onclick="translateCustomValue({{ $index }})"
+                                                class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
+                                            →
+                                        </button>
+                                    </label>
+                                    <input type="text" name="custom_attributes[{{ $index }}][value_en]" value="{{ $attr['value_en'] }}" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="custom-attr-value-en-{{ $index }}" placeholder="Stainless steel">
+                                </div>
+                                <div class="col-span-1 flex items-end">
+                                    <button type="button" onclick="removeCustomAttribute({{ $index }})" class="w-full px-3 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-700 rounded-lg">×</button>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+
+                <button type="button" onclick="addCustomAttribute()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Přidat parametr
+                </button>
             </div>
 
             <!-- Sort Order -->
@@ -731,7 +803,187 @@ document.addEventListener('DOMContentLoaded', function() {
 
     discountTypeSelect.addEventListener('change', toggleDiscountFields);
     toggleDiscountFields(); // Initial state
+
+    // Category-based section visibility
+    const categoryCheckboxes = document.querySelectorAll('input[name="categories[]"]');
+    const coffeeSection = document.getElementById('coffee-attributes-section');
+    const customSection = document.getElementById('custom-attributes-section');
+
+    function updateAttributeSections() {
+        const selectedCategories = Array.from(categoryCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+
+        const isCoffee = selectedCategories.some(cat => ['espresso', 'filter', 'decaf'].includes(cat));
+        const isAccessory = selectedCategories.includes('accessories');
+
+        coffeeSection.style.display = isCoffee ? 'block' : 'none';
+        customSection.style.display = isAccessory ? 'block' : 'none';
+    }
+
+    categoryCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateAttributeSections);
+    });
+
+    updateAttributeSections();
 });
+
+// Custom attributes management (for edit page)
+@php
+    $customAttrsCount = count($product->getCustomAttributes());
+@endphp
+var customAttrIndex = {{ $customAttrsCount }};
+
+function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = '') {
+    const container = document.getElementById('custom-attributes-container');
+    const index = customAttrIndex++;
+
+    const row = document.createElement('div');
+    row.className = 'grid grid-cols-12 gap-2 p-4 bg-white rounded-lg border border-blue-200 mb-3';
+    row.id = `custom-attr-${index}`;
+
+    row.innerHTML = `
+        <div class="col-span-3">
+            <label class="block text-xs font-medium text-gray-900 mb-1">Název 🇨🇿</label>
+            <input type="text"
+                   name="custom_attributes[${index}][label_cs]"
+                   value="${labelCs}"
+                   placeholder="Materiál"
+                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   required>
+        </div>
+        <div class="col-span-2">
+            <label class="block text-xs font-medium text-gray-900 mb-1 flex items-center justify-between">
+                <span>Name 🇬🇧</span>
+                <button type="button"
+                        onclick="translateCustomLabel(${index})"
+                        class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
+                    →
+                </button>
+            </label>
+            <input type="text"
+                   name="custom_attributes[${index}][label_en]"
+                   value="${labelEn}"
+                   placeholder="Material"
+                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   id="custom-attr-label-en-${index}">
+        </div>
+        <div class="col-span-3">
+            <label class="block text-xs font-medium text-gray-900 mb-1">Hodnota 🇨🇿</label>
+            <input type="text"
+                   name="custom_attributes[${index}][value_cs]"
+                   value="${valueCs}"
+                   placeholder="Nerezová ocel"
+                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   required
+                   id="custom-attr-value-cs-${index}">
+        </div>
+        <div class="col-span-3">
+            <label class="block text-xs font-medium text-gray-900 mb-1 flex items-center justify-between">
+                <span>Value 🇬🇧</span>
+                <button type="button"
+                        onclick="translateCustomValue(${index})"
+                        class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
+                    →
+                </button>
+            </label>
+            <input type="text"
+                   name="custom_attributes[${index}][value_en]"
+                   value="${valueEn}"
+                   placeholder="Stainless steel"
+                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   id="custom-attr-value-en-${index}">
+        </div>
+        <div class="col-span-1 flex items-end">
+            <button type="button"
+                    onclick="removeCustomAttribute(${index})"
+                    class="w-full px-3 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-700 rounded-lg">×</button>
+        </div>
+    `;
+
+    container.appendChild(row);
+}
+
+function removeCustomAttribute(index) {
+    const row = document.getElementById(`custom-attr-${index}`);
+    if (row) row.remove();
+}
+
+async function translateCustomLabel(index) {
+    const csInput = document.querySelector(`input[name="custom_attributes[${index}][label_cs]"]`);
+    const enInput = document.getElementById(`custom-attr-label-en-${index}`);
+
+    if (!csInput || !enInput) return;
+
+    const sourceText = csInput.value.trim();
+    if (!sourceText) {
+        alert('Nejprve vyplňte český název.');
+        return;
+    }
+
+    try {
+        const response = await fetch('{{ route("admin.translate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                text: sourceText,
+                source_lang: 'CS',
+                target_lang: 'EN'
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            enInput.value = data.translation;
+            enInput.classList.add('ring-2', 'ring-green-500');
+            setTimeout(() => enInput.classList.remove('ring-2', 'ring-green-500'), 1500);
+        }
+    } catch (error) {
+        console.error('Translation error:', error);
+    }
+}
+
+async function translateCustomValue(index) {
+    const csInput = document.getElementById(`custom-attr-value-cs-${index}`);
+    const enInput = document.getElementById(`custom-attr-value-en-${index}`);
+
+    if (!csInput || !enInput) return;
+
+    const sourceText = csInput.value.trim();
+    if (!sourceText) {
+        alert('Nejprve vyplňte českou hodnotu.');
+        return;
+    }
+
+    try {
+        const response = await fetch('{{ route("admin.translate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                text: sourceText,
+                source_lang: 'CS',
+                target_lang: 'EN'
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            enInput.value = data.translation;
+            enInput.classList.add('ring-2', 'ring-green-500');
+            setTimeout(() => enInput.classList.remove('ring-2', 'ring-green-500'), 1500);
+        }
+    } catch (error) {
+        console.error('Translation error:', error);
+    }
+}
 </script>
 @endsection
 

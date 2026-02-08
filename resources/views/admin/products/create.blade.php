@@ -173,8 +173,11 @@
             </div>
 
             <!-- Coffee Attributes Section -->
-            <div class="bg-cream-50 border-2 border-cream-200 p-6 rounded-lg space-y-4">
-                <h3 class="text-lg font-semibold text-coffee-900 mb-4">Informace o kávě (volitelné)</h3>
+            <div id="coffee-attributes-section" class="bg-cream-50 border-2 border-cream-200 p-6 rounded-lg space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-coffee-900">Informace o kávě</h3>
+                    <span class="text-xs text-coffee-600 italic">Zobrazeno pro kategorii: Espresso, Filtr, Bezkofeinová</span>
+                </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -317,6 +320,26 @@
                         <p class="text-xs text-coffee-600 mt-1">Kdy byla káva upražena</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- Custom Attributes Section (for accessories) -->
+            <div id="custom-attributes-section" class="bg-blue-50 border-2 border-blue-200 p-6 rounded-lg space-y-4" style="display: none;">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-coffee-900">Vlastní parametry produktu</h3>
+                        <p class="text-xs text-coffee-600 mt-1">Pro příslušenství můžete definovat libovolné parametry</p>
+                    </div>
+                    <span class="text-xs text-coffee-600 italic">Zobrazeno pro kategorii: Příslušenství</span>
+                </div>
+
+                <div id="custom-attributes-container"></div>
+
+                <button type="button" onclick="addCustomAttribute()" class="btn btn-outline btn-sm">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Přidat parametr
+                </button>
             </div>
 
             <!-- Sort Order -->
@@ -655,7 +678,184 @@ document.addEventListener('DOMContentLoaded', function() {
 
     discountTypeSelect.addEventListener('change', toggleDiscountFields);
     toggleDiscountFields(); // Initial state
+
+    // Category-based section visibility
+    const categoryCheckboxes = document.querySelectorAll('input[name="categories[]"]');
+    const coffeeSection = document.getElementById('coffee-attributes-section');
+    const customSection = document.getElementById('custom-attributes-section');
+
+    function updateAttributeSections() {
+        const selectedCategories = Array.from(categoryCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+
+        const isCoffee = selectedCategories.some(cat => ['espresso', 'filter', 'decaf'].includes(cat));
+        const isAccessory = selectedCategories.includes('accessories');
+
+        coffeeSection.style.display = isCoffee ? 'block' : 'none';
+        customSection.style.display = isAccessory ? 'block' : 'none';
+    }
+
+    categoryCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateAttributeSections);
+    });
+
+    updateAttributeSections();
 });
+
+// Custom attributes management
+let customAttrIndex = 0;
+
+function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = '') {
+    const container = document.getElementById('custom-attributes-container');
+    const index = customAttrIndex++;
+
+    const row = document.createElement('div');
+    row.className = 'grid grid-cols-12 gap-2 p-4 bg-white rounded-lg border border-blue-200 mb-3';
+    row.id = `custom-attr-${index}`;
+
+    row.innerHTML = `
+        <div class="col-span-3">
+            <label class="block text-xs font-medium text-coffee-900 mb-1">Název 🇨🇿</label>
+            <input type="text"
+                   name="custom_attributes[${index}][label_cs]"
+                   value="${labelCs}"
+                   placeholder="Materiál"
+                   class="input text-sm"
+                   required>
+        </div>
+        <div class="col-span-2">
+            <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
+                <span>Name 🇬🇧</span>
+                <button type="button"
+                        onclick="translateCustomLabel(${index})"
+                        class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
+                    →
+                </button>
+            </label>
+            <input type="text"
+                   name="custom_attributes[${index}][label_en]"
+                   value="${labelEn}"
+                   placeholder="Material"
+                   class="input text-sm"
+                   id="custom-attr-label-en-${index}">
+        </div>
+        <div class="col-span-3">
+            <label class="block text-xs font-medium text-coffee-900 mb-1">Hodnota 🇨🇿</label>
+            <input type="text"
+                   name="custom_attributes[${index}][value_cs]"
+                   value="${valueCs}"
+                   placeholder="Nerezová ocel"
+                   class="input text-sm"
+                   required
+                   id="custom-attr-value-cs-${index}">
+        </div>
+        <div class="col-span-3">
+            <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
+                <span>Value 🇬🇧</span>
+                <button type="button"
+                        onclick="translateCustomValue(${index})"
+                        class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
+                    →
+                </button>
+            </label>
+            <input type="text"
+                   name="custom_attributes[${index}][value_en]"
+                   value="${valueEn}"
+                   placeholder="Stainless steel"
+                   class="input text-sm"
+                   id="custom-attr-value-en-${index}">
+        </div>
+        <div class="col-span-1 flex items-end">
+            <button type="button"
+                    onclick="removeCustomAttribute(${index})"
+                    class="btn btn-sm bg-red-100 hover:bg-red-200 text-red-700 w-full">×</button>
+        </div>
+    `;
+
+    container.appendChild(row);
+}
+
+function removeCustomAttribute(index) {
+    const row = document.getElementById(`custom-attr-${index}`);
+    if (row) row.remove();
+}
+
+async function translateCustomLabel(index) {
+    const csInput = document.querySelector(`input[name="custom_attributes[${index}][label_cs]"]`);
+    const enInput = document.getElementById(`custom-attr-label-en-${index}`);
+
+    if (!csInput || !enInput) return;
+
+    const sourceText = csInput.value.trim();
+    if (!sourceText) {
+        alert('Nejprve vyplňte český název.');
+        return;
+    }
+
+    try {
+        const response = await fetch('{{ route("admin.translate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                text: sourceText,
+                source_lang: 'CS',
+                target_lang: 'EN'
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            enInput.value = data.translation;
+            enInput.classList.add('ring-2', 'ring-green-500');
+            setTimeout(() => enInput.classList.remove('ring-2', 'ring-green-500'), 1500);
+        }
+    } catch (error) {
+        console.error('Translation error:', error);
+    }
+}
+
+async function translateCustomValue(index) {
+    const csInput = document.getElementById(`custom-attr-value-cs-${index}`);
+    const enInput = document.getElementById(`custom-attr-value-en-${index}`);
+
+    if (!csInput || !enInput) return;
+
+    const sourceText = csInput.value.trim();
+    if (!sourceText) {
+        alert('Nejprve vyplňte českou hodnotu.');
+        return;
+    }
+
+    try {
+        const response = await fetch('{{ route("admin.translate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                text: sourceText,
+                source_lang: 'CS',
+                target_lang: 'EN'
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            enInput.value = data.translation;
+            enInput.classList.add('ring-2', 'ring-green-500');
+            setTimeout(() => enInput.classList.remove('ring-2', 'ring-green-500'), 1500);
+        }
+    } catch (error) {
+        console.error('Translation error:', error);
+    }
+}
 </script>
 @endsection
 

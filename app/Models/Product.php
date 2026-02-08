@@ -499,6 +499,92 @@ class Product extends Model
     {
         return count($this->getAllImages()) > 1;
     }
+
+    /**
+     * Check if product is coffee (espresso, filter, or decaf)
+     */
+    public function isCoffee(): bool
+    {
+        if (!is_array($this->category)) {
+            return false;
+        }
+
+        $coffeeCategories = ['espresso', 'filter', 'decaf'];
+        return !empty(array_intersect($this->category, $coffeeCategories));
+    }
+
+    /**
+     * Check if product is accessory
+     */
+    public function isAccessory(): bool
+    {
+        if (!is_array($this->category)) {
+            return false;
+        }
+
+        return in_array('accessories', $this->category);
+    }
+
+    /**
+     * Get coffee-specific attribute keys (fixed schema)
+     */
+    public function getCoffeeAttributes(): array
+    {
+        return [
+            'origin', 'altitude', 'processing', 'variety',
+            'flavor_notes', 'weight', 'roast_date'
+        ];
+    }
+
+    /**
+     * Get custom attribute keys (for accessories)
+     * Returns keys based on _label pattern (e.g., "material" from "material_label")
+     */
+    public function getCustomAttributeKeys(): array
+    {
+        $attrs = $this->getAttribute('attributes');
+
+        if (!$attrs || !is_array($attrs)) {
+            return [];
+        }
+
+        $allKeys = array_keys($attrs);
+        $customKeys = [];
+
+        // Find all keys ending with _label (these are custom parameter labels)
+        foreach ($allKeys as $key) {
+            if (str_ends_with($key, '_label') && !str_ends_with($key, '_label_en')) {
+                // Extract base key: "material_label" -> "material"
+                $baseKey = str_replace('_label', '', $key);
+                $customKeys[] = $baseKey;
+            }
+        }
+
+        return array_values($customKeys);
+    }
+
+    /**
+     * Get all custom attributes with translations
+     * Returns array of ['key' => string, 'label_cs' => string, 'label_en' => string|null, 'value_cs' => string, 'value_en' => string|null]
+     */
+    public function getCustomAttributes(): array
+    {
+        $keys = $this->getCustomAttributeKeys();
+        $attrs = $this->getAttribute('attributes') ?? [];
+        $result = [];
+
+        foreach ($keys as $key) {
+            $result[] = [
+                'key' => $key,
+                'label_cs' => $attrs[$key . '_label'] ?? ucfirst(str_replace('_', ' ', $key)),
+                'label_en' => $attrs[$key . '_label_en'] ?? null,
+                'value_cs' => $attrs[$key] ?? '',
+                'value_en' => $attrs[$key . '_en'] ?? null,
+            ];
+        }
+
+        return $result;
+    }
 }
 
 
