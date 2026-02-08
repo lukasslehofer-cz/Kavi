@@ -461,13 +461,43 @@ class Product extends Model
         }
 
         $productIds = array_keys($cart);
-        
+
         // Count products that are NOT digital
         $nonDigitalCount = self::whereIn('id', $productIds)
             ->where('is_digital', false)
             ->count();
 
         return $nonDigitalCount === 0;
+    }
+
+    /**
+     * Get the main product image (first in gallery or legacy fallback)
+     */
+    public function getMainImage(): ?string
+    {
+        if (!empty($this->images) && is_array($this->images)) {
+            return $this->images[0] ?? null;
+        }
+        return $this->image; // Legacy fallback
+    }
+
+    /**
+     * Get all product images as array
+     */
+    public function getAllImages(): array
+    {
+        if (!empty($this->images) && is_array($this->images)) {
+            return $this->images;
+        }
+        return $this->image ? [$this->image] : [];
+    }
+
+    /**
+     * Check if product has gallery (more than 1 image)
+     */
+    public function hasGallery(): bool
+    {
+        return count($this->getAllImages()) > 1;
     }
 }
 

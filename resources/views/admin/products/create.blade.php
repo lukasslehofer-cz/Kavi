@@ -40,21 +40,20 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-coffee-900 mb-2">Fotka produktu</label>
-                <input type="file" name="image" accept="image/*" 
-                       class="input @error('image') border-red-500 @enderror"
-                       onchange="previewImage(event)">
-                
-                <div id="image-preview" class="mt-4 hidden">
-                    <p class="text-sm text-coffee-600 mb-2">Náhled:</p>
-                    <img id="preview" src="" alt="Náhled" 
-                         class="w-48 h-48 object-cover rounded-lg border-2 border-primary-300">
-                </div>
-                
-                @error('image')
+                <label class="block text-sm font-medium text-coffee-900 mb-2">Galerie produktu (max 4 fotky)</label>
+
+                <input type="file" name="gallery[]" accept="image/*" multiple
+                       class="input @error('gallery.*') border-red-500 @enderror"
+                       onchange="previewGallery(event)">
+
+                <div id="gallery-preview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+                @error('gallery.*')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
-                <p class="text-xs text-coffee-600 mt-1">Podporované formáty: JPG, PNG, GIF. Maximální velikost: 2MB</p>
+                <p class="text-xs text-coffee-600 mt-1">
+                    <strong>První fotka bude hlavní.</strong> Podporované formáty: JPG, PNG, GIF, WebP. Max: 2MB na fotku, max 4 fotky celkem.
+                </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -505,18 +504,37 @@
 </div>
 
 <script>
-function previewImage(event) {
-    const preview = document.getElementById('preview');
-    const previewContainer = document.getElementById('image-preview');
-    const file = event.target.files[0];
-    
-    if (file) {
+function previewGallery(event) {
+    const preview = document.getElementById('gallery-preview');
+    const files = Array.from(event.target.files).slice(0, 4); // Max 4
+
+    preview.innerHTML = '';
+
+    if (files.length === 0) return;
+
+    files.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = function(e) {
-            preview.src = e.target.result;
-            previewContainer.classList.remove('hidden');
+            const div = document.createElement('div');
+            div.className = 'relative';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="Gallery ${index + 1}"
+                     class="w-full h-32 object-cover rounded-lg border-2 border-blue-500">
+                <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                    ${index === 0 ? 'HLAVNÍ' : index + 1}
+                </span>
+            `;
+            preview.appendChild(div);
         }
         reader.readAsDataURL(file);
+    });
+
+    // Show capacity indicator
+    if (files.length > 0) {
+        const capacityDiv = document.createElement('div');
+        capacityDiv.className = 'col-span-full text-xs text-coffee-600 text-center pt-2';
+        capacityDiv.textContent = `${files.length}/4 fotky nahráno`;
+        preview.appendChild(capacityDiv);
     }
 }
 

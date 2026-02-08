@@ -42,30 +42,60 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-900 mb-2">Fotka produktu</label>
-                
-                @if($product->image)
+                <label class="block text-sm font-medium text-gray-900 mb-2">Galerie produktu (max 4 fotky celkem)</label>
+
+                @php
+                    $currentImages = $product->images ?? ($product->image ? [$product->image] : []);
+                @endphp
+
+                @if(count($currentImages) > 0)
                 <div class="mb-4">
-                    <p class="text-sm text-gray-600 mb-2">Aktuální fotka:</p>
-                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" 
-                         class="w-48 h-48 object-cover rounded-lg border-2 border-gray-300">
+                    <p class="text-sm text-gray-600 mb-2">Aktuální galerie:</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        @foreach($currentImages as $index => $galleryImage)
+                        <div class="relative">
+                            <img src="{{ asset($galleryImage) }}" alt="Gallery {{ $index + 1 }}"
+                                 class="w-full h-32 object-cover rounded-lg border-2 border-gray-300">
+                            @if($index === 0)
+                            <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                                HLAVNÍ
+                            </span>
+                            @endif
+                            <label class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded cursor-pointer hover:bg-red-700">
+                                <input type="checkbox" name="remove_gallery[]" value="{{ $galleryImage }}" class="mr-1">
+                                Smazat
+                            </label>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
                 @endif
-                
-                <input type="file" name="image" accept="image/*" 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('image') border-red-500 @enderror"
-                       onchange="previewImage(event)">
-                
-                <div id="image-preview" class="mt-4 hidden">
-                    <p class="text-sm text-gray-600 mb-2">Náhled nové fotky:</p>
-                    <img id="preview" src="" alt="Náhled" 
-                         class="w-48 h-48 object-cover rounded-lg border-2 border-primary-300">
-                </div>
-                
-                @error('image')
+
+                <input type="file" name="gallery[]" accept="image/*" multiple
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('gallery.*') border-red-500 @enderror"
+                       onchange="previewGallery(event)">
+
+                <div id="gallery-preview" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+                @error('gallery.*')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
-                <p class="text-xs text-gray-600 mt-1">Podporované formáty: JPG, PNG, GIF. Maximální velikost: 2MB</p>
+
+                <p class="text-xs text-gray-600 mt-1">
+                    <strong>První fotka v galerii bude hlavní.</strong> Můžete přidat nové fotky (max 4 celkem).
+                    Zaškrtněte fotky, které chcete smazat. Podporované formáty: JPG, PNG, GIF, WebP. Max: 2MB.
+                </p>
+
+                @if(count($currentImages) > 0)
+                <p class="text-xs text-blue-600 mt-2">
+                    Aktuálně máte {{ count($currentImages) }}/4 fotek.
+                    @if(count($currentImages) < 4)
+                        Můžete přidat ještě {{ 4 - count($currentImages) }}.
+                    @else
+                        Galerie je plná.
+                    @endif
+                </p>
+                @endif
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -558,19 +588,30 @@
 </div>
 
 <script>
-function previewImage(event) {
-    const preview = document.getElementById('preview');
-    const previewContainer = document.getElementById('image-preview');
-    const file = event.target.files[0];
-    
-    if (file) {
+function previewGallery(event) {
+    const preview = document.getElementById('gallery-preview');
+    const files = Array.from(event.target.files).slice(0, 4);
+
+    preview.innerHTML = '';
+
+    if (files.length === 0) return;
+
+    files.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = function(e) {
-            preview.src = e.target.result;
-            previewContainer.classList.remove('hidden');
+            const div = document.createElement('div');
+            div.className = 'relative';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="Nová ${index + 1}"
+                     class="w-full h-32 object-cover rounded-lg border-2 border-green-500">
+                <span class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                    Nová ${index + 1}
+                </span>
+            `;
+            preview.appendChild(div);
         }
         reader.readAsDataURL(file);
-    }
+    });
 }
 
 // AI Translation function

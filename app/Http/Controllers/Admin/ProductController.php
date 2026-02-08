@@ -158,7 +158,7 @@ class ProductController extends Controller
             'categories' => 'required|array',
             'categories.*' => 'in:espresso,filter,decaf,accessories',
             'roastery_id' => 'nullable|exists:roasteries,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'free_shipping' => 'boolean',
@@ -237,12 +237,20 @@ class ProductController extends Controller
             unset($validated[$field]);
         }
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/products'), $filename);
-            $validated['image'] = 'images/products/' . $filename;
+        // Handle gallery images (max 4)
+        if ($request->hasFile('gallery')) {
+            $galleryPaths = [];
+            $galleryFiles = array_slice($request->file('gallery'), 0, 4); // Max 4 images
+
+            foreach ($galleryFiles as $index => $file) {
+                $filename = time() . '_gallery_' . $index . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/products/gallery'), $filename);
+                $galleryPaths[] = 'images/products/gallery/' . $filename;
+            }
+
+            $validated['images'] = $galleryPaths;
+            // Backwards compatibility: set first image as main
+            $validated['image'] = $galleryPaths[0] ?? null;
         }
 
         Product::create($validated);
@@ -280,7 +288,8 @@ class ProductController extends Controller
             'categories' => 'required|array',
             'categories.*' => 'in:espresso,filter,decaf,accessories',
             'roastery_id' => 'nullable|exists:roasteries,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'remove_gallery' => 'nullable|array',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'free_shipping' => 'boolean',
@@ -359,18 +368,38 @@ class ProductController extends Controller
             unset($validated[$field]);
         }
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($product->image && file_exists(public_path($product->image))) {
-                unlink(public_path($product->image));
+        // Handle gallery images
+        $existingGallery = $product->images ?? [];
+
+        // Remove selected gallery images
+        if ($request->has('remove_gallery')) {
+            foreach ($request->remove_gallery as $imageToRemove) {
+                if (($key = array_search($imageToRemove, $existingGallery)) !== false) {
+                    // Delete file from disk
+                    if (file_exists(public_path($imageToRemove))) {
+                        unlink(public_path($imageToRemove));
+                    }
+                    unset($existingGallery[$key]);
+                }
             }
-            
-            $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/products'), $filename);
-            $validated['image'] = 'images/products/' . $filename;
+            $existingGallery = array_values($existingGallery); // Reindex array
         }
+
+        // Add new gallery images (max 4 total)
+        if ($request->hasFile('gallery')) {
+            $remainingSlots = 4 - count($existingGallery);
+            $newFiles = array_slice($request->file('gallery'), 0, $remainingSlots);
+
+            foreach ($newFiles as $index => $file) {
+                $filename = time() . '_gallery_' . $index . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/products/gallery'), $filename);
+                $existingGallery[] = 'images/products/gallery/' . $filename;
+            }
+        }
+
+        $validated['images'] = $existingGallery;
+        // Backwards compatibility: set first image as main
+        $validated['image'] = $existingGallery[0] ?? $product->image;
 
         $product->update($validated);
 
@@ -384,7 +413,16 @@ class ProductController extends Controller
         if ($product->image && file_exists(public_path($product->image))) {
             unlink(public_path($product->image));
         }
-        
+
+        // Delete gallery images
+        if ($product->images) {
+            foreach ($product->images as $image) {
+                if (file_exists(public_path($image))) {
+                    unlink(public_path($image));
+                }
+            }
+        }
+
         $product->delete();
 
         return redirect()->route('admin.products.index')

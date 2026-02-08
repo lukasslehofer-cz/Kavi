@@ -61,6 +61,9 @@ CLAUDE.md
 # Uploaded images (user content)
 /public/images/products/*
 !/public/images/products/.gitkeep
+!/public/images/products/gallery/
+/public/images/products/gallery/*
+!/public/images/products/gallery/.gitkeep
 /public/images/roasteries/*
 !/public/images/roasteries/.gitkeep
 /public/images/promo-images/*

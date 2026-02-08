@@ -121,25 +121,62 @@
   <div class="relative">
     <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[80vh]">
       
-      <!-- Left Side - Product Photo (sticky to menu bottom) -->
-      <div class="lg:col-span-6 relative lg:sticky lg:top-[64px] lg:h-[calc(100vh-64px)]">
-        <div class="h-full w-full overflow-hidden" style="background-color: #e5e6df;">
-          @if($product->image)
-          <img src="{{ asset($product->image) }}" 
-               alt="{{ $product->getName() }}" 
-               class="w-full h-full object-contain p-8 lg:p-12">
-          @else
-          <div class="w-full h-full flex items-center justify-center">
-            <span class="font-display text-4xl text-warm-400 uppercase tracking-tight">{{ $product->getName() }}</span>
+      <!-- Left Side - Product Photo Gallery (sticky to menu bottom) -->
+      <div class="lg:col-span-6 relative lg:sticky lg:top-[64px] lg:max-h-[calc(100vh-64px)]">
+        <div class="w-full min-h-[60vh] lg:min-h-[80vh] flex flex-col" style="background-color: #e5e6df;">
+
+          @php
+              $allImages = $product->getAllImages();
+              $hasGallery = count($allImages) > 1;
+          @endphp
+
+          <!-- Main Image Container -->
+          <div class="flex-1 relative flex items-center justify-center">
+            @if(count($allImages) > 0)
+            <img id="main-product-image"
+                 src="{{ asset($allImages[0]) }}"
+                 alt="{{ $product->getName() }}"
+                 style="max-height: {{ $hasGallery ? 'calc(100vh - 64px - 150px)' : 'calc(100vh - 64px)' }};"
+                 class="w-full object-contain p-8 lg:p-12 transition-opacity duration-300">
+            @else
+            <div class="w-full h-full flex items-center justify-center">
+              <span class="font-display text-4xl text-warm-400 uppercase tracking-tight">{{ $product->getName() }}</span>
+            </div>
+            @endif
+
+            <!-- Discount Badge -->
+            @if($product->shouldShowDiscountPercentage())
+            <div class="absolute top-4 right-4 lg:top-8 lg:right-8 z-10">
+              <span class="text-xs uppercase tracking-widest text-primary-500 bg-[#e5e6df] px-2 py-1">-{{ $product->getDiscountPercentage() }}%</span>
+            </div>
+            @endif
+          </div>
+
+          <!-- Thumbnail Navigation -->
+          @if($hasGallery)
+          <div class="flex-shrink-0 px-4 pb-4 lg:px-8 lg:pb-6 relative z-20">
+            <div class="flex gap-2 justify-center">
+              @foreach($allImages as $index => $image)
+              <button type="button"
+                      onclick="switchImage('{{ asset($image) }}', {{ $index }})"
+                      class="gallery-thumb w-16 h-16 lg:w-20 lg:h-20 border-2 transition-all cursor-pointer {{ $index === 0 ? 'border-dark-800' : 'border-gray-300 hover:border-gray-400' }}"
+                      data-thumb-index="{{ $index }}">
+                <img src="{{ asset($image) }}"
+                     alt="{{ $product->getName() }} - {{ $index + 1 }}"
+                     class="w-full h-full object-cover pointer-events-none">
+              </button>
+              @endforeach
+            </div>
+
+            <!-- Image Counter -->
+            <div class="text-center mt-2">
+              <span id="image-counter" class="text-xs uppercase tracking-widest text-warm-500">
+                1/{{ count($allImages) }}
+              </span>
+            </div>
           </div>
           @endif
-          
-          <!-- Discount Badge -->
-          @if($product->shouldShowDiscountPercentage())
-          <div class="absolute top-4 right-4 lg:top-8 lg:right-8">
-            <span class="text-xs uppercase tracking-widest text-primary-500 bg-[#e5e6df] px-2 py-1">-{{ $product->getDiscountPercentage() }}%</span>
-          </div>
-          @endif
+
         </div>
       </div>
       
@@ -431,6 +468,41 @@
   </div>
 
 </div>
+
+{{-- Gallery Image Switcher --}}
+<script>
+function switchImage(imageUrl, index) {
+    // Fade out effect
+    const mainImage = document.getElementById('main-product-image');
+    mainImage.style.opacity = '0';
+
+    setTimeout(() => {
+        // Change image
+        mainImage.src = imageUrl;
+
+        // Fade in effect
+        mainImage.style.opacity = '1';
+
+        // Update active thumbnail border
+        document.querySelectorAll('.gallery-thumb').forEach((thumb, i) => {
+            if (i === index) {
+                thumb.classList.remove('border-gray-300', 'hover:border-gray-400');
+                thumb.classList.add('border-dark-800');
+            } else {
+                thumb.classList.remove('border-dark-800');
+                thumb.classList.add('border-gray-300', 'hover:border-gray-400');
+            }
+        });
+
+        // Update counter
+        const counter = document.getElementById('image-counter');
+        if (counter) {
+            const totalImages = document.querySelectorAll('.gallery-thumb').length;
+            counter.textContent = `${index + 1}/${totalImages}`;
+        }
+    }, 150);
+}
+</script>
 
 {{-- Enhanced Ecommerce: add_to_cart event for GTM/FB Pixel --}}
 <script>
