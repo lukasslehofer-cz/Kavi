@@ -62,8 +62,9 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        // If product is coffee of month, not active, or doesn't have price in current currency - 404
-        if ($product->is_coffee_of_month || !$product->is_active || !$product->hasPriceInCurrentCurrency()) {
+        // If product is coffee of month or doesn't have price in current currency - 404
+        // Inactive products remain accessible for SEO purposes
+        if ($product->is_coffee_of_month || !$product->hasPriceInCurrentCurrency()) {
             abort(404);
         }
 

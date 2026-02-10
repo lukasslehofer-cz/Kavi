@@ -42,7 +42,16 @@
 @php
     $productPrice = $product->isOnSale() ? $product->sale_price : $product->price;
     $currency = $currentLocale === 'en' ? 'EUR' : 'CZK';
-    $availability = $product->stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
+
+    // Determine availability status for Schema.org
+    if (!$product->is_active) {
+        $availability = 'https://schema.org/Discontinued';
+    } elseif ($product->stock > 0) {
+        $availability = 'https://schema.org/InStock';
+    } else {
+        $availability = 'https://schema.org/OutOfStock';
+    }
+
     $productImageUrl = $product->image ? url($product->image) : $siteUrl . '/images/og-image.jpg';
     $brandName = $product->roastery ? $product->roastery->getName() : ($product->attributes['roaster'] ?? ($product->attributes['manufacturer'] ?? 'KAVI'));
 @endphp
@@ -196,7 +205,12 @@
         
         <!-- Availability Status -->
         <div class="mb-4">
-          @if($product->stock > 0)
+          @if(!$product->is_active)
+          <span class="text-xs uppercase tracking-widest text-dark-800">
+            <span class="inline-block w-1.5 h-1.5 bg-gray-500 rounded-full mr-1"></span>
+            {{ $currentLocale === 'en' ? 'NO LONGER AVAILABLE' : 'UŽ NENÍ V NABÍDCE' }}
+          </span>
+          @elseif($product->stock > 0)
           <span class="text-xs uppercase tracking-widest text-dark-800">
             <span class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
             {{ $currentLocale === 'en' ? 'AVAILABILITY: IN STOCK' : 'DOSTUPNOST: SKLADEM' }}
@@ -235,6 +249,7 @@
         @endif
         
         <!-- Price - Prominent Technical Style -->
+        @if($product->is_active)
         <div class="mb-8">
           @if($product->isOnSale())
           <div class="flex flex-wrap items-baseline gap-3">
@@ -245,6 +260,7 @@
           <span class="font-display text-2xl sm:text-3xl uppercase tracking-tight text-dark-800">{{ $product->getFormattedPrice() }} —</span>
           @endif
         </div>
+        @endif
         
         <!-- Short Description -->
         @if($product->getShortDescription())
@@ -254,10 +270,10 @@
         @endif
         
         <!-- Purchase Configuration -->
-        @if($product->isInStock())
+        @if($product->is_active && $product->isInStock())
         <form id="add-to-cart-form" action="{{ localizedRoute('cart.add', $product) }}" method="POST" class="mb-12">
           @csrf
-          
+
           <!-- Quantity Selector - Simple Row -->
           <div class="mb-6">
             <span class="block text-xs uppercase tracking-widest text-warm-500 mb-3">
@@ -274,13 +290,22 @@
               @endfor
             </div>
           </div>
-          
+
           <!-- Add to Cart - Black Button -->
           <button type="submit" class="inline-flex items-center justify-center gap-2 bg-dark-800 text-white font-display uppercase tracking-widest px-8 py-4 hover:bg-dark-900 transition-all">
             <span>{{ $currentLocale === 'en' ? 'Add to Cart' : 'Přidat do košíku' }}</span>
             <span>→</span>
           </button>
         </form>
+        @elseif(!$product->is_active)
+        <div class="mb-12">
+          <p class="text-sm text-warm-600 font-light leading-relaxed max-w-lg">
+            {{ $currentLocale === 'en'
+              ? 'This product is no longer available for purchase. You can explore similar products in the recommended section below or browse our current selection.'
+              : 'Tento produkt již není v prodeji. Můžete prozkoumat podobné produkty v doporučené sekci níže nebo procházet naši aktuální nabídku.'
+            }}
+          </p>
+        </div>
         @else
         <div class="mb-12">
           <p class="text-xs uppercase tracking-widest text-warm-500">
