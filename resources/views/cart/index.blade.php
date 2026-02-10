@@ -357,7 +357,7 @@
                             </p>
                             
                             <!-- Product Name -->
-                            <h3 class="font-display text-base sm:text-lg font-normal text-dark-800 uppercase tracking-tight pt-[5px] pb-[8px] group-hover:text-primary-500 transition-colors line-clamp-2" style="line-height: 1.25;">{{ $product->getName() }}</h3>
+                            <h3 class="font-display text-base sm:text-lg font-normal text-dark-800 uppercase tracking-tight pt-[5px] pb-[8px] group-hover:text-primary-500 transition-colors line-clamp-3 sm:line-clamp-2" style="line-height: 1.25;">{{ $product->getName() }}</h3>
                             
                             <!-- Technical Info: Roastery · Flavor -->
                             <p class="text-xs uppercase tracking-widest text-warm-500 leading-tight">
