@@ -39,7 +39,12 @@
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ url()->current() }}">
-    
+
+    <!-- Google Search Console Verification -->
+    @if(config('services.google.search_console_verification'))
+    <meta name="google-site-verification" content="{{ config('services.google.search_console_verification') }}">
+    @endif
+
     <!-- Structured Data (JSON-LD) -->
     @yield('structured_data')
     

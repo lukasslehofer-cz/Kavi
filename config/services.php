@@ -73,6 +73,10 @@ return [
         'list_id' => env('ECOMAIL_LIST_ID'),
     ],
 
+    'google' => [
+        'search_console_verification' => env('GOOGLE_SEARCH_CONSOLE_VERIFICATION'),
+    ],
+
 ];
 
 

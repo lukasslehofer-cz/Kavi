@@ -9,6 +9,8 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\GoogleMerchantFeedController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\RobotsTxtController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +27,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/feed/heureka.xml', [FeedController::class, 'heureka'])->name('feed.heureka');
 Route::get('/feed/google-merchant.xml', [GoogleMerchantFeedController::class, 'index'])->name('feed.google-merchant');
 Route::get('/feed/facebook-catalog.xml', [FacebookCatalogFeedController::class, 'index'])->name('feed.facebook-catalog');
+
+// Sitemaps (technical routes - domain-specific, not localized)
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-static.xml', [SitemapController::class, 'static'])->name('sitemap.static');
+Route::get('/sitemap-products.xml', [SitemapController::class, 'products'])->name('sitemap.products');
+Route::get('/sitemap-roasteries.xml', [SitemapController::class, 'roasteries'])->name('sitemap.roasteries');
+Route::get('/sitemap-blog.xml', [SitemapController::class, 'blog'])->name('sitemap.blog');
+
+// Robots.txt (domain-specific)
+Route::get('/robots.txt', [RobotsTxtController::class, 'index'])->name('robots.txt');
 
 // Coupon activation from link (code is universal)
 Route::get('/code/{code}', [CouponController::class, 'activateFromLink'])->name('coupon.activate');
