@@ -20,6 +20,7 @@ class Product extends Model
         'short_description_en',
         'price',
         'price_eur',
+        'vat_rate',
         'stock',
         'image',
         'images',
@@ -47,6 +48,7 @@ class Product extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'price_eur' => 'decimal:2',
+        'vat_rate' => 'decimal:2',
         'stock' => 'integer',
         'images' => 'array',
         'attributes' => 'array',
@@ -523,6 +525,16 @@ class Product extends Model
         }
 
         return in_array('accessories', $this->category);
+    }
+
+    /**
+     * Get automatic VAT rate based on product category
+     * Coffee products (espresso, filter, decaf) → 12%
+     * Accessories and others → 21%
+     */
+    public function getAutoVatRate(): float
+    {
+        return $this->isCoffee() ? 12.00 : 21.00;
     }
 
     /**

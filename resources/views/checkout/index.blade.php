@@ -903,7 +903,13 @@
                     
                     <!-- VAT -->
                     <div class="flex justify-between items-baseline">
-                        <dt class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.vat') }}</dt>
+                        @php
+                            $uniqueVatRates = collect($cartItems)->pluck('product.vat_rate')->unique();
+                            $vatLabel = $uniqueVatRates->count() === 1
+                                ? 'DPH (' . number_format($uniqueVatRates->first(), 0) . '%)'
+                                : 'DPH';
+                        @endphp
+                        <dt class="text-xs uppercase tracking-widest text-olive-600">{{ $vatLabel }}</dt>
                         <dd class="text-sm text-dark-800 uppercase tracking-wide">{{ \App\Helpers\CurrencyHelper::formatAmount($vat, 2) }}</dd>
                     </div>
 

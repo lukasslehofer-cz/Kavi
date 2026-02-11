@@ -188,7 +188,13 @@
                             @endif
                             <tr>
                                 <td colspan="3" class="px-6 py-4 text-right font-medium text-gray-900">
-                                    DPH (21%):
+                                    @php
+                                        $uniqueVatRates = $order->items->pluck('vat_rate')->unique();
+                                        $vatLabel = $uniqueVatRates->count() === 1
+                                            ? 'DPH (' . number_format($uniqueVatRates->first(), 0) . '%)'
+                                            : 'DPH';
+                                    @endphp
+                                    {{ $vatLabel }}:
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">
                                     {!! \App\Helpers\CurrencyHelper::formatByCurrency($order->tax, $order->currency, 2) !!}

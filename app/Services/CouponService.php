@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\VatHelper;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\Order;
@@ -69,17 +70,18 @@ class CouponService
 
     /**
      * Aplikuje kupón na objednávku a vrátí upravené ceny
-     * 
+     *
      * @param Coupon $coupon
      * @param float $subtotal Celková cena produktů
      * @param float $shipping Cena dopravy
      * @param float|null $discountableSubtotal Cena produktů, na které se vztahuje sleva (null = použít subtotal)
+     * @param array|null $items Pole položek s 'total' a 'vat_rate' pro proporcionální výpočet DPH
      */
-    public function applyToOrder(Coupon $coupon, float $subtotal, float $shipping, ?float $discountableSubtotal = null): array
+    public function applyToOrder(Coupon $coupon, float $subtotal, float $shipping, ?float $discountableSubtotal = null, ?array $items = null): array
     {
         $discount = 0;
         $freeShipping = false;
-        
+
         // Pokud není specifikován discountableSubtotal, použít celý subtotal
         $discountableAmount = $discountableSubtotal ?? $subtotal;
 
@@ -97,9 +99,46 @@ class CouponService
         $newSubtotal = $subtotal - $discount;
         $newTotal = $newSubtotal + $shipping;
 
-        // Přepočet DPH (ceny včetně 21% DPH)
-        $totalWithoutVat = round($newTotal / 1.21, 2);
-        $vat = round($newTotal - $totalWithoutVat, 2);
+        // Proporcionální výpočet DPH pokud jsou poskytnuty položky
+        if ($items !== null && !empty($items)) {
+            // Agregovat položky podle DPH sazeb
+            $itemsByVatRate = [];
+            foreach ($items as $item) {
+                $vatRate = $item['vat_rate'];
+                if (!isset($itemsByVatRate[$vatRate])) {
+                    $itemsByVatRate[$vatRate] = 0;
+                }
+                $itemsByVatRate[$vatRate] += $item['total'];
+            }
+
+            $totalNet = 0;
+            $vat = 0;
+
+            // DPH z položek po slevě
+            foreach ($itemsByVatRate as $vatRate => $amount) {
+                $proportion = $amount / $subtotal;
+                $discountPortion = $discount * $proportion;
+                $amountAfterDiscount = $amount - $discountPortion;
+
+                $totalNet += VatHelper::calculateNet($amountAfterDiscount, $vatRate);
+                $vat += VatHelper::calculateVat($amountAfterDiscount, $vatRate);
+            }
+
+            // DPH z dopravy (proporcionální rozdělení)
+            if ($shipping > 0) {
+                $shippingByVat = VatHelper::calculateProportionalShipping($itemsByVatRate, $shipping);
+                foreach ($shippingByVat as $vatRate => $shippingPortion) {
+                    $totalNet += VatHelper::calculateNet($shippingPortion, $vatRate);
+                    $vat += VatHelper::calculateVat($shippingPortion, $vatRate);
+                }
+            }
+
+            $totalWithoutVat = $totalNet;
+        } else {
+            // Fallback na starý výpočet pokud items nejsou poskytnuty
+            $totalWithoutVat = round($newTotal / 1.21, 2);
+            $vat = round($newTotal - $totalWithoutVat, 2);
+        }
 
         return [
             'discount' => $discount,
@@ -120,9 +159,10 @@ class CouponService
         $discount = $coupon->calculateSubscriptionDiscount($price);
         $newPrice = $price - $discount;
 
-        // Přepočet DPH (ceny včetně 21% DPH)
-        $priceWithoutVat = round($newPrice / 1.21, 2);
-        $vat = round($newPrice - $priceWithoutVat, 2);
+        // Přepočet DPH - předplatné je vždy káva = 12% DPH
+        $subscriptionVatRate = 12.00;
+        $priceWithoutVat = VatHelper::calculateNet($newPrice, $subscriptionVatRate);
+        $vat = VatHelper::calculateVat($newPrice, $subscriptionVatRate);
 
         return [
             'discount' => $discount,

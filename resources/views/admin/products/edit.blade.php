@@ -163,9 +163,18 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-900 mb-2">Cena (EUR) <span class="text-sm text-gray-600">(pro kavibox.com)</span></label>
-                    <input type="number" name="price_eur" value="{{ old('price_eur', $product->price_eur) }}" step="0.01" min="0" 
+                    <input type="number" name="price_eur" value="{{ old('price_eur', $product->price_eur) }}" step="0.01" min="0"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('price_eur') border-red-500 @enderror">
                     @error('price_eur')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-900 mb-2">Sazba DPH (%) <span class="text-sm text-gray-600">(12% káva, 21% accessories)</span></label>
+                    <input type="number" name="vat_rate" value="{{ old('vat_rate', $product->vat_rate ?? 21) }}" step="0.01" min="0" max="100"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('vat_rate') border-red-500 @enderror">
+                    @error('vat_rate')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>

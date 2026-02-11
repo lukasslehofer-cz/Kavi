@@ -139,7 +139,13 @@
                         @endif
                         
                         <div class="flex justify-between items-center text-sm">
-                            <span class="text-xs uppercase tracking-widest text-warm-500">DPH (21%)</span>
+                            @php
+                                $uniqueVatRates = $order->items->pluck('vat_rate')->unique();
+                                $vatLabel = $uniqueVatRates->count() === 1
+                                    ? 'DPH (' . number_format($uniqueVatRates->first(), 0) . '%)'
+                                    : 'DPH';
+                            @endphp
+                            <span class="text-xs uppercase tracking-widest text-warm-500">{{ $vatLabel }}</span>
                             <span class="text-dark-800">{{ number_format($order->tax, 2, ',', ' ') }} Kč</span>
                         </div>
                         <div class="flex justify-between items-center pt-4 border-t border-dark-800">

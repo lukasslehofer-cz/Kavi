@@ -426,7 +426,14 @@
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #1c1c1c;">
                                 <tr>
                                     <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.order_confirmation.subtotal_without_vat', [], $locale) }}:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->subtotal / 1.21, $order->currency, 2) }}</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #1c1c1c; text-align: right;">
+                                        @php
+                                            $subtotalWithoutVat = $order->items->sum(function($item) {
+                                                return \App\Helpers\VatHelper::calculateNet($item->total, $item->vat_rate);
+                                            });
+                                        @endphp
+                                        {{ \App\Helpers\CurrencyHelper::formatByCurrency($subtotalWithoutVat, $order->currency, 2) }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.order_confirmation.vat', [], $locale) }}:</td>

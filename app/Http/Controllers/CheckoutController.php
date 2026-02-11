@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CurrencyHelper;
+use App\Helpers\VatHelper;
 use App\Mail\OrderConfirmation;
 use App\Models\Coupon;
 use App\Models\Order;
@@ -79,9 +80,11 @@ class CheckoutController extends Controller
                     'product' => $product,
                     'quantity' => $quantity,
                     'subtotal' => $itemSubtotal,
+                    'total' => $itemSubtotal,
+                    'vat_rate' => $product->vat_rate,
                 ];
                 $subtotal += $itemSubtotal;
-                
+
                 // Přičíst k discountable subtotal pouze pokud produkt není vyloučen ze slev
                 if (!$product->exclude_from_discounts) {
                     $discountableSubtotal += $itemSubtotal;
@@ -129,7 +132,7 @@ class CheckoutController extends Controller
             if ($result['valid']) {
                 $appliedCoupon = $result['coupon'];
                 // Předat discountableSubtotal pro výpočet slevy pouze z produktů bez vyloučení
-                $couponResult = $this->couponService->applyToOrder($appliedCoupon, $subtotal, $shipping, $discountableSubtotal);
+                $couponResult = $this->couponService->applyToOrder($appliedCoupon, $subtotal, $shipping, $discountableSubtotal, $cartItems);
                 
                 $discount = $couponResult['discount'];
                 $shipping = $couponResult['shipping'];
@@ -153,10 +156,37 @@ class CheckoutController extends Controller
         }
         
         if (!$appliedCoupon) {
-            // Bez kupónu - standardní výpočet
+            // Bez kupónu - dynamický výpočet DPH
+            $totalNet = 0;
+            $vat = 0;
+
+            // Agregovat podle DPH sazeb
+            $itemsByVatRate = [];
+            foreach ($cartItems as $item) {
+                $vatRate = $item['vat_rate'];
+                if (!isset($itemsByVatRate[$vatRate])) {
+                    $itemsByVatRate[$vatRate] = 0;
+                }
+                $itemsByVatRate[$vatRate] += $item['total'];
+            }
+
+            // DPH z položek
+            foreach ($itemsByVatRate as $vatRate => $amount) {
+                $totalNet += VatHelper::calculateNet($amount, $vatRate);
+                $vat += VatHelper::calculateVat($amount, $vatRate);
+            }
+
+            // DPH z dopravy (proporcionální)
+            if ($shipping > 0) {
+                $shippingByVat = VatHelper::calculateProportionalShipping($itemsByVatRate, $shipping);
+                foreach ($shippingByVat as $vatRate => $shippingPortion) {
+                    $totalNet += VatHelper::calculateNet($shippingPortion, $vatRate);
+                    $vat += VatHelper::calculateVat($shippingPortion, $vatRate);
+                }
+            }
+
+            $totalWithoutVat = $totalNet;
             $totalWithVat = $subtotal + $shipping;
-            $totalWithoutVat = round($totalWithVat / 1.21, 2);
-            $vat = round($totalWithVat - $totalWithoutVat, 2);
         }
         
         // Calculate adjusted discount for display (same as sent to Stripe)
@@ -373,23 +403,33 @@ class CheckoutController extends Controller
             $subtotal = 0;
             $discountableSubtotal = 0; // Subtotal produktů, na které se vztahují slevy
             $orderItems = [];
+            $itemsByVatRate = []; // Pro výpočet proporcionální dopravy
 
             foreach ($cart as $productId => $quantity) {
                 $product = Product::find($productId);
                 if ($product && $product->is_active && $product->stock >= $quantity) {
                     $itemTotal = $product->getPrice() * $quantity;
+                    $vatRate = $product->vat_rate;
+
                     $subtotal += $itemTotal;
-                    
+
+                    // Agregovat podle DPH sazeb pro proporcionální dopravu
+                    if (!isset($itemsByVatRate[$vatRate])) {
+                        $itemsByVatRate[$vatRate] = 0;
+                    }
+                    $itemsByVatRate[$vatRate] += $itemTotal;
+
                     // Přičíst k discountable subtotal pouze pokud produkt není vyloučen ze slev
                     if (!$product->exclude_from_discounts) {
                         $discountableSubtotal += $itemTotal;
                     }
-                    
+
                     $orderItems[] = [
                         'product' => $product,
                         'quantity' => $quantity,
                         'price' => $product->getPrice(),
                         'total' => $itemTotal,
+                        'vat_rate' => $vatRate,
                     ];
                 }
             }
@@ -441,7 +481,7 @@ class CheckoutController extends Controller
                 if ($result['valid']) {
                     $coupon = $result['coupon'];
                     // Předat discountableSubtotal pro výpočet slevy pouze z produktů bez vyloučení
-                    $couponResult = $this->couponService->applyToOrder($coupon, $subtotal, $shipping, $discountableSubtotal);
+                    $couponResult = $this->couponService->applyToOrder($coupon, $subtotal, $shipping, $discountableSubtotal, $orderItems);
                     
                     $discount = $couponResult['discount'];
                     $shipping = $couponResult['shipping'];
@@ -449,26 +489,71 @@ class CheckoutController extends Controller
                     // CRITICAL: Pokud je addon objednávka, doprava MUSÍ být vždy 0
                     if ($shipWithSubscription) {
                         $shipping = 0;
-                        // Přepočítat celkovou cenu bez dopravy
+                        // Přepočítat celkovou cenu bez dopravy s dynamickým DPH
                         $totalWithVat = ($subtotal - $discount) + $shipping;
-                        $totalWithoutVat = round($totalWithVat / 1.21, 2);
-                        $tax = round($totalWithVat - $totalWithoutVat, 2);
+
+                        // Spočítat DPH proporcionálně podle položek
+                        $totalNet = 0;
+                        $tax = 0;
+                        foreach ($itemsByVatRate as $vatRate => $amount) {
+                            $proportion = $amount / $subtotal;
+                            $discountPortion = $discount * $proportion;
+                            $amountAfterDiscount = $amount - $discountPortion;
+
+                            $totalNet += VatHelper::calculateNet($amountAfterDiscount, $vatRate);
+                            $tax += VatHelper::calculateVat($amountAfterDiscount, $vatRate);
+                        }
+                        $totalWithoutVat = $totalNet;
                     } else {
                         $totalWithVat = $couponResult['total'];
                         $totalWithoutVat = $couponResult['total_without_vat'];
                         $tax = $couponResult['vat'];
                     }
                 } else {
-                    // Kupón není platný, pokračovat bez něj
+                    // Kupón není platný, pokračovat bez něj - dynamický výpočet DPH
+                    $totalNet = 0;
+                    $tax = 0;
+
+                    // DPH z položek
+                    foreach ($itemsByVatRate as $vatRate => $amount) {
+                        $totalNet += VatHelper::calculateNet($amount, $vatRate);
+                        $tax += VatHelper::calculateVat($amount, $vatRate);
+                    }
+
+                    // DPH z dopravy (proporcionální)
+                    if ($shipping > 0) {
+                        $shippingByVat = VatHelper::calculateProportionalShipping($itemsByVatRate, $shipping);
+                        foreach ($shippingByVat as $vatRate => $shippingPortion) {
+                            $totalNet += VatHelper::calculateNet($shippingPortion, $vatRate);
+                            $tax += VatHelper::calculateVat($shippingPortion, $vatRate);
+                        }
+                    }
+
+                    $totalWithoutVat = $totalNet;
                     $totalWithVat = $subtotal + $shipping;
-                    $totalWithoutVat = round($totalWithVat / 1.21, 2);
-                    $tax = round($totalWithVat - $totalWithoutVat, 2);
                 }
             } else {
-                // Bez kupónu
+                // Bez kupónu - dynamický výpočet DPH
+                $totalNet = 0;
+                $tax = 0;
+
+                // DPH z položek
+                foreach ($itemsByVatRate as $vatRate => $amount) {
+                    $totalNet += VatHelper::calculateNet($amount, $vatRate);
+                    $tax += VatHelper::calculateVat($amount, $vatRate);
+                }
+
+                // DPH z dopravy (proporcionální)
+                if ($shipping > 0) {
+                    $shippingByVat = VatHelper::calculateProportionalShipping($itemsByVatRate, $shipping);
+                    foreach ($shippingByVat as $vatRate => $shippingPortion) {
+                        $totalNet += VatHelper::calculateNet($shippingPortion, $vatRate);
+                        $tax += VatHelper::calculateVat($shippingPortion, $vatRate);
+                    }
+                }
+
+                $totalWithoutVat = $totalNet;
                 $totalWithVat = $subtotal + $shipping;
-                $totalWithoutVat = round($totalWithVat / 1.21, 2);
-                $tax = round($totalWithVat - $totalWithoutVat, 2);
             }
 
             // Pokud se posílá s předplatným, použít Packeta údaje z předplatného
@@ -582,6 +667,7 @@ class CheckoutController extends Controller
                     'price' => $item['price'],
                     'quantity' => $item['quantity'],
                     'total' => $item['total'],
+                    'vat_rate' => $item['vat_rate'],
                 ]);
 
                 // Decrease stock

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\CurrencyHelper;
+use App\Helpers\VatHelper;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
@@ -167,42 +168,66 @@ class FakturoidService
             // E-shop prices include VAT, use vat_price_mode=with_vat
             // With this mode, unit_price should contain the price WITH VAT
             // Fakturoid will calculate the base price and VAT from it
-            $vatRate = 21; // DPH 21%
-            
+
             // Use order's currency for invoice (stored at order creation time)
             $orderCurrency = $order->currency ?? 'CZK';
-            
+
             $unitName = $this->getLocalizedText('unit', $orderCurrency);
-            $lines = $order->items->map(function ($item) use ($vatRate, $unitName) {
+            $lines = $order->items->map(function ($item) use ($unitName) {
                 return [
                     'name' => $item->product_name,
                     'quantity' => (string)$item->quantity,
                     'unit_name' => $unitName,
                     'unit_price' => (string)$item->price, // Price WITH VAT when vat_price_mode=with_vat
-                    'vat_rate' => (string)$vatRate,
+                    'vat_rate' => (string)$item->vat_rate, // Dynamic VAT rate from order item
                 ];
             })->toArray();
 
-            // Add shipping as a line item if applicable
+            // Add shipping - proporcionálně podle DPH sazeb položek v objednávce
             if ($order->shipping > 0) {
-                $lines[] = [
-                    'name' => $this->getLocalizedText('shipping', $orderCurrency),
-                    'quantity' => '1',
-                    'unit_name' => $unitName,
-                    'unit_price' => (string)$order->shipping, // Price WITH VAT
-                    'vat_rate' => (string)$vatRate,
-                ];
+                // Spočítat proporcionální rozdělení dopravy
+                $itemsByVatRate = [];
+                foreach ($order->items as $item) {
+                    $vatRate = $item->vat_rate;
+                    if (!isset($itemsByVatRate[$vatRate])) {
+                        $itemsByVatRate[$vatRate] = 0;
+                    }
+                    $itemsByVatRate[$vatRate] += $item->total;
+                }
+
+                $shippingByVat = VatHelper::calculateProportionalShipping($itemsByVatRate, $order->shipping);
+
+                // Vytvořit line item pro každou DPH sazbu
+                foreach ($shippingByVat as $vatRate => $shippingPortion) {
+                    if ($shippingPortion > 0) {
+                        $shippingLabel = $this->getLocalizedText('shipping', $orderCurrency);
+                        if (count($shippingByVat) > 1) {
+                            // Pokud je více DPH sazeb, rozlišit je v názvu
+                            $shippingLabel .= ' (DPH ' . $vatRate . '%)';
+                        }
+
+                        $lines[] = [
+                            'name' => $shippingLabel,
+                            'quantity' => '1',
+                            'unit_name' => $unitName,
+                            'unit_price' => (string)$shippingPortion,
+                            'vat_rate' => (string)$vatRate,
+                        ];
+                    }
+                }
             }
 
             // Add discount as a negative line item if applicable
             if ($order->discount_amount > 0) {
+                // Použít nejvyšší DPH sazbu v objednávce (standardní praxe)
+                $highestVatRate = $order->items->max('vat_rate') ?? 21;
                 $discountName = $this->getLocalizedText('discount', $orderCurrency);
                 $lines[] = [
                     'name' => $discountName . ($order->coupon_code ? ' (' . $order->coupon_code . ')' : ''),
                     'quantity' => '1',
                     'unit_name' => $unitName,
                     'unit_price' => (string)(-$order->discount_amount), // Negative price WITH VAT
-                    'vat_rate' => (string)$vatRate,
+                    'vat_rate' => (string)$highestVatRate,
                 ];
             }
 
@@ -624,7 +649,8 @@ class FakturoidService
             // Subscription prices include VAT, use vat_price_mode=with_vat
             // With this mode, unit_price should contain the price WITH VAT
             // Fakturoid will calculate the base price and VAT from it
-            $vatRate = 21;
+            // Předplatné je vždy káva → 12% DPH
+            $vatRate = $subscription->vat_rate ?? 12.00;
             
             // Check if discount is active for this subscription
             // Discount is active if: discount_amount > 0 AND (unlimited OR months remaining > 0)
