@@ -331,6 +331,67 @@
                 <p class="text-gray-700">{{ $order->customer_notes }}</p>
             </div>
             @endif
+
+            <!-- Package Dimensions -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Rozměry balíku pro Packetu</h3>
+                    @if($order->canEditPackageDimensions())
+                    <button onclick="openEditOrderDimensionsModal({{ $order->id }}, {{ $order->package_length ?? 'null' }}, {{ $order->package_width ?? 'null' }}, {{ $order->package_height ?? 'null' }}, {{ $order->package_weight ?? 'null' }})"
+                            class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                        Upravit
+                    </button>
+                    @endif
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">Délka:</span>
+                        <span class="font-medium text-gray-900">
+                            @php
+                                $dimensions = $order->getPackageDimensions();
+                            @endphp
+                            {{ number_format($dimensions['length'], 1) }} cm
+                            @if(!$order->package_length)
+                            <span class="text-xs text-gray-500">(počítáno)</span>
+                            @endif
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Šířka:</span>
+                        <span class="font-medium text-gray-900">
+                            {{ number_format($dimensions['width'], 1) }} cm
+                            @if(!$order->package_width)
+                            <span class="text-xs text-gray-500">(počítáno)</span>
+                            @endif
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Výška:</span>
+                        <span class="font-medium text-gray-900">
+                            {{ number_format($dimensions['height'], 1) }} cm
+                            @if(!$order->package_height)
+                            <span class="text-xs text-gray-500">(počítáno)</span>
+                            @endif
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Hmotnost:</span>
+                        <span class="font-medium text-gray-900">
+                            {{ number_format($order->getPackageWeight(), 2) }} kg
+                            @if(!$order->package_weight)
+                            <span class="text-xs text-gray-500">(počítáno)</span>
+                            @endif
+                        </span>
+                    </div>
+                </div>
+
+                @if($order->packeta_shipment_status === 'submitted')
+                <div class="mt-3 text-xs text-gray-500 italic">
+                    Rozměry nelze měnit po odeslání do Packety
+                </div>
+                @endif
+            </div>
         </div>
 
         <!-- Sidebar -->
@@ -469,5 +530,131 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Order Dimensions Modal -->
+<div id="editOrderDimensionsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Upravit rozměry balíku</h3>
+                <button type="button" onclick="closeEditOrderDimensionsModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="editOrderDimensionsForm" class="space-y-4">
+                <input type="hidden" id="orderId" name="order_id">
+
+                <div>
+                    <label for="order_package_length" class="block text-sm font-medium text-gray-700">Délka (cm)</label>
+                    <input type="number" step="0.01" id="order_package_length" name="package_length" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="order_package_width" class="block text-sm font-medium text-gray-700">Šířka (cm)</label>
+                    <input type="number" step="0.01" id="order_package_width" name="package_width" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="order_package_height" class="block text-sm font-medium text-gray-700">Výška (cm)</label>
+                    <input type="number" step="0.01" id="order_package_height" name="package_height" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="order_package_weight" class="block text-sm font-medium text-gray-700">Hmotnost (kg)</label>
+                    <input type="number" step="0.01" id="order_package_weight" name="package_weight" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="order_admin_notes" class="block text-sm font-medium text-gray-700">Admin poznámka</label>
+                    <textarea id="order_admin_notes" name="admin_notes" rows="3"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div class="flex gap-2 mt-6">
+                    <button type="button" onclick="saveOrderDimensions()"
+                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Uložit
+                    </button>
+                    <button type="button" onclick="closeEditOrderDimensionsModal()"
+                            class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                        Zrušit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openEditOrderDimensionsModal(orderId, length, width, height, weight) {
+    document.getElementById('orderId').value = orderId;
+
+    // Get default calculated values from the dimensions display
+    const dimensionsDisplay = @json($order->getPackageDimensions());
+    const weightDisplay = {{ $order->getPackageWeight() }};
+
+    document.getElementById('order_package_length').value = length || dimensionsDisplay.length;
+    document.getElementById('order_package_width').value = width || dimensionsDisplay.width;
+    document.getElementById('order_package_height').value = height || dimensionsDisplay.height;
+    document.getElementById('order_package_weight').value = weight || weightDisplay;
+    document.getElementById('order_admin_notes').value = '';
+    document.getElementById('editOrderDimensionsModal').classList.remove('hidden');
+}
+
+function closeEditOrderDimensionsModal() {
+    document.getElementById('editOrderDimensionsModal').classList.add('hidden');
+}
+
+async function saveOrderDimensions() {
+    const orderId = document.getElementById('orderId').value;
+    const formData = {
+        package_length: parseFloat(document.getElementById('order_package_length').value),
+        package_width: parseFloat(document.getElementById('order_package_width').value),
+        package_height: parseFloat(document.getElementById('order_package_height').value),
+        package_weight: parseFloat(document.getElementById('order_package_weight').value),
+        admin_notes: document.getElementById('order_admin_notes').value,
+    };
+
+    try {
+        const response = await fetch(`/admin/orders/${orderId}/update-dimensions`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert(data.message);
+            closeEditOrderDimensionsModal();
+            location.reload(); // Refresh to show updated data
+        } else {
+            alert(data.message || 'Chyba při ukládání');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Nastala chyba při ukládání dat');
+    }
+}
+
+// Close modal on outside click
+document.getElementById('editOrderDimensionsModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditOrderDimensionsModal();
+    }
+});
+</script>
+
 @endsection
 

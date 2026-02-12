@@ -51,6 +51,10 @@ class Order extends Model
         'packeta_point_name',
         'packeta_point_address',
         'packeta_shipment_status',
+        'package_weight',
+        'package_length',
+        'package_width',
+        'package_height',
     ];
 
     protected $casts = [
@@ -68,6 +72,10 @@ class Order extends Model
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
         'packeta_sent_at' => 'datetime',
+        'package_weight' => 'decimal:2',
+        'package_length' => 'decimal:2',
+        'package_width' => 'decimal:2',
+        'package_height' => 'decimal:2',
     ];
 
     public function user()
@@ -161,6 +169,60 @@ class Order extends Model
         }
         
         return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get package dimensions as array for Packeta
+     * Returns custom values if set, otherwise calculates from items
+     */
+    public function getPackageDimensions(): array
+    {
+        // If custom dimensions are set, use them
+        if ($this->package_length && $this->package_width && $this->package_height) {
+            return [
+                'length' => (float) $this->package_length,
+                'width' => (float) $this->package_width,
+                'height' => (float) $this->package_height,
+            ];
+        }
+
+        // Otherwise calculate from order items (current logic)
+        $totalQuantity = $this->items->sum('quantity');
+
+        $sizeCategory = match(true) {
+            $totalQuantity <= 2 => 2,
+            $totalQuantity == 3 => 3,
+            default => 4,
+        };
+
+        return [
+            'length' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_length", 30),
+            'width' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_width", 20),
+            'height' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_height", 10),
+        ];
+    }
+
+    /**
+     * Get package weight
+     * Returns custom value if set, otherwise calculates from items
+     */
+    public function getPackageWeight(): float
+    {
+        if ($this->package_weight) {
+            return (float) $this->package_weight;
+        }
+
+        // Calculate from items (0.25 kg per item)
+        $weight = $this->items->sum('quantity') * 0.25;
+        return max($weight, 0.1); // Minimum 0.1 kg
+    }
+
+    /**
+     * Check if order package dimensions can be edited (not sent to Packeta yet)
+     */
+    public function canEditPackageDimensions(): bool
+    {
+        return $this->packeta_shipment_status !== 'submitted';
     }
 }
 

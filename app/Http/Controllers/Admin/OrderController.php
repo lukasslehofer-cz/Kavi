@@ -180,32 +180,9 @@ class OrderController extends Controller
                 continue;
             }
 
-            // Calculate total weight from order items
-            $weight = 0;
-            $totalQuantity = 0;
-            foreach ($order->items as $item) {
-                // Assume each product weighs approximately 0.25 kg
-                $itemQty = ($item->quantity ?? 1);
-                $weight += $itemQty * 0.25;
-                $totalQuantity += $itemQty;
-            }
-            // Minimum weight 0.1 kg
-            $weight = max($weight, 0.1);
-            
-            // Determine package size based on total quantity
-            // Match to closest box size (2, 3, or 4 items)
-            $sizeCategory = match(true) {
-                $totalQuantity <= 2 => 2,
-                $totalQuantity == 3 => 3,
-                default => 4, // 4 or more items
-            };
-            
-            // Load package dimensions from SubscriptionConfig
-            $packageSize = [
-                'length' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_length", 30),
-                'width' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_width", 20),
-                'height' => \App\Models\SubscriptionConfig::get("package_{$sizeCategory}_height", 10),
-            ];
+            // Get dimensions and weight (custom or calculated)
+            $weight = $order->getPackageWeight();
+            $packageSize = $order->getPackageDimensions();
 
             // Prepare customer name
             $name = $shippingAddress['name'] ?? $order->user->name ?? 'Zákazník';
@@ -375,7 +352,55 @@ class OrderController extends Controller
         
         // Remove leading zero if present
         $phone = ltrim($phone, '0');
-        
+
         return $prefix . $phone;
+    }
+
+    /**
+     * Update package dimensions for an order
+     */
+    public function updatePackageDimensions(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'package_weight' => 'required|numeric|min:0.1|max:30',
+            'package_length' => 'required|numeric|min:1|max:200',
+            'package_width' => 'required|numeric|min:1|max:200',
+            'package_height' => 'required|numeric|min:1|max:200',
+            'admin_notes' => 'nullable|string|max:500',
+        ]);
+
+        // Only allow editing if not yet sent to Packeta
+        if (!$order->canEditPackageDimensions()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lze editovat pouze objednávku, která ještě nebyla odeslána do Packety.',
+            ], 400);
+        }
+
+        $order->update([
+            'package_weight' => $validated['package_weight'],
+            'package_length' => $validated['package_length'],
+            'package_width' => $validated['package_width'],
+            'package_height' => $validated['package_height'],
+            'admin_notes' => $validated['admin_notes'] ?? $order->admin_notes,
+        ]);
+
+        \Log::info('Order package dimensions updated by admin', [
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'admin_user_id' => auth()->id(),
+            'dimensions' => [
+                'weight' => $validated['package_weight'],
+                'length' => $validated['package_length'],
+                'width' => $validated['package_width'],
+                'height' => $validated['package_height'],
+            ],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rozměry balíku byly úspěšně aktualizovány.',
+            'order' => $order->fresh(),
+        ]);
     }
 }
