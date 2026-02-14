@@ -142,8 +142,6 @@
           <span>/</span>
           <span>{{ $roastery->getCity() }}</span>
           @endif
-          <span>/</span>
-          <span>EST. 2017</span>
         </div>
         
         <!-- Links -->
