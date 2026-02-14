@@ -280,21 +280,16 @@
 </div>
 
 <!-- Love Your Coffee Section - Editorial Magazine Style -->
-<div class="relative overflow-hidden">
+<div class="relative overflow-hidden bg-[#e5e6df]">
   
   <!-- Two-tone background -->
-  <div class="grid lg:grid-cols-2">
+  <div class="grid lg:grid-cols-2 max-w-[2400px] mx-auto">
     
     <!-- Left Side - Image with Red Accent -->
     <div class="relative bg-primary-500">
-      <!-- Top metadata -->
-      <div class="flex items-center justify-between text-xs uppercase tracking-widest px-4 sm:px-6 lg:px-10 pt-6 sm:pt-8 text-dark-800">
-        <span class="font-display">{{ $currentLocale === 'en' ? 'Subscription' : 'Předplatné' }}</span>
-        <span>{{ now()->format('m/Y') }}</span>
-        </div>
         
       <!-- Photo container - reduced height, grayscale with grain -->
-      <div class="px-4 sm:px-6 lg:px-10 py-4 pb-6 sm:pb-8">
+      <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
         <div class="relative aspect-[5/4] overflow-hidden">
           <img src="/images/kavi-box.jpg" loading="lazy" alt="KAVI box" class="h-full w-full object-cover grayscale" />
           <!-- Grain overlay for image -->

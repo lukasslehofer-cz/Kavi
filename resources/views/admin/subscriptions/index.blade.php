@@ -33,20 +33,20 @@
             <p class="text-3xl font-bold text-red-700">{{ $stats['unpaid'] ?? 0 }}</p>
             <p class="text-sm text-red-600 mt-1 font-semibold">⚠️ Neuhrazeno</p>
         </div>
-        <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 text-center shadow-sm border border-amber-200">
-            <p class="text-3xl font-bold text-amber-700">{{ $stats['pending'] }}</p>
-            <p class="text-sm text-amber-600 mt-1">Čeká</p>
-        </div>
         <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 text-center shadow-sm border border-blue-200">
             <p class="text-3xl font-bold text-blue-700">{{ $stats['trialing'] }}</p>
             <p class="text-sm text-blue-600 mt-1">Zkušební</p>
         </div>
-        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4 text-center shadow-sm border border-orange-200">
-            <p class="text-3xl font-bold text-orange-700">{{ $stats['past_due'] }}</p>
-            <p class="text-sm text-orange-600 mt-1">Po splatnosti</p>
+        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 text-center shadow-sm border border-purple-200">
+            <p class="text-3xl font-bold text-purple-700">{{ $stats['paused'] }}</p>
+            <p class="text-sm text-purple-600 mt-1">Pauza</p>
+        </div>
+        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 text-center shadow-sm border border-indigo-200">
+            <p class="text-3xl font-bold text-indigo-700">{{ $stats['complimentary'] }}</p>
+            <p class="text-sm text-indigo-600 mt-1">Bezplatné</p>
         </div>
         <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 text-center shadow-sm border border-gray-200">
-            <p class="text-3xl font-bold text-gray-700">{{ $stats['canceled'] }}</p>
+            <p class="text-3xl font-bold text-gray-700">{{ $stats['cancelled'] }}</p>
             <p class="text-sm text-gray-600 mt-1">Zrušeno</p>
         </div>
     </div>
@@ -71,10 +71,10 @@
                     <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Všechny</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktivní</option>
                     <option value="unpaid" {{ request('status') === 'unpaid' ? 'selected' : '' }}>⚠️ Neuhrazeno</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Čeká</option>
                     <option value="trialing" {{ request('status') === 'trialing' ? 'selected' : '' }}>Zkušební</option>
-                    <option value="past_due" {{ request('status') === 'past_due' ? 'selected' : '' }}>Po splatnosti</option>
-                    <option value="canceled" {{ request('status') === 'canceled' ? 'selected' : '' }}>Zrušeno</option>
+                    <option value="paused" {{ request('status') === 'paused' ? 'selected' : '' }}>Pauza</option>
+                    <option value="complimentary" {{ request('status') === 'complimentary' ? 'selected' : '' }}>Bezplatné</option>
+                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Zrušeno</option>
                 </select>
             </div>
             
@@ -171,13 +171,13 @@
                                 Pokusů: {{ $subscription->payment_failure_count }}
                             </div>
                             @endif
-                            @elseif($subscription->status === 'pending')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Čeká</span>
                             @elseif($subscription->status === 'trialing')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Zkušební</span>
-                            @elseif($subscription->status === 'past_due')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Po splatnosti</span>
-                            @elseif($subscription->status === 'canceled')
+                            @elseif($subscription->status === 'paused')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Pauza</span>
+                            @elseif($subscription->status === 'complimentary')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Bezplatné</span>
+                            @elseif($subscription->status === 'cancelled')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Zrušeno</span>
                             @else
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ $subscription->status }}</span>

@@ -43,10 +43,10 @@ class SubscriptionController extends Controller
             'total' => Subscription::count(),
             'active' => Subscription::where('status', 'active')->count(),
             'unpaid' => Subscription::where('status', 'unpaid')->count(),
-            'pending' => Subscription::where('status', 'pending')->count(),
             'trialing' => Subscription::where('status', 'trialing')->count(),
-            'past_due' => Subscription::where('status', 'past_due')->count(),
-            'canceled' => Subscription::where('status', 'canceled')->count(),
+            'paused' => Subscription::where('status', 'paused')->count(),
+            'complimentary' => Subscription::where('status', 'complimentary')->count(),
+            'cancelled' => Subscription::where('status', 'cancelled')->count(),
         ];
 
         return view('admin.subscriptions.index', compact('subscriptions', 'stats'));

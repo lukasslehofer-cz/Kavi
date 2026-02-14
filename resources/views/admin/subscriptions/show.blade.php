@@ -346,7 +346,7 @@
                             <option value="paused" {{ $subscription->status === 'paused' ? 'selected' : '' }}>Pozastaveno</option>
                             <option value="trialing" {{ $subscription->status === 'trialing' ? 'selected' : '' }}>Zkušební období</option>
                             <option value="past_due" {{ $subscription->status === 'past_due' ? 'selected' : '' }}>Po splatnosti</option>
-                            <option value="canceled" {{ $subscription->status === 'canceled' ? 'selected' : '' }}>Zrušeno</option>
+                            <option value="cancelled" {{ $subscription->status === 'cancelled' ? 'selected' : '' }}>Zrušeno</option>
                         </select>
                     </div>
                 </form>
@@ -365,7 +365,7 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Zkušební</span>
                         @elseif($subscription->status === 'past_due')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">Po splatnosti</span>
-                        @elseif($subscription->status === 'canceled')
+                        @elseif($subscription->status === 'cancelled')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Zrušeno</span>
                         @endif
                 </div>
@@ -451,7 +451,7 @@
             @endif
 
             <!-- Cancel Subscription -->
-            @if($subscription->status !== 'canceled' && $subscription->status !== 'cancelled')
+            @if($subscription->status !== 'cancelled')
             <button type="button" onclick="openCancelModal()" class="btn w-full bg-red-600 text-white hover:bg-red-700 px-6 py-3 rounded-lg font-medium transition-colors">
                 Zrušit předplatné
             </button>
