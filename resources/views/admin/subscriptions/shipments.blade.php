@@ -16,28 +16,68 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <div class="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-sm">
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+        <!-- Celkem k rozeslání - Extended with breakdown -->
+        <div class="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-sm md:col-span-2">
             <div class="relative z-10">
-                <p class="text-4xl font-bold">{{ $stats['total'] }}</p>
-                <p class="text-sm text-white/80 mt-1">Celkem k rozeslání</p>
+                <!-- Main total -->
+                <div class="flex items-baseline gap-2 mb-3">
+                    <p class="text-4xl font-bold">{{ $stats['total'] }}</p>
+                    <p class="text-2xl font-semibold text-white/80">({{ $nextMonthStats['total'] }})</p>
+                </div>
+                <p class="text-sm text-white/80 mb-3">Celkem k rozeslání</p>
+
+                <!-- Box size breakdown -->
+                <div class="flex flex-wrap gap-3 text-xs border-t border-white/20 pt-3">
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-semibold text-white/90">M Box:</span>
+                        <span class="font-bold">{{ $stats['m_box'] ?? 0 }}</span>
+                        <span class="text-white/70">({{ $nextMonthStats['m_box'] ?? 0 }})</span>
+                    </div>
+                    <div class="text-white/40">|</div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-semibold text-white/90">L Box:</span>
+                        <span class="font-bold">{{ $stats['l_box'] ?? 0 }}</span>
+                        <span class="text-white/70">({{ $nextMonthStats['l_box'] ?? 0 }})</span>
+                    </div>
+                    <div class="text-white/40">|</div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-semibold text-white/90">XL Box:</span>
+                        <span class="font-bold">{{ $stats['xl_box'] ?? 0 }}</span>
+                        <span class="text-white/70">({{ $nextMonthStats['xl_box'] ?? 0 }})</span>
+                    </div>
+                </div>
             </div>
             <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
         </div>
+
+        <!-- Frequency cards -->
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <p class="text-3xl font-bold text-gray-900">{{ $stats['one_time'] ?? 0 }}</p>
+            <div class="flex items-baseline gap-2">
+                <p class="text-3xl font-bold text-gray-900">{{ $stats['one_time'] ?? 0 }}</p>
+                <p class="text-xl font-semibold text-gray-500">({{ $nextMonthStats['one_time'] ?? 0 }})</p>
+            </div>
             <p class="text-sm text-gray-600 mt-1">Jednorázově</p>
         </div>
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <p class="text-3xl font-bold text-gray-900">{{ $stats['monthly'] }}</p>
+            <div class="flex items-baseline gap-2">
+                <p class="text-3xl font-bold text-gray-900">{{ $stats['monthly'] }}</p>
+                <p class="text-xl font-semibold text-gray-500">({{ $nextMonthStats['monthly'] }})</p>
+            </div>
             <p class="text-sm text-gray-600 mt-1">Měsíční</p>
         </div>
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <p class="text-3xl font-bold text-gray-900">{{ $stats['bimonthly'] }}</p>
+            <div class="flex items-baseline gap-2">
+                <p class="text-3xl font-bold text-gray-900">{{ $stats['bimonthly'] }}</p>
+                <p class="text-xl font-semibold text-gray-500">({{ $nextMonthStats['bimonthly'] }})</p>
+            </div>
             <p class="text-sm text-gray-600 mt-1">Jednou za 2 měsíce</p>
         </div>
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <p class="text-3xl font-bold text-gray-900">{{ $stats['quarterly'] }}</p>
+            <div class="flex items-baseline gap-2">
+                <p class="text-3xl font-bold text-gray-900">{{ $stats['quarterly'] }}</p>
+                <p class="text-xl font-semibold text-gray-500">({{ $nextMonthStats['quarterly'] }})</p>
+            </div>
             <p class="text-sm text-gray-600 mt-1">Jednou za 3 měsíce</p>
         </div>
     </div>

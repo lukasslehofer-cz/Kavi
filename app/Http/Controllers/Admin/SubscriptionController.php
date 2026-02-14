@@ -289,14 +289,12 @@ class SubscriptionController extends Controller
             $query->forDate($targetDate)->with('payment');
         }])->whereIn('id', $allSubscriptionIds)->get();
 
-        // Group by frequency for stats
-        $stats = [
-            'total' => $subscriptions->count(),
-            'one_time' => $subscriptions->where('frequency_months', 0)->count(),
-            'monthly' => $subscriptions->where('frequency_months', 1)->count(),
-            'bimonthly' => $subscriptions->where('frequency_months', 2)->count(),
-            'quarterly' => $subscriptions->where('frequency_months', 3)->count(),
-        ];
+        // Calculate statistics for current month using new method
+        $stats = $this->calculateShipmentStats($targetDate);
+
+        // Calculate statistics for next month's 20th
+        $nextMonthDate = $this->getNextMonthShipmentDate($targetDate);
+        $nextMonthStats = $this->calculateShipmentStats($nextMonthDate);
 
         // Get coffee usage statistics
         $coffeeUsage = [];
@@ -312,7 +310,117 @@ class SubscriptionController extends Controller
             $coffeeUsage = $reservationService->getCoffeeUsageStats($schedule);
         }
 
-        return view('admin.subscriptions.shipments', compact('subscriptions', 'targetDate', 'stats', 'coffeeUsage', 'schedule'));
+        return view('admin.subscriptions.shipments', compact('subscriptions', 'targetDate', 'stats', 'nextMonthStats', 'nextMonthDate', 'coffeeUsage', 'schedule'));
+    }
+
+    /**
+     * Calculate shipment statistics for a given date
+     *
+     * @param \Carbon\Carbon $targetDate The date to calculate statistics for
+     * @return array Statistics array with frequency breakdowns and box sizes
+     */
+    private function calculateShipmentStats(\Carbon\Carbon $targetDate): array
+    {
+        $shipmentService = app(SubscriptionShipmentService::class);
+
+        // Get billing date for this shipment month
+        $billingDate = ShipmentSchedule::getBillingDateForMonth($targetDate->year, $targetDate->month);
+
+        // Get subscriptions with pending shipments (copy logic from lines 234-249)
+        $pendingShipments = \App\Models\SubscriptionShipment::with(['subscription.user', 'subscription.plan', 'payment'])
+            ->whereDate('shipment_date', $targetDate->toDateString())
+            ->whereIn('status', ['pending', 'sent'])
+            ->where(function($q) use ($billingDate) {
+                $q->whereNotNull('subscription_payment_id')
+                  ->orWhereHas('subscription', function($q2) use ($billingDate) {
+                      $q2->where(function($q3) use ($billingDate) {
+                          $q3->where('status', '!=', 'paused')
+                             ->orWhereNull('paused_until_date')
+                             ->orWhere('paused_until_date', '<=', $billingDate);
+                      });
+                  });
+            })
+            ->get();
+
+        $subscriptionIds = $pendingShipments->pluck('subscription_id')->unique();
+
+        // Get subscriptions that SHOULD ship but don't have records yet (copy logic from lines 255-264)
+        $allSubscriptions = Subscription::with(['user', 'plan'])
+            ->whereIn('status', ['active', 'paused', 'pending', 'cancelled', 'complimentary'])
+            ->whereNotIn('id', $subscriptionIds)
+            ->where(function($q) use ($billingDate) {
+                $q->where('status', '!=', 'paused')
+                  ->orWhereNull('paused_until_date')
+                  ->orWhere('paused_until_date', '<=', $billingDate);
+            })
+            ->get();
+
+        // Filter subscriptions matching cadence (copy logic from lines 267-271)
+        $newSubscriptions = $allSubscriptions->filter(function($subscription) use ($targetDate, $shipmentService) {
+            return $shipmentService->shouldShipOn($subscription, $targetDate)
+                || ($subscription->last_shipment_date &&
+                    $subscription->last_shipment_date->format('Y-m-d') === $targetDate->format('Y-m-d'));
+        });
+
+        // Combine all subscriptions
+        $allSubscriptionIds = $subscriptionIds->merge($newSubscriptions->pluck('id'))->unique();
+        $subscriptions = Subscription::whereIn('id', $allSubscriptionIds)->get();
+
+        // Calculate statistics by frequency
+        $frequencyStats = [
+            'total' => $subscriptions->count(),
+            'one_time' => $subscriptions->where('frequency_months', 0)->count(),
+            'monthly' => $subscriptions->where('frequency_months', 1)->count(),
+            'bimonthly' => $subscriptions->where('frequency_months', 2)->count(),
+            'quarterly' => $subscriptions->where('frequency_months', 3)->count(),
+        ];
+
+        // Calculate statistics by box size (based on configuration['amount'])
+        $boxSizeStats = [
+            'm_box' => $subscriptions->filter(function($sub) {
+                $config = is_string($sub->configuration)
+                    ? json_decode($sub->configuration, true)
+                    : $sub->configuration;
+                return isset($config['amount']) && $config['amount'] == 2;
+            })->count(),
+            'l_box' => $subscriptions->filter(function($sub) {
+                $config = is_string($sub->configuration)
+                    ? json_decode($sub->configuration, true)
+                    : $sub->configuration;
+                return isset($config['amount']) && $config['amount'] == 3;
+            })->count(),
+            'xl_box' => $subscriptions->filter(function($sub) {
+                $config = is_string($sub->configuration)
+                    ? json_decode($sub->configuration, true)
+                    : $sub->configuration;
+                return isset($config['amount']) && $config['amount'] == 4;
+            })->count(),
+        ];
+
+        return array_merge($frequencyStats, $boxSizeStats);
+    }
+
+    /**
+     * Calculate the 20th day of the month following the target date
+     * Respects ShipmentSchedule configuration
+     *
+     * @param \Carbon\Carbon $targetDate Current target date
+     * @return \Carbon\Carbon Next month's shipment date
+     */
+    private function getNextMonthShipmentDate(\Carbon\Carbon $targetDate): \Carbon\Carbon
+    {
+        // Add one month to target date
+        $nextMonth = $targetDate->copy()->addMonthNoOverflow();
+
+        // Check if there's a custom ShipmentSchedule for next month
+        $schedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
+
+        if ($schedule && $schedule->shipment_date) {
+            return $schedule->shipment_date->copy()->startOfDay();
+        }
+
+        // Fallback to 20th if no schedule configured
+        return $nextMonth->day(20)->startOfDay();
     }
 
     /**
