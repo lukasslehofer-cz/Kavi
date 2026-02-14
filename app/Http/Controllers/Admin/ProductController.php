@@ -157,6 +157,7 @@ class ProductController extends Controller
             'stock' => 'nullable|integer|min:0',
             'categories' => 'required|array',
             'categories.*' => 'in:espresso,filter,decaf,accessories',
+            'vat_rate' => 'nullable|numeric|min:0|max:100',
             'roastery_id' => 'nullable|exists:roasteries,id',
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_active' => 'boolean',
@@ -294,6 +295,11 @@ class ProductController extends Controller
             $validated['image'] = $galleryPaths[0] ?? null;
         }
 
+        // Automatically set VAT rate based on category if not provided
+        if (!isset($validated['vat_rate']) || $validated['vat_rate'] === null) {
+            $validated['vat_rate'] = Product::isCoffeeCategory($validated['category']) ? 12.00 : 21.00;
+        }
+
         Product::create($validated);
 
         return redirect()->route('admin.products.index')
@@ -328,6 +334,7 @@ class ProductController extends Controller
             'stock' => 'nullable|integer|min:0',
             'categories' => 'required|array',
             'categories.*' => 'in:espresso,filter,decaf,accessories',
+            'vat_rate' => 'nullable|numeric|min:0|max:100',
             'roastery_id' => 'nullable|exists:roasteries,id',
             'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'remove_gallery' => 'nullable|array',
@@ -482,6 +489,11 @@ class ProductController extends Controller
         $validated['images'] = $existingGallery;
         // Backwards compatibility: set first image as main
         $validated['image'] = $existingGallery[0] ?? $product->image;
+
+        // Automatically set VAT rate based on category if not provided
+        if (!isset($validated['vat_rate']) || $validated['vat_rate'] === null) {
+            $validated['vat_rate'] = Product::isCoffeeCategory($validated['category']) ? 12.00 : 21.00;
+        }
 
         $product->update($validated);
 

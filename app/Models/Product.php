@@ -538,6 +538,14 @@ class Product extends Model
     }
 
     /**
+     * Check if given categories array contains coffee categories
+     */
+    public static function isCoffeeCategory(array $categories): bool
+    {
+        return !empty(array_intersect($categories, ['espresso', 'filter', 'decaf']));
+    }
+
+    /**
      * Get coffee-specific attribute keys (fixed schema)
      */
     public function getCoffeeAttributes(): array
