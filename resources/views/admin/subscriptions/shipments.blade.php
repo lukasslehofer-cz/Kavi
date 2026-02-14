@@ -58,6 +58,23 @@
                 <p class="text-xl font-semibold text-gray-500">({{ $nextMonthStats['one_time'] ?? 0 }})</p>
             </div>
             <p class="text-sm text-gray-600 mt-1">Jednorázově</p>
+
+            <!-- Coffee slots breakdown: E1, F1 -->
+            <div class="mt-3 pt-3 border-t border-gray-200">
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">E1:</span>
+                        <span class="font-semibold text-gray-900">{{ $stats['e1'] ?? 0 }}</span>
+                        <span class="text-gray-500">({{ $nextMonthStats['e1'] ?? 0 }})</span>
+                    </div>
+                    <div class="text-gray-300">|</div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">F1:</span>
+                        <span class="font-semibold text-gray-900">{{ $stats['f1'] ?? 0 }}</span>
+                        <span class="text-gray-500">({{ $nextMonthStats['f1'] ?? 0 }})</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="flex items-baseline gap-2">
@@ -65,6 +82,23 @@
                 <p class="text-xl font-semibold text-gray-500">({{ $nextMonthStats['monthly'] }})</p>
             </div>
             <p class="text-sm text-gray-600 mt-1">Měsíční</p>
+
+            <!-- Coffee slots breakdown: E2, F2 -->
+            <div class="mt-3 pt-3 border-t border-gray-200">
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">E2:</span>
+                        <span class="font-semibold text-gray-900">{{ $stats['e2'] ?? 0 }}</span>
+                        <span class="text-gray-500">({{ $nextMonthStats['e2'] ?? 0 }})</span>
+                    </div>
+                    <div class="text-gray-300">|</div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">F2:</span>
+                        <span class="font-semibold text-gray-900">{{ $stats['f2'] ?? 0 }}</span>
+                        <span class="text-gray-500">({{ $nextMonthStats['f2'] ?? 0 }})</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="flex items-baseline gap-2">
@@ -72,6 +106,23 @@
                 <p class="text-xl font-semibold text-gray-500">({{ $nextMonthStats['bimonthly'] }})</p>
             </div>
             <p class="text-sm text-gray-600 mt-1">Jednou za 2 měsíce</p>
+
+            <!-- Coffee slots breakdown: E3, F3 -->
+            <div class="mt-3 pt-3 border-t border-gray-200">
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">E3:</span>
+                        <span class="font-semibold text-gray-900">{{ $stats['e3'] ?? 0 }}</span>
+                        <span class="text-gray-500">({{ $nextMonthStats['e3'] ?? 0 }})</span>
+                    </div>
+                    <div class="text-gray-300">|</div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">F3:</span>
+                        <span class="font-semibold text-gray-900">{{ $stats['f3'] ?? 0 }}</span>
+                        <span class="text-gray-500">({{ $nextMonthStats['f3'] ?? 0 }})</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div class="flex items-baseline gap-2">
@@ -79,6 +130,15 @@
                 <p class="text-xl font-semibold text-gray-500">({{ $nextMonthStats['quarterly'] }})</p>
             </div>
             <p class="text-sm text-gray-600 mt-1">Jednou za 3 měsíce</p>
+
+            <!-- Coffee slots breakdown: Decaf only -->
+            <div class="mt-3 pt-3 border-t border-gray-200">
+                <div class="flex items-center gap-1 text-xs">
+                    <span class="text-gray-600">Decaf:</span>
+                    <span class="font-semibold text-gray-900">{{ $stats['d'] ?? 0 }}</span>
+                    <span class="text-gray-500">({{ $nextMonthStats['d'] ?? 0 }})</span>
+                </div>
+            </div>
         </div>
     </div>
 

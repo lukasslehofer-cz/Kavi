@@ -397,7 +397,10 @@ class SubscriptionController extends Controller
             })->count(),
         ];
 
-        return array_merge($frequencyStats, $boxSizeStats);
+        // Calculate coffee slot statistics
+        $coffeeSlotStats = $this->calculateCoffeeSlotStats($subscriptions, $targetDate);
+
+        return array_merge($frequencyStats, $boxSizeStats, $coffeeSlotStats);
     }
 
     /**
@@ -421,6 +424,154 @@ class SubscriptionController extends Controller
 
         // Fallback to 20th if no schedule configured
         return $nextMonth->day(20)->startOfDay();
+    }
+
+    /**
+     * Calculate coffee slot statistics for subscriptions
+     * Counts actual coffee packages (not subscriptions) based on subscription configuration
+     *
+     * @param \Illuminate\Support\Collection $subscriptions Collection of subscriptions
+     * @param \Carbon\Carbon $targetDate Target shipment date (not used, kept for compatibility)
+     * @return array Array with coffee slot counts (e1, e2, e3, f1, f2, f3, d)
+     */
+    private function calculateCoffeeSlotStats($subscriptions, \Carbon\Carbon $targetDate): array
+    {
+        // Initialize counters for each slot
+        $slotCounts = [
+            'e1' => 0,
+            'e2' => 0,
+            'e3' => 0,
+            'f1' => 0,
+            'f2' => 0,
+            'f3' => 0,
+            'd' => 0,
+        ];
+
+        // Process each subscription
+        foreach ($subscriptions as $subscription) {
+            // Parse configuration
+            $config = is_string($subscription->configuration)
+                ? json_decode($subscription->configuration, true)
+                : $subscription->configuration;
+
+            // Skip if no valid configuration
+            if (!$config || !isset($config['type']) || !isset($config['amount'])) {
+                continue;
+            }
+
+            // Get slot names used by this subscription (e.g., ['e1', 'e2', 'e3', 'e1'])
+            $slotsUsed = $this->allocateSlotsByConfiguration($config);
+
+            // Count each slot - array may contain duplicates (XL box uses E1 twice)
+            foreach ($slotsUsed as $slotName) {
+                $slotCounts[$slotName]++;
+            }
+        }
+
+        return $slotCounts;
+    }
+
+    /**
+     * Allocate slot names based on subscription configuration
+     * Used as fallback when ShipmentSchedule is not configured
+     * Mirrors the logic from CoffeeAllocationService but returns slot names instead of product IDs
+     *
+     * @param array $config Subscription configuration
+     * @return array Array of slot names (e.g., ['e1', 'e2', 'f1'])
+     */
+    private function allocateSlotsByConfiguration(array $config): array
+    {
+        // Convert to integers (JSON decode may return strings)
+        $amount = (int) ($config['amount'] ?? 0); // 2, 3, 4
+        $type = $config['type']; // espresso, filter, mix
+        $isDecaf = $config['isDecaf'] ?? false;
+        $mix = $config['mix'] ?? null;
+
+        $slots = [];
+
+        if ($type === 'espresso') {
+            if ($isDecaf) {
+                // Espresso with Decaf
+                if ($amount === 2) {
+                    $slots = ['e1', 'd'];
+                } elseif ($amount === 3) {
+                    $slots = ['e1', 'e2', 'd'];
+                } elseif ($amount === 4) {
+                    $slots = ['e1', 'e2', 'e3', 'd'];
+                }
+            } else {
+                // Espresso without Decaf
+                if ($amount === 2) {
+                    $slots = ['e1', 'e2'];
+                } elseif ($amount === 3) {
+                    $slots = ['e1', 'e2', 'e3'];
+                } elseif ($amount === 4) {
+                    $slots = ['e1', 'e2', 'e3', 'e1']; // E1 repeats
+                }
+            }
+        } elseif ($type === 'filter') {
+            if ($isDecaf) {
+                // Filter with Decaf
+                if ($amount === 2) {
+                    $slots = ['f1', 'd'];
+                } elseif ($amount === 3) {
+                    $slots = ['f1', 'f2', 'd'];
+                } elseif ($amount === 4) {
+                    $slots = ['f1', 'f2', 'f3', 'd'];
+                }
+            } else {
+                // Filter without Decaf
+                if ($amount === 2) {
+                    $slots = ['f1', 'f2'];
+                } elseif ($amount === 3) {
+                    $slots = ['f1', 'f2', 'f3'];
+                } elseif ($amount === 4) {
+                    $slots = ['f1', 'f2', 'f3', 'f1']; // F1 repeats
+                }
+            }
+        } elseif ($type === 'mix') {
+            // Convert mix counts to integers as well
+            $espressoCount = (int) ($mix['espresso'] ?? 0);
+            $filterCount = (int) ($mix['filter'] ?? 0);
+
+            if ($isDecaf) {
+                // Mix with Decaf - replace last coffee from larger group with D
+                $replaceFilter = $filterCount >= $espressoCount;
+
+                // Add filter coffees
+                $filterToAdd = $replaceFilter ? $filterCount - 1 : $filterCount;
+                if ($filterToAdd >= 1) $slots[] = 'f1';
+                if ($filterToAdd >= 2) $slots[] = 'f2';
+                if ($filterToAdd >= 3) $slots[] = 'f3';
+
+                // Add decaf if we're replacing filter
+                if ($replaceFilter && $filterCount > 0) {
+                    $slots[] = 'd';
+                }
+
+                // Add espresso coffees
+                $espressoToAdd = !$replaceFilter ? $espressoCount - 1 : $espressoCount;
+                if ($espressoToAdd >= 1) $slots[] = 'e1';
+                if ($espressoToAdd >= 2) $slots[] = 'e2';
+                if ($espressoToAdd >= 3) $slots[] = 'e3';
+
+                // Add decaf if we're replacing espresso
+                if (!$replaceFilter && $espressoCount > 0) {
+                    $slots[] = 'd';
+                }
+            } else {
+                // Mix without Decaf
+                if ($filterCount >= 1) $slots[] = 'f1';
+                if ($filterCount >= 2) $slots[] = 'f2';
+                if ($filterCount >= 3) $slots[] = 'f3';
+
+                if ($espressoCount >= 1) $slots[] = 'e1';
+                if ($espressoCount >= 2) $slots[] = 'e2';
+                if ($espressoCount >= 3) $slots[] = 'e3';
+            }
+        }
+
+        return $slots;
     }
 
     /**
