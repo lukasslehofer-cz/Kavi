@@ -833,6 +833,16 @@ class StripeService
                         \Log::error('Failed to send one-time box confirmation email: ' . $e->getMessage());
                     }
                     
+                    // Notify admins about new one-time box order
+                    try {
+                        \App\Mail\AdminOrderNotification::notifyAdmins($subscription);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send admin subscription notification', [
+                            'subscription_id' => $subscription->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                    
                     \Log::info('One-time box payment successful', [
                         'subscription_id' => $subscription->id,
                         'subscription_number' => $subscription->subscription_number,
