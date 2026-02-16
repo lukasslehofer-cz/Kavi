@@ -58,14 +58,14 @@
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0; line-height: 1.8;">
                                     @if($locale === 'cs')
                                     <span style="color: #4a6741;">01</span> Výběr kávy – Pečlivě jsme vybrali kávy z nejlepších pražíren<br>
-                                    <span style="color: #4a6741;">02</span> Káva dorazila – Balíčky z celé Evropy jsou na místě<br>
-                                    <span style="color: #CA4136;">03</span> <strong>Balení boxu</strong> – Právě teď balíme váš unikátní box<br>
-                                    <span style="color: #76716C;">04</span> Expedice – Za cca 5 dní odešleme k vám
+                                    <span style="color: #4a6741;">02</span> Káva dorazila – Zrna z celé Evropy jsou v našem skladu<br>
+                                    <span style="color: #CA4136;">03</span> <strong>Balení boxu</strong> – Právě teď balíme váš kávový box<br>
+                                    <span style="color: #76716C;">04</span> Expedice – Za pár dní odešleme k vám
                                     @else
                                     <span style="color: #4a6741;">01</span> Coffee selection – We carefully selected coffees from the best roasteries<br>
-                                    <span style="color: #4a6741;">02</span> Coffee arrived – Samples from across Europe are here<br>
-                                    <span style="color: #CA4136;">03</span> <strong>Packing your box</strong> – We're packing your unique box right now<br>
-                                    <span style="color: #76716C;">04</span> Shipping – We'll ship to you in about 5 days
+                                    <span style="color: #4a6741;">02</span> Coffee arrived – Beans from across Europe are in our warehouse<br>
+                                    <span style="color: #CA4136;">03</span> <strong>Packing your box</strong> – We're packing your coffee box right now<br>
+                                    <span style="color: #76716C;">04</span> Shipping – We'll ship to you in few days
                                     @endif
                                 </p>
                             </div>
@@ -97,13 +97,13 @@
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     @if($locale === 'cs')
-                                    <span style="color: #CA4136;">→</span> Váš box odešleme přibližně za <strong>5 dní</strong>
+                                    <span style="color: #CA4136;">→</span> Váš box odešleme přibližně za <strong>3-4 dny</strong>
                                     @else
-                                    <span style="color: #CA4136;">→</span> Your box will be shipped in approximately <strong>5 days</strong>
+                                    <span style="color: #CA4136;">→</span> Your box will be shipped in approximately <strong>3-4 days</strong>
                                     @endif
                                 </p>
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
-                                    {{ $locale === 'cs' ? 'O expedici vás budeme informovat dalším e-mailem s tracking číslem.' : 'We\'ll notify you with another email containing the tracking number.' }}
+                                    {{ $locale === 'cs' ? 'O expedici vás budeme informovat dalším e-mailem.' : 'We\'ll notify you with another email.' }}
                                 </p>
                             </div>
                             
