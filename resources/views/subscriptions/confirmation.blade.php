@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Potvrzení předplatného - KAVI.cz')
+@section('title', $subscription->frequency_months == 0 ? 'Potvrzení objednávky - KAVI.cz' : 'Potvrzení předplatného - KAVI.cz')
 
 @section('content')
 
@@ -9,7 +9,7 @@
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     <div class="flex items-center gap-3 mb-6">
       <span class="w-3 h-3 rounded-full bg-green-500"></span>
-      <span class="text-xs uppercase tracking-widest text-green-600">Předplatné aktivováno</span>
+      <span class="text-xs uppercase tracking-widest text-green-600">{{ $subscription->frequency_months == 0 ? 'Objednávka potvrzena' : 'Předplatné aktivováno' }}</span>
     </div>
     
     <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-8">
@@ -19,7 +19,11 @@
     
     <div class="flex justify-end">
       <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
+        @if($subscription->frequency_months == 0)
+        Vaše objednávka jednorázového boxu byla úspěšně potvrzena. Zásilku vám odešleme v nejbližším termínu rozesílky.
+        @else
         Vaše předplatné bylo úspěšně vytvořeno a je nyní aktivní. První zásilku vám odešleme v nejbližším termínu rozesílky.
+        @endif
       </p>
     </div>
   </div>
@@ -36,7 +40,9 @@
                 if (is_string($config)) {
                     $config = json_decode($config, true);
                 }
+                $isOneTime = $subscription->frequency_months == 0;
                 $frequencyTexts = [
+                    0 => 'Jednorázový box',
                     1 => 'Každý měsíc',
                     2 => 'Jednou za 2 měsíce',
                     3 => 'Jednou za 3 měsíce'
@@ -50,14 +56,16 @@
                     ? $subscriptionDate->copy()->setDay(15) 
                     : $subscriptionDate->copy()->addMonthNoOverflow()->setDay(15);
                 
-                $nextPaymentDate = $currentBillingCycleEnd->copy()->addMonths($subscription->frequency_months);
+                $nextPaymentDate = !$isOneTime 
+                    ? $currentBillingCycleEnd->copy()->addMonths($subscription->frequency_months)
+                    : null;
                 @endphp
 
                 <!-- Subscription Configuration -->
                 <div class="border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-8">
                         <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">01</span>
-                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">Vaše předplatné</h2>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ $isOneTime ? 'Vaše objednávka' : 'Vaše předplatné' }}</h2>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-6 mb-8">
@@ -99,17 +107,18 @@
                         <div>
                             <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">Cena</span>
                             <span class="font-display text-2xl text-dark-800">
-                                {{ number_format($subscription->configured_price + ($subscription->shipping_cost ?? 0), 0, ',', ' ') }} Kč —
+                                {{ number_format($subscription->configured_price + ($subscription->shipping_cost ?? 0), 0, ',', ' ') }} Kč{{ $isOneTime ? '' : ' —' }}
                             </span>
+                            @if(!$isOneTime)
                             <span class="text-xs text-warm-500 uppercase tracking-widest block mt-1">{{ $frequencyText }}</span>
+                            @endif
                         </div>
                     </div>
                     
                     @if($subscription->discount_amount > 0 && $subscription->coupon)
                     @php
                     $originalPrice = $subscription->configured_price;
-                    $discountEndsAt = $nextPaymentDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months);
-                    $fullPriceStartsAt = $discountEndsAt->copy()->addMonths($subscription->frequency_months);
+                    $discountEndsAt = (!$isOneTime && $nextPaymentDate) ? $nextPaymentDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months) : null;
                     @endphp
                     
                     <!-- Coupon Discount Info -->
@@ -128,7 +137,7 @@
                                 <span class="text-xs uppercase tracking-widest text-dark-800/70">Cena se slevou</span>
                                 <span class="font-display text-dark-800">{{ number_format($subscription->configured_price - $subscription->discount_amount, 0, ',', ' ') }} Kč</span>
                             </div>
-                            @if($subscription->discount_months_total)
+                            @if(!$isOneTime && $subscription->discount_months_total && $discountEndsAt)
                             <div class="flex justify-between items-center pt-3 border-t border-dark-800/20">
                                 <span class="text-xs uppercase tracking-widest text-dark-800/70">Sleva platí do</span>
                                 <span class="text-dark-800">{{ $discountEndsAt->format('j. n. Y') }}</span>
@@ -145,16 +154,18 @@
                     <!-- Shipping and Payment Dates -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-warm-300">
                         <div>
-                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">První rozesílka</span>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">{{ $isOneTime ? 'Rozesílka' : 'První rozesílka' }}</span>
                             <span class="font-display text-lg text-primary-500">{{ $shippingInfo['next_shipping_date']->format('j. n. Y') }}</span>
                             <span class="text-xs text-warm-500 block mt-1">20. den v měsíci</span>
                         </div>
                         
+                        @if(!$isOneTime && $nextPaymentDate)
                         <div>
                             <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">Další platba</span>
                             <span class="font-display text-lg text-dark-800">{{ $nextPaymentDate->format('j. n. Y') }}</span>
                             <span class="text-xs text-warm-500 block mt-1">15. den v měsíci</span>
                         </div>
+                        @endif
                     </div>
                 </div>
 
@@ -233,14 +244,14 @@
                             <span class="text-xs uppercase tracking-widest text-primary-500 w-8">01</span>
                             <div>
                                 <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">Potvrzení emailem</div>
-                                <div class="text-xs text-dark-800/70">Na váš email jsme odeslali potvrzení s detaily předplatného</div>
+                                <div class="text-xs text-dark-800/70">Na váš email jsme odeslali potvrzení s detaily {{ $isOneTime ? 'objednávky' : 'předplatného' }}</div>
                             </div>
                         </div>
                         
                         <div class="flex gap-4">
                             <span class="text-xs uppercase tracking-widest text-primary-500 w-8">02</span>
                             <div>
-                                <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">První zásilka</div>
+                                <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">{{ $isOneTime ? 'Zásilka' : 'První zásilka' }}</div>
                                 <div class="text-xs text-dark-800/70">Kávu vám odešleme v nejbližším termínu rozesílky (20. den v měsíci)</div>
                             </div>
                         </div>
@@ -248,6 +259,10 @@
                         <div class="flex gap-4">
                             <span class="text-xs uppercase tracking-widest text-primary-500 w-8">03</span>
                             <div>
+                                @if($isOneTime)
+                                <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">Bez závazku</div>
+                                <div class="text-xs text-dark-800/70">Jednorázový nákup bez předplatného. Žádné další platby neproběhnou.</div>
+                                @else
                                 <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">Správa předplatného</div>
                                 <div class="text-xs text-dark-800/70">
                                     @auth
@@ -256,6 +271,7 @@
                                     Pro správu předplatného si vytvořte účet - link jsme vám poslali na email
                                     @endauth
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -263,7 +279,7 @@
                     <div class="space-y-4">
                         @auth
                         <a href="{{ localizedRoute('dashboard.subscription') }}" class="block w-full text-center bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all">
-                            Zobrazit předplatné →
+                            {{ $isOneTime ? 'Zobrazit objednávku' : 'Zobrazit předplatné' }} →
                         </a>
                         @else
                         <a href="{{ localizedRoute('login') }}" class="block w-full text-center bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all">

@@ -308,7 +308,7 @@ class StripeService
             'payment_method_types' => ['card'],
             'line_items' => $lineItems,
             'mode' => 'payment',
-            'success_url' => route('dashboard.subscription') . '?payment=success',
+            'success_url' => route('subscriptions.checkout') . '?session_id={CHECKOUT_SESSION_ID}&success=1',
             'cancel_url' => route('subscriptions.index') . '?payment=cancelled',
             'metadata' => [
                 'subscription_id' => $subscription->id,
@@ -758,9 +758,41 @@ class StripeService
                         'starts_at' => now(),
                     ]);
                     
-                    // Create pending shipment for one-time box
+                    // Record the payment
+                    $paymentIntentId = $session['payment_intent'] ?? null;
+                    $payment = null;
+                    
                     try {
-                        $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+                        $totalAmount = ($subscription->configured_price ?? 0) + ($subscription->shipping_cost ?? 0);
+                        
+                        if ($totalAmount > 0 && $paymentIntentId) {
+                            $payment = \App\Models\SubscriptionPayment::create([
+                                'subscription_id' => $subscription->id,
+                                'stripe_payment_intent_id' => $paymentIntentId,
+                                'amount' => $totalAmount,
+                                'currency' => $subscription->currency ?? 'czk',
+                                'status' => 'paid',
+                                'paid_at' => now(),
+                                'period_start' => now(),
+                                'period_end' => now(),
+                            ]);
+                            
+                            \Log::info('Created payment record for one-time box', [
+                                'payment_id' => $payment->id,
+                                'subscription_id' => $subscription->id,
+                                'amount' => $totalAmount,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to create payment record for one-time box', [
+                            'subscription_id' => $subscription->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                    
+                    // Create pending shipment for one-time box
+                    $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+                    try {
                         $shipmentService->ensurePendingShipmentExists($subscription);
                     } catch (\Exception $e) {
                         \Log::error('Failed to create pending shipment for one-time box', [
@@ -769,9 +801,34 @@ class StripeService
                         ]);
                     }
                     
-                    // Send confirmation email (one-time box specific template)
+                    // Link payment to the shipment
+                    if ($payment) {
+                        try {
+                            $shipmentService->linkPaymentToShipment($payment, $subscription);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to link payment to shipment for one-time box', [
+                                'payment_id' => $payment->id,
+                                'subscription_id' => $subscription->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                        
+                        // Create Fakturoid invoice
+                        try {
+                            $fakturoidService = app(\App\Services\FakturoidService::class);
+                            $fakturoidService->processInvoiceForSubscriptionPayment($payment);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to create Fakturoid invoice for one-time box', [
+                                'subscription_id' => $subscription->id,
+                                'payment_id' => $payment->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+                    
+                    // Send confirmation email (same template as regular subscriptions, with one-time conditionals)
                     try {
-                        \Mail::to($subscription->user->email)->send(new \App\Mail\OneTimeBoxConfirmation($subscription));
+                        \Mail::to($subscription->user->email)->send(new \App\Mail\SubscriptionConfirmation($subscription));
                     } catch (\Exception $e) {
                         \Log::error('Failed to send one-time box confirmation email: ' . $e->getMessage());
                     }

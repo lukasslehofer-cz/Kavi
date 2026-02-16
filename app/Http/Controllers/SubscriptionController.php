@@ -1033,6 +1033,8 @@ class SubscriptionController extends Controller
                     $shippingRate
                 );
 
+                $subscription->update(['stripe_session_id' => $session->id]);
+
                 return redirect($session->url);
             }
             

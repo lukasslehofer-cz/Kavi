@@ -951,16 +951,20 @@ class SubscriptionShipmentService
     {
         // One-time boxes
         if ($subscription->frequency_months == 0) {
-            // Would ship only if not yet shipped
             if ($subscription->last_shipment_date) {
                 return false;
             }
-            // Check if there's already a pending shipment for an earlier date
-            $pendingShipment = $subscription->shipments()
-                ->where('status', 'pending')
-                ->whereDate('shipment_date', '<', $date->toDateString())
+            // Check if there's already a shipment record for any date
+            $existingShipment = $subscription->shipments()
+                ->whereIn('status', ['pending', 'sent', 'delivered'])
                 ->first();
-            return !$pendingShipment;
+            if ($existingShipment) {
+                // Only match if the existing shipment is for this exact date
+                return $existingShipment->shipment_date->isSameDay($date);
+            }
+            // No shipment exists yet - calculate where it should go
+            $firstDate = $this->getFirstShipmentDate($subscription);
+            return $firstDate->isSameDay($date);
         }
 
         // Recurring subscription - check frequency alignment
