@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\SubscriptionHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ShipmentSchedule;
 use App\Services\StockReservationService;
@@ -18,8 +19,9 @@ class SubscriptionAvailabilityController extends Controller
      */
     public function checkAvailability(Request $request)
     {
-        // Get next shipment schedule
-        $nextShipment = ShipmentSchedule::getNextShipment();
+        // Get next shipment schedule (using ordering target month logic, same as main configurator)
+        $displayMonth = SubscriptionHelper::getOrderingTargetMonth();
+        $nextShipment = ShipmentSchedule::getForMonth($displayMonth->year, $displayMonth->month);
 
         if (!$nextShipment) {
             return response()->json([
