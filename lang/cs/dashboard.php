@@ -58,7 +58,7 @@ return [
     'status_completed' => 'Dokončeno',
     'status_unpaid' => 'Neuhrazená platba',
     'status_cancelled' => 'Zrušeno',
-    'next_shipment' => 'Další rozesílka',
+    'next_shipment' => 'Rozesílka',
     'shipment_after_pause' => 'Rozesílka po pauze',
 
     // No subscription

@@ -58,7 +58,7 @@ return [
     'status_completed' => 'Completed',
     'status_unpaid' => 'Unpaid',
     'status_cancelled' => 'Cancelled',
-    'next_shipment' => 'Next shipment',
+    'next_shipment' => 'Shipment',
     'shipment_after_pause' => 'Shipment after pause',
 
     // No subscription
