@@ -57,11 +57,12 @@ class CouponService
             }
         }
 
-        // Kontrola minimální hodnoty objednávky
-        if ($orderValue !== null && !$coupon->meetsMinimumOrderValue($orderValue)) {
+        // Kontrola minimální hodnoty objednávky (pouze pro jednorázové objednávky)
+        if ($type === 'order' && $orderValue !== null && !$coupon->meetsMinimumOrderValue($orderValue)) {
+            $formattedMin = \App\Helpers\CurrencyHelper::formatAmount($coupon->getMinOrderValue());
             return [
                 'valid' => false,
-                'message' => "Minimální hodnota objednávky pro tento kupón je {$coupon->min_order_value} Kč."
+                'message' => "Minimální hodnota objednávky pro tento kupón je {$formattedMin}."
             ];
         }
 

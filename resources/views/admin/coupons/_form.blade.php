@@ -87,6 +87,34 @@
                 </label>
             </div>
         </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+                <label for="min_order_value" class="block text-sm font-medium text-gray-700 mb-1">Min. hodnota objednávky (Kč)</label>
+                <input type="number" name="min_order_value" id="min_order_value" 
+                    value="{{ old('min_order_value', $coupon->min_order_value ?? '') }}" 
+                    step="0.01" min="0"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="500">
+                <p class="text-xs text-gray-500 mt-1">Nechte prázdné pro bez omezení</p>
+                @error('min_order_value')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="min_order_value_eur" class="block text-sm font-medium text-gray-700 mb-1">Min. hodnota objednávky (EUR)</label>
+                <input type="number" name="min_order_value_eur" id="min_order_value_eur" 
+                    value="{{ old('min_order_value_eur', $coupon->min_order_value_eur ?? '') }}" 
+                    step="0.01" min="0"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="20">
+                <p class="text-xs text-gray-500 mt-1">Pro kavibox.com</p>
+                @error('min_order_value_eur')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
     </div>
 
     <!-- Sleva pro předplatné -->
@@ -280,33 +308,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label for="min_order_value" class="block text-sm font-medium text-gray-700 mb-1">Min. hodnota objednávky (Kč)</label>
-                <input type="number" name="min_order_value" id="min_order_value" 
-                    value="{{ old('min_order_value', $coupon->min_order_value ?? '') }}" 
-                    step="0.01" min="0"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="500">
-                <p class="text-xs text-gray-500 mt-1">Nechte prázdné pro bez omezení</p>
-                @error('min_order_value')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label for="min_order_value_eur" class="block text-sm font-medium text-gray-700 mb-1">Min. hodnota objednávky (EUR)</label>
-                <input type="number" name="min_order_value_eur" id="min_order_value_eur" 
-                    value="{{ old('min_order_value_eur', $coupon->min_order_value_eur ?? '') }}" 
-                    step="0.01" min="0"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="20">
-                <p class="text-xs text-gray-500 mt-1">Pro kavibox.com</p>
-                @error('min_order_value_eur')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label for="usage_limit_total" class="block text-sm font-medium text-gray-700 mb-1">Max. celkové použití</label>
                 <input type="number" name="usage_limit_total" id="usage_limit_total" 
