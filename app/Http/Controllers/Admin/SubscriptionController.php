@@ -19,7 +19,9 @@ class SubscriptionController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Subscription::with(['user', 'plan']);
+        $query = Subscription::with(['user', 'plan', 'shipments' => function($q) {
+            $q->where('status', 'pending')->orderBy('shipment_date', 'asc')->limit(1);
+        }]);
 
         // Filter by status if provided
         if ($request->has('status') && $request->status !== 'all') {

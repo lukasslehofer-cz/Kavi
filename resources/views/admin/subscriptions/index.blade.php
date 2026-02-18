@@ -186,9 +186,10 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                             @if($subscription->status === 'cancelled')
                                 @php
-                                    // Pro zrušená - najít poslední zaplacený box, který ještě nebyl odeslán
-                                    $nextShip = $subscription->next_shipment_date;
-                                    $hasRemainingBox = $nextShip && \App\Helpers\SubscriptionHelper::hasPaidCoverageForDate($subscription, $nextShip);
+                                    // Pro zrušená - zkontrolovat skutečné pending zásilky místo teoretického výpočtu
+                                    $pendingShipment = $subscription->shipments->first();
+                                    $hasRemainingBox = $pendingShipment !== null;
+                                    $nextShip = $pendingShipment?->shipment_date;
                                 @endphp
                                 @if($hasRemainingBox)
                                     <span class="text-orange-600">{{ $nextShip->format('d.m.Y') }}</span>
