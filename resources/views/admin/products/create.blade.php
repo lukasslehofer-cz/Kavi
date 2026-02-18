@@ -56,6 +56,18 @@
                 </p>
             </div>
 
+            <div>
+                <label class="block text-sm font-medium text-coffee-900 mb-2">Obrázek pro Facebook katalog</label>
+                <input type="file" name="facebook_image" accept="image/png,image/jpeg"
+                       class="input @error('facebook_image') border-red-500 @enderror">
+                @error('facebook_image')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-coffee-600 mt-1">
+                    Volitelný obrázek ve formátu PNG/JPG pro Facebook feed. Min. 500x500 px. Pokud není nahrán, použije se hlavní fotka z galerie.
+                </p>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Krátký popis 🇨🇿</label>

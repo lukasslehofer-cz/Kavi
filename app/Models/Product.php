@@ -24,6 +24,7 @@ class Product extends Model
         'stock',
         'image',
         'images',
+        'facebook_image',
         'category',
         'roastery_id',
         'attributes',

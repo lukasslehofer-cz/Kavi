@@ -98,6 +98,33 @@
                 @endif
             </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-900 mb-2">Obrázek pro Facebook katalog</label>
+
+                @if($product->facebook_image)
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 mb-2">Aktuální Facebook obrázek:</p>
+                    <div class="relative inline-block">
+                        <img src="{{ asset($product->facebook_image) }}" alt="Facebook image"
+                             class="h-32 object-cover rounded-lg border-2 border-gray-300">
+                        <label class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded cursor-pointer hover:bg-red-700">
+                            <input type="checkbox" name="remove_facebook_image" value="1" class="mr-1">
+                            Smazat
+                        </label>
+                    </div>
+                </div>
+                @endif
+
+                <input type="file" name="facebook_image" accept="image/png,image/jpeg"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('facebook_image') border-red-500 @enderror">
+                @error('facebook_image')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-gray-600 mt-1">
+                    Volitelný obrázek ve formátu PNG/JPG pro Facebook feed. Min. 500x500 px. Pokud není nahrán, použije se hlavní fotka z galerie.
+                </p>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-900 mb-2">Krátký popis 🇨🇿</label>

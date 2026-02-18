@@ -113,9 +113,10 @@ class FacebookCatalogFeedController extends Controller
         $productPath = $locale === 'en' ? '/product/' : '/produkt/';
         $this->addGoogleElement($dom, $item, 'link', $baseUrl . $productPath . $product->slug);
 
-        // g:image_link - Main product image (required)
-        if ($product->image) {
-            $imageUrl = $this->getAbsoluteImageUrl($product->image, $baseUrl);
+        // g:image_link - Use dedicated Facebook image (PNG/JPG) if available, otherwise fall back to main image
+        $mainImage = $product->facebook_image ?? $product->image;
+        if ($mainImage) {
+            $imageUrl = $this->getAbsoluteImageUrl($mainImage, $baseUrl);
             $this->addGoogleElement($dom, $item, 'image_link', $imageUrl);
         }
 
@@ -215,7 +216,7 @@ class FacebookCatalogFeedController extends Controller
         }
 
         $imagePath = ltrim($imagePath, '/');
-        return $baseUrl . '/' . $imagePath . '?v=2';
+        return $baseUrl . '/' . $imagePath;
     }
 
     /**
