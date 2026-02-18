@@ -721,7 +721,7 @@ class SubscriptionController extends Controller
             }
             
             // Convert value to target currency if needed
-            $value = $subscription->configured_price ?? 500;
+            $value = $subscription->configured_price ?: 500;
             if ($currency !== 'CZK') {
                 // Simple conversion: CZK to EUR (~25:1), CZK to USD (~23:1)
                 $value = match($currency) {
