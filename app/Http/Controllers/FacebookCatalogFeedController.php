@@ -206,8 +206,7 @@ class FacebookCatalogFeedController extends Controller
     }
 
     /**
-     * Get absolute image URL, converting WebP to JPEG for Facebook compatibility.
-     * Facebook only supports JPEG and PNG in catalog feeds.
+     * Get absolute image URL
      */
     private function getAbsoluteImageUrl(string $imagePath, string $baseUrl): string
     {
@@ -216,51 +215,7 @@ class FacebookCatalogFeedController extends Controller
         }
 
         $imagePath = ltrim($imagePath, '/');
-
-        if (str_ends_with(strtolower($imagePath), '.webp')) {
-            $imagePath = $this->ensureJpegVersion($imagePath);
-        }
-
         return $baseUrl . '/' . $imagePath;
-    }
-
-    /**
-     * Ensure a JPEG version of a WebP image exists on disk and return its path.
-     * Converts on first call, then serves the cached JPEG on subsequent requests.
-     */
-    private function ensureJpegVersion(string $webpPath): string
-    {
-        $jpegPath = preg_replace('/\.webp$/i', '.jpg', $webpPath);
-        $absoluteJpeg = public_path($jpegPath);
-
-        if (file_exists($absoluteJpeg)) {
-            return $jpegPath;
-        }
-
-        $absoluteWebp = public_path($webpPath);
-        if (!file_exists($absoluteWebp)) {
-            return $webpPath;
-        }
-
-        try {
-            $image = imagecreatefromwebp($absoluteWebp);
-            if ($image === false) {
-                return $webpPath;
-            }
-
-            $dir = dirname($absoluteJpeg);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
-            imagejpeg($image, $absoluteJpeg, 90);
-            imagedestroy($image);
-
-            return $jpegPath;
-        } catch (\Throwable $e) {
-            report($e);
-            return $webpPath;
-        }
     }
 
     /**
