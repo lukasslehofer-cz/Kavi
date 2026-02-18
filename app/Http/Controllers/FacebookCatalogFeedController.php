@@ -120,16 +120,6 @@ class FacebookCatalogFeedController extends Controller
             $this->addGoogleElement($dom, $item, 'image_link', $imageUrl);
         }
 
-        // g:additional_image_link - Additional images (up to 10), excluding the main image
-        if (!empty($product->images) && is_array($product->images)) {
-            foreach (array_slice($product->images, 0, 10) as $image) {
-                if ($image === $product->image) {
-                    continue;
-                }
-                $imageUrl = $this->getAbsoluteImageUrl($image, $baseUrl);
-                $this->addGoogleElement($dom, $item, 'additional_image_link', $imageUrl);
-            }
-        }
 
         // g:price - Original product price with currency (required)
         // Format: number + space + ISO 4217 currency code
