@@ -206,7 +206,7 @@ class FacebookCatalogFeedController extends Controller
     }
 
     /**
-     * Get absolute image URL
+     * Get absolute image URL with cache-busting parameter
      */
     private function getAbsoluteImageUrl(string $imagePath, string $baseUrl): string
     {
@@ -215,7 +215,7 @@ class FacebookCatalogFeedController extends Controller
         }
 
         $imagePath = ltrim($imagePath, '/');
-        return $baseUrl . '/' . $imagePath;
+        return $baseUrl . '/' . $imagePath . '?v=2';
     }
 
     /**
