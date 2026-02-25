@@ -249,11 +249,21 @@ class DownloadFakturoidInvoices extends Command
 
         for ($i = 0; $i < $maxRetries; $i++) {
             $token = $this->getAccessToken();
-            
-            $response = Http::withToken($token)
-                ->withHeaders(['User-Agent' => $this->userAgent])
-                ->timeout(30)
-                ->get("{$this->apiUrl}/accounts/{$this->slug}/invoices/{$invoiceId}/download.pdf");
+
+            try {
+                $response = Http::withToken($token)
+                    ->withHeaders(['User-Agent' => $this->userAgent])
+                    ->connectTimeout(60)
+                    ->timeout(120)
+                    ->get("{$this->apiUrl}/accounts/{$this->slug}/invoices/{$invoiceId}/download.pdf");
+            } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                if ($i < $maxRetries - 1) {
+                    $this->warn("    Network error for invoice {$invoiceId}, retrying... ({$e->getMessage()})");
+                    sleep($retryDelay);
+                    continue;
+                }
+                throw $e;
+            }
 
             if ($response->status() === 200) {
                 Storage::put($filename, $response->body());
