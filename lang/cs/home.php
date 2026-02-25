@@ -11,7 +11,7 @@ return [
     'hero' => [
         'badge' => 'Každý měsíc něco nového',
         'title' => 'Objevte tu nejlepší kávu z celé Evropy',
-        'subtitle' => 'Prémiová káva s pravidelným předplatným. Čerstvě pražená, pečlivě vybraná, doručená přímo k vám.',
+        'subtitle' => 'Výběrová káva s pravidelným předplatným. Čerstvě pražená, pečlivě vybraná, doručená přímo k vám.',
         'cta_primary' => 'Sestavte si vlastní box',
         'cta_secondary' => 'Kávový obchod',
     ],

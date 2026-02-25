@@ -39,13 +39,18 @@ class ResumeExpiredPausedSubscriptions extends Command
             $this->line("Processing: {$subscriptionNumber}");
             
             try {
-                // Resume subscription using the central service
-                $shipmentService->resumeSubscription($subscription);
+                $result = $shipmentService->resumeSubscription($subscription);
+                
+                if (!$result['success']) {
+                    $this->warn("  ⏭ Skipped: " . $result['message']);
+                    $failedCount++;
+                    continue;
+                }
                 
                 // Get the calculated next shipment info
                 $shipmentInfo = $shipmentService->getShipmentInfo($subscription);
                 $nextShipment = $shipmentInfo->nextShipmentDate();
-                $nextBilling = $subscription->next_billing_date;
+                $nextBilling = $subscription->fresh()->next_billing_date;
                 
                 $this->info("  ✓ Resumed → Next billing: {$nextBilling?->format('d.m.Y')}, Next shipment: {$nextShipment?->format('d.m.Y')}");
                 $resumedCount++;

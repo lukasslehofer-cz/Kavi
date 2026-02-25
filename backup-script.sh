@@ -47,7 +47,15 @@ else
     log "❌ Storage backup failed!"
 fi
 
-# 3. Backup .env souboru
+# 3. Backup nahraných obrázků (produkty, pražírny, blog, promo)
+log "📦 Backing up uploaded images..."
+if tar -czf "$BACKUP_DIR/${PROJECT_NAME}_images_${DATE}.tar.gz" -C "$PROJECT_PATH" public/images 2>/dev/null; then
+    log "✅ Images backup successful: ${PROJECT_NAME}_images_${DATE}.tar.gz"
+else
+    log "❌ Images backup failed!"
+fi
+
+# 4. Backup .env souboru
 log "📦 Backing up .env configuration..."
 if [ -f "$PROJECT_PATH/.env" ]; then
     cp "$PROJECT_PATH/.env" "$BACKUP_DIR/${PROJECT_NAME}_env_${DATE}.txt"
@@ -56,13 +64,13 @@ else
     log "⚠️  .env file not found!"
 fi
 
-# 4. Smazání starých backupů
+# 5. Smazání starých backupů
 log "🧹 Cleaning up old backups (older than $RETENTION_DAYS days)..."
 find "$BACKUP_DIR" -name "${PROJECT_NAME}_*" -type f -mtime +$RETENTION_DAYS -delete
 DELETED_COUNT=$(find "$BACKUP_DIR" -name "${PROJECT_NAME}_*" -type f -mtime +$RETENTION_DAYS | wc -l)
 log "✅ Removed $DELETED_COUNT old backup files"
 
-# 5. Kontrola disk space
+# 6. Kontrola disk space
 log "💾 Disk space check..."
 DISK_USAGE=$(df -h "$BACKUP_DIR" | awk 'NR==2 {print $5}' | sed 's/%//')
 log "📊 Backup directory disk usage: ${DISK_USAGE}%"
@@ -71,11 +79,11 @@ if [ "$DISK_USAGE" -gt 80 ]; then
     log "⚠️  WARNING: Disk usage is above 80%!"
 fi
 
-# 6. Velikost backupů
+# 7. Velikost backupů
 BACKUP_SIZE=$(du -sh "$BACKUP_DIR" | awk '{print $1}')
 log "📊 Total backup size: $BACKUP_SIZE"
 
-# 7. Seznam nejnovějších backupů
+# 8. Seznam nejnovějších backupů
 log "📋 Latest backups:"
 ls -lht "$BACKUP_DIR" | head -n 6
 

@@ -215,7 +215,7 @@
             <!-- Side description -->
             <div class="mt-6 flex flex-col sm:flex-row gap-6 sm:gap-12">
                 <p class="text-xs uppercase tracking-widest text-white/60 max-w-[250px] leading-relaxed">
-                    {{ $currentLocale === 'en' ? 'Premium coffee with regular subscription. Freshly roasted, carefully selected.' : 'Prémiová káva s pravidelným předplatným. Čerstvě pražená, pečlivě vybraná.' }}
+                    {{ $currentLocale === 'en' ? 'Specialty coffee with regular subscription. Freshly roasted, carefully selected.' : 'Výběrová káva s pravidelným předplatným. Čerstvě pražená, pečlivě vybraná.' }}
                 </p>
                 <!--<p class="text-xs uppercase tracking-widest text-white/60 max-w-[250px] leading-relaxed">
                     {{ $currentLocale === 'en' ? 'Each month a new selection from exceptional European roasteries.' : 'Každý měsíc nový výběr z výjimečných evropských pražíren.' }}

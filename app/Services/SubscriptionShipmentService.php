@@ -413,7 +413,8 @@ class SubscriptionShipmentService
         );
 
         // 6. Update subscription status
-        $pausedUntilDate = $skippedDates->last();
+        // Use day after last skipped shipment so resume doesn't collide with shipment date (20th -> 21st)
+        $pausedUntilDate = $skippedDates->last()?->copy()->addDay();
         $subscription->update([
             'status' => 'paused',
             'paused_iterations' => $iterations,
@@ -546,7 +547,7 @@ class SubscriptionShipmentService
         // 4. Delete all future skipped shipments (those that haven't happened yet)
         $deletedSkipped = $subscription->shipments()
             ->where('status', 'skipped')
-            ->where('shipment_date', '>', now())
+            ->where('shipment_date', '>=', today()->startOfDay())
             ->delete();
 
         // 5. Delete all future pending shipments (created when pause was set up)
@@ -588,20 +589,34 @@ class SubscriptionShipmentService
         $schedule = ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
         $billingDate = $schedule?->billing_date ?? $nextShipmentDate->copy()->day(15);
         
-        // If the shipment is skipped OR billing date has passed, we need to skip to next month
-        $needsToSkipToNextMonth = ($existingShipment && $existingShipment->status === 'skipped') 
-            || $billingDate->lte(today());
-        
-        if ($needsToSkipToNextMonth) {
-            // Calculate next month's shipment
+        // Skip forward until we find a month with a future billing date and no skipped shipment
+        $skippedMonths = 0;
+        while (
+            ($existingShipment && $existingShipment->status === 'skipped')
+            || $billingDate->lte(today())
+        ) {
             $nextMonth = $nextShipmentDate->copy()->addMonths($frequencyMonths);
-            $nextSchedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
-            $nextShipmentDate = $nextSchedule?->shipment_date ?? $nextMonth->copy()->day(20);
-            $billingDate = $nextSchedule?->billing_date ?? $nextMonth->copy()->day(15);
-            $schedule = $nextSchedule;
-            
-            \Log::info('Skipped to next month after resume (skipped shipment or past billing date)', [
+            $schedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
+            $nextShipmentDate = $schedule?->shipment_date ?? $nextMonth->copy()->day(20);
+            $billingDate = $schedule?->billing_date ?? $nextShipmentDate->copy()->day(15);
+
+            $existingShipment = $subscription->shipments()
+                ->whereDate('shipment_date', $nextShipmentDate->toDateString())
+                ->first();
+
+            $skippedMonths++;
+            if ($skippedMonths > 12) {
+                \Log::error('Resume skip loop exceeded 12 months, breaking', [
+                    'subscription_id' => $subscription->id,
+                ]);
+                break;
+            }
+        }
+
+        if ($skippedMonths > 0) {
+            \Log::info('Skipped months after resume to find future billing date', [
                 'subscription_id' => $subscription->id,
+                'skipped_months' => $skippedMonths,
                 'new_shipment_date' => $nextShipmentDate->toDateString(),
                 'new_billing_date' => $billingDate->toDateString(),
             ]);

@@ -68,3 +68,5 @@ CLAUDE.md
 !/public/images/roasteries/.gitkeep
 /public/images/promo-images/*
 !/public/images/promo-images/.gitkeep
+/public/images/blog/*
+!/public/images/blog/.gitkeep

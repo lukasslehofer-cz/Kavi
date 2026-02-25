@@ -23,6 +23,21 @@ class StockReservationService
      */
     public function updateReservationsForSchedule(ShipmentSchedule $schedule): void
     {
+        if ($schedule->isPast()) {
+            $hasSentShipments = \App\Models\SubscriptionShipment::where('shipment_schedule_id', $schedule->id)
+                ->where('status', 'sent')
+                ->exists();
+
+            if ($hasSentShipments) {
+                Log::warning('Attempted to recalculate reservations for already-shipped schedule, finalizing instead', [
+                    'schedule_id' => $schedule->id,
+                    'month' => $schedule->month . '/' . $schedule->year,
+                ]);
+                $this->finalizeReservationsForSchedule($schedule);
+                return;
+            }
+        }
+
         DB::transaction(function () use ($schedule) {
             // Get all subscriptions that should ship on this date
             $subscriptions = $this->getSubscriptionsForShipment($schedule);
@@ -313,13 +328,43 @@ class StockReservationService
     }
 
     /**
+     * Finalize (consume) reservations for a past schedule whose shipments have been sent.
+     * Deletes StockReservation records WITHOUT releasing stock back to the products,
+     * permanently locking in the stock deduction after physical shipping.
+     */
+    public function finalizeReservationsForSchedule(ShipmentSchedule $schedule): void
+    {
+        $deleted = StockReservation::where('shipment_schedule_id', $schedule->id)->delete();
+
+        if ($deleted > 0) {
+            Log::info('Finalized (consumed) reservations for shipped schedule', [
+                'schedule_id' => $schedule->id,
+                'month' => $schedule->month . '/' . $schedule->year,
+                'deleted_records' => $deleted,
+            ]);
+        }
+    }
+
+    /**
      * Update reservations for all upcoming shipments
      * This should be called via cron job on the 16th of each month
      */
     public function updateAllUpcomingReservations(): void
     {
         $today = now();
-        
+
+        // Finalize past schedules that still have lingering reservations
+        $pastScheduleIds = StockReservation::select('shipment_schedule_id')
+            ->distinct()
+            ->pluck('shipment_schedule_id');
+
+        foreach ($pastScheduleIds as $scheduleId) {
+            $schedule = ShipmentSchedule::find($scheduleId);
+            if ($schedule && $schedule->isPast()) {
+                $this->finalizeReservationsForSchedule($schedule);
+            }
+        }
+
         // Get current month's schedule if billing hasn't passed yet
         $currentSchedule = ShipmentSchedule::getForMonth($today->year, $today->month);
         

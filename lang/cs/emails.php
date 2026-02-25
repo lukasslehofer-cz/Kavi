@@ -16,7 +16,7 @@ return [
         'questions' => 'Pokud máte jakékoli dotazy, neváhejte nás kontaktovat.',
         'contact_email' => 'info@kavi.cz',
         'site_name' => 'KAVI.cz',
-        'tagline' => 'Prémiová káva s předplatným',
+        'tagline' => 'Výběrová káva s předplatným',
         'copyright' => '© :year KAVI.cz. Všechna práva vyhrazena.',
         'home' => 'Domů',
         'shop' => 'Obchod',

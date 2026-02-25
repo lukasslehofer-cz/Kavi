@@ -44,10 +44,11 @@ class SubscriptionStockObserver
         try {
             $reservationService = app(StockReservationService::class);
 
-            // Get the next shipment schedule
+            // Get the next shipment schedule (skip past ones — the service guard
+            // would also catch this, but we avoid the overhead entirely)
             $nextShipment = ShipmentSchedule::getNextShipment();
             
-            if ($nextShipment) {
+            if ($nextShipment && !$nextShipment->isPast()) {
                 $reservationService->updateReservationsForSchedule($nextShipment);
             }
 
@@ -55,7 +56,7 @@ class SubscriptionStockObserver
             $twoMonthsAhead = now()->addMonths(2);
             $futureSchedule = ShipmentSchedule::getForMonth($twoMonthsAhead->year, $twoMonthsAhead->month);
             
-            if ($futureSchedule) {
+            if ($futureSchedule && !$futureSchedule->isPast()) {
                 $reservationService->updateReservationsForSchedule($futureSchedule);
             }
 

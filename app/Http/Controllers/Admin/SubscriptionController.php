@@ -1122,6 +1122,11 @@ class SubscriptionController extends Controller
                     ->with('error', "Harmonogram pro {$month}/{$year} neexistuje.");
             }
 
+            if ($schedule->isPast()) {
+                return redirect()->back()
+                    ->with('error', "Nelze přepočítat rezervace pro minulý měsíc {$month}/{$year} — zásilky již byly odeslány.");
+            }
+
             $reservationService->updateReservationsForSchedule($schedule);
 
             Log::info('Stock reservations manually recalculated by admin', [

@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Storage;
 
 class DownloadFakturoidInvoices extends Command
 {
-    protected $signature = 'fakturoid:download-invoices 
+    protected $signature = 'fakturoid:download-invoices
                             {--orders : Download only order invoices}
                             {--subscriptions : Download only subscription payment invoices}
                             {--force : Re-download even if PDF already exists}
-                            {--dry-run : Show what would be downloaded without actually downloading}';
+                            {--dry-run : Show what would be downloaded without actually downloading}
+                            {--from= : Filter records created from this date (Y-m-d, e.g. 2026-01-01)}
+                            {--to= : Filter records created up to this date (Y-m-d, e.g. 2026-01-31)}';
 
     protected $description = 'Download all invoice PDFs from Fakturoid for orders and subscription payments';
 
@@ -43,6 +45,21 @@ class DownloadFakturoidInvoices extends Command
         $onlySubscriptions = $this->option('subscriptions');
         $force = $this->option('force');
         $dryRun = $this->option('dry-run');
+        $from = $this->option('from');
+        $to = $this->option('to');
+
+        if ($from && !strtotime($from)) {
+            $this->error('Invalid --from date format. Use Y-m-d (e.g. 2026-01-01)');
+            return 1;
+        }
+        if ($to && !strtotime($to)) {
+            $this->error('Invalid --to date format. Use Y-m-d (e.g. 2026-01-31)');
+            return 1;
+        }
+
+        if ($from || $to) {
+            $this->info('📅 Date filter: ' . ($from ?? '*') . ' → ' . ($to ?? '*'));
+        }
 
         // If neither specified, do both
         $doOrders = !$onlySubscriptions || $onlyOrders;
@@ -61,6 +78,8 @@ class DownloadFakturoidInvoices extends Command
             $this->info("\n📦 Processing Order Invoices...\n");
             
             $orders = Order::whereNotNull('fakturoid_invoice_id')
+                ->when($from, fn($q) => $q->where('created_at', '>=', $from . ' 00:00:00'))
+                ->when($to,   fn($q) => $q->where('created_at', '<=', $to   . ' 23:59:59'))
                 ->when(!$force, fn($q) => $q->where(function($q) {
                     $q->whereNull('invoice_pdf_path')
                       ->orWhere('invoice_pdf_path', '');
@@ -100,6 +119,8 @@ class DownloadFakturoidInvoices extends Command
             $this->info("\n📋 Processing Subscription Payment Invoices...\n");
             
             $payments = SubscriptionPayment::whereNotNull('fakturoid_invoice_id')
+                ->when($from, fn($q) => $q->where('created_at', '>=', $from . ' 00:00:00'))
+                ->when($to,   fn($q) => $q->where('created_at', '<=', $to   . ' 23:59:59'))
                 ->when(!$force, fn($q) => $q->where(function($q) {
                     $q->whereNull('invoice_pdf_path')
                       ->orWhere('invoice_pdf_path', '');
