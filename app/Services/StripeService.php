@@ -1259,9 +1259,27 @@ class StripeService
         ]);
 
         try {
-            // Get payment intent to access metadata
-            $paymentIntent = \Stripe\PaymentIntent::retrieve($session['payment_intent']);
-            $metadata = $paymentIntent->metadata->toArray();
+            // Use metadata from session webhook payload first (avoids an extra Stripe API call).
+            // Metadata is stored on both session and payment_intent, so the session payload
+            // already contains everything we need. Fall back to PaymentIntent::retrieve only
+            // if session metadata is missing the required fields.
+            $sessionMetadata = $session['metadata'] ?? [];
+            $hasRequiredMetadata = !empty($sessionMetadata['type']) &&
+                (!empty($sessionMetadata['user_id']) || !empty($sessionMetadata['guest_email']));
+
+            if ($hasRequiredMetadata) {
+                $metadata = $sessionMetadata;
+                $paymentIntentId = $session['payment_intent'];
+                $paymentIntentAmount = $session['amount_total'];
+                $paymentIntentCurrency = $session['currency'];
+            } else {
+                // Fallback: fetch from Stripe (legacy sessions or missing metadata)
+                $paymentIntent = \Stripe\PaymentIntent::retrieve($session['payment_intent']);
+                $metadata = $paymentIntent->metadata->toArray();
+                $paymentIntentId = $paymentIntent->id;
+                $paymentIntentAmount = $paymentIntent->amount;
+                $paymentIntentCurrency = $paymentIntent->currency;
+            }
 
             // Extract subscription data from metadata
             $userId = $metadata['user_id'] ?? null;
@@ -1274,14 +1292,14 @@ class StripeService
             }
 
             // Check for duplicate (idempotency)
-            $existingSubscription = Subscription::where('stripe_payment_intent_id', $paymentIntent->id)->first();
+            $existingSubscription = Subscription::where('stripe_payment_intent_id', $paymentIntentId)->first();
             if ($existingSubscription) {
                 \Log::info('Subscription already exists for this payment intent', [
                     'subscription_id' => $existingSubscription->id,
                 ]);
                 return;
             }
-            
+
             // Check if subscription was pre-created by SubscriptionController
             $preCreatedSubscription = null;
             if (isset($metadata['subscription_id'])) {
@@ -1289,7 +1307,7 @@ class StripeService
                 if ($preCreatedSubscription) {
                     \Log::info('Found pre-created subscription, updating instead of creating new', [
                         'subscription_id' => $preCreatedSubscription->id,
-                        'payment_intent' => $paymentIntent->id,
+                        'payment_intent' => $paymentIntentId,
                     ]);
                 }
             }
@@ -1298,7 +1316,7 @@ class StripeService
             $subscriptionRecord = [
                 'subscription_number' => Subscription::generateSubscriptionNumber(),
                 'user_id' => $userId,
-                'stripe_payment_intent_id' => $paymentIntent->id, // Store first payment intent
+                'stripe_payment_intent_id' => $paymentIntentId, // Store first payment intent
                 'stripe_session_id' => $session['id'],
                 'stripe_subscription_id' => null, // No Stripe subscription object!
                 'status' => 'active',
@@ -1346,7 +1364,7 @@ class StripeService
             if ($preCreatedSubscription) {
                 // Update pre-created subscription
                 $preCreatedSubscription->update([
-                    'stripe_payment_intent_id' => $paymentIntent->id,
+                    'stripe_payment_intent_id' => $paymentIntentId,
                     'stripe_session_id' => $session['id'],
                     'status' => 'active',
                     'starts_at' => now(),
@@ -1365,9 +1383,9 @@ class StripeService
             // This is different from next_billing_date which is when NEXT payment is due
             $payment = \App\Models\SubscriptionPayment::create([
                 'subscription_id' => $subscription->id,
-                'stripe_payment_intent_id' => $paymentIntent->id,
-                'amount' => $paymentIntent->amount / 100, // Convert from cents
-                'currency' => $paymentIntent->currency,
+                'stripe_payment_intent_id' => $paymentIntentId,
+                'amount' => $paymentIntentAmount / 100, // Convert from cents
+                'currency' => $paymentIntentCurrency,
                 'status' => 'paid',
                 'paid_at' => now(),
                 'period_start' => now(),
@@ -1570,7 +1588,7 @@ class StripeService
 
             // Mark this checkout as completed in cache
             // This helps differentiate between new subscription payment methods vs. changed payment methods
-            $customerId = $paymentIntent->customer;
+            $customerId = $stripeCustomerId; // already available from session['customer']
             if ($customerId) {
                 \Cache::put("recent_checkout_{$customerId}", true, now()->addMinutes(3));
                 \Log::info('Marked recent checkout for customer', [
