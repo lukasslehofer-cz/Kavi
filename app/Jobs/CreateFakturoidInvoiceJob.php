@@ -32,26 +32,39 @@ class CreateFakturoidInvoiceJob implements ShouldQueue
             return;
         }
 
-        if ($payment->fakturoid_invoice_id) {
-            Log::info('CreateFakturoidInvoiceJob: invoice already exists, skipping', [
+        // Invoice exists but PDF missing - just download PDF
+        if ($payment->fakturoid_invoice_id && !$payment->invoice_pdf_path) {
+            $pdfPath = $fakturoidService->downloadSubscriptionInvoicePdf(
+                $payment->fakturoid_invoice_id, $payment
+            );
+            if ($pdfPath) {
+                $payment->update(['invoice_pdf_path' => $pdfPath]);
+                Log::info('CreateFakturoidInvoiceJob: PDF downloaded for existing invoice', [
+                    'payment_id' => $this->paymentId,
+                    'invoice_id' => $payment->fakturoid_invoice_id,
+                ]);
+                return;
+            }
+            throw new \RuntimeException('CreateFakturoidInvoiceJob: failed to download PDF for existing invoice ' . $payment->fakturoid_invoice_id);
+        }
+
+        // Both exist - nothing to do
+        if ($payment->fakturoid_invoice_id && $payment->invoice_pdf_path) {
+            Log::info('CreateFakturoidInvoiceJob: invoice and PDF already exist, skipping', [
                 'payment_id' => $this->paymentId,
-                'invoice_id' => $payment->fakturoid_invoice_id,
             ]);
             return;
         }
 
+        // Nothing exists - create invoice from scratch
         $result = $fakturoidService->processInvoiceForSubscriptionPayment($payment);
 
         if (!$result) {
-            Log::error('CreateFakturoidInvoiceJob: invoice creation failed', [
-                'payment_id' => $this->paymentId,
-                'attempt' => $this->attempts(),
-            ]);
-            $this->fail('Fakturoid invoice creation returned false');
-        } else {
-            Log::info('CreateFakturoidInvoiceJob: invoice created successfully', [
-                'payment_id' => $this->paymentId,
-            ]);
+            throw new \RuntimeException('CreateFakturoidInvoiceJob: invoice creation failed for payment ' . $this->paymentId);
         }
+
+        Log::info('CreateFakturoidInvoiceJob: invoice created successfully', [
+            'payment_id' => $this->paymentId,
+        ]);
     }
 }

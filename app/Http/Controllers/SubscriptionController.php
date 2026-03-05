@@ -979,17 +979,8 @@ class SubscriptionController extends Controller
                     $this->couponService->clearCouponFromStorage();
                 }
 
-                DB::commit();
-
-                // Clear session
-                session()->forget([
-                    'subscription_configuration',
-                    'subscription_price',
-                    'subscription_price_without_vat',
-                    'subscription_vat',
-                ]);
-
-                // Create Stripe one-time payment session
+                // Create Stripe one-time payment session BEFORE commit
+                // If Stripe fails, the transaction rolls back — no orphaned subscriptions
                 $shippingAddress = [
                     'name' => $validated['name'],
                     'email' => $validated['email'],
@@ -1009,6 +1000,16 @@ class SubscriptionController extends Controller
                 );
 
                 $subscription->update(['stripe_session_id' => $session->id]);
+
+                DB::commit();
+
+                // Clear session after successful commit
+                session()->forget([
+                    'subscription_configuration',
+                    'subscription_price',
+                    'subscription_price_without_vat',
+                    'subscription_vat',
+                ]);
 
                 return redirect($session->url);
             }

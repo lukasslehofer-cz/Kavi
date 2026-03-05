@@ -793,7 +793,7 @@ class FakturoidService
     /**
      * Download subscription invoice PDF
      */
-    private function downloadSubscriptionInvoicePdf(int $invoiceId, \App\Models\SubscriptionPayment $payment): ?string
+    public function downloadSubscriptionInvoicePdf(int $invoiceId, \App\Models\SubscriptionPayment $payment): ?string
     {
         try {
             $maxRetries = 5;
