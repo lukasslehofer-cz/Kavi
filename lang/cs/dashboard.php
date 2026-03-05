@@ -62,7 +62,7 @@ return [
     'shipment_after_pause' => 'Rozesílka po pauze',
 
     // No subscription
-    'no_active_subscription' => 'Nemáte aktivní předplatné',
+    'no_active_subscription' => 'Vyberte si předplatné',
     'start_coffee_journey' => 'Začněte svou kávovou cestu s námi a objevte ty nejlepší kávy z prémiových pražíren.',
     'select_subscription' => 'Vybrat předplatné',
 
