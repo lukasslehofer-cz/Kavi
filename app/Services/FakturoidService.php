@@ -98,7 +98,11 @@ class FakturoidService
         }
 
         try {
-            $response = Http::withBasicAuth($this->clientId, $this->clientSecret)
+            $response = Http::timeout(15)
+                ->retry(3, 2000, function ($exception) {
+                    return $exception instanceof \Illuminate\Http\Client\ConnectionException;
+                })
+                ->withBasicAuth($this->clientId, $this->clientSecret)
                 ->withHeaders([
                     'User-Agent' => $this->userAgent,
                     'Accept' => 'application/json',

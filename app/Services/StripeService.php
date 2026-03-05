@@ -1577,13 +1577,26 @@ class StripeService
                 $payment = $subscription->payments()->first();
                 if ($payment) {
                     $fakturoidService = app(\App\Services\FakturoidService::class);
-                    $fakturoidService->processInvoiceForSubscriptionPayment($payment);
+                    $result = $fakturoidService->processInvoiceForSubscriptionPayment($payment);
+                    if (!$result) {
+                        \App\Jobs\CreateFakturoidInvoiceJob::dispatch($payment->id)
+                            ->delay(now()->addMinutes(5));
+                        \Log::warning('Fakturoid invoice creation failed, dispatched retry job', [
+                            'subscription_id' => $subscription->id,
+                            'payment_id' => $payment->id,
+                        ]);
+                    }
                 }
             } catch (\Exception $e) {
                 \Log::error('Failed to create Fakturoid invoice for first payment', [
                     'subscription_id' => $subscription->id,
                     'error' => $e->getMessage(),
                 ]);
+                $payment = $subscription->payments()->first();
+                if ($payment) {
+                    \App\Jobs\CreateFakturoidInvoiceJob::dispatch($payment->id)
+                        ->delay(now()->addMinutes(5));
+                }
             }
 
             // Mark this checkout as completed in cache
