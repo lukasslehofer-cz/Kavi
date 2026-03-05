@@ -54,32 +54,6 @@ class RetrySubscriptionInvoiceAndEmail extends Command
             }
         }
 
-        // 2. Confirmation email to customer
-        $email = $subscription->user?->email
-            ?? $subscription->shipping_address['email']
-            ?? null;
-
-        if ($email) {
-            $this->info("Sending confirmation email to {$email}...");
-            try {
-                \Mail::to($email)->send(new \App\Mail\SubscriptionConfirmation($subscription));
-                $this->info('Confirmation email sent.');
-            } catch (\Exception $e) {
-                $this->error("Email error: {$e->getMessage()}");
-            }
-        } else {
-            $this->warn('No customer email found, skipping confirmation email.');
-        }
-
-        // 3. Admin notification
-        $this->info('Sending admin notification...');
-        try {
-            \App\Mail\AdminOrderNotification::notifyAdmins($subscription);
-            $this->info('Admin notification sent.');
-        } catch (\Exception $e) {
-            $this->error("Admin notification error: {$e->getMessage()}");
-        }
-
         $this->info('Done!');
         $this->table(['Field', 'Value'], [
             ['Subscription', $subscription->subscription_number],
