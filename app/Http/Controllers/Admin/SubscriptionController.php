@@ -844,6 +844,85 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * Mark selected shipments as shipped and delivered manually (personal handover, no Packeta)
+     */
+    public function markAsShippedManually(Request $request)
+    {
+        $request->validate([
+            'subscription_ids' => 'required|array|min:1',
+            'subscription_ids.*' => 'exists:subscriptions,id',
+            'target_date' => 'nullable|date',
+        ]);
+
+        $targetDate = $request->has('target_date')
+            ? \Carbon\Carbon::parse($request->target_date)
+            : \App\Helpers\SubscriptionHelper::getNextShippingDate();
+
+        $successCount = 0;
+        $errorCount = 0;
+        $errors = [];
+
+        foreach ($request->subscription_ids as $subscriptionId) {
+            $subscription = Subscription::with('user')->find($subscriptionId);
+
+            // Get or create shipment for this date
+            $shipment = $this->getOrCreateShipment($subscription, $targetDate);
+
+            // Skip if already sent
+            if ($shipment->isSent()) {
+                continue;
+            }
+
+            try {
+                // Mark as shipped without Packeta data
+                $shipmentService = app(SubscriptionShipmentService::class);
+                $shipmentService->markAsShipped($shipment);
+
+                // Immediately mark as delivered (observer sends "delivered" email)
+                $shipment->update([
+                    'status' => 'delivered',
+                    'delivered_at' => now(),
+                ]);
+
+                $successCount++;
+                Log::info('Zásilka označena jako doručená (osobní předání)', [
+                    'subscription_id' => $subscription->id,
+                    'shipment_id' => $shipment->id,
+                    'admin_user_id' => auth()->id(),
+                ]);
+            } catch (\Exception $e) {
+                $errors[] = "Předplatné #{$subscription->id}: " . $e->getMessage();
+                $errorCount++;
+                Log::error('Chyba při ručním označení zásilky jako doručené', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Prepare success message
+        $message = '';
+        if ($successCount > 0) {
+            $message .= "Úspěšně označeno {$successCount} " .
+                ($successCount === 1 ? 'zásilka' : ($successCount < 5 ? 'zásilky' : 'zásilek')) .
+                " jako doručené (osobní předání). ";
+        }
+        if ($errorCount > 0) {
+            $message .= "{$errorCount} " .
+                ($errorCount === 1 ? 'zásilka selhala' : ($errorCount < 5 ? 'zásilky selhaly' : 'zásilek selhalo')) . ". ";
+        }
+
+        if ($errorCount > 0 && count($errors) > 0) {
+            return redirect()->route('admin.subscriptions.shipments')
+                ->with('warning', $message)
+                ->with('errors', $errors);
+        }
+
+        return redirect()->route('admin.subscriptions.shipments')
+            ->with('success', $message);
+    }
+
+    /**
      * Send "Box Preparing" emails to selected subscriptions
      */
     public function sendPreparingEmails(Request $request)

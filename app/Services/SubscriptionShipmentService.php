@@ -767,19 +767,26 @@ class SubscriptionShipmentService
     }
 
     /**
-     * Mark shipment as shipped (called from admin when sending to Packeta)
+     * Mark shipment as shipped (called from admin when sending to Packeta or manually)
      */
     public function markAsShipped(
         SubscriptionShipment $shipment,
-        string $packetId,
-        string $trackingUrl
+        ?string $packetId = null,
+        ?string $trackingUrl = null
     ): void {
-        $shipment->update([
+        $updateData = [
             'status' => 'sent',
-            'packeta_packet_id' => $packetId,
-            'packeta_tracking_url' => $trackingUrl,
             'sent_at' => now(),
-        ]);
+        ];
+
+        if ($packetId !== null) {
+            $updateData['packeta_packet_id'] = $packetId;
+        }
+        if ($trackingUrl !== null) {
+            $updateData['packeta_tracking_url'] = $trackingUrl;
+        }
+
+        $shipment->update($updateData);
 
         // Update last_shipment_date on subscription as cache (backward compatibility)
         $shipment->subscription->update([

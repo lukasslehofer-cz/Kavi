@@ -496,6 +496,12 @@
                 </svg>
                 Odeslat vybrané do Packety
             </button>
+            <button type="button" id="mark-shipped-manually-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Označit jako doručené (osobní předání)
+            </button>
             <button type="button" id="send-preparing-emails-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -699,6 +705,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 shipmentsForm.action = '{{ route('admin.subscriptions.send-preparing-emails') }}';
                 shipmentsForm.submit();
                 
+                // Restore original action (in case submit is prevented)
+                shipmentsForm.action = originalAction;
+            }
+        });
+    }
+
+    // Mark as shipped manually button
+    const markShippedManuallyBtn = document.getElementById('mark-shipped-manually-btn');
+    if (markShippedManuallyBtn) {
+        markShippedManuallyBtn.addEventListener('click', function() {
+            const checkedBoxes = document.querySelectorAll('.shipment-checkbox:checked');
+
+            if (checkedBoxes.length === 0) {
+                alert('Prosím vyberte alespoň jednu zásilku.');
+                return;
+            }
+
+            const count = checkedBoxes.length;
+            const message = `Opravdu chcete označit ${count} ${count === 1 ? 'zásilku' : (count < 5 ? 'zásilky' : 'zásilek')} jako doručené (osobní předání)?\n\nZákazníkům bude odeslán email o doručení.`;
+
+            if (confirm(message)) {
+                // Show loading state
+                markShippedManuallyBtn.disabled = true;
+                markShippedManuallyBtn.innerHTML = '<svg class="animate-spin h-5 w-5 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Zpracování...';
+
+                // Change form action to manual shipment endpoint
+                const originalAction = shipmentsForm.action;
+                shipmentsForm.action = '{{ route('admin.subscriptions.mark-shipped-manually') }}';
+                shipmentsForm.submit();
+
                 // Restore original action (in case submit is prevented)
                 shipmentsForm.action = originalAction;
             }
