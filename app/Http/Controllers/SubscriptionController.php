@@ -858,6 +858,31 @@ class SubscriptionController extends Controller
             }
         }
 
+        // Update stock reservations for the target month
+        // This ensures the order form immediately reflects the new subscription
+        try {
+            $targetMonth = \App\Helpers\SubscriptionHelper::getOrderingTargetMonth();
+            $targetSchedule = \App\Models\ShipmentSchedule::getForMonth($targetMonth->year, $targetMonth->month);
+
+            if ($targetSchedule) {
+                $reservationService = app(\App\Services\StockReservationService::class);
+                $reservationService->updateReservationsForSchedule($targetSchedule);
+
+                \Log::info('Stock reservations updated from subscription confirmation page', [
+                    'subscription_id' => $subscription->id,
+                    'schedule_id' => $targetSchedule->id,
+                    'schedule_year' => $targetSchedule->year,
+                    'schedule_month' => $targetSchedule->month,
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Only log the error, don't break the confirmation page
+            \Log::error('Failed to update stock reservations from confirmation page', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return view('subscriptions.confirmation', compact('subscription'));
     }
 
