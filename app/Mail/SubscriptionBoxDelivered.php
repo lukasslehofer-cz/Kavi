@@ -4,11 +4,15 @@ namespace App\Mail;
 
 use App\Models\Subscription;
 use App\Services\EmailService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-class SubscriptionBoxDelivered extends LocalizedMailable
+class SubscriptionBoxDelivered extends LocalizedMailable implements ShouldQueue
 {
+    use Queueable;
+
     public Subscription $subscription;
 
     public function __construct(Subscription $subscription, ?string $locale = null)
