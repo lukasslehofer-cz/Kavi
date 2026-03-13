@@ -38,6 +38,14 @@ class StockReservationService
             }
         }
 
+        if (!$schedule->hasCoffeeSlotsConfigured()) {
+            Log::info('Skipping reservation update - coffee slots not configured', [
+                'schedule_id' => $schedule->id,
+                'month' => $schedule->month . '/' . $schedule->year,
+            ]);
+            return;
+        }
+
         DB::transaction(function () use ($schedule) {
             // Get all subscriptions that should ship on this date
             $subscriptions = $this->getSubscriptionsForShipment($schedule);
@@ -128,19 +136,49 @@ class StockReservationService
     }
 
     /**
-     * Get all subscriptions that should ship on the given schedule date
+     * Get all subscriptions that should ship on the given schedule date.
+     * Uses two-source approach (mirroring calculateShipmentStats in admin):
+     * 1. Subscriptions with existing SubscriptionShipment records (already scheduled)
+     * 2. Additional subscriptions matching cadence via shouldShipOn
      */
     private function getSubscriptionsForShipment(ShipmentSchedule $schedule): \Illuminate\Support\Collection
     {
-        // Get all active, paused, or complimentary subscriptions
-        $allSubscriptions = Subscription::with(['user', 'plan'])
-            ->whereIn('status', ['active', 'paused', 'complimentary'])
-            ->get();
+        $billingDate = ShipmentSchedule::getBillingDateForMonth($schedule->year, $schedule->month);
 
-        // Filter by shipment date
-        return $allSubscriptions->filter(function ($subscription) use ($schedule) {
-            return $subscription->shouldShipOn($schedule->shipment_date);
-        });
+        // Source 1: Subscriptions with existing pending/sent shipment records
+        $shipmentSubscriptionIds = \App\Models\SubscriptionShipment::whereDate('shipment_date', $schedule->shipment_date->toDateString())
+            ->whereIn('status', ['pending', 'sent'])
+            ->where(function($q) use ($billingDate) {
+                $q->whereNotNull('subscription_payment_id')
+                  ->orWhereHas('subscription', function($q2) use ($billingDate) {
+                      $q2->where(function($q3) use ($billingDate) {
+                          $q3->where('status', '!=', 'paused')
+                             ->orWhereNull('paused_until_date')
+                             ->orWhere('paused_until_date', '<=', $billingDate);
+                      });
+                  });
+            })
+            ->pluck('subscription_id')
+            ->unique();
+
+        // Source 2: Additional subscriptions matching cadence (not yet having a shipment record)
+        $additionalSubscriptions = Subscription::with(['user', 'plan'])
+            ->whereIn('status', ['active', 'paused', 'pending', 'cancelled', 'complimentary'])
+            ->whereNotIn('id', $shipmentSubscriptionIds)
+            ->where(function($q) use ($billingDate) {
+                $q->where('status', '!=', 'paused')
+                  ->orWhereNull('paused_until_date')
+                  ->orWhere('paused_until_date', '<=', $billingDate);
+            })
+            ->get()
+            ->filter(function ($subscription) use ($schedule) {
+                return $subscription->shouldShipOn($schedule->shipment_date);
+            });
+
+        // Combine both sources
+        $allIds = $shipmentSubscriptionIds->merge($additionalSubscriptions->pluck('id'))->unique();
+
+        return Subscription::with(['user', 'plan'])->whereIn('id', $allIds)->get();
     }
 
     /**
