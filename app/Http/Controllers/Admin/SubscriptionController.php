@@ -235,7 +235,7 @@ class SubscriptionController extends Controller
         // Include: shipments with payment (already paid) OR non-paused subscriptions
         $pendingShipments = \App\Models\SubscriptionShipment::with(['subscription.user', 'subscription.plan', 'payment'])
             ->whereDate('shipment_date', $targetDate->toDateString())
-            ->whereIn('status', ['pending', 'sent'])
+            ->whereIn('status', ['pending', 'sent', 'delivered'])
             ->where(function($q) use ($billingDate) {
                 // 1. Shipment has payment (customer already paid) - always show
                 $q->whereNotNull('subscription_payment_id')
@@ -331,7 +331,7 @@ class SubscriptionController extends Controller
         // Get subscriptions with pending shipments (copy logic from lines 234-249)
         $pendingShipments = \App\Models\SubscriptionShipment::with(['subscription.user', 'subscription.plan', 'payment'])
             ->whereDate('shipment_date', $targetDate->toDateString())
-            ->whereIn('status', ['pending', 'sent'])
+            ->whereIn('status', ['pending', 'sent', 'delivered'])
             ->where(function($q) use ($billingDate) {
                 $q->whereNotNull('subscription_payment_id')
                   ->orWhereHas('subscription', function($q2) use ($billingDate) {

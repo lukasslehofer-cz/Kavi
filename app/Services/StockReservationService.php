@@ -147,7 +147,7 @@ class StockReservationService
 
         // Source 1: Subscriptions with existing pending/sent shipment records
         $shipmentSubscriptionIds = \App\Models\SubscriptionShipment::whereDate('shipment_date', $schedule->shipment_date->toDateString())
-            ->whereIn('status', ['pending', 'sent'])
+            ->whereIn('status', ['pending', 'sent', 'delivered'])
             ->where(function($q) use ($billingDate) {
                 $q->whereNotNull('subscription_payment_id')
                   ->orWhereHas('subscription', function($q2) use ($billingDate) {
