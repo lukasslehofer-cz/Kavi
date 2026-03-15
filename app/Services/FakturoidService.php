@@ -515,7 +515,7 @@ class FakturoidService
     /**
      * Mark invoice as sent
      */
-    private function markInvoiceAsSent(int $invoiceId): void
+    public function markInvoiceAsSent(int $invoiceId): void
     {
         try {
             $response = $this->makeRequest(
@@ -967,7 +967,7 @@ class FakturoidService
     /**
      * Mark subscription invoice as paid
      */
-    private function markSubscriptionInvoiceAsPaid(int $invoiceId, \App\Models\SubscriptionPayment $payment): void
+    public function markSubscriptionInvoiceAsPaid(int $invoiceId, \App\Models\SubscriptionPayment $payment): void
     {
         try {
             $paymentData = [
