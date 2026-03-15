@@ -200,58 +200,74 @@ class ChargeSubscriptionPayments extends Command
                 }
             }
             
-            try {
-                // Use DB transaction for atomicity
-                DB::beginTransaction();
-                
-                $result = $stripeService->chargeSubscriptionPayment($subscription);
-                
-                if ($result['success']) {
-                    DB::commit();
-                    
-                    $this->info("  ✓ Success - Payment ID: {$result['payment_intent_id']}");
-                    $successCount++;
-                    
-                    $results[] = [
-                        'subscription' => $subscriptionNumber,
-                        'status' => 'success',
-                        'payment_id' => $result['payment_intent_id'],
-                    ];
-                } else {
-                    DB::rollBack();
-                    
-                    if ($result['error'] === 'already_charged_today') {
-                        $this->warn("  ⚠️ Already charged today - skipping");
-                        $skippedCount++;
+            $maxAttempts = 3;
+            $retryDelay = 30; // seconds
+
+            for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+                try {
+                    // Use DB transaction for atomicity
+                    DB::beginTransaction();
+
+                    $result = $stripeService->chargeSubscriptionPayment($subscription);
+
+                    if ($result['success']) {
+                        DB::commit();
+
+                        $this->info("  ✓ Success - Payment ID: {$result['payment_intent_id']}");
+                        $successCount++;
+
+                        $results[] = [
+                            'subscription' => $subscriptionNumber,
+                            'status' => 'success',
+                            'payment_id' => $result['payment_intent_id'],
+                        ];
+                        break;
                     } else {
+                        DB::rollBack();
+
+                        if ($result['error'] === 'already_charged_today') {
+                            $this->warn("  ⚠️ Already charged today - skipping");
+                            $skippedCount++;
+                            break;
+                        }
+
+                        // Network error — retry after delay
+                        if (($result['network_error'] ?? false) && $attempt < $maxAttempts) {
+                            $this->warn("  ⚠️ Network error (attempt {$attempt}/{$maxAttempts}), retrying in {$retryDelay}s...");
+                            sleep($retryDelay);
+                            continue;
+                        }
+
                         $this->error("  ✗ Failed: {$result['error']}");
                         $failedCount++;
-                        
+
                         $results[] = [
                             'subscription' => $subscriptionNumber,
                             'status' => 'failed',
                             'error' => $result['error'],
                         ];
+                        break;
                     }
+
+                } catch (\Exception $e) {
+                    DB::rollBack();
+
+                    $this->error("  ✗ Exception: " . $e->getMessage());
+                    $failedCount++;
+
+                    \Log::error('Subscription payment exception in cron', [
+                        'subscription_id' => $subscription->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+
+                    $results[] = [
+                        'subscription' => $subscriptionNumber,
+                        'status' => 'exception',
+                        'error' => $e->getMessage(),
+                    ];
+                    break;
                 }
-                
-            } catch (\Exception $e) {
-                DB::rollBack();
-                
-                $this->error("  ✗ Exception: " . $e->getMessage());
-                $failedCount++;
-                
-                \Log::error('Subscription payment exception in cron', [
-                    'subscription_id' => $subscription->id,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-                
-                $results[] = [
-                    'subscription' => $subscriptionNumber,
-                    'status' => 'exception',
-                    'error' => $e->getMessage(),
-                ];
             }
         }
         

@@ -138,8 +138,12 @@ class FakturoidService
     private function makeRequest(string $method, string $endpoint, array $data = []): \Illuminate\Http\Client\Response
     {
         $token = $this->getAccessToken();
-        
-        $request = Http::withToken($token)
+
+        $request = Http::timeout(15)
+            ->retry(3, 2000, function ($exception) {
+                return $exception instanceof \Illuminate\Http\Client\ConnectionException;
+            })
+            ->withToken($token)
             ->withHeaders([
                 'User-Agent' => $this->userAgent,
                 'Content-Type' => 'application/json',

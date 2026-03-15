@@ -626,8 +626,13 @@ class StripeService
     public function getCustomerDefaultPaymentMethod(string $customerId): ?string
     {
         try {
-            $customer = StripeCustomer::retrieve($customerId);
-            
+            // Retry wrapper for transient network errors
+            $customer = retry(3, function () use ($customerId) {
+                return StripeCustomer::retrieve($customerId);
+            }, 2000, function ($e) {
+                return $e instanceof \Stripe\Exception\ApiConnectionException;
+            });
+
             // Ošetři případ kdy customer neexistuje nebo je smazaný
             if (!$customer || isset($customer->deleted)) {
                 \Log::warning('Customer not found or deleted in getCustomerDefaultPaymentMethod', [
@@ -635,24 +640,35 @@ class StripeService
                 ]);
                 return null;
             }
-            
+
             // Bezpečný přístup k invoice_settings
             if ($customer->invoice_settings->default_payment_method ?? null) {
                 return $customer->invoice_settings->default_payment_method;
             }
 
             // Fallback: get first payment method
-            $paymentMethods = \Stripe\PaymentMethod::all([
-                'customer' => $customerId,
-                'type' => 'card',
-                'limit' => 1,
-            ]);
+            $paymentMethods = retry(3, function () use ($customerId) {
+                return \Stripe\PaymentMethod::all([
+                    'customer' => $customerId,
+                    'type' => 'card',
+                    'limit' => 1,
+                ]);
+            }, 2000, function ($e) {
+                return $e instanceof \Stripe\Exception\ApiConnectionException;
+            });
 
             if (count($paymentMethods->data) > 0) {
                 return $paymentMethods->data[0]->id;
             }
 
             return null;
+        } catch (\Stripe\Exception\ApiConnectionException $e) {
+            // Síťový problém — propagovat výše, NEINTERPRETOVAT jako "nemá platební metodu"
+            \Log::error('Network error getting customer payment method', [
+                'customer_id' => $customerId,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
         } catch (\Stripe\Exception\InvalidRequestException $e) {
             // Zákazník neexistuje
             \Log::warning('Customer not found in getCustomerDefaultPaymentMethod', [
@@ -2654,7 +2670,9 @@ class StripeService
                 try {
                     $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
                     if ($email) {
-                        \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentSuccess($subscription, $payment));
+                        retry(3, function () use ($email, $subscription, $payment) {
+                            \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentSuccess($subscription, $payment));
+                        }, 5000);
                         \Log::info('Subscription payment confirmation email sent', [
                             'subscription_id' => $subscription->id,
                             'payment_id' => $payment->id,
@@ -2705,10 +2723,26 @@ class StripeService
                 'error' => $errorMessage,
             ];
 
+        } catch (\Stripe\Exception\ApiConnectionException $e) {
+            // Network error — DON'T mark subscription as failed (transient issue)
+            $errorMessage = $e->getMessage();
+
+            \Log::error('Subscription payment network error (not marking as failed)', [
+                'subscription_id' => $subscription->id,
+                'error' => $errorMessage,
+            ]);
+
+            return [
+                'success' => false,
+                'payment_intent_id' => null,
+                'error' => $errorMessage,
+                'network_error' => true,
+            ];
+
         } catch (\Exception $e) {
             // Other error
             $errorMessage = $e->getMessage();
-            
+
             \Log::error('Subscription payment failed', [
                 'subscription_id' => $subscription->id,
                 'error' => $errorMessage,

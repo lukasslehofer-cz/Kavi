@@ -61,8 +61,10 @@ class SendPaymentReminders extends Command
                     continue;
                 }
                 
-                // Send reminder email
-                Mail::to($email)->send(new UpcomingPaymentReminder($subscription));
+                // Send reminder email with retry (3 attempts, 5s pause)
+                retry(3, function () use ($email, $subscription) {
+                    Mail::to($email)->send(new UpcomingPaymentReminder($subscription));
+                }, 5000);
                 
                 $this->info("✓ Sent reminder to {$email} for subscription #{$subscription->id}");
                 $sentCount++;
