@@ -843,7 +843,7 @@
                     @if($appliedCoupon ?? null)
                         <div class="flex items-baseline justify-between mb-2">
                             <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.coupon.applied') }}</span>
-                            <a href="{{ localizedRoute('checkout.index', ['remove_coupon' => 1]) }}" class="text-xs uppercase tracking-widest text-olive-500 hover:text-primary-500 transition-colors">
+                            <a href="#" class="text-xs uppercase tracking-widest text-olive-500 hover:text-primary-500 transition-colors" id="remove-coupon-btn">
                                 {{ __('checkout.coupon.remove') }}
                             </a>
                         </div>
@@ -857,15 +857,16 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </summary>
-                            <form method="GET" action="{{ localizedRoute('checkout.index') }}" class="mt-4">
+                            <form id="coupon-form" class="mt-4" onsubmit="return false;">
                                 <div class="flex gap-3">
-                                    <input type="text" name="coupon_code" placeholder="{{ __('checkout.coupon.placeholder') }}" 
+                                    <input type="text" id="coupon-code-input" placeholder="{{ __('checkout.coupon.placeholder') }}"
                                         class="flex-1 uppercase py-2 bg-white border-none text-sm text-dark-800 px-3"
                                         value="{{ request('coupon_code') }}">
-                                    <button type="submit" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 border-b border-dark-800 hover:border-primary-500 pb-0.5 transition-colors whitespace-nowrap">
+                                    <button type="submit" id="apply-coupon-btn" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 border-b border-dark-800 hover:border-primary-500 pb-0.5 transition-colors whitespace-nowrap">
                                         {{ __('checkout.coupon.apply') }}
                                     </button>
                                 </div>
+                                <p id="coupon-error" class="text-xs uppercase tracking-widest text-red-600 mt-2 hidden"></p>
                             </form>
                         </details>
                     @endif
@@ -1230,6 +1231,104 @@ document.addEventListener('DOMContentLoaded', function() {
         changeBtn.addEventListener('click', openPacketaWidget);
     }
 });
+</script>
+<script>
+(function() {
+    const STORAGE_KEY = 'checkout_form_data';
+
+    function saveFormData() {
+        const form = document.getElementById('checkout-form');
+        if (!form) return;
+        const data = {};
+        const elements = form.querySelectorAll('input, select, textarea');
+        elements.forEach(function(el) {
+            if (!el.name || el.type === 'hidden' && el.name === '_token') return;
+            if (el.type === 'checkbox' || el.type === 'radio') {
+                data[el.name] = el.checked;
+            } else {
+                data[el.name] = el.value;
+            }
+        });
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function restoreFormData() {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        sessionStorage.removeItem(STORAGE_KEY);
+        const data = JSON.parse(raw);
+        const form = document.getElementById('checkout-form');
+        if (!form) return;
+        Object.keys(data).forEach(function(name) {
+            const el = form.querySelector('[name="' + name + '"]');
+            if (!el) return;
+            if (el.type === 'checkbox' || el.type === 'radio') {
+                el.checked = data[name];
+            } else {
+                el.value = data[name];
+            }
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        restoreFormData();
+
+        var couponForm = document.getElementById('coupon-form');
+        if (couponForm) {
+            couponForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var code = document.getElementById('coupon-code-input').value.trim();
+                if (!code) return;
+                var errorEl = document.getElementById('coupon-error');
+                errorEl.classList.add('hidden');
+
+                saveFormData();
+
+                fetch('{{ localizedRoute("coupon.validate") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ code: code, type: 'order', order_value: {{ $subtotal ?? 0 }} })
+                }).then(function(res) {
+                    return res.json().then(function(data) { return { ok: res.ok, data: data }; });
+                }).then(function(result) {
+                    if (result.ok && result.data.valid) {
+                        window.location.reload();
+                    } else {
+                        sessionStorage.removeItem(STORAGE_KEY);
+                        errorEl.textContent = result.data.message || 'Neplatný kupón';
+                        errorEl.classList.remove('hidden');
+                    }
+                }).catch(function() {
+                    sessionStorage.removeItem(STORAGE_KEY);
+                });
+            });
+        }
+
+        var removeBtn = document.getElementById('remove-coupon-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                saveFormData();
+
+                fetch('{{ localizedRoute("coupon.remove") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                }).then(function() {
+                    window.location.reload();
+                });
+            });
+        }
+    });
+})();
 </script>
 @endsection
 

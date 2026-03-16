@@ -58,6 +58,7 @@ return [
 
     // Coupons
     'coupon-validate' => 'kupony/validovat',
+    'coupon-remove' => 'kupony/odebrat',
 
     // Newsletter
     'newsletter-subscribe' => 'newsletter/prihlasit',

@@ -54,6 +54,10 @@ class CouponController extends Controller
 
         $coupon = $result['coupon'];
 
+        // Uložit kupón do session
+        session(['coupon_code' => strtoupper(trim($request->code))]);
+        session()->forget('affiliate_code');
+
         // Vrátit info o kupónu
         $response = [
             'valid' => true,
@@ -82,6 +86,16 @@ class CouponController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    /**
+     * Odebere kupón přes AJAX
+     */
+    public function removeCoupon()
+    {
+        $this->couponService->clearCouponFromStorage();
+
+        return response()->json(['success' => true]);
     }
 }
 

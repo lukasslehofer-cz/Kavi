@@ -135,6 +135,7 @@ class RouteServiceProvider extends ServiceProvider
 
             // Coupons
             Route::post('/' . $routes['coupon-validate'], [\App\Http\Controllers\CouponController::class, 'validateCoupon'])->name($this->routeName('coupon.validate', $locale, $isPrimary));
+            Route::post('/' . $routes['coupon-remove'], [\App\Http\Controllers\CouponController::class, 'removeCoupon'])->name($this->routeName('coupon.remove', $locale, $isPrimary));
 
             // Newsletter
             Route::post('/' . $routes['newsletter-subscribe'], [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name($this->routeName('newsletter.subscribe', $locale, $isPrimary));
