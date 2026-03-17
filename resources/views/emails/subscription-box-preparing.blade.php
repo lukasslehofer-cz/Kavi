@@ -97,9 +97,9 @@
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     @if($locale === 'cs')
-                                    <span style="color: #CA4136;">→</span> Váš box odešleme přibližně za <strong>3-4 dny</strong>
+                                    <span style="color: #CA4136;">→</span> Váš box odešleme přibližně za <strong>2-3 dny</strong>
                                     @else
-                                    <span style="color: #CA4136;">→</span> Your box will be shipped in approximately <strong>3-4 days</strong>
+                                    <span style="color: #CA4136;">→</span> Your box will be shipped in approximately <strong>2-3 days</strong>
                                     @endif
                                 </p>
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
