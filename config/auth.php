@@ -49,7 +49,7 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => 'password_reset_tokens',
-            'expire' => 10080, // 7 dní
+            'expire' => 60, // 1 hodina
             'throttle' => 60,
         ],
     ],
