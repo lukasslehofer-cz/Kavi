@@ -306,7 +306,7 @@
     </div>
 </div>
 
-{{-- Google Ads Conversion Tracking --}}
+{{-- Conversion Tracking: dataLayer + Meta Pixel --}}
 @if($order->payment_status === 'paid' && !($cancelled ?? false))
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -334,6 +334,17 @@
             ]
         }
     });
+
+    // Meta Pixel - Purchase
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'Purchase', {
+            content_ids: [{!! $order->items->pluck('product_id')->map(fn($id) => "'" . $id . "'")->implode(',') !!}],
+            content_type: 'product',
+            value: {{ $order->total }},
+            currency: '{{ $order->currency }}',
+            num_items: {{ $order->items->count() }}
+        });
+    }
 </script>
 @endif
 

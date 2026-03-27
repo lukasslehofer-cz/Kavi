@@ -81,6 +81,16 @@ class CookieConsentHelper
                 'marketing' => [
                     'enabled' => false,
                     'readOnly' => false,
+                    'autoClear' => [
+                        'cookies' => [
+                            [
+                                'name' => '_fbp',
+                            ],
+                            [
+                                'name' => '_fbc',
+                            ],
+                        ],
+                    ],
                 ],
             ],
 

@@ -304,25 +304,47 @@
     </div>
 </div>
 
-{{-- Enhanced Ecommerce: purchase event for GTM/FB Pixel --}}
+{{-- Conversion Tracking: dataLayer + Meta Pixel --}}
 @if($subscription->status === 'active')
+@php
+    $trackingValue = $subscription->configured_price - ($subscription->discount_amount ?? 0) + ($subscription->shipping_cost ?? 0);
+    $trackingCurrency = $subscription->currency ?? 'CZK';
+    $trackingItemId = 'subscription-' . ($config['amount'] ?? 3);
+    $trackingItemName = 'Subscription ' . (($config['amount'] ?? 3) == 2 ? 'M' : (($config['amount'] ?? 3) == 4 ? 'XL' : 'L')) . ' Box';
+@endphp
 <script>
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
         'event': 'purchase',
         'ecommerce': {
             'transaction_id': 'SUB-{{ $subscription->id }}',
-            'value': {{ $subscription->configured_price - ($subscription->discount_amount ?? 0) + ($subscription->shipping_cost ?? 0) }},
-            'currency': '{{ $subscription->currency ?? "CZK" }}',
+            'value': {{ $trackingValue }},
+            'currency': '{{ $trackingCurrency }}',
+            'shipping': {{ $subscription->shipping_cost ?? 0 }},
+            @if(($subscription->discount_amount ?? 0) > 0)
+            'coupon': '{{ $subscription->coupon_code }}',
+            'discount': {{ $subscription->discount_amount }},
+            @endif
             'items': [{
-                'item_id': 'subscription-{{ $config["amount"] ?? 3 }}',
-                'item_name': 'Subscription {{ ($config["amount"] ?? 3) == 2 ? "M" : (($config["amount"] ?? 3) == 4 ? "XL" : "L") }} Box',
+                'item_id': '{{ $trackingItemId }}',
+                'item_name': '{{ $trackingItemName }}',
                 'price': {{ $subscription->configured_price - ($subscription->discount_amount ?? 0) }},
                 'quantity': 1,
                 'item_category': 'subscription'
             }]
         }
     });
+
+    // Meta Pixel - Purchase
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'Purchase', {
+            content_ids: ['{{ $trackingItemId }}'],
+            content_type: 'product',
+            value: {{ $trackingValue }},
+            currency: '{{ $trackingCurrency }}',
+            num_items: 1
+        });
+    }
 </script>
 @endif
 

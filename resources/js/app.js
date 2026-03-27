@@ -20,10 +20,6 @@ function updateGoogleConsent() {
         'ad_personalization': marketingAccepted ? 'granted' : 'denied'
     });
     
-    console.log('Google Consent Mode updated:', {
-        analytics_storage: analyticsAccepted ? 'granted' : 'denied',
-        ad_storage: marketingAccepted ? 'granted' : 'denied'
-    });
 }
 
 // Initialize Cookie Consent
@@ -34,27 +30,19 @@ function initCookieConsent() {
         return;
     }
 
-    console.log('Initializing cookie consent with config:', window.cookieConsentConfig);
-    
     // Add callbacks to config
     const config = {
         ...window.cookieConsentConfig,
         
         onFirstConsent: ({ cookie }) => {
-            console.log('First consent given:', cookie);
-            // Update Google Consent Mode
             updateGoogleConsent();
         },
         
         onConsent: ({ cookie }) => {
-            console.log('Consent loaded:', cookie);
-            // Update Google Consent Mode (for returning visitors)
             updateGoogleConsent();
         },
         
         onChange: ({ cookie, changedCategories }) => {
-            console.log('Cookie consent changed:', changedCategories);
-            // Update Google Consent Mode on any change
             updateGoogleConsent();
         }
     };

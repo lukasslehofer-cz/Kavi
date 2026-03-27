@@ -7,6 +7,47 @@
     <title>@yield('title', ($currentLocale ?? 'cs') === 'en' ? 'Dashboard - KAVI' : 'Dashboard - KAVI.cz')</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Google Consent Mode v2 - Default State (MUST be before GTM) -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        // Set default consent to denied (GDPR compliant)
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
+    </script>
+
+    <!-- Google Ads / GA4 (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-96W0CFYXP1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-96W0CFYXP1');
+    </script>
+
+    <!-- Meta Pixel -->
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window,document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1702819173706935');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=1702819173706935&ev=PageView&noscript=1"/></noscript>
+
 </head>
 <body class="min-h-screen flex flex-col bg-gray-50">
 

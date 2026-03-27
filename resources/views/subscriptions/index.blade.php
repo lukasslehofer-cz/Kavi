@@ -921,20 +921,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Apply availability restrictions on page load
     updateAvailabilityUI();
     
-    // Enhanced Ecommerce: add_to_cart event for GTM/FB Pixel
+    // Tracking: add_to_cart (dataLayer + Meta Pixel)
     document.getElementById('subscription-configurator')?.addEventListener('submit', function() {
         var amount = document.querySelector('input[name="amount"]:checked')?.value || '3';
         var boxNames = {'2': 'M Box', '3': 'L Box', '4': 'XL Box'};
         var price = pricing[amount] || 0;
-        
+        var currency = currentLocale === 'en' ? 'EUR' : 'CZK';
+        var itemId = 'subscription-' + amount;
+
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
             'event': 'add_to_cart',
             'ecommerce': {
-                'currency': currentLocale === 'en' ? 'EUR' : 'CZK',
+                'currency': currency,
                 'value': price,
                 'items': [{
-                    'item_id': 'subscription-' + amount,
+                    'item_id': itemId,
                     'item_name': 'Subscription ' + boxNames[amount],
                     'price': price,
                     'quantity': 1,
@@ -942,6 +944,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }]
             }
         });
+
+        // Meta Pixel - AddToCart
+        if (typeof fbq !== 'undefined') {
+            fbq('track', 'AddToCart', {
+                content_ids: [itemId],
+                content_type: 'product',
+                value: price,
+                currency: currency
+            });
+        }
     });
 });
 </script>

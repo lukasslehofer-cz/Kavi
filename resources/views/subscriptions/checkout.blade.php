@@ -857,4 +857,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 })();
 </script>
+
+{{-- Tracking: InitiateCheckout (dataLayer + Meta Pixel) --}}
+@php
+    $trackingAmount = $configuration['amount'] ?? 3;
+    $trackingItemId = 'subscription-' . $trackingAmount;
+    $trackingItemName = 'Subscription ' . ($trackingAmount == 2 ? 'M' : ($trackingAmount == 4 ? 'XL' : 'L')) . ' Box';
+    $trackingValue = $price ?? 0;
+    $trackingCurrency = \App\Helpers\CurrencyHelper::code();
+@endphp
+<script>
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'begin_checkout',
+        'ecommerce': {
+            'currency': '{{ $trackingCurrency }}',
+            'value': {{ $trackingValue }},
+            'items': [{
+                'item_id': '{{ $trackingItemId }}',
+                'item_name': '{{ $trackingItemName }}',
+                'price': {{ $trackingValue }},
+                'quantity': 1,
+                'item_category': 'subscription'
+            }]
+        }
+    });
+
+    // Meta Pixel - InitiateCheckout
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'InitiateCheckout', {
+            content_ids: ['{{ $trackingItemId }}'],
+            content_type: 'product',
+            value: {{ $trackingValue }},
+            currency: '{{ $trackingCurrency }}',
+            num_items: 1
+        });
+    }
+</script>
 @endsection

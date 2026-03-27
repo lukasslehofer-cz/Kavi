@@ -59,7 +59,7 @@
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
-        
+
         // Set default consent to denied (GDPR compliant)
         gtag('consent', 'default', {
             'ad_storage': 'denied',
@@ -69,15 +69,32 @@
             'wait_for_update': 500
         });
     </script>
-    
-    <!-- Google Tag Manager (loads immediately, respects consent mode) -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-PPG54L4R');</script>
-    <!-- End Google Tag Manager -->
-    
+
+    <!-- Google Ads / GA4 (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-96W0CFYXP1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-96W0CFYXP1');
+    </script>
+
+    <!-- Meta Pixel -->
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window,document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1702819173706935');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=1702819173706935&ev=PageView&noscript=1"/></noscript>
+
     <!-- Cookie Consent Configuration -->
     <script>
         // Cookie consent config (loaded by Laravel)
@@ -91,11 +108,6 @@
     @endif
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PPG54L4R"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    
     <!-- Top Announcement Banner - Terracotta -->
     @php $announcementBanner = \App\Models\AnnouncementBanner::getCurrent(); @endphp
     @if($announcementBanner)
@@ -432,6 +444,13 @@
                             newsletterMessage.className = 'mt-4 text-sm p-3 rounded-lg bg-green-100 text-green-800 border border-green-200';
                             newsletterMessage.textContent = data.message;
                             newsletterEmail.value = '';
+
+                            // Tracking: Lead (dataLayer + Meta Pixel)
+                            window.dataLayer = window.dataLayer || [];
+                            window.dataLayer.push({'event': 'generate_lead'});
+                            if (typeof fbq !== 'undefined') {
+                                fbq('track', 'Lead', {content_name: 'Newsletter'});
+                            }
                         } else {
                             newsletterMessage.className = 'mt-4 text-sm p-3 rounded-lg bg-red-100 text-red-800 border border-red-200';
                             newsletterMessage.textContent = data.message;

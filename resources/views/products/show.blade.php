@@ -564,39 +564,55 @@ function switchImage(imageUrl, index) {
 }
 </script>
 
-{{-- Enhanced Ecommerce: add_to_cart event for GTM/FB Pixel --}}
+{{-- Tracking: add_to_cart event (dataLayer + Meta Pixel) --}}
+@php
+    $trackingPrice = $product->getPrice();
+    $trackingCurrency = \App\Helpers\CurrencyHelper::code();
+@endphp
 <script>
 document.getElementById('add-to-cart-form')?.addEventListener('submit', function() {
-    var quantity = document.querySelector('input[name="quantity"]:checked')?.value || 1;
+    var quantity = parseInt(document.querySelector('input[name="quantity"]:checked')?.value || 1);
+    var price = {{ $trackingPrice }};
+
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
         'event': 'add_to_cart',
         'ecommerce': {
-            'currency': '{{ $currentLocale === "en" ? "EUR" : "CZK" }}',
-            'value': {{ $product->isOnSale() ? $product->sale_price : $product->price }} * quantity,
+            'currency': '{{ $trackingCurrency }}',
+            'value': price * quantity,
             'items': [{
                 'item_id': '{{ $product->id }}',
                 'item_name': '{{ addslashes($product->getName()) }}',
-                'price': {{ $product->isOnSale() ? $product->sale_price : $product->price }},
-                'quantity': parseInt(quantity)
+                'price': price,
+                'quantity': quantity
             }]
         }
     });
+
+    // Meta Pixel - AddToCart
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'AddToCart', {
+            content_ids: ['{{ $product->id }}'],
+            content_type: 'product',
+            value: price * quantity,
+            currency: '{{ $trackingCurrency }}'
+        });
+    }
 });
 </script>
 
-{{-- Enhanced Ecommerce: view_item event for GTM/FB Pixel --}}
+{{-- Tracking: view_item + ViewContent event (dataLayer + Meta Pixel) --}}
 <script>
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
         'event': 'view_item',
         'ecommerce': {
-            'currency': '{{ $currentLocale === "en" ? "EUR" : "CZK" }}',
-            'value': {{ $product->isOnSale() ? $product->sale_price : $product->price }},
+            'currency': '{{ $trackingCurrency }}',
+            'value': {{ $trackingPrice }},
             'items': [{
                 'item_id': '{{ $product->id }}',
                 'item_name': '{{ addslashes($product->getName()) }}',
-                'price': {{ $product->isOnSale() ? $product->sale_price : $product->price }},
+                'price': {{ $trackingPrice }},
                 'quantity': 1
                 @if($product->roastery)
                 ,'item_brand': '{{ addslashes($product->roastery->getName()) }}'
@@ -607,5 +623,15 @@ document.getElementById('add-to-cart-form')?.addEventListener('submit', function
             }]
         }
     });
+
+    // Meta Pixel - ViewContent
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'ViewContent', {
+            content_ids: ['{{ $product->id }}'],
+            content_type: 'product',
+            value: {{ $trackingPrice }},
+            currency: '{{ $trackingCurrency }}'
+        });
+    }
 </script>
 @endsection

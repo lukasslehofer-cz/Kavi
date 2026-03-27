@@ -1330,5 +1330,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 })();
 </script>
+
+{{-- Tracking: InitiateCheckout (dataLayer + Meta Pixel) --}}
+<script>
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'begin_checkout',
+        'ecommerce': {
+            'currency': '{{ \App\Helpers\CurrencyHelper::code() }}',
+            'value': {{ $totalWithVat }},
+            'items': [
+                @foreach($cartItems as $item)
+                {
+                    'item_id': '{{ $item['product']->id }}',
+                    'item_name': '{{ addslashes($item['product']->getName()) }}',
+                    'price': {{ $item['product']->getPrice() }},
+                    'quantity': {{ $item['quantity'] }}
+                }@if(!$loop->last),@endif
+                @endforeach
+            ]
+        }
+    });
+
+    // Meta Pixel - InitiateCheckout
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'InitiateCheckout', {
+            content_ids: [{!! collect($cartItems)->map(fn($item) => "'" . $item['product']->id . "'")->implode(',') !!}],
+            content_type: 'product',
+            value: {{ $totalWithVat }},
+            currency: '{{ \App\Helpers\CurrencyHelper::code() }}',
+            num_items: {{ collect($cartItems)->sum('quantity') }}
+        });
+    }
+</script>
 @endsection
 
