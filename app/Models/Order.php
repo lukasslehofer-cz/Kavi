@@ -55,6 +55,10 @@ class Order extends Model
         'package_length',
         'package_width',
         'package_height',
+        'meta_event_id',
+        'meta_fbp',
+        'meta_fbc',
+        'meta_capi_sent_at',
     ];
 
     protected $casts = [
@@ -66,6 +70,7 @@ class Order extends Model
         'shipping_address' => 'array',
         'billing_address' => 'array',
         'shipped_with_subscription' => 'boolean',
+        'meta_capi_sent_at' => 'datetime',
         'paid_at' => 'datetime',
         'confirmation_email_sent_at' => 'datetime',
         'last_payment_failure_at' => 'datetime',

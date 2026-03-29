@@ -66,6 +66,9 @@ return [
 
     'facebook' => [
         'app_id' => env('FACEBOOK_APP_ID'),
+        'pixel_id' => env('META_PIXEL_ID'),
+        'conversions_api_token' => env('META_CONVERSIONS_API_TOKEN'),
+        'test_event_code' => env('META_TEST_EVENT_CODE'),
     ],
 
     'ecomail' => [

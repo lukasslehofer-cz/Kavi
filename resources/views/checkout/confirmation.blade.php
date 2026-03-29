@@ -307,7 +307,7 @@
 </div>
 
 {{-- Conversion Tracking: dataLayer + Meta Pixel --}}
-@if($order->payment_status === 'paid' && !($cancelled ?? false))
+@if($order->payment_status === 'paid' && !($cancelled ?? false) && ($shouldFirePixel ?? false))
 <script>
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
@@ -335,7 +335,7 @@
         }
     });
 
-    // Meta Pixel - Purchase
+    // Meta Pixel - Purchase (with eventID for CAPI deduplication)
     if (typeof fbq !== 'undefined') {
         fbq('track', 'Purchase', {
             content_ids: [{!! $order->items->pluck('product_id')->map(fn($id) => "'" . $id . "'")->implode(',') !!}],
@@ -343,7 +343,7 @@
             value: {{ $order->total }},
             currency: '{{ $order->currency }}',
             num_items: {{ $order->items->count() }}
-        });
+        }, {eventID: '{{ $order->meta_event_id }}'});
     }
 </script>
 @endif

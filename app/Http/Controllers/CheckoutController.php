@@ -632,6 +632,9 @@ class CheckoutController extends Controller
                 ],
                 'customer_notes' => $request->notes, // User's actual notes from form
                 'admin_notes' => null, // Will be set after order creation with cart backup
+                'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
+                'meta_fbp' => $request->cookie('_fbp'),
+                'meta_fbc' => $request->cookie('_fbc'),
             ];
 
             // Pokud je to addon objednávka, přidat subscription údaje
@@ -841,6 +844,48 @@ class CheckoutController extends Controller
                         ]);
                         // Continue anyway - webhook will retry
                     }
+
+                    // Send Meta CAPI Purchase event
+                    try {
+                        $metaService = app(\App\Services\MetaConversionsService::class);
+                        if ($metaService->isConfigured() && !$order->meta_capi_sent_at) {
+                            $address = $order->shipping_address ?? [];
+                            $user = $order->user;
+                            $nameParts = explode(' ', $address['name'] ?? '', 2);
+
+                            $success = $metaService->sendPurchaseEvent(
+                                eventId: $order->meta_event_id,
+                                value: (float) $order->total,
+                                currency: $order->currency ?? 'CZK',
+                                contentIds: $order->items->pluck('product_id')->toArray(),
+                                contentType: 'product',
+                                userData: [
+                                    'email' => $address['email'] ?? $user?->email,
+                                    'phone' => $address['phone'] ?? $user?->phone,
+                                    'firstName' => $nameParts[0] ?? null,
+                                    'lastName' => $nameParts[1] ?? null,
+                                    'city' => $address['billing_city'] ?? null,
+                                    'postalCode' => $address['billing_postal_code'] ?? null,
+                                    'country' => $address['billing_country'] ?? null,
+                                    'externalId' => $user?->id,
+                                    'clientIpAddress' => request()->ip(),
+                                    'clientUserAgent' => request()->userAgent(),
+                                ],
+                                fbp: $order->meta_fbp,
+                                fbc: $order->meta_fbc,
+                                sourceUrl: route('order.confirmation', $order),
+                            );
+
+                            if ($success) {
+                                $order->update(['meta_capi_sent_at' => now()]);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Meta CAPI failed for order (sync)', [
+                            'order_id' => $order->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
                 }
             } catch (\Exception $e) {
                 \Log::error('Failed to verify Stripe session synchronously', [
@@ -862,8 +907,14 @@ class CheckoutController extends Controller
                 'order_id' => $order->id
             ]);
         }
-        
-        return view('checkout.confirmation', compact('order', 'cancelled'));
+
+        // Prevent duplicate browser Purchase pixel on page reload
+        $shouldFirePixel = !session()->has('purchase_tracked_order_' . $order->id);
+        if ($shouldFirePixel && $order->payment_status === 'paid' && !$cancelled) {
+            session()->put('purchase_tracked_order_' . $order->id, true);
+        }
+
+        return view('checkout.confirmation', compact('order', 'cancelled', 'shouldFirePixel'));
     }
 
     /**

@@ -54,6 +54,10 @@ class Subscription extends Model
         'shipping_cost',
         'shipping_country',
         'shipping_rate_id',
+        'meta_event_id',
+        'meta_fbp',
+        'meta_fbc',
+        'meta_capi_sent_at',
     ];
 
     protected $casts = [
@@ -62,6 +66,7 @@ class Subscription extends Model
         'last_shipment_date' => 'date',
         'ends_at' => 'date',
         'paused_until_date' => 'date',
+        'meta_capi_sent_at' => 'datetime',
         'last_payment_failure_at' => 'datetime',
         'packeta_sent_at' => 'datetime',
         'configuration' => 'array',

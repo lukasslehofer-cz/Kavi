@@ -305,7 +305,7 @@
 </div>
 
 {{-- Conversion Tracking: dataLayer + Meta Pixel --}}
-@if($subscription->status === 'active')
+@if($subscription->status === 'active' && ($shouldFirePixel ?? false))
 @php
     $trackingValue = $subscription->configured_price - ($subscription->discount_amount ?? 0) + ($subscription->shipping_cost ?? 0);
     $trackingCurrency = $subscription->currency ?? 'CZK';
@@ -335,7 +335,7 @@
         }
     });
 
-    // Meta Pixel - Purchase
+    // Meta Pixel - Purchase (with eventID for CAPI deduplication)
     if (typeof fbq !== 'undefined') {
         fbq('track', 'Purchase', {
             content_ids: ['{{ $trackingItemId }}'],
@@ -343,7 +343,7 @@
             value: {{ $trackingValue }},
             currency: '{{ $trackingCurrency }}',
             num_items: 1
-        });
+        }, {eventID: '{{ $subscription->meta_event_id }}'});
     }
 </script>
 @endif

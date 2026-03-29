@@ -739,6 +739,9 @@ class SubscriptionController extends Controller
                     'shipping_cost' => $shipping,
                     'shipping_country' => $shippingCountry,
                     'shipping_rate_id' => $shippingRate?->id,
+                    'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
+                    'meta_fbp' => request()->cookie('_fbp'),
+                    'meta_fbc' => request()->cookie('_fbc'),
                 ]);
 
                 // Zaznamenat použití kupónu
@@ -883,7 +886,13 @@ class SubscriptionController extends Controller
             ]);
         }
 
-        return view('subscriptions.confirmation', compact('subscription'));
+        // Prevent duplicate browser Purchase pixel on page reload
+        $shouldFirePixel = !session()->has('purchase_tracked_sub_' . $subscription->id);
+        if ($shouldFirePixel && $subscription->status === 'active') {
+            session()->put('purchase_tracked_sub_' . $subscription->id, true);
+        }
+
+        return view('subscriptions.confirmation', compact('subscription', 'shouldFirePixel'));
     }
 
     /**
@@ -989,6 +998,9 @@ class SubscriptionController extends Controller
                     'shipping_cost' => $shipping,
                     'shipping_country' => $shippingCountry,
                     'shipping_rate_id' => $shippingRate?->id,
+                    'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
+                    'meta_fbp' => request()->cookie('_fbp'),
+                    'meta_fbc' => request()->cookie('_fbc'),
                 ]);
 
                 // Record coupon usage
@@ -1075,6 +1087,9 @@ class SubscriptionController extends Controller
                 'shipping_cost' => $shipping,
                 'shipping_country' => $shippingCountry,
                 'shipping_rate_id' => $shippingRate?->id,
+                'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
+                'meta_fbp' => request()->cookie('_fbp'),
+                'meta_fbc' => request()->cookie('_fbc'),
             ]);
 
             // Record coupon usage
@@ -1255,8 +1270,11 @@ class SubscriptionController extends Controller
                 'shipping_cost' => $shipping,
                 'shipping_country' => $shippingCountry,
                 'shipping_rate_id' => $shippingRate?->id,
+                'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
+                'meta_fbp' => request()->cookie('_fbp'),
+                'meta_fbc' => request()->cookie('_fbc'),
             ]);
-            
+
             // Record coupon usage
             if ($coupon) {
                 $this->couponService->recordUsage(
