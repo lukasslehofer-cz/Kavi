@@ -87,6 +87,18 @@ class Kernel extends ConsoleKernel
             ->timezone('Europe/Prague')
             ->appendOutputTo($cronLog);
 
+        // Send order payment reminders for pending orders (every hour)
+        $schedule->command('orders:send-payment-reminders')
+            ->hourly()
+            ->timezone('Europe/Prague')
+            ->appendOutputTo($cronLog);
+
+        // Cancel unpaid orders older than 24 hours and restore stock (every hour)
+        $schedule->command('orders:cancel-expired')
+            ->hourly()
+            ->timezone('Europe/Prague')
+            ->appendOutputTo($cronLog);
+
         // Update stock reservations on 16th of each month (at midnight)
         $schedule->command('stock:update-reservations')
             ->monthlyOn(16, '00:00')

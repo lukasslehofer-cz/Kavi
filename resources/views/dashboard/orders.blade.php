@@ -38,7 +38,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
                     @foreach($orders as $order)
-                    <tr class="hover:bg-gray-50 transition-colors {{ $order->payment_status === 'unpaid' ? 'bg-red-50 border-l-4 border-red-500' : '' }}">
+                    <tr class="hover:bg-gray-50 transition-colors {{ in_array($order->payment_status, ['unpaid', 'pending']) ? 'bg-red-50 border-l-4 border-red-500' : '' }}">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
                             {{ $order->order_number ?? '#' . $order->id }}
                         </td>
@@ -49,6 +49,10 @@
                             @if($order->payment_status === 'unpaid')
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-red-100 text-red-800 border border-red-300">
                                     {{ __('dashboard.unpaid') }}
+                                </span>
+                            @elseif($order->payment_status === 'pending')
+                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-orange-100 text-orange-800 border border-orange-300">
+                                    {{ __('dashboard.payment_pending') }}
                                 </span>
                             @elseif($order->status === 'completed')
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
@@ -80,12 +84,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             @if($order->payment_status === 'unpaid')
-                            <form method="POST" action="{{ localizedRoute('order.pay', $order) }}" class="inline">
-                                @csrf
-                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-full transition-colors text-xs">
-                                    {{ __('dashboard.pay') }}
-                                </button>
-                            </form>
+                            <span class="text-xs text-red-600 font-medium">{{ __('dashboard.unpaid') }}</span>
                             @endif
                             <a href="{{ localizedRoute('dashboard.order.detail', $order) }}" class="text-primary-600 hover:text-primary-700 font-medium {{ $order->payment_status === 'unpaid' ? 'ml-2' : '' }}">
                                 {{ __('dashboard.detail') }}

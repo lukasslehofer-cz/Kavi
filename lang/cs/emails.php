@@ -191,6 +191,24 @@ return [
         'retry_payment' => 'Opakovat platbu',
     ],
 
+    // Order Payment Reminder
+    'order_payment_reminder' => [
+        'subject' => 'Dokončete platbu za objednávku :order_number',
+        'title' => 'Nedokončená platba',
+        'subtitle' => 'Vaše objednávka čeká na zaplacení.',
+        'order_number' => 'Číslo objednávky',
+        'complete_payment' => 'Dokončit platbu',
+    ],
+
+    // Order Cancelled (Expired)
+    'order_cancelled_expired' => [
+        'subject' => 'Objednávka :order_number byla zrušena',
+        'title' => 'Objednávka zrušena',
+        'subtitle' => 'Platba nebyla dokončena včas.',
+        'order_number' => 'Číslo objednávky',
+        'browse_products' => 'Prozkoumat nabídku',
+    ],
+
     // Order Shipped
     'order_shipped' => [
         'subject' => 'Vaše objednávka :order_number byla odeslána - KAVI.cz',

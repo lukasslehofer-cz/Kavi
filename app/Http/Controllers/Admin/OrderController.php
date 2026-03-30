@@ -137,6 +137,14 @@ class OrderController extends Controller
                 ->with('error', 'Lze zrušit pouze objednávky ve stavu "Čeká".');
         }
 
+        // Restore stock for each order item
+        $order->load('items.product');
+        foreach ($order->items as $item) {
+            if ($item->product) {
+                $item->product->increment('stock', $item->quantity);
+            }
+        }
+
         $order->update(['status' => 'cancelled']);
 
         return redirect()->route('admin.orders.index')

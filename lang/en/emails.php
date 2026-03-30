@@ -191,6 +191,24 @@ return [
         'retry_payment' => 'Retry Payment',
     ],
 
+    // Order Payment Reminder
+    'order_payment_reminder' => [
+        'subject' => 'Complete payment for order :order_number',
+        'title' => 'Incomplete Payment',
+        'subtitle' => 'Your order is awaiting payment.',
+        'order_number' => 'Order Number',
+        'complete_payment' => 'Complete Payment',
+    ],
+
+    // Order Cancelled (Expired)
+    'order_cancelled_expired' => [
+        'subject' => 'Order :order_number has been cancelled',
+        'title' => 'Order Cancelled',
+        'subtitle' => 'Payment was not completed in time.',
+        'order_number' => 'Order Number',
+        'browse_products' => 'Browse Products',
+    ],
+
     // Order Shipped
     'order_shipped' => [
         'subject' => 'Your Order :order_number Has Been Shipped - KAVI',

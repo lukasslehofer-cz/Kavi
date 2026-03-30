@@ -14,6 +14,7 @@ use App\Rules\PhoneNumber;
 use App\Services\CouponService;
 use App\Services\FakturoidService;
 use App\Services\ShippingService;
+use App\Services\StripeService;
 use App\Services\SubscriptionAddonService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +27,8 @@ class CheckoutController extends Controller
     public function __construct(
         private CouponService $couponService,
         private ShippingService $shippingService,
-        private SubscriptionAddonService $addonService
+        private SubscriptionAddonService $addonService,
+        private StripeService $stripeService
     ) {
     }
 
@@ -927,8 +929,8 @@ class CheckoutController extends Controller
             abort(403, 'Nemáte oprávnění k této akci.');
         }
 
-        // Check if order has unpaid status
-        if ($order->payment_status !== 'unpaid') {
+        // Check if order needs payment
+        if (!in_array($order->payment_status, ['unpaid', 'pending'])) {
             return back()->with('error', __('flash.checkout.order_not_unpaid'));
         }
 
