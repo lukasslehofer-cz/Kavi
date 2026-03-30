@@ -13,8 +13,8 @@ class MetaConversionsService
 
     public function __construct()
     {
-        $this->pixelId = config('services.facebook.pixel_id', '');
-        $this->accessToken = config('services.facebook.conversions_api_token', '');
+        $this->pixelId = config('services.facebook.pixel_id') ?? '';
+        $this->accessToken = config('services.facebook.conversions_api_token') ?? '';
     }
 
     public function isConfigured(): bool

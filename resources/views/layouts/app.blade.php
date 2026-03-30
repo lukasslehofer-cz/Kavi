@@ -261,14 +261,18 @@
     <!-- Flash Messages -->
     @section('flash-messages')
     @if(session('success'))
-    <div class="bg-olive-500 text-white px-4 py-3 mx-4 mt-4">
-        {{ session('success') }}
+    <div class="px-4 py-4" style="background-color: #e5e6df;">
+        <div class="bg-olive-500 text-white px-4 py-3">
+            {{ session('success') }}
+        </div>
     </div>
     @endif
 
     @if(session('error'))
-    <div class="bg-primary-500 text-white px-4 py-3 mx-4 mt-4">
-        {{ session('error') }}
+    <div class="px-4 py-4" style="background-color: #e5e6df;">
+        <div class="bg-primary-500 text-white px-4 py-3">
+            {{ session('error') }}
+        </div>
     </div>
     @endif
     @show
