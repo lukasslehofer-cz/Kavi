@@ -137,10 +137,12 @@
             <form action="{{ localizedRoute('checkout.store') }}" method="POST">
                 @csrf
 
+                @php $sectionNum = 0; @endphp
+
                 <!-- Contact Information - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">01</span>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">{{ sprintf('%02d', ++$sectionNum) }}</span>
                         <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.contact_info') }}</h2>
                     </div>
                     
@@ -220,7 +222,7 @@
                 <!-- Billing Address - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">02</span>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">{{ sprintf('%02d', ++$sectionNum) }}</span>
                         <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.billing_address') }}</h2>
                     </div>
                     
@@ -305,12 +307,13 @@
                     </div>
                 </div>
 
-                <!-- Subscription Addon Option - Only for logged in users with active subscription -->
+                <!-- Subscription Addon Option - Only for logged in users with active subscription (hidden for digital-only orders) -->
+                @if(!$cartContainsOnlyDigitalProducts)
                 @auth
                 @if($canShipWithSubscription && !empty($availableSubscriptions))
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">03</span>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">{{ sprintf('%02d', ++$sectionNum) }}</span>
                         <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.subscription_addon.title') }}</h2>
                     </div>
                     
@@ -702,12 +705,13 @@
                 </script>
                 @endif
                 @endauth
+                @endif
 
                 <!-- Packeta Pickup Point - Swiss Style (hidden for digital-only orders) -->
                 @if(!$cartContainsOnlyDigitalProducts)
                 <div class="mb-16 border-t-2 border-primary-500 pt-6" id="packeta-section">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">04</span>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">{{ sprintf('%02d', ++$sectionNum) }}</span>
                         <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.pickup_point.title') }}</h2>
                     </div>
                     
@@ -757,25 +761,21 @@
                 </div>
                 @else
                 <!-- Digital products info -->
-                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mt-6">
-                    <div class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        <div>
-                            <h3 class="font-bold text-gray-900 mb-1">{{ __('checkout.digital_product.title') }}</h3>
-                            <p class="text-sm text-blue-700 font-light">
-                                {{ __('checkout.digital_product.description') }}
-                            </p>
-                        </div>
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-6">
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">{{ sprintf('%02d', ++$sectionNum) }}</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.digital_product.title') }}</h2>
                     </div>
+                    <p class="text-xs uppercase tracking-widest text-warm-500">
+                        {{ __('checkout.digital_product.description') }}
+                    </p>
                 </div>
                 @endif
 
                 <!-- Payment Method - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">05</span>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">{{ sprintf('%02d', ++$sectionNum) }}</span>
                         <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.payment.title') }}</h2>
                     </div>
                     
@@ -791,7 +791,7 @@
                 <!-- Additional Notes - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">06</span>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">{{ sprintf('%02d', ++$sectionNum) }}</span>
                         <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.fields.notes') }}</h2>
                         <span class="text-warm-400 text-xs uppercase tracking-widest">{{ __('checkout.fields.notes_optional') }}</span>
                     </div>
@@ -906,9 +906,10 @@
                     <div class="flex justify-between items-baseline">
                         @php
                             $uniqueVatRates = collect($cartItems)->pluck('product.vat_rate')->unique();
+                            $vatWord = app()->getLocale() === 'cs' ? 'DPH' : 'VAT';
                             $vatLabel = $uniqueVatRates->count() === 1
-                                ? 'DPH (' . number_format($uniqueVatRates->first(), 0) . '%)'
-                                : 'DPH';
+                                ? $vatWord . ' (' . number_format($uniqueVatRates->first(), 0) . '%)'
+                                : $vatWord;
                         @endphp
                         <dt class="text-xs uppercase tracking-widest text-olive-600">{{ $vatLabel }}</dt>
                         <dd class="text-sm text-dark-800 uppercase tracking-wide">{{ \App\Helpers\CurrencyHelper::formatAmount($vat, 2) }}</dd>
