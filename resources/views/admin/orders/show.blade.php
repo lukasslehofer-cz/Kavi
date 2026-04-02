@@ -459,6 +459,80 @@
                 @endif
             </div>
 
+            <!-- Digital Product Delivery -->
+            @if($order->containsDigitalProducts())
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                @if($order->digital_delivery_pdf_path)
+                {{-- Already sent --}}
+                <div class="bg-green-50 border-b border-green-200 p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-green-900">Voucher odeslán</h3>
+                            @if($order->shipped_at)
+                            <p class="text-sm text-green-700">{{ $order->shipped_at->format('d.m.Y H:i') }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    <p class="text-sm text-green-800">
+                        PDF: <span class="font-mono text-xs">{{ basename($order->digital_delivery_pdf_path) }}</span>
+                    </p>
+                </div>
+                {{-- Re-send option --}}
+                <div class="p-4">
+                    <details>
+                        <summary class="text-sm text-gray-600 cursor-pointer hover:text-gray-900">Znovu odeslat nebo nahrát jiný voucher</summary>
+                        <form action="{{ route('admin.orders.send-digital-delivery', $order) }}" method="POST" enctype="multipart/form-data" class="mt-4 space-y-3">
+                            @csrf
+                            <div>
+                                <input type="file" name="voucher_pdf" accept=".pdf" required
+                                    class="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                            </div>
+                            <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+                                    onclick="return confirm('Opravdu chcete znovu odeslat voucher?')">
+                                Znovu odeslat voucher
+                            </button>
+                        </form>
+                    </details>
+                </div>
+                @else
+                {{-- Not yet sent --}}
+                <div class="p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Odeslání digitálního produktu</h3>
+                            <p class="text-sm text-gray-500">Tato objednávka obsahuje digitální produkt.</p>
+                        </div>
+                    </div>
+
+                    <form action="{{ route('admin.orders.send-digital-delivery', $order) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Voucher (PDF)</label>
+                            <input type="file" name="voucher_pdf" accept=".pdf" required
+                                class="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Odeslat voucher zákazníkovi
+                        </button>
+                    </form>
+                </div>
+                @endif
+            </div>
+            @endif
+
             <!-- Customer Info -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-xl font-bold text-gray-900 mb-4">Informace o zákazníkovi</h3>

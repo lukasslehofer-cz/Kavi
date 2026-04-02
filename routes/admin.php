@@ -77,6 +77,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/orders/{order}/update-address', [\App\Http\Controllers\Admin\OrderController::class, 'updateAddress'])->name('orders.update-address');
     Route::put('/orders/{order}/update-dimensions', [\App\Http\Controllers\Admin\OrderController::class, 'updatePackageDimensions'])->name('orders.update-dimensions');
     Route::post('/orders/send-to-packeta', [\App\Http\Controllers\Admin\OrderController::class, 'sendToPacketa'])->name('orders.send-to-packeta');
+    Route::post('/orders/{order}/send-digital-delivery', [\App\Http\Controllers\Admin\OrderController::class, 'sendDigitalDelivery'])->name('orders.send-digital-delivery');
 
     // Subscriptions
     Route::resource('subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class)->only(['index', 'show', 'update', 'destroy']);

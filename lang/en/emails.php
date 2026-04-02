@@ -209,6 +209,15 @@ return [
         'browse_products' => 'Browse Products',
     ],
 
+    // Digital Product Delivery
+    'digital_delivery' => [
+        'subject' => 'Your voucher for order :order_number',
+        'title' => 'Your voucher is ready!',
+        'subtitle' => 'Digital product for your order',
+        'message' => 'Please find your voucher attached to this email as a PDF.',
+        'enjoy' => 'We hope you enjoy it!',
+    ],
+
     // Order Shipped
     'order_shipped' => [
         'subject' => 'Your Order :order_number Has Been Shipped - KAVI',

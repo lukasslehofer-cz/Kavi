@@ -209,6 +209,15 @@ return [
         'browse_products' => 'Prozkoumat nabídku',
     ],
 
+    // Digital Product Delivery
+    'digital_delivery' => [
+        'subject' => 'Váš voucher k objednávce :order_number',
+        'title' => 'Váš voucher je připraven!',
+        'subtitle' => 'Digitální produkt k vaší objednávce',
+        'message' => 'V příloze tohoto emailu najdete váš voucher ve formátu PDF.',
+        'enjoy' => 'Přejeme vám příjemné využití!',
+    ],
+
     // Order Shipped
     'order_shipped' => [
         'subject' => 'Vaše objednávka :order_number byla odeslána - KAVI.cz',

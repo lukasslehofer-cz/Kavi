@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\DigitalProductDelivery;
 use App\Models\Order;
 use App\Services\PacketaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -362,6 +364,61 @@ class OrderController extends Controller
         $phone = ltrim($phone, '0');
 
         return $prefix . $phone;
+    }
+
+    /**
+     * Send digital product (voucher PDF) to customer
+     */
+    public function sendDigitalDelivery(Request $request, Order $order)
+    {
+        $request->validate([
+            'voucher_pdf' => 'required|file|mimes:pdf|max:10240',
+        ]);
+
+        $path = $request->file('voucher_pdf')->store("vouchers/{$order->id}");
+
+        $order->update(['digital_delivery_pdf_path' => $path]);
+
+        $recipientEmail = $order->shipping_address['email'] ?? $order->user->email ?? null;
+
+        if (!$recipientEmail) {
+            return redirect()->route('admin.orders.show', $order)
+                ->with('error', 'Nelze odeslat: objednávka nemá emailovou adresu.');
+        }
+
+        try {
+            Mail::to($recipientEmail)->send(new DigitalProductDelivery($order, $path));
+
+            // Only mark as shipped if order contains only digital products
+            // Mixed orders wait for physical shipment via Packeta
+            if ($order->containsOnlyDigitalProducts()) {
+                $order->markAsShipped();
+            }
+
+            Log::info('Digital product delivery sent', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'recipient' => $recipientEmail,
+                'admin_user_id' => auth()->id(),
+                'only_digital' => $order->containsOnlyDigitalProducts(),
+            ]);
+
+            $message = $order->containsOnlyDigitalProducts()
+                ? 'Voucher byl úspěšně odeslán zákazníkovi.'
+                : 'Voucher byl úspěšně odeslán. Objednávka obsahuje i fyzické produkty — stav se změní po odeslání přes Packetu.';
+
+            return redirect()->route('admin.orders.show', $order)
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            Log::error('Failed to send digital product delivery', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('admin.orders.show', $order)
+                ->with('error', 'Nepodařilo se odeslat email: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -36,6 +36,7 @@ class Order extends Model
         'pending_payment_intent_id',
         'fakturoid_invoice_id',
         'invoice_pdf_path',
+        'digital_delivery_pdf_path',
         'shipping_address',
         'billing_address',
         'customer_notes',
@@ -155,6 +156,17 @@ class Order extends Model
     public function hasPaymentIssue(): bool
     {
         return $this->isUnpaid() || $this->payment_failure_count > 0;
+    }
+
+    public function containsDigitalProducts(): bool
+    {
+        return $this->items->contains(fn ($item) => $item->product?->is_digital);
+    }
+
+    public function containsOnlyDigitalProducts(): bool
+    {
+        return $this->items->isNotEmpty()
+            && $this->items->every(fn ($item) => $item->product?->is_digital);
     }
 
     public static function generateOrderNumber(): string

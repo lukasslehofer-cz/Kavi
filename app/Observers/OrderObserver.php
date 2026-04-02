@@ -35,8 +35,12 @@ class OrderObserver
     public function updated(Order $order): void
     {
         // Send "order shipped" email when shipped_at is set
+        // Skip for digital-only orders where voucher email replaces shipped email
         if ($order->isDirty('shipped_at') && $order->shipped_at !== null) {
-            $this->sendOrderShippedEmail($order);
+            $order->loadMissing('items.product');
+            if (!($order->digital_delivery_pdf_path && $order->containsOnlyDigitalProducts())) {
+                $this->sendOrderShippedEmail($order);
+            }
         }
         
         // Send "order delivered" email when delivered_at is set
