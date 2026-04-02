@@ -515,7 +515,13 @@
                     
                     <!-- VAT -->
                     <div class="flex justify-between items-baseline">
-                        <dt class="text-xs uppercase tracking-widest text-olive-600">DPH (12%)</dt>
+                        <dt class="text-xs uppercase tracking-widest text-olive-600">                                                        
+                        @php
+                            $vatWord = app()->getLocale() === 'cs' ? 'DPH' : 'VAT';
+                            $vatLabel = $vatWord . ' (12%)';
+                        @endphp
+                        {{ $vatLabel }}
+                        </dt>
                         <dd class="text-sm text-dark-800 uppercase tracking-wide">{{ \App\Helpers\CurrencyHelper::formatAmount($vat, 2) }}</dd>
                     </div>
 

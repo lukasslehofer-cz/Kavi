@@ -308,8 +308,8 @@ class StripeService
             'payment_method_types' => ['card'],
             'line_items' => $lineItems,
             'mode' => 'payment',
-            'success_url' => route('subscriptions.checkout') . '?session_id={CHECKOUT_SESSION_ID}&success=1',
-            'cancel_url' => route('subscriptions.index') . '?payment=cancelled',
+            'success_url' => localizedRoute('subscriptions.checkout') . '?session_id={CHECKOUT_SESSION_ID}&success=1',
+            'cancel_url' => localizedRoute('subscriptions.index') . '?payment=cancelled',
             'metadata' => [
                 'subscription_id' => $subscription->id,
                 'is_one_time_box' => 'true',
@@ -443,8 +443,8 @@ class StripeService
                 'setup_future_usage' => 'off_session', // Save card for future automated payments
                 'metadata' => $subscriptionMetadata, // Also in payment_intent for backup/redundancy
             ],
-            'success_url' => route('subscriptions.checkout') . '?session_id={CHECKOUT_SESSION_ID}&success=1',
-            'cancel_url' => route('subscriptions.checkout'),
+            'success_url' => localizedRoute('subscriptions.checkout') . '?session_id={CHECKOUT_SESSION_ID}&success=1',
+            'cancel_url' => localizedRoute('subscriptions.checkout'),
         ];
 
         // Add customer to session data - ALWAYS create real customer for recurring payments
@@ -1361,6 +1361,7 @@ class StripeService
                 'frequency_months' => $metadata['frequency_months'] ?? 1,
                 'configuration' => $configuration,
                 'configured_price' => $metadata['configured_price'] ?? null,
+                'currency' => strtoupper($paymentIntentCurrency),
                 'shipping_address' => $shippingAddress,
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'meta_fbp' => !empty($metadata['meta_fbp']) ? $metadata['meta_fbp'] : null,

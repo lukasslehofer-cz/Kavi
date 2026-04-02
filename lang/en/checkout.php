@@ -180,7 +180,7 @@ return [
         'coffee_from_europe' => 'Coffee from all over Europe',
         'no_commitment' => 'No commitment - cancel anytime',
         'fresh_coffee' => 'Freshly roasted coffee',
-        'free_shipping_always' => 'Freshly roasted & shipped with care',
+        'free_shipping_always' => 'Shipped with care',
     ],
     
     // Errors

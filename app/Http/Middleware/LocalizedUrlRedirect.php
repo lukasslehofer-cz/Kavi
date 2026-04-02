@@ -86,7 +86,8 @@ class LocalizedUrlRedirect
         $redirectUrl = $this->findRedirectUrl($path, $currentLocale, $oppositeLocale);
         
         if ($redirectUrl) {
-            return redirect($redirectUrl, 301);
+            $queryString = $request->getQueryString();
+            return redirect($redirectUrl . ($queryString ? '?' . $queryString : ''), 301);
         }
 
         return $next($request);
