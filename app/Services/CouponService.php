@@ -67,6 +67,30 @@ class CouponService
             ];
         }
 
+        // Kontrola, zda pevná sleva nepřesahuje hodnotu košíku
+        if ($orderValue !== null) {
+            $fixedDiscountValue = null;
+
+            if ($type === 'order' && $coupon->discount_type_order === 'fixed') {
+                $fixedDiscountValue = $coupon->getOrderDiscountValue();
+            } elseif ($type === 'subscription' && $coupon->discount_type_subscription === 'fixed') {
+                $fixedDiscountValue = $coupon->getSubscriptionDiscountValue();
+            }
+
+            if ($fixedDiscountValue !== null && $fixedDiscountValue > $orderValue) {
+                $formattedDiscount = \App\Helpers\CurrencyHelper::formatAmount($fixedDiscountValue);
+                $formattedTotal = \App\Helpers\CurrencyHelper::formatAmount($orderValue);
+
+                return [
+                    'valid' => false,
+                    'message' => __('checkout.coupon.exceeds_cart_value', [
+                        'discount' => $formattedDiscount,
+                        'total' => $formattedTotal,
+                    ]),
+                ];
+            }
+        }
+
         return ['valid' => true, 'coupon' => $coupon];
     }
 

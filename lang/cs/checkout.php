@@ -138,6 +138,7 @@ return [
         'not_for_subscriptions' => 'Tento kupón nelze použít pro předplatné.',
         'subscription_already_used' => 'Slevový kód pro předplatné lze použít pouze jednou. Již jste v minulosti využili slevu na předplatné.',
         'min_order_value' => 'Minimální hodnota objednávky pro tento kupón je :min.',
+        'exceeds_cart_value' => 'Hodnota kupónu (:discount) přesahuje hodnotu vašeho košíku (:total).',
     ],
     
     // 100% discount notice

@@ -138,6 +138,7 @@ return [
         'not_for_subscriptions' => 'This coupon cannot be used for subscriptions.',
         'subscription_already_used' => 'A subscription discount code can only be used once. You have already used a subscription discount in the past.',
         'min_order_value' => 'The minimum order value for this coupon is :min.',
+        'exceeds_cart_value' => 'The coupon value (:discount) exceeds your cart value (:total).',
     ],
     
     // 100% discount notice
