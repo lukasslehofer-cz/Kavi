@@ -128,6 +128,16 @@ return [
         'remove' => 'Remove',
         'applied' => 'Coupon applied',
         'discount_label' => 'Discount',
+        'valid' => 'Coupon is valid!',
+        'invalid_fallback' => 'Invalid coupon',
+        'not_found' => 'Coupon not found.',
+        'expired' => 'This coupon is no longer valid.',
+        'total_limit' => 'This coupon has reached its maximum number of uses.',
+        'user_limit' => 'You have already used this coupon the maximum number of times.',
+        'not_for_orders' => 'This coupon cannot be used for one-time orders.',
+        'not_for_subscriptions' => 'This coupon cannot be used for subscriptions.',
+        'subscription_already_used' => 'A subscription discount code can only be used once. You have already used a subscription discount in the past.',
+        'min_order_value' => 'The minimum order value for this coupon is :min.',
     ],
     
     // 100% discount notice

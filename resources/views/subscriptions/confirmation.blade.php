@@ -118,7 +118,10 @@
                     @if($subscription->discount_amount > 0 && $subscription->coupon)
                     @php
                     $originalPrice = $subscription->configured_price;
-                    $discountEndsAt = (!$isOneTime && $nextPaymentDate) ? $nextPaymentDate->copy()->addMonths(($subscription->discount_months_remaining - 1) * $subscription->frequency_months) : null;
+                    $remainingAfterFirstPayment = max(0, $subscription->discount_months_total - 1);
+                    $discountEndsAt = (!$isOneTime && $nextPaymentDate && $remainingAfterFirstPayment > 0)
+                        ? $nextPaymentDate->copy()->addMonths(($remainingAfterFirstPayment - 1) * $subscription->frequency_months)
+                        : null;
                     @endphp
 
                     <!-- Coupon Discount Info -->

@@ -23,28 +23,28 @@ class CouponService
         $coupon = Coupon::where('code', $code)->first();
 
         if (! $coupon) {
-            return ['valid' => false, 'message' => 'Kupón nebyl nalezen.'];
+            return ['valid' => false, 'message' => __('checkout.coupon.not_found')];
         }
 
         if (! $coupon->isValid()) {
-            return ['valid' => false, 'message' => 'Kupón již není platný.'];
+            return ['valid' => false, 'message' => __('checkout.coupon.expired')];
         }
 
         if ($coupon->hasReachedTotalLimit()) {
-            return ['valid' => false, 'message' => 'Kupón dosáhl maximálního počtu použití.'];
+            return ['valid' => false, 'message' => __('checkout.coupon.total_limit')];
         }
 
         if ($coupon->hasUserReachedLimit($user?->id)) {
-            return ['valid' => false, 'message' => 'Již jste tento kupón použili maximální počet krát.'];
+            return ['valid' => false, 'message' => __('checkout.coupon.user_limit')];
         }
 
         // Kontrola typu kupónu
         if ($type === 'order' && ! $coupon->hasOrderDiscount()) {
-            return ['valid' => false, 'message' => 'Tento kupón nelze použít pro jednorázové objednávky.'];
+            return ['valid' => false, 'message' => __('checkout.coupon.not_for_orders')];
         }
 
         if ($type === 'subscription' && ! $coupon->hasSubscriptionDiscount()) {
-            return ['valid' => false, 'message' => 'Tento kupón nelze použít pro předplatné.'];
+            return ['valid' => false, 'message' => __('checkout.coupon.not_for_subscriptions')];
         }
 
         // Kontrola, zda uživatel již někdy použil jakýkoliv kupón na předplatné
@@ -52,7 +52,7 @@ class CouponService
             if (! $coupon->allow_repeated_subscription_usage && $this->hasUserEverUsedSubscriptionCoupon($user->id)) {
                 return [
                     'valid' => false,
-                    'message' => 'Slevový kód pro předplatné lze použít pouze jednou. Již jste v minulosti využili slevu na předplatné.',
+                    'message' => __('checkout.coupon.subscription_already_used'),
                 ];
             }
         }
@@ -63,7 +63,7 @@ class CouponService
 
             return [
                 'valid' => false,
-                'message' => "Minimální hodnota objednávky pro tento kupón je {$formattedMin}.",
+                'message' => __('checkout.coupon.min_order_value', ['min' => $formattedMin]),
             ];
         }
 

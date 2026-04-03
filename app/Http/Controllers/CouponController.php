@@ -61,7 +61,7 @@ class CouponController extends Controller
         // Vrátit info o kupónu
         $response = [
             'valid' => true,
-            'message' => 'Kupón je platný!',
+            'message' => __('checkout.coupon.valid'),
             'coupon' => [
                 'code' => $coupon->code,
                 'name' => $coupon->name,

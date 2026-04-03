@@ -128,6 +128,16 @@ return [
         'remove' => 'Odebrat',
         'applied' => 'Kupón aplikován',
         'discount_label' => 'Sleva',
+        'valid' => 'Kupón je platný!',
+        'invalid_fallback' => 'Neplatný kupón',
+        'not_found' => 'Kupón nebyl nalezen.',
+        'expired' => 'Kupón již není platný.',
+        'total_limit' => 'Kupón dosáhl maximálního počtu použití.',
+        'user_limit' => 'Již jste tento kupón použili maximální počet krát.',
+        'not_for_orders' => 'Tento kupón nelze použít pro jednorázové objednávky.',
+        'not_for_subscriptions' => 'Tento kupón nelze použít pro předplatné.',
+        'subscription_already_used' => 'Slevový kód pro předplatné lze použít pouze jednou. Již jste v minulosti využili slevu na předplatné.',
+        'min_order_value' => 'Minimální hodnota objednávky pro tento kupón je :min.',
     ],
     
     // 100% discount notice

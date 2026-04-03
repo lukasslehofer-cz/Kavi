@@ -1306,7 +1306,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.location.reload();
                     } else {
                         sessionStorage.removeItem(STORAGE_KEY);
-                        errorEl.textContent = result.data.message || 'Neplatný kupón';
+                        errorEl.textContent = result.data.message || '{{ __('checkout.coupon.invalid_fallback') }}';
                         errorEl.classList.remove('hidden');
                     }
                 }).catch(function() {
