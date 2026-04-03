@@ -125,7 +125,13 @@
                     <div class="bg-[#BCBEB1] p-6 mb-8">
                         <div class="flex items-center gap-2 mb-4">
                             <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                            <span class="text-xs uppercase tracking-widest text-dark-800">{{ __('confirmation.coupon.activated', ['code' => $subscription->coupon_code]) }}</span>
+                            <span class="text-xs uppercase tracking-widest text-dark-800">
+                                @if($subscription->coupon?->is_gift_voucher)
+                                    {{ app()->getLocale() === 'cs' ? 'Dárkový voucher aktivován' : 'Gift voucher activated' }} ({{ $subscription->coupon_code }})
+                                @else
+                                    {{ __('confirmation.coupon.activated', ['code' => $subscription->coupon_code]) }}
+                                @endif
+                            </span>
                         </div>
 
                         <div class="space-y-3 text-sm">

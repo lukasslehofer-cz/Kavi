@@ -23,8 +23,7 @@ class SubscriptionController extends Controller
         private StripeService $stripeService,
         private CouponService $couponService,
         private ShippingService $shippingService
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -52,33 +51,33 @@ class SubscriptionController extends Controller
 
         // Get roasteries of the month (same as homepage)
         $roasteriesOfMonth = \App\Models\Roastery::getRoasteriesOfMonth();
-        
+
         // Get coffees of the month for next shipment - use correct method with month logic
         $coffeesOfMonth = \App\Models\Product::getCoffeesOfMonth();
 
         // Calculate display month and year using billing_date cutoff logic
         $displayMonth = \App\Helpers\SubscriptionHelper::getOrderingTargetMonth();
-        
+
         // Get schedule for the target month (used for promo image and availability check)
         $schedule = \App\Models\ShipmentSchedule::getForMonth($displayMonth->year, $displayMonth->month);
         $promoImage = $schedule?->promo_image ?? 'images/kavi-november-25.jpg';
-        
+
         // Get month name in nominative case based on locale
         $months = app()->getLocale() === 'en' ? [
             1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
             5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
-            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December',
         ] : [
             1 => 'Leden', 2 => 'Únor', 3 => 'Březen', 4 => 'Duben',
             5 => 'Květen', 6 => 'Červen', 7 => 'Červenec', 8 => 'Srpen',
-            9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec'
+            9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec',
         ];
         $monthName = $months[$displayMonth->month];
         $displayYear = $displayMonth->year;
-        
+
         // Check availability for displaying sold out message
-        
-        if (!$schedule || !$schedule->hasCoffeeSlotsConfigured()) {
+
+        if (! $schedule || ! $schedule->hasCoffeeSlotsConfigured()) {
             // No schedule or coffee slots not configured = sold out
             $availability = [
                 'espresso' => false,
@@ -90,11 +89,11 @@ class SubscriptionController extends Controller
         } else {
             $reservationService = app(\App\Services\StockReservationService::class);
             $availability = $reservationService->checkTypeAvailability($schedule);
-            
+
             // Check if both espresso and filter are sold out
-            $availability['allSoldOut'] = !$availability['espresso'] && !$availability['filter'];
+            $availability['allSoldOut'] = ! $availability['espresso'] && ! $availability['filter'];
         }
-        
+
         // Calculate next available month using billing_date cutoff logic
         // This respects the 15th billing cutoff (same as getOrderingTargetMonth)
         $today = now();
@@ -115,22 +114,22 @@ class SubscriptionController extends Controller
         $nextAvailableMonths = app()->getLocale() === 'en' ? [
             1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
             5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
-            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December',
         ] : [
             1 => 'Leden', 2 => 'Únor', 3 => 'Březen', 4 => 'Duben',
             5 => 'Květen', 6 => 'Červen', 7 => 'Červenec', 8 => 'Srpen',
-            9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec'
+            9 => 'Září', 10 => 'Říjen', 11 => 'Listopad', 12 => 'Prosinec',
         ];
         $nextAvailableMonthName = $nextAvailableMonths[$nextAvailableDate->month];
 
         return view('subscriptions.index', compact(
-            'plans', 
-            'subscriptionPricing', 
-            'shippingInfo', 
-            'roasteriesOfMonth', 
-            'coffeesOfMonth', 
-            'promoImage', 
-            'monthName', 
+            'plans',
+            'subscriptionPricing',
+            'shippingInfo',
+            'roasteriesOfMonth',
+            'coffeesOfMonth',
+            'promoImage',
+            'monthName',
             'displayYear',
             'availability',
             'nextAvailableMonthName',
@@ -140,7 +139,7 @@ class SubscriptionController extends Controller
 
     public function show(SubscriptionPlan $plan)
     {
-        if (!$plan->is_active) {
+        if (! $plan->is_active) {
             abort(404);
         }
 
@@ -149,7 +148,7 @@ class SubscriptionController extends Controller
 
     public function subscribe(Request $request, SubscriptionPlan $plan)
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect()->localizedRoute('login')
                 ->with('message', __('flash.auth.please_login_subscription'));
         }
@@ -167,12 +166,12 @@ class SubscriptionController extends Controller
     {
         // Log incoming data for debugging
         logger()->info('=== FORMULÁŘ ODESLÁN ===');
-        logger()->info('URL: ' . $request->fullUrl());
-        logger()->info('Method: ' . $request->method());
+        logger()->info('URL: '.$request->fullUrl());
+        logger()->info('Method: '.$request->method());
         logger()->info('Raw POST data:', $request->all());
         logger()->info('Headers:', $request->headers->all());
         logger()->info('Cookies:', $request->cookies->all());
-        
+
         try {
             $validated = $request->validate([
                 'amount' => 'required|integer|between:2,4',
@@ -183,17 +182,17 @@ class SubscriptionController extends Controller
                 'mix.filter' => 'nullable|integer|min:0',
                 'frequency' => 'required|integer|in:0,1,2,3',  // 0 = jednorázově
             ]);
-            
+
             // Convert isDecaf to boolean
             $validated['isDecaf'] = ($validated['isDecaf'] ?? '0') === '1';
-            
+
             logger()->info('Validation passed successfully', ['validated' => $validated]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             logger()->error('Validation failed:', [
                 'errors' => $e->errors(),
-                'input' => $request->all()
+                'input' => $request->all(),
             ]);
-            
+
             return back()
                 ->withErrors($e->errors())
                 ->withInput()
@@ -202,11 +201,11 @@ class SubscriptionController extends Controller
 
         // Validate mix total if type is mix
         if ($validated['type'] === 'mix') {
-            $mixTotal = ($validated['mix']['espresso'] ?? 0) + 
+            $mixTotal = ($validated['mix']['espresso'] ?? 0) +
                        ($validated['mix']['filter'] ?? 0);
-            
+
             if ($mixTotal != $validated['amount']) {
-                return back()->withErrors(['mix' => 'Celkový počet balení v mixu musí být ' . $validated['amount']]);
+                return back()->withErrors(['mix' => 'Celkový počet balení v mixu musí být '.$validated['amount']]);
             }
         }
 
@@ -214,73 +213,73 @@ class SubscriptionController extends Controller
         // Use billing_date cutoff logic to determine the correct month
         $targetMonth = \App\Helpers\SubscriptionHelper::getOrderingTargetMonth();
         $schedule = \App\Models\ShipmentSchedule::getForMonth($targetMonth->year, $targetMonth->month);
-        
+
         // If no schedule or coffee slots not configured, coffees are not available
-        if (!$schedule || !$schedule->hasCoffeeSlotsConfigured()) {
+        if (! $schedule || ! $schedule->hasCoffeeSlotsConfigured()) {
             return redirect()->localizedRoute('subscriptions.index')
                 ->with('error', 'Omlouváme se, ale kávy pro tento měsíc ještě nejsou k dispozici. Zkuste to prosím později.');
         }
-        
+
         $reservationService = app(\App\Services\StockReservationService::class);
         $availability = $reservationService->checkTypeAvailability($schedule);
-        
+
         // Check if selected type is available
         $typeAvailable = false;
         $errorMessage = '';
-        
+
         if ($validated['type'] === 'espresso') {
-            if (!$availability['espresso']) {
+            if (! $availability['espresso']) {
                 $errorMessage = 'Omlouváme se, ale espresso káva je pro tento měsíc již vyprodána. Zkuste prosím filtrovanou kávu nebo se vraťte po 16. dni příštího měsíce.';
             } else {
                 $typeAvailable = true;
             }
         } elseif ($validated['type'] === 'filter') {
-            if (!$availability['filter']) {
+            if (! $availability['filter']) {
                 $errorMessage = 'Omlouváme se, ale filtrovaná káva je pro tento měsíc již vyprodána. Zkuste prosím espresso kávu nebo se vraťte po 16. dni příštího měsíce.';
             } else {
                 $typeAvailable = true;
             }
         } elseif ($validated['type'] === 'mix') {
-            if (!$availability['mix']) {
+            if (! $availability['mix']) {
                 $errorMessage = 'Omlouváme se, ale kombinace káv není pro tento měsíc k dispozici kvůli nedostatku zásob. Zkuste prosím jen espresso nebo jen filtr, nebo se vraťte po 16. dni příštího měsíce.';
             } else {
                 $typeAvailable = true;
             }
         }
-        
+
         // Check decaf availability if requested
         if ($validated['isDecaf'] && $typeAvailable) {
-            if (!$availability['decaf']) {
+            if (! $availability['decaf']) {
                 $errorMessage = 'Omlouváme se, ale bezkofeinová káva je pro tento měsíc již vyprodána. Zkuste prosím objednávku bez decaf možnosti.';
                 $typeAvailable = false;
             }
         }
-        
-        if (!$typeAvailable) {
+
+        if (! $typeAvailable) {
             return redirect()->localizedRoute('subscriptions.index')
                 ->with('error', $errorMessage);
         }
 
         // Calculate price based on amount (tiered pricing)
-        $pricingKey = 'price_' . $validated['amount'] . '_bags';
+        $pricingKey = 'price_'.$validated['amount'].'_bags';
         if (CurrencyHelper::isEur()) {
-            $totalPriceWithVat = SubscriptionConfig::get($pricingKey . '_eur', 29);
+            $totalPriceWithVat = SubscriptionConfig::get($pricingKey.'_eur', 29);
         } else {
             $totalPriceWithVat = SubscriptionConfig::get($pricingKey, 500);
         }
-        
+
         // Add decaf surcharge if selected
         if ($validated['isDecaf']) {
             $totalPriceWithVat += CurrencyHelper::isEur() ? 5 : 100; // +5 € / +100 Kč za decaf variantu
         }
-        
+
         // Add one-time box surcharge if selected
         if ($validated['frequency'] == 0) {
             $totalPriceWithVat += CurrencyHelper::isEur() ? 5 : 100; // +5 € / +100 Kč za jednorázový box
         }
-        
-        // Calculate VAT (all prices include 21% VAT)
-        $priceWithoutVat = round($totalPriceWithVat / 1.21, 2);
+
+        // Calculate VAT (all prices include 12% VAT - coffee products)
+        $priceWithoutVat = round($totalPriceWithVat / 1.12, 2);
         $vat = round($totalPriceWithVat - $priceWithoutVat, 2);
 
         // Store configuration in session for checkout
@@ -296,7 +295,7 @@ class SubscriptionController extends Controller
             'price' => $totalPriceWithVat,
             'price_without_vat' => $priceWithoutVat,
             'vat' => $vat,
-            'is_one_time' => $validated['frequency'] == 0
+            'is_one_time' => $validated['frequency'] == 0,
         ]);
 
         // Proceed to checkout (same for subscription and one-time)
@@ -312,11 +311,11 @@ class SubscriptionController extends Controller
         if ($request->has('success') && $request->success == 1) {
             $sessionId = $request->get('session_id');
             $subscription = null;
-            
+
             // Try to find subscription by Stripe session_id (most reliable)
             if ($sessionId) {
                 $subscription = Subscription::where('stripe_session_id', $sessionId)->first();
-                
+
                 if ($subscription) {
                     \Log::info('Found subscription by session_id', [
                         'session_id' => $sessionId,
@@ -324,9 +323,9 @@ class SubscriptionController extends Controller
                     ]);
                 }
             }
-            
+
             // Fallback: find by user_id or email if session_id didn't work
-            if (!$subscription) {
+            if (! $subscription) {
                 if (auth()->check()) {
                     // For authenticated users, find by user_id
                     $subscription = Subscription::where('user_id', auth()->id())
@@ -341,7 +340,7 @@ class SubscriptionController extends Controller
                             ->first();
                     }
                 }
-                
+
                 if ($subscription) {
                     \Log::info('Found subscription by fallback method', [
                         'subscription_id' => $subscription->id,
@@ -353,14 +352,14 @@ class SubscriptionController extends Controller
             // If subscription found, redirect to confirmation
             if ($subscription) {
                 // Store subscription ID in session for secure auto-login
-                if (!auth()->check()) {
-                    session(['pending_subscription_' . $subscription->id => true]);
+                if (! auth()->check()) {
+                    session(['pending_subscription_'.$subscription->id => true]);
                 }
-                
+
                 // Auto-login guest user if not already authenticated
                 // SECURITY: Only auto-login if this session just created/accessed the subscription
-                if (!auth()->check() && $subscription->user_id) {
-                    if (session()->has('pending_subscription_' . $subscription->id)) {
+                if (! auth()->check() && $subscription->user_id) {
+                    if (session()->has('pending_subscription_'.$subscription->id)) {
                         $user = \App\Models\User::find($subscription->user_id);
                         if ($user) {
                             auth()->login($user);
@@ -376,10 +375,10 @@ class SubscriptionController extends Controller
                         ]);
                     }
                 }
-                
+
                 // Clear subscription session data (but keep guest email for confirmation page authorization)
                 session()->forget([
-                    'subscription_configuration', 
+                    'subscription_configuration',
                     'subscription_price',
                     'subscription_price_without_vat',
                     'subscription_vat',
@@ -389,7 +388,7 @@ class SubscriptionController extends Controller
                     'guest_subscription_name',
                     'guest_subscription_phone',
                 ]);
-                
+
                 return redirect()->localizedRoute('subscriptions.confirmation', $subscription);
             } else {
                 // Subscription not found yet (race condition) - show processing message
@@ -398,7 +397,7 @@ class SubscriptionController extends Controller
                     'user_id' => auth()->id(),
                     'guest_email' => session('guest_subscription_email'),
                 ]);
-                
+
                 return redirect()->localizedRoute('subscriptions.index')
                     ->with('success', __('flash.subscription.order_processing'));
             }
@@ -409,7 +408,7 @@ class SubscriptionController extends Controller
         $priceWithoutVat = session('subscription_price_without_vat');
         $vat = session('subscription_vat');
 
-        if (!$configuration || !$price) {
+        if (! $configuration || ! $price) {
             return redirect()->localizedRoute('subscriptions.index')
                 ->with('error', __('flash.subscription.config_not_found'));
         }
@@ -417,15 +416,17 @@ class SubscriptionController extends Controller
         // Handle coupon from GET parameter only (simple, reliable)
         $appliedCoupon = null;
         $discount = 0;
+        $isGiftVoucher = false;
         $errorMessage = null;
         $originalPrice = $price;
-        
+
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
             $this->couponService->clearCouponFromStorage();
+
             return redirect()->localizedRoute('subscriptions.checkout');
         }
-        
+
         // Zpracovat kupón z query parametru (ručně zadaný)
         $manualCouponCode = null;
         if (request()->has('coupon_code') && request('coupon_code')) {
@@ -434,23 +435,24 @@ class SubscriptionController extends Controller
             // Vymazat affiliate kód, protože uživatel zadal vlastní
             session()->forget('affiliate_code');
         }
-        
+
         // Zkusit načíst kupón - priorita: ručně zadaný > session > affiliate
         $couponCode = $manualCouponCode ?: $this->couponService->getCouponFromStorage();
-        $isAffiliateCoupon = !$manualCouponCode && session('affiliate_code') && $couponCode === session('affiliate_code');
-        
+        $isAffiliateCoupon = ! $manualCouponCode && session('affiliate_code') && $couponCode === session('affiliate_code');
+
         if ($couponCode) {
             $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'subscription', $price);
-            
+
             if ($result['valid']) {
                 $appliedCoupon = $result['coupon'];
                 $couponResult = $this->couponService->applyToSubscription($appliedCoupon, $price);
-                
+
                 $discount = $couponResult['discount'];
                 $price = $couponResult['price'];
                 $priceWithoutVat = $couponResult['price_without_vat'];
                 $vat = $couponResult['vat'];
-                
+                $isGiftVoucher = $couponResult['is_gift_voucher'] ?? false;
+
                 \Log::info('Coupon validated in checkout view', [
                     'coupon_code' => $couponCode,
                     'original_price' => $originalPrice,
@@ -462,7 +464,7 @@ class SubscriptionController extends Controller
                 if ($isAffiliateCoupon) {
                     \Log::debug('Affiliate coupon not valid for subscriptions, ignoring silently', [
                         'code' => $couponCode,
-                        'reason' => $result['message']
+                        'reason' => $result['message'],
                     ]);
                 } else {
                     // Ručně zadaný kód - zobrazit chybu
@@ -477,22 +479,22 @@ class SubscriptionController extends Controller
 
         // Get shipping date info
         $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
-        
+
         // Calculate shipping based on user country (if known)
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
         $packetaVendors = [];
         $shipping = 0;
-        
+
         if ($userCountry) {
             $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry);
             $shipping = $this->shippingService->calculateShippingCost($userCountry, $price, true); // true = is subscription
         }
-        
+
         // Pokud je chyba, uložit do session pro zobrazení
         if ($errorMessage) {
             session()->flash('coupon_error', $errorMessage);
         }
-        
+
         // Calculate adjusted discount for display (same as sent to Stripe)
         // This ensures the displayed discount matches what Stripe receives
         $adjustedDiscount = 0;
@@ -505,11 +507,11 @@ class SubscriptionController extends Controller
         // Get available countries for shipping (filtered by current region)
         // Translate names and sort by translated names for correct alphabetical order
         $availableCountries = ShippingRate::getAllEnabled()
-            ->mapWithKeys(fn($rate) => [$rate->country_code => __('countries.' . $rate->country_name)])
+            ->mapWithKeys(fn ($rate) => [$rate->country_code => __('countries.'.$rate->country_name)])
             ->sort()
             ->toArray();
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'packetaVendors', 'shipping', 'availableCountries'));
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'isGiftVoucher', 'packetaVendors', 'shipping', 'availableCountries'));
     }
 
     /**
@@ -520,7 +522,7 @@ class SubscriptionController extends Controller
         $configuration = session('subscription_configuration');
         $price = session('subscription_price');
 
-        if (!$configuration || !$price) {
+        if (! $configuration || ! $price) {
             return redirect()->localizedRoute('subscriptions.index')
                 ->with('error', __('flash.subscription.config_missing'));
         }
@@ -544,24 +546,24 @@ class SubscriptionController extends Controller
         ]);
 
         try {
-            // Zpracování kupónu - SINGLE SOURCE OF TRUTH: pouze z formuláře (POST)
+            // Zpracování kupónu - z formuláře (POST) nebo fallback na session/cookie
             $coupon = null;
             $discount = 0;
             $discountMonths = null;
             $originalPrice = $price; // Uchovat původní cenu pro log
-            $couponCode = !empty($validated['coupon_code']) ? $validated['coupon_code'] : null;
-            
+            $couponCode = ! empty($validated['coupon_code']) ? $validated['coupon_code'] : $this->couponService->getCouponFromStorage();
+
             if ($couponCode) {
                 $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'subscription', $price);
-                
+
                 if ($result['valid']) {
                     $coupon = $result['coupon'];
                     $couponResult = $this->couponService->applyToSubscription($coupon, $price);
-                    
+
                     $discount = $couponResult['discount'];
                     $price = $couponResult['price']; // Aktualizovat cenu se slevou
                     $discountMonths = $couponResult['months']; // null = neomezeně
-                    
+
                     \Log::info('Coupon applied successfully', [
                         'coupon_code' => $couponCode,
                         'original_price' => $originalPrice,
@@ -576,29 +578,29 @@ class SubscriptionController extends Controller
                         ->with('error', __('flash.coupon.invalid', ['code' => $couponCode, 'message' => $result['message']]));
                 }
             }
-            
+
             // Calculate shipping cost based on billing country
             $shippingCountry = $validated['billing_country'];
             $shipping = $this->shippingService->calculateShippingCost($shippingCountry, $price, true); // true = is subscription
             $shippingRate = ShippingRate::getForCountry($shippingCountry);
-            
+
             \Log::info('Shipping calculated for subscription', [
                 'country' => $shippingCountry,
                 'subtotal' => $price,
                 'shipping_cost' => $shipping,
                 'shipping_rate_id' => $shippingRate?->id,
             ]);
-            
+
             // Check for existing user if guest checkout
-            if (!auth()->check()) {
+            if (! auth()->check()) {
                 $existingUser = \App\Models\User::where('email', $validated['email'])->first();
-                
+
                 if ($existingUser) {
                     return back()
                         ->withInput()
                         ->with('error', __('flash.auth.account_exists'));
                 }
-                
+
                 // Store guest info in session for later registration
                 session([
                     'guest_subscription_email' => $validated['email'],
@@ -626,7 +628,7 @@ class SubscriptionController extends Controller
                 // Handle one-time box as a regular order
                 return $this->processOneTimeBoxOrder($request, $validated, $configuration, $price, $discount, $coupon);
             }
-            
+
             // BYPASS STRIPE FOR ZERO AMOUNT (100% discount)
             if ($price <= 0) {
                 \Log::info('Zero price detected - bypassing Stripe and creating subscription directly', [
@@ -635,7 +637,7 @@ class SubscriptionController extends Controller
                     'final_price' => $price,
                     'coupon_code' => $couponCode,
                 ]);
-                
+
                 return $this->createFreeSubscription($validated, $configuration, $originalPrice, $discount, $coupon, $discountMonths);
             }
 
@@ -699,8 +701,8 @@ class SubscriptionController extends Controller
 
                 // Calculate next billing date (15th of the next billing cycle)
                 // Billing cycle: 16th of one month to 15th of next month
-                $currentBillingCycleEnd = now()->day <= 15 
-                    ? now()->copy()->setDay(15) 
+                $currentBillingCycleEnd = now()->day <= 15
+                    ? now()->copy()->setDay(15)
                     : now()->copy()->addMonthNoOverflow()->setDay(15);
                 $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($configuration['frequency']);
 
@@ -754,28 +756,28 @@ class SubscriptionController extends Controller
                         null,
                         $subscription
                     );
-                    
+
                     // Vymazat kupón z cookie/session
                     $this->couponService->clearCouponFromStorage();
                 }
 
                 DB::commit();
-                
+
                 // Store subscription ID in session for secure access (bank transfer only)
-                if (!auth()->check()) {
-                    session(['pending_subscription_' . $subscription->id => true]);
+                if (! auth()->check()) {
+                    session(['pending_subscription_'.$subscription->id => true]);
                 }
-                
+
                 // Send subscription confirmation email
                 try {
                     Mail::to($validated['email'])->send(new SubscriptionConfirmation($subscription));
                 } catch (\Exception $e) {
-                    \Log::error('Failed to send subscription confirmation email: ' . $e->getMessage());
+                    \Log::error('Failed to send subscription confirmation email: '.$e->getMessage());
                 }
 
                 // Clear session
                 session()->forget([
-                    'subscription_configuration', 
+                    'subscription_configuration',
                     'subscription_price',
                     'subscription_price_without_vat',
                     'subscription_vat',
@@ -798,7 +800,7 @@ class SubscriptionController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return back()
                 ->withInput()
                 ->with('error', __('flash.subscription.creation_error'));
@@ -812,14 +814,14 @@ class SubscriptionController extends Controller
     {
         // Auto-login guest user if not already authenticated
         // SECURITY: Only auto-login if this session has pending_subscription flag
-        if (!auth()->check() && $subscription->user_id) {
-            if (session()->has('pending_subscription_' . $subscription->id)) {
+        if (! auth()->check() && $subscription->user_id) {
+            if (session()->has('pending_subscription_'.$subscription->id)) {
                 $user = \App\Models\User::find($subscription->user_id);
                 if ($user) {
                     auth()->login($user);
                     // Clear the pending session after successful login
-                    session()->forget('pending_subscription_' . $subscription->id);
-                    
+                    session()->forget('pending_subscription_'.$subscription->id);
+
                     \Log::info('Auto-logged in user for subscription confirmation', [
                         'user_id' => $user->id,
                         'subscription_id' => $subscription->id,
@@ -832,25 +834,25 @@ class SubscriptionController extends Controller
                 ]);
             }
         }
-        
+
         // If user is authenticated, check if subscription belongs to them
         if (auth()->check() && $subscription->user_id !== auth()->id()) {
             abort(403);
         }
 
         // If user is not authenticated, verify they have access via session data
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             // Allow access if:
             // 1. Subscription has no user_id (original guest subscription)
             // 2. OR guest email in session matches subscription email
             // 3. OR pending_subscription flag exists (just cleared by auto-login attempt)
             $guestEmail = session('guest_subscription_email');
             $subscriptionEmail = $subscription->shipping_address['email'] ?? null;
-            
-            $hasAccess = $subscription->user_id === null || 
+
+            $hasAccess = $subscription->user_id === null ||
                          ($guestEmail && $subscriptionEmail && $guestEmail === $subscriptionEmail);
-            
-            if (!$hasAccess) {
+
+            if (! $hasAccess) {
                 \Log::warning('Unauthorized access attempt to subscription confirmation', [
                     'subscription_id' => $subscription->id,
                     'subscription_user_id' => $subscription->user_id,
@@ -887,9 +889,9 @@ class SubscriptionController extends Controller
         }
 
         // Prevent duplicate browser Purchase pixel on page reload
-        $shouldFirePixel = !session()->has('purchase_tracked_sub_' . $subscription->id);
+        $shouldFirePixel = ! session()->has('purchase_tracked_sub_'.$subscription->id);
         if ($shouldFirePixel && $subscription->status === 'active') {
-            session()->put('purchase_tracked_sub_' . $subscription->id, true);
+            session()->put('purchase_tracked_sub_'.$subscription->id, true);
         }
 
         return view('subscriptions.confirmation', compact('subscription', 'shouldFirePixel'));
@@ -905,40 +907,40 @@ class SubscriptionController extends Controller
         try {
             // Mark configuration as one-time
             $configuration['is_one_time'] = true;
-            
+
             // Calculate shipping cost based on billing country
             $shippingCountry = $validated['billing_country'];
             $shipping = $this->shippingService->calculateShippingCost($shippingCountry, $price, true); // true = is subscription
             $shippingRate = ShippingRate::getForCountry($shippingCountry);
-            
+
             \Log::info('Shipping calculated for one-time box', [
                 'country' => $shippingCountry,
                 'subtotal' => $price,
                 'shipping_cost' => $shipping,
                 'shipping_rate_id' => $shippingRate?->id,
             ]);
-            
+
             // For one-time boxes, we create them as subscriptions with special handling
             // This allows them to appear in admin shipments and use KVS- numbering
-            
+
             // Calculate next billing/shipment date - one-time boxes ship once then auto-cancel
-            $currentBillingCycleEnd = now()->day <= 15 
-                ? now()->copy()->setDay(15) 
+            $currentBillingCycleEnd = now()->day <= 15
+                ? now()->copy()->setDay(15)
                 : now()->copy()->addMonthNoOverflow()->setDay(15);
-            
+
             // For card payments, create subscription first then redirect to Stripe payment
             if ($validated['payment_method'] === 'card') {
                 // Create user if not authenticated
-                if (!auth()->check()) {
+                if (! auth()->check()) {
                     // Check if user already exists
                     $existingUser = \App\Models\User::where('email', $validated['email'])->first();
-                    
+
                     if ($existingUser) {
                         return back()
                             ->withInput()
                             ->with('error', __('flash.auth.account_exists'));
                     }
-                    
+
                     $newUser = \App\Models\User::create([
                         'name' => $validated['name'],
                         'email' => $validated['email'],
@@ -954,14 +956,14 @@ class SubscriptionController extends Controller
                         'packeta_point_name' => $validated['packeta_point_name'],
                         'packeta_point_address' => $validated['packeta_point_address'],
                     ]);
-                    
+
                     auth()->login($newUser);
-                    
+
                     \Log::info('Created user account for one-time box with card payment', [
                         'user_id' => $newUser->id,
                     ]);
                 }
-                
+
                 // Create subscription with pending status
                 $subscription = Subscription::create([
                     'subscription_number' => Subscription::generateSubscriptionNumber(),
@@ -1050,7 +1052,7 @@ class SubscriptionController extends Controller
 
                 return redirect($session->url);
             }
-            
+
             // For bank transfer, create subscription directly as pending
             $subscription = Subscription::create([
                 'subscription_number' => Subscription::generateSubscriptionNumber(),
@@ -1106,12 +1108,12 @@ class SubscriptionController extends Controller
             }
 
             DB::commit();
-            
+
             // Store subscription ID in session for secure access
-            if (!auth()->check()) {
-                session(['pending_subscription_' . $subscription->id => true]);
+            if (! auth()->check()) {
+                session(['pending_subscription_'.$subscription->id => true]);
             }
-            
+
             // Send confirmation email (different templates for one-time vs subscription)
             try {
                 if ($subscription->frequency_months == 0) {
@@ -1120,7 +1122,7 @@ class SubscriptionController extends Controller
                     Mail::to($validated['email'])->send(new \App\Mail\SubscriptionConfirmation($subscription));
                 }
             } catch (\Exception $e) {
-                \Log::error('Failed to send confirmation email: ' . $e->getMessage());
+                \Log::error('Failed to send confirmation email: '.$e->getMessage());
             }
 
             // Clear session
@@ -1145,7 +1147,7 @@ class SubscriptionController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return back()
                 ->withInput()
                 ->with('error', __('flash.onetime_box.creation_error'));
@@ -1164,32 +1166,32 @@ class SubscriptionController extends Controller
         ?int $discountMonths
     ) {
         DB::beginTransaction();
-        
+
         try {
             // Calculate shipping cost based on billing country
             $shippingCountry = $validated['billing_country'];
             $shipping = $this->shippingService->calculateShippingCost($shippingCountry, 0, true); // 0 = free price, true = is subscription
             $shippingRate = ShippingRate::getForCountry($shippingCountry);
-            
+
             \Log::info('Shipping calculated for free subscription', [
                 'country' => $shippingCountry,
                 'shipping_cost' => $shipping,
                 'shipping_rate_id' => $shippingRate?->id,
             ]);
-            
+
             // Create or get user
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 // Check if user exists
                 $existingUser = \App\Models\User::where('email', $validated['email'])->first();
-                
+
                 if ($existingUser) {
                     return back()
                         ->withInput()
                         ->with('error', __('flash.auth.account_exists'));
                 }
-                
+
                 // Create new user
                 $user = \App\Models\User::create([
                     'name' => $validated['name'],
@@ -1206,10 +1208,10 @@ class SubscriptionController extends Controller
                     'packeta_point_name' => $validated['packeta_point_name'],
                     'packeta_point_address' => $validated['packeta_point_address'],
                 ]);
-                
+
                 // Auto-login
                 auth()->login($user);
-                
+
                 \Log::info('Created user for free subscription', [
                     'user_id' => $user->id,
                     'email' => $user->email,
@@ -1227,13 +1229,13 @@ class SubscriptionController extends Controller
                     'packeta_point_address' => $validated['packeta_point_address'],
                 ]);
             }
-            
+
             // Calculate next billing date
-            $currentBillingCycleEnd = now()->day <= 15 
-                ? now()->copy()->setDay(15) 
+            $currentBillingCycleEnd = now()->day <= 15
+                ? now()->copy()->setDay(15)
                 : now()->copy()->addMonthNoOverflow()->setDay(15);
             $nextBillingDate = $currentBillingCycleEnd->copy()->addMonths($configuration['frequency']);
-            
+
             // Create subscription directly in DB
             $subscription = Subscription::create([
                 'subscription_number' => Subscription::generateSubscriptionNumber(),
@@ -1285,13 +1287,13 @@ class SubscriptionController extends Controller
                     null,
                     $subscription
                 );
-                
+
                 \Log::info('Coupon usage recorded for free subscription', [
                     'coupon_id' => $coupon->id,
                     'subscription_id' => $subscription->id,
                 ]);
             }
-            
+
             // Create initial payment record (amount = 0)
             \App\Models\SubscriptionPayment::create([
                 'subscription_id' => $subscription->id,
@@ -1303,23 +1305,23 @@ class SubscriptionController extends Controller
                 'period_start' => now(),
                 'period_end' => $nextBillingDate,
             ]);
-            
+
             DB::commit();
-            
+
             \Log::info('Free subscription created successfully', [
                 'subscription_id' => $subscription->id,
                 'user_id' => $user->id,
                 'original_price' => $originalPrice,
                 'discount' => $discount,
             ]);
-            
+
             // Send confirmation email
             try {
                 Mail::to($validated['email'])->send(new \App\Mail\SubscriptionConfirmation($subscription));
             } catch (\Exception $e) {
-                \Log::error('Failed to send free subscription confirmation email: ' . $e->getMessage());
+                \Log::error('Failed to send free subscription confirmation email: '.$e->getMessage());
             }
-            
+
             // Clear session
             session()->forget([
                 'subscription_configuration',
@@ -1327,18 +1329,18 @@ class SubscriptionController extends Controller
                 'subscription_price_without_vat',
                 'subscription_vat',
             ]);
-            
+
             return redirect()->localizedRoute('subscriptions.confirmation', $subscription)
                 ->with('success', __('flash.subscription.activated_free'));
-            
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             \Log::error('Failed to create free subscription', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return back()
                 ->withInput()
                 ->with('error', __('flash.subscription.creation_error'));
@@ -1356,14 +1358,14 @@ class SubscriptionController extends Controller
         }
 
         // Check if subscription has unpaid status and pending invoice
-        if ($subscription->status !== 'unpaid' || !$subscription->pending_invoice_id) {
+        if ($subscription->status !== 'unpaid' || ! $subscription->pending_invoice_id) {
             return back()->with('error', __('flash.subscription.no_unpaid_invoice'));
         }
 
         try {
             $checkoutUrl = $this->stripeService->createInvoicePaymentSession($subscription);
-            
-            if (!$checkoutUrl) {
+
+            if (! $checkoutUrl) {
                 return back()->with('error', __('flash.subscription.payment_session_error'));
             }
 
@@ -1378,5 +1380,3 @@ class SubscriptionController extends Controller
         }
     }
 }
-
-

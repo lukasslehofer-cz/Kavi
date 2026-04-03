@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\VatHelper;
 use App\Mail\OrderConfirmation;
-use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -29,8 +28,7 @@ class CheckoutController extends Controller
         private ShippingService $shippingService,
         private SubscriptionAddonService $addonService,
         private StripeService $stripeService
-    ) {
-    }
+    ) {}
 
     public function index(Request $request)
     {
@@ -38,31 +36,31 @@ class CheckoutController extends Controller
         if ($request->has('order_id')) {
             $orderId = $request->get('order_id');
             $order = Order::find($orderId);
-            
+
             if ($order && $order->payment_status === 'pending') {
                 // Restore cart from order backup (stored in admin_notes)
                 try {
                     $adminNotes = json_decode($order->admin_notes, true);
                     if (isset($adminNotes['cart_backup'])) {
                         session(['cart' => $adminNotes['cart_backup']]);
-                        
+
                         \Log::info('Cart restored from cancelled order', [
                             'order_id' => $order->id,
-                            'cart' => $adminNotes['cart_backup']
+                            'cart' => $adminNotes['cart_backup'],
                         ]);
-                        
+
                         // Show message that they can try payment again
                         session()->flash('info', 'Platba byla zrušena. Můžete pokračovat v objednávce nebo upravit košík.');
                     }
                 } catch (\Exception $e) {
                     \Log::error('Failed to restore cart from order', [
                         'order_id' => $orderId,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
         }
-        
+
         $cart = session()->get('cart', []);
 
         if (empty($cart)) {
@@ -88,7 +86,7 @@ class CheckoutController extends Controller
                 $subtotal += $itemSubtotal;
 
                 // Přičíst k discountable subtotal pouze pokud produkt není vyloučen ze slev
-                if (!$product->exclude_from_discounts) {
+                if (! $product->exclude_from_discounts) {
                     $discountableSubtotal += $itemSubtotal;
                 }
             }
@@ -96,21 +94,22 @@ class CheckoutController extends Controller
 
         // Check if cart qualifies for free shipping (all products have free_shipping flag)
         $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
-        
+
         // Check if cart contains only digital products (no physical shipping needed)
         $cartContainsOnlyDigitalProducts = Product::cartContainsOnlyDigitalProducts($cart);
-        
+
         // Calculate shipping dynamically based on user country
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : 'CZ'; // Default to Czech Republic for guests
         $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
         $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry);
-        
+
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
             $this->couponService->clearCouponFromStorage();
+
             return redirect()->localizedRoute('checkout.index');
         }
-        
+
         // Zpracovat kupón z query parametru (ručně zadaný)
         $manualCouponCode = null;
         if (request()->has('coupon_code') && request('coupon_code')) {
@@ -119,35 +118,37 @@ class CheckoutController extends Controller
             // Vymazat affiliate kód, protože uživatel zadal vlastní
             session()->forget('affiliate_code');
         }
-        
+
         // Zkusit načíst kupón - priorita: ručně zadaný > session > affiliate
         $couponCode = $this->couponService->getCouponFromStorage();
-        $isAffiliateCoupon = !$manualCouponCode && session('affiliate_code') && $couponCode === session('affiliate_code');
-        
+        $isAffiliateCoupon = ! $manualCouponCode && session('affiliate_code') && $couponCode === session('affiliate_code');
+
         $appliedCoupon = null;
         $discount = 0;
+        $isGiftVoucher = false;
         $errorMessage = null;
-        
+
         if ($couponCode) {
             $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'order', $subtotal);
-            
+
             if ($result['valid']) {
                 $appliedCoupon = $result['coupon'];
                 // Předat discountableSubtotal pro výpočet slevy pouze z produktů bez vyloučení
                 $couponResult = $this->couponService->applyToOrder($appliedCoupon, $subtotal, $shipping, $discountableSubtotal, $cartItems);
-                
+
                 $discount = $couponResult['discount'];
                 $shipping = $couponResult['shipping'];
                 $totalWithVat = $couponResult['total'];
                 $totalWithoutVat = $couponResult['total_without_vat'];
                 $vat = $couponResult['vat'];
+                $isGiftVoucher = $couponResult['is_gift_voucher'] ?? false;
             } else {
                 // Pokud je to affiliate kód a není platný pro order, ticho ignorovat
                 if ($isAffiliateCoupon) {
                     // Nevymazávat, nehlásit chybu - prostě ignorovat pro tento typ
                     \Log::debug('Affiliate coupon not valid for orders, ignoring silently', [
                         'code' => $couponCode,
-                        'reason' => $result['message']
+                        'reason' => $result['message'],
                     ]);
                 } else {
                     // Ručně zadaný kód - zobrazit chybu
@@ -156,8 +157,8 @@ class CheckoutController extends Controller
                 }
             }
         }
-        
-        if (!$appliedCoupon) {
+
+        if (! $appliedCoupon) {
             // Bez kupónu - dynamický výpočet DPH
             $totalNet = 0;
             $vat = 0;
@@ -166,7 +167,7 @@ class CheckoutController extends Controller
             $itemsByVatRate = [];
             foreach ($cartItems as $item) {
                 $vatRate = $item['vat_rate'];
-                if (!isset($itemsByVatRate[$vatRate])) {
+                if (! isset($itemsByVatRate[$vatRate])) {
                     $itemsByVatRate[$vatRate] = 0;
                 }
                 $itemsByVatRate[$vatRate] += $item['total'];
@@ -190,7 +191,7 @@ class CheckoutController extends Controller
             $totalWithoutVat = $totalNet;
             $totalWithVat = $subtotal + $shipping;
         }
-        
+
         // Calculate adjusted discount for display (same as sent to Stripe)
         // This ensures the displayed discount matches what Stripe receives
         $adjustedDiscount = 0;
@@ -199,7 +200,7 @@ class CheckoutController extends Controller
             $displayedTotal = round($totalWithVat);
             $adjustedDiscount = $grossTotal - $displayedTotal;
         }
-        
+
         // Pokud je chyba, uložit do session pro zobrazení
         if ($errorMessage) {
             session()->flash('coupon_error', $errorMessage);
@@ -212,13 +213,13 @@ class CheckoutController extends Controller
 
         if (auth()->check()) {
             $cartQuantity = array_sum($cart);
-            
+
             // Získat všechna aktivní předplatná s dostupnými sloty
             $allSlots = $this->addonService->getAllAvailableSlots(auth()->user());
-            
-            if (!empty($allSlots)) {
+
+            if (! empty($allSlots)) {
                 $canShipWithSubscription = true;
-                
+
                 foreach ($allSlots as $slots) {
                     $availableSubscriptions[] = [
                         'subscription' => $slots['subscription'],
@@ -230,7 +231,7 @@ class CheckoutController extends Controller
                         'next_shipment_formatted' => $slots['next_shipment']->shipment_date->format('d.m.Y'),
                     ];
                 }
-                
+
                 // Pro zpětnou kompatibilitu - pokud je jen jedno předplatné
                 if (count($availableSubscriptions) === 1) {
                     $subscriptionShipmentInfo = $availableSubscriptions[0];
@@ -242,20 +243,21 @@ class CheckoutController extends Controller
         // Get available countries for shipping (filtered by current region)
         // Translate names and sort by translated names for correct alphabetical order
         $availableCountries = ShippingRate::getAllEnabled()
-            ->mapWithKeys(fn($rate) => [$rate->country_code => __('countries.' . $rate->country_name)])
+            ->mapWithKeys(fn ($rate) => [$rate->country_code => __('countries.'.$rate->country_name)])
             ->sort()
             ->toArray();
 
         return view('checkout.index', compact(
-            'cartItems', 
-            'subtotal', 
-            'shipping', 
-            'totalWithVat', 
-            'totalWithoutVat', 
-            'vat', 
-            'appliedCoupon', 
+            'cartItems',
+            'subtotal',
+            'shipping',
+            'totalWithVat',
+            'totalWithoutVat',
+            'vat',
+            'appliedCoupon',
             'discount',
             'adjustedDiscount',
+            'isGiftVoucher',
             'packetaVendors',
             'canShipWithSubscription',
             'subscriptionShipmentInfo',
@@ -274,8 +276,8 @@ class CheckoutController extends Controller
         $country = $request->input('country');
         $subtotal = (float) $request->input('subtotal', 0);
         $isSubscription = (bool) $request->input('is_subscription', false);
-        
-        if (!$country) {
+
+        if (! $country) {
             return response()->json(['error' => 'Country is required'], 400);
         }
 
@@ -285,14 +287,14 @@ class CheckoutController extends Controller
 
         // Calculate shipping (0 if all products have free_shipping)
         $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($country, $subtotal, $isSubscription);
-        
+
         // Get shipping rate details
         $rate = ShippingRate::getForCountry($country);
-        
+
         // Check if shipping is available
         $available = $rate && $rate->enabled;
-        
-        if (!$available) {
+
+        if (! $available) {
             return response()->json([
                 'error' => 'Shipping to this country is not available',
                 'available' => false,
@@ -301,7 +303,7 @@ class CheckoutController extends Controller
 
         // Calculate remaining for free shipping (only for orders, not subscriptions)
         $remaining = null;
-        if (!$isSubscription && !$cartQualifiesForFreeShipping) {
+        if (! $isSubscription && ! $cartQualifiesForFreeShipping) {
             $remaining = $this->shippingService->getRemainingForFreeShipping($country, $subtotal);
         }
 
@@ -321,7 +323,7 @@ class CheckoutController extends Controller
         // Check if cart contains only digital products
         $cart = session()->get('cart', []);
         $cartContainsOnlyDigitalProducts = Product::cartContainsOnlyDigitalProducts($cart);
-        
+
         // Dynamická validace - Packeta data jsou required pouze pokud se neposílá s předplatným
         $rules = [
             'name' => 'required|string|max:255',
@@ -338,7 +340,7 @@ class CheckoutController extends Controller
         ];
 
         // Packeta fields are required only if NOT shipping with subscription AND NOT digital-only cart
-        if (!$request->ship_with_subscription && !$cartContainsOnlyDigitalProducts) {
+        if (! $request->ship_with_subscription && ! $cartContainsOnlyDigitalProducts) {
             $rules['packeta_point_id'] = 'required|string';
             $rules['packeta_point_name'] = 'required|string';
             $rules['packeta_point_address'] = 'nullable|string';
@@ -347,9 +349,9 @@ class CheckoutController extends Controller
         $request->validate($rules);
 
         // Check for existing user if guest checkout
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $existingUser = \App\Models\User::where('email', $request->email)->first();
-            
+
             if ($existingUser) {
                 return back()
                     ->withInput()
@@ -376,32 +378,32 @@ class CheckoutController extends Controller
                     ->where('created_at', '>=', now()->subHours(2)) // Only within last 2 hours
                     ->orderBy('created_at', 'desc')
                     ->first();
-                
+
                 if ($existingPendingOrder) {
                     // Check if cart matches (stored in admin_notes)
                     $adminNotes = json_decode($existingPendingOrder->admin_notes, true);
                     $savedCart = $adminNotes['cart_backup'] ?? [];
-                    
+
                     // If cart matches, reuse this order
                     if ($savedCart === $cart) {
                         \Log::info('Reusing existing pending order', [
                             'order_id' => $existingPendingOrder->id,
                             'order_number' => $existingPendingOrder->order_number,
                         ]);
-                        
+
                         DB::commit();
-                        
+
                         // Proceed to payment
                         if ($request->payment_method === 'card') {
                             return redirect()->route('payment.card', $existingPendingOrder);
                         }
-                        
+
                         return redirect()->route('order.confirmation', $existingPendingOrder)
                             ->with('success', __('flash.checkout.order_created'));
                     }
                 }
             }
-            
+
             $subtotal = 0;
             $discountableSubtotal = 0; // Subtotal produktů, na které se vztahují slevy
             $orderItems = [];
@@ -416,13 +418,13 @@ class CheckoutController extends Controller
                     $subtotal += $itemTotal;
 
                     // Agregovat podle DPH sazeb pro proporcionální dopravu
-                    if (!isset($itemsByVatRate[$vatRate])) {
+                    if (! isset($itemsByVatRate[$vatRate])) {
                         $itemsByVatRate[$vatRate] = 0;
                     }
                     $itemsByVatRate[$vatRate] += $itemTotal;
 
                     // Přičíst k discountable subtotal pouze pokud produkt není vyloučen ze slev
-                    if (!$product->exclude_from_discounts) {
+                    if (! $product->exclude_from_discounts) {
                         $discountableSubtotal += $itemTotal;
                     }
 
@@ -440,17 +442,17 @@ class CheckoutController extends Controller
             $shipWithSubscription = false;
             $selectedSubscription = null;
             $shipmentSchedule = null;
-            
+
             if ($request->ship_with_subscription && auth()->check()) {
                 $cartQuantity = array_sum($cart);
-                
+
                 // Pokud je vybrané konkrétní předplatné
                 if ($request->selected_subscription_id) {
                     $selectedSubscription = auth()->user()->activeSubscriptions()
                         ->where('id', $request->selected_subscription_id)
                         ->first();
                 }
-                
+
                 // Validace možnosti přidat zboží
                 if ($selectedSubscription && $this->addonService->canAddItems(auth()->user(), $cartQuantity, $selectedSubscription)) {
                     $slots = $this->addonService->getAvailableSlots(auth()->user(), $selectedSubscription);
@@ -465,29 +467,29 @@ class CheckoutController extends Controller
 
             // Check if cart qualifies for free shipping (all products have free_shipping flag)
             $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
-            
+
             // Calculate shipping based on selected country or subscription addon
             // Free shipping if: shipped with subscription OR all products have free_shipping flag
             $shippingCountry = $request->billing_country;
             $shipping = ($shipWithSubscription || $cartQualifiesForFreeShipping) ? 0 : $this->shippingService->calculateShippingCost($shippingCountry, $subtotal, false);
             $shippingRate = ShippingRate::getForCountry($shippingCountry);
-            
+
             // Zpracování kupónu
             $coupon = null;
             $discount = 0;
             $couponCode = $request->coupon_code ?? $this->couponService->getCouponFromStorage();
-            
+
             if ($couponCode) {
                 $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'order', $subtotal);
-                
+
                 if ($result['valid']) {
                     $coupon = $result['coupon'];
                     // Předat discountableSubtotal pro výpočet slevy pouze z produktů bez vyloučení
                     $couponResult = $this->couponService->applyToOrder($coupon, $subtotal, $shipping, $discountableSubtotal, $orderItems);
-                    
+
                     $discount = $couponResult['discount'];
                     $shipping = $couponResult['shipping'];
-                    
+
                     // CRITICAL: Pokud je addon objednávka, doprava MUSÍ být vždy 0
                     if ($shipWithSubscription) {
                         $shipping = 0;
@@ -495,15 +497,22 @@ class CheckoutController extends Controller
                         $totalWithVat = ($subtotal - $discount) + $shipping;
 
                         // Spočítat DPH proporcionálně podle položek
+                        // U dárkového voucheru se DPH počítá z plné ceny
+                        $isGiftVoucher = $coupon->is_gift_voucher ?? false;
                         $totalNet = 0;
                         $tax = 0;
                         foreach ($itemsByVatRate as $vatRate => $amount) {
-                            $proportion = $amount / $subtotal;
-                            $discountPortion = $discount * $proportion;
-                            $amountAfterDiscount = $amount - $discountPortion;
+                            if ($isGiftVoucher) {
+                                $totalNet += VatHelper::calculateNet($amount, $vatRate);
+                                $tax += VatHelper::calculateVat($amount, $vatRate);
+                            } else {
+                                $proportion = $amount / $subtotal;
+                                $discountPortion = $discount * $proportion;
+                                $amountAfterDiscount = $amount - $discountPortion;
 
-                            $totalNet += VatHelper::calculateNet($amountAfterDiscount, $vatRate);
-                            $tax += VatHelper::calculateVat($amountAfterDiscount, $vatRate);
+                                $totalNet += VatHelper::calculateNet($amountAfterDiscount, $vatRate);
+                                $tax += VatHelper::calculateVat($amountAfterDiscount, $vatRate);
+                            }
                         }
                         $totalWithoutVat = $totalNet;
                     } else {
@@ -577,8 +586,8 @@ class CheckoutController extends Controller
             // This ensures user_id is set and if user creation fails, transaction rolls back
             $userId = auth()->id();
             $newUser = null;
-            
-            if (!auth()->check()) {
+
+            if (! auth()->check()) {
                 $newUser = \App\Models\User::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -593,9 +602,9 @@ class CheckoutController extends Controller
                     'packeta_point_name' => $request->packeta_point_name,
                     'packeta_point_address' => $request->packeta_point_address,
                 ]);
-                
+
                 $userId = $newUser->id;
-                
+
                 \Log::info('Created user account for guest checkout', [
                     'user_id' => $newUser->id,
                     'email' => $newUser->email,
@@ -688,7 +697,7 @@ class CheckoutController extends Controller
                     $discount,
                     $order
                 );
-                
+
                 // Vymazat kupón z cookie/session
                 $this->couponService->clearCouponFromStorage();
             }
@@ -698,11 +707,11 @@ class CheckoutController extends Controller
             // Auto-login the new guest user after successful transaction commit
             if ($newUser) {
                 // Store order ID in session for secure auto-login on confirmation page
-                session(['pending_order_' . $order->id => true]);
-                
+                session(['pending_order_'.$order->id => true]);
+
                 // Auto-login the new user for seamless checkout experience
                 auth()->login($newUser);
-                
+
                 \Log::info('Guest user logged in after order creation', [
                     'user_id' => $newUser->id,
                     'order_id' => $order->id,
@@ -726,6 +735,7 @@ class CheckoutController extends Controller
                     'is_authenticated' => auth()->check(),
                     'auth_user_id' => auth()->id(),
                 ]);
+
                 return redirect()->route('payment.card', $order);
             }
 
@@ -736,8 +746,9 @@ class CheckoutController extends Controller
             DB::rollBack();
             \Log::error('Order creation failed', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
+
             return back()
                 ->withInput()
                 ->with('error', __('flash.checkout.order_error', ['error' => $e->getMessage()]));
@@ -748,14 +759,14 @@ class CheckoutController extends Controller
     {
         // Auto-login guest user if not already authenticated
         // SECURITY: Only auto-login if this session created the order
-        if (!auth()->check() && $order->user_id) {
-            if (session()->has('pending_order_' . $order->id)) {
+        if (! auth()->check() && $order->user_id) {
+            if (session()->has('pending_order_'.$order->id)) {
                 $user = \App\Models\User::find($order->user_id);
                 if ($user) {
                     auth()->login($user);
                     // Clear the pending session after successful login
-                    session()->forget('pending_order_' . $order->id);
-                    
+                    session()->forget('pending_order_'.$order->id);
+
                     \Log::info('Auto-logged in user for order confirmation', [
                         'user_id' => $user->id,
                         'order_id' => $order->id,
@@ -768,14 +779,14 @@ class CheckoutController extends Controller
                 ]);
             }
         }
-        
+
         // If user is authenticated, check if order belongs to them
         if (auth()->check() && $order->user_id !== auth()->id()) {
             abort(403);
         }
 
         // If user is not authenticated, verify they have access
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             // For guest orders without user_id, allow access
             // In production, you might want to add a token-based verification here
             if ($order->user_id !== null) {
@@ -789,7 +800,7 @@ class CheckoutController extends Controller
             try {
                 \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
                 $session = \Stripe\Checkout\Session::retrieve($sessionId);
-                
+
                 if ($session->payment_status === 'paid' && isset($session->metadata['order_id']) && $session->metadata['order_id'] == $order->id) {
                     // Payment was successful, update order immediately
                     $order->update([
@@ -798,22 +809,22 @@ class CheckoutController extends Controller
                         'stripe_payment_intent_id' => $session->payment_intent ?? null,
                         'paid_at' => now(),
                     ]);
-                    
+
                     \Log::info('Order payment status updated synchronously', [
                         'order_id' => $order->id,
                         'session_id' => $sessionId,
                     ]);
-                    
+
                     // Reload order to get updated status
                     $order->refresh();
-                    
+
                     // Create invoice in Fakturoid immediately after payment
                     try {
                         $fakturoidService = app(FakturoidService::class);
                         $fakturoidService->processInvoiceForOrder($order);
                         // Refresh order to get updated invoice_pdf_path
                         $order->refresh();
-                        
+
                         \Log::info('Fakturoid invoice created synchronously', [
                             'order_id' => $order->id,
                         ]);
@@ -824,16 +835,16 @@ class CheckoutController extends Controller
                         ]);
                         // Continue anyway - webhook will retry
                     }
-                    
+
                     // Send order confirmation email immediately after payment
                     try {
                         $email = $order->shipping_address['email'] ?? $order->user?->email;
                         if ($email) {
                             Mail::to($email)->send(new OrderConfirmation($order));
-                            
+
                             // Mark email as sent
                             $order->update(['confirmation_email_sent_at' => now()]);
-                            
+
                             \Log::info('Order confirmation email sent synchronously', [
                                 'order_id' => $order->id,
                                 'email' => $email,
@@ -850,7 +861,7 @@ class CheckoutController extends Controller
                     // Send Meta CAPI Purchase event
                     try {
                         $metaService = app(\App\Services\MetaConversionsService::class);
-                        if ($metaService->isConfigured() && !$order->meta_capi_sent_at) {
+                        if ($metaService->isConfigured() && ! $order->meta_capi_sent_at) {
                             $address = $order->shipping_address ?? [];
                             $user = $order->user;
                             $nameParts = explode(' ', $address['name'] ?? '', 2);
@@ -901,19 +912,19 @@ class CheckoutController extends Controller
 
         // Check if payment was cancelled
         $cancelled = request()->get('cancelled', false);
-        
+
         // Clear cart only after successful payment (not if cancelled)
-        if (!$cancelled && $order->payment_status === 'paid') {
+        if (! $cancelled && $order->payment_status === 'paid') {
             session()->forget('cart');
             \Log::info('Cart cleared after successful payment', [
-                'order_id' => $order->id
+                'order_id' => $order->id,
             ]);
         }
 
         // Prevent duplicate browser Purchase pixel on page reload
-        $shouldFirePixel = !session()->has('purchase_tracked_order_' . $order->id);
-        if ($shouldFirePixel && $order->payment_status === 'paid' && !$cancelled) {
-            session()->put('purchase_tracked_order_' . $order->id, true);
+        $shouldFirePixel = ! session()->has('purchase_tracked_order_'.$order->id);
+        if ($shouldFirePixel && $order->payment_status === 'paid' && ! $cancelled) {
+            session()->put('purchase_tracked_order_'.$order->id, true);
         }
 
         return view('checkout.confirmation', compact('order', 'cancelled', 'shouldFirePixel'));
@@ -930,14 +941,14 @@ class CheckoutController extends Controller
         }
 
         // Check if order needs payment
-        if (!in_array($order->payment_status, ['unpaid', 'pending'])) {
+        if (! in_array($order->payment_status, ['unpaid', 'pending'])) {
             return back()->with('error', __('flash.checkout.order_not_unpaid'));
         }
 
         try {
             $checkoutUrl = $this->stripeService->createOrderPaymentSession($order);
-            
-            if (!$checkoutUrl) {
+
+            if (! $checkoutUrl) {
                 return back()->with('error', __('flash.subscription.payment_session_error'));
             }
 
@@ -952,6 +963,3 @@ class CheckoutController extends Controller
         }
     }
 }
-
-
-

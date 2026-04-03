@@ -35,6 +35,15 @@
             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
+        <div class="mt-4">
+            <label class="flex items-center cursor-pointer">
+                <input type="checkbox" name="is_gift_voucher" id="is_gift_voucher" value="1"
+                    {{ old('is_gift_voucher', $coupon->is_gift_voucher ?? false) ? 'checked' : '' }}
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
+                <span class="ml-2 text-sm font-medium text-gray-700">Dárkový voucher</span>
+            </label>
+            <p class="text-xs text-gray-500 mt-1 ml-6">DPH bude počítána z plné ceny před odečtením voucheru (voucher funguje jako platební metoda)</p>
+        </div>
     </div>
 
     <!-- Sleva pro jednorázové objednávky -->
@@ -170,6 +179,16 @@
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
+        </div>
+
+        <div class="mt-4">
+            <label class="flex items-center cursor-pointer">
+                <input type="checkbox" name="allow_repeated_subscription_usage" id="allow_repeated_subscription_usage" value="1"
+                    {{ old('allow_repeated_subscription_usage', $coupon->allow_repeated_subscription_usage ?? false) ? 'checked' : '' }}
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
+                <span class="ml-2 text-sm font-medium text-gray-700">Povolit opakované použití na předplatné</span>
+            </label>
+            <p class="text-xs text-gray-500 mt-1 ml-6">Uživatel může tento kupón použít i pokud již dříve využil jiný kupón na předplatné</p>
         </div>
     </div>
 

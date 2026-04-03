@@ -7,17 +7,23 @@ use App\Helpers\VatHelper;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class FakturoidService
 {
     private string $apiUrl;
+
     private string $slug;
+
     private string $clientId;
+
     private string $clientSecret;
+
     private ?string $numberFormat;
+
     private string $userAgent;
+
     private ?string $accessToken = null;
 
     public function __construct()
@@ -67,6 +73,7 @@ class FakturoidService
             'cz' => [
                 'shipping' => 'Doprava',
                 'discount' => 'Sleva',
+                'gift_voucher' => 'Dárkový voucher',
                 'unit' => 'ks',
                 'subscription' => 'Předplatné kávy',
                 'note' => 'Objednávka z e-shopu Kavi',
@@ -76,6 +83,7 @@ class FakturoidService
             'en' => [
                 'shipping' => 'Shipping',
                 'discount' => 'Discount',
+                'gift_voucher' => 'Gift voucher',
                 'unit' => 'pcs',
                 'subscription' => 'Coffee Subscription',
                 'note' => 'Order from Kavi e-shop',
@@ -85,6 +93,7 @@ class FakturoidService
         ];
 
         $lang = $currency ? $this->getInvoiceLanguageFromCurrency($currency) : $this->getInvoiceLanguage();
+
         return $texts[$lang][$key] ?? $texts['cz'][$key] ?? $key;
     }
 
@@ -112,7 +121,7 @@ class FakturoidService
                     'grant_type' => 'client_credentials',
                 ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('Failed to get Fakturoid access token', [
                     'status' => $response->status(),
                     'body' => $response->body(),
@@ -149,7 +158,7 @@ class FakturoidService
                 'Content-Type' => 'application/json',
             ]);
 
-        return match(strtoupper($method)) {
+        return match (strtoupper($method)) {
             'GET' => $request->get($endpoint, $data),
             'POST' => $request->post($endpoint, $data),
             'PATCH' => $request->patch($endpoint, $data),
@@ -167,8 +176,9 @@ class FakturoidService
             // First, create or get subject (customer) in Fakturoid
             $subjectId = $this->getOrCreateSubject($order);
 
-            if (!$subjectId) {
+            if (! $subjectId) {
                 Log::error('Failed to create subject in Fakturoid', ['order_id' => $order->id]);
+
                 return null;
             }
 
@@ -184,10 +194,10 @@ class FakturoidService
             $lines = $order->items->map(function ($item) use ($unitName) {
                 return [
                     'name' => $item->product_name,
-                    'quantity' => (string)$item->quantity,
+                    'quantity' => (string) $item->quantity,
                     'unit_name' => $unitName,
-                    'unit_price' => (string)$item->price, // Price WITH VAT when vat_price_mode=with_vat
-                    'vat_rate' => (string)$item->vat_rate, // Dynamic VAT rate from order item
+                    'unit_price' => (string) $item->price, // Price WITH VAT when vat_price_mode=with_vat
+                    'vat_rate' => (string) $item->vat_rate, // Dynamic VAT rate from order item
                 ];
             })->toArray();
 
@@ -197,7 +207,7 @@ class FakturoidService
                 $itemsByVatRate = [];
                 foreach ($order->items as $item) {
                     $vatRate = $item->vat_rate;
-                    if (!isset($itemsByVatRate[$vatRate])) {
+                    if (! isset($itemsByVatRate[$vatRate])) {
                         $itemsByVatRate[$vatRate] = 0;
                     }
                     $itemsByVatRate[$vatRate] += $item->total;
@@ -211,15 +221,15 @@ class FakturoidService
                         $shippingLabel = $this->getLocalizedText('shipping', $orderCurrency);
                         if (count($shippingByVat) > 1) {
                             // Pokud je více DPH sazeb, rozlišit je v názvu
-                            $shippingLabel .= ' (DPH ' . $vatRate . '%)';
+                            $shippingLabel .= ' (DPH '.$vatRate.'%)';
                         }
 
                         $lines[] = [
                             'name' => $shippingLabel,
                             'quantity' => '1',
                             'unit_name' => $unitName,
-                            'unit_price' => (string)$shippingPortion,
-                            'vat_rate' => (string)$vatRate,
+                            'unit_price' => (string) $shippingPortion,
+                            'vat_rate' => (string) $vatRate,
                         ];
                     }
                 }
@@ -227,15 +237,19 @@ class FakturoidService
 
             // Add discount as a negative line item if applicable
             if ($order->discount_amount > 0) {
-                // Použít nejvyšší DPH sazbu v objednávce (standardní praxe)
-                $highestVatRate = $order->items->max('vat_rate') ?? 21;
-                $discountName = $this->getLocalizedText('discount', $orderCurrency);
+                // Dárkový voucher: 0% DPH (voucher je platební metoda, DPH zůstává na plné ceně)
+                // Běžná sleva: nejvyšší DPH sazba v objednávce (standardní praxe)
+                $isGiftVoucher = $order->coupon?->is_gift_voucher ?? false;
+                $discountVatRate = $isGiftVoucher ? 0 : ($order->items->max('vat_rate') ?? 21);
+                $discountName = $isGiftVoucher
+                    ? $this->getLocalizedText('gift_voucher', $orderCurrency)
+                    : $this->getLocalizedText('discount', $orderCurrency);
                 $lines[] = [
-                    'name' => $discountName . ($order->coupon_code ? ' (' . $order->coupon_code . ')' : ''),
+                    'name' => $discountName.($order->coupon_code ? ' ('.$order->coupon_code.')' : ''),
                     'quantity' => '1',
                     'unit_name' => $unitName,
-                    'unit_price' => (string)(-$order->discount_amount), // Negative price WITH VAT
-                    'vat_rate' => (string)$highestVatRate,
+                    'unit_price' => (string) (-$order->discount_amount),
+                    'vat_rate' => (string) $discountVatRate,
                 ];
             }
 
@@ -257,7 +271,7 @@ class FakturoidService
 
             // Add number format ID if configured
             if ($this->numberFormat) {
-                $invoiceData['number_format_id'] = (int)$this->numberFormat;
+                $invoiceData['number_format_id'] = (int) $this->numberFormat;
             }
 
             // Create invoice in Fakturoid
@@ -267,17 +281,18 @@ class FakturoidService
                 $invoiceData
             );
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('Fakturoid invoice creation failed', [
                     'order_id' => $order->id,
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
                 return null;
             }
 
             $invoice = $response->json();
-            
+
             Log::info('Fakturoid invoice created', [
                 'order_id' => $order->id,
                 'invoice_id' => $invoice['id'],
@@ -295,6 +310,7 @@ class FakturoidService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return null;
         }
     }
@@ -338,6 +354,7 @@ class FakturoidService
                             'invoice_id' => $invoiceId,
                         ]);
                         sleep($retryDelay);
+
                         continue;
                     }
                 }
@@ -348,6 +365,7 @@ class FakturoidService
                     'invoice_id' => $invoiceId,
                     'status' => $response->status(),
                 ]);
+
                 return null;
             }
 
@@ -355,6 +373,7 @@ class FakturoidService
                 'order_id' => $order->id,
                 'invoice_id' => $invoiceId,
             ]);
+
             return null;
         } catch (\Exception $e) {
             Log::error('Exception downloading Fakturoid PDF', [
@@ -362,6 +381,7 @@ class FakturoidService
                 'invoice_id' => $invoiceId,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -396,15 +416,15 @@ class FakturoidService
                     'user_id' => $user->id,
                     'subject_id' => $user->fakturoid_subject_id,
                 ]);
-                
+
                 // Update subject with current data
                 $this->updateSubject($user->fakturoid_subject_id, $subjectData);
-                
+
                 return $user->fakturoid_subject_id;
             }
 
             // Try to find existing subject by email
-            if (!empty($subjectData['email'])) {
+            if (! empty($subjectData['email'])) {
                 $searchResponse = $this->makeRequest(
                     'GET',
                     "{$this->apiUrl}/accounts/{$this->slug}/subjects.json",
@@ -413,10 +433,10 @@ class FakturoidService
 
                 if ($searchResponse->successful()) {
                     $subjects = $searchResponse->json();
-                    if (!empty($subjects) && is_array($subjects)) {
+                    if (! empty($subjects) && is_array($subjects)) {
                         // Search API does full-text search, we need to verify email matches
                         $matchingSubject = collect($subjects)->first(function ($subject) use ($subjectData) {
-                            return !empty($subject['email']) && 
+                            return ! empty($subject['email']) &&
                                    strtolower(trim($subject['email'])) === strtolower(trim($subjectData['email']));
                         });
 
@@ -425,19 +445,19 @@ class FakturoidService
                                 'subject_id' => $matchingSubject['id'],
                                 'email' => $subjectData['email'],
                             ]);
-                            
+
                             // Update subject with current data
                             $this->updateSubject($matchingSubject['id'], $subjectData);
-                            
+
                             // Cache subject ID in user
-                            if ($user && !$user->fakturoid_subject_id) {
+                            if ($user && ! $user->fakturoid_subject_id) {
                                 $user->fakturoid_subject_id = $matchingSubject['id'];
                                 $user->save();
                             }
-                            
+
                             return $matchingSubject['id'];
                         }
-                        
+
                         Log::info('Search returned subjects but none with matching email', [
                             'searched_email' => $subjectData['email'],
                             'results_count' => count($subjects),
@@ -453,23 +473,24 @@ class FakturoidService
                 $subjectData
             );
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('Fakturoid subject creation failed', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
                 return null;
             }
 
             $subject = $response->json();
-            
+
             Log::info('Fakturoid subject created', [
                 'subject_id' => $subject['id'],
                 'name' => $subject['name'],
             ]);
 
             // Cache subject ID in user
-            if ($user && !$user->fakturoid_subject_id) {
+            if ($user && ! $user->fakturoid_subject_id) {
                 $user->fakturoid_subject_id = $subject['id'];
                 $user->save();
             }
@@ -479,6 +500,7 @@ class FakturoidService
             Log::error('Exception creating Fakturoid subject', [
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -528,7 +550,7 @@ class FakturoidService
                 ['event' => 'mark_as_sent']
             );
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::warning('Failed to mark Fakturoid invoice as sent', [
                     'invoice_id' => $invoiceId,
                     'status' => $response->status(),
@@ -551,7 +573,7 @@ class FakturoidService
             // Create payment record for the invoice
             $paymentData = [
                 'paid_on' => $order->paid_at?->format('Y-m-d') ?? now()->format('Y-m-d'),
-                'amount' => (string)$order->total,
+                'amount' => (string) $order->total,
                 'payment_method' => 'card',
             ];
 
@@ -561,7 +583,7 @@ class FakturoidService
                 $paymentData
             );
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::warning('Failed to mark Fakturoid invoice as paid', [
                     'invoice_id' => $invoiceId,
                     'status' => $response->status(),
@@ -587,8 +609,8 @@ class FakturoidService
     {
         // Create invoice
         $invoice = $this->createInvoiceForOrder($order);
-        
-        if (!$invoice) {
+
+        if (! $invoice) {
             return false;
         }
 
@@ -597,9 +619,10 @@ class FakturoidService
 
         // Download PDF
         $pdfPath = $this->downloadInvoicePdf($invoice['id'], $order);
-        
+
         if ($pdfPath) {
             $order->update(['invoice_pdf_path' => $pdfPath]);
+
             return true;
         }
 
@@ -612,11 +635,11 @@ class FakturoidService
     public function processInvoiceForSubscriptionPayment(\App\Models\SubscriptionPayment $payment): bool
     {
         $subscription = $payment->subscription;
-        
+
         // Create invoice
         $invoice = $this->createInvoiceForSubscription($payment);
-        
-        if (!$invoice) {
+
+        if (! $invoice) {
             return false;
         }
 
@@ -628,9 +651,10 @@ class FakturoidService
 
         // Download PDF
         $pdfPath = $this->downloadSubscriptionInvoicePdf($invoice['id'], $payment);
-        
+
         if ($pdfPath) {
             $payment->update(['invoice_pdf_path' => $pdfPath]);
+
             return true;
         }
 
@@ -645,12 +669,13 @@ class FakturoidService
         try {
             $subscription = $payment->subscription;
             $user = $subscription->user;
-            
+
             // Get or create subject (customer)
             $subjectId = $this->getOrCreateSubjectForSubscription($subscription);
 
-            if (!$subjectId) {
+            if (! $subjectId) {
                 Log::error('Failed to create subject in Fakturoid', ['subscription_id' => $subscription->id]);
+
                 return null;
             }
 
@@ -659,74 +684,80 @@ class FakturoidService
             // Fakturoid will calculate the base price and VAT from it
             // Předplatné je vždy káva → 12% DPH
             $vatRate = $subscription->vat_rate ?? 12.00;
-            
+
             // Check if discount is active for this subscription
             // Discount is active if: discount_amount > 0 AND (unlimited OR months remaining > 0)
-            $discountActive = $subscription->discount_amount > 0 && 
+            $discountActive = $subscription->discount_amount > 0 &&
                 ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0);
-            
+
             // Use subscription's currency for invoice (stored at subscription creation time)
             $subscriptionCurrency = $subscription->currency ?? 'CZK';
-            
+
             // Determine line items based on whether we have breakdown info
             $lines = [];
             $unitName = $this->getLocalizedText('unit', $subscriptionCurrency);
             $subscriptionName = $this->getLocalizedText('subscription', $subscriptionCurrency);
             $shippingName = $this->getLocalizedText('shipping', $subscriptionCurrency);
             $discountName = $this->getLocalizedText('discount', $subscriptionCurrency);
-            
+
             // If subscription has configured_price and discount, show the breakdown
             if ($subscription->configured_price > 0 && $discountActive) {
                 // Main subscription line (full price)
                 $lines[] = [
-                    'name' => $subscriptionName . ($subscription->subscription_number 
-                        ? ' (' . $subscription->subscription_number . ')'
+                    'name' => $subscriptionName.($subscription->subscription_number
+                        ? ' ('.$subscription->subscription_number.')'
                         : ''),
                     'quantity' => '1',
                     'unit_name' => $unitName,
-                    'unit_price' => (string)$subscription->configured_price,
-                    'vat_rate' => (string)$vatRate,
+                    'unit_price' => (string) $subscription->configured_price,
+                    'vat_rate' => (string) $vatRate,
                 ];
-                
+
                 // Add shipping if applicable
                 if ($subscription->shipping_cost > 0) {
                     $lines[] = [
                         'name' => $shippingName,
                         'quantity' => '1',
                         'unit_name' => $unitName,
-                        'unit_price' => (string)$subscription->shipping_cost,
-                        'vat_rate' => (string)$vatRate,
+                        'unit_price' => (string) $subscription->shipping_cost,
+                        'vat_rate' => (string) $vatRate,
                     ];
                 }
-                
+
                 // Add discount as negative line
+                // Dárkový voucher: 0% DPH (voucher je platební metoda)
+                $isGiftVoucher = $subscription->coupon?->is_gift_voucher ?? false;
+                $discountVatRate = $isGiftVoucher ? 0 : $vatRate;
+                $discountLabel = $isGiftVoucher
+                    ? $this->getLocalizedText('gift_voucher', $subscriptionCurrency)
+                    : $discountName;
                 $lines[] = [
-                    'name' => $discountName . ($subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : ''),
+                    'name' => $discountLabel.($subscription->coupon_code ? ' ('.$subscription->coupon_code.')' : ''),
                     'quantity' => '1',
                     'unit_name' => $unitName,
-                    'unit_price' => (string)(-$subscription->discount_amount),
-                    'vat_rate' => (string)$vatRate,
+                    'unit_price' => (string) (-$subscription->discount_amount),
+                    'vat_rate' => (string) $discountVatRate,
                 ];
             } else {
                 // No active discount - show as single line with payment amount
                 $lines[] = [
-                    'name' => $subscriptionName . ($subscription->subscription_number 
-                        ? ' (' . $subscription->subscription_number . ')'
+                    'name' => $subscriptionName.($subscription->subscription_number
+                        ? ' ('.$subscription->subscription_number.')'
                         : ''),
                     'quantity' => '1',
                     'unit_name' => $unitName,
-                    'unit_price' => (string)$payment->amount,
-                    'vat_rate' => (string)$vatRate,
+                    'unit_price' => (string) $payment->amount,
+                    'vat_rate' => (string) $vatRate,
                 ];
-                
+
                 // Add shipping if applicable and not included in payment amount
                 if ($subscription->shipping_cost > 0 && $subscription->configured_price > 0) {
                     $lines[] = [
                         'name' => $shippingName,
                         'quantity' => '1',
                         'unit_name' => $unitName,
-                        'unit_price' => (string)$subscription->shipping_cost,
-                        'vat_rate' => (string)$vatRate,
+                        'unit_price' => (string) $subscription->shipping_cost,
+                        'vat_rate' => (string) $vatRate,
                     ];
                 }
             }
@@ -734,7 +765,7 @@ class FakturoidService
             // Create invoice data
             $invoiceData = [
                 'subject_id' => $subjectId,
-                'custom_id' => 'SUB-' . $subscription->id . '-' . $payment->id,
+                'custom_id' => 'SUB-'.$subscription->id.'-'.$payment->id,
                 'document_type' => 'invoice',
                 'issued_on' => $payment->paid_at->format('Y-m-d'),
                 'taxable_fulfillment_due' => $payment->paid_at->format('Y-m-d'),
@@ -749,7 +780,7 @@ class FakturoidService
 
             // Add number format ID if configured
             if ($this->numberFormat) {
-                $invoiceData['number_format_id'] = (int)$this->numberFormat;
+                $invoiceData['number_format_id'] = (int) $this->numberFormat;
             }
 
             // Create invoice in Fakturoid
@@ -759,18 +790,19 @@ class FakturoidService
                 $invoiceData
             );
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('Fakturoid invoice creation failed', [
                     'subscription_id' => $subscription->id,
                     'payment_id' => $payment->id,
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
                 return null;
             }
 
             $invoice = $response->json();
-            
+
             Log::info('Fakturoid invoice created for subscription', [
                 'subscription_id' => $subscription->id,
                 'payment_id' => $payment->id,
@@ -790,6 +822,7 @@ class FakturoidService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return null;
         }
     }
@@ -829,6 +862,7 @@ class FakturoidService
                             'invoice_id' => $invoiceId,
                         ]);
                         sleep($retryDelay);
+
                         continue;
                     }
                 }
@@ -838,6 +872,7 @@ class FakturoidService
                     'invoice_id' => $invoiceId,
                     'status' => $response->status(),
                 ]);
+
                 return null;
             }
 
@@ -845,6 +880,7 @@ class FakturoidService
                 'payment_id' => $payment->id,
                 'invoice_id' => $invoiceId,
             ]);
+
             return null;
         } catch (\Exception $e) {
             Log::error('Exception downloading Fakturoid subscription PDF', [
@@ -852,6 +888,7 @@ class FakturoidService
                 'invoice_id' => $invoiceId,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -881,15 +918,15 @@ class FakturoidService
                     'user_id' => $user->id,
                     'subject_id' => $user->fakturoid_subject_id,
                 ]);
-                
+
                 // Update subject with current data
                 $this->updateSubject($user->fakturoid_subject_id, $subjectData);
-                
+
                 return $user->fakturoid_subject_id;
             }
 
             // Try to find existing subject by email
-            if (!empty($subjectData['email'])) {
+            if (! empty($subjectData['email'])) {
                 $searchResponse = $this->makeRequest(
                     'GET',
                     "{$this->apiUrl}/accounts/{$this->slug}/subjects.json",
@@ -898,10 +935,10 @@ class FakturoidService
 
                 if ($searchResponse->successful()) {
                     $subjects = $searchResponse->json();
-                    if (!empty($subjects) && is_array($subjects)) {
+                    if (! empty($subjects) && is_array($subjects)) {
                         // Search API does full-text search, we need to verify email matches
                         $matchingSubject = collect($subjects)->first(function ($subject) use ($subjectData) {
-                            return !empty($subject['email']) && 
+                            return ! empty($subject['email']) &&
                                    strtolower(trim($subject['email'])) === strtolower(trim($subjectData['email']));
                         });
 
@@ -910,19 +947,19 @@ class FakturoidService
                                 'subject_id' => $matchingSubject['id'],
                                 'email' => $subjectData['email'],
                             ]);
-                            
+
                             // Update subject with current data
                             $this->updateSubject($matchingSubject['id'], $subjectData);
-                            
+
                             // Cache subject ID in user
-                            if ($user && !$user->fakturoid_subject_id) {
+                            if ($user && ! $user->fakturoid_subject_id) {
                                 $user->fakturoid_subject_id = $matchingSubject['id'];
                                 $user->save();
                             }
-                            
+
                             return $matchingSubject['id'];
                         }
-                        
+
                         Log::info('Search returned subjects but none with matching email', [
                             'searched_email' => $subjectData['email'],
                             'results_count' => count($subjects),
@@ -938,23 +975,24 @@ class FakturoidService
                 $subjectData
             );
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('Fakturoid subject creation failed', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
+
                 return null;
             }
 
             $subject = $response->json();
-            
+
             Log::info('Fakturoid subject created', [
                 'subject_id' => $subject['id'],
                 'name' => $subject['name'],
             ]);
 
             // Cache subject ID in user
-            if ($user && !$user->fakturoid_subject_id) {
+            if ($user && ! $user->fakturoid_subject_id) {
                 $user->fakturoid_subject_id = $subject['id'];
                 $user->save();
             }
@@ -964,6 +1002,7 @@ class FakturoidService
             Log::error('Exception creating Fakturoid subject for subscription', [
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -976,7 +1015,7 @@ class FakturoidService
         try {
             $paymentData = [
                 'paid_on' => $payment->paid_at->format('Y-m-d'),
-                'amount' => (string)$payment->amount,
+                'amount' => (string) $payment->amount,
                 'payment_method' => 'card',
             ];
 
@@ -986,7 +1025,7 @@ class FakturoidService
                 $paymentData
             );
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::warning('Failed to mark Fakturoid subscription invoice as paid', [
                     'invoice_id' => $invoiceId,
                     'status' => $response->status(),
@@ -1005,4 +1044,3 @@ class FakturoidService
         }
     }
 }
-

@@ -133,7 +133,13 @@
 
                         @if($order->discount_amount > 0 && $order->coupon)
                         <div class="flex justify-between items-center text-sm py-2">
-                            <span class="text-xs uppercase tracking-widest text-green-600">{{ __('confirmation.pricing.discount_label', ['code' => $order->coupon_code]) }}</span>
+                            <span class="text-xs uppercase tracking-widest text-green-600">
+                                @if($order->coupon?->is_gift_voucher)
+                                    {{ app()->getLocale() === 'cs' ? 'Dárkový voucher' : 'Gift voucher' }} ({{ $order->coupon_code }})
+                                @else
+                                    {{ __('confirmation.pricing.discount_label', ['code' => $order->coupon_code]) }}
+                                @endif
+                            </span>
                             <span class="text-green-600">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency) }}</span>
                         </div>
                         @endif

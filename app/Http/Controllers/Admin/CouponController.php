@@ -42,31 +42,33 @@ class CouponController extends Controller
             'code' => 'required|string|unique:coupons,code|max:50',
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            
+
             // Jednorázový nákup
             'discount_type_order' => 'required|in:percentage,fixed,none',
             'discount_value_order' => 'nullable|numeric|min:0',
             'discount_value_order_eur' => 'nullable|numeric|min:0',
             'free_shipping' => 'boolean',
-            
+            'is_gift_voucher' => 'boolean',
+
             // Předplatné
             'discount_type_subscription' => 'required|in:percentage,fixed,none',
             'discount_value_subscription' => 'nullable|numeric|min:0',
             'discount_value_subscription_eur' => 'nullable|numeric|min:0',
             'subscription_discount_months' => 'nullable|integer|min:1',
-            
+            'allow_repeated_subscription_usage' => 'boolean',
+
             // Minimální hodnota
             'min_order_value' => 'nullable|numeric|min:0',
             'min_order_value_eur' => 'nullable|numeric|min:0',
-            
+
             // Platnost
             'valid_from' => 'nullable|date',
             'valid_until' => 'nullable|date|after_or_equal:valid_from',
-            
+
             // Limity
             'usage_limit_total' => 'nullable|integer|min:1',
             'usage_limit_per_user' => 'nullable|integer|min:1',
-            
+
             // Affiliate
             'affiliate_code_enabled' => 'boolean',
             'affiliate_partner_id' => 'nullable|exists:users,id',
@@ -78,20 +80,22 @@ class CouponController extends Controller
             'affiliate_reward_subscription_value' => 'nullable|numeric|min:0',
             'affiliate_reward_subscription_value_eur' => 'nullable|numeric|min:0',
             'affiliate_reward_subscription_months' => 'nullable|integer|min:1',
-            
+
             'is_active' => 'boolean',
         ]);
 
         // Upravit code na uppercase
         $validated['code'] = strtoupper($validated['code']);
-        
+
         // Výchozí hodnoty
         $validated['free_shipping'] = $request->has('free_shipping');
+        $validated['is_gift_voucher'] = $request->has('is_gift_voucher');
         $validated['is_active'] = $request->has('is_active');
         $validated['affiliate_code_enabled'] = $request->has('affiliate_code_enabled');
+        $validated['allow_repeated_subscription_usage'] = $request->has('allow_repeated_subscription_usage');
 
         $coupon = Coupon::create($validated);
-        
+
         // Vytvořit affiliate link pokud je affiliate enabled
         if ($coupon->affiliate_code_enabled && $coupon->affiliate_partner_id) {
             $affiliateService = app(\App\Services\AffiliateService::class);
@@ -108,7 +112,7 @@ class CouponController extends Controller
     public function edit(Coupon $coupon)
     {
         $coupon->loadCount('usages');
-        
+
         return view('admin.coupons.edit', compact('coupon'));
     }
 
@@ -118,34 +122,36 @@ class CouponController extends Controller
     public function update(Request $request, Coupon $coupon)
     {
         $validated = $request->validate([
-            'code' => 'required|string|max:50|unique:coupons,code,' . $coupon->id,
+            'code' => 'required|string|max:50|unique:coupons,code,'.$coupon->id,
             'name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            
+
             // Jednorázový nákup
             'discount_type_order' => 'required|in:percentage,fixed,none',
             'discount_value_order' => 'nullable|numeric|min:0',
             'discount_value_order_eur' => 'nullable|numeric|min:0',
             'free_shipping' => 'boolean',
-            
+            'is_gift_voucher' => 'boolean',
+
             // Předplatné
             'discount_type_subscription' => 'required|in:percentage,fixed,none',
             'discount_value_subscription' => 'nullable|numeric|min:0',
             'discount_value_subscription_eur' => 'nullable|numeric|min:0',
             'subscription_discount_months' => 'nullable|integer|min:1',
-            
+            'allow_repeated_subscription_usage' => 'boolean',
+
             // Minimální hodnota
             'min_order_value' => 'nullable|numeric|min:0',
             'min_order_value_eur' => 'nullable|numeric|min:0',
-            
+
             // Platnost
             'valid_from' => 'nullable|date',
             'valid_until' => 'nullable|date|after_or_equal:valid_from',
-            
+
             // Limity
             'usage_limit_total' => 'nullable|integer|min:1',
             'usage_limit_per_user' => 'nullable|integer|min:1',
-            
+
             // Affiliate
             'affiliate_code_enabled' => 'boolean',
             'affiliate_partner_id' => 'nullable|exists:users,id',
@@ -157,20 +163,22 @@ class CouponController extends Controller
             'affiliate_reward_subscription_value' => 'nullable|numeric|min:0',
             'affiliate_reward_subscription_value_eur' => 'nullable|numeric|min:0',
             'affiliate_reward_subscription_months' => 'nullable|integer|min:1',
-            
+
             'is_active' => 'boolean',
         ]);
 
         // Upravit code na uppercase
         $validated['code'] = strtoupper($validated['code']);
-        
+
         // Výchozí hodnoty
         $validated['free_shipping'] = $request->has('free_shipping');
+        $validated['is_gift_voucher'] = $request->has('is_gift_voucher');
         $validated['is_active'] = $request->has('is_active');
         $validated['affiliate_code_enabled'] = $request->has('affiliate_code_enabled');
+        $validated['allow_repeated_subscription_usage'] = $request->has('allow_repeated_subscription_usage');
 
         $coupon->update($validated);
-        
+
         // Vytvořit affiliate link pokud je affiliate enabled a ještě neexistuje
         if ($coupon->affiliate_code_enabled && $coupon->affiliate_partner_id) {
             $affiliateService = app(\App\Services\AffiliateService::class);
@@ -198,7 +206,7 @@ class CouponController extends Controller
     public function stats(Coupon $coupon)
     {
         $coupon->load(['usages.user', 'usages.order', 'usages.subscription']);
-        
+
         $stats = [
             'total_uses' => $coupon->usages->count(),
             'total_discount' => $coupon->usages->sum('discount_amount'),
@@ -210,4 +218,3 @@ class CouponController extends Controller
         return view('admin.coupons.stats', compact('coupon', 'stats'));
     }
 }
-

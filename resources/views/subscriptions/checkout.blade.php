@@ -502,7 +502,9 @@
                     <!-- Coupon discount -->
                     @if(($adjustedDiscount ?? 0) > 0)
                     <div class="flex justify-between items-baseline">
-                        <dt class="text-xs uppercase tracking-widest text-olive-700">{{ __('checkout.discount') }} {{ $appliedCoupon->code ?? '' }}</dt>
+                        <dt class="text-xs uppercase tracking-widest text-olive-700">
+                            {{ ($isGiftVoucher ?? false) ? (app()->getLocale() === 'cs' ? 'Dárkový voucher' : 'Gift voucher') : __('checkout.discount') }} {{ $appliedCoupon->code ?? '' }}
+                        </dt>
                         <dd class="text-sm text-olive-700 uppercase tracking-wide">-{{ \App\Helpers\CurrencyHelper::formatAmount($adjustedDiscount) }}</dd>
                     </div>
                     @endif
@@ -524,6 +526,9 @@
                         </dt>
                         <dd class="text-sm text-dark-800 uppercase tracking-wide">{{ \App\Helpers\CurrencyHelper::formatAmount($vat, 2) }}</dd>
                     </div>
+                    @if($isGiftVoucher ?? false)
+                    <p class="text-xs text-olive-500">{{ app()->getLocale() === 'cs' ? 'DPH je vypočtena z ceny před odečtením voucheru' : 'VAT is calculated on the price before voucher deduction' }}</p>
+                    @endif
 
                     <!-- Total -->
                     <div class="flex justify-between items-baseline pt-6 mt-4 border-t border-dark-800">

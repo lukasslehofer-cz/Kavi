@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Helpers\CurrencyHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class Coupon extends Model
 {
@@ -22,7 +21,9 @@ class Coupon extends Model
         'discount_value_subscription',
         'discount_value_subscription_eur',
         'subscription_discount_months',
+        'allow_repeated_subscription_usage',
         'free_shipping',
+        'is_gift_voucher',
         'min_order_value',
         'min_order_value_eur',
         'valid_from',
@@ -53,7 +54,9 @@ class Coupon extends Model
         'valid_from' => 'datetime',
         'valid_until' => 'datetime',
         'free_shipping' => 'boolean',
+        'is_gift_voucher' => 'boolean',
         'is_active' => 'boolean',
+        'allow_repeated_subscription_usage' => 'boolean',
         'affiliate_code_enabled' => 'boolean',
         'affiliate_reward_order_value' => 'decimal:2',
         'affiliate_reward_order_value_eur' => 'decimal:2',
@@ -87,6 +90,7 @@ class Coupon extends Model
         if ($this->min_order_value === null && $this->min_order_value_eur === null) {
             return null;
         }
+
         return CurrencyHelper::price($this->min_order_value ?? 0, $this->min_order_value_eur ?? 0);
     }
 
@@ -145,7 +149,7 @@ class Coupon extends Model
      */
     public function isValid(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -220,6 +224,7 @@ class Coupon extends Model
 
         if ($this->discount_type_order === 'fixed') {
             $discountValue = $this->getOrderDiscountValue();
+
             return min($discountValue, $subtotal); // Sleva nemůže být vyšší než subtotal
         }
 
@@ -241,6 +246,7 @@ class Coupon extends Model
 
         if ($this->discount_type_subscription === 'fixed') {
             $discountValue = $this->getSubscriptionDiscountValue();
+
             return min($discountValue, $price); // Sleva nemůže být vyšší než cena
         }
 
@@ -282,14 +288,15 @@ class Coupon extends Model
 
         if ($this->discount_type_order === 'fixed') {
             $value = $this->getOrderDiscountValue();
-            return "-" . CurrencyHelper::formatAmount($value);
+
+            return '-'.CurrencyHelper::formatAmount($value);
         }
 
         if ($this->free_shipping) {
-            return CurrencyHelper::isCzk() ? "Doprava zdarma" : "Free shipping";
+            return CurrencyHelper::isCzk() ? 'Doprava zdarma' : 'Free shipping';
         }
 
-        return CurrencyHelper::isCzk() ? "Žádná sleva" : "No discount";
+        return CurrencyHelper::isCzk() ? 'Žádná sleva' : 'No discount';
     }
 
     /**
@@ -301,19 +308,19 @@ class Coupon extends Model
             $desc = "-{$this->discount_value_subscription}%";
         } elseif ($this->discount_type_subscription === 'fixed') {
             $value = $this->getSubscriptionDiscountValue();
-            $desc = "-" . CurrencyHelper::formatAmount($value);
+            $desc = '-'.CurrencyHelper::formatAmount($value);
         } else {
-            return CurrencyHelper::isCzk() ? "Žádná sleva" : "No discount";
+            return CurrencyHelper::isCzk() ? 'Žádná sleva' : 'No discount';
         }
 
         if ($this->subscription_discount_months) {
             if (CurrencyHelper::isCzk()) {
-                $desc .= " po dobu {$this->subscription_discount_months} " . $this->getMonthsWord($this->subscription_discount_months);
+                $desc .= " po dobu {$this->subscription_discount_months} ".$this->getMonthsWord($this->subscription_discount_months);
             } else {
-                $desc .= " for {$this->subscription_discount_months} " . ($this->subscription_discount_months === 1 ? 'month' : 'months');
+                $desc .= " for {$this->subscription_discount_months} ".($this->subscription_discount_months === 1 ? 'month' : 'months');
             }
         } else {
-            $desc .= CurrencyHelper::isCzk() ? " neomezeně" : " unlimited";
+            $desc .= CurrencyHelper::isCzk() ? ' neomezeně' : ' unlimited';
         }
 
         return $desc;
@@ -325,11 +332,11 @@ class Coupon extends Model
     private function getMonthsWord(int $count): string
     {
         if ($count === 1) {
-            return "měsíc";
+            return 'měsíc';
         } elseif ($count >= 2 && $count <= 4) {
-            return "měsíce";
+            return 'měsíce';
         } else {
-            return "měsíců";
+            return 'měsíců';
         }
     }
 
@@ -373,6 +380,7 @@ class Coupon extends Model
         if ($this->affiliate_reward_order_min_value === null && $this->affiliate_reward_order_min_value_eur === null) {
             return null;
         }
+
         return CurrencyHelper::price($this->affiliate_reward_order_min_value ?? 0, $this->affiliate_reward_order_min_value_eur ?? 0);
     }
 
@@ -389,7 +397,7 @@ class Coupon extends Model
      */
     public function calculateAffiliateOrderReward(float $orderValue): float
     {
-        if (!$this->hasAffiliateOrderReward()) {
+        if (! $this->hasAffiliateOrderReward()) {
             return 0;
         }
 
@@ -415,11 +423,10 @@ class Coupon extends Model
      */
     public function calculateAffiliateSubscriptionReward(): float
     {
-        if (!$this->hasAffiliateSubscriptionReward()) {
+        if (! $this->hasAffiliateSubscriptionReward()) {
             return 0;
         }
 
         return $this->getAffiliateSubscriptionRewardValue();
     }
 }
-

@@ -22,11 +22,11 @@ class CouponService
     ): array {
         $coupon = Coupon::where('code', $code)->first();
 
-        if (!$coupon) {
+        if (! $coupon) {
             return ['valid' => false, 'message' => 'Kupón nebyl nalezen.'];
         }
 
-        if (!$coupon->isValid()) {
+        if (! $coupon->isValid()) {
             return ['valid' => false, 'message' => 'Kupón již není platný.'];
         }
 
@@ -39,30 +39,31 @@ class CouponService
         }
 
         // Kontrola typu kupónu
-        if ($type === 'order' && !$coupon->hasOrderDiscount()) {
+        if ($type === 'order' && ! $coupon->hasOrderDiscount()) {
             return ['valid' => false, 'message' => 'Tento kupón nelze použít pro jednorázové objednávky.'];
         }
 
-        if ($type === 'subscription' && !$coupon->hasSubscriptionDiscount()) {
+        if ($type === 'subscription' && ! $coupon->hasSubscriptionDiscount()) {
             return ['valid' => false, 'message' => 'Tento kupón nelze použít pro předplatné.'];
         }
 
         // Kontrola, zda uživatel již někdy použil jakýkoliv kupón na předplatné
         if ($type === 'subscription' && $user !== null) {
-            if ($this->hasUserEverUsedSubscriptionCoupon($user->id)) {
+            if (! $coupon->allow_repeated_subscription_usage && $this->hasUserEverUsedSubscriptionCoupon($user->id)) {
                 return [
                     'valid' => false,
-                    'message' => 'Slevový kód pro předplatné lze použít pouze jednou. Již jste v minulosti využili slevu na předplatné.'
+                    'message' => 'Slevový kód pro předplatné lze použít pouze jednou. Již jste v minulosti využili slevu na předplatné.',
                 ];
             }
         }
 
         // Kontrola minimální hodnoty objednávky (pouze pro jednorázové objednávky)
-        if ($type === 'order' && $orderValue !== null && !$coupon->meetsMinimumOrderValue($orderValue)) {
+        if ($type === 'order' && $orderValue !== null && ! $coupon->meetsMinimumOrderValue($orderValue)) {
             $formattedMin = \App\Helpers\CurrencyHelper::formatAmount($coupon->getMinOrderValue());
+
             return [
                 'valid' => false,
-                'message' => "Minimální hodnota objednávky pro tento kupón je {$formattedMin}."
+                'message' => "Minimální hodnota objednávky pro tento kupón je {$formattedMin}.",
             ];
         }
 
@@ -72,11 +73,10 @@ class CouponService
     /**
      * Aplikuje kupón na objednávku a vrátí upravené ceny
      *
-     * @param Coupon $coupon
-     * @param float $subtotal Celková cena produktů
-     * @param float $shipping Cena dopravy
-     * @param float|null $discountableSubtotal Cena produktů, na které se vztahuje sleva (null = použít subtotal)
-     * @param array|null $items Pole položek s 'total' a 'vat_rate' pro proporcionální výpočet DPH
+     * @param  float  $subtotal  Celková cena produktů
+     * @param  float  $shipping  Cena dopravy
+     * @param  float|null  $discountableSubtotal  Cena produktů, na které se vztahuje sleva (null = použít subtotal)
+     * @param  array|null  $items  Pole položek s 'total' a 'vat_rate' pro proporcionální výpočet DPH
      */
     public function applyToOrder(Coupon $coupon, float $subtotal, float $shipping, ?float $discountableSubtotal = null, ?array $items = null): array
     {
@@ -101,12 +101,12 @@ class CouponService
         $newTotal = $newSubtotal + $shipping;
 
         // Proporcionální výpočet DPH pokud jsou poskytnuty položky
-        if ($items !== null && !empty($items)) {
+        if ($items !== null && ! empty($items)) {
             // Agregovat položky podle DPH sazeb
             $itemsByVatRate = [];
             foreach ($items as $item) {
                 $vatRate = $item['vat_rate'];
-                if (!isset($itemsByVatRate[$vatRate])) {
+                if (! isset($itemsByVatRate[$vatRate])) {
                     $itemsByVatRate[$vatRate] = 0;
                 }
                 $itemsByVatRate[$vatRate] += $item['total'];
@@ -115,14 +115,20 @@ class CouponService
             $totalNet = 0;
             $vat = 0;
 
-            // DPH z položek po slevě
+            // DPH z položek po slevě (u dárkového voucheru se DPH počítá z plné ceny)
             foreach ($itemsByVatRate as $vatRate => $amount) {
-                $proportion = $amount / $subtotal;
-                $discountPortion = $discount * $proportion;
-                $amountAfterDiscount = $amount - $discountPortion;
+                if ($coupon->is_gift_voucher) {
+                    // Gift voucher: DPH z plné ceny (voucher je platební metoda, ne sleva)
+                    $totalNet += VatHelper::calculateNet($amount, $vatRate);
+                    $vat += VatHelper::calculateVat($amount, $vatRate);
+                } else {
+                    $proportion = $amount / $subtotal;
+                    $discountPortion = $discount * $proportion;
+                    $amountAfterDiscount = $amount - $discountPortion;
 
-                $totalNet += VatHelper::calculateNet($amountAfterDiscount, $vatRate);
-                $vat += VatHelper::calculateVat($amountAfterDiscount, $vatRate);
+                    $totalNet += VatHelper::calculateNet($amountAfterDiscount, $vatRate);
+                    $vat += VatHelper::calculateVat($amountAfterDiscount, $vatRate);
+                }
             }
 
             // DPH z dopravy (proporcionální rozdělení)
@@ -149,6 +155,7 @@ class CouponService
             'total_without_vat' => $totalWithoutVat,
             'vat' => $vat,
             'free_shipping' => $freeShipping,
+            'is_gift_voucher' => $coupon->is_gift_voucher,
         ];
     }
 
@@ -161,9 +168,11 @@ class CouponService
         $newPrice = $price - $discount;
 
         // Přepočet DPH - předplatné je vždy káva = 12% DPH
+        // U dárkového voucheru se DPH počítá z plné ceny (voucher je platební metoda)
         $subscriptionVatRate = 12.00;
-        $priceWithoutVat = VatHelper::calculateNet($newPrice, $subscriptionVatRate);
-        $vat = VatHelper::calculateVat($newPrice, $subscriptionVatRate);
+        $vatBase = $coupon->is_gift_voucher ? $price : $newPrice;
+        $priceWithoutVat = VatHelper::calculateNet($vatBase, $subscriptionVatRate);
+        $vat = VatHelper::calculateVat($vatBase, $subscriptionVatRate);
 
         return [
             'discount' => $discount,
@@ -171,6 +180,7 @@ class CouponService
             'price_without_vat' => $priceWithoutVat,
             'vat' => $vat,
             'months' => $coupon->subscription_discount_months, // null = neomezeně
+            'is_gift_voucher' => $coupon->is_gift_voucher,
         ];
     }
 
@@ -187,7 +197,7 @@ class CouponService
     ): CouponUsage {
         // IDEMPOTENCE: Check if usage already exists
         $existingUsage = null;
-        
+
         if ($order) {
             $existingUsage = CouponUsage::where('coupon_id', $coupon->id)
                 ->where('order_id', $order->id)
@@ -197,7 +207,7 @@ class CouponService
                 ->where('subscription_id', $subscription->id)
                 ->first();
         }
-        
+
         if ($existingUsage) {
             \Log::info('Coupon usage already recorded (idempotent)', [
                 'coupon_id' => $coupon->id,
@@ -205,7 +215,7 @@ class CouponService
                 'subscription_id' => $subscription?->id,
                 'existing_usage_id' => $existingUsage->id,
             ]);
-            
+
             return $existingUsage;
         }
 
@@ -230,13 +240,13 @@ class CouponService
     {
         // 1. Nejprve ručně zadaný kód (nejvyšší priorita)
         $code = session('coupon_code');
-        
-        if (!$code) {
+
+        if (! $code) {
             // 2. Zkusit cookie (uložené z linku)
             $code = request()->cookie('coupon_code');
         }
-        
-        if (!$code) {
+
+        if (! $code) {
             // 3. Fallback na affiliate kód ze session
             $code = session('affiliate_code');
         }
@@ -266,7 +276,7 @@ class CouponService
      */
     public function hasActiveDiscount(Subscription $subscription): bool
     {
-        if (!$subscription->coupon_id || !$subscription->discount_amount) {
+        if (! $subscription->coupon_id || ! $subscription->discount_amount) {
             return false;
         }
 
@@ -326,4 +336,3 @@ class CouponService
             ->exists();
     }
 }
-
