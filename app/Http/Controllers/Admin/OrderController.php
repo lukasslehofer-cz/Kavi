@@ -389,10 +389,10 @@ class OrderController extends Controller
         try {
             Mail::to($recipientEmail)->send(new DigitalProductDelivery($order, $path));
 
-            // Only mark as shipped if order contains only digital products
+            // Only mark as delivered if order contains only digital products
             // Mixed orders wait for physical shipment via Packeta
             if ($order->containsOnlyDigitalProducts()) {
-                $order->markAsShipped();
+                $order->markAsDelivered();
             }
 
             Log::info('Digital product delivery sent', [
@@ -404,7 +404,7 @@ class OrderController extends Controller
             ]);
 
             $message = $order->containsOnlyDigitalProducts()
-                ? 'Voucher byl úspěšně odeslán zákazníkovi.'
+                ? 'Voucher byl úspěšně odeslán a objednávka označena jako doručená.'
                 : 'Voucher byl úspěšně odeslán. Objednávka obsahuje i fyzické produkty — stav se změní po odeslání přes Packetu.';
 
             return redirect()->route('admin.orders.show', $order)

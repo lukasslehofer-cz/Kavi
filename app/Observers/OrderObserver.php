@@ -44,8 +44,12 @@ class OrderObserver
         }
         
         // Send "order delivered" email when delivered_at is set
+        // Skip for digital-only orders where voucher email replaces delivered email
         if ($order->isDirty('delivered_at') && $order->delivered_at !== null) {
-            $this->sendOrderDeliveredEmail($order);
+            $order->loadMissing('items.product');
+            if (!($order->digital_delivery_pdf_path && $order->containsOnlyDigitalProducts())) {
+                $this->sendOrderDeliveredEmail($order);
+            }
         }
     }
     
