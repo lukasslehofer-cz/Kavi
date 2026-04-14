@@ -755,9 +755,32 @@ class StripeService
                         }
                     }
 
-                    // Clear unpaid status and restore subscription
+                    // Record payment
+                    $paymentIntentId = $session['payment_intent'] ?? null;
+                    $amount = $subscription->pending_invoice_amount;
+                    $currency = $subscription->currency ?? 'CZK';
+                    $frequencyMonths = $subscription->frequency_months ?? 1;
+
+                    $payment = \App\Models\SubscriptionPayment::create([
+                        'subscription_id' => $subscription->id,
+                        'stripe_payment_intent_id' => $paymentIntentId,
+                        'amount' => $amount,
+                        'currency' => $currency,
+                        'status' => 'paid',
+                        'paid_at' => now(),
+                        'period_start' => $subscription->next_billing_date?->copy()->subMonths($frequencyMonths),
+                        'period_end' => $subscription->next_billing_date,
+                    ]);
+
+                    // Clear unpaid status, restore subscription and advance billing date
+                    $nextBillingDate = $this->calculateNextBillingDate(
+                        $subscription->next_billing_date,
+                        $frequencyMonths
+                    );
+
                     $subscription->update([
                         'status' => 'active',
+                        'next_billing_date' => $nextBillingDate,
                         'payment_failure_count' => 0,
                         'last_payment_failure_at' => null,
                         'last_payment_failure_reason' => null,
@@ -765,9 +788,54 @@ class StripeService
                         'pending_invoice_amount' => null,
                     ]);
 
+                    // Handle coupon countdown
+                    if ($subscription->discount_months_remaining > 0) {
+                        $subscription->decrement('discount_months_remaining');
+                    }
+
+                    // Link payment to shipment
+                    try {
+                        $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+                        $shipmentService->linkPaymentToShipment($payment, $subscription);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to link manual payment to shipment', [
+                            'payment_id' => $payment->id,
+                            'subscription_id' => $subscription->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+
+                    // Create Fakturoid invoice
+                    if (! $subscription->isComplimentary()) {
+                        try {
+                            $fakturoidService = app(\App\Services\FakturoidService::class);
+                            $fakturoidService->processInvoiceForSubscriptionPayment($payment);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to create Fakturoid invoice for manual payment', [
+                                'payment_id' => $payment->id,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+
+                    // Send confirmation email
+                    try {
+                        $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
+                        if ($email) {
+                            \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentSuccess($subscription, $payment));
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send manual payment confirmation email', [
+                            'subscription_id' => $subscription->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+
                     \Log::info('Manual invoice payment successful - subscription restored', [
                         'subscription_id' => $subscription->id,
+                        'payment_id' => $payment->id,
                         'invoice_id' => $invoiceId ?? 'manual_payment',
+                        'next_billing_date' => $nextBillingDate->toDateString(),
                     ]);
                 }
             }
@@ -2628,11 +2696,7 @@ class StripeService
             }
 
             // Calculate amount (with coupon discount if applicable)
-            $amount = $subscription->configured_price ?? $subscription->plan?->price ?? 0;
-            // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
-            if ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) {
-                $amount -= $subscription->discount_amount;
-            }
+            $amount = $this->calculatePendingAmount($subscription);
 
             // Use subscription's stored currency (not session currency)
             $subscriptionCurrency = strtolower($subscription->currency ?? 'CZK');
@@ -2830,6 +2894,8 @@ class StripeService
             'payment_failure_count' => $failureCount,
             'last_payment_failure_at' => now(),
             'last_payment_failure_reason' => $errorMessage,
+            'pending_invoice_id' => 'manual_'.($subscription->subscription_number ?? $subscription->id),
+            'pending_invoice_amount' => $this->calculatePendingAmount($subscription),
         ]);
 
         // Send failure email
@@ -2853,6 +2919,19 @@ class StripeService
                 'subscription_id' => $subscription->id,
             ]);
         }
+    }
+
+    /**
+     * Calculate the pending payment amount for a subscription (with coupon discount if applicable)
+     */
+    private function calculatePendingAmount(Subscription $subscription): float
+    {
+        $amount = $subscription->configured_price ?? $subscription->plan?->price ?? 0;
+        if ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) {
+            $amount -= $subscription->discount_amount;
+        }
+
+        return $amount;
     }
 
     /**
