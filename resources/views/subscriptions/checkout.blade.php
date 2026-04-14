@@ -471,8 +471,8 @@
                     @endif
                 </div>
 
-                <!-- 100% Discount Notice -->
-                @if($price <= 0 && ($discount ?? 0) > 0)
+                <!-- 100% Discount Notice (only when total including effective shipping is truly zero) -->
+                @if($price <= 0 && ($discount ?? 0) > 0 && max(0, ($shipping ?? 0) - ($giftVoucherShippingCredit ?? 0)) <= 0)
                 <div class="mb-8">
                     <p class="text-xs uppercase tracking-widest text-olive-600 mb-2">{{ __('checkout.full_discount.title') }}</p>
                     <p class="text-sm text-dark-800">
@@ -534,7 +534,7 @@
                     <div class="flex justify-between items-baseline pt-6 mt-4 border-t border-dark-800">
                         <dt class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.total_per_month') }}</dt>
                         <dd class="font-display text-2xl sm:text-3xl text-dark-800 uppercase tracking-tight" id="total-cost">
-                            {{ \App\Helpers\CurrencyHelper::formatAmount($price + ($shipping ?? 0)) }}
+                            {{ \App\Helpers\CurrencyHelper::formatAmount(max(0, $price + ($shipping ?? 0) - ($giftVoucherShippingCredit ?? 0))) }}
                         </dd>
                     </div>
                     <p class="text-xs uppercase tracking-widest text-olive-500 text-right">{{ $frequencyText }} / {{ __('checkout.incl_vat') }}</p>
@@ -602,6 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dynamic shipping calculation for subscriptions
     let currentPacketaVendors = @json($packetaVendors ?? []);
     const subscriptionPrice = {{ $price }};
+    const giftVoucherShippingCredit = {{ $giftVoucherShippingCredit ?? 0 }};
     
     document.getElementById('billing_country').addEventListener('change', function() {
         const country = this.value;
@@ -670,9 +671,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                // Update total cost
+                // Update total cost (gift voucher credit reduces effective shipping)
                 const frequencyText = '{{ $frequencyText }}';
-                const newTotal = subscriptionPrice + shippingCost;
+                const effectiveShipping = Math.max(0, shippingCost - giftVoucherShippingCredit);
+                const newTotal = subscriptionPrice + effectiveShipping;
                 if (totalCostElement) {
                     totalCostElement.textContent = formatCurrency(newTotal);
                 }

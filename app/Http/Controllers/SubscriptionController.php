@@ -495,12 +495,22 @@ class SubscriptionController extends Controller
             session()->flash('coupon_error', $errorMessage);
         }
 
+        // For gift vouchers, apply remaining credit to shipping
+        // Gift voucher = money/credit, so it covers total (product + shipping)
+        $giftVoucherShippingCredit = 0;
+        if ($appliedCoupon && ($isGiftVoucher ?? false) && $discount > 0 && $shipping > 0) {
+            $voucherValue = $appliedCoupon->getSubscriptionDiscountValue();
+            $remainingCredit = max(0, $voucherValue - $discount);
+            $giftVoucherShippingCredit = min($remainingCredit, $shipping);
+        }
+
         // Calculate adjusted discount for display (same as sent to Stripe)
         // This ensures the displayed discount matches what Stripe receives
         $adjustedDiscount = 0;
         if ($discount > 0) {
             $grossTotal = $originalPrice + $shipping;
-            $displayedTotal = round($price + $shipping);
+            $effectiveShipping = $shipping - $giftVoucherShippingCredit;
+            $displayedTotal = round($price + $effectiveShipping);
             $adjustedDiscount = $grossTotal - $displayedTotal;
         }
 
@@ -511,7 +521,7 @@ class SubscriptionController extends Controller
             ->sort()
             ->toArray();
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'isGiftVoucher', 'packetaVendors', 'shipping', 'availableCountries'));
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'isGiftVoucher', 'giftVoucherShippingCredit', 'packetaVendors', 'shipping', 'availableCountries'));
     }
 
     /**
@@ -584,10 +594,22 @@ class SubscriptionController extends Controller
             $shipping = $this->shippingService->calculateShippingCost($shippingCountry, $price, true); // true = is subscription
             $shippingRate = ShippingRate::getForCountry($shippingCountry);
 
+            // For gift vouchers, apply remaining credit to shipping
+            // Gift voucher = money/credit, so it covers total (product + shipping)
+            $giftVoucherShippingCredit = 0;
+            if ($coupon && $coupon->is_gift_voucher && $discount > 0 && $shipping > 0) {
+                $voucherValue = $coupon->getSubscriptionDiscountValue();
+                $remainingCredit = max(0, $voucherValue - $discount);
+                $giftVoucherShippingCredit = min($remainingCredit, $shipping);
+            }
+            $effectiveShipping = $shipping - $giftVoucherShippingCredit;
+
             \Log::info('Shipping calculated for subscription', [
                 'country' => $shippingCountry,
                 'subtotal' => $price,
                 'shipping_cost' => $shipping,
+                'gift_voucher_shipping_credit' => $giftVoucherShippingCredit,
+                'effective_shipping' => $effectiveShipping,
                 'shipping_rate_id' => $shippingRate?->id,
             ]);
 
@@ -629,12 +651,15 @@ class SubscriptionController extends Controller
                 return $this->processOneTimeBoxOrder($request, $validated, $configuration, $price, $discount, $coupon);
             }
 
-            // BYPASS STRIPE FOR ZERO AMOUNT (100% discount)
-            if ($price <= 0) {
+            // BYPASS STRIPE FOR ZERO AMOUNT (100% discount + free shipping)
+            // For gift vouchers, never bypass - they need Fakturoid invoice for VAT documentation
+            if ($price + $effectiveShipping <= 0 && ! ($coupon && $coupon->is_gift_voucher)) {
                 \Log::info('Zero price detected - bypassing Stripe and creating subscription directly', [
                     'original_price' => $originalPrice,
                     'discount' => $discount,
                     'final_price' => $price,
+                    'shipping' => $shipping,
+                    'effective_shipping' => $effectiveShipping,
                     'coupon_code' => $couponCode,
                 ]);
 
@@ -690,7 +715,8 @@ class SubscriptionController extends Controller
                     $discount,
                     $discountMonths,
                     $shipping,
-                    $shippingRate
+                    $shippingRate,
+                    $giftVoucherShippingCredit
                 );
 
                 // Redirect to Stripe Checkout
@@ -1294,17 +1320,23 @@ class SubscriptionController extends Controller
                 ]);
             }
 
-            // Create initial payment record (amount = 0)
+            // Create initial payment record (includes shipping if any — defensive)
             \App\Models\SubscriptionPayment::create([
                 'subscription_id' => $subscription->id,
                 'stripe_payment_intent_id' => null,
-                'amount' => 0,
-                'currency' => 'czk',
+                'amount' => $shipping,
+                'currency' => CurrencyHelper::code(),
                 'status' => 'paid',
                 'paid_at' => now(),
                 'period_start' => now(),
                 'period_end' => $nextBillingDate,
             ]);
+
+            // Add to newsletter subscribers
+            \App\Models\NewsletterSubscriber::firstOrCreate(
+                ['email' => $validated['email']],
+                ['source' => 'customer', 'user_id' => $user->id]
+            );
 
             DB::commit();
 
@@ -1313,6 +1345,7 @@ class SubscriptionController extends Controller
                 'user_id' => $user->id,
                 'original_price' => $originalPrice,
                 'discount' => $discount,
+                'shipping' => $shipping,
             ]);
 
             // Send confirmation email

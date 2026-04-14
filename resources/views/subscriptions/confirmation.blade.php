@@ -122,6 +122,15 @@
                     $discountEndsAt = (!$isOneTime && $nextPaymentDate && $remainingAfterFirstPayment > 0)
                         ? $nextPaymentDate->copy()->addMonths(($remainingAfterFirstPayment - 1) * $subscription->frequency_months)
                         : null;
+
+                    // For gift vouchers, calculate shipping credit (remaining voucher value covers shipping)
+                    $confirmGiftVoucherShippingCredit = 0;
+                    if ($subscription->coupon?->is_gift_voucher && $subscription->shipping_cost > 0) {
+                        $voucherValue = $subscription->coupon->getSubscriptionDiscountValue();
+                        $remainingCredit = max(0, $voucherValue - $subscription->discount_amount);
+                        $confirmGiftVoucherShippingCredit = min($remainingCredit, $subscription->shipping_cost);
+                    }
+                    $totalDiscount = $subscription->discount_amount + $confirmGiftVoucherShippingCredit;
                     @endphp
 
                     <!-- Coupon Discount Info -->
@@ -140,11 +149,11 @@
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between items-center">
                                 <span class="text-xs uppercase tracking-widest text-dark-800/70">{{ __('confirmation.coupon.discount') }}</span>
-                                <span class="text-dark-800">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->discount_amount, $subscription->currency) }}</span>
+                                <span class="text-dark-800">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($totalDiscount, $subscription->currency) }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-xs uppercase tracking-widest text-dark-800/70">{{ __('confirmation.coupon.discounted_price') }}</span>
-                                <span class="font-display text-dark-800">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price - $subscription->discount_amount, $subscription->currency) }}</span>
+                                <span class="font-display text-dark-800">{{ \App\Helpers\CurrencyHelper::formatByCurrency(max(0, $subscription->configured_price + ($subscription->shipping_cost ?? 0) - $totalDiscount), $subscription->currency) }}</span>
                             </div>
                             @if(!$isOneTime && $subscription->discount_months_total && $discountEndsAt)
                             <div class="flex justify-between items-center pt-3 border-t border-dark-800/20">
@@ -316,7 +325,15 @@
 {{-- Conversion Tracking: dataLayer + Meta Pixel --}}
 @if($subscription->status === 'active' && ($shouldFirePixel ?? false))
 @php
-    $trackingValue = $subscription->configured_price - ($subscription->discount_amount ?? 0) + ($subscription->shipping_cost ?? 0);
+    // Calculate gift voucher shipping credit for tracking
+    $trackingGiftVoucherShippingCredit = 0;
+    if ($subscription->coupon?->is_gift_voucher && ($subscription->shipping_cost ?? 0) > 0) {
+        $trackingVoucherValue = $subscription->coupon->getSubscriptionDiscountValue();
+        $trackingRemainingCredit = max(0, $trackingVoucherValue - ($subscription->discount_amount ?? 0));
+        $trackingGiftVoucherShippingCredit = min($trackingRemainingCredit, $subscription->shipping_cost);
+    }
+    $trackingTotalDiscount = ($subscription->discount_amount ?? 0) + $trackingGiftVoucherShippingCredit;
+    $trackingValue = $subscription->configured_price - ($subscription->discount_amount ?? 0) + ($subscription->shipping_cost ?? 0) - $trackingGiftVoucherShippingCredit;
     $trackingCurrency = $subscription->currency ?? 'CZK';
     $trackingItemId = 'subscription-' . ($config['amount'] ?? 3);
     $trackingItemName = 'Subscription ' . (($config['amount'] ?? 3) == 2 ? 'M' : (($config['amount'] ?? 3) == 4 ? 'XL' : 'L')) . ' Box';
@@ -329,10 +346,10 @@
             'transaction_id': 'SUB-{{ $subscription->id }}',
             'value': {{ $trackingValue }},
             'currency': '{{ $trackingCurrency }}',
-            'shipping': {{ $subscription->shipping_cost ?? 0 }},
-            @if(($subscription->discount_amount ?? 0) > 0)
+            'shipping': {{ ($subscription->shipping_cost ?? 0) - $trackingGiftVoucherShippingCredit }},
+            @if($trackingTotalDiscount > 0)
             'coupon': '{{ $subscription->coupon_code }}',
-            'discount': {{ $subscription->discount_amount }},
+            'discount': {{ $trackingTotalDiscount }},
             @endif
             'items': [{
                 'item_id': '{{ $trackingItemId }}',

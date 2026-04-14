@@ -330,7 +330,8 @@ class StripeService
         float $discount = 0,
         ?int $discountMonths = null,
         float $shipping = 0,
-        ?\App\Models\ShippingRate $shippingRate = null
+        ?\App\Models\ShippingRate $shippingRate = null,
+        float $giftVoucherShippingCredit = 0
     ): StripeSession {
         // Prepare metadata for subscription (includes Packeta and delivery_notes)
         // Store Packeta data in shipping_address JSON for consistency with Orders
@@ -396,9 +397,12 @@ class StripeService
         // Calculate actual payment amount (full price minus discount)
         $paymentAmount = $price - $discount;
 
+        // For gift vouchers, remaining credit covers shipping
+        $effectiveShipping = $shipping - $giftVoucherShippingCredit;
+
         // Calculate displayed total (what user sees on checkout page)
-        // This ensures Stripe total exactly matches what user sees: number_format($paymentAmount + $shipping, 0)
-        $displayedTotal = round($paymentAmount + $shipping);
+        // This ensures Stripe total exactly matches what user sees: number_format($paymentAmount + $effectiveShipping, 0)
+        $displayedTotal = round($paymentAmount + $effectiveShipping);
 
         // Build line items array - use single line item with full total to avoid rounding discrepancies
         $lineItems = [[
@@ -408,8 +412,8 @@ class StripeService
                 'product_data' => [
                     'name' => $productName,
                     'description' => CurrencyHelper::isCzk()
-                        ? ('Platba předplatného'.($shipping > 0 ? ' včetně dopravy' : ''))
-                        : ('Subscription payment'.($shipping > 0 ? ' including shipping' : '')),
+                        ? ('Platba předplatného'.($effectiveShipping > 0 ? ' včetně dopravy' : ''))
+                        : ('Subscription payment'.($effectiveShipping > 0 ? ' including shipping' : '')),
                 ],
             ],
             'quantity' => 1,
@@ -420,6 +424,8 @@ class StripeService
             'discount' => $discount,
             'payment_amount' => $paymentAmount,
             'shipping' => $shipping,
+            'gift_voucher_shipping_credit' => $giftVoucherShippingCredit,
+            'effective_shipping' => $effectiveShipping,
             'displayed_total' => $displayedTotal,
         ]);
 
