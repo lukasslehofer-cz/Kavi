@@ -2776,12 +2776,11 @@ class StripeService
                 'error' => $errorMessage,
             ]);
 
-            $this->handleSubscriptionPaymentFailure($subscription, $errorMessage);
-
             return [
                 'success' => false,
                 'payment_intent_id' => null,
                 'error' => $errorMessage,
+                'requires_failure_handling' => true,
             ];
 
         } catch (\Stripe\Exception\ApiConnectionException $e) {
@@ -2810,12 +2809,11 @@ class StripeService
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            $this->handleSubscriptionPaymentFailure($subscription, $errorMessage);
-
             return [
                 'success' => false,
                 'payment_intent_id' => null,
                 'error' => $errorMessage,
+                'requires_failure_handling' => true,
             ];
         }
     }
@@ -2823,7 +2821,7 @@ class StripeService
     /**
      * Handle subscription payment failure
      */
-    private function handleSubscriptionPaymentFailure(Subscription $subscription, string $errorMessage): void
+    public function handleSubscriptionPaymentFailure(Subscription $subscription, string $errorMessage): void
     {
         $failureCount = $subscription->payment_failure_count + 1;
 
