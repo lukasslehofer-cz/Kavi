@@ -2203,7 +2203,7 @@ class StripeService
 
             // If no real invoice, create a generic one-time payment
             if (! $hasRealInvoice) {
-                $currency = CurrencyHelper::stripeCode();
+                $currency = strtolower($subscription->currency ?? 'CZK');
                 $amount = (int) (round($subscription->pending_invoice_amount) * 100); // Convert to cents
             }
 
