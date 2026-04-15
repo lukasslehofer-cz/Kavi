@@ -764,42 +764,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Handle Decaf availability - disable ALL decaf checkboxes
-        if (!availability.decaf && decafCheckboxes.length > 0) {
-            console.log('Disabling decaf options, found checkboxes:', decafCheckboxes.length);
-            decafCheckboxes.forEach((checkbox) => {
-                // Find the parent label container for this checkbox
-                const decafContainer = checkbox.closest('label');
-                
-                if (decafContainer) {
-                    decafContainer.classList.add('opacity-50', 'cursor-not-allowed');
-                    decafContainer.style.pointerEvents = 'none';
-                }
-                
-                // Disable and uncheck the checkbox
-                checkbox.disabled = true;
-                if (checkbox.checked) {
-                    checkbox.checked = false;
-                    isDecaf = false;
-                }
-            });
-            
-            // Add note after the type options container (only once)
-            const typeOptionsContainer = document.querySelector('.space-y-3');
-            if (typeOptionsContainer && !typeOptionsContainer.querySelector('.decaf-unavailable-note')) {
-                const note = document.createElement('div');
-                note.className = 'decaf-unavailable-note mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700';
-                note.innerHTML = currentLocale === 'en' 
-                    ? '<strong>Notice:</strong> Decaf coffee is not available this month'
-                    : '<strong>Upozornění:</strong> Bezkofeinová káva již není tento měsíc k dispozici';
-                
-                // Insert after the last coffee type option
-                const lastTypeOption = typeOptionsContainer.querySelector('label.group:last-child');
-                if (lastTypeOption) {
-                    lastTypeOption.insertAdjacentElement('afterend', note);
-                }
-            }
-        }
+        // Decaf availability is handled in app.js
     }
     
     function updateSummary() {

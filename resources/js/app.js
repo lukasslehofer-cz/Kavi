@@ -263,32 +263,47 @@ function initSubscriptionConfigurator() {
             }
         }
 
-        // Handle Decaf availability - disable ALL decaf checkboxes
+        // Handle Decaf availability - visually dim but keep clickable for tooltip
         if (!availability.decaf && decafCheckboxes.length > 0) {
-            console.log('Disabling decaf options, found checkboxes:', decafCheckboxes.length);
+            const isEn = document.documentElement.lang === 'en';
             decafCheckboxes.forEach((checkbox) => {
-                // Find the parent label container for this checkbox
                 const decafContainer = checkbox.closest('label');
-                
+
                 if (decafContainer) {
-                    decafContainer.classList.add('opacity-50', 'cursor-not-allowed');
-                    decafContainer.style.pointerEvents = 'none';
+                    decafContainer.classList.add('opacity-50');
+                    decafContainer.style.position = 'relative';
+
+                    decafContainer.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        checkbox.checked = false;
+
+                        const parentLabel = decafContainer.closest('label.group');
+                        const tipAnchor = parentLabel || decafContainer;
+                        if (!tipAnchor.querySelector('.decaf-sold-out-tip')) {
+                            tipAnchor.style.position = 'relative';
+                            const tip = document.createElement('span');
+                            tip.className = 'decaf-sold-out-tip absolute text-xs px-2 py-1 z-10 transition-opacity duration-300';
+                            tip.style.cssText = 'color: #464934; background: #f6f7f4; border: 1px solid #b8bda8;';
+                            // Position directly below the decaf container
+                            const decafBottom = decafContainer.offsetTop + decafContainer.offsetHeight;
+                            tip.style.top = (decafBottom + 4) + 'px';
+                            tip.style.right = '0px';
+                            tip.textContent = isEn ? 'Decaf is sold out this month' : 'Bezkofeinová káva je pro tento měsíc vyprodaná';
+                            tipAnchor.appendChild(tip);
+
+                            setTimeout(() => {
+                                tip.style.opacity = '0';
+                                setTimeout(() => tip.remove(), 300);
+                            }, 2500);
+                        }
+                    });
                 }
-                
-                // Disable and uncheck the checkbox
-                checkbox.disabled = true;
+
+                // Uncheck if already checked
                 if (checkbox.checked) {
                     checkbox.checked = false;
                     config.isDecaf = false;
-                }
-                
-                // Add note if not already present (only once, after the parent type options container)
-                const typeOptionsContainer = checkbox.closest('.space-y-3');
-                if (typeOptionsContainer && !typeOptionsContainer.querySelector('.decaf-unavailable-note')) {
-                    const note = document.createElement('div');
-                    note.className = 'decaf-unavailable-note mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700';
-                    note.innerHTML = '<strong>Upozornění:</strong> Bezkofeinová káva již není tento měsíc k dispozici';
-                    typeOptionsContainer.appendChild(note);
                 }
             });
         }
