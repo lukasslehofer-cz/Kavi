@@ -113,7 +113,7 @@
     <!-- Top Announcement Banner - Terracotta -->
     @php $announcementBanner = \App\Models\AnnouncementBanner::getCurrent(); @endphp
     @if($announcementBanner)
-    <div class="bg-primary-500">
+    <div class="bg-dark-800">
         <div class="flex items-center justify-center gap-3 px-4 py-2.5">
             <span class="w-1.5 h-1.5 bg-white"></span>
             <div class="text-sm text-white font-light tracking-wide">
