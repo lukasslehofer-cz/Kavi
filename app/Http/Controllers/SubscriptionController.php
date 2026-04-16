@@ -78,13 +78,17 @@ class SubscriptionController extends Controller
         // Check availability for displaying sold out message
 
         if (! $schedule || ! $schedule->hasCoffeeSlotsConfigured()) {
-            // No schedule or coffee slots not configured = sold out
+            // No schedule or coffee slots not configured
+            $dayOfMonth = now()->day;
+            $isPreparationPeriod = $dayOfMonth >= 16 && $dayOfMonth <= 20;
+
             $availability = [
                 'espresso' => false,
                 'filter' => false,
                 'decaf' => false,
                 'mix' => false,
                 'allSoldOut' => true,
+                'preparingNewCoffees' => $isPreparationPeriod,
             ];
         } else {
             $reservationService = app(\App\Services\StockReservationService::class);
@@ -92,6 +96,7 @@ class SubscriptionController extends Controller
 
             // Check if both espresso and filter are sold out
             $availability['allSoldOut'] = ! $availability['espresso'] && ! $availability['filter'];
+            $availability['preparingNewCoffees'] = false;
         }
 
         // Calculate next available month using billing_date cutoff logic

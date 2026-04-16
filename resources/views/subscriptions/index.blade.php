@@ -121,6 +121,26 @@
       <!-- RIGHT COLUMN - Form -->
       <div class="lg:col-span-7">
         @if($availability['allSoldOut'])
+        @if($availability['preparingNewCoffees'] ?? false)
+        <!-- Preparing New Coffees Message -->
+        <div class="p-6">
+          <h2 class="font-display text-3xl font-normal text-primary-500 mb-4 uppercase">
+            {{ $currentLocale === 'en' ? 'We\'re preparing new coffees for you' : 'Připravujeme pro vás nové kávy' }}
+          </h2>
+
+          <p class="text-lg text-warm-500 mb-6 max-w-2xl font-light">
+            {{ $currentLocale === 'en' ? 'We\'re working on selecting the best coffees for the upcoming month. New coffees will be available in the coming days.' : 'Pracujeme na výběru těch nejlepších káv pro nadcházející měsíc. Nové kávy budou dostupné v nejbližších dnech.' }}
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-6">
+            <a href="{{ localizedRoute('products.index') }}"
+               class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+              <span>{{ $currentLocale === 'en' ? 'Browse shop' : 'Prohlédnout obchod' }}</span>
+              <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+            </a>
+          </div>
+        </div>
+        @else
         <!-- Sold Out Message -->
         <div class="p-6">
           <h2 class="font-display text-3xl font-normal text-primary-500 mb-4 uppercase">
@@ -148,6 +168,7 @@
             </a>
           </div>
         </div>
+        @endif
         @else
         <form id="subscription-configurator" method="POST" action="{{ localizedRoute('subscriptions.configure.checkout') }}">
           @csrf
