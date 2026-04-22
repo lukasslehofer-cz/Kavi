@@ -333,8 +333,9 @@ class StripeService
         ?\App\Models\ShippingRate $shippingRate = null,
         float $giftVoucherShippingCredit = 0
     ): StripeSession {
-        // Prepare metadata for subscription (includes Packeta and delivery_notes)
-        // Store Packeta data in shipping_address JSON for consistency with Orders
+        // Core address fields only — Stripe limits each metadata value to 500 chars.
+        // Packeta/carrier fields are sent as separate top-level metadata keys below
+        // and stored in dedicated DB columns by the webhook handler.
         $shippingAddressData = [
             'name' => $shippingAddress['name'],
             'email' => $shippingAddress['email'],
@@ -343,12 +344,6 @@ class StripeService
             'billing_city' => $shippingAddress['billing_city'],
             'billing_postal_code' => $shippingAddress['billing_postal_code'],
             'country' => $shippingAddress['billing_country'] ?? 'CZ',
-            // Packeta data (consistent with Orders structure)
-            'packeta_point_id' => $shippingAddress['packeta_point_id'],
-            'packeta_point_name' => $shippingAddress['packeta_point_name'],
-            'packeta_point_address' => $shippingAddress['packeta_point_address'] ?? null,
-            'carrier_id' => $shippingAddress['carrier_id'] ?? null,
-            'carrier_pickup_point' => $shippingAddress['carrier_pickup_point'] ?? null,
         ];
 
         $subscriptionMetadata = [
