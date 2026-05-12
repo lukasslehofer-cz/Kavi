@@ -2957,7 +2957,8 @@ class StripeService
     private function sendMetaCapiForOrder(Order $order): void
     {
         try {
-            $metaService = app(MetaConversionsService::class);
+            $region = \App\Helpers\MetaPixelHelper::regionFromCurrency($order->currency);
+            $metaService = MetaConversionsService::forRegion($region);
             if (! $metaService->isConfigured() || $order->meta_capi_sent_at) {
                 return;
             }
@@ -3004,7 +3005,8 @@ class StripeService
     private function sendMetaCapiForSubscription(Subscription $subscription): void
     {
         try {
-            $metaService = app(MetaConversionsService::class);
+            $region = \App\Helpers\MetaPixelHelper::regionFromCurrency($subscription->currency);
+            $metaService = MetaConversionsService::forRegion($region);
             if (! $metaService->isConfigured() || $subscription->meta_capi_sent_at) {
                 return;
             }

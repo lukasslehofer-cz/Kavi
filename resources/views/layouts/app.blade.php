@@ -79,7 +79,8 @@
         gtag('config', 'G-96W0CFYXP1');
     </script>
 
-    @if(config('services.facebook.pixel_id'))
+    @php $metaPixelId = \App\Helpers\MetaPixelHelper::currentPixelId(); @endphp
+    @if($metaPixelId)
     <!-- Meta Pixel -->
     <script>
         !function(f,b,e,v,n,t,s)
@@ -90,11 +91,11 @@
         t.src=v;s=b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t,s)}(window,document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '{{ config('services.facebook.pixel_id') }}');
+        fbq('init', '{{ $metaPixelId }}');
         fbq('track', 'PageView');
     </script>
     <noscript><img height="1" width="1" style="display:none"
-        src="https://www.facebook.com/tr?id={{ config('services.facebook.pixel_id') }}&ev=PageView&noscript=1"/></noscript>
+        src="https://www.facebook.com/tr?id={{ $metaPixelId }}&ev=PageView&noscript=1"/></noscript>
     @endif
 
     <!-- Cookie Consent Configuration -->

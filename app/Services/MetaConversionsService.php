@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\MetaPixelHelper;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -9,12 +10,29 @@ class MetaConversionsService
 {
     private string $pixelId;
     private string $accessToken;
+    private ?string $testEventCode;
+    private ?string $region;
     private string $apiVersion = 'v21.0';
 
-    public function __construct()
+    public function __construct(?string $region = null)
     {
-        $this->pixelId = config('services.facebook.pixel_id') ?? '';
-        $this->accessToken = config('services.facebook.conversions_api_token') ?? '';
+        $this->region = $region;
+
+        if ($region !== null) {
+            $config = MetaPixelHelper::configFor($region);
+            $this->pixelId = $config['pixel_id'] ?? '';
+            $this->accessToken = $config['conversions_api_token'] ?? '';
+            $this->testEventCode = $config['test_event_code'] ?? null;
+        } else {
+            $this->pixelId = config('services.facebook.pixel_id') ?? '';
+            $this->accessToken = config('services.facebook.conversions_api_token') ?? '';
+            $this->testEventCode = config('services.facebook.test_event_code');
+        }
+    }
+
+    public static function forRegion(string $region): self
+    {
+        return new self($region);
     }
 
     public function isConfigured(): bool
@@ -65,9 +83,8 @@ class MetaConversionsService
             'data' => [$eventData],
         ];
 
-        $testEventCode = config('services.facebook.test_event_code');
-        if ($testEventCode) {
-            $payload['test_event_code'] = $testEventCode;
+        if ($this->testEventCode) {
+            $payload['test_event_code'] = $this->testEventCode;
         }
 
         try {
@@ -82,6 +99,8 @@ class MetaConversionsService
                     'event_id' => $eventId,
                     'value' => $value,
                     'currency' => $currency,
+                    'region' => $this->region,
+                    'pixel_id' => $this->pixelId,
                 ]);
                 return true;
             }
@@ -90,12 +109,16 @@ class MetaConversionsService
                 'event_id' => $eventId,
                 'status' => $response->status(),
                 'response' => $response->json(),
+                'region' => $this->region,
+                'pixel_id' => $this->pixelId,
             ]);
             return false;
         } catch (\Exception $e) {
             Log::error('Meta CAPI Purchase event exception', [
                 'event_id' => $eventId,
                 'error' => $e->getMessage(),
+                'region' => $this->region,
+                'pixel_id' => $this->pixelId,
             ]);
             return false;
         }

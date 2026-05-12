@@ -69,6 +69,18 @@ return [
         'pixel_id' => env('META_PIXEL_ID'),
         'conversions_api_token' => env('META_CONVERSIONS_API_TOKEN'),
         'test_event_code' => env('META_TEST_EVENT_CODE'),
+        'regions' => [
+            'cz' => [
+                'pixel_id' => env('META_PIXEL_ID_CZ', env('META_PIXEL_ID')),
+                'conversions_api_token' => env('META_CONVERSIONS_API_TOKEN_CZ', env('META_CONVERSIONS_API_TOKEN')),
+                'test_event_code' => env('META_TEST_EVENT_CODE_CZ', env('META_TEST_EVENT_CODE')),
+            ],
+            'com' => [
+                'pixel_id' => env('META_PIXEL_ID_COM'),
+                'conversions_api_token' => env('META_CONVERSIONS_API_TOKEN_COM'),
+                'test_event_code' => env('META_TEST_EVENT_CODE_COM'),
+            ],
+        ],
     ],
 
     'ecomail' => [

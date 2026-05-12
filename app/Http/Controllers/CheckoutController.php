@@ -860,7 +860,8 @@ class CheckoutController extends Controller
 
                     // Send Meta CAPI Purchase event
                     try {
-                        $metaService = app(\App\Services\MetaConversionsService::class);
+                        $region = \App\Helpers\MetaPixelHelper::regionFromCurrency($order->currency);
+                        $metaService = \App\Services\MetaConversionsService::forRegion($region);
                         if ($metaService->isConfigured() && ! $order->meta_capi_sent_at) {
                             $address = $order->shipping_address ?? [];
                             $user = $order->user;
