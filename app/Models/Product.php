@@ -306,15 +306,24 @@ class Product extends Model
     public function getTranslatedAttribute(string $key)
     {
         $attributes = $this->getAttribute('attributes') ?? [];
-        
-        if (app()->getLocale() === 'en') {
+        $locale = app()->getLocale();
+
+        $value = null;
+        if ($locale === 'en') {
             $enKey = $key . '_en';
             if (!empty($attributes[$enKey])) {
-                return $attributes[$enKey];
+                $value = $attributes[$enKey];
             }
         }
-        
-        return $attributes[$key] ?? null;
+        if ($value === null) {
+            $value = $attributes[$key] ?? null;
+        }
+
+        if ($key === 'altitude' && !empty($value)) {
+            return $value . ($locale === 'en' ? ' masl' : ' m n.m.');
+        }
+
+        return $value;
     }
 
     public function orderItems()

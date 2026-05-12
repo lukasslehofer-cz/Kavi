@@ -186,8 +186,9 @@
                                     <span class="text-warm-300">·</span>
                             @endif
 
-                                    @if(!empty($coffee->attributes['altitude']))
-                                    <span>{{ $coffee->attributes['altitude'] }}</span>
+                                    @php $altitudeFormatted = $coffee->getTranslatedAttribute('altitude'); @endphp
+                                    @if(!empty($altitudeFormatted))
+                                    <span>{{ $altitudeFormatted }}</span>
                                     @endif
                                 </div>
                             </div>

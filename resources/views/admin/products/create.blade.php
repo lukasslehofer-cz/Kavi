@@ -229,13 +229,13 @@
 
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Nadmořská výška / Altitude</label>
-                    <input type="text" name="altitude" value="{{ old('altitude') }}" 
-                           placeholder="např. 1200-1800 m n.m."
+                    <input type="text" name="altitude" value="{{ old('altitude') }}"
+                           placeholder="např. 1200-1800"
                            class="input @error('altitude') border-red-500 @enderror">
                     @error('altitude')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-xs text-coffee-600 mt-1">Nadmořská výška pěstování v metrech (nepřekládá se)</p>
+                    <p class="text-xs text-coffee-600 mt-1">Pouze číslo nebo rozsah v metrech, jednotka se na webu doplní automaticky (CZ: m n.m., EN: masl).</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
