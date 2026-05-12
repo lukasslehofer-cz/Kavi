@@ -70,14 +70,17 @@
         });
     </script>
 
+    @php $gaMeasurementId = \App\Helpers\GoogleAnalyticsHelper::currentMeasurementId(); @endphp
+    @if($gaMeasurementId)
     <!-- Google Ads / GA4 (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-96W0CFYXP1"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaMeasurementId }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-96W0CFYXP1');
+        gtag('config', '{{ $gaMeasurementId }}');
     </script>
+    @endif
 
     @php $metaPixelId = \App\Helpers\MetaPixelHelper::currentPixelId(); @endphp
     @if($metaPixelId)

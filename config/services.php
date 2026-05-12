@@ -83,6 +83,18 @@ return [
         ],
     ],
 
+    'google_analytics' => [
+        'measurement_id' => env('GA_MEASUREMENT_ID', 'G-96W0CFYXP1'),
+        'regions' => [
+            'cz' => [
+                'measurement_id' => env('GA_MEASUREMENT_ID_CZ', env('GA_MEASUREMENT_ID', 'G-96W0CFYXP1')),
+            ],
+            'com' => [
+                'measurement_id' => env('GA_MEASUREMENT_ID_COM'),
+            ],
+        ],
+    ],
+
     'ecomail' => [
         'api_key' => env('ECOMAIL_API_KEY'),
         'list_id' => env('ECOMAIL_LIST_ID'),
