@@ -86,7 +86,7 @@
                             </div>
                         </div>
 
-                        @if($subscription->discount_amount > 0 && $subscription->coupon)
+                        @if($subscription->discount_amount > 0 && $subscription->coupon && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0))
                         <div class="border-t border-gray-200 pt-4">
                             <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                                 <div class="flex items-center justify-between mb-3">

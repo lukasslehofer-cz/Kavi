@@ -328,7 +328,7 @@
                     @endif
 
                     <!-- Active Discount Information (hidden for complimentary) -->
-                    @if(!$subscription->isComplimentary() && $subscription->discount_amount > 0 && $subscription->coupon_id)
+                    @if(!$subscription->isComplimentary() && $subscription->discount_amount > 0 && $subscription->coupon_id && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0))
                     <div>                        
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                             <div class="flex items-center justify-between mb-3">

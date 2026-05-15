@@ -115,7 +115,7 @@
                         </div>
                     </div>
 
-                    @if($subscription->discount_amount > 0 && $subscription->coupon)
+                    @if($subscription->discount_amount > 0 && $subscription->coupon && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0))
                     @php
                     $originalPrice = $subscription->configured_price;
                     $remainingAfterFirstPayment = max(0, $subscription->discount_months_total - 1);

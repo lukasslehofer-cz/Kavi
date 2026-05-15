@@ -295,7 +295,7 @@
                         </div>
                     @endif
 
-                    @if($subscription->discount_amount > 0)
+                    @if($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0))
                         <div class="item" style="color: #10b981;">
                             <span>Sleva{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}</span>
                             <span>-{{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč</span>

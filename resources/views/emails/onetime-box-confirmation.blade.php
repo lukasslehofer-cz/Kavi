@@ -102,7 +102,7 @@
                                     <span class="config-value">{{ $subscription->configuration['amount'] }}× 250g</span>
                                 </div>
                                 
-                                @if($subscription->discount_amount > 0)
+                                @if($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0))
                                 <div class="config-item">
                                     <span class="config-label">{{ __('emails.onetime_box.price', [], $locale) }}:</span>
                                     <span class="config-value">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency, 0) }}</span>

@@ -784,8 +784,8 @@ class StripeService
                     ]);
 
                     // Handle coupon countdown
-                    if ($subscription->discount_months_remaining > 0) {
-                        $subscription->decrement('discount_months_remaining');
+                    if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                        app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
                     }
 
                     // Link payment to shipment
@@ -2767,8 +2767,8 @@ class StripeService
                 ]);
 
                 // Handle coupon countdown
-                if ($subscription->discount_months_remaining > 0) {
-                    $subscription->decrement('discount_months_remaining');
+                if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                    app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
                 }
 
                 // Link payment to pending shipment
