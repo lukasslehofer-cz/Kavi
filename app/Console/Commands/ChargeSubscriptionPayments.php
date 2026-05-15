@@ -43,9 +43,19 @@ class ChargeSubscriptionPayments extends Command
             $this->warn('🧪 DRY RUN MODE - No actual charges will be made');
         }
 
-        // Find subscriptions to process
-        // Only 'active' subscriptions require billing, not 'complimentary'
-        $query = Subscription::where('status', 'active')
+        // Find subscriptions to process.
+        // Includes 'active' subs plus 'paused' subs whose pause has already ended -
+        // the latter is a self-heal path for cases where ResumeExpiredPausedSubscriptions
+        // failed to flip the row back to 'active'. The shipment-based safety check below
+        // and the status-flip-after-safety-check pattern keep this safe.
+        $query = Subscription::where(function ($q) {
+            $q->where('status', 'active')
+                ->orWhere(function ($qq) {
+                    $qq->where('status', 'paused')
+                        ->whereNotNull('paused_until_date')
+                        ->whereDate('paused_until_date', '<', today());
+                });
+        })
             ->whereNotNull('next_billing_date')
             ->with('user');
 
@@ -85,6 +95,7 @@ class ChargeSubscriptionPayments extends Command
 
         foreach ($subscriptions as $subscription) {
             $subscriptionNumber = $subscription->subscription_number ?? '#'.$subscription->id;
+            $wasStuckPaused = $subscription->status === 'paused';
 
             $this->line("Processing: {$subscriptionNumber}");
 
@@ -99,6 +110,10 @@ class ChargeSubscriptionPayments extends Command
             if ($isDryRun) {
                 // Perform all the same checks as real run
                 $this->line('  📅 next_billing_date: '.($subscription->next_billing_date?->format('Y-m-d') ?? 'NULL'));
+
+                if ($wasStuckPaused) {
+                    $this->warn('  🔧 Stuck paused (paused_until_date='.$subscription->paused_until_date?->toDateString().') - would be self-healed before charge');
+                }
 
                 // Check 1: Already charged today?
                 $alreadyChargedToday = $subscription->payments()->whereDate('paid_at', today())->exists();
@@ -184,6 +199,21 @@ class ChargeSubscriptionPayments extends Command
                 ->orderBy('shipment_date', 'asc')
                 ->first();
 
+            // Self-heal pojistka: stuck-paused sub bez pending zásilky neaktivujeme.
+            // Pause flow vždy vytvoří post-pause pending řádek; jeho absence znamená,
+            // že je něco rozbité jinde — netoč to slepým billing pokusem.
+            if ($wasStuckPaused && ! $nextPendingShipment) {
+                \Log::warning('Stuck paused subscription has no pending shipment, refusing to self-heal', [
+                    'subscription_id' => $subscription->id,
+                    'subscription_number' => $subscription->subscription_number,
+                    'paused_until_date' => $subscription->paused_until_date?->toDateString(),
+                ]);
+                $this->warn('  ⚠️ Skipped - stuck paused sub without pending shipment');
+                $skippedCount++;
+
+                continue;
+            }
+
             if ($nextPendingShipment) {
                 $schedule = \App\Models\ShipmentSchedule::getForMonth(
                     $nextPendingShipment->shipment_date->year,
@@ -206,6 +236,28 @@ class ChargeSubscriptionPayments extends Command
 
                     continue;
                 }
+            }
+
+            // Safety check prošel - pokud jde o self-heal cestu, flipni status na 'active'
+            // PŘED chargem. Tím se zajistí, že downstream (status='active' filtry, případný
+            // handleSubscriptionPaymentFailure → 'unpaid') nestaví na zastaralém 'paused'.
+            if ($wasStuckPaused) {
+                \Log::warning('Self-healing stuck paused subscription in billing cron', [
+                    'subscription_id' => $subscription->id,
+                    'subscription_number' => $subscription->subscription_number,
+                    'paused_until_date_was' => $subscription->paused_until_date?->toDateString(),
+                    'next_billing_date' => $subscription->next_billing_date?->toDateString(),
+                ]);
+
+                $subscription->update([
+                    'status' => 'active',
+                    'paused_iterations' => null,
+                    'paused_until_date' => null,
+                    'pause_reason' => null,
+                ]);
+                $subscription->refresh();
+
+                $this->warn('  🔧 Self-healed stuck paused subscription');
             }
 
             $maxAttempts = 3;

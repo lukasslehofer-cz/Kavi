@@ -70,3 +70,5 @@ CLAUDE.md
 !/public/images/promo-images/.gitkeep
 /public/images/blog/*
 !/public/images/blog/.gitkeep
+/public/images/mail/*
+!/public/images/mail/.gitkeep

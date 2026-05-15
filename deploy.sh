@@ -77,6 +77,7 @@ if [ -d ".git" ]; then
         git checkout stash@{0} -- public/images/roasteries/ 2>/dev/null || true
         git checkout stash@{0} -- public/images/blog/ 2>/dev/null || true
         git checkout stash@{0} -- public/images/promo-images/ 2>/dev/null || true
+        git checkout stash@{0} -- public/images/mail/ 2>/dev/null || true
         git stash drop 2>/dev/null || true
     fi
     

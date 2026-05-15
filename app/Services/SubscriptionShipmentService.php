@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Subscription;
-use App\Models\SubscriptionShipment;
 use App\Models\ShipmentSchedule;
+use App\Models\Subscription;
 use App\Models\SubscriptionPayment;
+use App\Models\SubscriptionShipment;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -176,9 +176,10 @@ class SubscriptionShipmentService
 
         if ($lastPaidPending) {
             // Calculate the next shipment date after the last paid one
-            $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+            $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
             $nextDate = $lastPaidPending->shipment_date->copy()->addMonths($frequencyMonths);
             $schedule = ShipmentSchedule::getForMonth($nextDate->year, $nextDate->month);
+
             return $schedule?->shipment_date ?? $nextDate->copy()->day(20);
         }
 
@@ -231,8 +232,8 @@ class SubscriptionShipmentService
     public function ensurePendingShipmentExists(Subscription $subscription): ?SubscriptionShipment
     {
         $nextDate = $this->calculateNextShipmentDate($subscription);
-        
-        if (!$nextDate) {
+
+        if (! $nextDate) {
             return null;
         }
 
@@ -264,20 +265,36 @@ class SubscriptionShipmentService
      */
     public function calculateNextShipmentDate(Subscription $subscription): ?Carbon
     {
-        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
-        
+        $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
+
         // One-time boxes (frequency = 0) ship once
         if ($subscription->frequency_months == 0) {
             if ($subscription->last_shipment_date) {
                 return null; // Already shipped
             }
+
             return $this->getFirstShipmentDate($subscription);
+        }
+
+        // Prefer the first future 'pending' shipment if one exists.
+        // The subscription_shipments table is the single source of truth and already
+        // reflects pauses (skipped rows) and post-pause planning (pending rows).
+        // Without this, last_sent + frequency can point at an already-skipped month
+        // and downstream availability checks then fail against a month nobody will ship.
+        $firstPending = $subscription->shipments()
+            ->where('status', 'pending')
+            ->where('shipment_date', '>=', today()->startOfDay())
+            ->orderBy('shipment_date', 'asc')
+            ->first();
+
+        if ($firstPending) {
+            return $firstPending->shipment_date->copy()->startOfDay();
         }
 
         // Get last sent shipment from history
         $lastSent = $this->getLastSentShipment($subscription);
 
-        if (!$lastSent) {
+        if (! $lastSent) {
             // No shipments yet - calculate first shipment date
             return $this->getFirstShipmentDate($subscription);
         }
@@ -322,6 +339,7 @@ class SubscriptionShipmentService
         if ($createdAt->day > 15) {
             return $createdAt->copy()->addMonthNoOverflow()->day(20)->startOfDay();
         }
+
         return $createdAt->copy()->day(20)->startOfDay();
     }
 
@@ -331,8 +349,8 @@ class SubscriptionShipmentService
      */
     public function pauseSubscription(Subscription $subscription, int $iterations, string $reason = 'user_request'): void
     {
-        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
-        
+        $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
+
         // 1. Find all paid pending shipments - these should NOT be affected
         $paidPendingShipments = $subscription->shipments()
             ->where('status', 'pending')
@@ -349,11 +367,11 @@ class SubscriptionShipmentService
 
         // 2. Calculate upcoming dates starting from AFTER any paid shipments
         $lastPaidDate = $paidPendingShipments->last()?->shipment_date;
-        $startDate = $lastPaidDate 
+        $startDate = $lastPaidDate
             ? $lastPaidDate->copy()->addMonths($frequencyMonths)
             : $this->calculateNextShipmentDate($subscription);
 
-        if (!$startDate) {
+        if (! $startDate) {
             $startDate = $this->getFirstShipmentDate($subscription);
         }
 
@@ -366,7 +384,7 @@ class SubscriptionShipmentService
         // 3. Generate dates for skipped shipments (starting from first unpaid)
         $skippedDates = collect();
         $candidate = $startDate->copy();
-        
+
         for ($i = 0; $i < $iterations; $i++) {
             $schedule = ShipmentSchedule::getForMonth($candidate->year, $candidate->month);
             $shipmentDate = $schedule?->shipment_date ?? $candidate->copy()->day(20);
@@ -380,7 +398,7 @@ class SubscriptionShipmentService
             $existingShipment = $subscription->shipments()
                 ->whereDate('shipment_date', $date->toDateString())
                 ->first();
-            
+
             if ($existingShipment && $existingShipment->subscription_payment_id) {
                 \Log::info('Preserving paid shipment during pause', [
                     'subscription_id' => $subscription->id,
@@ -388,14 +406,15 @@ class SubscriptionShipmentService
                     'shipment_date' => $date->toDateString(),
                     'payment_id' => $existingShipment->subscription_payment_id,
                 ]);
+
                 continue; // Skip this one, it's already paid
             }
-            
+
             $subscription->shipments()->updateOrCreate(
                 ['shipment_date' => $date],
                 [
                     'status' => 'skipped',
-                    'notes' => 'Paused by user: ' . $reason,
+                    'notes' => 'Paused by user: '.$reason,
                 ]
             );
         }
@@ -403,7 +422,7 @@ class SubscriptionShipmentService
         // 5. Create pending shipment for date after pause
         $schedule = ShipmentSchedule::getForMonth($candidate->year, $candidate->month);
         $resumeDate = $schedule?->shipment_date ?? $candidate->copy()->day(20);
-        
+
         $subscription->shipments()->updateOrCreate(
             ['shipment_date' => $resumeDate],
             [
@@ -425,10 +444,10 @@ class SubscriptionShipmentService
         // 7. Update coffee reservations for all skipped months (release reserved stock)
         $reservationService = app(StockReservationService::class);
         $updatedSchedules = collect();
-        
+
         foreach ($skippedDates as $skippedDate) {
             $schedule = ShipmentSchedule::getForMonth($skippedDate->year, $skippedDate->month);
-            if ($schedule && !$updatedSchedules->contains($schedule->id)) {
+            if ($schedule && ! $updatedSchedules->contains($schedule->id)) {
                 try {
                     $reservationService->updateReservationsForSchedule($schedule);
                     $updatedSchedules->push($schedule->id);
@@ -456,15 +475,15 @@ class SubscriptionShipmentService
      * Resume subscription from pause
      * Handles early resume by cleaning up future skipped/pending records
      * and creating a new pending record for the nearest available shipment
-     * 
+     *
      * @return array ['success' => bool, 'message' => string, 'next_shipment' => ?Carbon]
      */
     public function resumeSubscription(Subscription $subscription): array
     {
         // 1. Calculate what would be the next shipment date
         $nextShipmentDate = $this->calculateNextShipmentDate($subscription);
-        
-        if (!$nextShipmentDate) {
+
+        if (! $nextShipmentDate) {
             return [
                 'success' => false,
                 'message' => __('flash.subscription.resume_no_date'),
@@ -488,41 +507,41 @@ class SubscriptionShipmentService
         } else {
             // 3. Check coffee availability for this shipment month (only for unpaid shipments)
             $schedule = ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
-            
+
             if ($schedule && $schedule->hasCoffeeSlotsConfigured()) {
-                $config = is_string($subscription->configuration) 
-                    ? json_decode($subscription->configuration, true) 
+                $config = is_string($subscription->configuration)
+                    ? json_decode($subscription->configuration, true)
                     : $subscription->configuration;
-                
+
                 if ($config) {
                     $subscriptionType = $config['type'] ?? 'espresso';
                     $isDecaf = $config['isDecaf'] ?? false;
-                    
+
                     // Use checkTypeAvailability to check only relevant coffee slots
                     $reservationService = app(\App\Services\StockReservationService::class);
                     $typeAvailability = $reservationService->checkTypeAvailability($schedule);
-                    
+
                     // Determine if the subscription's type is available
-                    $typeAvailable = match($subscriptionType) {
+                    $typeAvailable = match ($subscriptionType) {
                         'espresso' => $typeAvailability['espresso'],
                         'filter' => $typeAvailability['filter'],
                         'mix' => $typeAvailability['mix'],
                         default => $typeAvailability['espresso'],
                     };
-                    
+
                     // Also check decaf if needed
-                    if ($isDecaf && !$typeAvailability['decaf']) {
+                    if ($isDecaf && ! $typeAvailability['decaf']) {
                         $typeAvailable = false;
                     }
-                    
-                    if (!$typeAvailable) {
-                        $typeName = match($subscriptionType) {
+
+                    if (! $typeAvailable) {
+                        $typeName = match ($subscriptionType) {
                             'espresso' => __('subscriptions.coffee_types.espresso'),
                             'filter' => __('subscriptions.coffee_types.filter'),
                             'mix' => __('subscriptions.coffee_types.mix'),
                             default => $subscriptionType,
                         };
-                        
+
                         \Log::warning('Cannot resume subscription - coffee type out of stock', [
                             'subscription_id' => $subscription->id,
                             'next_shipment' => $nextShipmentDate->toDateString(),
@@ -530,12 +549,12 @@ class SubscriptionShipmentService
                             'is_decaf' => $isDecaf,
                             'type_availability' => $typeAvailability,
                         ]);
-                        
+
                         return [
                             'success' => false,
                             'message' => __('flash.subscription.resume_out_of_stock', [
                                 'month' => $nextShipmentDate->translatedFormat('F Y'),
-                                'coffees' => $typeName . ($isDecaf ? ' + decaf' : ''),
+                                'coffees' => $typeName.($isDecaf ? ' + decaf' : ''),
                             ]),
                             'next_shipment' => $nextShipmentDate,
                         ];
@@ -573,22 +592,22 @@ class SubscriptionShipmentService
         ]);
 
         // 7. Calculate next shipment date and ensure pending shipment exists
-        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+        $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
         $nextShipmentDate = $this->calculateNextShipmentDate($subscription);
-        
-        if (!$nextShipmentDate) {
+
+        if (! $nextShipmentDate) {
             $nextShipmentDate = $this->getFirstShipmentDate($subscription);
         }
-        
+
         // Check what exists for this date
         $existingShipment = $subscription->shipments()
             ->whereDate('shipment_date', $nextShipmentDate->toDateString())
             ->first();
-        
+
         // Get billing date for this shipment
         $schedule = ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
         $billingDate = $schedule?->billing_date ?? $nextShipmentDate->copy()->day(15);
-        
+
         // Skip forward until we find a month with a future billing date and no skipped shipment
         $skippedMonths = 0;
         while (
@@ -621,14 +640,14 @@ class SubscriptionShipmentService
                 'new_billing_date' => $billingDate->toDateString(),
             ]);
         }
-        
+
         // Ensure pending shipment exists for the correct date
         $existingForNewDate = $subscription->shipments()
             ->whereDate('shipment_date', $nextShipmentDate->toDateString())
             ->first();
-        
+
         $nextPending = null;
-        if (!$existingForNewDate) {
+        if (! $existingForNewDate) {
             // Create new pending shipment
             $nextPending = $subscription->shipments()->create([
                 'shipment_date' => $nextShipmentDate,
@@ -636,7 +655,7 @@ class SubscriptionShipmentService
                 'status' => 'pending',
                 ...$this->getPackageDimensions($subscription),
             ]);
-            
+
             \Log::info('Created pending shipment after resume', [
                 'subscription_id' => $subscription->id,
                 'shipment_date' => $nextShipmentDate->toDateString(),
@@ -644,12 +663,12 @@ class SubscriptionShipmentService
         } elseif ($existingForNewDate->status === 'pending') {
             $nextPending = $existingForNewDate;
         }
-        
+
         // 8. Set next_billing_date
         $subscription->update([
             'next_billing_date' => $billingDate,
         ]);
-        
+
         // 9. Update coffee reservations for this schedule
         if ($schedule) {
             try {
@@ -684,14 +703,14 @@ class SubscriptionShipmentService
         // Find last paid shipment
         $lastPaidShipment = $subscription->shipments()
             ->where('status', 'pending')
-            ->whereHas('payment', fn($q) => $q->where('status', 'paid'))
+            ->whereHas('payment', fn ($q) => $q->where('status', 'paid'))
             ->orderBy('shipment_date', 'desc')
             ->first();
 
         // Mark unpaid pending shipments as cancelled
         $subscription->shipments()
             ->where('status', 'pending')
-            ->whereDoesntHave('payment', fn($q) => $q->where('status', 'paid'))
+            ->whereDoesntHave('payment', fn ($q) => $q->where('status', 'paid'))
             ->update(['status' => 'cancelled', 'notes' => 'Subscription cancelled']);
 
         $endsAt = $lastPaidShipment?->shipment_date ?? now();
@@ -716,38 +735,40 @@ class SubscriptionShipmentService
     {
         // Get expected shipment date for this payment
         $shipmentDate = $payment->expected_shipment_date;
-        
-        if (!$shipmentDate) {
+
+        if (! $shipmentDate) {
             \Log::warning('Cannot link payment to shipment - no expected shipment date', [
                 'payment_id' => $payment->id,
                 'subscription_id' => $subscription->id,
             ]);
+
             return null;
         }
-        
+
         // Try to find existing pending shipment for this date (without payment link)
         $shipment = $subscription->shipments()
             ->whereDate('shipment_date', $shipmentDate->toDateString())
             ->whereIn('status', ['pending', 'sent'])
             ->first();
-        
+
         if ($shipment) {
             // Link existing shipment to this payment (if not already linked)
-            if (!$shipment->subscription_payment_id) {
+            if (! $shipment->subscription_payment_id) {
                 $shipment->update(['subscription_payment_id' => $payment->id]);
-                
+
                 \Log::info('Linked existing shipment to payment', [
                     'shipment_id' => $shipment->id,
                     'payment_id' => $payment->id,
                     'shipment_date' => $shipmentDate->toDateString(),
                 ]);
             }
+
             return $shipment;
         }
-        
+
         // Create new pending shipment linked to this payment
         $schedule = ShipmentSchedule::getForMonth($shipmentDate->year, $shipmentDate->month);
-        
+
         $shipment = $subscription->shipments()->create([
             'shipment_date' => $shipmentDate,
             'shipment_schedule_id' => $schedule?->id,
@@ -756,13 +777,13 @@ class SubscriptionShipmentService
             'notes' => 'Created after payment',
             ...$this->getPackageDimensions($subscription),
         ]);
-        
+
         \Log::info('Created pending shipment for payment', [
             'shipment_id' => $shipment->id,
             'payment_id' => $payment->id,
             'shipment_date' => $shipmentDate->toDateString(),
         ]);
-        
+
         return $shipment;
     }
 
@@ -819,7 +840,7 @@ class SubscriptionShipmentService
             ->whereDate('shipment_date', $date->toDateString())
             ->where('status', 'pending')
             ->get()
-            ->map(fn($shipment) => $shipment->subscription)
+            ->map(fn ($shipment) => $shipment->subscription)
             ->filter() // Remove nulls
             ->unique('id');
     }
@@ -855,13 +876,13 @@ class SubscriptionShipmentService
      */
     protected function calculateUpcomingShipmentDates(Subscription $subscription, int $count): Collection
     {
-        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
+        $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
         $dates = collect();
 
         // Start from next unpaid shipment
         $candidate = $this->calculateNextShipmentDate($subscription);
-        
-        if (!$candidate) {
+
+        if (! $candidate) {
             $candidate = $this->getFirstShipmentDate($subscription);
         }
 
@@ -876,7 +897,7 @@ class SubscriptionShipmentService
         while ($dates->count() < $count && $guard < 24) {
             $schedule = ShipmentSchedule::getForMonth($candidate->year, $candidate->month);
             $shipmentDate = $schedule?->shipment_date ?? $candidate->copy()->day(20);
-            
+
             $dates->push($shipmentDate->copy()->startOfDay());
             $candidate = $candidate->copy()->addMonths($frequencyMonths);
             $guard++;
@@ -891,13 +912,13 @@ class SubscriptionShipmentService
     protected function findPaymentForShipment(Subscription $subscription, Carbon $shipmentDate): ?SubscriptionPayment
     {
         // Check for initial payment (first shipment)
-        if (!$subscription->last_shipment_date && !$subscription->shipments()->where('status', 'sent')->exists()) {
+        if (! $subscription->last_shipment_date && ! $subscription->shipments()->where('status', 'sent')->exists()) {
             // First shipment - check if initial checkout payment exists
             $initialPayment = $subscription->payments()
                 ->where('status', 'paid')
                 ->orderBy('paid_at', 'asc')
                 ->first();
-            
+
             if ($initialPayment) {
                 return $initialPayment;
             }
@@ -915,7 +936,7 @@ class SubscriptionShipmentService
     /**
      * Check if a subscription should ship on a specific date
      * Used for coffee reservation calculations
-     * 
+     *
      * Includes:
      * - Subscriptions with existing pending shipment for this date
      * - Active/complimentary subscriptions matching cadence for this date
@@ -939,11 +960,12 @@ class SubscriptionShipmentService
         // If so, the subscription WILL be active when billing occurs
         if ($subscription->status === 'paused' && $subscription->paused_until_date) {
             $billingDate = ShipmentSchedule::getBillingDateForMonth($date->year, $date->month);
-            
+
             // paused_until_date <= billing_date → subscription will be active for this shipment
             if ($subscription->paused_until_date->lte($billingDate)) {
                 return $this->wouldShipOnDateIfActive($subscription, $date);
             }
+
             return false;
         }
 
@@ -965,7 +987,7 @@ class SubscriptionShipmentService
     /**
      * Check if subscription WOULD ship on date if it were active
      * Used to determine if paused subscription should be counted in reservations
-     * 
+     *
      * Takes into account pending shipments before the target date to correctly
      * calculate cadence for future shipments.
      */
@@ -986,12 +1008,13 @@ class SubscriptionShipmentService
             }
             // No shipment exists yet - calculate where it should go
             $firstDate = $this->getFirstShipmentDate($subscription);
+
             return $firstDate->isSameDay($date);
         }
 
         // Recurring subscription - check frequency alignment
-        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
-        
+        $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
+
         // Find pending shipment BEFORE target date (more recent than last_shipment_date)
         // This ensures we calculate cadence from the most recent planned shipment
         $pendingBeforeTarget = $subscription->shipments()
@@ -999,28 +1022,28 @@ class SubscriptionShipmentService
             ->whereDate('shipment_date', '<', $date->toDateString())
             ->orderBy('shipment_date', 'desc')
             ->first();
-        
+
         if ($pendingBeforeTarget) {
             $lastShipment = $pendingBeforeTarget->shipment_date;
         } else {
-            $lastShipment = $subscription->last_shipment_date 
-                ?? $subscription->starts_at 
+            $lastShipment = $subscription->last_shipment_date
+                ?? $subscription->starts_at
                 ?? $subscription->created_at;
         }
-        
+
         // Calculate expected next shipment dates from the base
         $candidate = $lastShipment->copy();
-        
+
         for ($i = 0; $i < 24; $i++) { // Max 2 years
             $candidate = $candidate->copy()->addMonths($frequencyMonths);
             $schedule = ShipmentSchedule::getForMonth($candidate->year, $candidate->month);
             $shipDate = $schedule?->shipment_date ?? $candidate->copy()->day(20);
-            
+
             // Found matching date
             if ($shipDate->isSameDay($date)) {
                 return true;
             }
-            
+
             // Past the target date
             if ($shipDate->gt($date)) {
                 return false;
@@ -1066,6 +1089,7 @@ class SubscriptionShipmentService
         }
 
         $firstScheduled = $this->getFirstShipmentDate($subscription);
+
         return $firstScheduled->isSameDay($date);
     }
 
@@ -1074,12 +1098,12 @@ class SubscriptionShipmentService
      */
     protected function getPackageDimensions(Subscription $subscription): array
     {
-        $config = is_string($subscription->configuration) 
-            ? json_decode($subscription->configuration, true) 
+        $config = is_string($subscription->configuration)
+            ? json_decode($subscription->configuration, true)
             : $subscription->configuration;
-        
+
         $amount = $config['amount'] ?? 2;
-        
+
         return [
             'package_weight' => \App\Models\SubscriptionConfig::get("package_{$amount}_weight", $amount * 0.25),
             'package_length' => (int) \App\Models\SubscriptionConfig::get("package_{$amount}_length", 30),
@@ -1090,4 +1114,3 @@ class SubscriptionShipmentService
         ];
     }
 }
-

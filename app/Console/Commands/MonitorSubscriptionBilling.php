@@ -29,24 +29,24 @@ class MonitorSubscriptionBilling extends Command
     {
         $this->info('🔍 Monitoring subscription billing system...');
         $this->newLine();
-        
+
         $alerts = [];
-        
+
         // Check 1: Has cron run today?
         $lastRun = Cache::get('subscription_billing_cron_last_run');
-        if (!$lastRun || $lastRun->isYesterday()) {
+        if (! $lastRun || $lastRun->isYesterday()) {
             $alert = '⚠️ Billing cron has NOT run today!';
             $this->error($alert);
             $alerts[] = $alert;
         } else {
-            $this->info('✓ Billing cron last run: ' . $lastRun->diffForHumans());
+            $this->info('✓ Billing cron last run: '.$lastRun->diffForHumans());
         }
-        
+
         // Check 2: Any overdue payments?
         $overdue = Subscription::where('status', 'active')
             ->whereDate('next_billing_date', '<', today())
             ->count();
-            
+
         if ($overdue > 0) {
             $alert = "⚠️ {$overdue} subscription(s) with overdue payments!";
             $this->warn($alert);
@@ -54,7 +54,7 @@ class MonitorSubscriptionBilling extends Command
         } else {
             $this->info('✓ No overdue payments');
         }
-        
+
         // Check 3: Any unpaid subscriptions?
         $unpaid = Subscription::where('status', 'unpaid')->count();
         if ($unpaid > 0) {
@@ -63,7 +63,7 @@ class MonitorSubscriptionBilling extends Command
         } else {
             $this->info('✓ No unpaid subscriptions');
         }
-        
+
         // Check 4: Multiple payment failures today?
         $lastSummary = Cache::get('subscription_billing_cron_last_summary');
         if ($lastSummary && $lastSummary['failed'] > 3) {
@@ -71,15 +71,34 @@ class MonitorSubscriptionBilling extends Command
             $this->error($alert);
             $alerts[] = $alert;
         }
-        
+
         // Check 5: Subscriptions expiring cards soon?
         $expiringCards = $this->checkExpiringCards();
         if ($expiringCards > 0) {
             $this->warn("⚠️ {$expiringCards} subscription(s) with cards expiring within 30 days");
         }
-        
+
+        // Check 6: Stuck paused subscriptions (pause ended >24h ago but never resumed).
+        // 24h grace lets resume cron (04:00) and the billing self-heal path (01:00/06:00)
+        // try first. If this fires, all defense layers failed - human intervention needed.
+        $stuckPaused = Subscription::where('status', 'paused')
+            ->whereNotNull('paused_until_date')
+            ->whereDate('paused_until_date', '<', today()->subDay())
+            ->get(['id', 'subscription_number', 'paused_until_date']);
+
+        if ($stuckPaused->isNotEmpty()) {
+            $list = $stuckPaused->map(fn ($s) => "  - #{$s->id} ({$s->subscription_number}) paused_until={$s->paused_until_date->toDateString()}"
+            )->join("\n");
+
+            $alert = "⚠️ {$stuckPaused->count()} stuck paused subscription(s):\n{$list}";
+            $this->error($alert);
+            $alerts[] = $alert;
+        } else {
+            $this->info('✓ No stuck paused subscriptions');
+        }
+
         $this->newLine();
-        
+
         // Show last billing summary if available
         if ($lastSummary) {
             $this->info('📊 Last Billing Run Summary:');
@@ -94,20 +113,22 @@ class MonitorSubscriptionBilling extends Command
                 ]
             );
         }
-        
+
         // Send alerts if critical issues found
-        if (!empty($alerts)) {
+        if (! empty($alerts)) {
             $this->newLine();
             $this->error('🚨 CRITICAL ALERTS DETECTED');
             $this->sendCriticalAlerts($alerts);
+
             return 1; // Exit with error code
         }
-        
+
         $this->newLine();
         $this->info('✅ All systems operational');
+
         return 0;
     }
-    
+
     /**
      * Check for cards expiring soon
      */
@@ -117,7 +138,7 @@ class MonitorSubscriptionBilling extends Command
         // For now, return 0 - can be implemented later
         return 0;
     }
-    
+
     /**
      * Send critical alerts to admin
      */
@@ -125,25 +146,24 @@ class MonitorSubscriptionBilling extends Command
     {
         try {
             $adminEmail = config('mail.from.address');
-            
+
             if ($adminEmail) {
                 \Mail::raw(
-                    "🚨 SUBSCRIPTION BILLING SYSTEM ALERT\n\n" .
-                    "Critical issues detected:\n\n" .
-                    implode("\n", $alerts) . "\n\n" .
-                    "Time: " . now()->toDateTimeString() . "\n" .
-                    "Server: " . config('app.url'),
+                    "🚨 SUBSCRIPTION BILLING SYSTEM ALERT\n\n".
+                    "Critical issues detected:\n\n".
+                    implode("\n", $alerts)."\n\n".
+                    'Time: '.now()->toDateTimeString()."\n".
+                    'Server: '.config('app.url'),
                     function ($message) use ($adminEmail) {
                         $message->to($adminEmail)
-                            ->subject('🚨 Critical: Subscription Billing Issues - ' . now()->toDateString());
+                            ->subject('🚨 Critical: Subscription Billing Issues - '.now()->toDateString());
                     }
                 );
-                
+
                 $this->warn("📧 Critical alert email sent to {$adminEmail}");
             }
         } catch (\Exception $e) {
-            $this->error("Failed to send alert email: " . $e->getMessage());
+            $this->error('Failed to send alert email: '.$e->getMessage());
         }
     }
 }
-
