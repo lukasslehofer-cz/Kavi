@@ -216,20 +216,13 @@
                 </div>
 
                 @php
-                    // Calculate appropriate shipment date based on subscription status
-                    $nextShipment = null;
-                    $shipmentLabel = __('dashboard.next_shipment');
-                    
-                    if ($activeSubscription->status === 'paused' && $activeSubscription->paused_until_date) {
-                        // For paused subscriptions, show shipment after pause ends
-                        $nextShipment = \App\Helpers\SubscriptionHelper::getNextShipmentAfterDate(
-                            $activeSubscription,
-                            \Carbon\Carbon::parse($activeSubscription->paused_until_date)->startOfDay()
-                        );
+                    $pauseInfo = $shipmentInfo?->pauseInfo;
+                    if ($activeSubscription->status === 'paused' && $pauseInfo?->resumeDate) {
+                        $nextShipment = $pauseInfo->resumeDate;
                         $shipmentLabel = __('dashboard.shipment_after_pause');
                     } else {
-                        // For active subscriptions, use normal next shipment date
-                        $nextShipment = $activeSubscription->next_shipment_date;
+                        $nextShipment = $shipmentInfo?->nextShipmentDate() ?? $activeSubscription->next_shipment_date;
+                        $shipmentLabel = __('dashboard.next_shipment');
                     }
                 @endphp
                 @if($nextShipment)

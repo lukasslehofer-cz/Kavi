@@ -2724,6 +2724,24 @@ class StripeService
 
             // Check if payment succeeded
             if ($paymentIntent->status === 'succeeded') {
+                // Catch-up: pokud je next_billing_date v minulosti (po stuck pauze,
+                // manuálním zásahu, --subscription override), advancuj period_end po
+                // frequency-měsíčních skocích, dokud není >= today. Bez toho by se
+                // stale datum uložilo do paymentu, expected_shipment_date by ukazoval
+                // na zaniklý měsíc a linkPaymentToShipment by vytvořil duplicitní
+                // shipment místo trefení existujícího pending řádku.
+                $frequencyMonths = $subscription->frequency_months ?? 1;
+                $periodEnd = $subscription->next_billing_date?->copy();
+
+                if ($periodEnd) {
+                    $safetyLimit = 24;
+                    while ($periodEnd->lt(today()) && $safetyLimit-- > 0) {
+                        $periodEnd->addMonths($frequencyMonths);
+                    }
+                }
+
+                $periodStart = $periodEnd?->copy()->subMonths($frequencyMonths);
+
                 // Record successful payment
                 $payment = \App\Models\SubscriptionPayment::create([
                     'subscription_id' => $subscription->id,
@@ -2732,13 +2750,12 @@ class StripeService
                     'currency' => $subscriptionCurrency,
                     'status' => 'paid',
                     'paid_at' => now(),
-                    'period_start' => $subscription->next_billing_date?->copy()->subMonths($subscription->frequency_months ?? 1),
-                    'period_end' => $subscription->next_billing_date,
+                    'period_start' => $periodStart,
+                    'period_end' => $periodEnd,
                 ]);
 
                 // Update subscription
-                $frequencyMonths = $subscription->frequency_months ?? 1;
-                $nextBillingDate = $this->calculateNextBillingDate($subscription->next_billing_date, $frequencyMonths);
+                $nextBillingDate = $this->calculateNextBillingDate($periodEnd, $frequencyMonths);
 
                 $subscription->update([
                     'next_billing_date' => $nextBillingDate,

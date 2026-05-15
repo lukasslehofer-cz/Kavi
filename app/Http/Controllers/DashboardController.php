@@ -53,6 +53,10 @@ class DashboardController extends Controller
             ->get();
         $activeSubscription = $activeSubscriptions->first(); // For backward compatibility
 
+        $shipmentInfo = $activeSubscription
+            ? app(SubscriptionShipmentService::class)->getShipmentInfo($activeSubscription)
+            : null;
+
         // Get unpaid subscriptions for alert
         $unpaidSubscriptions = $user->subscriptions()
             ->where('status', 'unpaid')
@@ -64,7 +68,7 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('dashboard.index', compact('orders', 'activeSubscription', 'activeSubscriptions', 'unpaidSubscriptions', 'unpaidOrders'));
+        return view('dashboard.index', compact('orders', 'activeSubscription', 'activeSubscriptions', 'shipmentInfo', 'unpaidSubscriptions', 'unpaidOrders'));
     }
 
     public function orders()
