@@ -186,11 +186,15 @@ return [
     'paid' => 'Uhrazeno',
     'failed' => 'Selhalo',
     'refunded' => 'Vráceno',
-    
+
     // Shipment history
     'shipment_history' => 'Historie zásilek',
     'no_shipments' => 'Zatím žádné zásilky',
     'track_shipment' => 'Sledovat zásilku',
+
+    // History expand/collapse
+    'show_all_history' => 'Zobrazit vše',
+    'show_less_history' => 'Zobrazit méně',
 
     // Profile page
     'success' => 'Úspěch!',

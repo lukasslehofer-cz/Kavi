@@ -580,9 +580,9 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-100">
-                        @foreach($shipmentInfo->history as $shipment)
-                        <tr class="hover:bg-gray-50 transition-colors">
+                    <tbody class="bg-white divide-y divide-gray-100" data-history-group="shipment-history-{{ $subscription->id }}">
+                        @foreach($shipmentInfo->history as $index => $shipment)
+                        <tr class="hover:bg-gray-50 transition-colors {{ $index >= 5 ? 'subscription-history-extra hidden' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $shipment->shipment_date->format('d.m.Y') }}
                             </td>
@@ -625,6 +625,20 @@
                     </tbody>
                 </table>
             </div>
+            @if($shipmentInfo->history->count() > 5)
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 text-center">
+                <button type="button"
+                        class="subscription-history-toggle inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700"
+                        data-target="shipment-history-{{ $subscription->id }}"
+                        data-show-text="{{ __('dashboard.show_all_history') }}"
+                        data-hide-text="{{ __('dashboard.show_less_history') }}">
+                    <span class="toggle-label">{{ __('dashboard.show_all_history') }}</span>
+                    <svg class="w-4 h-4 toggle-icon transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
+            @endif
         </div>
         @endif
 
@@ -662,9 +676,9 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-100">
-                        @foreach($payments as $payment)
-                        <tr class="hover:bg-gray-50 transition-colors">
+                    <tbody class="bg-white divide-y divide-gray-100" data-history-group="payment-history-{{ $subscription->id }}">
+                        @foreach($payments as $index => $payment)
+                        <tr class="hover:bg-gray-50 transition-colors {{ $index >= 5 ? 'subscription-history-extra hidden' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $payment->paid_at ? $payment->paid_at->format('d.m.Y') : '-' }}
                             </td>
@@ -711,6 +725,20 @@
                     </tbody>
                 </table>
             </div>
+            @if($payments->count() > 5)
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 text-center">
+                <button type="button"
+                        class="subscription-history-toggle inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700"
+                        data-target="payment-history-{{ $subscription->id }}"
+                        data-show-text="{{ __('dashboard.show_all_history') }}"
+                        data-hide-text="{{ __('dashboard.show_less_history') }}">
+                    <span class="toggle-label">{{ __('dashboard.show_all_history') }}</span>
+                    <svg class="w-4 h-4 toggle-icon transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
+            @endif
         </div>
         @endif
     </div>
@@ -942,6 +970,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    document.querySelectorAll('.subscription-history-toggle').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const targetId = btn.dataset.target;
+            const rows = document.querySelectorAll(
+                '[data-history-group="' + targetId + '"] .subscription-history-extra'
+            );
+            const expanded = btn.classList.toggle('is-expanded');
+            rows.forEach(function(row) {
+                row.classList.toggle('hidden', !expanded);
+            });
+            const label = btn.querySelector('.toggle-label');
+            if (label) {
+                label.textContent = expanded ? btn.dataset.hideText : btn.dataset.showText;
+            }
+            const icon = btn.querySelector('.toggle-icon');
+            if (icon) {
+                icon.classList.toggle('rotate-180', expanded);
+            }
+        });
+    });
 });
 </script>
 @endsection

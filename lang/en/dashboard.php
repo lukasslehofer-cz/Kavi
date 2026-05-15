@@ -186,11 +186,15 @@ return [
     'paid' => 'Paid',
     'failed' => 'Failed',
     'refunded' => 'Refunded',
-    
+
     // Shipment history
     'shipment_history' => 'Shipment history',
     'no_shipments' => 'No shipments yet',
     'track_shipment' => 'Track shipment',
+
+    // History expand/collapse
+    'show_all_history' => 'Show all',
+    'show_less_history' => 'Show less',
 
     // Profile page
     'success' => 'Success!',
