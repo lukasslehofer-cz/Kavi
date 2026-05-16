@@ -44,12 +44,18 @@ class ChargeSubscriptionPayments extends Command
         }
 
         // Find subscriptions to process.
-        // Includes 'active' subs plus 'paused' subs whose pause has already ended -
-        // the latter is a self-heal path for cases where ResumeExpiredPausedSubscriptions
-        // failed to flip the row back to 'active'. The shipment-based safety check below
-        // and the status-flip-after-safety-check pattern keep this safe.
+        // Three buckets:
+        //   - 'active': normální billing den.
+        //   - 'unpaid': denní retry po předchozím failure. Po 3. failure
+        //     handleSubscriptionPaymentFailure() přepne na 'paused' přes
+        //     pauseSubscription(.., 1, 'payment_failure_skip'), čímž z této
+        //     query vypadne, a další cyklus převezme subscriptions:resume-paused.
+        //   - 'paused' s prošlým paused_until_date: self-heal pro případy,
+        //     kdy ResumeExpiredPausedSubscriptions selže. Status flip na 'active'
+        //     proběhne až po shipment-based safety check níže.
         $query = Subscription::where(function ($q) {
             $q->where('status', 'active')
+                ->orWhere('status', 'unpaid')
                 ->orWhere(function ($qq) {
                     $qq->where('status', 'paused')
                         ->whereNotNull('paused_until_date')

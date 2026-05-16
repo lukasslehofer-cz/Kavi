@@ -2757,14 +2757,23 @@ class StripeService
                 // Update subscription
                 $nextBillingDate = $this->calculateNextBillingDate($periodEnd, $frequencyMonths);
 
-                $subscription->update([
+                $updates = [
                     'next_billing_date' => $nextBillingDate,
                     'payment_failure_count' => 0,
                     'last_payment_failure_at' => null,
                     'last_payment_failure_reason' => null,
                     'pending_invoice_id' => null,
                     'pending_invoice_amount' => null,
-                ]);
+                ];
+
+                // Úspěšný retry během 'unpaid' fáze → návrat na 'active'.
+                // Pro 'paused' self-heal se status flipne dřív v ChargeSubscriptionPayments,
+                // ostatní stavy (complimentary atd.) nesahat.
+                if ($subscription->status === 'unpaid') {
+                    $updates['status'] = 'active';
+                }
+
+                $subscription->update($updates);
 
                 // Handle coupon countdown
                 if ($subscription->coupon_id && $subscription->discount_amount > 0) {
@@ -2923,13 +2932,30 @@ class StripeService
             ]);
         }
 
-        // If 3rd failure, pause subscription
+        // Po 3. (a každém dalším) failure předplatné "vynechá" měsíc jako
+        // při běžné uživatelské pauze: pauseSubscription označí aktuální zásilku
+        // jako skipped, vytvoří post-pause pending řádek a nastaví paused_until_date.
+        // Příští měsíc převezme cron subscriptions:resume-paused a billing cron
+        // zkusí naúčtovat znovu. Bez tohohle by status='paused' + NULL
+        // paused_until_date byl zombie, kterého žádný cron nezachytí.
         if ($failureCount >= 3) {
-            $subscription->update(['status' => 'paused']);
+            try {
+                app(\App\Services\SubscriptionShipmentService::class)
+                    ->pauseSubscription($subscription, 1, 'payment_failure_skip');
 
-            \Log::warning('Subscription paused after 3 payment failures', [
-                'subscription_id' => $subscription->id,
-            ]);
+                \Log::warning('Subscription paused for one cycle after 3 payment failures', [
+                    'subscription_id' => $subscription->id,
+                    'subscription_number' => $subscription->subscription_number,
+                ]);
+            } catch (\Exception $e) {
+                // Fallback — pokud pauseSubscription selže (např. stock check),
+                // alespoň přepneme status, ať předplatné nejedeme dál v retry smyčce.
+                $subscription->update(['status' => 'paused']);
+                \Log::error('pauseSubscription failed during 3-failure handler — falling back to bare paused status', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 
