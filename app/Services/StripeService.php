@@ -2792,6 +2792,39 @@ class StripeService
                     ]);
                 }
 
+                // Create affiliate reward if applicable
+                if ($subscription->coupon_id) {
+                    try {
+                        $coupon = $subscription->coupon;
+                        if ($coupon && $coupon->hasAffiliateSubscriptionReward()) {
+                            $affiliateService = app(\App\Services\AffiliateService::class);
+
+                            // Zjisti, kolikátá platba to je (včetně právě vytvořené)
+                            $paymentNumber = \App\Models\SubscriptionPayment::where('subscription_id', $subscription->id)
+                                ->where('status', 'paid')
+                                ->count();
+
+                            $reward = $affiliateService->createSubscriptionReward($subscription, $coupon, $paymentNumber);
+
+                            if ($reward) {
+                                \Log::info('Affiliate reward created for subscription payment', [
+                                    'subscription_id' => $subscription->id,
+                                    'payment_number' => $paymentNumber,
+                                    'reward_id' => $reward->id,
+                                    'reward_amount' => $reward->reward_amount,
+                                    'partner_id' => $reward->affiliate_partner_id,
+                                ]);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to create affiliate reward for subscription payment', [
+                            'subscription_id' => $subscription->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        // Don't fail the whole payment if affiliate reward creation fails
+                    }
+                }
+
                 // Create Fakturoid invoice (skip for complimentary subscriptions)
                 if (! $subscription->isComplimentary()) {
                     try {
