@@ -131,8 +131,8 @@
         </div>
         
         <!-- Giant Roastery Name -->
-        <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-dark-800 uppercase tracking-tight leading-[0.95] sm:leading-[0.9] mb-6">
-          {{ $roastery->getName() }}
+        <h1 class="relative z-10 font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-dark-800 uppercase tracking-tight leading-[0.95] sm:leading-[0.9] mb-6">
+          <span class="bg-warm-200 box-decoration-clone">{{ $roastery->getName() }}</span>
         </h1>
         
         <!-- Technical Data -->
