@@ -32,6 +32,22 @@
                 <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
                     {{ __('dashboard.status_processing_icon') }}
                 </span>
+            @elseif($order->status === 'paid')
+                <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    {{ __('dashboard.status_paid_icon') }}
+                </span>
+            @elseif($order->status === 'submitted')
+                <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200">
+                    {{ __('dashboard.status_submitted_icon') }}
+                </span>
+            @elseif($order->status === 'shipped')
+                <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                    {{ __('dashboard.status_shipped_icon') }}
+                </span>
+            @elseif($order->status === 'delivered')
+                <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-green-100 text-green-800 border border-green-200">
+                    {{ __('dashboard.status_delivered_icon') }}
+                </span>
             @elseif($order->status === 'cancelled')
                 <span class="px-3 py-1.5 text-sm font-medium rounded-full bg-red-100 text-red-800 border border-red-200">
                     {{ __('dashboard.status_cancelled_icon') }}

@@ -66,6 +66,22 @@
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100 text-blue-800">
                                     {{ __('dashboard.processing') }}
                                 </span>
+                            @elseif($order->status === 'paid')
+                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-emerald-100 text-emerald-800">
+                                    {{ __('dashboard.paid') }}
+                                </span>
+                            @elseif($order->status === 'submitted')
+                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-indigo-100 text-indigo-800">
+                                    {{ __('dashboard.submitted') }}
+                                </span>
+                            @elseif($order->status === 'shipped')
+                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-purple-100 text-purple-800">
+                                    {{ __('dashboard.shipped') }}
+                                </span>
+                            @elseif($order->status === 'delivered')
+                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
+                                    {{ __('dashboard.delivered') }}
+                                </span>
                             @elseif($order->status === 'cancelled')
                                 <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800">
                                     {{ __('dashboard.cancelled') }}
