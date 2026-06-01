@@ -21,6 +21,7 @@
         'Rumunsko' => 'RO', 'Romania' => 'RO',
         'Lotyšsko' => 'LV', 'Latvia' => 'LV',
         'Velká Británie' => 'GB', 'United Kingdom' => 'GB',
+        'Švédsko' => 'S', 'Sweden' => 'S',
     ];
     $countryCode = $countryCodes[$roastery->country] ?? strtoupper(substr($roastery->country, 0, 2));
 @endphp
@@ -131,8 +132,8 @@
         </div>
         
         <!-- Giant Roastery Name -->
-        <h1 class="relative z-10 font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-dark-800 uppercase tracking-tight leading-[0.95] sm:leading-[0.9] mb-6">
-          <span class="bg-warm-200 box-decoration-clone" style="padding-right: 20px;">{{ $roastery->getName() }}</span>
+        <h1 class="relative z-10 self-start font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-dark-800 uppercase tracking-tight leading-[0.95] sm:leading-[0.9] mb-6 bg-warm-200" style="padding-right: 20px;">
+          {{ $roastery->getName() }}
         </h1>
         
         <!-- Technical Data -->
