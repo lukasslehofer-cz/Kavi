@@ -254,6 +254,9 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             @if($reward->reward_type === 'subscription')
                                 {{ __('affiliate.subscription') }}
+                                @if($reward->subscription)
+                                    {{ \Illuminate\Support\Str::after($reward->subscription->subscription_number ?? '#' . $reward->subscription->id, 'KVS-') }}
+                                @endif
                                 @if($reward->subscription_payment_number)
                                     ({{ $reward->subscription_payment_number }}.)
                                 @endif
