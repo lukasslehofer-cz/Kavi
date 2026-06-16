@@ -100,7 +100,7 @@ class PostController extends Controller
         // Handle image upload
         if ($request->hasFile('featured_image')) {
             $file = $request->file('featured_image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = safeUploadFilename($file);
             $file->move(public_path('images/blog'), $filename);
             $validated['featured_image'] = 'images/blog/' . $filename;
         }
@@ -170,7 +170,7 @@ class PostController extends Controller
             }
             
             $file = $request->file('featured_image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = safeUploadFilename($file);
             $file->move(public_path('images/blog'), $filename);
             $validated['featured_image'] = 'images/blog/' . $filename;
         }

@@ -16,8 +16,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@kavi.cz',
             'password' => bcrypt('password'),
-            'is_admin' => true,
-        ]);
+        ])->forceFill(['is_admin' => true])->save();
 
         // Create test customer
         User::create([

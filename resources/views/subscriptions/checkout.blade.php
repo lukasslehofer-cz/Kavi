@@ -476,7 +476,7 @@
                 <div class="mb-8">
                     <p class="text-xs uppercase tracking-widest text-olive-600 mb-2">{{ __('checkout.full_discount.title') }}</p>
                     <p class="text-sm text-dark-800">
-                        {!! __('checkout.full_discount.description', ['code' => $appliedCoupon->code]) !!}
+                        {!! __('checkout.full_discount.description', ['code' => e($appliedCoupon->code)]) !!}
                     </p>
                 </div>
                 @endif

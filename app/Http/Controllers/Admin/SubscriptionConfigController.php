@@ -172,7 +172,7 @@ class SubscriptionConfigController extends Controller
                     }
                     
                     // Upload to public/images/promo-images (same as products)
-                    $filename = time() . '_' . $scheduleId . '_' . $file->getClientOriginalName();
+                    $filename = safeUploadFilename($file, (string) $scheduleId);
                     $file->move(public_path('images/promo-images'), $filename);
                     $path = 'images/promo-images/' . $filename;
                     
@@ -269,7 +269,7 @@ class SubscriptionConfigController extends Controller
             }
             
             // Upload to public/images/promo-images (same as products)
-            $filename = time() . '_' . $schedule->id . '_' . $file->getClientOriginalName();
+            $filename = safeUploadFilename($file, (string) $schedule->id);
             $file->move(public_path('images/promo-images'), $filename);
             $validated['promo_image'] = 'images/promo-images/' . $filename;
         }

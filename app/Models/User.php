@@ -21,8 +21,8 @@ class User extends Authenticatable
         'city',
         'postal_code',
         'country',
-        'is_admin',
-        'is_affiliate_partner',
+        // 'is_admin' a 'is_affiliate_partner' záměrně NEJSOU fillable kvůli ochraně
+        // proti mass assignmentu (eskalace oprávnění). Nastavují se explicitně přes forceFill().
         'affiliate_activated_at',
         'stripe_customer_id',
         'fakturoid_subject_id',

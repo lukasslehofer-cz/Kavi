@@ -47,10 +47,10 @@ class AffiliatePartnerController extends Controller
      */
     public function activate(User $user)
     {
-        $user->update([
+        $user->forceFill([
             'is_affiliate_partner' => true,
             'affiliate_activated_at' => now(),
-        ]);
+        ])->save();
 
         return redirect()->back()
             ->with('success', __('affiliate.partner_activated'));
@@ -61,9 +61,9 @@ class AffiliatePartnerController extends Controller
      */
     public function deactivate(User $user)
     {
-        $user->update([
+        $user->forceFill([
             'is_affiliate_partner' => false,
-        ]);
+        ])->save();
 
         return redirect()->back()
             ->with('success', __('affiliate.partner_deactivated'));
@@ -85,10 +85,10 @@ class AffiliatePartnerController extends Controller
                 ->with('error', 'Tento uživatel už je affiliate partnerem.');
         }
 
-        $user->update([
+        $user->forceFill([
             'is_affiliate_partner' => true,
             'affiliate_activated_at' => now(),
-        ]);
+        ])->save();
 
         return redirect()->back()
             ->with('success', __('affiliate.partner_activated'));

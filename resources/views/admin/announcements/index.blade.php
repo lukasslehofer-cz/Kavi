@@ -147,9 +147,9 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="max-w-md">
-                                <p class="text-sm text-gray-900 truncate">{!! $banner->message_cs !!}</p>
+                                <p class="text-sm text-gray-900 truncate">{{ $banner->message_cs }}</p>
                                 @if($banner->message_en)
-                                <p class="text-xs text-gray-500 truncate mt-1">EN: {!! $banner->message_en !!}</p>
+                                <p class="text-xs text-gray-500 truncate mt-1">EN: {{ $banner->message_en }}</p>
                                 @endif
                             </div>
                         </td>
@@ -233,7 +233,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $currentBanner->getIconPath() }}" />
                     </svg>
                     <div class="text-sm text-white font-light">
-                        {!! $currentBanner->getMessage('cs') !!}
+                        {{ $currentBanner->getMessage('cs') }}
                     </div>
                 </div>
             </div>

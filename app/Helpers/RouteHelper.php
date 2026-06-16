@@ -57,6 +57,40 @@ if (!function_exists('localizedRoute')) {
     }
 }
 
+if (!function_exists('safeRedirectPath')) {
+    /**
+     * Validate a user-supplied redirect target and return it only if it is a
+     * safe internal path. Prevents open-redirect attacks (e.g. "//evil.com",
+     * "https://evil.com", "javascript:...", backslash tricks).
+     *
+     * @param string|null $redirect The raw redirect value from the request
+     * @return string|null The path if it is a safe relative URL, otherwise null
+     */
+    function safeRedirectPath(?string $redirect): ?string
+    {
+        if (!is_string($redirect) || $redirect === '') {
+            return null;
+        }
+
+        // Must be an absolute path on this site: starts with a single "/".
+        // Reject protocol-relative ("//host"), backslash variants ("/\host")
+        // and anything containing a scheme separator or control characters.
+        if (!str_starts_with($redirect, '/')) {
+            return null;
+        }
+
+        if (str_starts_with($redirect, '//') || str_starts_with($redirect, '/\\')) {
+            return null;
+        }
+
+        if (preg_match('#[\x00-\x1f\\\\]#', $redirect) || str_contains($redirect, ':')) {
+            return null;
+        }
+
+        return $redirect;
+    }
+}
+
 if (!function_exists('localizedRouteName')) {
     /**
      * Get the localized route name for a given base route name.

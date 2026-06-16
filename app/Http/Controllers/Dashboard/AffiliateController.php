@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Http\Controllers\Concerns\ImpersonatesUser;
 use App\Http\Controllers\Controller;
 use App\Services\AffiliateService;
 use Illuminate\Http\Request;
 
 class AffiliateController extends Controller
 {
+    use ImpersonatesUser;
+
     public function __construct(
         private AffiliateService $affiliateService
     ) {
@@ -19,7 +22,7 @@ class AffiliateController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user = $this->getViewingUser();
 
         // Kontrola, že je uživatel affiliate partner
         if (!$user->isAffiliatePartner()) {

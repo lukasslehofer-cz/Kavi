@@ -72,3 +72,7 @@ CLAUDE.md
 !/public/images/blog/.gitkeep
 /public/images/mail/*
 !/public/images/mail/.gitkeep
+
+# Database management tools - never deploy
+public/kafedata.php
+public/adminer*.php

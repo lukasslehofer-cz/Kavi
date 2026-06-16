@@ -37,10 +37,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: kavi
-      MYSQL_USER: kavi
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DB_DATABASE:-kavi}
+      MYSQL_USER: ${DB_USERNAME:-kavi}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:

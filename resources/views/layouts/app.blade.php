@@ -121,7 +121,7 @@
         <div class="flex items-center justify-center gap-3 px-4 py-2.5">
             <span class="w-1.5 h-1.5 bg-white"></span>
             <div class="text-sm text-white font-light tracking-wide">
-                {!! $announcementBanner->getMessage($currentLocale ?? 'cs') !!}
+                {{ $announcementBanner->getMessage($currentLocale ?? 'cs') }}
             </div>
         </div>
     </div>
