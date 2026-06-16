@@ -373,7 +373,7 @@
         </div>
 
         <div class="px-6 py-4 bg-gray-50">
-            {{ $orders->links() }}
+            {{ $orders->appends(request()->query())->links() }}
         </div>
         @else
         <div class="text-center py-12 px-4">

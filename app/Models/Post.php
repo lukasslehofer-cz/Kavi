@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Stevebauman\Purify\Facades\Purify;
 
 class Post extends Model
 {
@@ -56,10 +57,13 @@ class Post extends Model
      */
     public function getContent(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->content_en)) {
-            return $this->content_en;
-        }
-        return $this->content_cs ?? '';
+        $content = (app()->getLocale() === 'en' && !empty($this->content_en))
+            ? $this->content_en
+            : ($this->content_cs ?? '');
+
+        // Sanitize admin-authored HTML to strip any <script>, event handlers,
+        // javascript: URLs etc. while keeping normal blog formatting (stored XSS).
+        return Purify::clean($content);
     }
 
     /**

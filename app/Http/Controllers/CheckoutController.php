@@ -37,7 +37,15 @@ class CheckoutController extends Controller
             $orderId = $request->get('order_id');
             $order = Order::find($orderId);
 
-            if ($order && $order->payment_status === 'pending') {
+            // SECURITY: only restore the cart when the order belongs to the
+            // current user, or to the guest session that created it. Otherwise
+            // any order_id could be guessed to leak another customer's cart.
+            $ownsOrder = $order && (
+                (auth()->check() && $order->user_id === auth()->id())
+                || session()->has('pending_order_'.$order->id)
+            );
+
+            if ($order && $ownsOrder && $order->payment_status === 'pending') {
                 // Restore cart from order backup (stored in admin_notes)
                 try {
                     $adminNotes = json_decode($order->admin_notes, true);
@@ -785,11 +793,11 @@ class CheckoutController extends Controller
             abort(403);
         }
 
-        // If user is not authenticated, verify they have access
+        // If user is not authenticated, verify they have access.
+        // Guest (user_id = null) orders are only viewable by the session that
+        // created them, preventing enumeration of order details by guessing IDs.
         if (! auth()->check()) {
-            // For guest orders without user_id, allow access
-            // In production, you might want to add a token-based verification here
-            if ($order->user_id !== null) {
+            if ($order->user_id !== null || ! session()->has('pending_order_'.$order->id)) {
                 abort(403, 'Nemáte oprávnění zobrazit tuto stránku. Prosím přihlaste se.');
             }
         }

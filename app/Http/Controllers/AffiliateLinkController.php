@@ -61,13 +61,8 @@ class AffiliateLinkController extends Controller
             'partner_id' => $link->affiliate_partner_id,
         ]);
 
-        // Přesměruj na homepage nebo zadanou URL
-        $redirectTo = $request->query('redirect', localizedRoute('home'));
-        
-        // Bezpečnostní kontrola - pouze interní URL
-        if (!str_starts_with($redirectTo, url('/'))) {
-            $redirectTo = localizedRoute('home');
-        }
+        // Přesměruj na homepage nebo zadanou (pouze bezpečnou interní) URL
+        $redirectTo = safeRedirectPath($request->query('redirect')) ?? localizedRoute('home');
 
         return redirect($redirectTo);
     }

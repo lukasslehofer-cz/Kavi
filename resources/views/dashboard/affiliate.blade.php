@@ -206,14 +206,17 @@
         <div class="bg-gray-50 p-6 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-bold text-gray-900">{{ __('affiliate.recent_rewards') }}</h2>
+                @php
+                    $viewAsParam = request()->has('view_as') ? '&view_as=' . request()->get('view_as') : '';
+                @endphp
                 <div class="flex gap-2">
-                    <a href="{{ localizedRoute('dashboard.affiliate') }}" class="px-3 py-1.5 text-sm {{ !$statusFilter ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
+                    <a href="{{ localizedRoute('dashboard.affiliate') }}{{ $viewAsParam ? '?' . ltrim($viewAsParam, '&') : '' }}" class="px-3 py-1.5 text-sm {{ !$statusFilter ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
                         {{ __('affiliate.all') }}
                     </a>
-                    <a href="{{ localizedRoute('dashboard.affiliate') }}?status=pending" class="px-3 py-1.5 text-sm {{ $statusFilter === 'pending' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
+                    <a href="{{ localizedRoute('dashboard.affiliate') }}?status=pending{{ $viewAsParam }}" class="px-3 py-1.5 text-sm {{ $statusFilter === 'pending' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
                         {{ __('affiliate.pending') }}
                     </a>
-                    <a href="{{ localizedRoute('dashboard.affiliate') }}?status=paid" class="px-3 py-1.5 text-sm {{ $statusFilter === 'paid' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
+                    <a href="{{ localizedRoute('dashboard.affiliate') }}?status=paid{{ $viewAsParam }}" class="px-3 py-1.5 text-sm {{ $statusFilter === 'paid' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
                         {{ __('affiliate.paid') }}
                     </a>
                 </div>

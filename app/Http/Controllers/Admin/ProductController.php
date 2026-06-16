@@ -291,7 +291,7 @@ class ProductController extends Controller
             $galleryFiles = array_slice($request->file('gallery'), 0, 4); // Max 4 images
 
             foreach ($galleryFiles as $index => $file) {
-                $filename = time() . '_gallery_' . $index . '_' . $file->getClientOriginalName();
+                $filename = safeUploadFilename($file, 'gallery_' . $index);
                 $file->move(public_path('images/products/gallery'), $filename);
                 $galleryPaths[] = 'images/products/gallery/' . $filename;
             }
@@ -304,7 +304,7 @@ class ProductController extends Controller
         // Handle Facebook image (PNG/JPG for catalog feed)
         if ($request->hasFile('facebook_image')) {
             $file = $request->file('facebook_image');
-            $filename = time() . '_fb_' . $file->getClientOriginalName();
+            $filename = safeUploadFilename($file, 'fb');
             $file->move(public_path('images/products/facebook'), $filename);
             $validated['facebook_image'] = 'images/products/facebook/' . $filename;
         }
@@ -502,7 +502,7 @@ class ProductController extends Controller
             $newFiles = array_slice($request->file('gallery'), 0, $remainingSlots);
 
             foreach ($newFiles as $index => $file) {
-                $filename = time() . '_gallery_' . $index . '_' . $file->getClientOriginalName();
+                $filename = safeUploadFilename($file, 'gallery_' . $index);
                 $file->move(public_path('images/products/gallery'), $filename);
                 $existingGallery[] = 'images/products/gallery/' . $filename;
             }
@@ -525,7 +525,7 @@ class ProductController extends Controller
                 unlink(public_path($product->facebook_image));
             }
             $file = $request->file('facebook_image');
-            $filename = time() . '_fb_' . $file->getClientOriginalName();
+            $filename = safeUploadFilename($file, 'fb');
             $file->move(public_path('images/products/facebook'), $filename);
             $validated['facebook_image'] = 'images/products/facebook/' . $filename;
         }

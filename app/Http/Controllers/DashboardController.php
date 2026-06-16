@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ImpersonatesUser;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Services\AccountDeletionService;
@@ -15,27 +16,11 @@ use Illuminate\Validation\Rules\Password;
 
 class DashboardController extends Controller
 {
+    use ImpersonatesUser;
+
     public function __construct()
     {
         $this->middleware('auth');
-    }
-
-    /**
-     * Get the user to display (either authenticated user or user being viewed by admin)
-     */
-    protected function getViewingUser()
-    {
-        // Check if admin is viewing another user's dashboard
-        if (request()->has('view_as') && auth()->user()->is_admin) {
-            $userId = request()->get('view_as');
-            $user = \App\Models\User::find($userId);
-            
-            if ($user) {
-                return $user;
-            }
-        }
-        
-        return auth()->user();
     }
 
     public function index()

@@ -59,10 +59,9 @@ class TestDataSeeder extends Seeder
             [
                 'name' => 'Admin Kavi',
                 'password' => bcrypt('password123'),
-                'is_admin' => true,
                 'email_verified_at' => now(),
             ]
-        );
+        )->forceFill(['is_admin' => true])->save();
 
         // Testovací zákazník
         User::updateOrCreate(
@@ -70,7 +69,6 @@ class TestDataSeeder extends Seeder
             [
                 'name' => 'Test Zákazník',
                 'password' => bcrypt('password123'),
-                'is_admin' => false,
                 'email_verified_at' => now(),
                 'phone' => '+420 123 456 789',
                 'billing_street' => 'Testovací 123',

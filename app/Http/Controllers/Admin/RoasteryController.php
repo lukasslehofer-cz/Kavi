@@ -60,7 +60,7 @@ class RoasteryController extends Controller
         // Handle main image upload
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = safeUploadFilename($file);
             $file->move(public_path('images/roasteries'), $filename);
             $validated['image'] = 'images/roasteries/' . $filename;
         }
@@ -71,7 +71,7 @@ class RoasteryController extends Controller
             $galleryFiles = array_slice($request->file('gallery'), 0, 4); // Max 4 images
             
             foreach ($galleryFiles as $index => $file) {
-                $filename = time() . '_gallery_' . $index . '_' . $file->getClientOriginalName();
+                $filename = safeUploadFilename($file, 'gallery_' . $index);
                 $file->move(public_path('images/roasteries/gallery'), $filename);
                 $galleryPaths[] = 'images/roasteries/gallery/' . $filename;
             }
@@ -128,7 +128,7 @@ class RoasteryController extends Controller
             }
             
             $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = safeUploadFilename($file);
             $file->move(public_path('images/roasteries'), $filename);
             $validated['image'] = 'images/roasteries/' . $filename;
         }
@@ -156,7 +156,7 @@ class RoasteryController extends Controller
             $newFiles = array_slice($request->file('gallery'), 0, $remainingSlots);
             
             foreach ($newFiles as $index => $file) {
-                $filename = time() . '_gallery_' . $index . '_' . $file->getClientOriginalName();
+                $filename = safeUploadFilename($file, 'gallery_' . $index);
                 $file->move(public_path('images/roasteries/gallery'), $filename);
                 $existingGallery[] = 'images/roasteries/gallery/' . $filename;
             }

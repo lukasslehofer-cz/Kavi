@@ -145,17 +145,17 @@ class RouteServiceProvider extends ServiceProvider
 
             // Auth routes
             Route::get('/' . $routes['login'], [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name($this->routeName('login', $locale, $isPrimary));
-            Route::post('/' . $routes['login'], [\App\Http\Controllers\Auth\LoginController::class, 'login']);
+            Route::post('/' . $routes['login'], [\App\Http\Controllers\Auth\LoginController::class, 'login'])->middleware('throttle:10,1');
             Route::post('/' . $routes['logout'], [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name($this->routeName('logout', $locale, $isPrimary));
             Route::get('/' . $routes['register'], [\App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name($this->routeName('register', $locale, $isPrimary));
-            Route::post('/' . $routes['register'], [\App\Http\Controllers\Auth\RegisterController::class, 'register']);
+            Route::post('/' . $routes['register'], [\App\Http\Controllers\Auth\RegisterController::class, 'register'])->middleware('throttle:5,1');
             Route::get('/' . $routes['password-request'], [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name($this->routeName('password.request', $locale, $isPrimary));
-            Route::post('/' . $routes['password-request'], [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name($this->routeName('password.email', $locale, $isPrimary));
+            Route::post('/' . $routes['password-request'], [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name($this->routeName('password.email', $locale, $isPrimary))->middleware('throttle:5,1');
             Route::get('/' . $this->replaceParams($routes['password-reset']), [\App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name($this->routeName('password.reset', $locale, $isPrimary));
-            Route::post('/' . $routes['password-reset-post'], [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name($this->routeName('password.update', $locale, $isPrimary));
+            Route::post('/' . $routes['password-reset-post'], [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name($this->routeName('password.update', $locale, $isPrimary))->middleware('throttle:5,1');
 
             // Magic Link
-            Route::post('/' . $routes['magic-link-send'], [\App\Http\Controllers\Auth\MagicLinkController::class, 'sendLink'])->name($this->routeName('magic-link.send', $locale, $isPrimary));
+            Route::post('/' . $routes['magic-link-send'], [\App\Http\Controllers\Auth\MagicLinkController::class, 'sendLink'])->name($this->routeName('magic-link.send', $locale, $isPrimary))->middleware('throttle:5,1');
             Route::get('/' . $this->replaceParams($routes['magic-link-verify']), [\App\Http\Controllers\Auth\MagicLinkController::class, 'verify'])->name($this->routeName('magic-link.verify', $locale, $isPrimary));
 
             // Dashboard routes

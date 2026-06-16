@@ -24,7 +24,7 @@ class MagicLinkController extends Controller
         ]);
 
         $email = $request->email;
-        $redirect = $request->input('redirect');
+        $redirect = safeRedirectPath($request->input('redirect'));
 
         // Check if user exists
         $user = User::where('email', $email)->first();
@@ -100,11 +100,10 @@ class MagicLinkController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        // Check if there's a redirect parameter
-        $redirect = $request->input('redirect');
-        
-        if ($redirect && filter_var($redirect, FILTER_VALIDATE_URL) === false) {
-            // If it's a relative path, redirect to it
+        // Check if there's a redirect parameter (only safe internal paths allowed)
+        $redirect = safeRedirectPath($request->input('redirect'));
+
+        if ($redirect) {
             return redirect($redirect)->with('success', __('flash.auth.login_success'));
         }
 

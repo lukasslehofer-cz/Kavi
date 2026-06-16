@@ -15,9 +15,9 @@ class LoginController extends Controller
 
     public function showLoginForm(Request $request)
     {
-        // Store redirect URL in session if provided
-        if ($request->has('redirect')) {
-            session(['url.intended' => $request->input('redirect')]);
+        // Store redirect URL in session if provided (only safe internal paths)
+        if ($redirect = safeRedirectPath($request->input('redirect'))) {
+            session(['url.intended' => $redirect]);
         }
         
         return view('auth.login');
