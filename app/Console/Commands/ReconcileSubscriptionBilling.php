@@ -84,8 +84,10 @@ class ReconcileSubscriptionBilling extends Command
             $nbd = $subscription->next_billing_date?->copy();
             if ($nbd && $nbd->lte(today())) {
                 $anchor = $nbd;
+                $anchorIsHistorical = false;
             } else {
                 $anchor = $subscription->last_payment_failure_at?->copy();
+                $anchorIsHistorical = true;
             }
 
             if (! $anchor) {
@@ -117,8 +119,23 @@ class ReconcileSubscriptionBilling extends Command
 
             $reason = $subscription->last_payment_failure_reason ?? 'Reconciled unpaid period';
 
+            // The reconciled period is itself an unpaid shipment, so the
+            // consecutive-unpaid counter must be at least 1 (this backfills the
+            // already-abandoned period the old logic hid). Live charge failures
+            // then increment it further for subsequent unpaid periods.
+            $newConsecutive = max((int) $subscription->consecutive_unpaid_shipments, 1);
+
+            // For a historical failure the subscription already advanced to a
+            // future period, so the leftover per-shipment reminder count is stale
+            // (it was cumulative under the old logic). Reset it so the next period
+            // gets a clean 3-reminder cycle. For an overdue period the count is
+            // still meaningful, so keep it.
+            $newFailureCount = $anchorIsHistorical ? 0 : (int) $subscription->payment_failure_count;
+
             $this->line("   → period {$periodEnd->toDateString()}: ".
-                ($existing ? 'failed record exists, ensuring shipment visible' : 'creating failed record + unpaid shipment'));
+                ($existing ? 'failed record exists, ensuring shipment visible' : 'creating failed record + unpaid shipment').
+                "; consecutive_unpaid {$subscription->consecutive_unpaid_shipments} → {$newConsecutive}".
+                ($anchorIsHistorical ? "; failure_count {$subscription->payment_failure_count} → {$newFailureCount} (stale reset)" : ''));
 
             if ($isDryRun) {
                 $changed++;
@@ -145,12 +162,13 @@ class ReconcileSubscriptionBilling extends Command
             // skipped/pending row or creates one), linked to the failed record.
             $shipmentService->markShipmentUnpaid($payment->refresh(), $subscription);
 
-            // Only flag the subscription itself as an ongoing problem when it is
-            // still unpaid; an active subscription that already moved on keeps the
-            // unpaid month only as history and must not be forced red in the list.
-            if ($subscription->status === 'unpaid' && (int) $subscription->consecutive_unpaid_shipments < 1) {
-                $subscription->update(['consecutive_unpaid_shipments' => 1]);
-            }
+            // Count this already-abandoned period toward the consecutive-unpaid
+            // total so it is visible as a payment problem, and clear any stale
+            // per-shipment reminder count.
+            $subscription->update([
+                'consecutive_unpaid_shipments' => $newConsecutive,
+                'payment_failure_count' => $newFailureCount,
+            ]);
 
             $changed++;
         }
