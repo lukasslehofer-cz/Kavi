@@ -132,10 +132,20 @@ class ReconcileSubscriptionBilling extends Command
             // still meaningful, so keep it.
             $newFailureCount = $anchorIsHistorical ? 0 : (int) $subscription->payment_failure_count;
 
+            // Reflect the outstanding debt in the status column too, so admin and
+            // the customer dashboard show it as unpaid (consistent with a live
+            // failure). Only convert states that would otherwise hide the problem
+            // — an active subscription, or one paused specifically by the payment
+            // failure — never a user-requested pause / cancelled / complimentary.
+            $convertStatus = $subscription->status === 'active'
+                || ($subscription->status === 'paused' && $subscription->pause_reason === 'payment_failure_skip');
+            $newStatus = $convertStatus ? 'unpaid' : $subscription->status;
+
             $this->line("   → period {$periodEnd->toDateString()}: ".
                 ($existing ? 'failed record exists, ensuring shipment visible' : 'creating failed record + unpaid shipment').
                 "; consecutive_unpaid {$subscription->consecutive_unpaid_shipments} → {$newConsecutive}".
-                ($anchorIsHistorical ? "; failure_count {$subscription->payment_failure_count} → {$newFailureCount} (stale reset)" : ''));
+                ($anchorIsHistorical ? "; failure_count {$subscription->payment_failure_count} → {$newFailureCount} (stale reset)" : '').
+                ($convertStatus ? "; status {$subscription->status} → {$newStatus}" : ''));
 
             if ($isDryRun) {
                 $changed++;
@@ -163,12 +173,20 @@ class ReconcileSubscriptionBilling extends Command
             $shipmentService->markShipmentUnpaid($payment->refresh(), $subscription);
 
             // Count this already-abandoned period toward the consecutive-unpaid
-            // total so it is visible as a payment problem, and clear any stale
-            // per-shipment reminder count.
-            $subscription->update([
+            // total so it is visible as a payment problem, clear any stale
+            // per-shipment reminder count, and surface the debt in the status.
+            $updates = [
                 'consecutive_unpaid_shipments' => $newConsecutive,
                 'payment_failure_count' => $newFailureCount,
-            ]);
+            ];
+            if ($convertStatus) {
+                $updates['status'] = 'unpaid';
+                // A payment-failure pause becomes a plain unpaid state.
+                $updates['paused_until_date'] = null;
+                $updates['pause_reason'] = null;
+                $updates['paused_iterations'] = null;
+            }
+            $subscription->update($updates);
 
             $changed++;
         }

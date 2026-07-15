@@ -458,7 +458,9 @@
                     </div>
 
                     <!-- Payment Issue Warning (not shown for complimentary) -->
-                    @if(!$subscription->isComplimentary() && $subscription->status === 'unpaid')
+                    {{-- hasPaymentIssue() covers 'unpaid' as well as a subscription paused after
+                         exhausting its payment reminders, so the customer keeps seeing it. --}}
+                    @if(!$subscription->isComplimentary() && $subscription->hasPaymentIssue())
                     <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6">
                         <div class="flex items-start gap-3">
                             <svg class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
