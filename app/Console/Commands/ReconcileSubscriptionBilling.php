@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ShipmentSchedule;
 use App\Models\Subscription;
 use App\Models\SubscriptionPayment;
 use App\Services\SubscriptionShipmentService;
@@ -59,17 +60,48 @@ class ReconcileSubscriptionBilling extends Command
         foreach ($subscriptions as $subscription) {
             $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
 
-            // Period currently being billed (catch-up to the present, same as the
-            // charge/failure paths).
-            $periodEnd = $subscription->next_billing_date?->copy();
-            if ($periodEnd) {
-                $safety = 24;
-                while ($periodEnd->lt(today()) && $safety-- > 0) {
-                    $periodEnd->addMonths($frequencyMonths);
-                }
-            } else {
-                $periodEnd = today()->copy();
+            // Diagnostics — print what we actually see, so the state is auditable.
+            $this->line('');
+            $this->line("── {$subscription->subscription_number} (id {$subscription->id})");
+            $this->line("   status={$subscription->status}".
+                ' next_billing='.($subscription->next_billing_date?->toDateString() ?? 'null').
+                " failure_count={$subscription->payment_failure_count}".
+                " consecutive_unpaid={$subscription->consecutive_unpaid_shipments}");
+            $this->line('   last_failure_at='.($subscription->last_payment_failure_at?->toDateString() ?? 'null').
+                ' pending_invoice='.($subscription->pending_invoice_id ?? 'null'));
+            foreach ($subscription->shipments()->orderBy('shipment_date')->get() as $sh) {
+                $this->line("     · {$sh->shipment_date->toDateString()}  {$sh->status}".
+                    ($sh->subscription_payment_id ? "  (payment #{$sh->subscription_payment_id})" : ''));
             }
+
+            // Pick the period to reconcile:
+            //  1. If next_billing_date is overdue, THAT is the period currently
+            //     failing — reconcile it (the active problem).
+            //  2. Otherwise the subscription has already advanced to a future
+            //     period, so the failure is historical — anchor on when it
+            //     actually failed (last_payment_failure_at), never the future
+            //     next_billing_date.
+            $nbd = $subscription->next_billing_date?->copy();
+            if ($nbd && $nbd->lte(today())) {
+                $anchor = $nbd;
+            } else {
+                $anchor = $subscription->last_payment_failure_at?->copy();
+            }
+
+            if (! $anchor) {
+                $this->line('   → no overdue or recorded failure to reconcile (skipping)');
+                continue;
+            }
+
+            // period_end = billing date of the anchor month.
+            $schedule = ShipmentSchedule::getForMonth($anchor->year, $anchor->month);
+            $periodEnd = $schedule?->billing_date?->copy() ?? $anchor->copy()->day(15);
+
+            if ($periodEnd->gt(today())) {
+                $this->line("   → computed period {$periodEnd->toDateString()} is in the future — subscription already moved past the failure (skipping)");
+                continue;
+            }
+
             $periodStart = $periodEnd->copy()->subMonths($frequencyMonths);
 
             // Already covered by a paid or failed record for this period? Nothing to do.
@@ -79,13 +111,14 @@ class ReconcileSubscriptionBilling extends Command
                 ->first();
 
             if ($existing && $existing->status === 'paid') {
+                $this->line("   → period {$periodEnd->toDateString()} already paid (skipping)");
                 continue;
             }
 
             $reason = $subscription->last_payment_failure_reason ?? 'Reconciled unpaid period';
 
-            $this->line("  {$subscription->subscription_number}: period {$periodEnd->toDateString()} — ".
-                ($existing ? 'failed record exists' : 'creating failed record')." (status={$subscription->status})");
+            $this->line("   → period {$periodEnd->toDateString()}: ".
+                ($existing ? 'failed record exists, ensuring shipment visible' : 'creating failed record + unpaid shipment'));
 
             if ($isDryRun) {
                 $changed++;
@@ -108,36 +141,22 @@ class ReconcileSubscriptionBilling extends Command
             ]);
             $payment->save();
 
-            // Convert the hidden 'skipped' shipment for this period into a visible
-            // 'unpaid' one, or create it if missing.
-            $shipmentDate = $payment->expected_shipment_date;
-            if ($shipmentDate) {
-                $skipped = $subscription->shipments()
-                    ->whereDate('shipment_date', $shipmentDate->toDateString())
-                    ->where('status', 'skipped')
-                    ->whereNull('subscription_payment_id')
-                    ->first();
+            // Surface the shipment for that period as unpaid (converts an existing
+            // skipped/pending row or creates one), linked to the failed record.
+            $shipmentService->markShipmentUnpaid($payment->refresh(), $subscription);
 
-                if ($skipped) {
-                    $skipped->update([
-                        'status' => 'unpaid',
-                        'subscription_payment_id' => $payment->id,
-                        'notes' => 'Neuhrazená platba předplatného (reconcile)',
-                    ]);
-                } else {
-                    $shipmentService->markShipmentUnpaid($payment, $subscription);
-                }
-            }
-
-            // Ensure the consecutive-unpaid counter reflects at least this period.
-            if ((int) $subscription->consecutive_unpaid_shipments < 1) {
+            // Only flag the subscription itself as an ongoing problem when it is
+            // still unpaid; an active subscription that already moved on keeps the
+            // unpaid month only as history and must not be forced red in the list.
+            if ($subscription->status === 'unpaid' && (int) $subscription->consecutive_unpaid_shipments < 1) {
                 $subscription->update(['consecutive_unpaid_shipments' => 1]);
             }
 
             $changed++;
         }
 
-        $this->info(($isDryRun ? '[DRY RUN] ' : '')."Done. {$changed} subscription(s) ".($isDryRun ? 'would be' : '')." reconciled.");
+        $this->line('');
+        $this->info(($isDryRun ? '[DRY RUN] ' : '')."Done. {$changed} subscription(s) ".($isDryRun ? 'would be ' : '')."reconciled.");
 
         return self::SUCCESS;
     }
