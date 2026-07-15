@@ -88,6 +88,7 @@ return [
     'delivered' => 'Doručeno',
     'submitted' => 'Odesláno k přepravci',
     'skipped' => 'Přeskočeno',
+    'unpaid' => 'Neuhrazeno',
     'tracking' => 'Sledování',
     'track_package' => 'Sledovat zásilku',
     'skipped_shipments' => 'Přeskočené rozesílky',

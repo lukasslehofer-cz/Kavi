@@ -599,6 +599,10 @@
                                     <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
                                         ⏸ {{ __('dashboard.skipped') ?? 'Přeskočeno' }}
                                     </span>
+                                @elseif($shipment->status === 'unpaid')
+                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800 border border-red-200">
+                                        ⚠️ {{ __('dashboard.unpaid') ?? 'Neuhrazeno' }}
+                                    </span>
                                 @elseif($shipment->status === 'cancelled')
                                     <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">
                                         ✕ {{ __('dashboard.cancelled') ?? 'Zrušeno' }}

@@ -71,6 +71,16 @@ class SubscriptionShipment extends Model
     }
 
     /**
+     * Shipment abandoned because its charge was never paid (after exhausting
+     * the reminder attempts). Kept as a durable record linked to the failed
+     * payment so admin shows it as "Neuhrazeno" instead of hiding it.
+     */
+    public function isUnpaid(): bool
+    {
+        return $this->status === 'unpaid';
+    }
+
+    /**
      * Check if shipment is pending
      */
     public function isPending(): bool
@@ -152,6 +162,14 @@ class SubscriptionShipment extends Model
     }
 
     /**
+     * Scope to get unpaid (abandoned after failed payment) shipments
+     */
+    public function scopeUnpaid($query)
+    {
+        return $query->where('status', 'unpaid');
+    }
+
+    /**
      * Get human-readable status label
      */
     public function getStatusLabelAttribute(): string
@@ -161,6 +179,7 @@ class SubscriptionShipment extends Model
             'sent' => __('shipments.status.sent'),
             'delivered' => __('shipments.status.delivered'),
             'skipped' => __('shipments.status.skipped'),
+            'unpaid' => __('shipments.status.unpaid'),
             'cancelled' => __('shipments.status.cancelled'),
             default => $this->status,
         };
@@ -173,7 +192,7 @@ class SubscriptionShipment extends Model
     public function getSequenceNumber(): int
     {
         return $this->subscription->shipments()
-            ->whereNotIn('status', ['cancelled', 'skipped'])
+            ->whereNotIn('status', ['cancelled', 'skipped', 'unpaid'])
             ->where('shipment_date', '<=', $this->shipment_date)
             ->count();
     }

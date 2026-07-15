@@ -23,10 +23,12 @@ class Subscription extends Model
         'stripe_payment_intent_id',
         'status',
         'payment_failure_count',
+        'consecutive_unpaid_shipments',
         'last_payment_failure_at',
         'last_payment_failure_reason',
         'pending_invoice_id',
         'pending_invoice_amount',
+        'cancellation_reason',
         'starts_at',
         'next_billing_date',
         'last_shipment_date',
@@ -72,6 +74,8 @@ class Subscription extends Model
         'configuration' => 'array',
         'shipping_address' => 'array',
         'configured_price' => 'decimal:2',
+        'payment_failure_count' => 'integer',
+        'consecutive_unpaid_shipments' => 'integer',
         'vat_rate' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'pending_invoice_amount' => 'decimal:2',
@@ -130,7 +134,24 @@ class Subscription extends Model
 
     public function hasPaymentIssue(): bool
     {
-        return $this->isUnpaid() || $this->payment_failure_count > 0;
+        return $this->isUnpaid()
+            || $this->payment_failure_count > 0
+            || $this->consecutive_unpaid_shipments > 0;
+    }
+
+    /**
+     * Subscriptions with an unresolved payment problem, regardless of their
+     * current status. A subscription paused after exhausting its reminders
+     * still owes money, so it must remain discoverable in admin even though
+     * its status column reads 'paused' rather than 'unpaid'.
+     */
+    public function scopeWithPaymentIssue($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('status', 'unpaid')
+                ->orWhere('payment_failure_count', '>', 0)
+                ->orWhere('consecutive_unpaid_shipments', '>', 0);
+        });
     }
 
     public function isComplimentary(): bool

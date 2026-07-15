@@ -16,7 +16,10 @@ class SubscriptionPayment extends Model
         'amount',
         'currency',
         'status',
+        'failure_reason',
+        'attempts',
         'paid_at',
+        'last_attempt_at',
         'period_start',
         'period_end',
         'fakturoid_invoice_id',
@@ -26,7 +29,9 @@ class SubscriptionPayment extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'attempts' => 'integer',
         'paid_at' => 'datetime',
+        'last_attempt_at' => 'datetime',
         'period_start' => 'date',
         'period_end' => 'date',
     ];
@@ -47,6 +52,11 @@ class SubscriptionPayment extends Model
     public function isPaid(): bool
     {
         return $this->status === 'paid';
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->status === 'failed';
     }
 
     /**

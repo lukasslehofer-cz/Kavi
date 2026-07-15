@@ -29,10 +29,10 @@
             <p class="text-3xl font-bold text-green-700">{{ $stats['active'] }}</p>
             <p class="text-sm text-green-600 mt-1">Aktivní</p>
         </div>
-        <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 text-center shadow-sm border-2 border-red-300 {{ ($stats['unpaid'] ?? 0) > 0 ? 'ring-2 ring-red-500 ring-offset-2' : '' }}">
-            <p class="text-3xl font-bold text-red-700">{{ $stats['unpaid'] ?? 0 }}</p>
+        <a href="{{ route('admin.subscriptions.index', ['status' => 'payment_issue']) }}" class="block bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 text-center shadow-sm border-2 border-red-300 hover:from-red-100 hover:to-red-200 transition-colors {{ ($stats['payment_issue'] ?? 0) > 0 ? 'ring-2 ring-red-500 ring-offset-2' : '' }}">
+            <p class="text-3xl font-bold text-red-700">{{ $stats['payment_issue'] ?? 0 }}</p>
             <p class="text-sm text-red-600 mt-1 font-semibold">⚠️ Neuhrazeno</p>
-        </div>
+        </a>
         <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 text-center shadow-sm border border-blue-200">
             <p class="text-3xl font-bold text-blue-700">{{ $stats['trialing'] }}</p>
             <p class="text-sm text-blue-600 mt-1">Zkušební</p>
@@ -70,6 +70,7 @@
                 <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Všechny</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktivní</option>
+                    <option value="payment_issue" {{ request('status') === 'payment_issue' ? 'selected' : '' }}>⚠️ Platební problém (vše)</option>
                     <option value="unpaid" {{ request('status') === 'unpaid' ? 'selected' : '' }}>⚠️ Neuhrazeno</option>
                     <option value="trialing" {{ request('status') === 'trialing' ? 'selected' : '' }}>Zkušební</option>
                     <option value="paused" {{ request('status') === 'paused' ? 'selected' : '' }}>Pauza</option>
@@ -109,7 +110,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($subscriptions as $subscription)
-                    <tr class="hover:bg-gray-50 transition-colors {{ $subscription->status === 'unpaid' ? 'bg-red-50 border-l-4 border-red-500' : '' }}">
+                    <tr class="hover:bg-gray-50 transition-colors {{ $subscription->hasPaymentIssue() ? 'bg-red-50 border-l-4 border-red-500' : '' }}">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="font-mono text-sm font-medium text-gray-900">{{ $subscription->subscription_number ?? '#' . $subscription->id }}</span>
                         </td>
@@ -181,6 +182,18 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Zrušeno</span>
                             @else
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ $subscription->status }}</span>
+                            @endif
+
+                            {{-- Payment problem that is hidden behind a non-unpaid status (e.g. paused after exhausting reminders) --}}
+                            @if($subscription->status !== 'unpaid' && $subscription->hasPaymentIssue())
+                            <div class="mt-1">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300">
+                                    ⚠️ Neuhrazeno
+                                </span>
+                                @if($subscription->consecutive_unpaid_shipments > 0)
+                                <div class="text-xs text-red-700 mt-1">Neuhrazených rozesílek po sobě: {{ $subscription->consecutive_unpaid_shipments }}</div>
+                                @endif
+                            </div>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
