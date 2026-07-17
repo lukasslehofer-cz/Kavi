@@ -777,6 +777,8 @@ class StripeService
                         'status' => 'active',
                         'next_billing_date' => $nextBillingDate,
                         'payment_failure_count' => 0,
+                        // Ruční doplacení stejně jako úspěšný cron ruší sérii neuhrazených rozesílek.
+                        'consecutive_unpaid_shipments' => 0,
                         'last_payment_failure_at' => null,
                         'last_payment_failure_reason' => null,
                         'pending_invoice_id' => null,
