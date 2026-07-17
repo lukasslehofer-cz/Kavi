@@ -371,15 +371,10 @@
                 </div>
                 
                 <!-- Payment Failure Warning -->
-                @if($subscription->hasPaymentIssue())
+                @if($subscription->status === 'unpaid' && $subscription->pending_invoice_id)
                 <div class="mt-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
                     <h4 class="text-sm font-bold text-red-900 mb-2">⚠️ Neuhrazená platba</h4>
                     <div class="text-xs text-red-800 space-y-1">
-                        @if($subscription->status === 'paused')
-                        <div class="pb-2 mb-2 border-b border-red-300 font-semibold">
-                            Předplatné je pozastaveno kvůli neúspěšné platbě, ale stále má neuhrazenou rozesílku.
-                        </div>
-                        @endif
                         @if($subscription->pending_invoice_amount)
                         <div class="flex justify-between font-semibold">
                             <span>K úhradě:</span>
@@ -387,10 +382,7 @@
                         </div>
                         @endif
                         @if($subscription->payment_failure_count)
-                        <div>Počet pokusů (aktuální rozesílka): {{ $subscription->payment_failure_count }}</div>
-                        @endif
-                        @if($subscription->consecutive_unpaid_shipments)
-                        <div>Neuhrazených rozesílek po sobě: {{ $subscription->consecutive_unpaid_shipments }}</div>
+                        <div>Počet pokusů: {{ $subscription->payment_failure_count }}</div>
                         @endif
                         @if($subscription->last_payment_failure_at)
                         <div>Poslední pokus: {{ $subscription->last_payment_failure_at->format('d.m.Y H:i') }}</div>
@@ -518,10 +510,6 @@
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     ⏸ Přeskočeno (pauza)
                                 </span>
-                                @elseif($shipment->status === 'unpaid')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-300">
-                                    ⚠️ Neuhrazeno
-                                </span>
                                 @elseif($shipment->status === 'cancelled')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                     Zrušeno
@@ -553,20 +541,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4">
-                                @if($shipment->payment && $shipment->payment->isFailed())
-                                <div class="text-sm">
-                                    <div class="font-bold text-red-700">⚠️ Neuhrazeno</div>
-                                    @if($shipment->payment->attempts)
-                                    <div class="text-xs text-red-600">Pokusů: {{ $shipment->payment->attempts }}</div>
-                                    @endif
-                                    @if($shipment->payment->last_attempt_at)
-                                    <div class="text-xs text-gray-500">Poslední pokus: {{ $shipment->payment->last_attempt_at->format('d.m.Y') }}</div>
-                                    @endif
-                                    @if($shipment->payment->failure_reason)
-                                    <div class="text-xs text-red-600 max-w-xs truncate" title="{{ $shipment->payment->failure_reason }}">{{ $shipment->payment->failure_reason }}</div>
-                                    @endif
-                                </div>
-                                @elseif($shipment->payment)
+                                @if($shipment->payment)
                                 <div class="text-sm">
                                     <div class="font-medium text-gray-900">{{ $shipment->payment->invoice_number ?? 'FID ' . $shipment->payment->fakturoid_invoice_id }}</div>
                                     @if($shipment->payment->paid_at)

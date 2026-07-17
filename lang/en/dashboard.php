@@ -88,7 +88,6 @@ return [
     'delivered' => 'Delivered',
     'submitted' => 'Submitted to carrier',
     'skipped' => 'Skipped',
-    'unpaid' => 'Unpaid',
     'tracking' => 'Tracking',
     'track_package' => 'Track package',
     'skipped_shipments' => 'Skipped shipments',

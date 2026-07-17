@@ -745,34 +745,21 @@ class SubscriptionShipmentService
             return null;
         }
 
-        // Try to find existing shipment for this date. Includes 'unpaid' so that a
-        // shipment previously abandoned after a failed charge gets reclaimed (and
-        // flipped back to pending) once the payment finally succeeds, instead of
-        // spawning a duplicate pending shipment for the same date.
+        // Try to find existing pending shipment for this date (without payment link)
         $shipment = $subscription->shipments()
             ->whereDate('shipment_date', $shipmentDate->toDateString())
-            ->whereIn('status', ['pending', 'sent', 'unpaid'])
+            ->whereIn('status', ['pending', 'sent'])
             ->first();
 
         if ($shipment) {
-            $shipmentUpdates = [];
+            // Link existing shipment to this payment (if not already linked)
             if (! $shipment->subscription_payment_id) {
-                $shipmentUpdates['subscription_payment_id'] = $payment->id;
-            }
-            // A now-paid shipment must leave the 'unpaid' state so it gets shipped.
-            if ($shipment->status === 'unpaid' && $payment->status === 'paid') {
-                $shipmentUpdates['subscription_payment_id'] = $payment->id;
-                $shipmentUpdates['status'] = 'pending';
-            }
-
-            if (! empty($shipmentUpdates)) {
-                $shipment->update($shipmentUpdates);
+                $shipment->update(['subscription_payment_id' => $payment->id]);
 
                 \Log::info('Linked existing shipment to payment', [
                     'shipment_id' => $shipment->id,
                     'payment_id' => $payment->id,
                     'shipment_date' => $shipmentDate->toDateString(),
-                    'new_status' => $shipment->status,
                 ]);
             }
 
@@ -798,56 +785,6 @@ class SubscriptionShipmentService
         ]);
 
         return $shipment;
-    }
-
-    /**
-     * Mark the shipment for a failed payment's period as unpaid and link it to
-     * the failed SubscriptionPayment, so admin shows it as "Neuhrazeno" instead
-     * of a blank/skipped cell. Creates the shipment row if it doesn't exist yet.
-     * Never touches an already sent/delivered shipment.
-     */
-    public function markShipmentUnpaid(SubscriptionPayment $payment, Subscription $subscription): ?SubscriptionShipment
-    {
-        $shipmentDate = $payment->expected_shipment_date;
-
-        if (! $shipmentDate) {
-            \Log::warning('Cannot mark shipment as unpaid - no expected shipment date', [
-                'payment_id' => $payment->id,
-                'subscription_id' => $subscription->id,
-            ]);
-
-            return null;
-        }
-
-        $shipment = $subscription->shipments()
-            ->whereDate('shipment_date', $shipmentDate->toDateString())
-            ->first();
-
-        if ($shipment) {
-            // Don't clobber a shipment that already went out.
-            if (in_array($shipment->status, ['sent', 'delivered'])) {
-                return $shipment;
-            }
-
-            $shipment->update([
-                'status' => 'unpaid',
-                'subscription_payment_id' => $payment->id,
-                'notes' => 'Neuhrazená platba předplatného',
-            ]);
-
-            return $shipment;
-        }
-
-        $schedule = ShipmentSchedule::getForMonth($shipmentDate->year, $shipmentDate->month);
-
-        return $subscription->shipments()->create([
-            'shipment_date' => $shipmentDate,
-            'shipment_schedule_id' => $schedule?->id,
-            'subscription_payment_id' => $payment->id,
-            'status' => 'unpaid',
-            'notes' => 'Neuhrazená platba předplatného',
-            ...$this->getPackageDimensions($subscription),
-        ]);
     }
 
     /**

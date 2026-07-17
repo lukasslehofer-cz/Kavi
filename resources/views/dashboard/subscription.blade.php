@@ -458,9 +458,7 @@
                     </div>
 
                     <!-- Payment Issue Warning (not shown for complimentary) -->
-                    {{-- hasPaymentIssue() covers 'unpaid' as well as a subscription paused after
-                         exhausting its payment reminders, so the customer keeps seeing it. --}}
-                    @if(!$subscription->isComplimentary() && $subscription->hasPaymentIssue())
+                    @if(!$subscription->isComplimentary() && $subscription->status === 'unpaid')
                     <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6">
                         <div class="flex items-start gap-3">
                             <svg class="w-6 h-6 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -600,10 +598,6 @@
                                 @elseif($shipment->status === 'skipped')
                                     <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
                                         ⏸ {{ __('dashboard.skipped') ?? 'Přeskočeno' }}
-                                    </span>
-                                @elseif($shipment->status === 'unpaid')
-                                    <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800 border border-red-200">
-                                        ⚠️ {{ __('dashboard.unpaid') ?? 'Neuhrazeno' }}
                                     </span>
                                 @elseif($shipment->status === 'cancelled')
                                     <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">

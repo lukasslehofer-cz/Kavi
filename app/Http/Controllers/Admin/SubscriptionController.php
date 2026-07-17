@@ -25,13 +25,7 @@ class SubscriptionController extends Controller
 
         // Filter by status if provided
         if ($request->has('status') && $request->status !== 'all') {
-            if ($request->status === 'payment_issue') {
-                // Any unresolved payment problem, regardless of status column
-                // (unpaid, or paused after exhausting reminders, etc.).
-                $query->withPaymentIssue();
-            } else {
-                $query->where('status', $request->status);
-            }
+            $query->where('status', $request->status);
         }
 
         // Search by user name or email
@@ -51,9 +45,6 @@ class SubscriptionController extends Controller
             'total' => Subscription::count(),
             'active' => Subscription::where('status', 'active')->count(),
             'unpaid' => Subscription::where('status', 'unpaid')->count(),
-            // Everything that still owes money, including subscriptions paused
-            // after exhausting their reminders (status column no longer 'unpaid').
-            'payment_issue' => Subscription::withPaymentIssue()->count(),
             'trialing' => Subscription::where('status', 'trialing')->count(),
             'paused' => Subscription::where('status', 'paused')->count(),
             'complimentary' => Subscription::where('status', 'complimentary')->count(),

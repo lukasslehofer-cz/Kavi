@@ -2742,39 +2742,17 @@ class StripeService
 
                 $periodStart = $periodEnd?->copy()->subMonths($frequencyMonths);
 
-                // Promote an existing 'failed' record for this period to 'paid'
-                // (keeps the shipment link intact), otherwise create a fresh row.
-                $payment = $periodEnd
-                    ? \App\Models\SubscriptionPayment::where('subscription_id', $subscription->id)
-                        ->where('status', 'failed')
-                        ->whereDate('period_end', $periodEnd->toDateString())
-                        ->first()
-                    : null;
-
-                if ($payment) {
-                    $payment->update([
-                        'stripe_payment_intent_id' => $paymentIntent->id,
-                        'amount' => $amount,
-                        'currency' => $subscriptionCurrency,
-                        'status' => 'paid',
-                        'paid_at' => now(),
-                        'failure_reason' => null,
-                        'period_start' => $periodStart,
-                        'period_end' => $periodEnd,
-                    ]);
-                } else {
-                    // Record successful payment
-                    $payment = \App\Models\SubscriptionPayment::create([
-                        'subscription_id' => $subscription->id,
-                        'stripe_payment_intent_id' => $paymentIntent->id,
-                        'amount' => $amount,
-                        'currency' => $subscriptionCurrency,
-                        'status' => 'paid',
-                        'paid_at' => now(),
-                        'period_start' => $periodStart,
-                        'period_end' => $periodEnd,
-                    ]);
-                }
+                // Record successful payment
+                $payment = \App\Models\SubscriptionPayment::create([
+                    'subscription_id' => $subscription->id,
+                    'stripe_payment_intent_id' => $paymentIntent->id,
+                    'amount' => $amount,
+                    'currency' => $subscriptionCurrency,
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'period_start' => $periodStart,
+                    'period_end' => $periodEnd,
+                ]);
 
                 // Update subscription
                 $nextBillingDate = $this->calculateNextBillingDate($periodEnd, $frequencyMonths);
@@ -2782,7 +2760,6 @@ class StripeService
                 $updates = [
                     'next_billing_date' => $nextBillingDate,
                     'payment_failure_count' => 0,
-                    'consecutive_unpaid_shipments' => 0,
                     'last_payment_failure_at' => null,
                     'last_payment_failure_reason' => null,
                     'pending_invoice_id' => null,
@@ -2964,15 +2941,7 @@ class StripeService
      */
     public function handleSubscriptionPaymentFailure(Subscription $subscription, string $errorMessage): void
     {
-        // Reminder attempt counter for the CURRENT shipment (not cumulative across
-        // the whole lifetime — that was the bug that pushed old subscriptions
-        // straight past the threshold and disguised them as a normal pause).
         $failureCount = $subscription->payment_failure_count + 1;
-        $retryAttempts = max(1, (int) config('subscriptions.payment_retry_attempts', 3));
-
-        // Persist a durable 'failed' payment record for this period and surface the
-        // current shipment as unpaid, so it never silently disappears from admin.
-        $this->recordFailedSubscriptionPayment($subscription, $errorMessage);
 
         $subscription->update([
             'status' => 'unpaid',
@@ -2983,7 +2952,7 @@ class StripeService
             'pending_invoice_amount' => $this->calculatePendingAmount($subscription),
         ]);
 
-        // Send reminder email
+        // Send failure email
         try {
             $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
             if ($email) {
@@ -2996,172 +2965,30 @@ class StripeService
             ]);
         }
 
-        // Remindery pro aktuální rozesílku ještě nejsou vyčerpané → jen zůstat 'unpaid'
-        // a příští běh billing cronu to zkusí znovu (denní retry bucket).
-        if ($failureCount < $retryAttempts) {
-            return;
-        }
-
-        // Remindery vyčerpány → aktuální rozesílku "vynecháme". Per-shipment čítač
-        // se resetuje (příští období počítáme s uživatelem jakoby se nic nestalo),
-        // ale počet neuhrazených rozesílek po sobě roste.
-        $consecutiveUnpaid = $subscription->consecutive_unpaid_shipments + 1;
-        $subscription->update([
-            'payment_failure_count' => 0,
-            'consecutive_unpaid_shipments' => $consecutiveUnpaid,
-        ]);
-
-        // Tři neuhrazené rozesílky po sobě → automatické zrušení předplatného.
-        $cancelThreshold = max(1, (int) config('subscriptions.unpaid_shipments_before_cancel', 3));
-        if ($consecutiveUnpaid >= $cancelThreshold) {
-            $this->autoCancelSubscriptionForNonPayment($subscription, $errorMessage);
-
-            return;
-        }
-
-        // Jinak: přepnout do pauzy jako při běžné uživatelské pauze. pauseSubscription
-        // označí aktuální (neuhrazenou) zásilku, vytvoří post-pause pending řádek a
-        // nastaví paused_until_date; příští cyklus převezme subscriptions:resume-paused.
-        try {
-            app(\App\Services\SubscriptionShipmentService::class)
-                ->pauseSubscription($subscription, 1, 'payment_failure_skip');
-
-            \Log::warning('Subscription paused for one cycle after exhausting payment reminders', [
-                'subscription_id' => $subscription->id,
-                'subscription_number' => $subscription->subscription_number,
-                'consecutive_unpaid_shipments' => $consecutiveUnpaid,
-            ]);
-        } catch (\Exception $e) {
-            // Fallback — pokud pauseSubscription selže (např. stock check),
-            // alespoň přepneme status, ať předplatné nejedeme dál v retry smyčce.
-            $subscription->update(['status' => 'paused']);
-            \Log::error('pauseSubscription failed during payment-failure handler — falling back to bare paused status', [
-                'subscription_id' => $subscription->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Record (or update) a durable 'failed' SubscriptionPayment row for the
-     * subscription's current billing period and link the matching shipment as
-     * unpaid. One row per (subscription, period_end); each retry bumps attempts.
-     *
-     * Runs OUTSIDE the charge transaction (the caller invokes it after rollback),
-     * so the record survives even though the charge attempt was rolled back.
-     */
-    private function recordFailedSubscriptionPayment(Subscription $subscription, string $errorMessage): ?\App\Models\SubscriptionPayment
-    {
-        try {
-            $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
-
-            // Same catch-up logic as the success path so period_end lands on the
-            // period actually being billed (not a stale past date).
-            $periodEnd = $subscription->next_billing_date?->copy();
-            if ($periodEnd) {
-                $safetyLimit = 24;
-                while ($periodEnd->lt(today()) && $safetyLimit-- > 0) {
-                    $periodEnd->addMonths($frequencyMonths);
-                }
-            } else {
-                $periodEnd = today();
-            }
-            $periodStart = $periodEnd->copy()->subMonths($frequencyMonths);
-
-            $payment = \App\Models\SubscriptionPayment::firstOrNew([
-                'subscription_id' => $subscription->id,
-                'status' => 'failed',
-                'period_end' => $periodEnd->toDateString(),
-            ]);
-
-            $payment->fill([
-                'amount' => $this->calculatePendingAmount($subscription),
-                'currency' => strtolower($subscription->currency ?? 'CZK'),
-                'period_start' => $periodStart,
-                'period_end' => $periodEnd,
-                'failure_reason' => $errorMessage,
-                'attempts' => ($payment->attempts ?? 0) + 1,
-                'last_attempt_at' => now(),
-            ]);
-            $payment->save();
-
-            // Surface the current shipment as unpaid, linked to this failed payment.
+        // Po 3. (a každém dalším) failure předplatné "vynechá" měsíc jako
+        // při běžné uživatelské pauze: pauseSubscription označí aktuální zásilku
+        // jako skipped, vytvoří post-pause pending řádek a nastaví paused_until_date.
+        // Příští měsíc převezme cron subscriptions:resume-paused a billing cron
+        // zkusí naúčtovat znovu. Bez tohohle by status='paused' + NULL
+        // paused_until_date byl zombie, kterého žádný cron nezachytí.
+        if ($failureCount >= 3) {
             try {
                 app(\App\Services\SubscriptionShipmentService::class)
-                    ->markShipmentUnpaid($payment, $subscription);
-            } catch (\Exception $e) {
-                \Log::error('Failed to mark shipment as unpaid', [
+                    ->pauseSubscription($subscription, 1, 'payment_failure_skip');
+
+                \Log::warning('Subscription paused for one cycle after 3 payment failures', [
                     'subscription_id' => $subscription->id,
-                    'payment_id' => $payment->id,
+                    'subscription_number' => $subscription->subscription_number,
+                ]);
+            } catch (\Exception $e) {
+                // Fallback — pokud pauseSubscription selže (např. stock check),
+                // alespoň přepneme status, ať předplatné nejedeme dál v retry smyčce.
+                $subscription->update(['status' => 'paused']);
+                \Log::error('pauseSubscription failed during 3-failure handler — falling back to bare paused status', [
+                    'subscription_id' => $subscription->id,
                     'error' => $e->getMessage(),
                 ]);
             }
-
-            return $payment;
-        } catch (\Exception $e) {
-            \Log::error('Failed to record failed subscription payment', [
-                'subscription_id' => $subscription->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return null;
-        }
-    }
-
-    /**
-     * Automatically cancel a subscription after too many consecutive unpaid
-     * shipments. Keeps all data; only flips status and notifies.
-     */
-    private function autoCancelSubscriptionForNonPayment(Subscription $subscription, string $errorMessage): void
-    {
-        $subscription->update([
-            'status' => 'cancelled',
-            'ends_at' => now(),
-            'paused_iterations' => null,
-            'paused_until_date' => null,
-            'pause_reason' => null,
-            'cancellation_reason' => 'payment_failure_auto',
-        ]);
-
-        \Log::warning('Subscription auto-cancelled after consecutive unpaid shipments', [
-            'subscription_id' => $subscription->id,
-            'subscription_number' => $subscription->subscription_number,
-            'consecutive_unpaid_shipments' => $subscription->consecutive_unpaid_shipments,
-            'last_error' => $errorMessage,
-        ]);
-
-        // Notify the customer (reuse the standard cancellation email).
-        try {
-            $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
-            if ($email) {
-                \Mail::to($email)->send(new \App\Mail\SubscriptionCancelled($subscription));
-            }
-        } catch (\Throwable $e) {
-            \Log::error('Failed to send subscription auto-cancel email', [
-                'subscription_id' => $subscription->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-
-        // Alert admin.
-        try {
-            $adminEmail = config('mail.from.address');
-            if ($adminEmail) {
-                \Mail::raw(
-                    "Subscription auto-cancelled after {$subscription->consecutive_unpaid_shipments} consecutive unpaid shipments.\n\n".
-                    'Subscription: '.($subscription->subscription_number ?? '#'.$subscription->id)."\n".
-                    'Last error: '.$errorMessage,
-                    function ($message) use ($adminEmail, $subscription) {
-                        $message->to($adminEmail)
-                            ->subject('Subscription auto-cancelled (non-payment) - '.($subscription->subscription_number ?? '#'.$subscription->id));
-                    }
-                );
-            }
-        } catch (\Throwable $e) {
-            \Log::error('Failed to send admin auto-cancel alert', [
-                'subscription_id' => $subscription->id,
-                'error' => $e->getMessage(),
-            ]);
         }
     }
 
