@@ -2760,6 +2760,8 @@ class StripeService
                 $updates = [
                     'next_billing_date' => $nextBillingDate,
                     'payment_failure_count' => 0,
+                    // Úspěšná platba ruší sérii neuhrazených rozesílek.
+                    'consecutive_unpaid_shipments' => 0,
                     'last_payment_failure_at' => null,
                     'last_payment_failure_reason' => null,
                     'pending_invoice_id' => null,
@@ -2972,6 +2974,25 @@ class StripeService
         // zkusí naúčtovat znovu. Bez tohohle by status='paused' + NULL
         // paused_until_date byl zombie, kterého žádný cron nezachytí.
         if ($failureCount >= 3) {
+            // Remindery pro TUTO rozesílku jsou vyčerpány → rozesílka se přeskočí.
+            // payment_failure_count resetujeme, aby příští rozesílka začínala načisto:
+            // dřív byl čítač kumulativní za celý život předplatného (nulovala ho jen
+            // úspěšná platba), takže staré předplatné překročilo práh hned prvním
+            // selháním a o 3 remindery přišlo.
+            $consecutiveUnpaid = $subscription->consecutive_unpaid_shipments + 1;
+
+            $subscription->update([
+                'payment_failure_count' => 0,
+                'consecutive_unpaid_shipments' => $consecutiveUnpaid,
+            ]);
+
+            // 3 neuhrazené rozesílky za sebou → předplatné zrušit.
+            if ($consecutiveUnpaid >= 3) {
+                $this->cancelSubscriptionForNonPayment($subscription, $errorMessage);
+
+                return;
+            }
+
             try {
                 app(\App\Services\SubscriptionShipmentService::class)
                     ->pauseSubscription($subscription, 1, 'payment_failure_skip');
@@ -2979,6 +3000,7 @@ class StripeService
                 \Log::warning('Subscription paused for one cycle after 3 payment failures', [
                     'subscription_id' => $subscription->id,
                     'subscription_number' => $subscription->subscription_number,
+                    'consecutive_unpaid_shipments' => $consecutiveUnpaid,
                 ]);
             } catch (\Exception $e) {
                 // Fallback — pokud pauseSubscription selže (např. stock check),
@@ -2989,6 +3011,65 @@ class StripeService
                     'error' => $e->getMessage(),
                 ]);
             }
+        }
+    }
+
+    /**
+     * Zrušení předplatného po 3 neuhrazených rozesílkách za sebou.
+     *
+     * Nepoužívá Subscription::cancel() — ten dopočítává "paid coverage" a posunul by
+     * ends_at na poslední zaplacenou rozesílku. Tady rušíme okamžitě.
+     */
+    private function cancelSubscriptionForNonPayment(Subscription $subscription, string $errorMessage): void
+    {
+        $subscription->update([
+            'status' => 'cancelled',
+            'ends_at' => now(),
+            'paused_iterations' => null,
+            'paused_until_date' => null,
+            'pause_reason' => null,
+            'cancellation_reason' => 'payment_failure_auto',
+            // Zrušené předplatné nedluží — rozesílky se přeskočily, není za co vybírat.
+            'pending_invoice_id' => null,
+            'pending_invoice_amount' => null,
+        ]);
+
+        \Log::warning('Subscription auto-cancelled after 3 consecutive unpaid shipments', [
+            'subscription_id' => $subscription->id,
+            'subscription_number' => $subscription->subscription_number,
+            'last_error' => $errorMessage,
+        ]);
+
+        try {
+            $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
+            if ($email) {
+                \Mail::to($email)->send(new \App\Mail\SubscriptionCancelled($subscription));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Failed to send auto-cancel email', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        try {
+            $adminEmail = config('mail.from.address');
+            if ($adminEmail) {
+                \Mail::raw(
+                    'Předplatné '.($subscription->subscription_number ?? '#'.$subscription->id).
+                    " bylo automaticky zrušeno po 3 neuhrazených rozesílkách za sebou.\n\n".
+                    'Poslední chyba: '.$errorMessage,
+                    function ($message) use ($adminEmail, $subscription) {
+                        $message->to($adminEmail)
+                            ->subject('Automatické zrušení předplatného (neplacení) - '.($subscription->subscription_number ?? '#'.$subscription->id));
+                    }
+                );
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Failed to send admin auto-cancel alert', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
