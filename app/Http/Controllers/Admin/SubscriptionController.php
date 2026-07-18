@@ -241,11 +241,13 @@ class SubscriptionController extends Controller
                 $q->whereNotNull('subscription_payment_id')
                 // 2. OR subscription meets pause criteria
                 ->orWhereHas('subscription', function($q2) use ($billingDate) {
-                    $q2->where(function($q3) use ($billingDate) {
-                        $q3->where('status', '!=', 'paused')
-                           ->orWhereNull('paused_until_date')
-                           ->orWhere('paused_until_date', '<=', $billingDate);
-                    });
+                    // Never ship an unpaid subscription (no successful payment yet)
+                    $q2->where('status', '!=', 'unpaid')
+                       ->where(function($q3) use ($billingDate) {
+                            $q3->where('status', '!=', 'paused')
+                               ->orWhereNull('paused_until_date')
+                               ->orWhere('paused_until_date', '<=', $billingDate);
+                       });
                 });
             })
             ->get();
@@ -335,11 +337,13 @@ class SubscriptionController extends Controller
             ->where(function($q) use ($billingDate) {
                 $q->whereNotNull('subscription_payment_id')
                   ->orWhereHas('subscription', function($q2) use ($billingDate) {
-                      $q2->where(function($q3) use ($billingDate) {
-                          $q3->where('status', '!=', 'paused')
-                             ->orWhereNull('paused_until_date')
-                             ->orWhere('paused_until_date', '<=', $billingDate);
-                      });
+                      // Never ship an unpaid subscription (no successful payment yet)
+                      $q2->where('status', '!=', 'unpaid')
+                         ->where(function($q3) use ($billingDate) {
+                             $q3->where('status', '!=', 'paused')
+                                ->orWhereNull('paused_until_date')
+                                ->orWhere('paused_until_date', '<=', $billingDate);
+                         });
                   });
             })
             ->get();

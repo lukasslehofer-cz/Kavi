@@ -839,6 +839,8 @@ class SubscriptionShipmentService
         return SubscriptionShipment::with(['subscription.user', 'subscription.plan', 'payment'])
             ->whereDate('shipment_date', $date->toDateString())
             ->where('status', 'pending')
+            // Never ship an unpaid subscription (no successful payment yet)
+            ->whereHas('subscription', fn ($q) => $q->where('status', '!=', 'unpaid'))
             ->get()
             ->map(fn ($shipment) => $shipment->subscription)
             ->filter() // Remove nulls
