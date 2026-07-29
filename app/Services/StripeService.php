@@ -1078,6 +1078,12 @@ class StripeService
      */
     public function handleSubscriptionCreated(array $subscriptionData): void
     {
+        // KROK 11: legacy Stripe-managed billing se nepoužívá (0 subs se stripe_subscription_id).
+        // Handler je inertní – webhook už ho nevolá (viz PaymentController), tohle je pojistka.
+        \Log::warning('Legacy handleSubscriptionCreated invoked; ignoring (custom billing je autoritativní)');
+
+        return;
+
         \Log::info('handleSubscriptionCreated called', [
             'subscription_id' => $subscriptionData['id'] ?? 'unknown',
             'metadata' => $subscriptionData['metadata'] ?? [],
@@ -1751,6 +1757,11 @@ class StripeService
      */
     public function handleSubscriptionUpdated(array $subscriptionData): void
     {
+        // KROK 11: legacy Stripe-managed billing – inertní no-op.
+        \Log::warning('Legacy handleSubscriptionUpdated invoked; ignoring');
+
+        return;
+
         $subscription = Subscription::where('stripe_subscription_id', $subscriptionData['id'])->first();
 
         if ($subscription) {
@@ -1803,6 +1814,11 @@ class StripeService
      */
     public function handleSubscriptionDeleted(array $subscriptionData): void
     {
+        // KROK 11: legacy Stripe-managed billing – inertní no-op.
+        \Log::warning('Legacy handleSubscriptionDeleted invoked; ignoring');
+
+        return;
+
         $subscription = Subscription::where('stripe_subscription_id', $subscriptionData['id'])->first();
 
         if ($subscription) {
@@ -1818,6 +1834,12 @@ class StripeService
      */
     public function handleInvoicePaymentSucceeded(array $invoiceData): void
     {
+        // KROK 11: legacy Stripe-managed billing – inertní no-op. Recurring platby jedou
+        // přes vlastní billing cron (chargeSubscriptionPayment), ne přes invoice webhook.
+        \Log::warning('Legacy handleInvoicePaymentSucceeded invoked; ignoring');
+
+        return;
+
         $subscriptionId = $invoiceData['subscription'] ?? null;
 
         if ($subscriptionId) {
@@ -2052,6 +2074,12 @@ class StripeService
      */
     public function handleInvoicePaymentFailed(array $invoiceData): void
     {
+        // KROK 11: legacy Stripe-managed billing – inertní no-op. Selhání recurring plateb
+        // řeší handleSubscriptionPaymentFailure z billing cronu.
+        \Log::warning('Legacy handleInvoicePaymentFailed invoked; ignoring');
+
+        return;
+
         $subscriptionId = $invoiceData['subscription'] ?? null;
 
         if ($subscriptionId) {
@@ -2658,7 +2686,7 @@ class StripeService
      * @param  Subscription  $subscription  The subscription to charge
      * @return array ['success' => bool, 'payment_intent_id' => string|null, 'error' => string|null]
      */
-    public function chargeSubscriptionPayment(Subscription $subscription): array
+    public function chargeSubscriptionPayment(Subscription $subscription, ?\App\Models\SubscriptionShipment $targetShipment = null): array
     {
         // Idempotency check - has this been charged today already?
         if ($subscription->payments()->whereDate('paid_at', today())->exists()) {
@@ -2708,6 +2736,13 @@ class StripeService
                 'currency' => $subscriptionCurrency,
             ]);
 
+            // Idempotency key stabilní pro daný billing cyklus předplatného.
+            // Zabrání dvojímu STRŽENÍ při retry (network error v cronu / rollback po capture):
+            // Stripe vrátí tentýž PaymentIntent místo nového stržení. Klíč se mění až s
+            // posunem next_billing_date (tj. po úspěšné platbě dalšího cyklu).
+            $idempotencyKey = 'sub_charge_'.$subscription->id.'_'
+                .($subscription->next_billing_date?->format('Ymd') ?? now()->format('Ymd'));
+
             // Create and confirm payment intent
             $paymentIntent = \Stripe\PaymentIntent::create([
                 'amount' => (int) (round($amount) * 100), // Convert to cents
@@ -2722,6 +2757,8 @@ class StripeService
                     'subscription_number' => $subscription->subscription_number ?? '',
                     'billing_date' => now()->toDateString(),
                 ],
+            ], [
+                'idempotency_key' => $idempotencyKey,
             ]);
 
             // Check if payment succeeded
@@ -2777,17 +2814,33 @@ class StripeService
                     $updates['status'] = 'active';
                 }
 
-                $subscription->update($updates);
+                // Po CAPTURE jsou peníze strženy – žádná chyba v následných krocích už
+                // NESMÍ probublat do outer catch, jinak by cron rollbacknul právě vytvořený
+                // payment řádek k reálně stržené platbě a příště by hrozilo dvojí stržení.
+                try {
+                    $subscription->update($updates);
 
-                // Handle coupon countdown
-                if ($subscription->coupon_id && $subscription->discount_amount > 0) {
-                    app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
+                    // Handle coupon countdown
+                    if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                        app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
+                    }
+                } catch (\Throwable $e) {
+                    \Log::error('Post-capture subscription update failed (platba zůstává platná)', [
+                        'subscription_id' => $subscription->id,
+                        'payment_id' => $payment->id,
+                        'error' => $e->getMessage(),
+                    ]);
                 }
 
-                // Link payment to pending shipment
+                // Explicitní vazba platby na KONKRÉTNÍ zásilku, kterou cron vybral jako due.
+                // Bez cíle fallback na odvození přes expected_shipment_date (legacy cesty).
                 try {
                     $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
-                    $shipmentService->linkPaymentToShipment($payment, $subscription);
+                    if ($targetShipment) {
+                        $shipmentService->linkPaymentToShipmentRow($payment, $targetShipment);
+                    } else {
+                        $shipmentService->linkPaymentToShipment($payment, $subscription);
+                    }
                 } catch (\Exception $e) {
                     \Log::error('Failed to link payment to shipment', [
                         'payment_id' => $payment->id,

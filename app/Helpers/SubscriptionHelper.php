@@ -113,58 +113,10 @@ class SubscriptionHelper
      */
     public static function calculateNextShipmentDate($subscription): ?Carbon
     {
-        $frequencyMonths = $subscription->frequency_months ?? 1;
-        $lastShipmentDate = $subscription->last_shipment_date;
-        
-        if (!$lastShipmentDate) {
-            // First shipment - find next scheduled shipment
-            $createdAt = $subscription->created_at;
-            $createdYear = $createdAt->year;
-            $createdMonth = $createdAt->month;
-            
-            // Get current month's schedule
-            $currentSchedule = ShipmentSchedule::getForMonth($createdYear, $createdMonth);
-            
-            if ($currentSchedule && $createdAt->lessThanOrEqualTo($currentSchedule->billing_date)) {
-                // Created before or ON billing date, can get this month's shipment
-                return $currentSchedule->shipment_date->copy()->startOfDay();
-            }
-            
-            // Otherwise, get next month's schedule
-            $nextMonth = $createdAt->copy()->addMonthNoOverflow();
-            $nextSchedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
-            
-            if ($nextSchedule) {
-                return $nextSchedule->shipment_date->copy()->startOfDay();
-            }
-            
-            // Fallback to old logic
-            if ($createdAt->day > 15) {
-                return Carbon::parse($createdAt)->addMonthNoOverflow()->day(20)->startOfDay();
-            } else {
-                return Carbon::parse($createdAt)->day(20)->startOfDay();
-            }
-        }
-        
-        // Special handling for subscriptions that were/are paused
-        // If pause has expired (or ends today), calculate from pause end date instead of last shipment
-        if ($subscription->paused_until_date && $subscription->paused_until_date->lte(Carbon::now()->endOfDay())) {
-            // Calculate next shipment after pause ended
-            $baseDate = $subscription->paused_until_date->copy();
-            $nextDate = self::getNextShipmentAfterDate($subscription, $baseDate);
-            return $nextDate;
-        }
-        
-        // Calculate next shipment based on last one + frequency
-        $nextDate = Carbon::parse($lastShipmentDate)->addMonths($frequencyMonths);
-        $nextSchedule = ShipmentSchedule::getForMonth($nextDate->year, $nextDate->month);
-        
-        if ($nextSchedule) {
-            return $nextSchedule->shipment_date->copy()->startOfDay();
-        }
-        
-        // Fallback
-        return $nextDate->day(20)->startOfDay();
+        // KROK 7: Jediný výpočtový engine je SubscriptionShipmentService (ledger-first).
+        // Tento helper zůstává jen tenkým delegátorem kvůli zpětné kompatibilitě volajících.
+        return app(\App\Services\SubscriptionShipmentService::class)
+            ->calculateNextShipmentDate($subscription);
     }
 
     /**
@@ -241,27 +193,9 @@ class SubscriptionHelper
      */
     public static function hasPaidCoverageForDate($subscription, Carbon $date): bool
     {
-        // If shipment date is before next_billing_date, it's covered.
-        // next_billing_date represents the NEXT payment date, so everything before it is already paid.
-        // This handles race conditions where payment was processed but subscription_payments
-        // record hasn't been created yet (e.g., webhook delay).
-        if ($subscription->next_billing_date && $date->lt($subscription->next_billing_date)) {
-            return true;
-        }
-
-        // Initial shipment coverage: if customer just subscribed and hasn't received any shipment yet,
-        // the first scheduled shipment (per configurator rules) is considered covered by the initial payment
-        if (self::isInitialShipmentCovered($subscription, $date)) {
-            return true;
-        }
-
-        // Check payment periods
-        // period_end is EXCLUSIVE (it's the next billing date), so use > not >=
-        return $subscription->payments()
-            ->where('status', 'paid')
-            ->whereDate('period_start', '<=', $date->toDateString())
-            ->whereDate('period_end', '>', $date->toDateString())
-            ->exists();
+        // KROK 7: delegace na jediný engine (ledger-first coverage).
+        return app(\App\Services\SubscriptionShipmentService::class)
+            ->hasPaidCoverageForDate($subscription, $date);
     }
 
     /**
@@ -270,18 +204,9 @@ class SubscriptionHelper
      */
     public static function isInitialShipmentCovered($subscription, Carbon $date): bool
     {
-        // No shipment sent yet
-        if ($subscription->last_shipment_date) {
-            return false;
-        }
-
-        // First scheduled shipment for this subscription
-        $firstScheduled = self::calculateNextShipmentDate($subscription);
-        if (!$firstScheduled) {
-            return false;
-        }
-
-        return $firstScheduled->isSameDay($date);
+        // KROK 7: delegace na jediný engine.
+        return app(\App\Services\SubscriptionShipmentService::class)
+            ->isInitialShipmentCovered($subscription, $date);
     }
 
     /**
@@ -290,28 +215,10 @@ class SubscriptionHelper
      */
     public static function getFirstUnpaidShipmentDate($subscription): Carbon
     {
-        $frequencyMonths = max(1, (int)($subscription->frequency_months ?? 1));
-        $candidate = self::calculateNextShipmentDate($subscription) ?? self::getNextShippingDate();
-
-        // Ensure we start from a future date (today or later)
-        // This fixes the bug where old last_shipment_date would cause past dates to be returned
-        $today = Carbon::now()->startOfDay();
-        while ($candidate->lt($today)) {
-            $candidate = $candidate->copy()->addMonths($frequencyMonths);
-        }
-
-        // Iterate through cadence until we find a date not covered by a paid period
-        $guard = 0;
-        while ($guard < 24) { // prevent infinite loops
-            if (!self::hasPaidCoverageForDate($subscription, $candidate)) {
-                return $candidate->copy()->startOfDay();
-            }
-            $candidate = $candidate->copy()->addMonths($frequencyMonths);
-            $guard++;
-        }
-
-        // Fallback (should not happen)
-        return $candidate->copy()->startOfDay();
+        // KROK 7: delegace na jediný engine; fallback zajistí nenullový návrat.
+        return app(\App\Services\SubscriptionShipmentService::class)
+            ->getFirstUnpaidShipmentDate($subscription)
+            ?? self::getNextShippingDate();
     }
 
     /**

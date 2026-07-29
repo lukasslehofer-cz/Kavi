@@ -581,83 +581,14 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Get or create draft shipment for subscription on given date
+     * Get or create draft shipment for subscription on given date.
+     * Deleguje na centrální SubscriptionShipmentService – jediný idempotentní creator
+     * klíčovaný na (subscription, schedule). Vlastní duplicitní logika (findPaymentForShipment,
+     * ruční ->create) byla odstraněna v KROKU 5 revize.
      */
     private function getOrCreateShipment(Subscription $subscription, \Carbon\Carbon $shipmentDate): \App\Models\SubscriptionShipment
     {
-        // Check if shipment already exists
-        $shipment = $subscription->shipments()
-            ->forDate($shipmentDate)
-            ->first();
-        
-        if ($shipment) {
-            // Always re-link payment according to current logic
-            $payment = $this->findPaymentForShipment($subscription, $shipmentDate);
-            $newPaymentId = $payment?->id;
-            
-            // Update if payment link changed
-            if ($shipment->subscription_payment_id !== $newPaymentId) {
-                $shipment->update(['subscription_payment_id' => $newPaymentId]);
-                \Log::info('Updated shipment payment link', [
-                    'shipment_id' => $shipment->id,
-                    'old_payment_id' => $shipment->subscription_payment_id,
-                    'new_payment_id' => $newPaymentId,
-                ]);
-            }
-            return $shipment;
-        }
-        
-        // Get default dimensions from config based on subscription configuration
-        $config = is_string($subscription->configuration) 
-            ? json_decode($subscription->configuration, true) 
-            : $subscription->configuration;
-        
-        $amount = $config['amount'] ?? 2;
-        
-        // Find corresponding payment for this shipment
-        $payment = $this->findPaymentForShipment($subscription, $shipmentDate);
-        
-        // Create new draft shipment with default values
-        return $subscription->shipments()->create([
-            'shipment_date' => $shipmentDate,
-            'subscription_payment_id' => $payment?->id,
-            'package_weight' => \App\Models\SubscriptionConfig::get("package_{$amount}_weight", $amount * 0.25),
-            'package_length' => \App\Models\SubscriptionConfig::get("package_{$amount}_length", 30),
-            'package_width' => \App\Models\SubscriptionConfig::get("package_{$amount}_width", 20),
-            'package_height' => \App\Models\SubscriptionConfig::get("package_{$amount}_height", 10),
-            'carrier_id' => $subscription->carrier_id,
-            'carrier_pickup_point' => $subscription->carrier_pickup_point,
-            'status' => 'pending',
-        ]);
-    }
-
-    /**
-     * Find payment for given shipment date
-     * @deprecated Use SubscriptionShipmentService instead
-     */
-    private function findPaymentForShipment(Subscription $subscription, \Carbon\Carbon $shipmentDate): ?\App\Models\SubscriptionPayment
-    {
-        // Check for initial shipment (no shipment sent yet)
-        $hasSentShipments = $subscription->shipments()->whereIn('status', ['sent', 'delivered'])->exists();
-        
-        if (!$hasSentShipments) {
-            return $subscription->payments()
-                ->where('status', 'paid')
-                ->orderBy('paid_at', 'asc')
-                ->first();
-        }
-        
-        // For subsequent shipments, find payment where billing_date falls within period
-        // period_end is EXCLUSIVE (it's the next billing date), so use > not >=
-        $schedule = \App\Models\ShipmentSchedule::getForMonth($shipmentDate->year, $shipmentDate->month);
-        $billingDate = $schedule?->billing_date ?? $shipmentDate->copy()->day(15);
-        
-        return $subscription->payments()
-            ->where('status', 'paid')
-            ->whereDate('period_start', '<=', $billingDate)
-            ->whereDate('period_end', '>', $billingDate)
-            ->orderBy('paid_at', 'desc')
-            ->first();
+        return app(SubscriptionShipmentService::class)->getOrCreateShipment($subscription, $shipmentDate);
     }
 
     /**
@@ -707,6 +638,15 @@ class SubscriptionController extends Controller
             // Get dimensions and weight from shipment (can be customized per shipment)
             $weight = $shipment->package_weight;
             $packageSize = $shipment->getPackageDimensions();
+
+            // KROK 10: navázané addon objednávky se balí FYZICKY spolu s boxem –
+            // připočíst jejich váhu, ať zásilka nikdy neodejde s podhodnocenou hmotností.
+            $addonOrders = $shipment->addonOrders()
+                ->whereNotIn('status', ['shipped', 'delivered', 'cancelled'])
+                ->get();
+            foreach ($addonOrders as $addon) {
+                $weight = (float) $weight + $addon->getPackageWeight();
+            }
 
             // Prepare data for Packeta
             $name = $shippingAddress['name'] ?? $subscription->user->name ?? '';
@@ -768,17 +708,18 @@ class SubscriptionController extends Controller
                     // Get tracking URL from Packeta
                     $trackingUrl = $this->getPacketaTrackingUrl($result['id']);
                     
-                    // Use the central shipment service to mark as sent
+                    // Use the central shipment service to mark as sent.
+                    // KROK 8: tracking žije POUZE na řádku zásilky (ledger); duplicitní
+                    // zápis na subscription.packeta_* byl odstraněn – "poslední tracking"
+                    // se čte přes accessor $subscription->packeta_* → latestShipment.
                     $shipmentService = app(SubscriptionShipmentService::class);
                     $shipmentService->markAsShipped($shipment, $result['id'], $trackingUrl);
-                    
-                    // Update subscription packeta fields for backward compatibility
-                    $subscription->update([
-                        'packeta_packet_id' => $result['id'],
-                        'packeta_tracking_url' => $trackingUrl,
-                        'packeta_shipment_status' => 'sent',
-                        'packeta_sent_at' => now(),
-                    ]);
+
+                    // KROK 10: addon objednávky odeslané spolu s boxem označit jako shipped,
+                    // ať se nepošlou znovu samostatně.
+                    foreach ($addonOrders as $addon) {
+                        $addon->markAsShipped();
+                    }
 
                     // Send subscription shipped email
                     try {
@@ -1154,18 +1095,9 @@ class SubscriptionController extends Controller
         }
 
         try {
-            // Mark shipment as delivered - observer will send the email
-            $shipment->update([
-                'status' => 'delivered',
-                'delivered_at' => now(),
-                // If not sent yet, also set sent_at
-                'sent_at' => $shipment->sent_at ?? now(),
-            ]);
-
-            // Update subscription for backward compatibility
-            $shipment->subscription->update([
-                'packeta_shipment_status' => 'delivered',
-            ]);
+            // KROK 8: jediný zápis "doručeno" přes centrální službu; observer pošle e-mail.
+            // Zápis subscription.packeta_shipment_status byl odstraněn (sloupec zrušen).
+            app(SubscriptionShipmentService::class)->markAsDelivered($shipment);
 
             Log::info('Subscription shipment manually marked as delivered', [
                 'shipment_id' => $shipment->id,

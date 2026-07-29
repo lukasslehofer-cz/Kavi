@@ -2,160 +2,86 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\Subscription;
+use App\Models\SubscriptionPayment;
 use App\Models\SubscriptionShipment;
+use App\Services\SubscriptionShipmentService;
+use Illuminate\Console\Command;
 
+/**
+ * Backfill: naváže zaplacené platby, které nemají odpovídající řádek zásilky
+ * (subscription_shipments.subscription_payment_id), na jejich zásilku.
+ *
+ * KROK 6/9 revize: používá centrální SubscriptionShipmentService::linkPaymentToShipment
+ * (schedule-keyed, idempotentní). Obsolete migrace starých Packeta dat z `subscriptions`
+ * byla odstraněna – tracking žije na ledgeru a duplicitní sloupce na subscription zanikly.
+ */
 class LinkShipmentPayments extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'subscriptions:link-shipment-payments {--force : Force re-link even if already linked} {--migrate-packeta : Migrate old Packeta data from subscriptions}';
+    protected $signature = 'subscriptions:link-shipment-payments {--dry-run : Jen náhled, nic nezapisuje}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Link subscription shipments with their corresponding payments/invoices and optionally migrate old Packeta data';
+    protected $description = 'Naváže osiřelé zaplacené platby na jejich zásilku (ledger)';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    public function handle(SubscriptionShipmentService $shipmentService): int
     {
-        $this->info('Starting to link shipment payments...');
-        
-        // Get all shipments that need linking
-        $query = SubscriptionShipment::with(['subscription.payments']);
-        
-        if (!$this->option('force')) {
-            $query->whereNull('subscription_payment_id');
-        }
-        
-        $shipments = $query->get();
-        
-        if ($shipments->isEmpty()) {
-            $this->info('No shipments need linking.');
+        $dryRun = (bool) $this->option('dry-run');
+
+        // Paid platby, na které neukazuje žádná zásilka.
+        $referenced = SubscriptionShipment::whereNotNull('subscription_payment_id')
+            ->pluck('subscription_payment_id')
+            ->unique();
+
+        $orphans = SubscriptionPayment::with('subscription')
+            ->where('status', 'paid')
+            ->whereNotIn('id', $referenced)
+            ->get();
+
+        if ($orphans->isEmpty()) {
+            $this->info('✓ Žádné osiřelé zaplacené platby.');
+
             return 0;
         }
-        
-        $this->info("Found {$shipments->count()} shipments to process.");
-        
+
+        $this->info(($dryRun ? '🧪 DRY-RUN – ' : '')."Nalezeno {$orphans->count()} osiřelých plateb.");
+
         $linked = 0;
         $skipped = 0;
-        $failed = 0;
-        
-        $progressBar = $this->output->createProgressBar($shipments->count());
-        $progressBar->start();
-        
-        foreach ($shipments as $shipment) {
-            $payment = $this->findPaymentForShipment($shipment);
-            
-            if ($payment) {
-                $shipment->update(['subscription_payment_id' => $payment->id]);
-                $linked++;
-                
-                $this->newLine();
-                $this->line("✓ Linked shipment #{$shipment->id} ({$shipment->shipment_date->format('Y-m-d')}) with payment #{$payment->id}");
-            } else {
+
+        foreach ($orphans as $payment) {
+            $subNumber = $payment->subscription?->subscription_number ?? '#'.$payment->subscription_id;
+
+            if (! $payment->subscription) {
+                $this->warn("  ✗ Platba #{$payment->id}: chybí předplatné, přeskočeno");
                 $skipped++;
-                
-                if ($this->option('verbose')) {
-                    $this->newLine();
-                    $this->warn("✗ No payment found for shipment #{$shipment->id} ({$shipment->shipment_date->format('Y-m-d')})");
-                }
+
+                continue;
             }
-            
-            // Migrate old Packeta data if requested
-            if ($this->option('migrate-packeta')) {
-                $this->migratePacketaData($shipment);
+
+            if ($dryRun) {
+                $expected = $payment->expected_shipment_date?->toDateString() ?? '—';
+                $this->line("  [would] Platba #{$payment->id} ({$subNumber}) → zásilka pro {$expected}");
+                $linked++;
+
+                continue;
             }
-            
-            $progressBar->advance();
+
+            $shipment = $shipmentService->linkPaymentToShipment($payment, $payment->subscription);
+
+            if ($shipment && $shipment->subscription_payment_id === $payment->id) {
+                $this->line("  ✓ Platba #{$payment->id} ({$subNumber}) → zásilka #{$shipment->id} ({$shipment->shipment_date->format('Y-m-d')})");
+                $linked++;
+            } elseif ($shipment) {
+                // Měsíc už obsazen jinou platbou – historická anomálie k ruční revizi.
+                $this->warn("  ✗ Platba #{$payment->id} ({$subNumber}): zásilka #{$shipment->id} už patří platbě #{$shipment->subscription_payment_id} – ponechávám k ruční revizi");
+                $skipped++;
+            } else {
+                $this->warn("  ✗ Platba #{$payment->id} ({$subNumber}): nelze určit zásilku");
+                $skipped++;
+            }
         }
-        
-        $progressBar->finish();
-        $this->newLine(2);
-        
-        // Summary
-        $this->info('Summary:');
-        $this->table(
-            ['Status', 'Count'],
-            [
-                ['Linked', $linked],
-                ['Skipped (no payment)', $skipped],
-                ['Failed', $failed],
-            ]
-        );
-        
+
+        $this->newLine();
+        $this->info(($dryRun ? 'Navázalo by se' : 'Navázáno')." plateb: {$linked}, přeskočeno: {$skipped}.");
+
         return 0;
-    }
-    
-    /**
-     * Find payment for given shipment
-     */
-    private function findPaymentForShipment(SubscriptionShipment $shipment): ?\App\Models\SubscriptionPayment
-    {
-        $subscription = $shipment->subscription;
-        $shipmentDate = $shipment->shipment_date;
-        
-        // Look for payment where shipment_date falls within period_start and period_end
-        // or find the most recent payment before this shipment date
-        return $subscription->payments()
-            ->where('status', 'paid')
-            ->where(function($query) use ($shipmentDate) {
-                $query->where(function($q) use ($shipmentDate) {
-                    // Payment covers this date
-                    $q->whereDate('period_start', '<=', $shipmentDate)
-                      ->whereDate('period_end', '>=', $shipmentDate);
-                })->orWhere(function($q) use ($shipmentDate) {
-                    // Or find most recent payment before this date
-                    $q->whereDate('paid_at', '<=', $shipmentDate);
-                });
-            })
-            ->orderBy('paid_at', 'desc')
-            ->first();
-    }
-    
-    /**
-     * Migrate old Packeta data from subscription to shipment
-     */
-    private function migratePacketaData(SubscriptionShipment $shipment): void
-    {
-        $subscription = $shipment->subscription;
-        
-        // Check if subscription has old Packeta data
-        if (!$subscription->packeta_packet_id) {
-            return;
-        }
-        
-        // Check if this shipment was sent on or before last_shipment_date
-        // This helps identify which shipment the old data belongs to
-        if ($subscription->last_shipment_date && 
-            $shipment->shipment_date->lte($subscription->last_shipment_date)) {
-            
-            // Only migrate if shipment doesn't already have Packeta data
-            if (!$shipment->packeta_packet_id) {
-                $updateData = [
-                    'packeta_packet_id' => $subscription->packeta_packet_id,
-                    'packeta_tracking_url' => $subscription->packeta_tracking_url,
-                ];
-                
-                // Set status based on old packeta_shipment_status
-                if ($subscription->packeta_shipment_status === 'sent') {
-                    $updateData['status'] = 'sent';
-                    $updateData['sent_at'] = $subscription->packeta_sent_at ?? $subscription->updated_at;
-                }
-                
-                $shipment->update($updateData);
-                
-                $this->newLine();
-                $this->info("  ↳ Migrated Packeta data: {$subscription->packeta_packet_id}");
-            }
-        }
     }
 }

@@ -274,7 +274,9 @@ class ChargeSubscriptionPayments extends Command
                     // Use DB transaction for atomicity
                     DB::beginTransaction();
 
-                    $result = $stripeService->chargeSubscriptionPayment($subscription);
+                    // Explicitně předáme zásilku, kterou jsme vybrali jako due (gate),
+                    // aby se platba navázala přímo na ni a neodvozovala se znovu z period_end.
+                    $result = $stripeService->chargeSubscriptionPayment($subscription, $nextPendingShipment);
 
                     if ($result['success']) {
                         DB::commit();

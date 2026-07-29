@@ -61,15 +61,15 @@ class TestSubscriptionEmails extends Command
         
         // 3. Box Shipped
         $this->info('3/10 Sending: Box Shipped...');
-        // Set some test tracking data
-        $originalPacketId = $subscription->packeta_packet_id;
-        $originalTrackingUrl = $subscription->packeta_tracking_url;
-        $subscription->packeta_packet_id = 'Z123456789';
-        $subscription->packeta_tracking_url = 'https://tracking.packeta.com/cs/?id=Z123456789';
+        // KROK 8: tracking se čte přes accessor z latestShipment – podstrčíme fake zásilku.
+        $originalLatest = $subscription->relationLoaded('latestShipment') ? $subscription->getRelation('latestShipment') : null;
+        $subscription->setRelation('latestShipment', new \App\Models\SubscriptionShipment([
+            'packeta_packet_id' => 'Z123456789',
+            'packeta_tracking_url' => 'https://tracking.packeta.com/cs/?id=Z123456789',
+        ]));
         Mail::to($email)->send(new SubscriptionBoxShipped($subscription));
-        // Restore original values
-        $subscription->packeta_packet_id = $originalPacketId;
-        $subscription->packeta_tracking_url = $originalTrackingUrl;
+        // Restore original relation state
+        $subscription->setRelation('latestShipment', $originalLatest);
         $this->info('   ✓ Sent!');
         sleep(2);
         

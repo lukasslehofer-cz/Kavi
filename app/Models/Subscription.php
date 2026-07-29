@@ -31,7 +31,8 @@ class Subscription extends Model
         'cancellation_reason',
         'starts_at',
         'next_billing_date',
-        'last_shipment_date',
+        // KROK 9: last_shipment_date se už neukládá – je to accessor odvozený z ledgeru
+        // (MAX shipment_date z sent/delivered zásilek). Viz getLastShipmentDateAttribute.
         'ends_at',
         'delivery_notes',
         'configuration',
@@ -49,10 +50,9 @@ class Subscription extends Model
         'packeta_point_address',
         'carrier_id',
         'carrier_pickup_point',
-        'packeta_packet_id',
-        'packeta_tracking_url',
-        'packeta_shipment_status',
-        'packeta_sent_at',
+        // KROK 8: per-box Packeta tracking (packet_id, tracking_url, shipment_status, sent_at)
+        // se už NEukládá na subscription – žije na subscription_shipments (ledger).
+        // Čtení "posledního trackingu" jde přes accessor packeta_* → latestShipment.
         'shipping_cost',
         'shipping_country',
         'shipping_rate_id',
@@ -65,12 +65,10 @@ class Subscription extends Model
     protected $casts = [
         'starts_at' => 'date',
         'next_billing_date' => 'date',
-        'last_shipment_date' => 'date',
         'ends_at' => 'date',
         'paused_until_date' => 'date',
         'meta_capi_sent_at' => 'datetime',
         'last_payment_failure_at' => 'datetime',
-        'packeta_sent_at' => 'datetime',
         'configuration' => 'array',
         'shipping_address' => 'array',
         'configured_price' => 'decimal:2',
@@ -105,6 +103,46 @@ class Subscription extends Model
     public function shipments()
     {
         return $this->hasMany(SubscriptionShipment::class)->orderBy('shipment_date', 'desc');
+    }
+
+    /**
+     * KROK 8: Poslední odeslaná/doručená zásilka – jediný zdroj "aktuálního" trackingu.
+     */
+    public function latestShipment()
+    {
+        return $this->hasOne(SubscriptionShipment::class)
+            ->whereIn('status', ['sent', 'delivered'])
+            ->orderByDesc('shipment_date')
+            ->orderByDesc('id');
+    }
+
+    /**
+     * KROK 8: "Poslední Packeta tracking předplatného" se odvozuje z ledgeru,
+     * ne z (odstraněných) sloupců na subscription. Zachovává API $subscription->packeta_*
+     * pro stávající čtenáře (např. e-mail o odeslání boxu).
+     */
+    public function getPacketaTrackingUrlAttribute(): ?string
+    {
+        return $this->latestShipment?->packeta_tracking_url;
+    }
+
+    public function getPacketaPacketIdAttribute(): ?string
+    {
+        return $this->latestShipment?->packeta_packet_id;
+    }
+
+    /**
+     * KROK 9: last_shipment_date je odvozený z ledgeru = MAX(shipment_date) přes
+     * odeslané/doručené zásilky. Rodičovský sloupec byl odstraněn; tímto accessorem
+     * zůstává API $subscription->last_shipment_date funkční pro čtenáře (blade, cadence).
+     */
+    public function getLastShipmentDateAttribute(): ?\Carbon\Carbon
+    {
+        $max = $this->relationLoaded('shipments')
+            ? $this->shipments->whereIn('status', ['sent', 'delivered'])->max('shipment_date')
+            : $this->shipments()->whereIn('status', ['sent', 'delivered'])->max('shipment_date');
+
+        return $max ? \Carbon\Carbon::parse($max) : null;
     }
 
     public function coupon()
@@ -230,7 +268,9 @@ class Subscription extends Model
      */
     public function getNextShipmentDateAttribute(): ?\Carbon\Carbon
     {
-        return \App\Helpers\SubscriptionHelper::calculateNextShipmentDate($this);
+        // KROK 7: jediný zdroj pravdy = SubscriptionShipmentService (ledger-first).
+        return app(\App\Services\SubscriptionShipmentService::class)
+            ->calculateNextShipmentDate($this);
     }
 
     /**

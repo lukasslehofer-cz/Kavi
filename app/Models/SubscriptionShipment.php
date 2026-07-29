@@ -63,6 +63,16 @@ class SubscriptionShipment extends Model
     }
 
     /**
+     * KROK 10: Addon objednávky (doprava "Doručení s předplatným") navázané přímo
+     * na tuto zásilku – balí se fyzicky spolu s boxem.
+     */
+    public function addonOrders()
+    {
+        return $this->hasMany(\App\Models\Order::class, 'subscription_shipment_id')
+            ->where('shipped_with_subscription', true);
+    }
+
+    /**
      * Check if shipment was skipped (paused)
      */
     public function isSkipped(): bool
@@ -84,19 +94,6 @@ class SubscriptionShipment extends Model
     public function isSent(): bool
     {
         return in_array($this->status, ['sent', 'delivered']);
-    }
-
-    /**
-     * Mark shipment as sent
-     */
-    public function markAsSent(string $packetId, string $trackingUrl): void
-    {
-        $this->update([
-            'packeta_packet_id' => $packetId,
-            'packeta_tracking_url' => $trackingUrl,
-            'status' => 'sent',
-            'sent_at' => now(),
-        ]);
     }
 
     /**

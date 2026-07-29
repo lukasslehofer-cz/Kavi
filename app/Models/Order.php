@@ -14,6 +14,7 @@ class Order extends Model
         'user_id',
         'subscription_id',
         'shipment_schedule_id',
+        'subscription_shipment_id',
         'shipped_with_subscription',
         'subscription_addon_slots_used',
         'coupon_id',
@@ -114,6 +115,14 @@ class Order extends Model
     public function shipmentSchedule()
     {
         return $this->belongsTo(ShipmentSchedule::class);
+    }
+
+    /**
+     * KROK 10: Robustní vazba addon objednávky na konkrétní zásilku předplatného.
+     */
+    public function subscriptionShipment()
+    {
+        return $this->belongsTo(SubscriptionShipment::class);
     }
 
     public function markAsPaid()

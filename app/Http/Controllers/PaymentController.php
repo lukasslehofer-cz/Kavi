@@ -77,26 +77,12 @@ class PaymentController extends Controller
                 case 'checkout.session.completed':
                     $this->stripeService->handlePaymentSuccess($eventData);
                     break;
-                
-                case 'customer.subscription.created':
-                    $this->stripeService->handleSubscriptionCreated($eventData);
-                    break;
 
-                case 'customer.subscription.updated':
-                    $this->stripeService->handleSubscriptionUpdated($eventData);
-                    break;
-
-                case 'customer.subscription.deleted':
-                    $this->stripeService->handleSubscriptionDeleted($eventData);
-                    break;
-
-                case 'invoice.payment_succeeded':
-                    $this->stripeService->handleInvoicePaymentSucceeded($eventData);
-                    break;
-
-                case 'invoice.payment_failed':
-                    $this->stripeService->handleInvoicePaymentFailed($eventData);
-                    break;
+                // KROK 11 revize: legacy Stripe-managed billing (customer.subscription.*,
+                // invoice.payment_*) se už NEPOUŽÍVÁ – všechna předplatná jedou na vlastním
+                // billingu (0 subs se stripe_subscription_id). Tyto eventy proto neroutujeme;
+                // dřívější handlery zapisovaly next_billing_date/period jinak než custom billing
+                // a byly zdrojem rozjezdů. Případné eventy spadnou do default (jen log).
 
                 case 'payment_intent.payment_failed':
                     $this->stripeService->handleOrderPaymentFailed($eventData);

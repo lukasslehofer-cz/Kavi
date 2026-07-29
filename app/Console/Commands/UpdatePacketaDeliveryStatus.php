@@ -262,11 +262,9 @@ class UpdatePacketaDeliveryStatus extends Command
                 if ($status['isDelivered']) {
                     // Update shipment as delivered
                     if (!$dryRun) {
-                        $shipment->update([
-                            'status' => 'delivered',
-                            'delivered_at' => now(),
-                        ]);
-                        
+                        // KROK 8: jediný zápis "doručeno" přes centrální službu (observer pošle e-mail).
+                        app(\App\Services\SubscriptionShipmentService::class)->markAsDelivered($shipment);
+
                         Log::info('Subscription shipment marked as delivered from Packeta', [
                             'shipment_id' => $shipment->id,
                             'subscription_id' => $shipment->subscription_id,

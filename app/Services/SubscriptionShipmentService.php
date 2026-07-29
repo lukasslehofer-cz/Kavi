@@ -7,6 +7,7 @@ use App\Models\Subscription;
 use App\Models\SubscriptionPayment;
 use App\Models\SubscriptionShipment;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 
 /**
@@ -237,25 +238,11 @@ class SubscriptionShipmentService
             return null;
         }
 
-        // Check if shipment already exists for this date
-        $existing = $subscription->shipments()
-            ->whereDate('shipment_date', $nextDate->toDateString())
-            ->first();
+        $schedule = ShipmentSchedule::getOrCreateForMonth($nextDate->year, $nextDate->month);
+        $payment = $this->findPaymentForShipment($subscription, $schedule->shipment_date);
 
-        if ($existing) {
-            return $existing;
-        }
-
-        // Create new pending shipment
-        $schedule = ShipmentSchedule::getForMonth($nextDate->year, $nextDate->month);
-        $payment = $this->findPaymentForShipment($subscription, $nextDate);
-
-        return $subscription->shipments()->create([
-            'shipment_date' => $nextDate,
-            'shipment_schedule_id' => $schedule?->id,
+        return $this->getOrCreateForSchedule($subscription, $schedule, [
             'subscription_payment_id' => $payment?->id,
-            'status' => 'pending',
-            ...$this->getPackageDimensions($subscription),
         ]);
     }
 
@@ -394,9 +381,11 @@ class SubscriptionShipmentService
 
         // 4. Mark these dates as skipped (but preserve already paid shipments)
         foreach ($skippedDates as $date) {
+            $schedule = ShipmentSchedule::getOrCreateForMonth($date->year, $date->month);
+
             // Check if this shipment already has a payment - if so, don't skip it
             $existingShipment = $subscription->shipments()
-                ->whereDate('shipment_date', $date->toDateString())
+                ->where('shipment_schedule_id', $schedule->id)
                 ->first();
 
             if ($existingShipment && $existingShipment->subscription_payment_id) {
@@ -410,26 +399,22 @@ class SubscriptionShipmentService
                 continue; // Skip this one, it's already paid
             }
 
-            $subscription->shipments()->updateOrCreate(
-                ['shipment_date' => $date],
-                [
-                    'status' => 'skipped',
-                    'notes' => 'Paused by user: '.$reason,
-                ]
-            );
+            $skippedShipment = $this->updateOrCreateForSchedule($subscription, $schedule, [
+                'status' => 'skipped',
+                'notes' => 'Paused by user: '.$reason,
+            ]);
+
+            // KROK 10: addon objednávky přeskočeného boxu odpojit k ruční revizi.
+            $this->detachAddonOrders($skippedShipment, 'pause_skip');
         }
 
         // 5. Create pending shipment for date after pause
-        $schedule = ShipmentSchedule::getForMonth($candidate->year, $candidate->month);
-        $resumeDate = $schedule?->shipment_date ?? $candidate->copy()->day(20);
+        $resumeSchedule = ShipmentSchedule::getOrCreateForMonth($candidate->year, $candidate->month);
+        $resumeDate = $resumeSchedule->shipment_date;
 
-        $subscription->shipments()->updateOrCreate(
-            ['shipment_date' => $resumeDate],
-            [
-                'status' => 'pending',
-                'shipment_schedule_id' => $schedule?->id,
-            ]
-        );
+        $this->updateOrCreateForSchedule($subscription, $resumeSchedule, [
+            'status' => 'pending',
+        ]);
 
         // 6. Update subscription status
         // Use day after last skipped shipment so resume doesn't collide with shipment date (20th -> 21st)
@@ -641,19 +626,16 @@ class SubscriptionShipmentService
             ]);
         }
 
-        // Ensure pending shipment exists for the correct date
+        // Ensure pending shipment exists for the correct date (idempotentní, klíč = schedule)
+        $resumeSchedule = ShipmentSchedule::getOrCreateForMonth($nextShipmentDate->year, $nextShipmentDate->month);
         $existingForNewDate = $subscription->shipments()
-            ->whereDate('shipment_date', $nextShipmentDate->toDateString())
+            ->where('shipment_schedule_id', $resumeSchedule->id)
             ->first();
 
         $nextPending = null;
         if (! $existingForNewDate) {
-            // Create new pending shipment
-            $nextPending = $subscription->shipments()->create([
-                'shipment_date' => $nextShipmentDate,
-                'shipment_schedule_id' => $schedule?->id,
+            $nextPending = $this->getOrCreateForSchedule($subscription, $resumeSchedule, [
                 'status' => 'pending',
-                ...$this->getPackageDimensions($subscription),
             ]);
 
             \Log::info('Created pending shipment after resume', [
@@ -708,9 +690,18 @@ class SubscriptionShipmentService
             ->first();
 
         // Mark unpaid pending shipments as cancelled
-        $subscription->shipments()
+        $toCancel = $subscription->shipments()
             ->where('status', 'pending')
             ->whereDoesntHave('payment', fn ($q) => $q->where('status', 'paid'))
+            ->get();
+
+        // KROK 10: addon objednávky rušených boxů odpojit k ruční revizi.
+        foreach ($toCancel as $ship) {
+            $this->detachAddonOrders($ship, 'subscription_cancelled');
+        }
+
+        $subscription->shipments()
+            ->whereIn('id', $toCancel->pluck('id'))
             ->update(['status' => 'cancelled', 'notes' => 'Subscription cancelled']);
 
         $endsAt = $lastPaidShipment?->shipment_date ?? now();
@@ -745,43 +736,56 @@ class SubscriptionShipmentService
             return null;
         }
 
-        // Try to find existing pending shipment for this date (without payment link)
-        $shipment = $subscription->shipments()
-            ->whereDate('shipment_date', $shipmentDate->toDateString())
-            ->whereIn('status', ['pending', 'sent'])
-            ->first();
+        // Jediný idempotentní creator, klíčovaný na měsíc (schedule). Unique index
+        // zaručí, že se trefíme do existujícího řádku místo vytvoření duplicitního.
+        $schedule = ShipmentSchedule::getOrCreateForMonth($shipmentDate->year, $shipmentDate->month);
+        $shipment = $this->getOrCreateForSchedule($subscription, $schedule, [
+            'subscription_payment_id' => $payment->id,
+            'notes' => 'Created after payment',
+        ]);
 
-        if ($shipment) {
-            // Link existing shipment to this payment (if not already linked)
-            if (! $shipment->subscription_payment_id) {
-                $shipment->update(['subscription_payment_id' => $payment->id]);
-
-                \Log::info('Linked existing shipment to payment', [
-                    'shipment_id' => $shipment->id,
-                    'payment_id' => $payment->id,
-                    'shipment_date' => $shipmentDate->toDateString(),
-                ]);
+        // Navázat platbu, pokud řádek existoval bez ní. Zaplacený box "oživí"
+        // případný přeskočený/zrušený měsíc.
+        if (! $shipment->subscription_payment_id) {
+            $updates = ['subscription_payment_id' => $payment->id];
+            if (in_array($shipment->status, ['skipped', 'cancelled'], true)) {
+                $updates['status'] = 'pending';
             }
+            $shipment->update($updates);
 
+            \Log::info('Linked existing shipment to payment', [
+                'shipment_id' => $shipment->id,
+                'payment_id' => $payment->id,
+                'shipment_date' => optional($shipment->shipment_date)->toDateString(),
+                'reactivated' => isset($updates['status']),
+            ]);
+        }
+
+        return $shipment;
+    }
+
+    /**
+     * KROK 6: Explicitní navázání platby na KONKRÉTNÍ řádek zásilky (bez odvozování
+     * z period_end / expected_shipment_date). Volá se z billing cronu, který zásilku
+     * vybral jako due. Zaplacený box "oživí" případný přeskočený/zrušený měsíc.
+     */
+    public function linkPaymentToShipmentRow(SubscriptionPayment $payment, SubscriptionShipment $shipment): SubscriptionShipment
+    {
+        if ($shipment->subscription_payment_id === $payment->id) {
             return $shipment;
         }
 
-        // Create new pending shipment linked to this payment
-        $schedule = ShipmentSchedule::getForMonth($shipmentDate->year, $shipmentDate->month);
+        $updates = ['subscription_payment_id' => $payment->id];
+        if (in_array($shipment->status, ['skipped', 'cancelled'], true)) {
+            $updates['status'] = 'pending';
+        }
 
-        $shipment = $subscription->shipments()->create([
-            'shipment_date' => $shipmentDate,
-            'shipment_schedule_id' => $schedule?->id,
-            'subscription_payment_id' => $payment->id,
-            'status' => 'pending',
-            'notes' => 'Created after payment',
-            ...$this->getPackageDimensions($subscription),
-        ]);
+        $shipment->update($updates);
 
-        \Log::info('Created pending shipment for payment', [
+        \Log::info('Linked payment to explicit shipment row', [
             'shipment_id' => $shipment->id,
             'payment_id' => $payment->id,
-            'shipment_date' => $shipmentDate->toDateString(),
+            'reactivated' => isset($updates['status']),
         ]);
 
         return $shipment;
@@ -798,6 +802,10 @@ class SubscriptionShipmentService
         $updateData = [
             'status' => 'sent',
             'sent_at' => now(),
+            // KROK 8: zmrazit skutečně použitého dopravce/výdejní místo z AKTUÁLNÍ
+            // konfigurace předplatného v čase odeslání (ne ze zastaralé cache na řádku).
+            'carrier_id' => $shipment->subscription->carrier_id,
+            'carrier_pickup_point' => $shipment->subscription->carrier_pickup_point,
         ];
 
         if ($packetId !== null) {
@@ -809,10 +817,8 @@ class SubscriptionShipmentService
 
         $shipment->update($updateData);
 
-        // Update last_shipment_date on subscription as cache (backward compatibility)
-        $shipment->subscription->update([
-            'last_shipment_date' => $shipment->shipment_date,
-        ]);
+        // KROK 9: last_shipment_date se už neukládá – odvozuje se z ledgeru
+        // (accessor Subscription::last_shipment_date = MAX sent/delivered).
 
         // For one-time boxes, mark as completed
         if ($shipment->subscription->frequency_months == 0) {
@@ -827,6 +833,55 @@ class SubscriptionShipmentService
             'shipment_id' => $shipment->id,
             'subscription_id' => $shipment->subscription_id,
             'packeta_packet_id' => $packetId,
+        ]);
+    }
+
+    /**
+     * KROK 10: Odpojí addon objednávky navázané na zásilku a podrží je k RUČNÍMU řešení
+     * (dle rozhodnutí – žádné auto-přepojení). Volá se, když se box přeskočí/zruší, aby
+     * addon nezůstal tiše navázaný na měsíc, který se neodešle.
+     */
+    public function detachAddonOrders(SubscriptionShipment $shipment, string $reason): int
+    {
+        $orders = $shipment->addonOrders()
+            ->whereNotIn('status', ['shipped', 'delivered', 'cancelled'])
+            ->get();
+
+        foreach ($orders as $order) {
+            $order->update([
+                'subscription_shipment_id' => null,
+                'admin_notes' => trim(($order->admin_notes ? $order->admin_notes."\n" : '')
+                    .'['.now()->toDateString().'] Addon odpojen od zásilky #'.$shipment->id.' ('.$reason.') – k ruční revizi.'),
+            ]);
+
+            \Log::warning('Addon order detached from shipment for manual handling', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'shipment_id' => $shipment->id,
+                'reason' => $reason,
+            ]);
+        }
+
+        return $orders->count();
+    }
+
+    /**
+     * KROK 8: Jediný zápis stavu "doručeno". Nastaví status/delivered_at (a doplní sent_at,
+     * pokud chybí). Observer na základě změny delivered_at odešle e-mail o doručení boxu.
+     */
+    public function markAsDelivered(SubscriptionShipment $shipment, ?Carbon $deliveredAt = null): void
+    {
+        $when = $deliveredAt ?? now();
+
+        $shipment->update([
+            'status' => 'delivered',
+            'delivered_at' => $when,
+            'sent_at' => $shipment->sent_at ?? $when,
+        ]);
+
+        \Log::info('Shipment marked as delivered', [
+            'shipment_id' => $shipment->id,
+            'subscription_id' => $shipment->subscription_id,
         ]);
     }
 
@@ -848,29 +903,89 @@ class SubscriptionShipmentService
     }
 
     /**
+     * KROK 5: Jediný idempotentní creator zásilek, klíčovaný na (subscription, schedule).
+     *
+     * Díky unique(subscription_id, shipment_schedule_id) nemůže vzniknout duplicita:
+     * pro daný měsíc téhož předplatného existuje vždy nejvýš jeden řádek. shipment_date
+     * je denormalizovaná kopie z rozvrhu (nikdy match-klíč). $createAttributes se použijí
+     * jen při vytvoření nového řádku; existující se vrací beze změny.
+     */
+    public function getOrCreateForSchedule(Subscription $subscription, ShipmentSchedule $schedule, array $createAttributes = []): SubscriptionShipment
+    {
+        try {
+            return $subscription->shipments()->firstOrCreate(
+                ['shipment_schedule_id' => $schedule->id],
+                array_merge([
+                    'shipment_date' => $schedule->shipment_date->copy()->startOfDay(),
+                    'status' => 'pending',
+                    ...$this->getPackageDimensions($subscription),
+                ], $createAttributes)
+            );
+        } catch (QueryException $e) {
+            // Souběh: řádek vznikl mezi SELECT a INSERT (chytí unique index) – dohledej ho.
+            $existing = $subscription->shipments()
+                ->where('shipment_schedule_id', $schedule->id)
+                ->first();
+
+            if ($existing) {
+                return $existing;
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * KROK 5: get-or-create klíčovaný na schedule + aktualizace existujícího řádku danými
+     * hodnotami (např. status 'skipped'/'pending' při pauze/resume).
+     */
+    public function updateOrCreateForSchedule(Subscription $subscription, ShipmentSchedule $schedule, array $values = []): SubscriptionShipment
+    {
+        $shipment = $this->getOrCreateForSchedule($subscription, $schedule, $values);
+
+        // Při vytvoření už jsou $values aplikované přes firstOrCreate; na existující je doplň.
+        if (! $shipment->wasRecentlyCreated && ! empty($values)) {
+            $shipment->fill($values);
+            if ($shipment->isDirty()) {
+                $shipment->save();
+            }
+        }
+
+        return $shipment;
+    }
+
+    /**
+     * KROK 5: convenience – vyřeší schedule z měsíce data a deleguje na getOrCreateForSchedule.
+     * Datum řádku se vždy srovná na schedule.shipment_date.
+     */
+    public function getOrCreateForDate(Subscription $subscription, Carbon $date, array $createAttributes = []): SubscriptionShipment
+    {
+        $schedule = ShipmentSchedule::getOrCreateForMonth($date->year, $date->month);
+
+        return $this->getOrCreateForSchedule($subscription, $schedule, $createAttributes);
+    }
+
+    /**
      * Get or create shipment record for a subscription and date
      * Used when preparing shipments in admin
      */
     public function getOrCreateShipment(Subscription $subscription, Carbon $shipmentDate): SubscriptionShipment
     {
-        $existing = $subscription->shipments()
-            ->whereDate('shipment_date', $shipmentDate->toDateString())
-            ->first();
+        $schedule = ShipmentSchedule::getOrCreateForMonth($shipmentDate->year, $shipmentDate->month);
+        $shipment = $this->getOrCreateForSchedule($subscription, $schedule);
 
-        if ($existing) {
-            return $existing;
+        // Admin příprava očekává přepočítání vazby platby dle aktuální logiky.
+        $payment = $this->findPaymentForShipment($subscription, $schedule->shipment_date);
+        if ($shipment->subscription_payment_id !== $payment?->id) {
+            \Log::info('Updated shipment payment link', [
+                'shipment_id' => $shipment->id,
+                'old_payment_id' => $shipment->subscription_payment_id,
+                'new_payment_id' => $payment?->id,
+            ]);
+            $shipment->update(['subscription_payment_id' => $payment?->id]);
         }
 
-        $schedule = ShipmentSchedule::getForMonth($shipmentDate->year, $shipmentDate->month);
-        $payment = $this->findPaymentForShipment($subscription, $shipmentDate);
-
-        return $subscription->shipments()->create([
-            'shipment_date' => $shipmentDate,
-            'shipment_schedule_id' => $schedule?->id,
-            'subscription_payment_id' => $payment?->id,
-            'status' => 'pending',
-            ...$this->getPackageDimensions($subscription),
-        ]);
+        return $shipment;
     }
 
     /**
@@ -1061,17 +1176,27 @@ class SubscriptionShipmentService
      */
     public function hasPaidCoverageForDate(Subscription $subscription, Carbon $date): bool
     {
-        // Check next_billing_date (anything before it is paid)
-        if ($subscription->next_billing_date && $date->lt($subscription->next_billing_date)) {
-            return true;
+        // 1) AUTORITATIVNĚ: má zásilka pro tento měsíc (schedule) navázanou zaplacenou platbu?
+        //    Ledger je jediný zdroj pravdy o zaplacení konkrétního boxu.
+        $schedule = ShipmentSchedule::getForMonth($date->year, $date->month);
+        if ($schedule) {
+            $shipment = $subscription->shipments()
+                ->where('shipment_schedule_id', $schedule->id)
+                ->first();
+
+            if ($shipment && $shipment->subscription_payment_id) {
+                return optional($shipment->payment)->status === 'paid';
+            }
         }
 
-        // Check initial shipment
+        // 2) První zásilka je krytá aktivační platbou i bez navázaného řádku.
         if ($this->isInitialShipmentCovered($subscription, $date)) {
             return true;
         }
 
-        // Check payment periods
+        // 3) Přechodný fallback pro řádky ještě bez FK: zaplacené období pokrývající datum.
+        //    Dřívější zkratka `date < next_billing_date` byla odstraněna – rozcházela se
+        //    s reálným zaplacením konkrétního boxu a byla zdrojem chyb.
         // period_end is EXCLUSIVE (it's the next billing date), so use > not >=
         return $subscription->payments()
             ->where('status', 'paid')
@@ -1083,7 +1208,7 @@ class SubscriptionShipmentService
     /**
      * Check if date is the initial shipment covered by first payment
      */
-    protected function isInitialShipmentCovered(Subscription $subscription, Carbon $date): bool
+    public function isInitialShipmentCovered(Subscription $subscription, Carbon $date): bool
     {
         // Has shipments sent - not initial
         if ($subscription->shipments()->whereIn('status', ['sent', 'delivered'])->exists()) {

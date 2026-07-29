@@ -662,6 +662,11 @@ class CheckoutController extends Controller
                 $orderData['shipment_schedule_id'] = $shipmentSchedule->id;
                 $orderData['shipped_with_subscription'] = true;
                 $orderData['subscription_addon_slots_used'] = array_sum($cart);
+
+                // KROK 10: robustní vazba přímo na konkrétní řádek zásilky (ne jen měsíc).
+                $orderData['subscription_shipment_id'] = app(\App\Services\SubscriptionShipmentService::class)
+                    ->getOrCreateForSchedule($selectedSubscription, $shipmentSchedule)
+                    ->id;
             }
 
             $order = Order::create($orderData);

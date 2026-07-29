@@ -32,9 +32,12 @@ class TestSubscriptionBoxShippedEmail extends Command
             $this->info("Using latest subscription: {$subscription->subscription_number}");
         }
         
-        // Set test tracking data
-        $subscription->packeta_packet_id = 'Z123456789';
-        $subscription->packeta_tracking_url = 'https://tracking.packeta.com/cs/?id=Z123456789';
+        // KROK 8: tracking se čte přes accessor z latestShipment – pro preview
+        // podstrčíme fake zásilku (bez zápisu do DB).
+        $subscription->setRelation('latestShipment', new \App\Models\SubscriptionShipment([
+            'packeta_packet_id' => 'Z123456789',
+            'packeta_tracking_url' => 'https://tracking.packeta.com/cs/?id=Z123456789',
+        ]));
         
         try {
             Mail::to($email)->send(new SubscriptionBoxShipped($subscription));
