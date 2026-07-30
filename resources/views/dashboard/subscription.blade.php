@@ -523,15 +523,11 @@
                                 {{ __('dashboard.pause_subscription') }}
                             </button>
 
-                            <form method="POST" action="{{ localizedRoute('dashboard.subscription.cancel') }}">
-                                @csrf
-                                <input type="hidden" name="subscription_id" value="{{ $subscription->id }}">
-                                <button type="submit" 
-                                        class="w-full text-center px-4 py-2 text-sm border border-red-600 text-red-600 rounded-full hover:bg-red-50 transition font-medium" 
-                                        onclick="return confirm('{{ __('dashboard.cancel_warning') }}')">
-                                    {{ __('dashboard.cancel_subscription') }}
-                                </button>
-                            </form>
+                            <button type="button"
+                                    class="w-full text-center px-4 py-2 text-sm border border-red-600 text-red-600 rounded-full hover:bg-red-50 transition font-medium"
+                                    onclick="openCancelModal({{ $subscription->id }})">
+                                {{ __('dashboard.cancel_subscription') }}
+                            </button>
                             @elseif($subscription->status === 'paused')
                             <form method="POST" action="{{ localizedRoute('dashboard.subscription.resume') }}">
                                 @csrf
@@ -541,18 +537,71 @@
                                 </button>
                             </form>
 
-                            <form method="POST" action="{{ localizedRoute('dashboard.subscription.cancel') }}">
-                                @csrf
-                                <input type="hidden" name="subscription_id" value="{{ $subscription->id }}">
-                                <button type="submit" 
-                                        class="w-full text-center px-4 py-2 text-sm border border-red-600 text-red-600 rounded-full hover:bg-red-50 transition font-medium" 
-                                        onclick="return confirm('{{ __('dashboard.cancel_warning') }}')">
-                                    {{ __('dashboard.cancel_subscription') }}
-                                </button>
-                            </form>
+                            <button type="button"
+                                    class="w-full text-center px-4 py-2 text-sm border border-red-600 text-red-600 rounded-full hover:bg-red-50 transition font-medium"
+                                    onclick="openCancelModal({{ $subscription->id }})">
+                                {{ __('dashboard.cancel_subscription') }}
+                            </button>
                             @endif
                         </div>
                     </div>
+
+                    {{-- Cancel modal (jen pro zrušitelná předplatná) --}}
+                    @if(in_array($subscription->status, ['active', 'paused']))
+                    @php $cancelPreview = $cancellationPreviews[$subscription->id] ?? null; @endphp
+                    <div id="cancel-modal-{{ $subscription->id }}" class="cancel-modal fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-40 p-4">
+                        <div class="bg-white rounded-2xl w-full max-w-lg border border-gray-200 shadow-xl">
+                            <div class="p-6 border-b border-gray-200 flex items-start gap-3">
+                                <span class="shrink-0 mt-0.5 inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-100 text-red-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                                </span>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">{{ __('dashboard.cancel_modal_title') }}</h3>
+                                    <p class="text-sm text-gray-600 mt-1">{{ __('dashboard.cancel_modal_intro') }}</p>
+                                </div>
+                            </div>
+
+                            <div class="p-6 space-y-3 text-sm">
+                                @if($cancelPreview && !$cancelPreview->endsImmediately)
+                                    <div class="rounded-xl bg-green-50 border border-green-200 p-3 text-green-800">
+                                        @if($cancelPreview->paidCount === 1)
+                                            {{ __('dashboard.cancel_paid_notice', ['date' => $cancelPreview->lastPaidDate->format('j. n. Y')]) }}
+                                        @else
+                                            {{ __('dashboard.cancel_paid_notice_multiple', ['count' => $cancelPreview->paidCount, 'date' => $cancelPreview->lastPaidDate->format('j. n. Y')]) }}
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="rounded-xl bg-gray-50 border border-gray-200 p-3 text-gray-700">
+                                        {{ __('dashboard.cancel_immediate_notice') }}
+                                    </div>
+                                @endif
+
+                                @if($cancelPreview && $cancelPreview->addonToDetachCount > 0)
+                                    <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-3 text-yellow-800">
+                                        {{ __('dashboard.cancel_addons_notice', ['count' => $cancelPreview->addonToDetachCount]) }}
+                                    </div>
+                                @endif
+
+                                <p class="text-gray-500">{{ __('dashboard.cancel_irreversible') }}</p>
+                            </div>
+
+                            <div class="p-6 border-t border-gray-200 flex items-center justify-end gap-3">
+                                <button type="button"
+                                        class="px-4 py-2 text-sm border border-gray-300 rounded-full hover:bg-gray-50"
+                                        onclick="closeCancelModal({{ $subscription->id }})">
+                                    {{ __('dashboard.keep_subscription') }}
+                                </button>
+                                <form method="POST" action="{{ localizedRoute('dashboard.subscription.cancel') }}">
+                                    @csrf
+                                    <input type="hidden" name="subscription_id" value="{{ $subscription->id }}">
+                                    <button type="submit" class="px-4 py-2 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition font-medium">
+                                        {{ __('dashboard.cancel_confirm') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     @endif
                 </div>
             </div>
@@ -851,6 +900,38 @@ document.addEventListener('DOMContentLoaded', function() {
             const firstUnpaid = this.dataset.firstUnpaid ? new Date(this.dataset.firstUnpaid) : null;
             openPauseModal(subId, freq, firstUnpaid);
         });
+    });
+
+    // Cancel modal (server-rendered, one per subscription)
+    window.openCancelModal = function (id) {
+        const m = document.getElementById('cancel-modal-' + id);
+        if (!m) return;
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeCancelModal = function (id) {
+        const m = document.getElementById('cancel-modal-' + id);
+        if (!m) return;
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+        document.body.style.overflow = '';
+    };
+    const closeAllCancelModals = function () {
+        document.querySelectorAll('.cancel-modal').forEach(function (m) {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        });
+        document.body.style.overflow = '';
+    };
+    // Backdrop click + Escape (registrováno jednou, žádné duplicitní listenery)
+    document.querySelectorAll('.cancel-modal').forEach(function (m) {
+        m.addEventListener('click', function (e) {
+            if (e.target === m) { closeAllCancelModals(); }
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { closeAllCancelModals(); }
     });
 
     function createPauseModal() {

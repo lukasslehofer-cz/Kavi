@@ -172,7 +172,14 @@ return [
     'cancel_warning' => 'Are you sure you want to cancel your subscription?',
     'cancel_confirm' => 'Yes, cancel subscription',
     'keep_subscription' => 'No, keep subscription',
-    
+    'cancel_modal_title' => 'Cancel subscription',
+    'cancel_modal_intro' => 'Before you cancel, please read what will happen:',
+    'cancel_paid_notice' => 'The shipment from :date is already paid and will still be delivered to you. Your subscription will end afterwards.',
+    'cancel_paid_notice_multiple' => 'Paid shipments still to be delivered: :count (last one :date). Your subscription will end after they are delivered.',
+    'cancel_immediate_notice' => 'You have no paid undelivered shipment, so your subscription will end immediately.',
+    'cancel_addons_notice' => 'Add-on orders linked to the cancelled shipments (:count) will be detached and handled manually.',
+    'cancel_irreversible' => 'Cancellation is irreversible. We will notify you by email once the subscription ends.',
+
     // Delivery address
     'delivery_address' => 'Delivery address',
     'edit_address' => 'Edit address',

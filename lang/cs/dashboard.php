@@ -172,7 +172,14 @@ return [
     'cancel_warning' => 'Opravdu chcete zrušit předplatné?',
     'cancel_confirm' => 'Ano, zrušit předplatné',
     'keep_subscription' => 'Ne, ponechat předplatné',
-    
+    'cancel_modal_title' => 'Zrušit předplatné',
+    'cancel_modal_intro' => 'Než předplatné zrušíte, přečtěte si prosím, co se stane:',
+    'cancel_paid_notice' => 'Zásilka z :date je již uhrazená a bude vám ještě doručena. Poté bude předplatné ukončeno.',
+    'cancel_paid_notice_multiple' => 'Uhrazené zásilky, které vám ještě dorazí: :count (poslední :date). Po jejich doručení bude předplatné ukončeno.',
+    'cancel_immediate_notice' => 'Nemáte žádnou uhrazenou nedoručenou zásilku – předplatné bude ukončeno okamžitě.',
+    'cancel_addons_notice' => 'Doplňkové objednávky navázané na zrušené zásilky (:count) budou odpojeny a vyřešíme je ručně.',
+    'cancel_irreversible' => 'Zrušení je nevratné. O ukončení předplatného vás budeme informovat e-mailem.',
+
     // Delivery address
     'delivery_address' => 'Doručovací adresa',
     'edit_address' => 'Upravit adresu',

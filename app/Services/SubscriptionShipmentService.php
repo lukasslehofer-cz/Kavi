@@ -86,6 +86,27 @@ class PauseInfo
 }
 
 /**
+ * DTO: Náhled zrušení předplatného. Popisuje PŘESNĚ to, co cancelSubscription() udělá –
+ * modal na dashboardu čerpá z téhož výpočtu, aby se informace nemohla rozejít s akcí.
+ */
+class CancellationPreview
+{
+    public function __construct(
+        /** @var Collection<SubscriptionShipment> Zaplacené pending zásilky, které BUDOU ještě doručeny (dle data). */
+        public Collection $paidShipments,
+        /** Datum poslední zaplacené zásilky = budoucí ends_at (null když se ruší okamžitě). */
+        public ?Carbon $lastPaidDate,
+        public int $paidCount,
+        /** Počet nezaplacených pending zásilek, které se zruší. */
+        public int $unpaidToCancelCount,
+        /** Počet addon objednávek, které se odpojí k ruční revizi. */
+        public int $addonToDetachCount,
+        /** True = žádné zaplacené pokrytí → předplatné skončí okamžitě. */
+        public bool $endsImmediately,
+    ) {}
+}
+
+/**
  * Central service for all subscription shipment operations
  * Uses subscription_shipments table as the single source of truth
  */
@@ -678,33 +699,70 @@ class SubscriptionShipmentService
     }
 
     /**
-     * Cancel subscription
+     * Náhled zrušení – jediný zdroj pravdy o tom, co zrušení udělá. Použije se pro
+     * informativní modal na dashboardu i pro samotné cancelSubscription().
+     */
+    public function getCancellationPreview(Subscription $subscription): CancellationPreview
+    {
+        // Zaplacené pending zásilky (payment.status='paid') = budou ještě doručeny.
+        // reorder() zruší default desc řazení z relace shipments(), ať ->last() = nejzazší box.
+        $paidShipments = $subscription->shipments()
+            ->where('status', 'pending')
+            ->whereHas('payment', fn ($q) => $q->where('status', 'paid'))
+            ->reorder('shipment_date', 'asc')
+            ->get();
+
+        // Nezaplacené pending = zruší se.
+        $unpaid = $subscription->shipments()
+            ->where('status', 'pending')
+            ->whereDoesntHave('payment', fn ($q) => $q->where('status', 'paid'))
+            ->get();
+
+        // Addon objednávky navázané na rušené (nezaplacené) boxy = odpojí se.
+        $addonToDetach = 0;
+        foreach ($unpaid as $ship) {
+            $addonToDetach += $ship->addonOrders()
+                ->whereNotIn('status', ['shipped', 'delivered', 'cancelled'])
+                ->count();
+        }
+
+        $lastPaidDate = $paidShipments->last()?->shipment_date;
+
+        return new CancellationPreview(
+            paidShipments: $paidShipments,
+            lastPaidDate: $lastPaidDate,
+            paidCount: $paidShipments->count(),
+            unpaidToCancelCount: $unpaid->count(),
+            addonToDetachCount: $addonToDetach,
+            endsImmediately: $paidShipments->isEmpty(),
+        );
+    }
+
+    /**
+     * Cancel subscription – ke konci zaplaceného období. Konzumuje getCancellationPreview(),
+     * takže se nemůže rozejít s tím, co bylo uživateli ukázáno v modalu.
      */
     public function cancelSubscription(Subscription $subscription): void
     {
-        // Find last paid shipment
-        $lastPaidShipment = $subscription->shipments()
-            ->where('status', 'pending')
-            ->whereHas('payment', fn ($q) => $q->where('status', 'paid'))
-            ->orderBy('shipment_date', 'desc')
-            ->first();
+        $preview = $this->getCancellationPreview($subscription);
 
-        // Mark unpaid pending shipments as cancelled
-        $toCancel = $subscription->shipments()
+        // Nezaplacené pending zásilky → cancelled (a odpojit jejich addon objednávky).
+        $unpaid = $subscription->shipments()
             ->where('status', 'pending')
             ->whereDoesntHave('payment', fn ($q) => $q->where('status', 'paid'))
             ->get();
 
         // KROK 10: addon objednávky rušených boxů odpojit k ruční revizi.
-        foreach ($toCancel as $ship) {
+        foreach ($unpaid as $ship) {
             $this->detachAddonOrders($ship, 'subscription_cancelled');
         }
 
         $subscription->shipments()
-            ->whereIn('id', $toCancel->pluck('id'))
+            ->whereIn('id', $unpaid->pluck('id'))
             ->update(['status' => 'cancelled', 'notes' => 'Subscription cancelled']);
 
-        $endsAt = $lastPaidShipment?->shipment_date ?? now();
+        // ends_at = poslední zaplacená zásilka (doběhne do konce období), jinak teď.
+        $endsAt = $preview->lastPaidDate ?? now();
 
         $subscription->update([
             'status' => 'cancelled',
@@ -714,7 +772,8 @@ class SubscriptionShipmentService
         \Log::info('Subscription cancelled', [
             'subscription_id' => $subscription->id,
             'ends_at' => $endsAt->toDateString(),
-            'last_paid_shipment' => $lastPaidShipment?->shipment_date?->toDateString(),
+            'last_paid_shipment' => $preview->lastPaidDate?->toDateString(),
+            'ends_immediately' => $preview->endsImmediately,
         ]);
     }
 

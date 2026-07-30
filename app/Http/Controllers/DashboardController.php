@@ -113,7 +113,14 @@ class DashboardController extends Controller
             return [$subscription->id => $shipmentService->getShipmentInfo($subscription)];
         });
 
-        return view('dashboard.subscription', compact('subscriptions', 'shipmentInfos'));
+        // Náhled zrušení pro modal (jen tam, kde jde zrušit) – stejný výpočet jako akce.
+        $cancellationPreviews = $subscriptions
+            ->filter(fn ($subscription) => in_array($subscription->status, ['active', 'paused'], true))
+            ->mapWithKeys(function ($subscription) use ($shipmentService) {
+                return [$subscription->id => $shipmentService->getCancellationPreview($subscription)];
+            });
+
+        return view('dashboard.subscription', compact('subscriptions', 'shipmentInfos', 'cancellationPreviews'));
     }
 
     public function updatePacketaPoint(Request $request)
