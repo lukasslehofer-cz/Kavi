@@ -50,6 +50,7 @@ class CheckSubscriptionConsistency extends Command
         $this->checkShipmentDateMismatch($subscriptions, $schedules);
         $this->checkCancelledWithLeftoverPending($subscriptions);
         $this->checkPaidPaymentsWithoutShipment();
+        $this->checkPaymentOnMultipleShipments();
         $this->checkOrphanedAddonOrders();
         $this->checkLegacyStripeSubscriptions($subscriptions);
 
@@ -204,6 +205,38 @@ class CheckSubscriptionConsistency extends Command
         }
 
         $this->record('paid_without_shipment', 'Zaplacené platby bez navázané zásilky', 'high', $rows);
+    }
+
+    /**
+     * 8b) Jedna platba navázaná na VÍCE boxů. V měsíčním modelu platí 1 platba = 1 zásilka;
+     * víc odkazů = historický mislink (starý dvojí linkovací průchod). Náprava:
+     * subscriptions:dedupe-payment-links.
+     */
+    protected function checkPaymentOnMultipleShipments(): void
+    {
+        $multi = SubscriptionShipment::whereNotNull('subscription_payment_id')
+            ->select('subscription_payment_id')
+            ->groupBy('subscription_payment_id')
+            ->havingRaw('COUNT(*) > 1')
+            ->pluck('subscription_payment_id');
+
+        $rows = [];
+        foreach ($multi as $paymentId) {
+            $payment = SubscriptionPayment::with('subscription')->find($paymentId);
+            $shipments = SubscriptionShipment::where('subscription_payment_id', $paymentId)
+                ->orderBy('shipment_date')
+                ->get();
+
+            $rows[] = [
+                'payment_id' => $paymentId,
+                'subscription' => $payment?->subscription?->subscription_number ?? '#'.optional($payment)->subscription_id,
+                'boxes' => $shipments->count(),
+                'shipment_ids' => $shipments->pluck('id')->implode(','),
+                'period_end' => optional($payment?->period_end)->toDateString() ?? '—',
+            ];
+        }
+
+        $this->record('payment_multi_shipment', 'Platba navázaná na více boxů', 'high', $rows);
     }
 
     /**
