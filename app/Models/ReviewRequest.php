@@ -70,6 +70,15 @@ class ReviewRequest extends Model
     }
 
     /**
+     * Bez testovacích žádostí z email:test-review-request. Ty se poznají podle
+     * prefixu tokenu a nemají zkreslovat statistiky ani spouštět připomínky.
+     */
+    public function scopeReal($query)
+    {
+        return $query->where('tracking_token', 'not like', 'test-%');
+    }
+
+    /**
      * Helper methods
      */
     public function hasClicked(): bool

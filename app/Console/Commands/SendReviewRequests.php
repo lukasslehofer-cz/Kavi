@@ -287,7 +287,8 @@ class SendReviewRequests extends Command
 
         $sent = 0;
 
-        $pending = ReviewRequest::whereNotNull('email_sent_at')
+        $pending = ReviewRequest::real()
+            ->whereNotNull('email_sent_at')
             ->whereNull('clicked_at')
             ->whereNull('reminded_at')
             ->where('email_sent_at', '<=', now()->subDays($after))

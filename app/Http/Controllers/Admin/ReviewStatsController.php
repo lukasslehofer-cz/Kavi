@@ -13,16 +13,16 @@ class ReviewStatsController extends Controller
      */
     public function index()
     {
-        $sent = ReviewRequest::whereNotNull('email_sent_at')->count();
-        $clicked = ReviewRequest::whereNotNull('clicked_at')->count();
-        $rated = ReviewRequest::whereNotNull('rating')->count();
+        $sent = ReviewRequest::real()->whereNotNull('email_sent_at')->count();
+        $clicked = ReviewRequest::real()->whereNotNull('clicked_at')->count();
+        $rated = ReviewRequest::real()->whereNotNull('rating')->count();
 
-        $distribution = ReviewRequest::whereNotNull('rating')
+        $distribution = ReviewRequest::real()->whereNotNull('rating')
             ->selectRaw('rating, count(*) as total')
             ->groupBy('rating')
             ->pluck('total', 'rating');
 
-        $average = ReviewRequest::whereNotNull('rating')->avg('rating');
+        $average = ReviewRequest::real()->whereNotNull('rating')->avg('rating');
 
         return view('admin.review-stats.index', [
             'stats' => [
@@ -31,10 +31,10 @@ class ReviewStatsController extends Controller
                 'rated' => $rated,
                 'click_rate' => $sent > 0 ? round($clicked / $sent * 100, 1) : 0,
                 'average' => $average ? round((float) $average, 1) : null,
-                'reminders' => ReviewRequest::whereNotNull('reminded_at')->count(),
+                'reminders' => ReviewRequest::real()->whereNotNull('reminded_at')->count(),
             ],
             'distribution' => $distribution,
-            'recent' => ReviewRequest::with(['user', 'order', 'subscription'])
+            'recent' => ReviewRequest::real()->with(['user', 'order', 'subscription'])
                 ->whereNotNull('email_sent_at')
                 ->latest('email_sent_at')
                 ->limit(30)
