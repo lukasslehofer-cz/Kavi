@@ -95,5 +95,20 @@ abstract class LocalizedMailable extends Mailable
     {
         return __($key, $replace, $this->emailLocale);
     }
+
+    /**
+     * URL na lokalizovanou routu podle jazyka e-mailu, ne podle jazyka requestu.
+     * E-mail se často renderuje z cronu, kde app()->getLocale() nic neříká.
+     */
+    protected function localizedRouteFor(string $name, array $parameters = []): string
+    {
+        $localized = "{$name}.{$this->emailLocale}";
+
+        if (\Illuminate\Support\Facades\Route::has($localized)) {
+            return route($localized, $parameters);
+        }
+
+        return route($name, $parameters);
+    }
 }
 

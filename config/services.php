@@ -104,6 +104,78 @@ return [
         'search_console_verification' => env('GOOGLE_SEARCH_CONSOLE_VERIFICATION'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Odkazy na veřejné recenzní profily
+    |--------------------------------------------------------------------------
+    |
+    | Každá doména má vlastní Business Profile. Odkazy míří na writereview,
+    | tedy do vyhledávání - dialog pro napsání recenze se otevře nad lokálním
+    | knowledge panelem, na všech zařízeních stejně.
+    |
+    | Proč ne tvar g.page/r/<kód>/review: ten se na Googlu větví podle
+    | User-Agentu a zařízení bez tokenu Android/iPhone/iPad (tedy i iPad
+    | v desktop módu) skončí na Mapách, což je pro napsání recenze horší.
+    | Zůstává ale jako záloha - je to jediný tvar, který Google oficiálně
+    | generuje (Business Profile -> Read reviews -> Get more reviews -> Copy),
+    | zatímco writereview je nedokumentovaný endpoint.
+    |
+    |   kavi.cz      https://g.page/r/CUKHHPAV65MnEBM/review
+    |   kavibox.com  https://g.page/r/CXi_Z2uRcZAiEBM/review
+    |
+    | Kdyby writereview přestal fungovat, přepni přes REVIEW_LINK_CS / _EN
+    | v .env bez nasazování kódu.
+    |
+    */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Google Business Profile - čtení vlastních recenzí
+    |--------------------------------------------------------------------------
+    |
+    | Recenze jsou dostupné jen na legacy Google My Business API v4; nová
+    | rozdělená v1 API je neobsahují. Přístup Google schvaluje ručně přes
+    | "GBP API contact form" a do schválení je kvóta 0 QPM.
+    |
+    | refresh_token se získá jednorázovým OAuth souhlasem vlastníka profilu
+    | (scope business.manage, access_type=offline, prompt=consent). Service
+    | account použít nelze. Consent screen musí být "In production", v režimu
+    | "Testing" token vyprší po 7 dnech.
+    |
+    */
+
+    'google_reviews' => [
+        'client_id' => env('GOOGLE_REVIEWS_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_REVIEWS_CLIENT_SECRET'),
+
+        // Sdílený refresh token pro případ, že oba profily spravuje jeden
+        // Google účet. Když má každý profil vlastní účet, vyplň refresh_token
+        // u konkrétního profilu níž - ten má přednost.
+        'refresh_token' => env('GOOGLE_REVIEWS_REFRESH_TOKEN'),
+
+        // Každá doména má vlastní Business Profile, klíč je locale.
+        'profiles' => [
+            'cs' => [
+                'account_id' => env('GOOGLE_REVIEWS_CS_ACCOUNT_ID'),
+                'location_id' => env('GOOGLE_REVIEWS_CS_LOCATION_ID'),
+                'refresh_token' => env('GOOGLE_REVIEWS_CS_REFRESH_TOKEN'),
+            ],
+            'en' => [
+                'account_id' => env('GOOGLE_REVIEWS_EN_ACCOUNT_ID'),
+                'location_id' => env('GOOGLE_REVIEWS_EN_LOCATION_ID'),
+                'refresh_token' => env('GOOGLE_REVIEWS_EN_REFRESH_TOKEN'),
+            ],
+        ],
+    ],
+
+    'review_links' => [
+        // kavi.cz - Place ID ChIJUTMeyWmRnmERQocc8BXrkyc, CID 2851881468510897986
+        'cs' => env('REVIEW_LINK_CS', 'https://search.google.com/local/writereview?placeid=ChIJUTMeyWmRnmERQocc8BXrkyc'),
+
+        // kavibox.com - Place ID ChIJLztJeicVqCEReL9na5FxkCI
+        'en' => env('REVIEW_LINK_EN', 'https://search.google.com/local/writereview?placeid=ChIJLztJeicVqCEReL9na5FxkCI'),
+    ],
+
 ];
 
 

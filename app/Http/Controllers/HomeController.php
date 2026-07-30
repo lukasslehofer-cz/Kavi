@@ -6,10 +6,11 @@ use App\Helpers\CurrencyHelper;
 use App\Models\Product;
 use App\Models\SubscriptionConfig;
 use App\Models\SubscriptionPlan;
+use App\Services\GoogleReviewsService;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(GoogleReviewsService $googleReviews)
     {
         $featuredProducts = Product::forShop()
             ->withPriceInCurrentCurrency()
@@ -55,7 +56,11 @@ class HomeController extends Controller
             ->take(7)
             ->get();
 
-        return view('home', compact('featuredProducts', 'subscriptionPlans', 'subscriptionPricing', 'roasteriesOfMonth', 'coffeesOfMonth'));
+        // Google recenze do sekce "Co říkají naši zákazníci". Dokud není zdroj
+        // nakonfigurovaný, vrátí prázdno a šablona ukáže prosbu o hodnocení.
+        $testimonials = $googleReviews->latest(3);
+
+        return view('home', compact('featuredProducts', 'subscriptionPlans', 'subscriptionPricing', 'roasteriesOfMonth', 'coffeesOfMonth', 'testimonials'));
     }
 }
 

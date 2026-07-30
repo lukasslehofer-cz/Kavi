@@ -99,46 +99,12 @@
                                 @endforeach
                             </table>
                             
-                            <!-- Rating Request -->
-                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
-                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px; text-align: center;">
-                                    {{ $locale === 'cs' ? 'Ohodnoťte svou zkušenost' : 'Rate your experience' }}
-                                </div>
-                                <p style="font-size: 14px; color: #5a5a5a; margin: 0; text-align: center;">
-                                    {{ $locale === 'cs' ? 'Jak byste ohodnotili kvalitu kávy a naše služby?' : 'How would you rate the coffee quality and our services?' }}
-                                </p>
+                            @include('emails.partials.review-stars')
+
+                            <div style="border-top: 1px solid #bcbeb1; margin-top: 28px; padding-top: 16px; font-size: 12px; color: #76716C;">
+                                {{ __('emails.review_request.ignore_note', [], $locale) }}
                             </div>
-                            
-                            <!-- CTA Button -->
-                            <div style="text-align: center; margin: 40px 0;">
-                                <a href="{{ $trustpilotLink }}" target="_blank" rel="noopener" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                                    {{ $locale === 'cs' ? 'Hodnotit na Google' : 'Review on Trustpilot' }} →
-                                </a>
-                                <p style="font-size: 11px; color: #76716C; margin: 16px 0 0 0; text-transform: uppercase; letter-spacing: 0.1em;">
-                                    {{ $locale === 'cs' ? 'Budete přesměrováni na Google.com' : 'You will be redirected to Trustpilot.com' }}
-                                </p>
-                            </div>
-                            
-                            <!-- Benefits -->
-                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
-                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Proč je vaše hodnocení důležité' : 'Why your review matters' }}
-                                </div>
-                                <p style="font-size: 14px; color: #5a5a5a; margin: 0; line-height: 1.8;">
-                                    @if($locale === 'cs')
-                                    <span style="color: #CA4136;">→</span> Pomáháte ostatním kávovarům s výběrem<br>
-                                    <span style="color: #CA4136;">→</span> Dáváte nám vědět, co děláme dobře<br>
-                                    <span style="color: #CA4136;">→</span> Inspirujete nás ke zlepšení<br>
-                                    <span style="color: #CA4136;">→</span> Vaše hodnocení je transparentní a veřejné
-                                    @else
-                                    <span style="color: #CA4136;">→</span> You help other coffee lovers choose<br>
-                                    <span style="color: #CA4136;">→</span> You let us know what we're doing well<br>
-                                    <span style="color: #CA4136;">→</span> You inspire us to improve<br>
-                                    <span style="color: #CA4136;">→</span> Your review is transparent and public
-                                    @endif
-                                </p>
-                            </div>
-                            
+
                             <!-- Explore More -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em; text-align: center;">

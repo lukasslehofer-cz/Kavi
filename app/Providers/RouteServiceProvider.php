@@ -140,7 +140,8 @@ class RouteServiceProvider extends ServiceProvider
             // Newsletter
             Route::post('/' . $routes['newsletter-subscribe'], [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name($this->routeName('newsletter.subscribe', $locale, $isPrimary));
 
-            // Review tracking
+            // Review tracking. Varianta s hvězdičkou musí být před tou bez ní.
+            Route::get('/' . $this->replaceParams($routes['review-track-rating']), [\App\Http\Controllers\ReviewRequestController::class, 'track'])->whereNumber('rating')->name($this->routeName('review.track.rating', $locale, $isPrimary));
             Route::get('/' . $this->replaceParams($routes['review-track']), [\App\Http\Controllers\ReviewRequestController::class, 'track'])->name($this->routeName('review.track', $locale, $isPrimary));
 
             // Auth routes

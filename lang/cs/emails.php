@@ -359,6 +359,10 @@ return [
         'subject' => 'Jak se vám líbila káva? ⭐',
         'title' => 'Jak se vám líbila káva? ⭐',
         'subtitle' => 'Vaše zpětná vazba nám pomáhá zlepšovat naši nabídku.',
+        'rate_label' => 'Ohodnoťte jedním kliknutím',
+        'time_note' => 'Zabere to půl minuty. Vaše hodnocení pomůže ostatním s výběrem a nám ukáže, co zlepšit.',
+        'fallback_link' => 'Nebo napište hodnocení tady',
+        'ignore_note' => 'Nechcete hodnotit? Stačí tenhle e-mail ignorovat.',
     ],
 
     // Order Review Request

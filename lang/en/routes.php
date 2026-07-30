@@ -68,6 +68,7 @@ return [
 
     // Review
     'review-track' => 'review/{token}',
+    'review-track-rating' => 'review/{token}/{rating}',
 
     // Auth
     'login' => 'login',

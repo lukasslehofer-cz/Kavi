@@ -359,6 +359,10 @@ return [
         'subject' => 'How Did You Like Your Coffee? ⭐',
         'title' => 'How Did You Like Your Coffee? ⭐',
         'subtitle' => 'Your feedback helps us improve our selection.',
+        'rate_label' => 'Rate with a single click',
+        'time_note' => 'It takes half a minute. Your review helps others choose and shows us what to improve.',
+        'fallback_link' => 'Or write your review here',
+        'ignore_note' => 'Not interested? Just ignore this email.',
     ],
 
     // Order Review Request

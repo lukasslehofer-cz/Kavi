@@ -113,6 +113,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/newsletter/sync-ecomail', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'syncToEcomail'])->name('newsletter.sync-ecomail');
     Route::get('/newsletter/export', [\App\Http\Controllers\Admin\AdminNewsletterController::class, 'export'])->name('newsletter.export');
     
+    // Statistiky žádostí o hodnocení
+    Route::get('/hodnoceni', [\App\Http\Controllers\Admin\ReviewStatsController::class, 'index'])->name('reviews.index');
+
     // Email Logs
     Route::get('/email-logs', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])->name('email-logs.index');
     Route::get('/email-logs/{emailLog}', [\App\Http\Controllers\Admin\EmailLogController::class, 'show'])->name('email-logs.show');

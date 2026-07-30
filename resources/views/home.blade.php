@@ -487,152 +487,128 @@
   </div>
 </div>
 
+{{-- Dokud nejsou aspoň tři schválená hodnocení, místo vymyšlených referencí
+     se zobrazí prosba o hodnocení. Odkaz na veřejný profil je v obou stavech. --}}
+@php $hasTestimonials = count($testimonials) >= 3; @endphp
+
 <!-- Testimonials Section - Card Style -->
 <div class="relative">
-  
+
   <!-- Top section with cards -->
   <div class="pt-16 sm:pt-20 lg:pt-24" style="background-color: #e5e6df;">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8">
-      
+
       <!-- Section Header -->
       <div class="text-center mb-12 sm:mb-16">
-        <!-- <p class="text-xs uppercase tracking-widest text-warm-500 mb-4">{{ $currentLocale === 'en' ? 'Testimonials' : 'Reference' }}</p> -->
         <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-          {{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}
+          @if($hasTestimonials)
+            {{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}
+          @else
+            {{ $currentLocale === 'en' ? 'Share your experience' : 'Podělte se o svou zkušenost' }}
+          @endif
         </h2>
         </div>
-        
+
+      @if(! $hasTestimonials)
+      <!-- Prosba o hodnocení - dokud nemáme dost reálných recenzí -->
+      <div class="max-w-3xl mx-auto pb-12 sm:pb-16">
+        <div class="bg-dark-800 p-8 sm:p-12">
+          <p class="text-xs uppercase tracking-widest text-white/50 mb-6">
+            {{ $currentLocale === 'en' ? 'Your review' : 'Vaše hodnocení' }}
+          </p>
+          <p class="text-white text-xl sm:text-2xl leading-relaxed font-light mb-10">
+            {{ $currentLocale === 'en'
+              ? 'Have you ordered from us? Tell us how the coffee tasted. You will help others choose, and show us what to improve.'
+              : 'Nakupovali jste u nás? Napište, jak vám káva chutnala. Pomůžete tím ostatním s výběrem a nám ukážete, co zlepšit.' }}
+          </p>
+          <a href="{{ config('services.review_links.'.$currentLocale) }}"
+             target="_blank" rel="noopener"
+             class="inline-flex items-center gap-3 bg-primary-500 hover:bg-white text-dark-800 font-display uppercase tracking-widest text-xs px-8 py-4 transition-colors duration-200">
+            <span>{{ $currentLocale === 'en' ? 'Review on Google' : 'Hodnotit na Googlu' }}</span>
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+      @else
       <!-- 3 Testimonial Cards -->
       <div class="grid lg:grid-cols-3 gap-6">
-        
-        <!-- Card 1 -->
+
+        @foreach($testimonials as $review)
+        <!-- Card -->
         <div class="flex flex-col relative z-10">
-          <!-- Dark section with label + quote + beak -->
+          <!-- Dark section with quote + beak -->
           <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative">
-            <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Customer review' : 'Recenze zákazníka' }}</p>
+            <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Google review' : 'Recenze z Googlu' }}</p>
+            @if($review['text'])
             <p class="text-white text-lg sm:text-xl leading-relaxed font-light">
-              "{{ $currentLocale === 'en' ? 'I\'ve been a KAVI subscriber for almost a year and every single coffee delivery has been amazing!' : 'Jsem členkou KAVI předplatného už skoro rok a každá jedna zásilka kávy byla skvělá!' }}"
+              "{{ $review['text'] }}"
             </p>
+            @endif
             <!-- Beak/triangle -->
             <div class="absolute -bottom-4 left-6 w-8 h-4 bg-dark-800" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
+          </div>
+          <!-- Light section with author -->
+          <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden bg-dark-800 flex items-center justify-center">
+              @if($review['photo'])
+                {{-- Fotka se hotlinkuje z Google CDN, lokální kopie by spadala pod 30denní limit --}}
+                <img src="{{ $review['photo'] }}" alt="" loading="lazy" referrerpolicy="no-referrer" class="h-full w-full object-cover grayscale" />
+              @else
+                <span class="font-display text-white text-xl sm:text-2xl tracking-wide" aria-hidden="true">&#9679;</span>
+              @endif
             </div>
-          <!-- Light section with photo -->
-          <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
-            <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
-              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Eva V." class="h-full w-full object-cover grayscale" />
-              </div>
             <div>
-              <div class="font-display text-dark-800 uppercase tracking-wide">Eva V.</div>
-              <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 1 year' : 'Zákaznice 1 rok' }}</p>
-        </div>
-      </div>
+              <div class="font-display text-dark-800 uppercase tracking-wide">
+                {{ $review['author'] ?? ($currentLocale === 'en' ? 'Anonymous' : 'Anonymní recenze') }}
+              </div>
+              @if($review['created_at'])
+              <p class="text-sm text-warm-500">{{ $review['created_at']->format('m/Y') }}</p>
+              @endif
+            </div>
+          </div>
           <!-- Stars - positioned to overlap red bar -->
           <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
             <div class="inline-flex px-4 py-3" style="background-color: #e5e6df;">
-              <div class="flex gap-0.5 text-lg">
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-    </div>
+              <div class="flex gap-0.5 text-lg" aria-label="{{ $review['rating'] }}/5">
+                @for($i = 1; $i <= 5; $i++)
+                  <span class="{{ $i <= $review['rating'] ? 'text-dark-800' : 'text-warm-500/40' }}" aria-hidden="true">&#9733;</span>
+                @endfor
+              </div>
+            </div>
           </div>
+        </div>
+        @endforeach
+
+          </div>
+
+      {{-- Informační povinnost o původu recenzí podle zákona 634/1992 Sb.
+           ve znění novely Omnibus účinné od 6. 1. 2023. --}}
+      <p class="text-xs text-warm-500 text-center mt-12 max-w-2xl mx-auto leading-relaxed">
+        {{ $currentLocale === 'en'
+          ? 'Reviews come from our Google Business Profile. We display them unedited and unfiltered, including negative ones. We do not verify who wrote them, Google does.'
+          : 'Recenze pocházejí z našeho profilu na Googlu. Zobrazujeme je neupravené a nefiltrované, včetně negativních. Neověřujeme, kdo je napsal, to dělá Google.' }}
+      </p>
+      @endif
+
           </div>
         </div>
 
-        <!-- Card 2 -->
-        <div class="flex flex-col relative z-10">
-          <!-- Dark section with label + quote + beak -->
-          <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative">
-            <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Customer review' : 'Recenze zákazníka' }}</p>
-            <p class="text-white text-lg sm:text-xl leading-relaxed font-light">
-              "{{ $currentLocale === 'en' ? 'Great service and top-notch coffee. The flexibility is great - I can change the quantity anytime.' : 'Skvělý servis a prvotřídní káva. Flexibilita je skvělá - můžu kdykoli změnit množství.' }}"
-            </p>
-            <!-- Beak/triangle -->
-            <div class="absolute -bottom-4 left-6 w-8 h-4 bg-dark-800" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
-          </div>
-          <!-- Light section with photo -->
-          <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
-            <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
-              <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Petr D." class="h-full w-full object-cover grayscale" />
-          </div>
-          <div>
-              <div class="font-display text-dark-800 uppercase tracking-wide">Petr D.</div>
-              <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 6 months' : 'Zákazník 6 měsíců' }}</p>
-          </div>
-        </div>
-          <!-- Stars - positioned to overlap red bar -->
-          <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
-            <div class="inline-flex px-4 py-3" style="background-color: #e5e6df;">
-              <div class="flex gap-0.5 text-lg">
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-      </div>
-          </div>
-          </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="flex flex-col relative z-10">
-          <!-- Dark section with label + quote + beak -->
-          <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative">
-            <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Customer review' : 'Recenze zákazníka' }}</p>
-            <p class="text-white text-lg sm:text-xl leading-relaxed font-light">
-              "{{ $currentLocale === 'en' ? 'I love tasting coffees from European roasters! The freshness and selection are amazing.' : 'Miluju ochutnávat kávy z evropských pražíren! Čerstvost a výběr jsou skvělé.' }}"
-            </p>
-            <!-- Beak/triangle -->
-            <div class="absolute -bottom-4 left-6 w-8 h-4 bg-dark-800" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
-          </div>
-          <!-- Light section with photo -->
-          <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
-            <div class="w-20 h-20 sm:w-24 sm:h-24 overflow-hidden flex-shrink-0">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&q=75&fit=crop&w=200" loading="lazy" alt="Marie H." class="h-full w-full object-cover grayscale" />
-          </div>
-          <div>
-              <div class="font-display text-dark-800 uppercase tracking-wide">Marie H.</div>
-              <p class="text-sm text-warm-500">{{ $currentLocale === 'en' ? 'Customer for 6+ months' : 'Zákaznice 6+ měsíců' }}</p>
-          </div>
-        </div>
-          <!-- Stars - positioned to overlap red bar -->
-          <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
-            <div class="inline-flex px-4 py-3" style="background-color: #e5e6df;">
-              <div class="flex gap-0.5 text-lg">
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-                <span class="text-dark-800">★</span>
-      </div>
-          </div>
-          </div>
-        </div>
-
-          </div>
-      
-          </div>
-        </div>
-  
   <!-- Full-width red bar with CTA - overlaps with stars -->
-  <div class="bg-primary-500 pt-16 pb-8 sm:pt-20 sm:pb-10">
+  <div class="bg-primary-500 {{ $hasTestimonials ? 'pt-16 sm:pt-20' : 'pt-8 sm:pt-10' }} pb-8 sm:pb-10">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <p class="text-xs uppercase tracking-widest text-dark-800">
-        {{ $currentLocale === 'en' ? 'Join our community of coffee lovers' : 'Přidejte se k řadě spokojených milovníků kávy' }}
+        @if($hasTestimonials)
+          {{ $currentLocale === 'en' ? 'Join our community of coffee lovers' : 'Přidejte se k řadě spokojených milovníků kávy' }}
+        @else
+          {{ $currentLocale === 'en' ? 'Already ordered from us? Let others know' : 'Nakupovali jste u nás? Řekněte to ostatním' }}
+        @endif
       </p>
-      @if($currentLocale === 'en')
-        <a href="https://www.trustpilot.com/review/kavi.cz" target="_blank" rel="noopener" class="text-xs uppercase tracking-widest text-dark-800 hover:text-white transition-colors">
-          Trustpilot →
-        </a>
-      @else
-        <a href="https://g.page/r/CUKHHPAV65MnEBM/review" target="_blank" rel="noopener" class="text-xs uppercase tracking-widest text-dark-800 hover:text-white transition-colors">
-          Google Reviews →
-        </a>
-      @endif
+      <a href="{{ config('services.review_links.'.$currentLocale) }}" target="_blank" rel="noopener" class="text-xs uppercase tracking-widest text-dark-800 hover:text-white transition-colors">
+        Google Reviews &rarr;
+      </a>
     </div>
   </div>
-  
+
 </div>
 
 <!-- Coffee of the Month Teaser -->

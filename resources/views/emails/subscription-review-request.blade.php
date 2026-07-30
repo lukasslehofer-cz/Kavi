@@ -7,152 +7,152 @@
     <meta name="supported-color-schemes" content="light">
     <title>{{ __('emails.review_request.title', [], $locale) }}</title>
     <style>
+        /* Reset styles */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-        body { margin: 0; padding: 0; width: 100%; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
-        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-        .header { background-color: #111827; padding: 32px 40px; text-align: center; }
-        .logo { max-width: 150px; height: auto; }
-        .content { padding: 40px; color: #374151; }
-        h1 { font-size: 28px; font-weight: 700; color: #111827; margin: 0 0 12px 0; line-height: 1.2; }
-        .subtitle { font-size: 16px; color: #6b7280; margin: 0 0 32px 0; font-weight: 300; }
-        .info-box { background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 24px 0; }
-        .info-title { font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0; }
-        .info-text { font-size: 14px; color: #4b5563; line-height: 1.6; margin: 4px 0; }
-        .button { display: inline-block; background-color: #e6305a; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 9999px; font-weight: 600; font-size: 15px; margin: 24px 0; text-align: center; }
-        .footer { background-color: #f9fafb; padding: 32px 40px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
-        .footer-text { margin: 8px 0; font-weight: 300; }
-        .footer-links { margin: 16px 0; }
-        .footer-link { color: #e6305a; text-decoration: none; margin: 0 8px; }
-        @media only screen and (max-width: 600px) { .content { padding: 24px !important; } h1 { font-size: 24px !important; } .header, .footer { padding: 24px !important; } }
+
+        /* Swiss Style Base */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: #bcbeb1;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #e5e6df;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .content { padding: 32px 24px !important; }
+            h1 { font-size: 26px !important; }
+            .header, .footer { padding: 32px 24px !important; }
+        }
+
+        /* Dark mode override */
+        @media (prefers-color-scheme: dark) {
+            body { background-color: #bcbeb1 !important; }
+            .email-container { background-color: #e5e6df !important; }
+        }
     </style>
 </head>
 <body>
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6 !important; padding: 20px 0;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
         <tr>
             <td align="center">
                 <!--[if mso]><table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600"><tr><td><![endif]-->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
-                    
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #e5e6df !important;" bgcolor="#e5e6df">
+
+                    <!-- Header -->
                     <tr>
-                        <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                        <td class="header" style="background-color: #1c1c1c; padding: 32px 40px; text-align: left;">
+                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" width="80" style="max-width: 80px !important; width: 80px !important; height: auto !important; display: block !important; border: 0; outline: none;">
                         </td>
                     </tr>
-                    
+
+                    <!-- Content -->
                     <tr>
-                        <td class="content">
-                            <div style="text-align: center; margin-bottom: 24px;">
-                                <div style="width: 64px; height: 64px; background-color: #fbbf24 !important; border-radius: 50%; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; line-height: 64px;">
-                                    ⭐
+                        <td class="content" style="padding: 48px 40px; color: #4a4a4a; background-color: #e5e6df;">
+
+                            <!-- Title -->
+                            <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
+                                {{ __('emails.subscription_review.title', [], $locale) }}
+                            </h1>
+                            <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
+                                {{ __('emails.subscription_review.subtitle', [], $locale) }}
+                            </p>
+
+                            <!-- Subscription Number -->
+                            <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
+                                <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
+                                    {{ __('emails.subscription_review.subscription_number', [], $locale) }}
+                                </div>
+                                <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
+                                    {{ $subscription->subscription_number }}
                                 </div>
                             </div>
-                            
-                            <h1 style="text-align: center;">{{ $locale === 'cs' ? 'Jak se vám líbí naše služby? ⭐' : 'How do you like our services? ⭐' }}</h1>
-                            <p class="subtitle" style="text-align: center;">{{ __('emails.review_request.subtitle', [], $locale) }}</p>
-                            
-                            <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: center;">
-                                <div style="font-size: 14px; color: #6b7280; font-weight: 500; margin-bottom: 4px;">{{ $locale === 'cs' ? 'Vaše předplatné' : 'Your subscription' }}</div>
-                                <div style="font-size: 20px; font-weight: 700; color: #111827;">{{ $subscription->subscription_number }}</div>
-                            </div>
-                            
+
                             <!-- What they've received -->
-                            <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">📦 {{ $locale === 'cs' ? 'Co jste již obdrželi' : 'What you\'ve received' }}</h3>
-                                <p class="info-text" style="color: #111827;">
-                                    @if($deliveredOrdersCount > 0)
-                                        @if($locale === 'cs')
-                                        <strong>{{ $deliveredOrdersCount }} {{ $deliveredOrdersCount == 1 ? 'kávový box' : ($deliveredOrdersCount < 5 ? 'kávové boxy' : 'kávových boxů') }}</strong>
-                                        @else
-                                        <strong>{{ $deliveredOrdersCount }} coffee {{ $deliveredOrdersCount == 1 ? 'box' : 'boxes' }}</strong>
-                                        @endif
-                                    @else
-                                        {{ $locale === 'cs' ? 'Právě jste si vytvořili předplatné' : 'You just created your subscription' }}
-                                    @endif
-                                </p>
-                                @if($subscription->starts_at)
-                                <p class="info-text">
-                                    {{ $locale === 'cs' ? 'Členem jste od' : 'Member since' }}: <strong>{{ $subscription->starts_at->format($locale === 'cs' ? 'd.m.Y' : 'M d, Y') }}</strong>
-                                </p>
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #bcbeb1;">
+                                @if($deliveredOrdersCount > 0)
+                                <tr>
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top;">
+                                        <div style="font-size: 11px; color: #76716C; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">
+                                            {{ $locale === 'cs' ? 'Doručené boxy' : 'Boxes delivered' }}
+                                        </div>
+                                        <div style="font-size: 15px; color: #1c1c1c;">{{ $deliveredOrdersCount }}</div>
+                                    </td>
+                                </tr>
                                 @endif
-                            </div>
-                            
-                            <!-- Rating Request -->
-                            <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #fbbf24 !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e; text-align: center;">{{ $locale === 'cs' ? 'Ohodnoťte naše služby' : 'Rate our services' }}</h3>
-                                <p class="info-text" style="color: #78350f; text-align: center; margin-bottom: 16px;">
-                                    {{ $locale === 'cs' ? 'Jak byste ohodnotili kvalitu naší kávy, pravidelnost dodávek a celkové služby?' : 'How would you rate the quality of our coffee, delivery reliability, and overall services?' }}
-                                </p>
-                            </div>
-                            
-                            <!-- Benefits -->
-                            <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
-                                <h3 class="info-title" style="color: #065f46;">💚 {{ $locale === 'cs' ? 'Proč je vaše hodnocení důležité' : 'Why your review matters' }}</h3>
-                                <p class="info-text" style="color: #047857;">
-                                    @if($locale === 'cs')
-                                    • Pomáháte ostatním zákazníkům s výběrem<br>
-                                    • Inspirujete nás ke zlepšení<br>
-                                    • Podporujete kvalitní kávu<br>
-                                    • Vaše hodnocení je transparentní a veřejné
-                                    @else
-                                    • You help other customers choose<br>
-                                    • You inspire us to improve<br>
-                                    • You support quality coffee<br>
-                                    • Your review is transparent and public
-                                    @endif
-                                </p>
-                            </div>
-                            
-                            <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ $trustpilotLink }}" class="button" target="_blank" rel="noopener">
-                                    {{ $locale === 'cs' ? 'Hodnotit na Google' : 'Review on Trustpilot' }}
-                                </a>
-                                <p style="font-size: 12px; color: #6b7280; margin-top: 12px; font-weight: 300;">
-                                    {{ $locale === 'cs' ? 'Budete přesměrováni na Google.com' : 'You will be redirected to Trustpilot.com' }}
-                                </p>
-                            </div>
-                            
+                                @if($subscription->starts_at)
+                                <tr>
+                                    <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top;">
+                                        <div style="font-size: 11px; color: #76716C; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">
+                                            {{ $locale === 'cs' ? 'Členem od' : 'Member since' }}
+                                        </div>
+                                        <div style="font-size: 15px; color: #1c1c1c;">{{ $subscription->starts_at->format($locale === 'cs' ? 'd.m.Y' : 'M d, Y') }}</div>
+                                    </td>
+                                </tr>
+                                @endif
+                            </table>
+
+                            @include('emails.partials.review-stars')
+
                             <!-- Explore More -->
-                            <div style="background-color: #f9fafb; border-radius: 12px; padding: 20px; margin: 32px 0; text-align: center;">
-                                <h3 style="font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">{{ $locale === 'cs' ? 'Prozkoumejte naši nabídku' : 'Explore our selection' }}</h3>
-                                <p style="font-size: 14px; color: #6b7280; margin-bottom: 16px; font-weight: 300;">
-                                    {{ $locale === 'cs' ? 'Máme pro vás desítky dalších výběrových káv' : 'We have dozens of specialty coffees for you' }}
-                                </p>
-                                <a href="{{ route('products.index') }}" style="display: inline-block; background-color: #111827; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 9999px; font-weight: 600; font-size: 14px;">
-                                    {{ $locale === 'cs' ? 'Prohlédnout obchod' : 'Browse shop' }}
-                                </a>
+                            <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
+                                <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em; text-align: center;">
+                                    {{ $locale === 'cs' ? 'Objevujte další kávy' : 'Discover more coffees' }}
+                                </div>
+                                <div style="text-align: center;">
+                                    <a href="{{ route('products.index') }}" style="display: inline-block; background-color: transparent; color: #1c1c1c !important; text-decoration: none; padding: 14px 28px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; border: 2px solid #1c1c1c;">
+                                        {{ $locale === 'cs' ? 'Prohlédnout nabídku' : 'Browse selection' }} &rarr;
+                                    </a>
+                                </div>
                             </div>
-                            
-                            <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">
-                                {{ __('emails.common.questions', [], $locale) }} 
-                                <a href="mailto:{{ $contactEmail }}" style="color: #e6305a; text-decoration: none;">{{ $contactEmail }}</a>
+
+                            <!-- Help Text -->
+                            <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
+                                {{ __('emails.common.questions', [], $locale) }}
+                                <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
-                            
-                            <p style="font-size: 14px; color: #6b7280; margin-top: 24px; font-weight: 300;">
+
+                            <p style="font-size: 13px; color: #5a5a5a; margin-top: 24px;">
                                 {{ $locale === 'cs' ? 'Děkujeme za vaši důvěru' : 'Thank you for your trust' }},<br>
-                                <strong style="color: #111827;">{{ __('emails.common.team', [], $locale) }}</strong>
+                                <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>
+
+                            <div style="border-top: 1px solid #bcbeb1; margin-top: 28px; padding-top: 16px; font-size: 12px; color: #76716C;">
+                                {{ __('emails.review_request.ignore_note', [], $locale) }}
+                            </div>
                         </td>
                     </tr>
-                    
+
+                    <!-- Footer -->
                     <tr>
-                        <td class="footer">
-                            <p class="footer-text">
-                                <strong style="color: #111827;">{{ $siteName }}</strong><br>
+                        <td class="footer" style="background-color: #d5d7ca; padding: 40px; text-align: center; color: #5a5a5a; font-size: 12px;">
+                            <p style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 4px 0;">
+                                {{ $siteName }}
+                            </p>
+                            <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">
                                 {{ __('emails.common.tagline', [], $locale) }}
                             </p>
-                            <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ route('dashboard.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.my_account', [], $locale) }}</a>
+                            <div style="margin: 20px 0;">
+                                <a href="{{ route('home') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ route('products.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ route('dashboard.index') }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.my_account', [], $locale) }}</a>
                             </div>
-                            <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
-                                {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}
-                            </p>
+                            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
+                                <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
+                            </div>
                         </td>
                     </tr>
-                    
+
                 </table>
                 <!--[if mso]></td></tr></table><![endif]-->
             </td>

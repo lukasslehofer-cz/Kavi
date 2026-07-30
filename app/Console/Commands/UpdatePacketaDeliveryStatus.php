@@ -74,14 +74,23 @@ class UpdatePacketaDeliveryStatus extends Command
 
         // Find orders that:
         // 1. Have packeta_packet_id (were sent to Packeta)
-        // 2. Have status 'submitted' (not yet delivered)
+        // 2. Are still in transit - 'submitted' nebo 'shipped' (admin může stav
+        //    posunout ručně, dřív takové objednávky z dosahu polleru vypadly)
         // 3. Were created in last 30 days (older orders are likely already resolved)
         $orders = Order::whereNotNull('packeta_packet_id')
-            ->where('status', 'submitted')
+            ->whereIn('status', ['submitted', 'shipped'])
             ->where('created_at', '>=', now()->subDays(30))
             ->orderBy('packeta_sent_at', 'asc')
             ->limit($limit)
             ->get();
+
+        $this->reportUntrackable(
+            Order::whereNull('packeta_packet_id')
+                ->whereIn('status', ['submitted', 'shipped'])
+                ->where('created_at', '>=', now()->subDays(30))
+                ->count(),
+            'objednávek'
+        );
 
         $stats = [
             'checked' => 0,
@@ -214,6 +223,14 @@ class UpdatePacketaDeliveryStatus extends Command
             ->limit($limit)
             ->get();
 
+        $this->reportUntrackable(
+            SubscriptionShipment::whereNull('packeta_packet_id')
+                ->where('status', 'sent')
+                ->where('sent_at', '>=', now()->subDays(30))
+                ->count(),
+            'zásilek předplatného'
+        );
+
         $stats = [
             'checked' => 0,
             'delivered' => 0,
@@ -324,5 +341,24 @@ class UpdatePacketaDeliveryStatus extends Command
         $this->info("Shipments - Checked: {$stats['checked']}, Delivered: {$stats['delivered']}, Returned: {$stats['returned']}, Errors: {$stats['errors']}");
 
         return $stats;
+    }
+
+    /**
+     * Bez packeta_packet_id nemá poller co se Packety zeptat, takže se taková
+     * položka nikdy nedostane na 'delivered'. Hlásíme to nahlas, aby se to
+     * nedalo přehlédnout na měsíce.
+     */
+    protected function reportUntrackable(int $count, string $label): void
+    {
+        if ($count === 0) {
+            return;
+        }
+
+        $this->warn("⚠ {$count} {$label} bez packeta_packet_id - poller je nemůže zkontrolovat");
+
+        Log::warning('Packeta poller: položky bez packeta_packet_id', [
+            'type' => $label,
+            'count' => $count,
+        ]);
     }
 }

@@ -6,10 +6,9 @@ use App\Mail\OrderReviewRequestMail;
 use App\Mail\SubscriptionReviewRequestMail;
 use App\Models\Order;
 use App\Models\ReviewRequest;
-use App\Models\Subscription;
 use App\Models\SubscriptionShipment;
-use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SendReviewRequests extends Command
@@ -19,8 +18,9 @@ class SendReviewRequests extends Command
      *
      * @var string
      */
-    protected $signature = 'reviews:send 
+    protected $signature = 'reviews:send
                             {--type= : Type of review requests to send (order|subscription|all)}
+                            {--max= : Maximum number of emails to send in this run}
                             {--dry-run : Run without actually sending emails}';
 
     /**
@@ -28,7 +28,19 @@ class SendReviewRequests extends Command
      *
      * @var string
      */
-    protected $description = 'Send review requests to customers based on their purchase history';
+    protected $description = 'Send review requests to customers based on their delivery milestones';
+
+    protected bool $dryRun = false;
+
+    protected ?int $remaining = null;
+
+    /**
+     * Identity oslovené v tomhle běhu. V ostrém běhu je zachytí odstup mezi
+     * žádostmi, v dry-runu se ale nic neukládá - bez tohohle by výpis nadhodnotil.
+     *
+     * @var array<string, true>
+     */
+    protected array $askedThisRun = [];
 
     /**
      * Execute the console command.
@@ -36,35 +48,46 @@ class SendReviewRequests extends Command
     public function handle()
     {
         $type = $this->option('type') ?? 'all';
-        $dryRun = $this->option('dry-run');
+        $this->dryRun = (bool) $this->option('dry-run');
+        $this->remaining = $this->option('max') !== null ? (int) $this->option('max') : null;
 
-        if ($dryRun) {
-            $this->warn('🔍 DRY RUN MODE - No emails will be sent');
+        if ($this->dryRun) {
+            $this->warn('DRY RUN - nic se neodešle ani neuloží');
         }
 
-        $this->info('🚀 Starting review request sending process...');
+        if (! config('reviews.enabled')) {
+            $this->warn('REVIEWS_ENABLED je false - naplánovaný běh se přeskakuje, ruční spuštění pokračuje');
+        }
+
+        $this->info('Milníky: '.implode(', ', config('reviews.milestones')));
+        $this->info(sprintf(
+            'Okno: doručeno před %d až %d dny',
+            config('reviews.delay_days'),
+            config('reviews.max_age_days')
+        ));
+        $this->newLine();
 
         $ordersSent = 0;
         $subscriptionsSent = 0;
 
-        // Send order review requests
         if ($type === 'all' || $type === 'order') {
-            $ordersSent = $this->sendOrderReviewRequests($dryRun);
+            $ordersSent = $this->sendOrderReviewRequests();
         }
 
-        // Send subscription review requests
         if ($type === 'all' || $type === 'subscription') {
-            $subscriptionsSent = $this->sendSubscriptionReviewRequests($dryRun);
+            $subscriptionsSent = $this->sendSubscriptionReviewRequests();
         }
+
+        $remindersSent = $this->sendReminders();
 
         $this->newLine();
-        $this->info('✅ Review request sending complete!');
         $this->table(
-            ['Type', 'Sent'],
+            ['Typ', 'Odesláno'],
             [
-                ['Order Reviews', $ordersSent],
-                ['Subscription Reviews', $subscriptionsSent],
-                ['Total', $ordersSent + $subscriptionsSent],
+                ['Objednávky', $ordersSent],
+                ['Předplatné', $subscriptionsSent],
+                ['Připomínky', $remindersSent],
+                ['Celkem', $ordersSent + $subscriptionsSent + $remindersSent],
             ]
         );
 
@@ -72,169 +95,332 @@ class SendReviewRequests extends Command
     }
 
     /**
-     * Send review requests for delivered orders
+     * Žádosti o hodnocení pro doručené objednávky.
      */
-    protected function sendOrderReviewRequests(bool $dryRun): int
+    protected function sendOrderReviewRequests(): int
     {
-        $this->info('📦 Processing order review requests...');
+        $this->info('Objednávky');
 
         $sent = 0;
 
-        // Get all orders delivered exactly 7 days ago
-        $recentOrders = Order::where('status', 'delivered')
-            ->whereDate('delivered_at', now()->subDays(7)->toDateString())
-            ->whereNotNull('user_id')
+        $orders = Order::where('status', 'delivered')
+            ->whereBetween('delivered_at', [
+                now()->subDays(config('reviews.max_age_days'))->startOfDay(),
+                now()->subDays(config('reviews.delay_days'))->endOfDay(),
+            ])
             ->with('user')
+            ->orderBy('delivered_at')
             ->get();
 
-        $this->line("Found {$recentOrders->count()} delivered orders to check");
+        $this->line("  Ve výběru: {$orders->count()} doručených objednávek");
 
-        foreach ($recentOrders as $order) {
-            // Skip if no user
-            if (!$order->user) {
+        foreach ($orders as $order) {
+            if ($this->exhausted()) {
+                break;
+            }
+
+            $email = $this->resolveOrderEmail($order);
+
+            if (! $email) {
                 continue;
             }
 
-            // Check if user has already clicked any review request
-            if (ReviewRequest::userHasClickedAnyReview($order->user_id)) {
+            if ($this->looksLikeBackfill($order->shipped_at, $order->delivered_at)) {
+                $this->line("  - #{$order->order_number}: vypadá jako backfill, přeskakuji");
+
+                Log::info('Review request přeskočen kvůli backfillu', [
+                    'order_id' => $order->id,
+                    'shipped_at' => $order->shipped_at,
+                    'delivered_at' => $order->delivered_at,
+                ]);
+
                 continue;
             }
 
-            // Check if we already sent review request for this order
-            $existingRequest = ReviewRequest::where('user_id', $order->user_id)
-                ->where('order_id', $order->id)
-                ->where('review_type', 'order')
-                ->first();
-
-            if ($existingRequest) {
+            if (! $this->canAsk($order->user_id, $email)) {
                 continue;
             }
 
-            // Count how many order review requests this user has received
-            $orderReviewCount = ReviewRequest::getSentCountForUser($order->user_id, 'order');
+            $milestone = $this->countDeliveredOrders($order->user_id, $email);
 
-            // Count total delivered orders for this user
-            $totalDeliveredOrders = Order::where('user_id', $order->user_id)
-                ->where('status', 'delivered')
-                ->count();
-
-            // Send review request on 1st, 3rd, 6th, 9th... order
-            $isFirstOrder = $totalDeliveredOrders === 1;
-            $isThirdMultiple = $totalDeliveredOrders >= 3 && $totalDeliveredOrders % 3 === 0;
-            if (!$isFirstOrder && !$isThirdMultiple) {
+            if (! in_array($milestone, config('reviews.milestones'), true)) {
                 continue;
             }
 
-            // Check if we haven't sent request for this specific "cycle"
-            // 1st order = 1 request expected, 3rd = 2, 6th = 3, 9th = 4...
-            $expectedRequests = $totalDeliveredOrders === 1 ? 1 : (1 + floor($totalDeliveredOrders / 3));
-            if ($orderReviewCount >= $expectedRequests) {
+            if (ReviewRequest::existsForMilestone($order->user_id, $email, 'order', $milestone)) {
                 continue;
             }
 
-            // Create review request
-            $reviewRequest = ReviewRequest::create([
-                'user_id' => $order->user_id,
-                'order_id' => $order->id,
-                'review_type' => 'order',
-                'tracking_token' => ReviewRequest::generateTrackingToken(),
-                'email_sent_at' => now(),
-            ]);
+            $this->line("  ✓ #{$order->order_number} → {$email} (milník {$milestone})");
 
-            if (!$dryRun) {
-                // Send email
-                Mail::to($order->user->email)->send(new OrderReviewRequestMail($order, $reviewRequest));
+            if (! $this->dryRun) {
+                $reviewRequest = ReviewRequest::create([
+                    'user_id' => $order->user_id,
+                    'email' => $email,
+                    'order_id' => $order->id,
+                    'review_type' => 'order',
+                    'milestone' => $milestone,
+                    'tracking_token' => ReviewRequest::generateTrackingToken(),
+                    'email_sent_at' => now(),
+                ]);
+
+                Mail::to($email)->send(new OrderReviewRequestMail($order, $reviewRequest));
             }
 
-            $this->line("  ✓ Order #{$order->order_number} → {$order->user->email}");
+            $this->markAsked($order->user_id, $email);
+            $this->consume();
             $sent++;
         }
 
-        $this->info("📧 Sent {$sent} order review requests");
+        $this->info("  Odesláno: {$sent}");
+        $this->newLine();
 
         return $sent;
     }
 
     /**
-     * Send review requests for subscription shipments delivered 7 days ago
+     * Žádosti o hodnocení pro doručené zásilky předplatného.
      */
-    protected function sendSubscriptionReviewRequests(bool $dryRun): int
+    protected function sendSubscriptionReviewRequests(): int
     {
-        $this->info('🔄 Processing subscription review requests...');
+        $this->info('Předplatné');
 
         $sent = 0;
 
-        // Get all subscription shipments delivered exactly 7 days ago
-        $recentShipments = SubscriptionShipment::whereDate('delivered_at', now()->subDays(7)->toDateString())
+        $shipments = SubscriptionShipment::whereBetween('delivered_at', [
+            now()->subDays(config('reviews.max_age_days'))->startOfDay(),
+            now()->subDays(config('reviews.delay_days'))->endOfDay(),
+        ])
             ->with(['subscription.user'])
+            ->orderBy('delivered_at')
             ->get();
 
-        $this->line("Found {$recentShipments->count()} subscription shipments delivered 7 days ago to check");
+        $this->line("  Ve výběru: {$shipments->count()} doručených zásilek");
 
-        foreach ($recentShipments as $shipment) {
+        foreach ($shipments as $shipment) {
+            if ($this->exhausted()) {
+                break;
+            }
+
             $subscription = $shipment->subscription;
-            
-            // Skip if no subscription or user
-            if (!$subscription || !$subscription->user) {
+
+            if (! $subscription || ! $subscription->user) {
                 continue;
             }
 
-            // Check if user has already clicked any review request
-            if (ReviewRequest::userHasClickedAnyReview($subscription->user_id)) {
+            $email = $subscription->user->email;
+
+            if ($this->looksLikeBackfill($shipment->sent_at, $shipment->delivered_at)) {
+                $this->line("  - #{$subscription->subscription_number}: vypadá jako backfill, přeskakuji");
+
+                Log::info('Review request přeskočen kvůli backfillu', [
+                    'shipment_id' => $shipment->id,
+                    'sent_at' => $shipment->sent_at,
+                    'delivered_at' => $shipment->delivered_at,
+                ]);
+
                 continue;
             }
 
-            // Check if we already sent review request for this subscription
-            $existingRequest = ReviewRequest::where('user_id', $subscription->user_id)
-                ->where('subscription_id', $subscription->id)
-                ->where('review_type', 'subscription')
-                ->first();
-
-            if ($existingRequest) {
+            if (! $this->canAsk($subscription->user_id, $email)) {
                 continue;
             }
 
-            // Count delivered shipments from this subscription
-            $deliveredShipments = SubscriptionShipment::where('subscription_id', $subscription->id)
+            $milestone = SubscriptionShipment::where('subscription_id', $subscription->id)
                 ->whereNotNull('delivered_at')
+                ->where('delivered_at', '<=', $shipment->delivered_at)
                 ->count();
 
-            // Send review request after every 3rd subscription delivery (3., 6., 9....)
-            if ($deliveredShipments % 3 !== 0) {
+            if (! in_array($milestone, config('reviews.milestones'), true)) {
                 continue;
             }
 
-            // Count how many subscription review requests this user has received
-            $subscriptionReviewCount = ReviewRequest::getSentCountForUser($subscription->user_id, 'subscription');
-
-            // Check if we haven't sent request for this specific "cycle"
-            $expectedRequests = floor($deliveredShipments / 3);
-            if ($subscriptionReviewCount >= $expectedRequests) {
+            if (ReviewRequest::existsForMilestone(
+                $subscription->user_id,
+                $email,
+                'subscription',
+                $milestone,
+                $subscription->id
+            )) {
                 continue;
             }
 
-            // Create review request
-            $reviewRequest = ReviewRequest::create([
-                'user_id' => $subscription->user_id,
-                'subscription_id' => $subscription->id,
-                'review_type' => 'subscription',
-                'tracking_token' => ReviewRequest::generateTrackingToken(),
-                'email_sent_at' => now(),
-            ]);
+            $this->line("  ✓ #{$subscription->subscription_number} → {$email} (milník {$milestone})");
 
-            if (!$dryRun) {
-                // Send email
-                Mail::to($subscription->user->email)->send(
-                    new SubscriptionReviewRequestMail($subscription, $reviewRequest)
-                );
+            if (! $this->dryRun) {
+                $reviewRequest = ReviewRequest::create([
+                    'user_id' => $subscription->user_id,
+                    'email' => $email,
+                    'subscription_id' => $subscription->id,
+                    'review_type' => 'subscription',
+                    'milestone' => $milestone,
+                    'tracking_token' => ReviewRequest::generateTrackingToken(),
+                    'email_sent_at' => now(),
+                ]);
+
+                Mail::to($email)->send(new SubscriptionReviewRequestMail($subscription, $reviewRequest));
             }
 
-            $this->line("  ✓ Subscription #{$subscription->subscription_number} → {$subscription->user->email}");
+            $this->markAsked($subscription->user_id, $email);
+            $this->consume();
             $sent++;
         }
 
-        $this->info("📧 Sent {$sent} subscription review requests");
+        $this->info("  Odesláno: {$sent}");
+        $this->newLine();
 
         return $sent;
+    }
+
+    /**
+     * Jedna připomínka pro toho, kdo na žádost vůbec nereagoval.
+     */
+    protected function sendReminders(): int
+    {
+        $after = (int) config('reviews.reminder_after_days');
+
+        if ($after <= 0) {
+            return 0;
+        }
+
+        $this->info('Připomínky');
+
+        $sent = 0;
+
+        $pending = ReviewRequest::whereNotNull('email_sent_at')
+            ->whereNull('clicked_at')
+            ->whereNull('reminded_at')
+            ->where('email_sent_at', '<=', now()->subDays($after))
+            ->where('email_sent_at', '>=', now()->subDays($after + config('reviews.max_age_days')))
+            ->with(['order.user', 'subscription.user'])
+            ->get();
+
+        $this->line("  Ve výběru: {$pending->count()} nezodpovězených žádostí");
+
+        foreach ($pending as $reviewRequest) {
+            if ($this->exhausted()) {
+                break;
+            }
+
+            $email = $reviewRequest->email;
+
+            if (! $email) {
+                continue;
+            }
+
+            if (ReviewRequest::hasSubmittedReview($reviewRequest->user_id, $email)) {
+                continue;
+            }
+
+            $mailable = $reviewRequest->review_type === 'order'
+                ? ($reviewRequest->order ? new OrderReviewRequestMail($reviewRequest->order, $reviewRequest) : null)
+                : ($reviewRequest->subscription ? new SubscriptionReviewRequestMail($reviewRequest->subscription, $reviewRequest) : null);
+
+            if (! $mailable) {
+                continue;
+            }
+
+            $this->line("  ✓ připomínka → {$email}");
+
+            if (! $this->dryRun) {
+                Mail::to($email)->send($mailable);
+                $reviewRequest->update(['reminded_at' => now()]);
+            }
+
+            $this->consume();
+            $sent++;
+        }
+
+        $this->info("  Odesláno: {$sent}");
+
+        return $sent;
+    }
+
+    /**
+     * Společná pravidla potlačení pro jednu identitu.
+     */
+    protected function canAsk(?int $userId, ?string $email): bool
+    {
+        if (isset($this->askedThisRun[$this->identityKey($userId, $email)])) {
+            return false;
+        }
+
+        if (ReviewRequest::hasSubmittedReview($userId, $email)) {
+            return false;
+        }
+
+        $cooldown = now()->subMonths((int) config('reviews.click_cooldown_months'));
+
+        if (ReviewRequest::hasClickedSince($userId, $email, $cooldown)) {
+            return false;
+        }
+
+        $lastSent = ReviewRequest::lastSentAt($userId, $email);
+
+        if ($lastSent && now()->diffInDays($lastSent) < (int) config('reviews.min_days_between_requests')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Kolikátá doručená objednávka to je. Hosté nemají účet, takže se počítá
+     * podle e-mailu v doručovací adrese.
+     */
+    protected function countDeliveredOrders(?int $userId, string $email): int
+    {
+        $query = Order::where('status', 'delivered');
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        } else {
+            $query->whereNull('user_id')->where('shipping_address->email', $email);
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * E-mail příjemce - stejné pořadí jako v OrderObserver.
+     */
+    protected function resolveOrderEmail(Order $order): ?string
+    {
+        return $order->shipping_address['email'] ?? $order->user?->email;
+    }
+
+    /**
+     * Doručení zapsané dlouho po odeslání znamená skoro vždy zpětný import,
+     * ne čerstvý balík. Bez téhle pojistky by první běh oslovil celou historii.
+     */
+    protected function looksLikeBackfill($sentAt, $deliveredAt): bool
+    {
+        if (! $sentAt || ! $deliveredAt) {
+            return false;
+        }
+
+        return $sentAt->diffInDays($deliveredAt) > 30;
+    }
+
+    protected function identityKey(?int $userId, ?string $email): string
+    {
+        return $userId ? "u:{$userId}" : 'e:'.strtolower((string) $email);
+    }
+
+    protected function markAsked(?int $userId, ?string $email): void
+    {
+        $this->askedThisRun[$this->identityKey($userId, $email)] = true;
+    }
+
+    protected function exhausted(): bool
+    {
+        return $this->remaining !== null && $this->remaining <= 0;
+    }
+
+    protected function consume(): void
+    {
+        if ($this->remaining !== null) {
+            $this->remaining--;
+        }
     }
 }

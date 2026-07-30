@@ -63,10 +63,22 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping(10)
             ->appendOutputTo($cronLog);
 
-        // Send Trustpilot review requests (daily at 10:00 AM)
+        // Send review requests - each domain has its own Google profile. Daily 10:00.
+        // Gated by REVIEWS_ENABLED so a deploy never blasts existing customers;
+        // run `reviews:send --dry-run` first, then flip the flag.
         $schedule->command('reviews:send')
             ->dailyAt('10:00')
             ->timezone('Europe/Prague')
+            ->when(fn () => config('reviews.enabled'))
+            ->appendOutputTo($cronLog);
+
+        // Refresh Google reviews cache (daily at 5:00 AM).
+        // Google policy allows keeping the content for at most 30 calendar days,
+        // so this also keeps the homepage section from going dark.
+        $schedule->command('reviews:refresh-google')
+            ->dailyAt('05:00')
+            ->timezone('Europe/Prague')
+            ->when(fn () => count(app(\App\Services\GoogleReviewsService::class)->configuredLocales()) > 0)
             ->appendOutputTo($cronLog);
 
         // Clean up expired login tokens (daily at 3:00 AM)
