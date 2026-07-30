@@ -292,7 +292,7 @@ class SendReviewRequests extends Command
             ->whereNull('reminded_at')
             ->where('email_sent_at', '<=', now()->subDays($after))
             ->where('email_sent_at', '>=', now()->subDays($after + config('reviews.max_age_days')))
-            ->with(['order.user', 'subscription.user'])
+            ->with(['user', 'order.user', 'subscription.user'])
             ->get();
 
         $this->line("  Ve výběru: {$pending->count()} nezodpovězených žádostí");
@@ -302,7 +302,11 @@ class SendReviewRequests extends Command
                 break;
             }
 
-            $email = $reviewRequest->email;
+            // Žádosti založené před přidáním sloupce 'email' ho mají prázdný,
+            // příjemce se u nich dohledá z objednávky nebo účtu.
+            $email = $reviewRequest->email
+                ?? $reviewRequest->order?->shipping_address['email']
+                ?? $reviewRequest->user?->email;
 
             if (! $email) {
                 continue;
