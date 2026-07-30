@@ -2,30 +2,36 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ShipmentSchedule;
 use App\Models\SubscriptionPayment;
 use App\Models\SubscriptionShipment;
-use App\Services\SubscriptionShipmentService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 /**
- * Backfill: naváže zaplacené platby, které nemají odpovídající řádek zásilky
- * (subscription_shipments.subscription_payment_id), na jejich zásilku.
+ * Backfill osiřelých zaplacených plateb – BEZPEČNÁ link-only varianta.
  *
- * KROK 6/9 revize: používá centrální SubscriptionShipmentService::linkPaymentToShipment
- * (schedule-keyed, idempotentní). Obsolete migrace starých Packeta dat z `subscriptions`
- * byla odstraněna – tracking žije na ledgeru a duplicitní sloupce na subscription zanikly.
+ * Naváže zaplacenou platbu (subscription_shipments.subscription_payment_id) na JIŽ EXISTUJÍCÍ
+ * řádek zásilky jejího měsíce, a to POUZE když je stav pending/sent/delivered. Záměrně:
+ *   - NEZAKLÁDÁ nové řádky (na rozdíl od live linkPaymentToShipment / getOrCreateForSchedule),
+ *   - NEMĚNÍ stav zásilky – tedy NEOŽIVUJE skipped/cancelled měsíce.
+ * Vše ostatní (skipped/cancelled box, box už patřící jiné platbě, chybějící box, platba bez data)
+ * se přeskočí a vypíše k RUČNÍ revizi.
+ *
+ * Cílový měsíc platby = měsíc period_end (jinak fallback na paid_at, stejně jako
+ * SubscriptionPayment::expected_shipment_date). Bezpečné default = dry-run; zápis až s --apply.
  */
 class LinkShipmentPayments extends Command
 {
-    protected $signature = 'subscriptions:link-shipment-payments {--dry-run : Jen náhled, nic nezapisuje}';
+    protected $signature = 'subscriptions:link-shipment-payments {--apply : Skutečně zapsat vazby (bez tohoto přepínače jen náhled)}';
 
-    protected $description = 'Naváže osiřelé zaplacené platby na jejich zásilku (ledger)';
+    protected $description = 'Bezpečně naváže osiřelé zaplacené platby na existující zásilku (bez oživení, bez nových řádků)';
 
-    public function handle(SubscriptionShipmentService $shipmentService): int
+    public function handle(): int
     {
-        $dryRun = (bool) $this->option('dry-run');
+        $apply = (bool) $this->option('apply');
 
-        // Paid platby, na které neukazuje žádná zásilka.
         $referenced = SubscriptionShipment::whereNotNull('subscription_payment_id')
             ->pluck('subscription_payment_id')
             ->unique();
@@ -41,47 +47,114 @@ class LinkShipmentPayments extends Command
             return 0;
         }
 
-        $this->info(($dryRun ? '🧪 DRY-RUN – ' : '')."Nalezeno {$orphans->count()} osiřelých plateb.");
+        $this->info(($apply ? '⚙️  APPLY – ' : '🧪 DRY-RUN – ')."Nalezeno {$orphans->count()} osiřelých plateb.");
+        $this->newLine();
 
-        $linked = 0;
-        $skipped = 0;
+        $toLink = [];      // [payment_id => shipment]
+        $manual = [];      // řádky k ruční revizi
 
         foreach ($orphans as $payment) {
             $subNumber = $payment->subscription?->subscription_number ?? '#'.$payment->subscription_id;
 
             if (! $payment->subscription) {
-                $this->warn("  ✗ Platba #{$payment->id}: chybí předplatné, přeskočeno");
-                $skipped++;
+                $manual[] = "Platba #{$payment->id} ({$subNumber}): chybí předplatné";
 
                 continue;
             }
 
-            if ($dryRun) {
-                $expected = $payment->expected_shipment_date?->toDateString() ?? '—';
-                $this->line("  [would] Platba #{$payment->id} ({$subNumber}) → zásilka pro {$expected}");
-                $linked++;
+            $month = $this->targetMonth($payment);
+            if (! $month) {
+                $manual[] = "Platba #{$payment->id} ({$subNumber}): nelze určit měsíc (period_end/paid_at)";
 
                 continue;
             }
 
-            $shipment = $shipmentService->linkPaymentToShipment($payment, $payment->subscription);
+            // Read-only: pokud schedule pro měsíc neexistuje, NEZAKLÁDÁME ho – jde k ruční revizi.
+            $schedule = ShipmentSchedule::getForMonth($month['year'], $month['month']);
+            $shipment = $schedule
+                ? SubscriptionShipment::where('subscription_id', $payment->subscription_id)
+                    ->where('shipment_schedule_id', $schedule->id)
+                    ->first()
+                : null;
 
-            if ($shipment && $shipment->subscription_payment_id === $payment->id) {
-                $this->line("  ✓ Platba #{$payment->id} ({$subNumber}) → zásilka #{$shipment->id} ({$shipment->shipment_date->format('Y-m-d')})");
-                $linked++;
-            } elseif ($shipment) {
-                // Měsíc už obsazen jinou platbou – historická anomálie k ruční revizi.
-                $this->warn("  ✗ Platba #{$payment->id} ({$subNumber}): zásilka #{$shipment->id} už patří platbě #{$shipment->subscription_payment_id} – ponechávám k ruční revizi");
-                $skipped++;
-            } else {
-                $this->warn("  ✗ Platba #{$payment->id} ({$subNumber}): nelze určit zásilku");
-                $skipped++;
+            $ym = sprintf('%04d-%02d', $month['year'], $month['month']);
+
+            if (! $shipment) {
+                $manual[] = "Platba #{$payment->id} ({$subNumber}): žádný box pro {$ym} (nezakládám)";
+
+                continue;
             }
+            if ($shipment->subscription_payment_id) {
+                $manual[] = "Platba #{$payment->id} ({$subNumber}): box #{$shipment->id} už patří platbě #{$shipment->subscription_payment_id}";
+
+                continue;
+            }
+            if (in_array($shipment->status, ['skipped', 'cancelled'], true)) {
+                $manual[] = "Platba #{$payment->id} ({$subNumber}): box #{$shipment->id} ({$ym}) je {$shipment->status} – NEOŽIVUJI";
+
+                continue;
+            }
+
+            // pending / sent / delivered bez platby → bezpečné navázání beze změny stavu.
+            $toLink[$payment->id] = $shipment;
+            $this->line("  ✓ Platba #{$payment->id} ({$subNumber}) → box #{$shipment->id} ({$shipment->shipment_date->format('Y-m-d')}, {$shipment->status})");
+        }
+
+        if ($apply && $toLink) {
+            DB::transaction(function () use ($toLink) {
+                foreach ($toLink as $payId => $shipment) {
+                    // Jen FK, žádná změna stavu; saveQuietly = bez model-eventů (žádné e-maily).
+                    $shipment->subscription_payment_id = $payId;
+                    $shipment->saveQuietly();
+
+                    \Log::info('Backfill: linked orphan payment to existing shipment', [
+                        'payment_id' => $payId,
+                        'shipment_id' => $shipment->id,
+                        'status' => $shipment->status,
+                    ]);
+                }
+            });
         }
 
         $this->newLine();
-        $this->info(($dryRun ? 'Navázalo by se' : 'Navázáno')." plateb: {$linked}, přeskočeno: {$skipped}.");
+        if ($manual) {
+            $this->warn('K RUČNÍ REVIZI ('.count($manual).'):');
+            foreach ($manual as $mline) {
+                $this->line('  - '.$mline);
+            }
+            $this->newLine();
+        }
+
+        $verb = $apply ? 'Navázáno' : 'Navázalo by se';
+        $this->info("{$verb}: ".count($toLink)." | k ruční revizi: ".count($manual).' | celkem osiřelých: '.$orphans->count());
+
+        if (! $apply) {
+            $this->line('   (dry-run – nic nezapsáno; pro zápis spusť s --apply)');
+        }
 
         return 0;
+    }
+
+    /**
+     * Cílový měsíc platby: period_end (jinak paid_at s posunem po 15.) – zrcadlí
+     * SubscriptionPayment::expected_shipment_date, ale bez vytváření schedule.
+     *
+     * @return array{year:int,month:int}|null
+     */
+    private function targetMonth(SubscriptionPayment $payment): ?array
+    {
+        if ($payment->period_end) {
+            return ['year' => $payment->period_end->year, 'month' => $payment->period_end->month];
+        }
+
+        if ($payment->paid_at) {
+            $d = $payment->paid_at->day > 15
+                ? $payment->paid_at->copy()->addMonthNoOverflow()
+                : $payment->paid_at->copy();
+
+            return ['year' => $d->year, 'month' => $d->month];
+        }
+
+        return null;
     }
 }
