@@ -51,11 +51,6 @@ class ReviewRequest extends Model
         return $this->belongsTo(Subscription::class);
     }
 
-    public function review()
-    {
-        return $this->hasOne(Review::class);
-    }
-
     /**
      * Scopes
      */
@@ -125,16 +120,9 @@ class ReviewRequest extends Model
     }
 
     /**
-     * Kdo hodnocení opravdu odeslal, už se neptáme znovu.
-     */
-    public static function hasSubmittedReview(?int $userId, ?string $email): bool
-    {
-        return static::forIdentity($userId, $email)->whereHas('review')->exists();
-    }
-
-    /**
-     * Kdo jen kliknul a nedokončil, dostane pokoj na zadanou dobu - dřív ho
-     * jediné kliknutí vyřadilo natrvalo.
+     * Kliknutí je jediný signál, který o spokojenosti máme - recenze žijí na
+     * Googlu, takže nevíme, jestli ji člověk opravdu napsal. Kdo kliknul,
+     * dostane pokoj na zadanou dobu.
      */
     public static function hasClickedSince(?int $userId, ?string $email, $since): bool
     {

@@ -308,7 +308,10 @@ class SendReviewRequests extends Command
                 continue;
             }
 
-            if (ReviewRequest::hasSubmittedReview($reviewRequest->user_id, $email)) {
+            // Kdo mezitím kliknul jinou žádostí, připomínku nedostane.
+            $cooldown = now()->subMonths((int) config('reviews.click_cooldown_months'));
+
+            if (ReviewRequest::hasClickedSince($reviewRequest->user_id, $email, $cooldown)) {
                 continue;
             }
 
@@ -342,10 +345,6 @@ class SendReviewRequests extends Command
     protected function canAsk(?int $userId, ?string $email): bool
     {
         if (isset($this->askedThisRun[$this->identityKey($userId, $email)])) {
-            return false;
-        }
-
-        if (ReviewRequest::hasSubmittedReview($userId, $email)) {
             return false;
         }
 
