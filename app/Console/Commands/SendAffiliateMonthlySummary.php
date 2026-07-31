@@ -159,6 +159,7 @@ class SendAffiliateMonthlySummary extends Command
             'currency' => $balance['currency'],
             'payable_amount' => $balance['amount'],
             'threshold' => $balance['threshold'],
+            'threshold_enabled' => $balance['enabled'],
             'threshold_reached' => $balance['reached'],
             'active_subscriptions' => $activeSubscriptions->count(),
             'estimated_monthly_income' => (float) $activeSubscriptions->sum('current_rate'),

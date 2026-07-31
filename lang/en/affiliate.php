@@ -115,7 +115,8 @@ return [
 
     // Payout threshold
     'payout_threshold' => 'Payout threshold',
-    'payout_threshold_help' => 'The amount from which the partner can invoice their rewards. Empty = default from settings.',
+    'payout_threshold_help' => 'The amount from which the partner can invoice their rewards. Empty = default from settings, 0 = no threshold (the partner does not see it and gets no email about reaching it).',
+    'payout_threshold_disabled' => 'Threshold is off (0) – the partner does not see it and gets no email about reaching it.',
     'payout_progress' => 'Progress towards payout',
     'payout_progress_text' => ':amount of :threshold',
     'payout_reached' => 'You have reached the payout threshold. Send us your invoice at :email and we will pay your rewards.',

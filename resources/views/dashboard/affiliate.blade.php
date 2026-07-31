@@ -85,6 +85,8 @@
         </div>
     </div>
 
+    {{-- Hranice nastavená na 0 znamená "neřešit" – celý blok se pak nezobrazuje --}}
+    @if($statistics['payout_threshold_enabled'])
     <!-- Postup k fakturační hranici -->
     <div class="bg-white rounded-2xl p-6 border border-gray-200">
         <div class="flex flex-wrap justify-between items-baseline gap-2 mb-3">
@@ -110,6 +112,7 @@
             @endif
         </p>
     </div>
+    @endif
 
     <!-- Vývoj po měsících -->
     <div class="bg-white rounded-2xl p-6 border border-gray-200">

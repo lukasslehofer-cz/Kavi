@@ -95,7 +95,9 @@
                     {{ __('affiliate.save') }}
                 </button>
 
-                @if($statistics['threshold_reached'])
+                @if(! $statistics['payout_threshold_enabled'])
+                    <span class="text-sm text-gray-500 pb-2">{{ __('affiliate.payout_threshold_disabled') }}</span>
+                @elseif($statistics['threshold_reached'])
                     <span class="text-sm text-green-700 pb-2">
                         {{ __('affiliate.payout_progress_text', [
                             'amount' => \App\Helpers\CurrencyHelper::formatByCurrency($statistics['payable_amount'], $statistics['payout_currency'], 0),

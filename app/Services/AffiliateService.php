@@ -287,10 +287,12 @@ class AffiliateService
             'estimated_monthly_income' => (float) $active->sum('current_rate'),
             'payout_threshold' => $threshold['amount'],
             'payout_currency' => $threshold['currency'],
-            'threshold_reached' => $payableAmount >= $threshold['amount'],
-            'threshold_progress' => $threshold['amount'] > 0
+            // false = hranice je nastavená na 0, tedy se neřeší (blok se nezobrazuje)
+            'payout_threshold_enabled' => $threshold['enabled'],
+            'threshold_reached' => $threshold['enabled'] && $payableAmount >= $threshold['amount'],
+            'threshold_progress' => $threshold['enabled']
                 ? min(100, round($payableAmount / $threshold['amount'] * 100, 1))
-                : 100.0,
+                : 0.0,
         ];
     }
 
@@ -501,19 +503,26 @@ class AffiliateService
     /**
      * Fakturační hranice partnera (vlastní hodnota, jinak výchozí z configu)
      *
-     * @return array{amount: float, currency: string, is_custom: bool}
+     * Hranice nastavená na 0 znamená "hranici neřešit" – partner ji nevidí
+     * v dashboardu a nechodí mu mail o jejím dosažení. Prázdná hodnota naopak
+     * znamená "použij výchozí z configu".
+     *
+     * @return array{amount: float, currency: string, is_custom: bool, enabled: bool}
      */
     public function getPayoutThreshold(User $partner): array
     {
         $currency = $this->getPartnerCurrency($partner);
         $custom = $partner->affiliate_payout_threshold;
 
+        $amount = $custom !== null
+            ? (float) $custom
+            : (float) (config('affiliate.payout_threshold.'.$currency) ?? config('affiliate.payout_threshold.CZK', 1000));
+
         return [
-            'amount' => $custom !== null
-                ? (float) $custom
-                : (float) (config('affiliate.payout_threshold.'.$currency) ?? config('affiliate.payout_threshold.CZK', 1000)),
+            'amount' => $amount,
             'currency' => $currency,
             'is_custom' => $custom !== null,
+            'enabled' => $amount > 0,
         ];
     }
 
@@ -534,7 +543,8 @@ class AffiliateService
             'amount' => $amount,
             'currency' => $threshold['currency'],
             'threshold' => $threshold['amount'],
-            'reached' => $amount >= $threshold['amount'],
+            'enabled' => $threshold['enabled'],
+            'reached' => $threshold['enabled'] && $amount >= $threshold['amount'],
         ];
     }
 
@@ -608,7 +618,8 @@ class AffiliateService
 
         $balance = $this->getPayoutBalance($partner);
 
-        if (! $balance['reached'] || ! $partner->email) {
+        // Hranice 0 = neřešíme ji, mail by chodil hned u první odměny
+        if (! $balance['enabled'] || ! $balance['reached'] || ! $partner->email) {
             return false;
         }
 

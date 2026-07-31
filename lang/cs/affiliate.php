@@ -115,7 +115,8 @@ return [
 
     // Fakturační hranice
     'payout_threshold' => 'Fakturační hranice',
-    'payout_threshold_help' => 'Od jaké částky si partner může odměny vyfakturovat. Prázdné = výchozí hodnota z nastavení.',
+    'payout_threshold_help' => 'Od jaké částky si partner může odměny vyfakturovat. Prázdné = výchozí hodnota z nastavení, 0 = hranici neřešit (partner ji nevidí a nechodí mu mail o dosažení).',
+    'payout_threshold_disabled' => 'Hranice je vypnutá (0) – partner ji nevidí a nedostává mail o dosažení.',
     'payout_progress' => 'Postup k fakturační hranici',
     'payout_progress_text' => ':amount z :threshold',
     'payout_reached' => 'Dosáhli jste fakturační hranice. Pošlete nám fakturu na :email a odměny vám vyplatíme.',
@@ -138,7 +139,7 @@ return [
     'next_reward' => 'Další odměna',
     'reward_every_shipment' => 'Za každou rozesílku',
     'remaining_then_followup' => '{1} ještě 1× v této výši, pak :followup|[2,4] ještě :count× v této výši, pak :followup|[5,*] ještě :count× v této výši, pak :followup',
-    'remaining_then_end' => '{1} poslední odměna z tohoto předplatného|[2,4] zbývají :count odměny, pak končí|[5,*] zbývá :count odměn, pak končí',
+    'remaining_then_end' => '{1} poslední odměna z tohoto předplatného|[2,4] zbývají :count odměny|[5,*] zbývá :count odměn',
     'no_further_reward' => 'Odměny vyčerpány',
     'subscription_ended' => 'Ukončeno',
     'subscription_active' => 'Aktivní',

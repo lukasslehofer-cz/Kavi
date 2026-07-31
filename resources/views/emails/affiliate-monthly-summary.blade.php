@@ -62,6 +62,7 @@
                 <td style="padding: 8px 0; font-size: 18px; color: #1c1c1c; text-align: right;">{{ $fmt($summary['payable_amount']) }}</td>
             </tr>
         </table>
+        @if($summary['threshold_enabled'] ?? true)
         <p style="font-size: 14px; color: #5a5a5a; line-height: 1.7; margin: 16px 0 0 0;">
             @if($summary['threshold_reached'])
                 {{ __('emails.affiliate_monthly_summary.threshold_reached', [], $locale) }}
@@ -69,6 +70,7 @@
                 {{ __('emails.affiliate_monthly_summary.threshold_remaining', ['amount' => $fmt(max(0, $summary['threshold'] - $summary['payable_amount']))], $locale) }}
             @endif
         </p>
+        @endif
     </div>
 
     <!-- CTA Button -->
