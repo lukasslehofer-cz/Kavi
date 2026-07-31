@@ -99,6 +99,7 @@ return [
     'dashboard-subscription-invoice' => 'subscription/payment/{payment}/invoice',
     'dashboard-subscription-packeta' => 'subscription/update-packeta',
     'dashboard-notifications' => 'notifications',
+    'dashboard-affiliate' => 'affiliate',
 
 ];
 

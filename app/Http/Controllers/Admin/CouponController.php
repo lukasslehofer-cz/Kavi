@@ -80,6 +80,8 @@ class CouponController extends Controller
             'affiliate_reward_subscription_value' => 'nullable|numeric|min:0',
             'affiliate_reward_subscription_value_eur' => 'nullable|numeric|min:0',
             'affiliate_reward_subscription_months' => 'nullable|integer|min:1',
+            'affiliate_reward_subscription_followup_value' => 'nullable|numeric|min:0',
+            'affiliate_reward_subscription_followup_value_eur' => 'nullable|numeric|min:0',
 
             'is_active' => 'boolean',
         ]);
@@ -163,6 +165,8 @@ class CouponController extends Controller
             'affiliate_reward_subscription_value' => 'nullable|numeric|min:0',
             'affiliate_reward_subscription_value_eur' => 'nullable|numeric|min:0',
             'affiliate_reward_subscription_months' => 'nullable|integer|min:1',
+            'affiliate_reward_subscription_followup_value' => 'nullable|numeric|min:0',
+            'affiliate_reward_subscription_followup_value_eur' => 'nullable|numeric|min:0',
 
             'is_active' => 'boolean',
         ]);

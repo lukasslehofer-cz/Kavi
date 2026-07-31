@@ -102,7 +102,7 @@ class EmailLogController extends Controller
             $mailable = $this->reconstructMailable($emailLog);
 
             if (!$mailable) {
-                return back()->with('error', 'Nelze znovu vytvořit email. Chybí potřebná data.');
+                return back()->with('error', 'Tento typ e-mailu nelze znovu odeslat z administrace – potřebuje víc dat, než je v logu. Použij příslušný artisan příkaz.');
             }
 
             // Send the email
@@ -123,10 +123,19 @@ class EmailLogController extends Controller
 
     /**
      * Reconstruct a mailable instance from email log
+     *
+     * Funguje jen pro mailable, které se dají poskládat z jednoho modelu.
+     * Cokoliv s dalšími povinnými argumenty (platba, odměna, tělo zprávy)
+     * se znovu odeslat nedá – radši vrátíme null, než abychom poslali mail
+     * s podstrčenými daty.
      */
     private function reconstructMailable(EmailLog $emailLog)
     {
         $mailableClass = $emailLog->mailable_class;
+
+        if (! $this->isSingleModelMailable($mailableClass)) {
+            return null;
+        }
 
         // Try to reconstruct based on what we have
         if ($emailLog->order_id && $emailLog->order) {
@@ -143,5 +152,23 @@ class EmailLogController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Má mailable jen jeden povinný argument konstruktoru (model)?
+     */
+    private function isSingleModelMailable(string $mailableClass): bool
+    {
+        try {
+            $constructor = (new \ReflectionClass($mailableClass))->getConstructor();
+        } catch (\ReflectionException $e) {
+            return false;
+        }
+
+        if (! $constructor) {
+            return false;
+        }
+
+        return $constructor->getNumberOfRequiredParameters() <= 1;
     }
 }

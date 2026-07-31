@@ -22,7 +22,7 @@ return [
     'per_payment' => 'per payment',
     'your_link' => 'Your affiliate link',
     'copy' => 'Copy',
-    'link_copied' => 'Link copied!',
+    'link_copied' => 'Copied',
     'no_codes' => 'No affiliate codes yet',
     'no_codes_text' => 'Contact administrator to create your affiliate codes.',
     
@@ -92,4 +92,98 @@ return [
     'total_amount' => 'Total Amount',
     'no_rewards_admin' => 'No affiliate rewards yet.',
     'payment_number' => 'Payment',
+    // Statistics - extended
+    'payable' => 'Payable',
+    'cancelled_amount' => 'Cancelled',
+    'conversion_rate' => 'Conversion rate',
+    'this_month' => 'This month',
+    'active_subscriptions' => 'Active subscriptions',
+    'estimated_income' => 'Estimated per shipment',
+    'status_cancelled' => 'Cancelled',
+    'from_clicks' => 'from :count clicks',
+    'awaiting_payout' => 'awaiting payout',
+
+    // Reward tiers
+    'tier_initial' => 'Initial rate',
+    'tier_followup' => 'Long-term rate',
+    'reward_scheme_unlimited' => ':amount per shipment',
+    'reward_scheme_limited' => '{1} :amount for the first shipment|[2,*] :amount for the first :count shipments',
+    'reward_scheme_tiered' => '{1} :amount for the first shipment, then :followup for every further one|[2,*] :amount for the first :count shipments, then :followup for every further one',
+    'followup_reward' => 'Long-term subscription reward',
+    'followup_reward_help' => 'Reward for every further shipment once the repetition count above runs out. Empty = nothing is paid after that.',
+    'followup_reward_note' => 'Applies without limit until the subscription ends.',
+
+    // Payout threshold
+    'payout_threshold' => 'Payout threshold',
+    'payout_threshold_help' => 'The amount from which the partner can invoice their rewards. Empty = default from settings.',
+    'payout_progress' => 'Progress towards payout',
+    'payout_progress_text' => ':amount of :threshold',
+    'payout_reached' => 'You have reached the payout threshold. Send us your invoice at :email and we will pay your rewards.',
+    'payout_remaining' => 'You need :amount more to reach the payout threshold.',
+    'payout_threshold_saved' => 'Payout threshold has been saved.',
+
+    // Development over time
+    'monthly_development' => 'Monthly development',
+    'monthly_development_subtitle' => 'Earnings over the last 12 months',
+    'no_monthly_data' => 'No data for the chart yet.',
+
+    // Subscriptions overview
+    'your_subscriptions' => 'Subscriptions earning you money',
+    'your_subscriptions_subtitle' => 'Overview of referred subscriptions and their rewards',
+    'subscription_number' => 'Subscription',
+    'since' => 'Since',
+    'rewarded_shipments' => 'Rewarded shipments',
+    'earned' => 'Earned',
+    'current_rate' => 'Current rate',
+    'next_reward' => 'Next reward',
+    'remaining_at_initial' => ':count more at the initial rate',
+    'no_further_reward' => 'Rewards used up',
+    'subscription_ended' => 'Ended',
+    'subscription_active' => 'Active',
+    'no_subscriptions' => 'No subscription is earning you money yet',
+    'no_subscriptions_text' => 'As soon as someone starts a subscription with your code, you will see it here.',
+
+    // Code performance
+    'code_performance' => 'Your code performance',
+    'code_performance_subtitle' => 'How many customers each code brought in',
+
+    // Admin - partner detail
+    'partner_detail' => 'Partner detail',
+    'back_to_partners' => 'Back to partners',
+    'view_as_partner' => 'View their dashboard',
+    'partner_settings' => 'Partner settings',
+    'save' => 'Save',
+    'mark_all_approved_paid' => 'Mark all approved as paid',
+    'mark_all_approved_paid_confirm' => 'Really mark all approved rewards of this partner as paid?',
+    'bulk_paid_done' => 'Rewards paid: :count',
+    'bulk_paid_none' => 'This partner has no approved rewards to pay out.',
+    'customer' => 'Customer',
+
+    // Admin - bulk mail
+    'mail_title' => 'Mail to affiliate partners',
+    'mail_subtitle' => 'The message is sent in the Kavi template including a link to the partner affiliate section',
+    'mail_recipients' => 'Recipients',
+    'mail_select_all' => 'Select all',
+    'mail_subject' => 'Subject',
+    'mail_body' => 'Message body',
+    'mail_body_help' => 'Plain text. An empty line separates paragraphs. HTML is not used.',
+    'mail_preview' => 'Preview',
+    'mail_send_test' => 'Send test to myself',
+    'mail_send' => 'Send to selected',
+    'mail_send_confirm' => 'Really send the message to the selected partners?',
+    'mail_no_recipients' => 'Select at least one partner.',
+    'mail_test_sent' => 'Test email has been sent to :email.',
+    'mail_sent' => 'Emails sent: :count',
+    'mail_sent_with_errors' => 'Emails sent: :count, errors: :errors',
+    'mail_preview_hint' => 'The preview is generated for the first selected partner.',
+
+    // Admin - výpis partnerů
+    'search' => 'Search',
+    'reset' => 'Reset',
+    'codes' => 'Codes',
+    'actions' => 'Actions',
+    'user_email' => 'User e-mail',
+    'activate' => 'Activate',
+    'deactivate_confirm' => 'Really deactivate this partner?',
+    'already_partner' => 'This user is already an affiliate partner.',
 ];

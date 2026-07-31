@@ -101,6 +101,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/affiliate/partners/{user}/activate', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'activate'])->name('affiliate.partners.activate');
     Route::post('/affiliate/partners/{user}/deactivate', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'deactivate'])->name('affiliate.partners.deactivate');
     Route::post('/affiliate/partners/activate-by-email', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'activateByEmail'])->name('affiliate.partners.activate-by-email');
+    Route::post('/affiliate/partners/{user}/settings', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'updateSettings'])->name('affiliate.partners.settings');
+    Route::post('/affiliate/partners/{user}/payout-approved', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'payoutApproved'])->name('affiliate.partners.payout-approved');
+    // Detail až za statickými cestami, ať /affiliate/partners/activate-by-email nespadne do {user}
+    Route::get('/affiliate/partners/{user}', [\App\Http\Controllers\Admin\AffiliatePartnerController::class, 'show'])->name('affiliate.partners.show');
+    Route::get('/affiliate/mail', [\App\Http\Controllers\Admin\AffiliateMailController::class, 'create'])->name('affiliate.mail.create');
+    Route::post('/affiliate/mail/preview', [\App\Http\Controllers\Admin\AffiliateMailController::class, 'preview'])->name('affiliate.mail.preview');
+    Route::post('/affiliate/mail/send-test', [\App\Http\Controllers\Admin\AffiliateMailController::class, 'sendTest'])->name('affiliate.mail.send-test');
+    Route::post('/affiliate/mail/send', [\App\Http\Controllers\Admin\AffiliateMailController::class, 'send'])->name('affiliate.mail.send');
     Route::get('/affiliate/rewards', [\App\Http\Controllers\Admin\AffiliateRewardController::class, 'index'])->name('affiliate.rewards.index');
     Route::post('/affiliate/rewards/{reward}/approve', [\App\Http\Controllers\Admin\AffiliateRewardController::class, 'approve'])->name('affiliate.rewards.approve');
     Route::post('/affiliate/rewards/{reward}/mark-paid', [\App\Http\Controllers\Admin\AffiliateRewardController::class, 'markPaid'])->name('affiliate.rewards.mark-paid');

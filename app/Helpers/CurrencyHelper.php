@@ -69,12 +69,31 @@ class CurrencyHelper
      */
     public static function price(?float $priceCzk, ?float $priceEur): float
     {
-        if (self::isEur()) {
+        return self::priceFor(self::code(), $priceCzk, $priceEur);
+    }
+
+    /**
+     * Get the appropriate price for an explicitly given currency
+     *
+     * Na rozdíl od price() nečte session – použij všude, kde se počítá mimo
+     * request (webhooky, cron, artisan příkazy, maily).
+     *
+     * @param string|null $currency CZK / EUR (null = aktuální měna)
+     * @param float|null $priceCzk Price in CZK
+     * @param float|null $priceEur Price in EUR
+     * @return float
+     */
+    public static function priceFor(?string $currency, ?float $priceCzk, ?float $priceEur): float
+    {
+        $currency = $currency ? strtoupper($currency) : self::code();
+
+        if ($currency === 'EUR') {
             return $priceEur ?? 0;
         }
+
         return $priceCzk ?? 0;
     }
-    
+
     /**
      * Format a price with the current currency symbol
      * 

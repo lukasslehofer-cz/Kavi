@@ -17,6 +17,7 @@ class AffiliateReward extends Model
         'subscription_id',
         'subscription_payment_number',
         'reward_type',
+        'reward_tier',
         'reward_amount',
         'currency',
         'status',
@@ -124,12 +125,40 @@ class AffiliateReward extends Model
     public function getStatusLabel(): string
     {
         return match($this->status) {
-            'pending' => 'Čeká na schválení',
-            'approved' => 'Schváleno',
-            'paid' => 'Vyplaceno',
-            'cancelled' => 'Zrušeno',
+            'pending' => __('affiliate.status_pending'),
+            'approved' => __('affiliate.status_approved'),
+            'paid' => __('affiliate.status_paid'),
+            'cancelled' => __('affiliate.status_cancelled'),
             default => $this->status,
         };
+    }
+
+    /**
+     * Získá název sazby (initial / followup / order)
+     */
+    public function getTierLabel(): ?string
+    {
+        return match($this->reward_tier) {
+            'initial' => __('affiliate.tier_initial'),
+            'followup' => __('affiliate.tier_followup'),
+            default => null,
+        };
+    }
+
+    /**
+     * Odměna, kterou má partner ještě dostat zaplacenou (nezrušená a nevyplacená)
+     */
+    public function scopePayable($query)
+    {
+        return $query->whereIn('status', ['pending', 'approved']);
+    }
+
+    /**
+     * Odměny, které se počítají do výdělku (vše kromě zrušených)
+     */
+    public function scopeCounted($query)
+    {
+        return $query->where('status', '!=', 'cancelled');
     }
 
     /**
@@ -149,6 +178,11 @@ class AffiliateReward extends Model
      */
     public function markAsPaid(?string $notes = null): bool
     {
+        // Zrušenou odměnu nelze vyplatit – nejdřív ji musí admin vrátit do hry
+        if ($this->status === 'cancelled') {
+            return false;
+        }
+
         $data = [
             'status' => 'paid',
             'paid_at' => now(),

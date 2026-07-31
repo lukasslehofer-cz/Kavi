@@ -81,6 +81,14 @@ class Kernel extends ConsoleKernel
             ->when(fn () => count(app(\App\Services\GoogleReviewsService::class)->configuredLocales()) > 0)
             ->appendOutputTo($cronLog);
 
+        // Affiliate monthly summary – 1st of the month at 9:00.
+        // Skips partners with no activity and no balance, so quiet partners get nothing.
+        $schedule->command('affiliate:send-monthly-summary')
+            ->monthlyOn(1, '09:00')
+            ->timezone('Europe/Prague')
+            ->when(fn () => config('affiliate.emails.monthly_summary'))
+            ->appendOutputTo($cronLog);
+
         // Clean up expired login tokens (daily at 3:00 AM)
         $schedule->command('auth:cleanup-login-tokens')
             ->dailyAt('03:00')

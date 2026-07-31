@@ -28,6 +28,7 @@ class BackfillAffiliateSubscriptionRewards extends Command
         $subscriptions = $query->get();
 
         $planned = [];
+        $skippedShifted = [];
 
         foreach ($subscriptions as $sub) {
             $coupon = $sub->coupon;
@@ -35,25 +36,54 @@ class BackfillAffiliateSubscriptionRewards extends Command
                 continue;
             }
 
-            $limit = $coupon->affiliate_reward_subscription_months;
+            $currency = strtoupper($sub->currency ?? 'CZK');
             $payments = SubscriptionPayment::where('subscription_id', $sub->id)
                 ->where('status', 'paid')
                 ->orderBy('paid_at')
                 ->orderBy('id')
                 ->get();
 
-            $existing = AffiliateReward::where('subscription_id', $sub->id)
+            $existingRewards = AffiliateReward::where('subscription_id', $sub->id)
                 ->whereNotNull('subscription_payment_number')
-                ->pluck('subscription_payment_number')
-                ->all();
+                ->where('status', '!=', 'cancelled')
+                ->get();
+
+            $existing = $existingRewards->pluck('subscription_payment_number')->all();
+
+            // Pojistka proti dvojímu vyplacení: pořadová čísla odměn se odvozují
+            // z počtu zaplacených plateb a umí se posunout (viz affiliate:audit,
+            // sekce "Posunuté číslování"). Pokud už je odměn tolik co plateb, je
+            // každá rozesílka odměněná – i kdyby čísla nesouhlasila.
+            if ($existingRewards->count() >= $payments->count()) {
+                if ($existingRewards->count() > 0 && ! empty(array_diff(range(1, max(1, $payments->count())), $existing))) {
+                    $skippedShifted[] = [
+                        $sub->subscription_number,
+                        $payments->count(),
+                        $existingRewards->pluck('subscription_payment_number')->sort()->implode(', '),
+                    ];
+                }
+
+                continue;
+            }
 
             foreach ($payments as $i => $payment) {
                 $paymentNumber = $i + 1;
 
-                if ($limit !== null && $paymentNumber > $limit) {
-                    break;
-                }
                 if (in_array($paymentNumber, $existing, true)) {
+                    continue;
+                }
+
+                // O sazbě i o tom, zda odměna vůbec náleží, rozhoduje kupón
+                // (úvodní sazba / navazující dlouhodobá sazba / nic).
+                $tier = $coupon->affiliateSubscriptionTierFor($paymentNumber);
+
+                if ($tier === null) {
+                    continue;
+                }
+
+                $amount = $coupon->calculateAffiliateSubscriptionReward($paymentNumber, $currency);
+
+                if ($amount <= 0) {
                     continue;
                 }
 
@@ -62,9 +92,18 @@ class BackfillAffiliateSubscriptionRewards extends Command
                     'coupon' => $coupon,
                     'payment' => $payment,
                     'payment_number' => $paymentNumber,
-                    'reward_amount' => $coupon->calculateAffiliateSubscriptionReward(),
+                    'tier' => $tier,
+                    'currency' => $currency,
+                    'reward_amount' => $amount,
                 ];
             }
+        }
+
+        if ($skippedShifted) {
+            $this->newLine();
+            $this->line('<fg=cyan>Přeskočeno kvůli posunutému číslování ('.count($skippedShifted).')</>');
+            $this->line('Tato předplatná mají odměn tolik co zaplacených plateb, jen s jinými pořadovými čísly.');
+            $this->table(['Předplatné', 'Zaplaceno plateb', 'Čísla odměn'], $skippedShifted);
         }
 
         if (empty($planned)) {
@@ -73,15 +112,16 @@ class BackfillAffiliateSubscriptionRewards extends Command
         }
 
         $this->table(
-            ['Subscription', 'Payment #', 'Paid at', 'Partner ID', 'Coupon', 'Reward', 'Currency'],
+            ['Subscription', 'Payment #', 'Paid at', 'Partner ID', 'Coupon', 'Tier', 'Reward', 'Currency'],
             array_map(fn ($p) => [
                 $p['subscription']->subscription_number,
                 $p['payment_number'],
                 $p['payment']->paid_at?->toDateTimeString(),
                 $p['coupon']->affiliate_partner_id,
                 $p['coupon']->code,
+                $p['tier'],
                 $p['reward_amount'],
-                strtoupper($p['subscription']->currency ?? 'CZK'),
+                $p['currency'],
             ], $planned)
         );
 
@@ -110,8 +150,9 @@ class BackfillAffiliateSubscriptionRewards extends Command
                         'subscription_id' => $p['subscription']->id,
                         'subscription_payment_number' => $p['payment_number'],
                         'reward_type' => 'subscription',
+                        'reward_tier' => $p['tier'],
                         'reward_amount' => $p['reward_amount'],
-                        'currency' => $p['subscription']->currency ?? 'czk',
+                        'currency' => $p['currency'],
                         'status' => 'pending',
                     ]);
 

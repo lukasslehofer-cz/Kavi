@@ -19,11 +19,11 @@
                     class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 >
                 <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
-                    Hledat
+                    {{ __('affiliate.search') }}
                 </button>
                 @if($search)
                 <a href="{{ route('admin.affiliate.partners.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-                    Zrušit
+                    {{ __('affiliate.reset') }}
                 </a>
                 @endif
             </form>
@@ -36,22 +36,25 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Partner
+                            {{ __('affiliate.partner') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             {{ __('affiliate.partner_since') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Kódy
+                            {{ __('affiliate.codes') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             {{ __('affiliate.total_earned') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {{ __('affiliate.payable') }}
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             {{ __('affiliate.clicks') }}
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Akce
+                            {{ __('affiliate.actions') }}
                         </th>
                     </tr>
                 </thead>
@@ -61,9 +64,9 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900">
+                                    <a href="{{ route('admin.affiliate.partners.show', $partner) }}" class="text-sm font-medium text-purple-700 hover:text-purple-900">
                                         {{ $partner->name }}
-                                    </div>
+                                    </a>
                                     <div class="text-sm text-gray-500">
                                         {{ $partner->email }}
                                     </div>
@@ -77,18 +80,24 @@
                             {{ $partner->affiliateCoupons->count() }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ \App\Helpers\CurrencyHelper::formatAmount($partner->statistics['total_earned']) }}
+                            {{ \App\Helpers\CurrencyHelper::formatAmount($partner->overview->total_earned) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ \App\Helpers\CurrencyHelper::formatAmount($partner->overview->payable_amount) }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $partner->statistics['total_clicks'] }}
+                            {{ $partner->overview->clicks }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{{ route('admin.affiliate.partners.show', $partner) }}" class="text-purple-600 hover:text-purple-900 mr-4">
+                                {{ __('affiliate.partner_detail') }}
+                            </a>
                             <form method="POST" action="{{ route('admin.affiliate.partners.deactivate', $partner) }}" class="inline">
                                 @csrf
                                 <button 
                                     type="submit" 
                                     class="text-red-600 hover:text-red-900"
-                                    onclick="return confirm('Opravdu chcete deaktivovat tohoto partnera?')"
+                                    onclick="return confirm('{{ __('affiliate.deactivate_confirm') }}')"
                                 >
                                     {{ __('affiliate.deactivate_partner') }}
                                 </button>
@@ -117,12 +126,12 @@
                 <input 
                     type="email" 
                     name="email" 
-                    placeholder="E-mail uživatele" 
+                    placeholder="{{ __('affiliate.user_email') }}" 
                     required
                     class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 >
                 <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-                    Aktivovat
+                    {{ __('affiliate.activate') }}
                 </button>
             </form>
         </div>

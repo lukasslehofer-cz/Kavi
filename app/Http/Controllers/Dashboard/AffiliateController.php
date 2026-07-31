@@ -40,20 +40,22 @@ class AffiliateController extends Controller
             ->with('affiliateLinks')
             ->get();
 
-        // Získej odměny
+        // Vývoj po měsících, přehled předplatných a výkon jednotlivých kódů
+        $monthlyBreakdown = $this->affiliateService->getMonthlyBreakdown($user);
+        $referredSubscriptions = $this->affiliateService->getPartnerSubscriptions($user);
+        $codePerformance = $this->affiliateService->getPartnerCodePerformance($user);
+
+        // Získej odměny (stránkovaně)
         $statusFilter = $request->query('status');
-        $rewards = $this->affiliateService->getPartnerRewards($user, $statusFilter);
-        
-        // Seskupit odměny pro tabulku
-        $rewardsGrouped = $rewards->groupBy(function($reward) {
-            return $reward->created_at->format('Y-m');
-        });
+        $rewards = $this->affiliateService->getPartnerRewards($user, $statusFilter, 25);
 
         return view('dashboard.affiliate', compact(
             'statistics',
             'coupons',
             'rewards',
-            'rewardsGrouped',
+            'monthlyBreakdown',
+            'referredSubscriptions',
+            'codePerformance',
             'statusFilter'
         ));
     }

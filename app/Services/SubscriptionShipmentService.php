@@ -523,24 +523,12 @@ class SubscriptionShipmentService
                     $subscriptionType = $config['type'] ?? 'espresso';
                     $isDecaf = $config['isDecaf'] ?? false;
 
-                    // Use checkTypeAvailability to check only relevant coffee slots
+                    // Check the subscription's exact configuration - box size decides
+                    // whether E3/F3 are needed, so a type-level check is not enough
                     $reservationService = app(\App\Services\StockReservationService::class);
-                    $typeAvailability = $reservationService->checkTypeAvailability($schedule);
+                    $configAvailability = $reservationService->checkAvailability($config, $schedule);
 
-                    // Determine if the subscription's type is available
-                    $typeAvailable = match ($subscriptionType) {
-                        'espresso' => $typeAvailability['espresso'],
-                        'filter' => $typeAvailability['filter'],
-                        'mix' => $typeAvailability['mix'],
-                        default => $typeAvailability['espresso'],
-                    };
-
-                    // Also check decaf if needed
-                    if ($isDecaf && ! $typeAvailability['decaf']) {
-                        $typeAvailable = false;
-                    }
-
-                    if (! $typeAvailable) {
+                    if (! $configAvailability['available']) {
                         $typeName = match ($subscriptionType) {
                             'espresso' => __('subscriptions.coffee_types.espresso'),
                             'filter' => __('subscriptions.coffee_types.filter'),
@@ -548,12 +536,14 @@ class SubscriptionShipmentService
                             default => $subscriptionType,
                         };
 
-                        \Log::warning('Cannot resume subscription - coffee type out of stock', [
+                        \Log::warning('Cannot resume subscription - coffees out of stock', [
                             'subscription_id' => $subscription->id,
                             'next_shipment' => $nextShipmentDate->toDateString(),
                             'type' => $subscriptionType,
+                            'amount' => $config['amount'] ?? null,
                             'is_decaf' => $isDecaf,
-                            'type_availability' => $typeAvailability,
+                            'out_of_stock' => $configAvailability['out_of_stock'],
+                            'missing_slots' => $configAvailability['missing_slots'],
                         ]);
 
                         return [

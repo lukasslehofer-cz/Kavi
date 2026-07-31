@@ -505,7 +505,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load availability data from backend
     const availability = @json($availability);
-    
+
+    // Per box size / decaf / mix split availability - the type flags above cannot
+    // tell that e.g. an L filter box is sold out while an M filter box is not
+    const availabilityMatrix = @json($availabilityMatrix);
+
     let selectedAmount = null;
     let selectedType = null;
     let selectedFrequency = null;
@@ -522,8 +526,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Pokud je vybraný mix, přepočítej počty a zobraz sekci
             if (selectedType === 'mix') {
-                mixEspressoCount = Math.floor(selectedAmount / 2);
-                mixFilterCount = selectedAmount - mixEspressoCount;
+                mixFilterCount = defaultMixFilterCount(selectedAmount);
+                mixEspressoCount = selectedAmount - mixFilterCount;
                 updateMixNoDecafDisplay();
                 showDistributionLayout();
             }
@@ -590,8 +594,8 @@ document.addEventListener('DOMContentLoaded', function() {
             mixNoDecafDistribution.classList.remove('hidden');
             
             if (selectedAmount && (mixEspressoCount === 0 && mixFilterCount === 0)) {
-                mixEspressoCount = Math.floor(selectedAmount / 2);
-                mixFilterCount = selectedAmount - mixEspressoCount;
+                mixFilterCount = defaultMixFilterCount(selectedAmount);
+                mixEspressoCount = selectedAmount - mixFilterCount;
                 updateMixNoDecafDisplay();
             }
         } else {
@@ -613,10 +617,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const mixFilterPlus = document.getElementById('mix-filter-plus');
         const mixFilterMinus = document.getElementById('mix-filter-minus');
         
-        if (mixEspressoPlus) mixEspressoPlus.disabled = mixFilterCount <= 0;
-        if (mixEspressoMinus) mixEspressoMinus.disabled = mixEspressoCount <= 0;
-        if (mixFilterPlus) mixFilterPlus.disabled = mixEspressoCount <= 0;
-        if (mixFilterMinus) mixFilterMinus.disabled = mixFilterCount <= 0;
+        // Block splits that cannot be shipped, otherwise moving a bag across would
+        // silently invalidate - and clear - the chosen box size
+        const splitOk = filterCount => !selectedAmount || mixSplitAvailable(selectedAmount, filterCount);
+
+        if (mixEspressoPlus) mixEspressoPlus.disabled = mixFilterCount <= 0 || !splitOk(mixFilterCount - 1);
+        if (mixEspressoMinus) mixEspressoMinus.disabled = mixEspressoCount <= 0 || !splitOk(mixFilterCount + 1);
+        if (mixFilterPlus) mixFilterPlus.disabled = mixEspressoCount <= 0 || !splitOk(mixFilterCount + 1);
+        if (mixFilterMinus) mixFilterMinus.disabled = mixFilterCount <= 0 || !splitOk(mixFilterCount - 1);
     }
     
     // Event listenery pro Mix distribution tlačítka
@@ -669,126 +677,150 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    const ALL_TYPES = ['espresso', 'filter', 'mix'];
+    const ALL_AMOUNTS = [2, 3, 4];
+
+    // Mark an option as sold out, or restore it. Selections can become invalid as
+    // the customer changes type or decaf, so this has to work in both directions.
+    function setSoldOut(label, input, soldOut) {
+        if (!label) {
+            return;
+        }
+
+        if (soldOut) {
+            label.classList.add('cursor-not-allowed');
+            label.style.pointerEvents = 'none';
+            label.style.position = 'relative';
+            label.style.backgroundColor = '#f3f4f6'; // gray-100
+            label.querySelectorAll('div:not(.sold-out-label)').forEach(div => {
+                div.style.opacity = '0.5';
+            });
+
+            if (input) {
+                input.disabled = true;
+                input.checked = false;
+            }
+
+            if (!label.querySelector('.sold-out-label')) {
+                const badge = document.createElement('div');
+                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
+                badge.style.opacity = '1'; // Ensure full opacity
+                badge.textContent = currentLocale === 'en' ? 'Sold out this month' : 'Tento měsíc vyprodáno';
+                label.appendChild(badge);
+            }
+        } else {
+            label.classList.remove('cursor-not-allowed');
+            label.style.pointerEvents = '';
+            label.style.backgroundColor = '';
+            label.querySelectorAll('div:not(.sold-out-label)').forEach(div => {
+                div.style.opacity = '';
+            });
+
+            if (input) {
+                input.disabled = false;
+            }
+
+            const badge = label.querySelector('.sold-out-label');
+            if (badge) {
+                badge.remove();
+            }
+        }
+    }
+
+    // Can a mix box be shipped with this many filter bags?
+    function mixSplitAvailable(amount, filterCount) {
+        const branch = availabilityMatrix.mix && availabilityMatrix.mix[amount];
+
+        return branch ? !!branch[isDecaf ? 'decaf' : 'plain'][filterCount] : false;
+    }
+
+    // Balanced split by default, nudged to the nearest one that can be shipped
+    function defaultMixFilterCount(amount) {
+        const balanced = amount - Math.floor(amount / 2);
+
+        for (let delta = 0; delta <= amount; delta++) {
+            for (const filterCount of [balanced - delta, balanced + delta]) {
+                if (filterCount >= 0 && filterCount <= amount && mixSplitAvailable(amount, filterCount)) {
+                    return filterCount;
+                }
+            }
+        }
+
+        return balanced;
+    }
+
+    // Can this exact combination be shipped this month?
+    function combinationOk(type, amount) {
+        const branch = availabilityMatrix[type] && availabilityMatrix[type][amount];
+        if (!branch) {
+            return false;
+        }
+
+        const variant = branch[isDecaf ? 'decaf' : 'plain'];
+
+        if (type !== 'mix') {
+            return !!variant;
+        }
+
+        // For mix the split matters. Until the customer has picked one, any
+        // workable split keeps the option open.
+        const splitChosen = selectedType === 'mix'
+            && selectedAmount === amount
+            && (mixEspressoCount + mixFilterCount) === amount;
+
+        return splitChosen
+            ? mixSplitAvailable(amount, mixFilterCount)
+            : Object.values(variant).some(Boolean);
+    }
+
     // Function to update UI based on availability
     function updateAvailabilityUI() {
-        console.log('Updating availability UI:', availability);
-        
-        // Find radio buttons by their name/value attributes
-        const espressoRadio = document.querySelector('input[name="type"][value="espresso"]');
-        const filterRadio = document.querySelector('input[name="type"][value="filter"]');
-        const mixRadio = document.querySelector('input[name="type"][value="mix"]');
-        
-        // Get parent label elements
-        const espressoLabel = espressoRadio?.closest('label.group');
-        const filterLabel = filterRadio?.closest('label.group');
-        const mixLabel = mixRadio?.closest('label.group');
-        
-        // Find all decaf checkboxes (there are 3 - one for each type)
-        const decafCheckboxes = document.querySelectorAll('input[name="isDecaf"]');
-
-        // Handle Espresso availability
-        if (!availability.espresso && espressoLabel) {
-            console.log('Disabling espresso option');
-            espressoLabel.classList.add('cursor-not-allowed');
-            espressoLabel.style.pointerEvents = 'none';
-            espressoLabel.style.position = 'relative';
-            espressoLabel.style.backgroundColor = '#f3f4f6'; // gray-100
-            
-            // Add opacity for content
-            const contentDivs = espressoLabel.querySelectorAll('div:not(.sold-out-label)');
-            contentDivs.forEach(div => {
-                div.style.opacity = '0.5';
-            });
-            
-            // Disable the radio button
-            if (espressoRadio) {
-                espressoRadio.disabled = true;
-                if (espressoRadio.checked) {
-                    espressoRadio.checked = false;
-                    selectedType = null;
-                }
+        // Drop a box size that the current type no longer supports, otherwise the
+        // stale pair would grey each other out and leave nothing selectable
+        if (selectedType && selectedAmount && !combinationOk(selectedType, selectedAmount)) {
+            const checkedAmount = document.querySelector('input[name="amount"]:checked');
+            if (checkedAmount) {
+                checkedAmount.checked = false;
             }
-            
-            // Add sold out badge if not already present
-            if (!espressoLabel.querySelector('.sold-out-label')) {
-                const badge = document.createElement('div');
-                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
-                badge.style.opacity = '1'; // Ensure full opacity
-                badge.textContent = currentLocale === 'en' ? 'Sold out this month' : 'Tento měsíc vyprodáno';
-                espressoLabel.appendChild(badge);
-            }
+            selectedAmount = null;
         }
 
-        // Handle Filter availability
-        if (!availability.filter && filterLabel) {
-            console.log('Disabling filter option');
-            filterLabel.classList.add('cursor-not-allowed');
-            filterLabel.style.pointerEvents = 'none';
-            filterLabel.style.position = 'relative';
-            filterLabel.style.backgroundColor = '#f3f4f6'; // gray-100
-            
-            // Add opacity for content
-            const contentDivs = filterLabel.querySelectorAll('div:not(.sold-out-label)');
-            contentDivs.forEach(div => {
-                div.style.opacity = '0.5';
-            });
-            
-            // Disable the radio button
-            if (filterRadio) {
-                filterRadio.disabled = true;
-                if (filterRadio.checked) {
-                    filterRadio.checked = false;
-                    selectedType = null;
-                }
-            }
-            
-            // Add sold out badge if not already present
-            if (!filterLabel.querySelector('.sold-out-label')) {
-                const badge = document.createElement('div');
-                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
-                badge.style.opacity = '1'; // Ensure full opacity
-                badge.textContent = currentLocale === 'en' ? 'Sold out this month' : 'Tento měsíc vyprodáno';
-                filterLabel.appendChild(badge);
-            }
-        }
+        // A coffee type is offered when it works with the chosen box size,
+        // or with any size while none is chosen yet
+        ALL_TYPES.forEach(type => {
+            const radio = document.querySelector(`input[name="type"][value="${type}"]`);
+            const amounts = selectedAmount ? [selectedAmount] : ALL_AMOUNTS;
+            const available = amounts.some(amount => combinationOk(type, amount));
 
-        // Handle Mix availability
-        if (!availability.mix && mixLabel) {
-            console.log('Disabling mix option');
-            mixLabel.classList.add('cursor-not-allowed');
-            mixLabel.style.pointerEvents = 'none';
-            mixLabel.style.position = 'relative';
-            mixLabel.style.backgroundColor = '#f3f4f6'; // gray-100
-            
-            // Add opacity for content
-            const contentDivs = mixLabel.querySelectorAll('div:not(.sold-out-label)');
-            contentDivs.forEach(div => {
-                div.style.opacity = '0.5';
-            });
-            
-            // Disable the radio button
-            if (mixRadio) {
-                mixRadio.disabled = true;
-                if (mixRadio.checked) {
-                    mixRadio.checked = false;
-                    selectedType = null;
-                }
+            setSoldOut(radio?.closest('label.group'), radio, !available);
+
+            if (!available && selectedType === type) {
+                selectedType = null;
             }
-            
-            // Add sold out badge if not already present
-            if (!mixLabel.querySelector('.sold-out-label')) {
-                const badge = document.createElement('div');
-                badge.className = 'sold-out-label absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-md';
-                badge.style.opacity = '1'; // Ensure full opacity
-                badge.textContent = currentLocale === 'en' ? 'Sold out this month' : 'Tento měsíc vyprodáno';
-                mixLabel.appendChild(badge);
+        });
+
+        // Same the other way round for the box sizes
+        ALL_AMOUNTS.forEach(amount => {
+            const radio = document.querySelector(`input[name="amount"][value="${amount}"]`);
+            const types = selectedType ? [selectedType] : ALL_TYPES;
+            const available = types.some(type => combinationOk(type, amount));
+
+            setSoldOut(radio?.closest('label.group'), radio, !available);
+
+            if (!available && selectedAmount === amount) {
+                selectedAmount = null;
             }
-        }
+        });
 
         // Decaf availability is handled in app.js
     }
+
     
     function updateSummary() {
+        // Availability depends on the whole combination, so re-check it on every
+        // change - a size can become unavailable once the type or decaf changes
+        updateAvailabilityUI();
+
         // Množství
         if (selectedAmount) {
             const grams = selectedAmount * 250;

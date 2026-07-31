@@ -424,4 +424,78 @@ return [
         'one_time' => 'Jednorázově',
     ],
 
+    // Affiliate - společné texty
+    'affiliate_common' => [
+        'section' => 'Affiliate',
+        'open_section' => 'Otevřít affiliate sekci',
+        'code' => 'Použitý kód',
+        'type' => 'Typ',
+        'type_order' => 'Objednávka',
+        'type_subscription' => 'Předplatné',
+        'date' => 'Datum',
+    ],
+
+    // Affiliate - někdo použil partnerův kód
+    'affiliate_code_used' => [
+        'subject' => 'Někdo použil váš kód :code',
+        'title' => 'Máte nového zákazníka',
+        'subtitle' => 'Váš affiliate kód právě přinesl odměnu',
+        'reward_label' => 'Vaše odměna',
+        'reward_pending' => 'Odměna je připsaná a čeká na schválení.',
+        'details' => 'Detaily',
+        'whats_next' => 'Jak to bude pokračovat',
+        'next_monthly' => 'Souhrn všech odměn vám pošleme jednou měsíčně.',
+    ],
+
+    // Affiliate - měsíční souhrn
+    'affiliate_monthly_summary' => [
+        'subject' => 'Váš affiliate souhrn za :month',
+        'title' => 'Měsíční souhrn',
+        'earned_label' => 'Vyděláno za měsíc',
+        'this_month' => 'Za tento měsíc',
+        'new_customers' => 'Noví zákazníci',
+        'rewarded_shipments' => 'Odměněné rozesílky',
+        'clicks' => 'Kliknutí na odkazy',
+        'active_label' => 'Aktivní předplatná',
+        'active_text' => '{1} Máte 1 aktivní předplatné, které vám vydělává přibližně :amount za rozesílku.|[2,4] Máte :count aktivní předplatná, která vám vydělávají přibližně :amount za rozesílku.|[5,*] Máte :count aktivních předplatných, která vám vydělávají přibližně :amount za rozesílku.',
+        'balance' => 'Zůstatek',
+        'payable' => 'K výplatě',
+        'threshold_reached' => 'Dosáhli jste fakturační hranice, takže si můžete odměny vyfakturovat.',
+        'threshold_remaining' => 'Do fakturační hranice vám zbývá :amount.',
+        'months' => [
+            1 => 'Leden',
+            2 => 'Únor',
+            3 => 'Březen',
+            4 => 'Duben',
+            5 => 'Květen',
+            6 => 'Červen',
+            7 => 'Červenec',
+            8 => 'Srpen',
+            9 => 'Září',
+            10 => 'Říjen',
+            11 => 'Listopad',
+            12 => 'Prosinec',
+        ],
+    ],
+
+    // Affiliate - dosažení fakturační hranice
+    'affiliate_payout_threshold' => [
+        'subject' => 'Můžete si vyfakturovat affiliate odměny',
+        'title' => 'Máte na výplatu',
+        'subtitle' => 'Váš zůstatek překročil fakturační hranici',
+        'amount_label' => 'K výplatě',
+        'threshold_note' => 'Fakturační hranice je :threshold.',
+        'intro' => 'Odměny za vaše doporučení dosáhly částky, od které si je můžete nechat vyplatit.',
+        'how_to' => 'Jak si peníze vybrat',
+        'step_1' => 'Zkontrolujte si přehled odměn ve své affiliate sekci.',
+        'step_2' => 'Pošlete nám fakturu na :email.',
+        'step_3' => 'Peníze vám odešleme a odměny označíme jako vyplacené.',
+        'keep_earning' => 'Vaše kódy zůstávají v platnosti, odměny vám tedy běží dál.',
+    ],
+
+    // Affiliate - zpráva od nás
+    'affiliate_admin_message' => [
+        'your_codes' => 'Vaše kódy a odkazy',
+    ],
+
 ];

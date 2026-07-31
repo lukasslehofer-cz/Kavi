@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AffiliateReward;
 use App\Models\User;
+use App\Services\AffiliateService;
 use Illuminate\Http\Request;
 
 class AffiliateRewardController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(
+        private AffiliateService $affiliateService
+    ) {
         $this->middleware(['auth', 'admin']);
     }
 
@@ -70,6 +72,8 @@ class AffiliateRewardController extends Controller
     {
         $reward->markAsPaid($request->input('notes'));
 
+        $this->resetThresholdNotice($reward);
+
         return redirect()->back()
             ->with('success', __('affiliate.reward_marked_paid'));
     }
@@ -81,7 +85,19 @@ class AffiliateRewardController extends Controller
     {
         $reward->cancel($request->input('notes'));
 
+        $this->resetThresholdNotice($reward);
+
         return redirect()->back()
             ->with('success', __('affiliate.reward_cancelled'));
+    }
+
+    /**
+     * Zůstatek klesl – ať partner dostane mail znovu, až hranici překročí příště
+     */
+    private function resetThresholdNotice(AffiliateReward $reward): void
+    {
+        if ($partner = $reward->affiliatePartner) {
+            $this->affiliateService->resetPayoutThresholdNotice($partner);
+        }
     }
 }

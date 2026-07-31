@@ -181,7 +181,7 @@ class RouteServiceProvider extends ServiceProvider
                 Route::get('/' . $routes['dashboard-notifications'], [\App\Http\Controllers\DashboardController::class, 'notifications'])->name($this->routeName('notifications', $locale, $isPrimary, false));
                 
                 // Affiliate dashboard
-                Route::get('/affiliate', [\App\Http\Controllers\Dashboard\AffiliateController::class, 'index'])->name($this->routeName('affiliate', $locale, $isPrimary, false));
+                Route::get('/' . $routes['dashboard-affiliate'], [\App\Http\Controllers\Dashboard\AffiliateController::class, 'index'])->name($this->routeName('affiliate', $locale, $isPrimary, false));
             });
         });
     }

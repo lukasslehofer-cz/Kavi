@@ -22,7 +22,7 @@ return [
     'per_payment' => 'za platbu',
     'your_link' => 'Váš affiliate link',
     'copy' => 'Kopírovat',
-    'link_copied' => 'Link byl zkopírován!',
+    'link_copied' => 'Zkopírováno',
     'no_codes' => 'Zatím nemáte žádné affiliate kódy',
     'no_codes_text' => 'Kontaktujte administrátora pro vytvoření vašich affiliate kódů.',
     
@@ -92,4 +92,98 @@ return [
     'total_amount' => 'Celková částka',
     'no_rewards_admin' => 'Zatím nejsou žádné affiliate odměny.',
     'payment_number' => 'Platba',
+    // Statistiky - rozšíření
+    'payable' => 'K výplatě',
+    'cancelled_amount' => 'Zrušeno',
+    'conversion_rate' => 'Konverzní poměr',
+    'this_month' => 'Tento měsíc',
+    'active_subscriptions' => 'Aktivní předplatná',
+    'estimated_income' => 'Odhad za rozesílku',
+    'status_cancelled' => 'Zrušeno',
+    'from_clicks' => 'z :count kliknutí',
+    'awaiting_payout' => 'čeká na výplatu',
+
+    // Sazby odměn
+    'tier_initial' => 'Úvodní sazba',
+    'tier_followup' => 'Dlouhodobá sazba',
+    'reward_scheme_unlimited' => ':amount za každou rozesílku',
+    'reward_scheme_limited' => '{1} :amount za první rozesílku|[2,4] :amount za první :count rozesílky|[5,*] :amount za prvních :count rozesílek',
+    'reward_scheme_tiered' => '{1} :amount za první rozesílku, poté :followup za každou další|[2,4] :amount za první :count rozesílky, poté :followup za každou další|[5,*] :amount za prvních :count rozesílek, poté :followup za každou další',
+    'followup_reward' => 'Dlouhodobá odměna za předplatné',
+    'followup_reward_help' => 'Odměna za každou další rozesílku po vyčerpání počtu opakování výše. Prázdné = po vyčerpání se už neplatí nic.',
+    'followup_reward_note' => 'Platí bez omezení až do konce předplatného.',
+
+    // Fakturační hranice
+    'payout_threshold' => 'Fakturační hranice',
+    'payout_threshold_help' => 'Od jaké částky si partner může odměny vyfakturovat. Prázdné = výchozí hodnota z nastavení.',
+    'payout_progress' => 'Postup k fakturační hranici',
+    'payout_progress_text' => ':amount z :threshold',
+    'payout_reached' => 'Dosáhli jste fakturační hranice. Pošlete nám fakturu na :email a odměny vám vyplatíme.',
+    'payout_remaining' => 'Do fakturační hranice vám zbývá :amount.',
+    'payout_threshold_saved' => 'Fakturační hranice byla uložena.',
+
+    // Vývoj v čase
+    'monthly_development' => 'Vývoj po měsících',
+    'monthly_development_subtitle' => 'Výdělek za posledních 12 měsíců',
+    'no_monthly_data' => 'Zatím nemáme data pro graf.',
+
+    // Přehled předplatných
+    'your_subscriptions' => 'Předplatná, která vám vydělávají',
+    'your_subscriptions_subtitle' => 'Přehled doporučených předplatných a jejich odměn',
+    'subscription_number' => 'Předplatné',
+    'since' => 'Od',
+    'rewarded_shipments' => 'Odměněných rozesílek',
+    'earned' => 'Vyděláno',
+    'current_rate' => 'Aktuální sazba',
+    'next_reward' => 'Další odměna',
+    'remaining_at_initial' => 'ještě :count v úvodní sazbě',
+    'no_further_reward' => 'Odměny vyčerpány',
+    'subscription_ended' => 'Ukončeno',
+    'subscription_active' => 'Aktivní',
+    'no_subscriptions' => 'Zatím vám nevydělává žádné předplatné',
+    'no_subscriptions_text' => 'Jakmile někdo přes váš kód založí předplatné, uvidíte ho tady.',
+
+    // Výkon kódů
+    'code_performance' => 'Výkon vašich kódů',
+    'code_performance_subtitle' => 'Kolik který kód přivedl zákazníků',
+
+    // Admin - detail partnera
+    'partner_detail' => 'Detail partnera',
+    'back_to_partners' => 'Zpět na partnery',
+    'view_as_partner' => 'Zobrazit jeho dashboard',
+    'partner_settings' => 'Nastavení partnera',
+    'save' => 'Uložit',
+    'mark_all_approved_paid' => 'Označit vše schválené jako vyplacené',
+    'mark_all_approved_paid_confirm' => 'Opravdu označit všechny schválené odměny tohoto partnera jako vyplacené?',
+    'bulk_paid_done' => 'Vyplaceno odměn: :count',
+    'bulk_paid_none' => 'Partner nemá žádné schválené odměny k vyplacení.',
+    'customer' => 'Zákazník',
+
+    // Admin - hromadný mail
+    'mail_title' => 'Mail affiliate partnerům',
+    'mail_subtitle' => 'Zpráva se odešle v Kavi šabloně i s odkazem na affiliate sekci partnera',
+    'mail_recipients' => 'Příjemci',
+    'mail_select_all' => 'Vybrat všechny',
+    'mail_subject' => 'Předmět',
+    'mail_body' => 'Text zprávy',
+    'mail_body_help' => 'Prostý text. Prázdný řádek oddělí odstavce. HTML se nepoužije.',
+    'mail_preview' => 'Náhled',
+    'mail_send_test' => 'Poslat test na sebe',
+    'mail_send' => 'Odeslat vybraným',
+    'mail_send_confirm' => 'Opravdu odeslat zprávu vybraným partnerům?',
+    'mail_no_recipients' => 'Vyberte alespoň jednoho partnera.',
+    'mail_test_sent' => 'Testovací mail byl odeslán na :email.',
+    'mail_sent' => 'Odesláno mailů: :count',
+    'mail_sent_with_errors' => 'Odesláno mailů: :count, chyby: :errors',
+    'mail_preview_hint' => 'Náhled se vygeneruje pro prvního vybraného partnera.',
+
+    // Admin - výpis partnerů
+    'search' => 'Hledat',
+    'reset' => 'Zrušit',
+    'codes' => 'Kódy',
+    'actions' => 'Akce',
+    'user_email' => 'E-mail uživatele',
+    'activate' => 'Aktivovat',
+    'deactivate_confirm' => 'Opravdu chcete deaktivovat tohoto partnera?',
+    'already_partner' => 'Tento uživatel už je affiliate partnerem.',
 ];

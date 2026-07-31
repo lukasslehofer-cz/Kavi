@@ -99,6 +99,7 @@ return [
     'dashboard-subscription-invoice' => 'predplatne/platba/{payment}/faktura',
     'dashboard-subscription-packeta' => 'predplatne/update-packeta',
     'dashboard-notifications' => 'notifikace',
+    'dashboard-affiliate' => 'affiliate',
 
 ];
 

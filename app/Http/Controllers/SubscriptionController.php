@@ -90,9 +90,15 @@ class SubscriptionController extends Controller
                 'allSoldOut' => true,
                 'preparingNewCoffees' => $isPreparationPeriod,
             ];
+
+            $availabilityMatrix = [];
         } else {
             $reservationService = app(\App\Services\StockReservationService::class);
             $availability = $reservationService->checkTypeAvailability($schedule);
+
+            // Per box size / mix split availability so the configurator can disable
+            // exactly the option that cannot be fulfilled, not just the whole type
+            $availabilityMatrix = $reservationService->getAvailabilityMatrix($schedule);
 
             // Check if both espresso and filter are sold out
             $availability['allSoldOut'] = ! $availability['espresso'] && ! $availability['filter'];
@@ -137,6 +143,7 @@ class SubscriptionController extends Controller
             'monthName',
             'displayYear',
             'availability',
+            'availabilityMatrix',
             'nextAvailableMonthName',
             'nextAvailableDate'
         ));
@@ -263,6 +270,23 @@ class SubscriptionController extends Controller
         if (! $typeAvailable) {
             return redirect()->localizedRoute('subscriptions.index')
                 ->with('error', $errorMessage);
+        }
+
+        // The type check above only knows whether a type is sellable at all. Check the
+        // exact configuration too - an L or XL box reaches into E3/F3 and an XL box
+        // needs its first coffee twice, none of which the type check can see.
+        $configAvailability = $reservationService->checkAvailability($validated, $schedule);
+
+        if (! $configAvailability['available']) {
+            logger()->warning('Subscription configuration not available', [
+                'configuration' => $validated,
+                'schedule_id' => $schedule->id,
+                'out_of_stock' => $configAvailability['out_of_stock'],
+                'missing_slots' => $configAvailability['missing_slots'],
+            ]);
+
+            return redirect()->localizedRoute('subscriptions.index')
+                ->with('error', 'Omlouváme se, ale zvolená velikost boxu není pro tento měsíc v této kombinaci k dispozici. Zkuste prosím menší box nebo jiný typ kávy, případně se vraťte po 16. dni příštího měsíce.');
         }
 
         // Calculate price based on amount (tiered pricing)

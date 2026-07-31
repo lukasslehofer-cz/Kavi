@@ -24,6 +24,7 @@ class User extends Authenticatable
         // 'is_admin' a 'is_affiliate_partner' záměrně NEJSOU fillable kvůli ochraně
         // proti mass assignmentu (eskalace oprávnění). Nastavují se explicitně přes forceFill().
         'affiliate_activated_at',
+        'affiliate_payout_threshold',
         'stripe_customer_id',
         'fakturoid_subject_id',
         'packeta_point_id',
@@ -45,6 +46,8 @@ class User extends Authenticatable
         'is_admin' => 'boolean',
         'is_affiliate_partner' => 'boolean',
         'affiliate_activated_at' => 'datetime',
+        'affiliate_payout_threshold' => 'decimal:2',
+        'affiliate_threshold_notified_at' => 'datetime',
         'deleted_at' => 'datetime',
         'anonymized_at' => 'datetime',
     ];

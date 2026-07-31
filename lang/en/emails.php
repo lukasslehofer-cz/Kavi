@@ -424,4 +424,78 @@ return [
         'one_time' => 'One-time',
     ],
 
+    // Affiliate - shared strings
+    'affiliate_common' => [
+        'section' => 'Affiliate',
+        'open_section' => 'Open affiliate section',
+        'code' => 'Code used',
+        'type' => 'Type',
+        'type_order' => 'Order',
+        'type_subscription' => 'Subscription',
+        'date' => 'Date',
+    ],
+
+    // Affiliate - someone used the partner's code
+    'affiliate_code_used' => [
+        'subject' => 'Someone used your code :code',
+        'title' => 'You have a new customer',
+        'subtitle' => 'Your affiliate code just earned a reward',
+        'reward_label' => 'Your reward',
+        'reward_pending' => 'The reward has been credited and is awaiting approval.',
+        'details' => 'Details',
+        'whats_next' => 'What happens next',
+        'next_monthly' => 'We send a summary of all your rewards once a month.',
+    ],
+
+    // Affiliate - monthly summary
+    'affiliate_monthly_summary' => [
+        'subject' => 'Your affiliate summary for :month',
+        'title' => 'Monthly summary',
+        'earned_label' => 'Earned this month',
+        'this_month' => 'This month',
+        'new_customers' => 'New customers',
+        'rewarded_shipments' => 'Rewarded shipments',
+        'clicks' => 'Link clicks',
+        'active_label' => 'Active subscriptions',
+        'active_text' => '{1} You have 1 active subscription earning you roughly :amount per shipment.|[2,*] You have :count active subscriptions earning you roughly :amount per shipment.',
+        'balance' => 'Balance',
+        'payable' => 'Payable',
+        'threshold_reached' => 'You have reached the payout threshold, so you can invoice your rewards.',
+        'threshold_remaining' => 'You need :amount more to reach the payout threshold.',
+        'months' => [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December',
+        ],
+    ],
+
+    // Affiliate - payout threshold reached
+    'affiliate_payout_threshold' => [
+        'subject' => 'You can invoice your affiliate rewards',
+        'title' => 'Ready for payout',
+        'subtitle' => 'Your balance has passed the payout threshold',
+        'amount_label' => 'Payable',
+        'threshold_note' => 'The payout threshold is :threshold.',
+        'intro' => 'Your referral rewards have reached the amount at which you can have them paid out.',
+        'how_to' => 'How to get paid',
+        'step_1' => 'Review your rewards in the affiliate section.',
+        'step_2' => 'Send us your invoice at :email.',
+        'step_3' => 'We will send the money and mark the rewards as paid.',
+        'keep_earning' => 'Your codes stay active, so your rewards keep accruing.',
+    ],
+
+    // Affiliate - message from us
+    'affiliate_admin_message' => [
+        'your_codes' => 'Your codes and links',
+    ],
+
 ];

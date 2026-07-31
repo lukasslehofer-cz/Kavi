@@ -42,6 +42,8 @@ class Coupon extends Model
         'affiliate_reward_subscription_value',
         'affiliate_reward_subscription_value_eur',
         'affiliate_reward_subscription_months',
+        'affiliate_reward_subscription_followup_value',
+        'affiliate_reward_subscription_followup_value_eur',
     ];
 
     protected $casts = [
@@ -64,6 +66,8 @@ class Coupon extends Model
         'affiliate_reward_order_min_value_eur' => 'decimal:2',
         'affiliate_reward_subscription_value' => 'decimal:2',
         'affiliate_reward_subscription_value_eur' => 'decimal:2',
+        'affiliate_reward_subscription_followup_value' => 'decimal:2',
+        'affiliate_reward_subscription_followup_value_eur' => 'decimal:2',
     ];
 
     /**
@@ -365,44 +369,89 @@ class Coupon extends Model
     }
 
     /**
-     * Získá hodnotu affiliate odměny pro objednávky v aktuální měně
+     * Má kupón navazující (dlouhodobou) odměnu za rozesílky nad rámec prvních N?
      */
-    public function getAffiliateOrderRewardValue(): float
+    public function hasAffiliateSubscriptionFollowupReward(): bool
     {
-        return CurrencyHelper::price($this->affiliate_reward_order_value, $this->affiliate_reward_order_value_eur);
+        return $this->hasAffiliateSubscriptionReward()
+            && $this->affiliate_reward_subscription_months !== null
+            && $this->affiliate_reward_subscription_followup_value > 0;
     }
 
     /**
-     * Získá minimální hodnotu objednávky pro affiliate odměnu v aktuální měně
+     * Získá hodnotu affiliate odměny pro objednávky
+     *
+     * @param  string|null  $currency  CZK/EUR – vždy předej explicitně mimo request (webhook, cron)
      */
-    public function getAffiliateOrderMinValue(): ?float
+    public function getAffiliateOrderRewardValue(?string $currency = null): float
+    {
+        return CurrencyHelper::priceFor($currency, $this->affiliate_reward_order_value, $this->affiliate_reward_order_value_eur);
+    }
+
+    /**
+     * Získá minimální hodnotu objednávky pro affiliate odměnu
+     */
+    public function getAffiliateOrderMinValue(?string $currency = null): ?float
     {
         if ($this->affiliate_reward_order_min_value === null && $this->affiliate_reward_order_min_value_eur === null) {
             return null;
         }
 
-        return CurrencyHelper::price($this->affiliate_reward_order_min_value ?? 0, $this->affiliate_reward_order_min_value_eur ?? 0);
+        return CurrencyHelper::priceFor($currency, $this->affiliate_reward_order_min_value ?? 0, $this->affiliate_reward_order_min_value_eur ?? 0);
     }
 
     /**
-     * Získá hodnotu affiliate odměny pro předplatné v aktuální měně
+     * Získá základní hodnotu affiliate odměny pro předplatné (prvních N rozesílek)
      */
-    public function getAffiliateSubscriptionRewardValue(): float
+    public function getAffiliateSubscriptionRewardValue(?string $currency = null): float
     {
-        return CurrencyHelper::price($this->affiliate_reward_subscription_value, $this->affiliate_reward_subscription_value_eur);
+        return CurrencyHelper::priceFor($currency, $this->affiliate_reward_subscription_value, $this->affiliate_reward_subscription_value_eur);
+    }
+
+    /**
+     * Získá navazující (dlouhodobou) hodnotu affiliate odměny pro předplatné
+     */
+    public function getAffiliateSubscriptionFollowupRewardValue(?string $currency = null): float
+    {
+        return CurrencyHelper::priceFor($currency, $this->affiliate_reward_subscription_followup_value, $this->affiliate_reward_subscription_followup_value_eur);
+    }
+
+    /**
+     * Určí sazbu (tier) pro dané opakování předplatného
+     *
+     * @return string|null 'initial' | 'followup' | null (bez odměny)
+     */
+    public function affiliateSubscriptionTierFor(int $paymentNumber): ?string
+    {
+        if (! $this->hasAffiliateSubscriptionReward()) {
+            return null;
+        }
+
+        $limit = $this->affiliate_reward_subscription_months;
+
+        // Bez limitu = základní sazba napořád (dosavadní chování)
+        if ($limit === null) {
+            return 'initial';
+        }
+
+        if ($paymentNumber <= $limit) {
+            return 'initial';
+        }
+
+        return $this->hasAffiliateSubscriptionFollowupReward() ? 'followup' : null;
     }
 
     /**
      * Vypočítá affiliate odměnu pro objednávku
      */
-    public function calculateAffiliateOrderReward(float $orderValue): float
+    public function calculateAffiliateOrderReward(float $orderValue, ?string $currency = null): float
     {
         if (! $this->hasAffiliateOrderReward()) {
             return 0;
         }
 
         // Kontrola minimální hodnoty
-        $minValue = $this->getAffiliateOrderMinValue();
+        $minValue = $this->getAffiliateOrderMinValue($currency);
         if ($minValue !== null && $orderValue < $minValue) {
             return 0;
         }
@@ -412,21 +461,65 @@ class Coupon extends Model
         }
 
         if ($this->affiliate_reward_order_type === 'fixed') {
-            return $this->getAffiliateOrderRewardValue();
+            return $this->getAffiliateOrderRewardValue($currency);
         }
 
         return 0;
     }
 
     /**
-     * Vypočítá affiliate odměnu za jedno opakování předplatného
+     * Vypočítá affiliate odměnu za konkrétní opakování předplatného
      */
-    public function calculateAffiliateSubscriptionReward(): float
+    public function calculateAffiliateSubscriptionReward(int $paymentNumber = 1, ?string $currency = null): float
+    {
+        return match ($this->affiliateSubscriptionTierFor($paymentNumber)) {
+            'initial' => $this->getAffiliateSubscriptionRewardValue($currency),
+            'followup' => $this->getAffiliateSubscriptionFollowupRewardValue($currency),
+            default => 0,
+        };
+    }
+
+    /**
+     * Lidský popis schématu odměny za předplatné (pro dashboard, maily a admin)
+     *
+     * @param  string|null  $locale  Jazyk textu – v mailech předej jazyk e-mailu,
+     *                               ten se renderuje mimo request.
+     */
+    public function getAffiliateSubscriptionRewardDescription(?string $currency = null, ?string $locale = null): ?string
     {
         if (! $this->hasAffiliateSubscriptionReward()) {
-            return 0;
+            return null;
         }
 
-        return $this->getAffiliateSubscriptionRewardValue();
+        $currency = $currency ?? CurrencyHelper::code();
+
+        $initial = CurrencyHelper::formatByCurrency(
+            $this->getAffiliateSubscriptionRewardValue($currency),
+            $currency
+        );
+
+        $limit = $this->affiliate_reward_subscription_months;
+
+        if ($limit === null) {
+            return __('affiliate.reward_scheme_unlimited', ['amount' => $initial], $locale);
+        }
+
+        if (! $this->hasAffiliateSubscriptionFollowupReward()) {
+            return trans_choice('affiliate.reward_scheme_limited', $limit, [
+                'amount' => $initial,
+                'count' => $limit,
+            ], $locale);
+        }
+
+        $followup = CurrencyHelper::formatByCurrency(
+            $this->getAffiliateSubscriptionFollowupRewardValue($currency),
+            $currency
+        );
+
+        return trans_choice('affiliate.reward_scheme_tiered', $limit, [
+            'amount' => $initial,
+            'count' => $limit,
+            'followup' => $followup,
+        ], $locale);
     }
 }

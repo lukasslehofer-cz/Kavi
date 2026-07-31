@@ -11,17 +11,15 @@ class CoffeeAllocationService
 {
     /**
      * Allocate coffees for a subscription based on configuration
-     * 
+     *
      * @param array $configuration Subscription configuration (amount, type, isDecaf, mix)
      * @param ShipmentSchedule $schedule The shipment schedule with coffee slots
      * @return array Array of [product_id => quantity]
      */
     public function allocateCoffeesForSubscription(array $configuration, ShipmentSchedule $schedule): array
     {
-        $amount = $configuration['amount']; // 2, 3, 4
-        $type = $configuration['type']; // espresso, filter, mix
-        $isDecaf = $configuration['isDecaf'] ?? false;
-        $mix = $configuration['mix'] ?? null;
+        $type = $configuration['type'] ?? '';
+        $isDecaf = (bool) ($configuration['isDecaf'] ?? false);
 
         // Get coffee slots from schedule
         $slots = $schedule->getCoffeeSlotsArray();
@@ -31,25 +29,61 @@ class CoffeeAllocationService
             throw new \Exception('Coffee slots not properly configured for this shipment schedule');
         }
 
-        // Allocate based on type
+        // Map slot names to the products configured for this shipment.
+        // Two slots can hold the same coffee, so quantities are summed per product.
+        $aggregated = [];
+
+        foreach ($this->getRequiredSlots($configuration) as $slotName => $quantity) {
+            $productId = $slots[$slotName] ?? null;
+
+            if (empty($productId)) {
+                continue; // Slot not configured for this month
+            }
+
+            if (!isset($aggregated[$productId])) {
+                $aggregated[$productId] = 0;
+            }
+            $aggregated[$productId] += $quantity;
+        }
+
+        return $aggregated;
+    }
+
+    /**
+     * Get the coffee slots a configuration needs, independent of any shipment schedule
+     *
+     * This is the single source of truth for the allocation rules. It answers
+     * "which slots and how many bags of each", e.g. an XL filter box returns
+     * ['f1' => 2, 'f2' => 1, 'f3' => 1] because F1 is used twice.
+     *
+     * @param array $configuration Subscription configuration (amount, type, isDecaf, mix)
+     * @return array Array of [slot_name => quantity]
+     */
+    public function getRequiredSlots(array $configuration): array
+    {
+        // Cast to integers - JSON decode may return strings
+        $amount = (int) ($configuration['amount'] ?? 0); // 2, 3, 4
+        $type = $configuration['type'] ?? ''; // espresso, filter, mix
+        $isDecaf = (bool) ($configuration['isDecaf'] ?? false);
+        $mix = $configuration['mix'] ?? null;
+
         if ($type === 'espresso') {
-            $coffees = $isDecaf 
-                ? $this->allocateEspressoWithDecaf($amount, $slots)
-                : $this->allocateEspresso($amount, $slots);
+            $slots = $isDecaf
+                ? $this->allocateEspressoWithDecaf($amount)
+                : $this->allocateEspresso($amount);
         } elseif ($type === 'filter') {
-            $coffees = $isDecaf 
-                ? $this->allocateFilterWithDecaf($amount, $slots)
-                : $this->allocateFilter($amount, $slots);
+            $slots = $isDecaf
+                ? $this->allocateFilterWithDecaf($amount)
+                : $this->allocateFilter($amount);
         } elseif ($type === 'mix') {
-            $coffees = $isDecaf 
-                ? $this->allocateMixWithDecaf($amount, $mix, $slots)
-                : $this->allocateMix($amount, $mix, $slots);
+            $slots = $isDecaf
+                ? $this->allocateMixWithDecaf($mix)
+                : $this->allocateMix($mix);
         } else {
             throw new \Exception('Invalid subscription type: ' . $type);
         }
 
-        // Aggregate coffees (count occurrences)
-        return $this->aggregateCoffees($coffees);
+        return $this->countOccurrences($slots);
     }
 
     /**
@@ -58,19 +92,17 @@ class CoffeeAllocationService
      * - 3 packages: E1, E2, E3
      * - 4 packages: E1, E2, E3, E1
      */
-    private function allocateEspresso(int $amount, array $slots): array
+    private function allocateEspresso(int $amount): array
     {
-        $coffees = [];
-
         if ($amount === 2) {
-            $coffees = [$slots['e1'], $slots['e2']];
+            return ['e1', 'e2'];
         } elseif ($amount === 3) {
-            $coffees = [$slots['e1'], $slots['e2'], $slots['e3']];
+            return ['e1', 'e2', 'e3'];
         } elseif ($amount === 4) {
-            $coffees = [$slots['e1'], $slots['e2'], $slots['e3'], $slots['e1']];
+            return ['e1', 'e2', 'e3', 'e1']; // E1 repeats
         }
 
-        return array_filter($coffees); // Remove nulls
+        return [];
     }
 
     /**
@@ -79,19 +111,17 @@ class CoffeeAllocationService
      * - 3 packages: E1, E2, D
      * - 4 packages: E1, E2, E3, D
      */
-    private function allocateEspressoWithDecaf(int $amount, array $slots): array
+    private function allocateEspressoWithDecaf(int $amount): array
     {
-        $coffees = [];
-
         if ($amount === 2) {
-            $coffees = [$slots['e1'], $slots['d']];
+            return ['e1', 'd'];
         } elseif ($amount === 3) {
-            $coffees = [$slots['e1'], $slots['e2'], $slots['d']];
+            return ['e1', 'e2', 'd'];
         } elseif ($amount === 4) {
-            $coffees = [$slots['e1'], $slots['e2'], $slots['e3'], $slots['d']];
+            return ['e1', 'e2', 'e3', 'd'];
         }
 
-        return array_filter($coffees);
+        return [];
     }
 
     /**
@@ -100,19 +130,17 @@ class CoffeeAllocationService
      * - 3 packages: F1, F2, F3
      * - 4 packages: F1, F2, F3, F1
      */
-    private function allocateFilter(int $amount, array $slots): array
+    private function allocateFilter(int $amount): array
     {
-        $coffees = [];
-
         if ($amount === 2) {
-            $coffees = [$slots['f1'], $slots['f2']];
+            return ['f1', 'f2'];
         } elseif ($amount === 3) {
-            $coffees = [$slots['f1'], $slots['f2'], $slots['f3']];
+            return ['f1', 'f2', 'f3'];
         } elseif ($amount === 4) {
-            $coffees = [$slots['f1'], $slots['f2'], $slots['f3'], $slots['f1']];
+            return ['f1', 'f2', 'f3', 'f1']; // F1 repeats
         }
 
-        return array_filter($coffees);
+        return [];
     }
 
     /**
@@ -121,19 +149,17 @@ class CoffeeAllocationService
      * - 3 packages: F1, F2, D
      * - 4 packages: F1, F2, F3, D
      */
-    private function allocateFilterWithDecaf(int $amount, array $slots): array
+    private function allocateFilterWithDecaf(int $amount): array
     {
-        $coffees = [];
-
         if ($amount === 2) {
-            $coffees = [$slots['f1'], $slots['d']];
+            return ['f1', 'd'];
         } elseif ($amount === 3) {
-            $coffees = [$slots['f1'], $slots['f2'], $slots['d']];
+            return ['f1', 'f2', 'd'];
         } elseif ($amount === 4) {
-            $coffees = [$slots['f1'], $slots['f2'], $slots['f3'], $slots['d']];
+            return ['f1', 'f2', 'f3', 'd'];
         }
 
-        return array_filter($coffees);
+        return [];
     }
 
     /**
@@ -142,24 +168,24 @@ class CoffeeAllocationService
      * Example: 3 packages, 2 filter + 1 espresso = F1, F2, E1
      * Example: 4 packages, 1 filter + 3 espresso = F1, E1, E2, E3
      */
-    private function allocateMix(int $amount, ?array $mix, array $slots): array
+    private function allocateMix(?array $mix): array
     {
-        $espressoCount = $mix['espresso'] ?? 0;
-        $filterCount = $mix['filter'] ?? 0;
+        $espressoCount = (int) ($mix['espresso'] ?? 0);
+        $filterCount = (int) ($mix['filter'] ?? 0);
 
         $coffees = [];
 
         // Add filter coffees first
-        if ($filterCount >= 1) $coffees[] = $slots['f1'];
-        if ($filterCount >= 2) $coffees[] = $slots['f2'];
-        if ($filterCount >= 3) $coffees[] = $slots['f3'];
+        if ($filterCount >= 1) $coffees[] = 'f1';
+        if ($filterCount >= 2) $coffees[] = 'f2';
+        if ($filterCount >= 3) $coffees[] = 'f3';
 
         // Add espresso coffees
-        if ($espressoCount >= 1) $coffees[] = $slots['e1'];
-        if ($espressoCount >= 2) $coffees[] = $slots['e2'];
-        if ($espressoCount >= 3) $coffees[] = $slots['e3'];
+        if ($espressoCount >= 1) $coffees[] = 'e1';
+        if ($espressoCount >= 2) $coffees[] = 'e2';
+        if ($espressoCount >= 3) $coffees[] = 'e3';
 
-        return array_filter($coffees);
+        return $coffees;
     }
 
     /**
@@ -169,10 +195,10 @@ class CoffeeAllocationService
      * Example: 4 packages, 1 filter + 3 espresso = F1, E1, E2, D
      * If equal counts, replace one filter
      */
-    private function allocateMixWithDecaf(int $amount, ?array $mix, array $slots): array
+    private function allocateMixWithDecaf(?array $mix): array
     {
-        $espressoCount = $mix['espresso'] ?? 0;
-        $filterCount = $mix['filter'] ?? 0;
+        $espressoCount = (int) ($mix['espresso'] ?? 0);
+        $filterCount = (int) ($mix['filter'] ?? 0);
 
         $coffees = [];
 
@@ -181,51 +207,51 @@ class CoffeeAllocationService
 
         // Add filter coffees
         $filterToAdd = $replaceFilter ? $filterCount - 1 : $filterCount;
-        if ($filterToAdd >= 1) $coffees[] = $slots['f1'];
-        if ($filterToAdd >= 2) $coffees[] = $slots['f2'];
-        if ($filterToAdd >= 3) $coffees[] = $slots['f3'];
+        if ($filterToAdd >= 1) $coffees[] = 'f1';
+        if ($filterToAdd >= 2) $coffees[] = 'f2';
+        if ($filterToAdd >= 3) $coffees[] = 'f3';
 
         // Add decaf if we're replacing filter
         if ($replaceFilter && $filterCount > 0) {
-            $coffees[] = $slots['d'];
+            $coffees[] = 'd';
         }
 
         // Add espresso coffees
         $espressoToAdd = !$replaceFilter ? $espressoCount - 1 : $espressoCount;
-        if ($espressoToAdd >= 1) $coffees[] = $slots['e1'];
-        if ($espressoToAdd >= 2) $coffees[] = $slots['e2'];
-        if ($espressoToAdd >= 3) $coffees[] = $slots['e3'];
+        if ($espressoToAdd >= 1) $coffees[] = 'e1';
+        if ($espressoToAdd >= 2) $coffees[] = 'e2';
+        if ($espressoToAdd >= 3) $coffees[] = 'e3';
 
         // Add decaf if we're replacing espresso
         if (!$replaceFilter && $espressoCount > 0) {
-            $coffees[] = $slots['d'];
+            $coffees[] = 'd';
         }
 
-        return array_filter($coffees);
+        return $coffees;
     }
 
     /**
-     * Aggregate coffees - count how many times each product appears
-     * 
-     * @param array $coffees Array of product IDs
-     * @return array Array of [product_id => quantity]
+     * Count how many times each value appears
+     *
+     * @param array $values Array of slot names
+     * @return array Array of [slot_name => quantity]
      */
-    private function aggregateCoffees(array $coffees): array
+    private function countOccurrences(array $values): array
     {
-        $aggregated = [];
+        $counted = [];
 
-        foreach ($coffees as $productId) {
-            if (empty($productId)) {
+        foreach ($values as $value) {
+            if (empty($value)) {
                 continue;
             }
 
-            if (!isset($aggregated[$productId])) {
-                $aggregated[$productId] = 0;
+            if (!isset($counted[$value])) {
+                $counted[$value] = 0;
             }
-            $aggregated[$productId]++;
+            $counted[$value]++;
         }
 
-        return $aggregated;
+        return $counted;
     }
 
     /**

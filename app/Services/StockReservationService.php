@@ -182,40 +182,46 @@ class StockReservationService
     }
 
     /**
-     * Check if a new subscription configuration is available
-     * 
+     * Check if a specific subscription configuration can be fulfilled
+     *
+     * Unlike checkTypeAvailability() this is quantity aware - it knows that an XL
+     * filter box needs F1 twice, and that L/XL boxes reach into E3/F3 at all.
+     *
      * @param array $configuration
      * @param ShipmentSchedule $schedule
-     * @return array ['available' => bool, 'out_of_stock' => array of product names]
+     * @return array ['available' => bool, 'out_of_stock' => array of product names, 'missing_slots' => array of slot names]
      */
     public function checkAvailability(array $configuration, ShipmentSchedule $schedule): array
     {
         try {
-            // Calculate what coffees this subscription would need
-            $neededCoffees = $this->allocationService->allocateCoffeesForSubscription(
-                $configuration,
-                $schedule
-            );
+            $slots = $schedule->getCoffeeSlotsArray();
+            $needs = $this->resolveProductNeeds($configuration, $slots);
+
+            // A slot this configuration reaches into is not filled for this month,
+            // or the rules cannot produce the promised number of bags. Either way
+            // selling it would silently ship the customer short.
+            if (!empty($needs['missing_slots']) || !$this->allocationIsComplete($configuration, $needs)) {
+                return [
+                    'available' => false,
+                    'out_of_stock' => [],
+                    'missing_slots' => $needs['missing_slots'],
+                ];
+            }
+
+            $products = \App\Models\Product::whereIn('id', array_keys($needs['products']))->get()->keyBy('id');
 
             $outOfStock = [];
 
-            foreach ($neededCoffees as $productId => $neededQuantity) {
-                // Get current reservations
-                $reservation = StockReservation::where('product_id', $productId)
-                    ->where('shipment_schedule_id', $schedule->id)
-                    ->first();
+            foreach ($needs['products'] as $productId => $neededQuantity) {
+                $product = $products->get($productId);
 
-                $currentlyReserved = $reservation ? $reservation->actual_quantity : 0;
-
-                // Get product stock
-                $product = \App\Models\Product::find($productId);
                 if (!$product) {
+                    $outOfStock[] = '#'.$productId;
                     continue;
                 }
 
-                $availableStock = $product->stock - $currentlyReserved;
-
-                if ($availableStock < $neededQuantity) {
+                // Stock already has reservations deducted, so it is the available quantity
+                if ($product->stock < $neededQuantity) {
                     $outOfStock[] = $product->name;
                 }
             }
@@ -223,6 +229,7 @@ class StockReservationService
             return [
                 'available' => empty($outOfStock),
                 'out_of_stock' => $outOfStock,
+                'missing_slots' => [],
             ];
         } catch (\Exception $e) {
             Log::error('Failed to check availability', [
@@ -234,15 +241,41 @@ class StockReservationService
             return [
                 'available' => false,
                 'out_of_stock' => ['Chyba při kontrole dostupnosti'],
+                'missing_slots' => [],
             ];
         }
     }
 
     /**
-     * Check which subscription types are available for the next shipment
-     * 
+     * Build the full availability matrix for a shipment
+     *
+     * Every purchasable combination is evaluated so the configurator can disable
+     * exactly the box size / split that cannot be fulfilled, instead of only
+     * knowing whether a coffee type is sold out as a whole.
+     *
+     * Shape:
+     *   'espresso' => [2 => ['plain' => bool, 'decaf' => bool], 3 => [...], 4 => [...]]
+     *   'filter'   => same
+     *   'mix'      => [2 => ['plain' => [filterCount => bool], 'decaf' => [...]], ...]
+     *
      * @param ShipmentSchedule $schedule
-     * @return array ['espresso' => bool, 'filter' => bool, 'decaf' => bool]
+     * @return array
+     */
+    public function getAvailabilityMatrix(ShipmentSchedule $schedule): array
+    {
+        $slots = $schedule->getCoffeeSlotsArray();
+
+        return $this->buildAvailabilityMatrix($slots, $this->getStockBySlotProduct($slots));
+    }
+
+    /**
+     * Check which subscription types are available for the next shipment
+     *
+     * A type counts as available when at least one of its box sizes can be
+     * fulfilled - the configurator disables the individual sizes from the matrix.
+     *
+     * @param ShipmentSchedule $schedule
+     * @return array ['espresso' => bool, 'filter' => bool, 'decaf' => bool, 'mix' => bool]
      */
     public function checkTypeAvailability(ShipmentSchedule $schedule): array
     {
@@ -257,58 +290,168 @@ class StockReservationService
         }
 
         $slots = $schedule->getCoffeeSlotsArray();
+        $stock = $this->getStockBySlotProduct($slots);
+        $matrix = $this->buildAvailabilityMatrix($slots, $stock);
 
-        // Check espresso availability (need E1, E2)
-        $espressoAvailable = $this->checkSlotAvailability([$slots['e1'], $slots['e2']], $schedule);
-
-        // Check filter availability (need F1, F2)
-        $filterAvailable = $this->checkSlotAvailability([$slots['f1'], $slots['f2']], $schedule);
-
-        // Check decaf availability (need D)
-        $decafAvailable = !empty($slots['d']) && $this->checkSlotAvailability([$slots['d']], $schedule);
-
-        // Mix is available if both espresso and filter are available
-        $mixAvailable = $espressoAvailable && $filterAvailable;
+        // Decaf never adds a bag, it replaces one - a single D bag is enough
+        $decafAvailable = !empty($slots['d']) && ($stock[$slots['d']] ?? 0) > 0;
 
         return [
-            'espresso' => $espressoAvailable,
-            'filter' => $filterAvailable,
+            'espresso' => $this->hasAvailableCombination($matrix['espresso']),
+            'filter' => $this->hasAvailableCombination($matrix['filter']),
             'decaf' => $decafAvailable,
-            'mix' => $mixAvailable,
+            'mix' => $this->hasAvailableCombination($matrix['mix']),
         ];
     }
 
     /**
-     * Check if specific coffee slots have available stock
-     * Returns false if ANY slot has 0 or negative stock
-     * 
-     * Note: product.stock now already has reservations deducted,
-     * so we just check if stock > 0
+     * Translate a configuration into per-product quantities for a given set of slots
+     *
+     * Two slots can hold the same coffee, so quantities are summed per product.
+     *
+     * @return array ['products' => [product_id => quantity], 'missing_slots' => array of slot names, 'bags' => int]
      */
-    private function checkSlotAvailability(array $productIds, ShipmentSchedule $schedule): bool
+    private function resolveProductNeeds(array $configuration, array $slots): array
     {
-        foreach ($productIds as $productId) {
+        $products = [];
+        $missingSlots = [];
+        $bags = 0;
+
+        foreach ($this->allocationService->getRequiredSlots($configuration) as $slotName => $quantity) {
+            $bags += $quantity;
+
+            $productId = $slots[$slotName] ?? null;
+
             if (empty($productId)) {
-                return false; // Slot not configured
+                $missingSlots[] = $slotName;
+                continue;
             }
 
-            $product = \App\Models\Product::find($productId);
-            if (!$product) {
-                return false;
+            if (!isset($products[$productId])) {
+                $products[$productId] = 0;
+            }
+            $products[$productId] += $quantity;
+        }
+
+        return [
+            'products' => $products,
+            'missing_slots' => $missingSlots,
+            'bags' => $bags,
+        ];
+    }
+
+    /**
+     * Does the allocation actually produce the number of bags the box promises?
+     *
+     * Guards against configurations the rules cannot express - an all-filter mix
+     * only reaches F1-F3, so a 4 bag mix without espresso would ship one bag short.
+     */
+    private function allocationIsComplete(array $configuration, array $needs): bool
+    {
+        return $needs['bags'] === (int) ($configuration['amount'] ?? 0);
+    }
+
+    /**
+     * Load the stock of every product used by the shipment slots in a single query
+     *
+     * @return array [product_id => stock]
+     */
+    private function getStockBySlotProduct(array $slots): array
+    {
+        $productIds = array_values(array_unique(array_filter($slots)));
+
+        if (empty($productIds)) {
+            return [];
+        }
+
+        return \App\Models\Product::whereIn('id', $productIds)
+            ->pluck('stock', 'id')
+            ->map(fn ($stock) => (int) $stock)
+            ->all();
+    }
+
+    /**
+     * Evaluate every purchasable combination in memory
+     */
+    private function buildAvailabilityMatrix(array $slots, array $stock): array
+    {
+        $matrix = [
+            'espresso' => [],
+            'filter' => [],
+            'mix' => [],
+        ];
+
+        foreach ([2, 3, 4] as $amount) {
+            foreach (['espresso', 'filter'] as $type) {
+                $matrix[$type][$amount] = [
+                    'plain' => $this->configurationFits(
+                        ['amount' => $amount, 'type' => $type, 'isDecaf' => false],
+                        $slots,
+                        $stock
+                    ),
+                    'decaf' => $this->configurationFits(
+                        ['amount' => $amount, 'type' => $type, 'isDecaf' => true],
+                        $slots,
+                        $stock
+                    ),
+                ];
             }
 
-            // Stock already has reservations deducted, so just check if > 0
-            if ($product->stock <= 0) {
-                \Log::info('Slot unavailable due to insufficient stock', [
-                    'product_id' => $productId,
-                    'product_name' => $product->name,
-                    'stock' => $product->stock,
-                ]);
+            $matrix['mix'][$amount] = ['plain' => [], 'decaf' => []];
+
+            // Keyed by the number of filter bags in the split; espresso takes the rest
+            for ($filterCount = 0; $filterCount <= $amount; $filterCount++) {
+                $mix = ['filter' => $filterCount, 'espresso' => $amount - $filterCount];
+
+                foreach (['plain' => false, 'decaf' => true] as $key => $isDecaf) {
+                    $matrix['mix'][$amount][$key][$filterCount] = $this->configurationFits(
+                        ['amount' => $amount, 'type' => 'mix', 'isDecaf' => $isDecaf, 'mix' => $mix],
+                        $slots,
+                        $stock
+                    );
+                }
+            }
+        }
+
+        return $matrix;
+    }
+
+    /**
+     * Can this exact configuration be fulfilled from the given slots and stock?
+     */
+    private function configurationFits(array $configuration, array $slots, array $stock): bool
+    {
+        $needs = $this->resolveProductNeeds($configuration, $slots);
+
+        if (!empty($needs['missing_slots']) || !$this->allocationIsComplete($configuration, $needs)) {
+            return false;
+        }
+
+        foreach ($needs['products'] as $productId => $neededQuantity) {
+            if (($stock[$productId] ?? 0) < $neededQuantity) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Is at least one combination in this branch of the matrix available?
+     */
+    private function hasAvailableCombination(array $branch): bool
+    {
+        foreach ($branch as $value) {
+            if (is_array($value)) {
+                if ($this->hasAvailableCombination($value)) {
+                    return true;
+                }
+            } elseif ($value) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

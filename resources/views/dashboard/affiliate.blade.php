@@ -3,6 +3,12 @@
 @section('title', 'Affiliate Dashboard')
 
 @section('content')
+@php
+    $currency = $statistics['payout_currency'];
+    $money = fn ($amount) => \App\Helpers\CurrencyHelper::formatByCurrency($amount, $currency, 0);
+    $viewAsParam = request()->has('view_as') ? '&view_as=' . request()->get('view_as') : '';
+@endphp
+
 <div class="space-y-6">
     <!-- Page Header -->
     <div class="bg-white rounded-2xl p-6 border border-gray-200">
@@ -11,7 +17,7 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Earned -->
         <div class="bg-white rounded-2xl p-6 border border-gray-200">
             <div class="flex items-start gap-3">
@@ -22,12 +28,13 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-600 font-medium mb-1">{{ __('affiliate.total_earned') }}</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::formatAmount($statistics['total_earned']) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $money($statistics['total_earned']) }}</p>
+                    <p class="text-xs text-gray-500">{{ __('affiliate.this_month') }}: {{ $money($statistics['this_month_earned']) }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Pending -->
+        <!-- Payable -->
         <div class="bg-white rounded-2xl p-6 border border-gray-200">
             <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
@@ -36,9 +43,9 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 font-medium mb-1">{{ __('affiliate.pending') }}</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::formatAmount($statistics['pending_amount']) }}</p>
-                    <p class="text-xs text-gray-500">{{ $statistics['pending_count'] }} {{ __('affiliate.rewards') }}</p>
+                    <p class="text-sm text-gray-600 font-medium mb-1">{{ __('affiliate.payable') }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $money($statistics['payable_amount']) }}</p>
+                    <p class="text-xs text-gray-500">{{ $statistics['pending_count'] + $statistics['approved_count'] }} {{ __('affiliate.rewards') }}</p>
                 </div>
             </div>
         </div>
@@ -53,7 +60,7 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-600 font-medium mb-1">{{ __('affiliate.paid') }}</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::formatAmount($statistics['paid_amount']) }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $money($statistics['paid_amount']) }}</p>
                     <p class="text-xs text-gray-500">{{ $statistics['paid_count'] }} {{ __('affiliate.rewards') }}</p>
                 </div>
             </div>
@@ -68,13 +75,68 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-600 font-medium mb-1">{{ __('affiliate.clicks') }}</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ $statistics['total_clicks'] }}</p>
-                    <p class="text-xs text-gray-500">{{ $statistics['total_conversions'] }} {{ __('affiliate.conversions') }}</p>
+                    <p class="text-sm text-gray-600 font-medium mb-1">{{ __('affiliate.conversions') }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $statistics['total_conversions'] }}</p>
+                    <p class="text-xs text-gray-500">
+                        {{ __('affiliate.from_clicks', ['count' => $statistics['total_clicks']]) }}@if($statistics['conversion_rate'] !== null) &middot; {{ $statistics['conversion_rate'] }} %@endif
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Postup k fakturační hranici -->
+    <div class="bg-white rounded-2xl p-6 border border-gray-200">
+        <div class="flex flex-wrap justify-between items-baseline gap-2 mb-3">
+            <h2 class="text-lg font-bold text-gray-900">{{ __('affiliate.payout_progress') }}</h2>
+            <span class="text-sm text-gray-600">
+                {{ __('affiliate.payout_progress_text', [
+                    'amount' => $money($statistics['payable_amount']),
+                    'threshold' => $money($statistics['payout_threshold']),
+                ]) }}
+            </span>
+        </div>
+
+        <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+            <div class="{{ $statistics['threshold_reached'] ? 'bg-green-500' : 'bg-amber-400' }} h-3 rounded-full transition-all"
+                 style="width: {{ $statistics['threshold_progress'] }}%"></div>
+        </div>
+
+        <p class="text-sm {{ $statistics['threshold_reached'] ? 'text-green-700' : 'text-gray-600' }} mt-3">
+            @if($statistics['threshold_reached'])
+                {{ __('affiliate.payout_reached', ['email' => \App\Services\EmailService::getContactEmail(app()->getLocale())]) }}
+            @else
+                {{ __('affiliate.payout_remaining', ['amount' => $money(max(0, $statistics['payout_threshold'] - $statistics['payable_amount']))]) }}
+            @endif
+        </p>
+    </div>
+
+    <!-- Vývoj po měsících -->
+    <div class="bg-white rounded-2xl p-6 border border-gray-200">
+        <h2 class="text-lg font-bold text-gray-900">{{ __('affiliate.monthly_development') }}</h2>
+        <p class="text-sm text-gray-600 font-light mb-4">{{ __('affiliate.monthly_development_subtitle') }}</p>
+        @include('partials.affiliate.monthly-chart')
+    </div>
+
+    <!-- Předplatná, která vydělávají -->
+    <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
+        <div class="bg-gray-50 p-6 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">{{ __('affiliate.your_subscriptions') }}</h2>
+            <p class="text-sm text-gray-600 font-light">{{ __('affiliate.your_subscriptions_subtitle') }}</p>
+        </div>
+        @include('partials.affiliate.subscriptions-table')
+    </div>
+
+    <!-- Výkon kódů -->
+    @if($codePerformance->isNotEmpty())
+    <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
+        <div class="bg-gray-50 p-6 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">{{ __('affiliate.code_performance') }}</h2>
+            <p class="text-sm text-gray-600 font-light">{{ __('affiliate.code_performance_subtitle') }}</p>
+        </div>
+        @include('partials.affiliate.code-performance')
+    </div>
+    @endif
 
     <!-- Affiliate Codes & Links -->
     <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
@@ -104,7 +166,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div class="bg-gray-50 rounded-lg p-3">
                         <p class="text-xs text-gray-600 mb-1">{{ __('affiliate.customer_discount') }}</p>
-                        
+
                         @if($coupon->hasSubscriptionDiscount())
                         <div class="mb-2">
                             <p class="text-xs font-medium text-purple-700 mb-0.5">{{ __('affiliate.subscription') }}:</p>
@@ -113,7 +175,7 @@
                             </p>
                         </div>
                         @endif
-                        
+
                         @if($coupon->hasOrderDiscount())
                         <div>
                             <p class="text-xs font-medium text-blue-700 mb-0.5">{{ __('affiliate.order') }}:</p>
@@ -122,27 +184,23 @@
                             </p>
                         </div>
                         @endif
-                        
+
                         @if(!$coupon->hasSubscriptionDiscount() && !$coupon->hasOrderDiscount())
                         <p class="text-sm text-gray-500">{{ __('affiliate.no_discount') }}</p>
                         @endif
                     </div>
                     <div class="bg-gray-50 rounded-lg p-3">
                         <p class="text-xs text-gray-600 mb-1">{{ __('affiliate.your_reward') }}</p>
-                        
+
                         @if($coupon->hasAffiliateSubscriptionReward())
                         <div class="mb-2">
                             <p class="text-xs font-medium text-purple-700 mb-0.5">{{ __('affiliate.subscription') }}:</p>
                             <p class="text-sm font-medium text-gray-900">
-                                {{ \App\Helpers\CurrencyHelper::formatAmount($coupon->getAffiliateSubscriptionRewardValue()) }}
-                                {{ __('affiliate.per_payment') }}
-                                @if($coupon->affiliate_reward_subscription_months)
-                                    ({{ $coupon->affiliate_reward_subscription_months }}x)
-                                @endif
+                                {{ $coupon->getAffiliateSubscriptionRewardDescription() }}
                             </p>
                         </div>
                         @endif
-                        
+
                         @if($coupon->hasAffiliateOrderReward())
                         <div>
                             <p class="text-xs font-medium text-blue-700 mb-0.5">{{ __('affiliate.order') }}:</p>
@@ -152,13 +210,13 @@
                                 @else
                                     {{ \App\Helpers\CurrencyHelper::formatAmount($coupon->getAffiliateOrderRewardValue()) }}
                                 @endif
-                                @if($coupon->affiliate_reward_order_min_value)
-                                    <span class="text-xs text-gray-600">(min. {{ \App\Helpers\CurrencyHelper::formatAmount($coupon->affiliate_reward_order_min_value) }})</span>
+                                @if($coupon->getAffiliateOrderMinValue())
+                                    <span class="text-xs text-gray-600">(min. {{ \App\Helpers\CurrencyHelper::formatAmount($coupon->getAffiliateOrderMinValue()) }})</span>
                                 @endif
                             </p>
                         </div>
                         @endif
-                        
+
                         @if(!$coupon->hasAffiliateSubscriptionReward() && !$coupon->hasAffiliateOrderReward())
                         <p class="text-sm text-gray-500">{{ __('affiliate.no_rewards') }}</p>
                         @endif
@@ -175,8 +233,9 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-xs text-gray-600">{{ $link->clicks_count }} {{ __('affiliate.clicks') }}</span>
-                            <button 
-                                onclick="copyToClipboard('{{ $link->getFullUrl() }}')" 
+                            <button
+                                type="button"
+                                onclick="copyToClipboard('{{ $link->getFullUrl() }}', this)"
                                 class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors"
                             >
                                 {{ __('affiliate.copy') }}
@@ -204,21 +263,18 @@
     <!-- Recent Rewards -->
     <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
         <div class="bg-gray-50 p-6 border-b border-gray-200">
-            <div class="flex justify-between items-center">
+            <div class="flex flex-wrap justify-between items-center gap-3">
                 <h2 class="text-xl font-bold text-gray-900">{{ __('affiliate.recent_rewards') }}</h2>
-                @php
-                    $viewAsParam = request()->has('view_as') ? '&view_as=' . request()->get('view_as') : '';
-                @endphp
                 <div class="flex gap-2">
-                    <a href="{{ localizedRoute('dashboard.affiliate') }}{{ $viewAsParam ? '?' . ltrim($viewAsParam, '&') : '' }}" class="px-3 py-1.5 text-sm {{ !$statusFilter ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
-                        {{ __('affiliate.all') }}
-                    </a>
-                    <a href="{{ localizedRoute('dashboard.affiliate') }}?status=pending{{ $viewAsParam }}" class="px-3 py-1.5 text-sm {{ $statusFilter === 'pending' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
-                        {{ __('affiliate.pending') }}
-                    </a>
-                    <a href="{{ localizedRoute('dashboard.affiliate') }}?status=paid{{ $viewAsParam }}" class="px-3 py-1.5 text-sm {{ $statusFilter === 'paid' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
-                        {{ __('affiliate.paid') }}
-                    </a>
+                    @foreach(['' => __('affiliate.all'), 'pending' => __('affiliate.status_pending'), 'approved' => __('affiliate.status_approved'), 'paid' => __('affiliate.status_paid')] as $value => $label)
+                        @php
+                            $query = $value ? '?status=' . $value . $viewAsParam : ($viewAsParam ? '?' . ltrim($viewAsParam, '&') : '');
+                        @endphp
+                        <a href="{{ localizedRoute('dashboard.affiliate') }}{{ $query }}"
+                           class="px-3 py-1.5 text-sm {{ (string) $statusFilter === (string) $value ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600' }} rounded-lg">
+                            {{ $label }}
+                        </a>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -228,21 +284,11 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            {{ __('affiliate.date') }}
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            {{ __('affiliate.type') }}
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            {{ __('affiliate.code') }}
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            {{ __('affiliate.amount') }}
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                            {{ __('affiliate.status') }}
-                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{{ __('affiliate.date') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{{ __('affiliate.type') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{{ __('affiliate.code') }}</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">{{ __('affiliate.amount') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">{{ __('affiliate.status') }}</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
@@ -260,40 +306,43 @@
                                 @if($reward->subscription_payment_number)
                                     ({{ $reward->subscription_payment_number }}.)
                                 @endif
+                                @if($reward->getTierLabel())
+                                    <div class="text-xs {{ $reward->reward_tier === 'followup' ? 'text-blue-600' : 'text-green-600' }}">{{ $reward->getTierLabel() }}</div>
+                                @endif
                             @else
                                 {{ __('affiliate.order') }}
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ $reward->coupon->code }}
+                            {{ $reward->coupon?->code }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
                             {{ $reward->getFormattedAmount() }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @if($reward->status === 'pending')
-                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-yellow-100 text-yellow-800">
-                                    {{ __('affiliate.status_pending') }}
-                                </span>
-                            @elseif($reward->status === 'approved')
-                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100 text-blue-800">
-                                    {{ __('affiliate.status_approved') }}
-                                </span>
-                            @elseif($reward->status === 'paid')
-                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
-                                    {{ __('affiliate.status_paid') }}
-                                </span>
-                            @else
-                                <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800">
-                                    {{ $reward->status }}
-                                </span>
-                            @endif
+                            @php
+                                $badge = match($reward->status) {
+                                    'pending' => 'bg-yellow-100 text-yellow-800',
+                                    'approved' => 'bg-blue-100 text-blue-800',
+                                    'paid' => 'bg-green-100 text-green-800',
+                                    default => 'bg-gray-100 text-gray-800',
+                                };
+                            @endphp
+                            <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-medium rounded-full {{ $badge }}">
+                                {{ $reward->getStatusLabel() }}
+                            </span>
                         </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+
+        @if($rewards->hasPages())
+        <div class="p-6 border-t border-gray-200">
+            {{ $rewards->links() }}
+        </div>
+        @endif
         @else
         <div class="text-center py-12 px-4">
             <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -309,9 +358,19 @@
 </div>
 
 <script>
-function copyToClipboard(text) {
+function copyToClipboard(text, button) {
     navigator.clipboard.writeText(text).then(() => {
-        alert('{{ __('affiliate.link_copied') }}');
+        // Nevtíravé potvrzení přímo na tlačítku místo alert()
+        const original = button.textContent;
+        button.textContent = @json(__('affiliate.link_copied'));
+        button.classList.add('bg-green-600');
+        button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+
+        setTimeout(() => {
+            button.textContent = original;
+            button.classList.remove('bg-green-600');
+            button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        }, 2000);
     }).catch(err => {
         console.error('Failed to copy:', err);
     });

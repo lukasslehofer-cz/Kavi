@@ -256,12 +256,21 @@
                     </div>
                     <div>
                         <label for="affiliate_reward_order_min_value" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.min_order_value') }} (Kč)</label>
-                        <input type="number" name="affiliate_reward_order_min_value" id="affiliate_reward_order_min_value" 
-                            value="{{ old('affiliate_reward_order_min_value', $coupon->affiliate_reward_order_min_value ?? '') }}" 
+                        <input type="number" name="affiliate_reward_order_min_value" id="affiliate_reward_order_min_value"
+                            value="{{ old('affiliate_reward_order_min_value', $coupon->affiliate_reward_order_min_value ?? '') }}"
                             step="0.01" min="0"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             placeholder="500">
                         <p class="text-xs text-gray-500 mt-1">Pro odměnu</p>
+                    </div>
+                    <div>
+                        <label for="affiliate_reward_order_min_value_eur" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.min_order_value') }} (€)</label>
+                        <input type="number" name="affiliate_reward_order_min_value_eur" id="affiliate_reward_order_min_value_eur"
+                            value="{{ old('affiliate_reward_order_min_value_eur', $coupon->affiliate_reward_order_min_value_eur ?? '') }}"
+                            step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="20">
+                        <p class="text-xs text-gray-500 mt-1">Pro odměnu v EUR</p>
                     </div>
                 </div>
             </div>
@@ -289,12 +298,39 @@
                     </div>
                     <div>
                         <label for="affiliate_reward_subscription_months" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_months') }}</label>
-                        <input type="number" name="affiliate_reward_subscription_months" id="affiliate_reward_subscription_months" 
-                            value="{{ old('affiliate_reward_subscription_months', $coupon->affiliate_reward_subscription_months ?? '') }}" 
+                        <input type="number" name="affiliate_reward_subscription_months" id="affiliate_reward_subscription_months"
+                            value="{{ old('affiliate_reward_subscription_months', $coupon->affiliate_reward_subscription_months ?? '') }}"
                             min="1"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             placeholder="3">
                         <p class="text-xs text-gray-500 mt-1">{{ __('affiliate.reward_months_help') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navazující (dlouhodobá) odměna za předplatné -->
+            <div class="border-t border-gray-200 pt-4 mt-4">
+                <h4 class="text-sm font-semibold text-gray-900 mb-1">{{ __('affiliate.followup_reward') }}</h4>
+                <p class="text-xs text-gray-500 mb-3">{{ __('affiliate.followup_reward_help') }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="affiliate_reward_subscription_followup_value" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_value_czk') }}</label>
+                        <input type="number" name="affiliate_reward_subscription_followup_value" id="affiliate_reward_subscription_followup_value"
+                            value="{{ old('affiliate_reward_subscription_followup_value', $coupon->affiliate_reward_subscription_followup_value ?? '') }}"
+                            step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="50">
+                    </div>
+                    <div>
+                        <label for="affiliate_reward_subscription_followup_value_eur" class="block text-sm font-medium text-gray-700 mb-1">{{ __('affiliate.reward_value_eur') }}</label>
+                        <input type="number" name="affiliate_reward_subscription_followup_value_eur" id="affiliate_reward_subscription_followup_value_eur"
+                            value="{{ old('affiliate_reward_subscription_followup_value_eur', $coupon->affiliate_reward_subscription_followup_value_eur ?? '') }}"
+                            step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="2">
+                    </div>
+                    <div class="flex items-end">
+                        <p class="text-xs text-gray-500 pb-2">{{ __('affiliate.followup_reward_note') }}</p>
                     </div>
                 </div>
             </div>
