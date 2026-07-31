@@ -403,6 +403,9 @@ class AffiliateService
                 'current_tier' => $nextTier,
                 'current_rate' => (float) $nextRate,
                 'remaining_initial' => $remainingInitial,
+                'is_unlimited' => $limit === null,
+                'has_followup' => $coupon->hasAffiliateSubscriptionFollowupReward(),
+                'followup_rate' => (float) $coupon->getAffiliateSubscriptionFollowupRewardValue($currency),
                 'next_reward_date' => $isActive && $nextTier ? $subscription->next_billing_date : null,
                 'reward_scheme' => $coupon->getAffiliateSubscriptionRewardDescription($currency),
             ];

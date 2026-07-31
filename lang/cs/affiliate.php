@@ -104,8 +104,8 @@ return [
     'awaiting_payout' => 'čeká na výplatu',
 
     // Sazby odměn
-    'tier_initial' => 'Úvodní sazba',
-    'tier_followup' => 'Dlouhodobá sazba',
+    'tier_initial' => 'Úvodní odměna',
+    'tier_followup' => 'Dlouhodobá odměna',
     'reward_scheme_unlimited' => ':amount za každou rozesílku',
     'reward_scheme_limited' => '{1} :amount za první rozesílku|[2,4] :amount za první :count rozesílky|[5,*] :amount za prvních :count rozesílek',
     'reward_scheme_tiered' => '{1} :amount za první rozesílku, poté :followup za každou další|[2,4] :amount za první :count rozesílky, poté :followup za každou další|[5,*] :amount za prvních :count rozesílek, poté :followup za každou další',
@@ -134,9 +134,11 @@ return [
     'since' => 'Od',
     'rewarded_shipments' => 'Odměněných rozesílek',
     'earned' => 'Vyděláno',
-    'current_rate' => 'Aktuální sazba',
+    'current_rate' => 'Aktuální odměna',
     'next_reward' => 'Další odměna',
-    'remaining_at_initial' => 'ještě :count v úvodní sazbě',
+    'reward_every_shipment' => 'Za každou rozesílku',
+    'remaining_then_followup' => '{1} ještě 1× v této výši, pak :followup|[2,4] ještě :count× v této výši, pak :followup|[5,*] ještě :count× v této výši, pak :followup',
+    'remaining_then_end' => '{1} poslední odměna z tohoto předplatného|[2,4] zbývají :count odměny, pak končí|[5,*] zbývá :count odměn, pak končí',
     'no_further_reward' => 'Odměny vyčerpány',
     'subscription_ended' => 'Ukončeno',
     'subscription_active' => 'Aktivní',
@@ -144,6 +146,7 @@ return [
     'no_subscriptions_text' => 'Jakmile někdo přes váš kód založí předplatné, uvidíte ho tady.',
 
     // Výkon kódů
+    'code_inactive' => 'Neaktivní',
     'code_performance' => 'Výkon vašich kódů',
     'code_performance_subtitle' => 'Kolik který kód přivedl zákazníků',
 

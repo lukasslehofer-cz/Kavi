@@ -23,7 +23,7 @@
                     <div class="text-xs text-gray-500">
                         {{ $row->name }}
                         @unless($row->is_active)
-                            <span class="ml-1 text-gray-400">({{ __('affiliate.subscription_ended') }})</span>
+                            <span class="ml-1 text-gray-400">({{ __('affiliate.code_inactive') }})</span>
                         @endunless
                     </div>
                 </td>

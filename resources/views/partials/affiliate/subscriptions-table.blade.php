@@ -53,14 +53,25 @@
                             {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->current_rate, $item->currency, 0) }}
                         </div>
                         <div class="text-xs {{ $item->current_tier === 'followup' ? 'text-blue-600' : 'text-green-600' }}">
-                            @if($item->current_tier === 'initial' && $item->remaining_initial)
-                                {{ __('affiliate.remaining_at_initial', ['count' => $item->remaining_initial]) }}
+                            @if($item->current_tier === 'followup')
+                                {{ __('affiliate.tier_followup') }}
+                            @elseif($item->is_unlimited)
+                                {{ __('affiliate.reward_every_shipment') }}
+                            @elseif($item->has_followup)
+                                {{ trans_choice('affiliate.remaining_then_followup', $item->remaining_initial, [
+                                    'count' => $item->remaining_initial,
+                                    'followup' => \App\Helpers\CurrencyHelper::formatByCurrency($item->followup_rate, $item->currency, 0),
+                                ]) }}
                             @else
-                                {{ $item->current_tier === 'followup' ? __('affiliate.tier_followup') : __('affiliate.tier_initial') }}
+                                {{ trans_choice('affiliate.remaining_then_end', $item->remaining_initial, ['count' => $item->remaining_initial]) }}
                             @endif
                         </div>
-                    @else
+                    @elseif($item->is_active)
+                        {{-- Předplatné běží, ale počet odměněných rozesílek je vyčerpaný --}}
                         <span class="text-sm text-gray-400">{{ __('affiliate.no_further_reward') }}</span>
+                    @else
+                        {{-- Ukončené předplatné – že skončilo, říká už sloupec se stavem --}}
+                        <span class="text-sm text-gray-400">&mdash;</span>
                     @endif
                 </td>
                 <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">

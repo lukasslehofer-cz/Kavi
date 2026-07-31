@@ -12,7 +12,7 @@ class AuditAffiliateRewards extends Command
     protected $signature = 'affiliate:audit
                             {--subscription= : Omezí kontrolu na jedno subscription_number}';
 
-    protected $description = 'Zkontroluje konzistenci affiliate odměn – chybějící odměny a nesedící sazby';
+    protected $description = 'Zkontroluje konzistenci affiliate odměn – chybějící odměny a nesedící částky';
 
     public function handle(): int
     {
@@ -147,7 +147,7 @@ class AuditAffiliateRewards extends Command
         $this->warn('Chybějící odměny ('.count($rows).')');
         $this->line('Zaplacené platby předplatného, ke kterým neexistuje odměna. Typicky ruční úhrada faktury,');
         $this->line('jednorázový box nebo předplatné se 100% slevou. Doplníš přes affiliate:backfill-subscription-rewards.');
-        $this->table(['Předplatné', 'Platba #', 'Zaplaceno', 'Kód', 'Sazba', 'Očekávaná odměna'], $rows);
+        $this->table(['Předplatné', 'Platba #', 'Zaplaceno', 'Kód', 'Typ odměny', 'Očekávaná částka'], $rows);
     }
 
     private function reportMismatched(array $rows): void
@@ -158,9 +158,9 @@ class AuditAffiliateRewards extends Command
 
         $this->newLine();
         $this->warn('Nesedící částky ('.count($rows).')');
-        $this->line('Uložená odměna neodpovídá aktuálnímu nastavení kupónu. Může jít o legitimní následek změny sazby,');
+        $this->line('Uložená odměna neodpovídá aktuálnímu nastavení kupónu. Může jít o legitimní následek změny odměny na kupónu,');
         $this->line('nebo o odměnu spočtenou ve špatné měně. Historické odměny se automaticky nepřepočítávají.');
-        $this->table(['Předplatné', 'Platba #', 'Kód', 'Uloženo', 'Podle kupónu', 'Sazba'], $rows);
+        $this->table(['Předplatné', 'Platba #', 'Kód', 'Uloženo', 'Podle kupónu', 'Typ odměny'], $rows);
     }
 
     private function reportOrphaned(array $rows): void
@@ -184,7 +184,7 @@ class AuditAffiliateRewards extends Command
         $this->newLine();
         $this->line('<fg=cyan>Posunuté číslování ('.count($rows).')</>');
         $this->line('Odměn je stejně jako zaplacených plateb, jen mají jiná pořadová čísla – každá rozesílka JE odměněná.');
-        $this->line('Nedoplňuj je přes backfill, vznikly by duplicity. Ovlivňuje to jen hranici mezi úvodní a dlouhodobou sazbou.');
+        $this->line('Nedoplňuj je přes backfill, vznikly by duplicity. Ovlivňuje to jen hranici mezi úvodní a dlouhodobou odměnou.');
         $this->table(['Předplatné', 'Zaplaceno plateb', 'Čísla odměn', 'Kód', 'Vyplaceno celkem'], $rows);
     }
 }

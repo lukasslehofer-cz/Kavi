@@ -104,8 +104,8 @@ return [
     'awaiting_payout' => 'awaiting payout',
 
     // Reward tiers
-    'tier_initial' => 'Initial rate',
-    'tier_followup' => 'Long-term rate',
+    'tier_initial' => 'Initial reward',
+    'tier_followup' => 'Long-term reward',
     'reward_scheme_unlimited' => ':amount per shipment',
     'reward_scheme_limited' => '{1} :amount for the first shipment|[2,*] :amount for the first :count shipments',
     'reward_scheme_tiered' => '{1} :amount for the first shipment, then :followup for every further one|[2,*] :amount for the first :count shipments, then :followup for every further one',
@@ -134,9 +134,11 @@ return [
     'since' => 'Since',
     'rewarded_shipments' => 'Rewarded shipments',
     'earned' => 'Earned',
-    'current_rate' => 'Current rate',
+    'current_rate' => 'Current reward',
     'next_reward' => 'Next reward',
-    'remaining_at_initial' => ':count more at the initial rate',
+    'reward_every_shipment' => 'For every shipment',
+    'remaining_then_followup' => '{1} 1 more at this amount, then :followup|[2,*] :count more at this amount, then :followup',
+    'remaining_then_end' => '{1} last reward from this subscription|[2,*] :count rewards left, then it ends',
     'no_further_reward' => 'Rewards used up',
     'subscription_ended' => 'Ended',
     'subscription_active' => 'Active',
@@ -144,6 +146,7 @@ return [
     'no_subscriptions_text' => 'As soon as someone starts a subscription with your code, you will see it here.',
 
     // Code performance
+    'code_inactive' => 'Inactive',
     'code_performance' => 'Your code performance',
     'code_performance_subtitle' => 'How many customers each code brought in',
 
