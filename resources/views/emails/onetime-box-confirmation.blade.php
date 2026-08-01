@@ -102,25 +102,35 @@
                                     <span class="config-value">{{ $subscription->configuration['amount'] }}× 250g</span>
                                 </div>
                                 
-                                @if($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0))
+                                @php
+                                $breakdown = \App\Helpers\SubscriptionPricing::forFirstPayment($subscription);
+                                @endphp
                                 <div class="config-item">
                                     <span class="config-label">{{ __('emails.onetime_box.price', [], $locale) }}:</span>
-                                    <span class="config-value">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency, 0) }}</span>
+                                    <span class="config-value">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->box, $breakdown->currency) }}</span>
                                 </div>
+                                @if($breakdown->discount > 0)
                                 <div class="config-item">
                                     <span class="config-label">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}:</span>
-                                    <span class="config-value" style="color: #059669;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->discount_amount, $subscription->currency, 0) }}</span>
-                                </div>
-                                <div class="config-item">
-                                    <span class="config-label">{{ __('emails.order_confirmation.total', [], $locale) }}:</span>
-                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price - $subscription->discount_amount, $subscription->currency, 0) }}</span>
-                                </div>
-                                @else
-                                <div class="config-item">
-                                    <span class="config-label">{{ __('emails.order_confirmation.total', [], $locale) }}:</span>
-                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency, 0) }}</span>
+                                    <span class="config-value" style="color: #059669;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->discount, $breakdown->currency) }}</span>
                                 </div>
                                 @endif
+                                @if($breakdown->shipping > 0)
+                                <div class="config-item">
+                                    <span class="config-label">{{ __('emails.order_confirmation.shipping', [], $locale) }}:</span>
+                                    <span class="config-value">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->shipping, $breakdown->currency) }}</span>
+                                </div>
+                                @endif
+                                @if($breakdown->giftVoucherShippingCredit > 0)
+                                <div class="config-item">
+                                    <span class="config-label">{{ __('emails.order_confirmation.shipping', [], $locale) }} – voucher:</span>
+                                    <span class="config-value" style="color: #059669;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->giftVoucherShippingCredit, $breakdown->currency) }}</span>
+                                </div>
+                                @endif
+                                <div class="config-item">
+                                    <span class="config-label">{{ __('emails.order_confirmation.total', [], $locale) }}:</span>
+                                    <span class="config-value" style="font-size: 18px; color: #e6305a;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency) }}</span>
+                                </div>
                             </div>
                             
                             <!-- Delivery Info -->

@@ -70,16 +70,19 @@ class CartController extends Controller
                 ? 'Free shipping (digital product)' 
                 : 'Doprava zdarma (digitální produkt)';
         } elseif ($userCountry) {
-            $shipping = $this->shippingService->calculateShippingCost($userCountry, $total, false);
-            $remainingForFreeShipping = $this->shippingService->getRemainingForFreeShipping($userCountry, $total);
-            
+            // Košík drží CZK i EUR součet vedle sebe, takže se do výpočtu musí poslat
+            // ten ve správné měně – jinak by se porovnával korunový součet s eurovým prahem.
+            $currency = \App\Helpers\CurrencyHelper::code();
+            $totalInCurrency = \App\Helpers\CurrencyHelper::priceFor($currency, $total, $totalEur);
+
+            $shipping = $this->shippingService->calculateShippingCost($userCountry, $totalInCurrency, false, $currency);
+
             // Get threshold and EUR values for display
             $rate = \App\Models\ShippingRate::getForCountry($userCountry);
-            $freeShippingThreshold = $rate?->free_shipping_threshold_czk;
+            $freeShippingThreshold = $rate?->getFreeShippingThresholdFor($currency);
             $shippingEur = $rate?->price_eur ?? 0;
-            $remainingForFreeShippingEur = $rate?->free_shipping_threshold_eur 
-                ? max(0, $rate->free_shipping_threshold_eur - $totalEur)
-                : null;
+            $remainingForFreeShipping = $this->shippingService->getRemainingForFreeShipping($userCountry, $total, 'CZK');
+            $remainingForFreeShippingEur = $this->shippingService->getRemainingForFreeShipping($userCountry, $totalEur, 'EUR');
         } else {
             $shippingMessage = app()->getLocale() === 'en' 
                 ? 'Shipping cost will be calculated at checkout'

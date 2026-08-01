@@ -51,6 +51,7 @@ class ShippingRateController extends Controller
             'price_eur' => 'required|numeric|min:0',
             'applies_to_subscriptions' => 'required|boolean',
             'free_shipping_threshold_czk' => 'nullable|numeric|min:0',
+            'free_shipping_threshold_eur' => 'nullable|numeric|min:0',
             'packeta_carrier_ids' => 'nullable|array',
             'packeta_carrier_ids.*' => 'exists:packeta_carriers,id',
         ]);
@@ -64,6 +65,9 @@ class ShippingRateController extends Controller
         // Handle nullable fields
         if (empty($validated['free_shipping_threshold_czk'])) {
             $validated['free_shipping_threshold_czk'] = null;
+        }
+        if (empty($validated['free_shipping_threshold_eur'])) {
+            $validated['free_shipping_threshold_eur'] = null;
         }
         
         // Remove packeta_carrier_ids from validated data (it's handled separately)

@@ -73,7 +73,8 @@
                                     <tr>
                                         <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Částka' : 'Amount' }}:</td>
                                         <td style="padding: 8px 0; font-size: 16px; color: #1c1c1c; text-align: right; font-weight: 400;">
-                                            {{ \App\Helpers\CurrencyHelper::formatByCurrency($payment->amount, $subscription->currency, 0) }}
+                                            {{-- Bez pevného počtu desetinných míst – EUR se strhává na centy --}}
+                                            {{ \App\Helpers\CurrencyHelper::formatByCurrency($payment->amount, $payment->currency ?: $subscription->currency) }}
                                         </td>
                                     </tr>
                                     <tr>

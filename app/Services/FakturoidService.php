@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Helpers\CurrencyHelper;
+use App\Helpers\SubscriptionPricing;
 use App\Helpers\VatHelper;
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -407,7 +409,9 @@ class FakturoidService
                 'street' => $address['address'] ?? $address['billing_address'] ?? '',
                 'city' => $address['city'] ?? $address['billing_city'] ?? '',
                 'zip' => $address['postal_code'] ?? $address['billing_postal_code'] ?? '',
-                'country' => 'CZ',
+                // Skutečná země zákazníka, ne natvrdo CZ – zahraniční odběratel se jinak
+                // ve Fakturoidu založí jako český subjekt.
+                'country' => strtoupper($address['country'] ?? $address['billing_country'] ?? 'CZ'),
             ];
 
             // Check if user has cached Fakturoid subject ID
@@ -662,13 +666,149 @@ class FakturoidService
     }
 
     /**
+     * Sestaví payload faktury k platbě předplatného.
+     *
+     * Vydělené z createInvoiceForSubscription(), aby šel payload zkontrolovat
+     * bez odeslání do Fakturoidu – viz `php artisan invoices:preview-subscription`.
+     *
+     * Řádky vždy vzniknou jednou cestou: box → doprava → záporná sleva. Dřív tu byly
+     * dvě rozbíhající se větve a ta bez slevy brala jako cenu boxu $payment->amount,
+     * což už dopravu obsahuje – a pak dopravu přidala ještě jednou.
+     */
+    public function buildSubscriptionInvoicePayload(\App\Models\SubscriptionPayment $payment, int $subjectId): array
+    {
+        $subscription = $payment->subscription;
+
+        // Subscription prices include VAT, use vat_price_mode=with_vat
+        // With this mode, unit_price should contain the price WITH VAT
+        // Fakturoid will calculate the base price and VAT from it
+        // Předplatné je vždy káva → 12% DPH
+        $vatRate = $subscription->vat_rate ?? 12.00;
+
+        $breakdown = SubscriptionPricing::forPayment($payment);
+        $subscriptionCurrency = $breakdown->currency;
+
+        $unitName = $this->getLocalizedText('unit', $subscriptionCurrency);
+        $subscriptionName = $this->getLocalizedText('subscription', $subscriptionCurrency);
+        $shippingName = $this->getLocalizedText('shipping', $subscriptionCurrency);
+        $discountName = $this->getLocalizedText('discount', $subscriptionCurrency);
+
+        $numberSuffix = $subscription->subscription_number
+            ? ' ('.$subscription->subscription_number.')'
+            : '';
+
+        // Fakturoid chce ceny jako desetinné řetězce.
+        $fmt = fn (float $value): string => number_format($value, 2, '.', '');
+
+        // Zaokrouhlení se rozpouští v jedné položce, aby řádky vždy daly přesně total.
+        // Doprava zůstává nedotčená – ta musí na faktuře sedět na haléř s ceníkem.
+        $totalDiscount = $breakdown->totalDiscount();
+        if ($totalDiscount > 0) {
+            $boxLine = $breakdown->box;
+            $discountLine = round($breakdown->box + $breakdown->shipping - $breakdown->total, 2);
+        } else {
+            $boxLine = round($breakdown->total - $breakdown->shipping, 2);
+            $discountLine = 0.0;
+        }
+
+        $lines = [];
+
+        $lines[] = [
+            'name' => $subscriptionName.$numberSuffix,
+            'quantity' => '1',
+            'unit_name' => $unitName,
+            'unit_price' => $fmt($boxLine),
+            'vat_rate' => (string) $vatRate,
+        ];
+
+        if ($breakdown->shipping > 0) {
+            $lines[] = [
+                'name' => $shippingName,
+                'quantity' => '1',
+                'unit_name' => $unitName,
+                'unit_price' => $fmt($breakdown->shipping),
+                'vat_rate' => (string) $vatRate,
+            ];
+        }
+
+        if ($discountLine > 0) {
+            // Dárkový voucher: 0% DPH (voucher je platební metoda)
+            $isGiftVoucher = $subscription->coupon?->is_gift_voucher ?? false;
+            $discountVatRate = $isGiftVoucher ? 0 : $vatRate;
+            $discountLabel = $isGiftVoucher
+                ? $this->getLocalizedText('gift_voucher', $subscriptionCurrency)
+                : $discountName;
+
+            $lines[] = [
+                'name' => $discountLabel.($subscription->coupon_code ? ' ('.$subscription->coupon_code.')' : ''),
+                'quantity' => '1',
+                'unit_name' => $unitName,
+                'unit_price' => $fmt(-$discountLine),
+                'vat_rate' => (string) $discountVatRate,
+            ];
+        }
+
+        // Create invoice data
+        $invoiceData = [
+            'subject_id' => $subjectId,
+            'custom_id' => 'SUB-'.$subscription->id.'-'.$payment->id,
+            'document_type' => 'invoice',
+            'issued_on' => $payment->paid_at->format('Y-m-d'),
+            'taxable_fulfillment_due' => $payment->paid_at->format('Y-m-d'),
+            'due' => 0, // Already paid
+            'payment_method' => 'card',
+            'vat_price_mode' => 'with_vat', // Prices include VAT, Fakturoid calculates base price
+            'currency' => $subscriptionCurrency,
+            'language' => $this->getInvoiceLanguageFromCurrency($subscriptionCurrency),
+            'lines' => $lines,
+            'note' => $this->getLocalizedText('subscription_note', $subscriptionCurrency),
+        ];
+
+        // Add number format ID if configured
+        if ($this->numberFormat) {
+            $invoiceData['number_format_id'] = (int) $this->numberFormat;
+        }
+
+        // Pojistka: součet faktury se MUSÍ rovnat skutečně stržené částce.
+        // Rozpad na položky je kosmetika, součet je účetní fakt – když se rozejdou,
+        // vystav radši jednu položku na správnou částku než itemizovanou nesprávnou.
+        $lineTotal = round($boxLine + $breakdown->shipping - $discountLine, 2);
+        $paidAmount = round((float) $payment->amount, 2);
+
+        if (abs($lineTotal - $paidAmount) > 0.01) {
+            Log::error('Fakturoid subscription invoice does not reconcile with captured payment', [
+                'payment_id' => $payment->id,
+                'subscription_id' => $subscription->id,
+                'subscription_number' => $subscription->subscription_number,
+                'currency' => $subscriptionCurrency,
+                'breakdown' => $breakdown->toArray(),
+                'line_total' => $lineTotal,
+                'payment_amount' => $paidAmount,
+                'delta' => round($lineTotal - $paidAmount, 2),
+            ]);
+            Cache::increment('fakturoid_invoice_mismatch_'.now()->format('Y-m-d'));
+
+            $invoiceData['lines'] = [[
+                'name' => $subscriptionName.$numberSuffix,
+                'quantity' => '1',
+                'unit_name' => $unitName,
+                'unit_price' => $fmt($paidAmount),
+                'vat_rate' => (string) $vatRate,
+            ]];
+            $invoiceData['private_note'] = 'Automatický fallback: rozpad položek ('.$fmt($lineTotal)
+                .') nesouhlasil s uhrazenou částkou ('.$fmt($paidAmount).'). Zkontrolovat konfiguraci předplatného.';
+        }
+
+        return $invoiceData;
+    }
+
+    /**
      * Create invoice in Fakturoid for a subscription payment
      */
     private function createInvoiceForSubscription(\App\Models\SubscriptionPayment $payment): ?array
     {
         try {
             $subscription = $payment->subscription;
-            $user = $subscription->user;
 
             // Get or create subject (customer)
             $subjectId = $this->getOrCreateSubjectForSubscription($subscription);
@@ -679,109 +819,7 @@ class FakturoidService
                 return null;
             }
 
-            // Subscription prices include VAT, use vat_price_mode=with_vat
-            // With this mode, unit_price should contain the price WITH VAT
-            // Fakturoid will calculate the base price and VAT from it
-            // Předplatné je vždy káva → 12% DPH
-            $vatRate = $subscription->vat_rate ?? 12.00;
-
-            // Check if discount is active for this subscription
-            // Discount is active if: discount_amount > 0 AND (unlimited OR months remaining > 0)
-            $discountActive = $subscription->discount_amount > 0 &&
-                ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0);
-
-            // Use subscription's currency for invoice (stored at subscription creation time)
-            $subscriptionCurrency = $subscription->currency ?? 'CZK';
-
-            // Determine line items based on whether we have breakdown info
-            $lines = [];
-            $unitName = $this->getLocalizedText('unit', $subscriptionCurrency);
-            $subscriptionName = $this->getLocalizedText('subscription', $subscriptionCurrency);
-            $shippingName = $this->getLocalizedText('shipping', $subscriptionCurrency);
-            $discountName = $this->getLocalizedText('discount', $subscriptionCurrency);
-
-            // If subscription has configured_price and discount, show the breakdown
-            if ($subscription->configured_price > 0 && $discountActive) {
-                // Main subscription line (full price)
-                $lines[] = [
-                    'name' => $subscriptionName.($subscription->subscription_number
-                        ? ' ('.$subscription->subscription_number.')'
-                        : ''),
-                    'quantity' => '1',
-                    'unit_name' => $unitName,
-                    'unit_price' => (string) $subscription->configured_price,
-                    'vat_rate' => (string) $vatRate,
-                ];
-
-                // Add shipping if applicable
-                if ($subscription->shipping_cost > 0) {
-                    $lines[] = [
-                        'name' => $shippingName,
-                        'quantity' => '1',
-                        'unit_name' => $unitName,
-                        'unit_price' => (string) $subscription->shipping_cost,
-                        'vat_rate' => (string) $vatRate,
-                    ];
-                }
-
-                // Add discount as negative line
-                // Dárkový voucher: 0% DPH (voucher je platební metoda)
-                $isGiftVoucher = $subscription->coupon?->is_gift_voucher ?? false;
-                $discountVatRate = $isGiftVoucher ? 0 : $vatRate;
-                $discountLabel = $isGiftVoucher
-                    ? $this->getLocalizedText('gift_voucher', $subscriptionCurrency)
-                    : $discountName;
-                $lines[] = [
-                    'name' => $discountLabel.($subscription->coupon_code ? ' ('.$subscription->coupon_code.')' : ''),
-                    'quantity' => '1',
-                    'unit_name' => $unitName,
-                    'unit_price' => (string) (-$subscription->discount_amount),
-                    'vat_rate' => (string) $discountVatRate,
-                ];
-            } else {
-                // No active discount - show as single line with payment amount
-                $lines[] = [
-                    'name' => $subscriptionName.($subscription->subscription_number
-                        ? ' ('.$subscription->subscription_number.')'
-                        : ''),
-                    'quantity' => '1',
-                    'unit_name' => $unitName,
-                    'unit_price' => (string) $payment->amount,
-                    'vat_rate' => (string) $vatRate,
-                ];
-
-                // Add shipping if applicable and not included in payment amount
-                if ($subscription->shipping_cost > 0 && $subscription->configured_price > 0) {
-                    $lines[] = [
-                        'name' => $shippingName,
-                        'quantity' => '1',
-                        'unit_name' => $unitName,
-                        'unit_price' => (string) $subscription->shipping_cost,
-                        'vat_rate' => (string) $vatRate,
-                    ];
-                }
-            }
-
-            // Create invoice data
-            $invoiceData = [
-                'subject_id' => $subjectId,
-                'custom_id' => 'SUB-'.$subscription->id.'-'.$payment->id,
-                'document_type' => 'invoice',
-                'issued_on' => $payment->paid_at->format('Y-m-d'),
-                'taxable_fulfillment_due' => $payment->paid_at->format('Y-m-d'),
-                'due' => 0, // Already paid
-                'payment_method' => 'card',
-                'vat_price_mode' => 'with_vat', // Prices include VAT, Fakturoid calculates base price
-                'currency' => $subscriptionCurrency,
-                'language' => $this->getInvoiceLanguageFromCurrency($subscriptionCurrency),
-                'lines' => $lines,
-                'note' => $this->getLocalizedText('subscription_note', $subscriptionCurrency),
-            ];
-
-            // Add number format ID if configured
-            if ($this->numberFormat) {
-                $invoiceData['number_format_id'] = (int) $this->numberFormat;
-            }
+            $invoiceData = $this->buildSubscriptionInvoicePayload($payment, $subjectId);
 
             // Create invoice in Fakturoid
             $response = $this->makeRequest(
@@ -909,7 +947,9 @@ class FakturoidService
                 'street' => $shippingAddress['billing_address'] ?? $shippingAddress['address'] ?? '',
                 'city' => $shippingAddress['billing_city'] ?? $shippingAddress['city'] ?? '',
                 'zip' => $shippingAddress['billing_postal_code'] ?? $shippingAddress['postal_code'] ?? '',
-                'country' => 'CZ',
+                // Skutečná země zákazníka, ne natvrdo CZ – zahraniční odběratel se jinak
+                // ve Fakturoidu založí jako český subjekt.
+                'country' => strtoupper($shippingAddress['country'] ?? $subscription->shipping_country ?? 'CZ'),
             ];
 
             // Check if user has cached Fakturoid subject ID
@@ -1032,8 +1072,13 @@ class FakturoidService
                     'body' => $response->body(),
                 ]);
             } else {
+                // Částku i měnu logujeme schválně – právě tenhle řádek by odhalil,
+                // že se proti faktuře na 55 EUR připisuje platba 51 EUR.
                 Log::info('Fakturoid subscription invoice marked as paid', [
                     'invoice_id' => $invoiceId,
+                    'payment_id' => $payment->id,
+                    'amount' => (float) $payment->amount,
+                    'currency' => strtoupper($payment->currency ?: ''),
                 ]);
             }
         } catch (\Exception $e) {
@@ -1041,6 +1086,39 @@ class FakturoidService
                 'invoice_id' => $invoiceId,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Načte fakturu z Fakturoidu (read-only).
+     *
+     * makeRequest() je private, takže audit potřebuje tenhle wrapper.
+     */
+    public function getInvoice(int $invoiceId): ?array
+    {
+        try {
+            $response = $this->makeRequest(
+                'GET',
+                "{$this->apiUrl}/accounts/{$this->slug}/invoices/{$invoiceId}.json"
+            );
+
+            if (! $response->successful()) {
+                Log::warning('Failed to fetch Fakturoid invoice', [
+                    'invoice_id' => $invoiceId,
+                    'status' => $response->status(),
+                ]);
+
+                return null;
+            }
+
+            return $response->json();
+        } catch (\Exception $e) {
+            Log::error('Exception fetching Fakturoid invoice', [
+                'invoice_id' => $invoiceId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
         }
     }
 }

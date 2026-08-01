@@ -182,16 +182,14 @@ class ChargeSubscriptionPayments extends Command
                 }
 
                 // Calculate the amount that would be charged
-                $amount = $subscription->configured_price ?? 0;
-                if ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) {
-                    $amount -= $subscription->discount_amount;
-                }
+                // Stejný rozpad, jaký použije ostrý běh – dry-run se s ním nemá jak rozejít.
+                $breakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
+                $currency = $breakdown->currency;
 
-                $currency = $subscription->currency ?? 'CZK';
-                $this->info('  ✓ Would charge: '.number_format($amount, 2)." {$currency}");
-                if ($subscription->discount_amount > 0) {
-                    $this->line('      (Original: '.number_format($subscription->configured_price, 2)." {$currency}, Discount: -".number_format($subscription->discount_amount, 2)." {$currency})");
-                }
+                $this->info('  ✓ Would charge: '.number_format($breakdown->total, 2)." {$currency}");
+                $this->line('      (Box: '.number_format($breakdown->box, 2)." {$currency}"
+                    .', Shipping: +'.number_format($breakdown->shipping, 2)." {$currency}"
+                    .', Discount: -'.number_format($breakdown->discount, 2)." {$currency})");
                 $successCount++;
 
                 continue;

@@ -341,13 +341,11 @@ class CouponService
      */
     public function getSubscriptionPrice(Subscription $subscription): float
     {
-        $basePrice = $subscription->configured_price ?? $subscription->plan?->price ?? 0;
+        // Fallback na plán jde přes SubscriptionPricing, aby se u EUR předplatného
+        // nevzal syrový CZK sloupec plan->price.
+        $basePrice = \App\Helpers\SubscriptionPricing::boxPrice($subscription);
 
-        if ($this->hasActiveDiscount($subscription)) {
-            return max(0, $basePrice - $subscription->discount_amount);
-        }
-
-        return $basePrice;
+        return max(0, $basePrice - \App\Helpers\SubscriptionPricing::discount($subscription));
     }
 
     /**

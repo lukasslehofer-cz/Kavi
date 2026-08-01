@@ -192,7 +192,7 @@
                             <span class="text-sm text-gray-900">{{ $order->user->name ?? 'Host' }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm font-bold text-gray-900">{{ number_format($order->total, 0, ',', ' ') }} Kč</span>
+                            <span class="text-sm font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency) }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($order->status === 'pending')
@@ -269,7 +269,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="text-sm font-bold text-gray-900">
-                                {{ number_format($subscription->configured_price ?? $subscription->plan->price ?? 0, 0, ',', ' ') }} Kč
+                                {{ \App\Helpers\CurrencyHelper::formatByCurrency(\App\Helpers\SubscriptionPricing::forRecurringPayment($subscription)->total, $subscription->currency) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">

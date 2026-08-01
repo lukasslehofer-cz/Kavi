@@ -97,6 +97,28 @@ class MonitorSubscriptionBilling extends Command
             $this->info('✓ No stuck paused subscriptions');
         }
 
+        // Check 7: Faktury, u kterých rozpad položek nesouhlasil se stržnou částkou.
+        // Čítač plní pojistka ve FakturoidService::buildSubscriptionInvoicePayload().
+        // Nenulová hodnota znamená, že se vystavila fallback faktura na jednu položku -
+        // částka sedí, ale konfigurace předplatného je rozbitá a chce prohlédnout.
+        $mismatchKeys = [
+            'dnes' => 'fakturoid_invoice_mismatch_'.today()->format('Y-m-d'),
+            'včera' => 'fakturoid_invoice_mismatch_'.today()->subDay()->format('Y-m-d'),
+        ];
+        $mismatchTotal = 0;
+        foreach ($mismatchKeys as $label => $key) {
+            $count = (int) Cache::get($key, 0);
+            $mismatchTotal += $count;
+            if ($count > 0) {
+                $alert = "⚠️ {$count} faktur ({$label}) nesouhlasilo s rozpadem ceny - viz invoices:audit-subscriptions";
+                $this->error($alert);
+                $alerts[] = $alert;
+            }
+        }
+        if ($mismatchTotal === 0) {
+            $this->info('✓ No Fakturoid invoice mismatches');
+        }
+
         $this->newLine();
 
         // Show last billing summary if available

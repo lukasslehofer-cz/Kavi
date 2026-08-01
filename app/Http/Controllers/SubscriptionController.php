@@ -677,7 +677,7 @@ class SubscriptionController extends Controller
             // Check if this is a one-time box order (frequency = 0)
             if ($configuration['frequency'] == 0) {
                 // Handle one-time box as a regular order
-                return $this->processOneTimeBoxOrder($request, $validated, $configuration, $price, $discount, $coupon);
+                return $this->processOneTimeBoxOrder($request, $validated, $configuration, $price, $discount, $coupon, $originalPrice);
             }
 
             // BYPASS STRIPE FOR ZERO AMOUNT (100% discount + free shipping)
@@ -794,6 +794,7 @@ class SubscriptionController extends Controller
                     'carrier_pickup_point' => $validated['carrier_pickup_point'] ?? null,
                     'delivery_notes' => $validated['delivery_notes'] ?? null,
                     'shipping_cost' => $shipping,
+                    'gift_voucher_shipping_credit' => $giftVoucherShippingCredit,
                     'shipping_country' => $shippingCountry,
                     'shipping_rate_id' => $shippingRate?->id,
                     'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
@@ -955,13 +956,18 @@ class SubscriptionController extends Controller
     /**
      * Process one-time box order as a Subscription (for admin shipments integration)
      */
-    private function processOneTimeBoxOrder(Request $request, array $validated, array $configuration, float $price, float $discount, $coupon)
+    private function processOneTimeBoxOrder(Request $request, array $validated, array $configuration, float $price, float $discount, $coupon, ?float $originalPrice = null)
     {
         DB::beginTransaction();
 
         try {
             // Mark configuration as one-time
             $configuration['is_one_time'] = true;
+
+            // configured_price se ukládá vždy jako plná cena před slevou – stejně jako
+            // u běžného předplatného. Jednorázový box tu dřív ukládal cenu už po slevě,
+            // takže faktura odečetla slevu podruhé.
+            $originalPrice = $originalPrice ?? ($price + $discount);
 
             // Calculate shipping cost based on billing country
             $shippingCountry = $validated['billing_country'];
@@ -1030,7 +1036,7 @@ class SubscriptionController extends Controller
                     'discount_months_remaining' => null,
                     'discount_months_total' => null,
                     'configuration' => $configuration,
-                    'configured_price' => $price,
+                    'configured_price' => $originalPrice, // Store FULL price without discount
                     'currency' => CurrencyHelper::code(),
                     'frequency_months' => 0, // 0 = one-time
                     'status' => 'pending',
@@ -1119,7 +1125,7 @@ class SubscriptionController extends Controller
                 'discount_months_remaining' => null,
                 'discount_months_total' => null,
                 'configuration' => $configuration,
-                'configured_price' => $price,
+                'configured_price' => $originalPrice, // Store FULL price without discount
                 'currency' => CurrencyHelper::code(),
                 'frequency_months' => 0, // 0 = one-time
                 'status' => 'pending',

@@ -14,9 +14,10 @@ class ShippingService
      * @param string $countryCode ISO 3166-1 alpha-2 country code (e.g. 'CZ', 'SK')
      * @param float $subtotal Order subtotal amount
      * @param bool $isSubscription Whether this is a subscription order
+     * @param string|null $currency Měna objednávky (null = aktuální měna ze session)
      * @return float Shipping cost (0 if free or not available)
      */
-    public function calculateShippingCost(string $countryCode, float $subtotal, bool $isSubscription = false): float
+    public function calculateShippingCost(string $countryCode, float $subtotal, bool $isSubscription = false, ?string $currency = null): float
     {
         $rate = $this->getShippingRate($countryCode);
 
@@ -29,7 +30,7 @@ class ShippingService
             return 0;
         }
 
-        return $rate->calculateShipping($subtotal, $isSubscription);
+        return $rate->calculateShipping($subtotal, $isSubscription, $currency);
     }
 
     /**
@@ -120,17 +121,19 @@ class ShippingService
      *
      * @param string $countryCode
      * @param float $currentSubtotal
+     * @param string|null $currency Měna objednávky (null = aktuální měna ze session)
      * @return float|null Returns null if no free shipping threshold
      */
-    public function getRemainingForFreeShipping(string $countryCode, float $currentSubtotal): ?float
+    public function getRemainingForFreeShipping(string $countryCode, float $currentSubtotal, ?string $currency = null): ?float
     {
         $rate = $this->getShippingRate($countryCode);
+        $threshold = $rate?->getFreeShippingThresholdFor($currency);
 
-        if (!$rate || !$rate->free_shipping_threshold_czk) {
+        if ($threshold === null) {
             return null;
         }
 
-        $remaining = $rate->free_shipping_threshold_czk - $currentSubtotal;
+        $remaining = $threshold - $currentSubtotal;
 
         return $remaining > 0 ? $remaining : 0;
     }

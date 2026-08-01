@@ -81,8 +81,7 @@
                                     {{ $locale === 'cs' ? 'Vaše předplatné' : 'Your subscription' }}
                                 </div>
                                 @php
-                                $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
-                                $displayPrice = ($subscription->configured_price ?? 0) - $activeDiscount;
+                                $breakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
                                 @endphp
                                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
@@ -99,7 +98,7 @@
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Cena' : 'Price' }}:</td>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($displayPrice, $subscription->currency, 0) }} / {{ $locale === 'cs' ? 'měsíc' : 'month' }}</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency) }} / {{ $locale === 'cs' ? 'měsíc' : 'month' }}</td>
                                     </tr>
                                     @if($subscription->next_billing_date)
                                     <tr>

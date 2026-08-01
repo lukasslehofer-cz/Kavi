@@ -35,20 +35,20 @@
             <div class="bg-white rounded-lg shadow p-4">
                 <div class="text-xs text-gray-500 uppercase tracking-wide">{{ __('affiliate.total_earned') }}</div>
                 <div class="text-2xl font-bold text-gray-900 mt-1">
-                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['total_earned'], $statistics['payout_currency'], 0) }}
+                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['total_earned'], $statistics['payout_currency']) }}
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow p-4">
                 <div class="text-xs text-gray-500 uppercase tracking-wide">{{ __('affiliate.payable') }}</div>
                 <div class="text-2xl font-bold text-yellow-600 mt-1">
-                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['payable_amount'], $statistics['payout_currency'], 0) }}
+                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['payable_amount'], $statistics['payout_currency']) }}
                 </div>
                 <div class="text-xs text-gray-500 mt-1">{{ $statistics['pending_count'] + $statistics['approved_count'] }} {{ __('affiliate.rewards') }}</div>
             </div>
             <div class="bg-white rounded-lg shadow p-4">
                 <div class="text-xs text-gray-500 uppercase tracking-wide">{{ __('affiliate.paid') }}</div>
                 <div class="text-2xl font-bold text-green-600 mt-1">
-                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['paid_amount'], $statistics['payout_currency'], 0) }}
+                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['paid_amount'], $statistics['payout_currency']) }}
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow p-4">
@@ -63,7 +63,7 @@
                 <div class="text-2xl font-bold text-gray-900 mt-1">{{ $statistics['active_subscriptions_count'] }}</div>
                 <div class="text-xs text-gray-500 mt-1">
                     {{ __('affiliate.estimated_income') }}
-                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['estimated_monthly_income'], $statistics['payout_currency'], 0) }}
+                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['estimated_monthly_income'], $statistics['payout_currency']) }}
                 </div>
             </div>
         </div>
@@ -100,8 +100,8 @@
                 @elseif($statistics['threshold_reached'])
                     <span class="text-sm text-green-700 pb-2">
                         {{ __('affiliate.payout_progress_text', [
-                            'amount' => \App\Helpers\CurrencyHelper::formatByCurrency($statistics['payable_amount'], $statistics['payout_currency'], 0),
-                            'threshold' => \App\Helpers\CurrencyHelper::formatByCurrency($statistics['payout_threshold'], $statistics['payout_currency'], 0),
+                            'amount' => \App\Helpers\CurrencyHelper::formatByCurrency($statistics['payable_amount'], $statistics['payout_currency']),
+                            'threshold' => \App\Helpers\CurrencyHelper::formatByCurrency($statistics['payout_threshold'], $statistics['payout_currency']),
                         ]) }}
                     </span>
                 @endif
@@ -114,7 +114,7 @@
                     @csrf
                     <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                         {{ __('affiliate.mark_all_approved_paid') }}
-                        ({{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['approved_amount'], $statistics['payout_currency'], 0) }})
+                        ({{ \App\Helpers\CurrencyHelper::formatByCurrency($statistics['approved_amount'], $statistics['payout_currency']) }})
                     </button>
                 </form>
             </div>

@@ -127,24 +127,36 @@
                             
                             <!-- Price Summary -->
                             @php
-                            $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
-                            $currentPrice = $subscription->configured_price - $activeDiscount;
+                            $breakdown = \App\Helpers\SubscriptionPricing::forFirstPayment($subscription);
+                            $activeDiscount = $breakdown->discount;
                             @endphp
-                            
+
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #1c1c1c;">
-                                @if($activeDiscount > 0)
                                 <tr>
                                     <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a;">{{ __('emails.subscription_confirmation.price', [], $locale) }}:</td>
-                                    <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a; text-align: right; text-decoration: line-through;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency, 0) }}</td>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a; text-align: right;{{ $activeDiscount > 0 ? ' text-decoration: line-through;' : '' }}">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->box, $breakdown->currency) }}</td>
                                 </tr>
+                                @if($activeDiscount > 0)
                                 <tr>
                                     <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a;">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #4a6741; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($activeDiscount, $subscription->currency, 0) }}</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #4a6741; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($activeDiscount, $breakdown->currency) }}</td>
+                                </tr>
+                                @endif
+                                @if($breakdown->shipping > 0)
+                                <tr>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a;">{{ __('emails.order_confirmation.shipping', [], $locale) }}:</td>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->shipping, $breakdown->currency) }}</td>
+                                </tr>
+                                @endif
+                                @if($breakdown->giftVoucherShippingCredit > 0)
+                                <tr>
+                                    <td style="padding: 6px 0; font-size: 14px; color: #5a5a5a;">{{ __('emails.order_confirmation.shipping', [], $locale) }} – {{ $locale === 'cs' ? 'voucher' : 'voucher' }}:</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #4a6741; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->giftVoucherShippingCredit, $breakdown->currency) }}</td>
                                 </tr>
                                 @endif
                                 <tr>
-                                    <td style="padding: 20px 0 6px 0; font-size: 11px; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em;">{{ $activeDiscount > 0 ? ($locale === 'cs' ? 'Cena po slevě' : 'Price after discount') : __('emails.subscription_confirmation.price', [], $locale) }}:</td>
-                                    <td style="padding: 20px 0 6px 0; font-size: 28px; color: #1c1c1c; text-align: right; letter-spacing: -0.02em;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($currentPrice, $subscription->currency, 0) }}</td>
+                                    <td style="padding: 20px 0 6px 0; font-size: 11px; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em;">{{ __('emails.order_confirmation.total', [], $locale) }}:</td>
+                                    <td style="padding: 20px 0 6px 0; font-size: 28px; color: #1c1c1c; text-align: right; letter-spacing: -0.02em;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency) }}</td>
                                 </tr>
                             </table>
                             

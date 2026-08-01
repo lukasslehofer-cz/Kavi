@@ -77,7 +77,7 @@
                                     {{ $order->order_number ?? '#' . $order->id }}
                                 </div>
                                 <div style="font-size: 18px; color: #76716C; margin-top: 8px; text-decoration: line-through;">
-                                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency, 0) }}
+                                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency) }}
                                 </div>
                             </div>
 

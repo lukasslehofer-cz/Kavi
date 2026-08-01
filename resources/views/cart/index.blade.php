@@ -77,17 +77,24 @@
                     {{ $currentLocale === 'en' ? 'GRATIS SHIPPING ACHIEVED' : 'DOPRAVA ZDARMA DOSAŽENA' }}
                 </span>
             </div>
-            @elseif($shipping !== null && $shipping > 0 && $remainingForFreeShipping !== null && $remainingForFreeShipping > 0)
+            @else
+            @php
+                // Zbytek do dopravy zdarma se bere v měně košíku – v každé měně má
+                // vlastní práh a v té druhé nemusí být nastavený vůbec.
+                $remainingInCurrency = \App\Helpers\CurrencyHelper::isEur()
+                    ? $remainingForFreeShippingEur
+                    : $remainingForFreeShipping;
+            @endphp
+            @if($shipping !== null && $shipping > 0 && $remainingInCurrency !== null && $remainingInCurrency > 0)
             <div class="mb-8">
                 <span class="text-xs uppercase tracking-widest text-warm-500">
                     @php
-                        $remainingFormatted = $currentLocale === 'en' 
-                            ? '€' . number_format($remainingForFreeShippingEur ?? 0, 2, '.', ' ')
-                            : number_format($remainingForFreeShipping, 0, ',', ' ') . ' Kč';
+                        $remainingFormatted = \App\Helpers\CurrencyHelper::formatAmount($remainingInCurrency);
                     @endphp
                     {!! __('cart.free_shipping_remaining', ['amount' => '<span class="text-dark-800">' . $remainingFormatted . '</span>']) !!}
                 </span>
             </div>
+            @endif
             @endif
 
             <!-- Product List -->

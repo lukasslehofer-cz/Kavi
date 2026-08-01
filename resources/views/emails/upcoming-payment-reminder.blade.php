@@ -77,13 +77,20 @@
                                         </td>
                                     </tr>
                                     @php
-                                    $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
-                                    $currentPrice = $subscription->configured_price - $activeDiscount;
+                                    $breakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
                                     @endphp
+                                    @if($breakdown->shipping > 0)
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.order_confirmation.shipping', [], $locale) }}:</td>
+                                        <td style="padding: 8px 0; font-size: 16px; color: #1c1c1c; text-align: right; font-weight: 400;">
+                                            {{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->shipping, $breakdown->currency) }}
+                                        </td>
+                                    </tr>
+                                    @endif
                                     <tr>
                                         <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Částka' : 'Amount' }}:</td>
                                         <td style="padding: 8px 0; font-size: 16px; color: #1c1c1c; text-align: right; font-weight: 400;">
-                                            {{ \App\Helpers\CurrencyHelper::formatByCurrency($currentPrice, $subscription->currency, 0) }}
+                                            {{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency) }}
                                         </td>
                                     </tr>
                                 </table>

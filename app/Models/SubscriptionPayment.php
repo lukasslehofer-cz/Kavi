@@ -31,6 +31,18 @@ class SubscriptionPayment extends Model
         'period_end' => 'date',
     ];
 
+    /**
+     * Měnu ukládej vždy velkými písmeny.
+     *
+     * Stripe vrací kód lowercase, ostatní zapisovatelé uppercase – na subscriptions
+     * je uppercase, takže se to sjednocuje sem, aby porovnání nezáviselo na tom,
+     * kterou cestou platba vznikla.
+     */
+    public function setCurrencyAttribute($value): void
+    {
+        $this->attributes['currency'] = $value ? strtoupper($value) : $value;
+    }
+
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);

@@ -534,7 +534,8 @@
                     <div class="flex justify-between items-baseline pt-6 mt-4 border-t border-dark-800">
                         <dt class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight">{{ __('checkout.total_per_month') }}</dt>
                         <dd class="font-display text-2xl sm:text-3xl text-dark-800 uppercase tracking-tight" id="total-cost">
-                            {{ \App\Helpers\CurrencyHelper::formatAmount(max(0, $price + ($shipping ?? 0) - ($giftVoucherShippingCredit ?? 0))) }}
+                            {{-- Stejný rozpad, jaký pošle částku do Stripu – zobrazená a stržená cena se nemají jak rozejít --}}
+                            {{ \App\Helpers\CurrencyHelper::formatAmount(\App\Helpers\SubscriptionPricing::fromValues($price, 0, $shipping ?? 0, \App\Helpers\CurrencyHelper::code(), $giftVoucherShippingCredit ?? 0)->total) }}
                         </dd>
                     </div>
                     <p class="text-xs uppercase tracking-widest text-olive-500 text-right">{{ $frequencyText }} / {{ __('checkout.incl_vat') }}</p>
@@ -592,7 +593,8 @@ const isEur = {{ \App\Helpers\CurrencyHelper::isEur() ? 'true' : 'false' }};
 
 window.formatCurrency = function(amount) {
     if (isEur) {
-        return '€' + amount.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        // EUR se strhává na centy, takže je musí ukazovat i přepočet po změně země
+        return '€' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     } else {
         return amount.toLocaleString('cs-CZ') + ' Kč';
     }

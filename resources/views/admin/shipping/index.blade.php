@@ -164,8 +164,12 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             @if($rate->free_shipping_threshold_czk)
-                                {{ number_format($rate->free_shipping_threshold_czk, 0, ',', ' ') }} Kč
-                            @else
+                                <div>{{ number_format($rate->free_shipping_threshold_czk, 0, ',', ' ') }} Kč</div>
+                            @endif
+                            @if($rate->free_shipping_threshold_eur)
+                                <div>{{ number_format($rate->free_shipping_threshold_eur, 2, ',', ' ') }} €</div>
+                            @endif
+                            @if(!$rate->free_shipping_threshold_czk && !$rate->free_shipping_threshold_eur)
                                 <span class="text-gray-400">—</span>
                             @endif
                         </td>

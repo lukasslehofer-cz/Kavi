@@ -20,6 +20,7 @@ class ShippingRate extends Model
         'price_eur',
         'applies_to_subscriptions',
         'free_shipping_threshold_czk',
+        'free_shipping_threshold_eur',
         'packeta_carrier_id',
         'packeta_carrier_name',
     ];
@@ -32,6 +33,7 @@ class ShippingRate extends Model
         'price_czk' => 'decimal:2',
         'price_eur' => 'decimal:2',
         'free_shipping_threshold_czk' => 'decimal:2',
+        'free_shipping_threshold_eur' => 'decimal:2',
     ];
 
     /**
@@ -39,7 +41,31 @@ class ShippingRate extends Model
      */
     public function getPrice(): float
     {
-        return CurrencyHelper::price($this->price_czk, $this->price_eur);
+        return $this->getPriceFor(null);
+    }
+
+    /**
+     * Get the shipping price for an explicitly given currency
+     *
+     * Na rozdíl od getPrice() nečte session – použij mimo request zákazníka.
+     */
+    public function getPriceFor(?string $currency): float
+    {
+        return CurrencyHelper::priceFor($currency, $this->price_czk, $this->price_eur);
+    }
+
+    /**
+     * Práh pro dopravu zdarma v dané měně; null = pro tuto měnu se neuplatňuje.
+     *
+     * Vrací null, ne 0 – nulový práh by jinak znamenal "doprava vždy zdarma".
+     */
+    public function getFreeShippingThresholdFor(?string $currency = null): ?float
+    {
+        $threshold = strtoupper($currency ?: CurrencyHelper::code()) === 'EUR'
+            ? $this->free_shipping_threshold_eur
+            : $this->free_shipping_threshold_czk;
+
+        return $threshold !== null && (float) $threshold > 0 ? (float) $threshold : null;
     }
 
     /**
@@ -108,7 +134,7 @@ class ShippingRate extends Model
     /**
      * Calculate shipping cost for this rate
      */
-    public function calculateShipping(float $subtotal, bool $isSubscription = false): float
+    public function calculateShipping(float $subtotal, bool $isSubscription = false, ?string $currency = null): float
     {
         // If shipping doesn't apply to subscriptions and this is a subscription, return 0
         if ($isSubscription && !$this->applies_to_subscriptions) {
@@ -116,12 +142,16 @@ class ShippingRate extends Model
         }
 
         // Check free shipping threshold (only for one-time orders)
-        // TODO: Add free_shipping_threshold_eur for EUR threshold
-        if (!$isSubscription && $this->free_shipping_threshold_czk && CurrencyHelper::isCzk() && $subtotal >= $this->free_shipping_threshold_czk) {
-            return 0;
+        // Práh se bere v měně objednávky – dřív byl výpočet podmíněný isCzk(),
+        // takže EUR objednávka dopravu zdarma nedostala nikdy.
+        if (!$isSubscription) {
+            $threshold = $this->getFreeShippingThresholdFor($currency);
+            if ($threshold !== null && $subtotal >= $threshold) {
+                return 0;
+            }
         }
 
-        return $this->getPrice();
+        return $this->getPriceFor($currency);
     }
 
     /**

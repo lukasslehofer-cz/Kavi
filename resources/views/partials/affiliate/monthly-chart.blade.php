@@ -21,11 +21,11 @@
             @endphp
             <div class="flex-1 flex flex-col items-center justify-end h-full group">
                 <div class="text-[10px] text-gray-500 mb-1 opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($month['earned'], $currency, 0) }}
+                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($month['earned'], $currency) }}
                 </div>
                 <div class="w-full bg-amber-400 hover:bg-amber-500 transition rounded-t"
                      style="height: {{ $height }}%"
-                     title="{{ $month['month'] }}: {{ \App\Helpers\CurrencyHelper::formatByCurrency($month['earned'], $currency, 0) }} / {{ $month['clicks'] }} {{ __('affiliate.clicks') }}"></div>
+                     title="{{ $month['month'] }}: {{ \App\Helpers\CurrencyHelper::formatByCurrency($month['earned'], $currency) }} / {{ $month['clicks'] }} {{ __('affiliate.clicks') }}"></div>
             </div>
         @endforeach
     </div>

@@ -5,7 +5,7 @@
 
 @section('content')
     @php
-        $fmt = fn ($amount) => \App\Helpers\CurrencyHelper::formatByCurrency($amount, $summary['currency'], 0);
+        $fmt = fn ($amount) => \App\Helpers\CurrencyHelper::formatByCurrency($amount, $summary['currency']);
     @endphp
 
     <!-- Výdělek za měsíc -->

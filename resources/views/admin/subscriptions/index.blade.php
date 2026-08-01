@@ -145,9 +145,11 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
-                                $fullPrice = $subscription->configured_price ?? $subscription->plan->price ?? 0;
-                                $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
-                                $displayPrice = $fullPrice - $activeDiscount;
+                                // Fallback na plán jde přes SubscriptionPricing, aby EUR předplatné
+                                // nevzalo syrovou CZK cenu plánu.
+                                $priceBreakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
+                                $activeDiscount = $priceBreakdown->discount;
+                                $displayPrice = $priceBreakdown->total;
                             @endphp
                             <span class="text-sm font-bold text-gray-900">
                                 {!! \App\Helpers\CurrencyHelper::formatByCurrency($displayPrice, $subscription->currency) !!}

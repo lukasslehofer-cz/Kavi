@@ -413,10 +413,10 @@
                                         @if($item->product && $item->product->roastery)
                                         <div style="font-size: 12px; color: #5a5a5a; font-weight: 400; margin-bottom: 4px;">{{ $item->product->roastery->name }}</div>
                                         @endif
-                                        <div style="font-size: 13px; color: #76716C; font-weight: 400;">{{ $item->quantity }}× {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency, 0) }}</div>
+                                        <div style="font-size: 13px; color: #76716C; font-weight: 400;">{{ $item->quantity }}× {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->price, $order->currency) }}</div>
                                     </td>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top; text-align: right;">
-                                        <span style="font-weight: 400; color: #1c1c1c; white-space: nowrap; font-size: 15px;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($item->total, $order->currency, 0) }}</span>
+                                        <span style="font-weight: 400; color: #1c1c1c; white-space: nowrap; font-size: 15px;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($item->total, $order->currency) }}</span>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -445,19 +445,19 @@
                                         @if($order->shipping == 0)
                                         <span style="color: #4a6741; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em;">{{ __('emails.common.free', [], $locale) }}</span>
                                         @else
-                                        <span style="color: #1c1c1c;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->shipping, $order->currency, 0) }}</span>
+                                        <span style="color: #1c1c1c;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->shipping, $order->currency) }}</span>
                                         @endif
                                     </td>
                                 </tr>
                                 @if($order->discount_amount > 0)
                                 <tr>
                                     <td style="padding: 6px 0; font-size: 13px; color: #5a5a5a;">{{ __('emails.order_confirmation.discount', [], $locale) }}{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}:</td>
-                                    <td style="padding: 6px 0; font-size: 13px; color: #4a6741; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency, 0) }}</td>
+                                    <td style="padding: 6px 0; font-size: 13px; color: #4a6741; text-align: right;">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency) }}</td>
                                 </tr>
                                 @endif
                                 <tr>
                                     <td style="padding: 20px 0 6px 0; font-size: 11px; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em;">{{ __('emails.order_confirmation.total', [], $locale) }}:</td>
-                                    <td style="padding: 20px 0 6px 0; font-size: 28px; color: #1c1c1c; text-align: right; letter-spacing: -0.02em;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency, 0) }}</td>
+                                    <td style="padding: 20px 0 6px 0; font-size: 28px; color: #1c1c1c; text-align: right; letter-spacing: -0.02em;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency) }}</td>
                                 </tr>
                             </table>
                             

@@ -5,7 +5,7 @@
 @section('content')
 @php
     $currency = $statistics['payout_currency'];
-    $money = fn ($amount) => \App\Helpers\CurrencyHelper::formatByCurrency($amount, $currency, 0);
+    $money = fn ($amount) => \App\Helpers\CurrencyHelper::formatByCurrency($amount, $currency);
     $viewAsParam = request()->has('view_as') ? '&view_as=' . request()->get('view_as') : '';
 @endphp
 

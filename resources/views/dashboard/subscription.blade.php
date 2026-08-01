@@ -115,14 +115,14 @@
                 </div>
                 <div class="text-right">
                     @php
-                    // configured_price now contains FULL price (without discount)
-                    // If active discount, subtract it from price
-                    $fullPrice = $subscription->configured_price ?? $subscription->plan->price;
-                    // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
-                    $activeDiscount = ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) ? $subscription->discount_amount : 0;
+                    // Rozpad z jednoho místa – fallback na plan->price přes SubscriptionPricing,
+                    // aby se u EUR předplatného nevzala syrová CZK cena plánu.
+                    $priceBreakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
+                    $fullPrice = $priceBreakdown->box;
+                    $activeDiscount = $priceBreakdown->discount;
                     $basePrice = $fullPrice - $activeDiscount;
-                    $shippingCost = $subscription->shipping_cost ?? 0;
-                    $totalPrice = $basePrice + $shippingCost;
+                    $shippingCost = $priceBreakdown->shipping;
+                    $totalPrice = $priceBreakdown->total;
                     @endphp
                     <div class="text-2xl font-bold text-primary-600">
                         {{ \App\Helpers\CurrencyHelper::formatByCurrency($totalPrice, $subscription->currency) }}
@@ -301,26 +301,30 @@
                             
                             <!-- Pricing breakdown (hidden for complimentary subscriptions) -->
                             @if(!$subscription->isComplimentary() && $subscription->configured_price)
+                            @php
+                                $breakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
+                            @endphp
                             <div class="pt-3 border-t-2 border-gray-300">
                                 <div class="flex justify-between mb-2">
                                     <span class="text-gray-600">{{ __('dashboard.subscription_price') }}:</span>
-                                    <span class="font-medium">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency) }}</span>
+                                    <span class="font-medium">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->box, $breakdown->currency) }}</span>
                                 </div>
-                                @if(($subscription->shipping_cost ?? 0) > 0)
+                                @if($breakdown->discount > 0)
                                 <div class="flex justify-between mb-2">
-                                    <span class="text-gray-600">{{ __('dashboard.shipping') }}:</span>
-                                    <span class="font-medium">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->shipping_cost, $subscription->currency) }}</span>
-                                </div>
-                                <div class="flex justify-between pt-2 border-t border-gray-300">
-                                    <span class="text-gray-700 font-semibold">{{ __('dashboard.total') }}:</span>
-                                    <span class="font-bold text-lg text-primary-600">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price + $subscription->shipping_cost, $subscription->currency) }}</span>
-                                </div>
-                                @else
-                                <div class="flex justify-between pt-2 border-t border-gray-300">
-                                    <span class="text-gray-700 font-semibold">{{ __('dashboard.total') }}:</span>
-                                    <span class="font-bold text-lg text-primary-600">{{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price, $subscription->currency) }}</span>
+                                    <span class="text-gray-600">{{ __('dashboard.discount') }}:</span>
+                                    <span class="font-medium text-green-600">-{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->discount, $breakdown->currency) }}</span>
                                 </div>
                                 @endif
+                                @if($breakdown->shipping > 0)
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-600">{{ __('dashboard.shipping') }}:</span>
+                                    <span class="font-medium">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->shipping, $breakdown->currency) }}</span>
+                                </div>
+                                @endif
+                                <div class="flex justify-between pt-2 border-t border-gray-300">
+                                    <span class="text-gray-700 font-semibold">{{ __('dashboard.total') }}:</span>
+                                    <span class="font-bold text-lg text-primary-600">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency) }}</span>
+                                </div>
                             </div>
                             @endif
                         </div>

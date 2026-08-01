@@ -107,7 +107,7 @@
                         <div>
                             <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">{{ __('confirmation.subscription_details.price') }}</span>
                             <span class="font-display text-2xl text-dark-800">
-                                {{ \App\Helpers\CurrencyHelper::formatByCurrency($subscription->configured_price + ($subscription->shipping_cost ?? 0), $subscription->currency) }}{{ $isOneTime ? '' : ' —' }}
+                                {{ \App\Helpers\CurrencyHelper::formatByCurrency(\App\Helpers\SubscriptionPricing::forFirstPayment($subscription)->total, $subscription->currency) }}{{ $isOneTime ? '' : ' —' }}
                             </span>
                             @if(!$isOneTime)
                             <span class="text-xs text-warm-500 uppercase tracking-widest block mt-1">{{ $frequencyText }}</span>
@@ -325,16 +325,13 @@
 {{-- Conversion Tracking: dataLayer + Meta Pixel --}}
 @if($subscription->status === 'active' && ($shouldFirePixel ?? false))
 @php
-    // Calculate gift voucher shipping credit for tracking
-    $trackingGiftVoucherShippingCredit = 0;
-    if ($subscription->coupon?->is_gift_voucher && ($subscription->shipping_cost ?? 0) > 0) {
-        $trackingVoucherValue = $subscription->coupon->getSubscriptionDiscountValue();
-        $trackingRemainingCredit = max(0, $trackingVoucherValue - ($subscription->discount_amount ?? 0));
-        $trackingGiftVoucherShippingCredit = min($trackingRemainingCredit, $subscription->shipping_cost);
-    }
-    $trackingTotalDiscount = ($subscription->discount_amount ?? 0) + $trackingGiftVoucherShippingCredit;
-    $trackingValue = $subscription->configured_price - ($subscription->discount_amount ?? 0) + ($subscription->shipping_cost ?? 0) - $trackingGiftVoucherShippingCredit;
-    $trackingCurrency = $subscription->currency ?? 'CZK';
+    // Hodnoty pro tracking berou stejný rozpad jako Meta CAPI na serveru
+    // (StripeService::sendMetaCapiForSubscription) – jinak by se události nespárovaly.
+    $trackingBreakdown = \App\Helpers\SubscriptionPricing::forFirstPayment($subscription);
+    $trackingGiftVoucherShippingCredit = $trackingBreakdown->giftVoucherShippingCredit;
+    $trackingTotalDiscount = $trackingBreakdown->totalDiscount();
+    $trackingValue = $trackingBreakdown->total;
+    $trackingCurrency = $trackingBreakdown->currency;
     $trackingItemId = 'subscription-' . ($config['amount'] ?? 3);
     $trackingItemName = 'Subscription ' . (($config['amount'] ?? 3) == 2 ? 'M' : (($config['amount'] ?? 3) == 4 ? 'XL' : 'L')) . ' Box';
 @endphp

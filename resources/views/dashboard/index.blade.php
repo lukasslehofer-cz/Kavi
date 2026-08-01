@@ -164,11 +164,8 @@
                         <p class="text-sm text-gray-600 font-medium mb-1">{{ __('dashboard.price') }}</p>
                         @if($activeSubscription->configured_price)
                         @php
-                        // configured_price now contains FULL price (without discount)
-                        // If active discount, subtract it
-                        // Sleva je aktivní pokud: discount_amount > 0 A (neomezená NEBO zbývají měsíce)
-                        $activeDiscount = ($activeSubscription->discount_amount > 0 && ($activeSubscription->discount_months_remaining === null || $activeSubscription->discount_months_remaining > 0)) ? $activeSubscription->discount_amount : 0;
-                        $currentPrice = $activeSubscription->configured_price - $activeDiscount + ($activeSubscription->shipping_cost ?? 0);
+                        // Rozpad z jednoho místa – viz SubscriptionPricing
+                        $currentPrice = \App\Helpers\SubscriptionPricing::forRecurringPayment($activeSubscription)->total;
                         @endphp
                         <p class="text-xl font-bold text-gray-900">{{ \App\Helpers\CurrencyHelper::formatByCurrency($currentPrice, $activeSubscription->currency) }}</p>
                         <p class="text-xs text-gray-500 mt-0.5 font-light">

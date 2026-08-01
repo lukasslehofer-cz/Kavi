@@ -161,31 +161,58 @@
             <!-- Free Shipping Threshold -->
             <div class="mb-6 pb-6 border-b border-gray-200">
                 <h4 class="text-lg font-bold text-gray-900 mb-2">Doprava zdarma</h4>
-                <p class="text-sm text-gray-600 mb-4">Nastavte hranici pro dopravu zdarma u jednorázových objednávek (neplatí pro předplatné)</p>
-                
-                <div>
-                    <label for="free_shipping_threshold_czk" class="block text-sm font-medium text-gray-700 mb-2">
-                        Hranice v CZK (volitelné)
-                    </label>
-                    <div class="relative">
-                        <input 
-                            type="number" 
-                            id="free_shipping_threshold_czk" 
-                            name="free_shipping_threshold_czk" 
-                            value="{{ old('free_shipping_threshold_czk', $rate->free_shipping_threshold_czk) }}" 
-                            step="0.01"
-                            min="0"
-                            placeholder="Např. 1000"
-                            class="w-full px-4 py-2.5 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                        >
-                        <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">
-                            Kč
+                <p class="text-sm text-gray-600 mb-4">Nastavte hranici pro dopravu zdarma u jednorázových objednávek (neplatí pro předplatné). Každá měna má vlastní hranici – prázdné pole znamená, že se v dané měně doprava zdarma nenabízí.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="free_shipping_threshold_czk" class="block text-sm font-medium text-gray-700 mb-2">
+                            Hranice v CZK (volitelné)
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="number"
+                                id="free_shipping_threshold_czk"
+                                name="free_shipping_threshold_czk"
+                                value="{{ old('free_shipping_threshold_czk', $rate->free_shipping_threshold_czk) }}"
+                                step="0.01"
+                                min="0"
+                                placeholder="Např. 1000"
+                                class="w-full px-4 py-2.5 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            >
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">
+                                Kč
+                            </div>
                         </div>
+                        <p class="text-xs text-gray-500 mt-1">Platí pro objednávky na kavi.cz</p>
+                        @error('free_shipping_threshold_czk')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Ponechte prázdné pokud nechcete nabízet dopravu zdarma</p>
-                    @error('free_shipping_threshold_czk')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
+
+                    <div>
+                        <label for="free_shipping_threshold_eur" class="block text-sm font-medium text-gray-700 mb-2">
+                            Hranice v EUR (volitelné)
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="number"
+                                id="free_shipping_threshold_eur"
+                                name="free_shipping_threshold_eur"
+                                value="{{ old('free_shipping_threshold_eur', $rate->free_shipping_threshold_eur) }}"
+                                step="0.01"
+                                min="0"
+                                placeholder="Např. 40"
+                                class="w-full px-4 py-2.5 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            >
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">
+                                €
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Platí pro objednávky na kavibox.com</p>
+                        @error('free_shipping_threshold_eur')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
 

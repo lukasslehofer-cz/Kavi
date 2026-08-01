@@ -214,7 +214,8 @@
                         @if(isset($config['isDecaf']) && $config['isDecaf'])
                         <div class="flex justify-between py-2 border-b">
                             <span class="text-gray-600">Decaf varianta:</span>
-                            <span class="font-semibold text-gray-900">Ano (+{!! \App\Helpers\CurrencyHelper::formatByCurrency($subscription->currency === 'EUR' ? 4 : 100, $subscription->currency) !!})</span>
+                            {{-- Příplatek za decaf, viz SubscriptionController::configure() – +5 € / +100 Kč --}}
+                            <span class="font-semibold text-gray-900">Ano (+{!! \App\Helpers\CurrencyHelper::formatByCurrency($subscription->currency === 'EUR' ? 5 : 100, $subscription->currency) !!})</span>
                         </div>
                         @endif
 

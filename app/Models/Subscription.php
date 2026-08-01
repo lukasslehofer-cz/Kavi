@@ -54,6 +54,7 @@ class Subscription extends Model
         // se už NEukládá na subscription – žije na subscription_shipments (ledger).
         // Čtení "posledního trackingu" jde přes accessor packeta_* → latestShipment.
         'shipping_cost',
+        'gift_voucher_shipping_credit',
         'shipping_country',
         'shipping_rate_id',
         'meta_event_id',
@@ -78,6 +79,7 @@ class Subscription extends Model
         'discount_amount' => 'decimal:2',
         'pending_invoice_amount' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
+        'gift_voucher_shipping_credit' => 'decimal:2',
     ];
 
     public function user()

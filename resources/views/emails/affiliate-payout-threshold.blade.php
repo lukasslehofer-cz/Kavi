@@ -10,10 +10,10 @@
             {{ __('emails.affiliate_payout_threshold.amount_label', [], $locale) }}
         </div>
         <p style="font-size: 32px; color: #4a6741; margin: 0 0 8px 0; letter-spacing: -0.02em;">
-            {{ \App\Helpers\CurrencyHelper::formatByCurrency($amount, $currency, 0) }}
+            {{ \App\Helpers\CurrencyHelper::formatByCurrency($amount, $currency) }}
         </p>
         <p style="font-size: 14px; color: #4a6741; margin: 0;">
-            {{ __('emails.affiliate_payout_threshold.threshold_note', ['threshold' => \App\Helpers\CurrencyHelper::formatByCurrency($threshold, $currency, 0)], $locale) }}
+            {{ __('emails.affiliate_payout_threshold.threshold_note', ['threshold' => \App\Helpers\CurrencyHelper::formatByCurrency($threshold, $currency)], $locale) }}
         </p>
     </div>
 

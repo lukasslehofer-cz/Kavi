@@ -45,12 +45,12 @@
                     {{ $item->rewarded_payments }}
                 </td>
                 <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->total_earned, $item->currency, 0) }}
+                    {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->total_earned, $item->currency) }}
                 </td>
                 <td class="px-4 py-4 whitespace-nowrap">
                     @if($item->current_tier)
                         <div class="text-sm text-gray-900">
-                            {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->current_rate, $item->currency, 0) }}
+                            {{ \App\Helpers\CurrencyHelper::formatByCurrency($item->current_rate, $item->currency) }}
                         </div>
                         <div class="text-xs {{ $item->current_tier === 'followup' ? 'text-blue-600' : 'text-green-600' }}">
                             @if($item->current_tier === 'followup')
@@ -60,7 +60,7 @@
                             @elseif($item->has_followup)
                                 {{ trans_choice('affiliate.remaining_then_followup', $item->remaining_initial, [
                                     'count' => $item->remaining_initial,
-                                    'followup' => \App\Helpers\CurrencyHelper::formatByCurrency($item->followup_rate, $item->currency, 0),
+                                    'followup' => \App\Helpers\CurrencyHelper::formatByCurrency($item->followup_rate, $item->currency),
                                 ]) }}
                             @else
                                 {{ trans_choice('affiliate.remaining_then_end', $item->remaining_initial, ['count' => $item->remaining_initial]) }}

@@ -173,25 +173,25 @@
                     @foreach($order->items as $item)
                         <div class="item">
                             <span class="item-name">{{ $item->quantity }}× {{ $item->product_name }}</span>
-                            <span class="item-price">{{ number_format($item->total, 0, ',', ' ') }} Kč</span>
+                            <span class="item-price">{{ \App\Helpers\CurrencyHelper::formatByCurrency($item->total, $order->currency) }}</span>
                         </div>
                     @endforeach
-                    
+
                     <div class="item" style="color: #6b7280;">
                         <span>Doprava</span>
-                        <span>{{ $order->shipping > 0 ? number_format($order->shipping, 0, ',', ' ') . ' Kč' : 'Zdarma' }}</span>
+                        <span>{{ $order->shipping > 0 ? \App\Helpers\CurrencyHelper::formatByCurrency($order->shipping, $order->currency) : 'Zdarma' }}</span>
                     </div>
-                    
+
                     @if($order->discount_amount > 0)
                         <div class="item" style="color: #10b981;">
                             <span>Sleva{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}</span>
-                            <span>-{{ number_format($order->discount_amount, 0, ',', ' ') }} Kč</span>
+                            <span>-{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->discount_amount, $order->currency) }}</span>
                         </div>
                     @endif
-                    
+
                     <div class="total-row">
                         <span class="total-label">Celkem</span>
-                        <span class="total-value">{{ number_format($order->total, 0, ',', ' ') }} Kč</span>
+                        <span class="total-value">{{ \App\Helpers\CurrencyHelper::formatByCurrency($order->total, $order->currency) }}</span>
                     </div>
                 </div>
 
@@ -295,17 +295,46 @@
                         </div>
                     @endif
 
-                    @if($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0))
+                    @php
+                        $breakdown = \App\Helpers\SubscriptionPricing::forFirstPayment($subscription);
+                        $firstPayment = $subscription->payments()->orderBy('id')->first();
+                    @endphp
+
+                    <div class="item">
+                        <span class="item-name">Cena boxu</span>
+                        <span class="item-price">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->box, $breakdown->currency) }}</span>
+                    </div>
+
+                    <div class="item" style="color: #6b7280;">
+                        <span>Doprava</span>
+                        <span>{{ $breakdown->shipping > 0 ? \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->shipping, $breakdown->currency) : 'Zdarma' }}</span>
+                    </div>
+
+                    @if($breakdown->discount > 0)
                         <div class="item" style="color: #10b981;">
                             <span>Sleva{{ $subscription->coupon_code ? ' (' . $subscription->coupon_code . ')' : '' }}</span>
-                            <span>-{{ number_format($subscription->discount_amount, 0, ',', ' ') }} Kč</span>
+                            <span>-{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->discount, $breakdown->currency) }}</span>
                         </div>
                     @endif
-                    
+
+                    @if($breakdown->giftVoucherShippingCredit > 0)
+                        <div class="item" style="color: #10b981;">
+                            <span>Voucher na dopravu</span>
+                            <span>-{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->giftVoucherShippingCredit, $breakdown->currency) }}</span>
+                        </div>
+                    @endif
+
                     <div class="total-row">
-                        <span class="total-label">Cena</span>
-                        <span class="total-value">{{ number_format($subscription->configured_price ?? 0, 0, ',', ' ') }} Kč</span>
+                        <span class="total-label">Celkem</span>
+                        <span class="total-value">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency) }}</span>
                     </div>
+
+                    @if($firstPayment && !$breakdown->reconcilesWith((float) $firstPayment->amount))
+                        <div class="item" style="color: #dc2626;">
+                            <span>⚠️ Strženo ve Stripe</span>
+                            <span>{{ \App\Helpers\CurrencyHelper::formatByCurrency((float) $firstPayment->amount, $firstPayment->currency) }}</span>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Delivery Address --}}

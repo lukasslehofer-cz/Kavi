@@ -51,7 +51,18 @@ class SubscriptionPlan extends Model
      */
     public function getPrice(): float
     {
-        return CurrencyHelper::price($this->price, $this->price_eur);
+        return $this->getPriceFor(null);
+    }
+
+    /**
+     * Get the price for an explicitly given currency
+     *
+     * Na rozdíl od getPrice() nečte session – použij všude, kde se počítá mimo
+     * request zákazníka (cron, Stripe webhook, artisan příkazy, maily).
+     */
+    public function getPriceFor(?string $currency): float
+    {
+        return CurrencyHelper::priceFor($currency, $this->price, $this->price_eur);
     }
 
     /**

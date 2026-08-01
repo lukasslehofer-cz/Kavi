@@ -281,7 +281,7 @@ class StripeService
                         'name' => $productName,
                         'description' => CurrencyHelper::isCzk() ? 'Jednorázový kávový box bez předplatného' : 'One-time coffee box without subscription',
                     ],
-                    'unit_amount' => (int) (round($price) * 100),
+                    'unit_amount' => \App\Helpers\SubscriptionPricing::stripeAmount($price, CurrencyHelper::code()),
                 ],
                 'quantity' => 1,
             ],
@@ -295,7 +295,7 @@ class StripeService
                     'product_data' => [
                         'name' => CurrencyHelper::isCzk() ? 'Doprava' : 'Shipping',
                     ],
-                    'unit_amount' => (int) (round($shipping) * 100),
+                    'unit_amount' => \App\Helpers\SubscriptionPricing::stripeAmount($shipping, CurrencyHelper::code()),
                 ],
                 'quantity' => 1,
             ];
@@ -360,6 +360,7 @@ class StripeService
             'delivery_notes' => $shippingAddress['delivery_notes'] ?? null,
             // Shipping cost information
             'shipping_cost' => $shipping,
+            'gift_voucher_shipping_credit' => $giftVoucherShippingCredit,
             'shipping_country' => $shippingAddress['billing_country'] ?? 'CZ',
             'shipping_rate_id' => $shippingRate?->id,
         ];
@@ -389,21 +390,23 @@ class StripeService
         // Build product description
         $productName = $this->buildProductName($configuration, 'first_payment');
 
-        // Calculate actual payment amount (full price minus discount)
-        $paymentAmount = $price - $discount;
-
-        // For gift vouchers, remaining credit covers shipping
-        $effectiveShipping = $shipping - $giftVoucherShippingCredit;
-
-        // Calculate displayed total (what user sees on checkout page)
-        // This ensures Stripe total exactly matches what user sees: number_format($paymentAmount + $effectiveShipping, 0)
-        $displayedTotal = round($paymentAmount + $effectiveShipping);
+        // Rozpad ceny počítá SubscriptionPricing – stejný kód, jaký pak sestaví
+        // fakturu i zobrazí částku v košíku, takže se nemají jak rozejít.
+        $breakdown = \App\Helpers\SubscriptionPricing::fromValues(
+            $price,
+            $discount,
+            $shipping,
+            CurrencyHelper::code(),
+            $giftVoucherShippingCredit,
+        );
+        $effectiveShipping = $shipping - $breakdown->giftVoucherShippingCredit;
+        $unitAmount = \App\Helpers\SubscriptionPricing::stripeAmount($breakdown->total, $breakdown->currency);
 
         // Build line items array - use single line item with full total to avoid rounding discrepancies
         $lineItems = [[
             'price_data' => [
                 'currency' => CurrencyHelper::stripeCode(),
-                'unit_amount' => (int) ($displayedTotal * 100), // Exact displayed total in cents/haléře
+                'unit_amount' => $unitAmount,
                 'product_data' => [
                     'name' => $productName,
                     'description' => CurrencyHelper::isCzk()
@@ -415,13 +418,9 @@ class StripeService
         ]];
 
         \Log::info('Subscription checkout total calculated', [
-            'original_price' => $price,
-            'discount' => $discount,
-            'payment_amount' => $paymentAmount,
-            'shipping' => $shipping,
-            'gift_voucher_shipping_credit' => $giftVoucherShippingCredit,
+            'breakdown' => $breakdown->toArray(),
             'effective_shipping' => $effectiveShipping,
-            'displayed_total' => $displayedTotal,
+            'stripe_unit_amount' => $unitAmount,
         ]);
 
         // Add user_id or guest_email to metadata BEFORE creating $sessionData
@@ -603,7 +602,7 @@ class StripeService
                 'interval' => 'month',
                 'interval_count' => $configuration['frequency'] ?? 1,
             ],
-            'unit_amount' => (int) (round($price) * 100),
+            'unit_amount' => \App\Helpers\SubscriptionPricing::stripeAmount($price, CurrencyHelper::code()),
         ]);
 
         $subscription = StripeSubscription::create([
@@ -859,7 +858,9 @@ class StripeService
                     $payment = null;
 
                     try {
-                        $totalAmount = ($subscription->configured_price ?? 0) + ($subscription->shipping_cost ?? 0);
+                        // configured_price je i u jednorázového boxu plná cena před slevou,
+                        // slevu odečte až rozpad – viz SubscriptionPricing.
+                        $totalAmount = \App\Helpers\SubscriptionPricing::forFirstPayment($subscription)->total;
 
                         if ($totalAmount > 0 && $paymentIntentId) {
                             $payment = \App\Models\SubscriptionPayment::create([
@@ -1469,6 +1470,7 @@ class StripeService
             // Add shipping data if available
             if (isset($metadata['shipping_cost'])) {
                 $subscriptionRecord['shipping_cost'] = $metadata['shipping_cost'];
+                $subscriptionRecord['gift_voucher_shipping_credit'] = $metadata['gift_voucher_shipping_credit'] ?? 0;
                 $subscriptionRecord['shipping_country'] = $metadata['shipping_country'] ?? null;
                 $subscriptionRecord['shipping_rate_id'] = $metadata['shipping_rate_id'] ?? null;
             }
@@ -1583,17 +1585,6 @@ class StripeService
                     \App\Jobs\CreateFakturoidInvoiceJob::dispatch($payment->id)
                         ->delay(now()->addMinutes(5));
                 }
-            }
-
-            // Decrement discount months for first payment (if applicable)
-            if ($subscription->discount_months_remaining > 0) {
-                $couponService = app(\App\Services\CouponService::class);
-                $couponService->decrementSubscriptionDiscountMonth($subscription);
-
-                \Log::info('Decremented discount months after first payment', [
-                    'subscription_id' => $subscription->id,
-                    'discount_months_remaining' => $subscription->fresh()->discount_months_remaining,
-                ]);
             }
 
             // Record coupon usage if coupon was applied (only for newly created subscriptions)
@@ -1741,6 +1732,27 @@ class StripeService
 
             // Send Meta CAPI Purchase event
             $this->sendMetaCapiForSubscription($subscription);
+
+            // Countdown slevových měsíců až úplně nakonec – po faktuře, e-mailech i Meta CAPI.
+            // decrementSubscriptionDiscountMonth() při vyčerpání měsíců vynuluje discount_amount
+            // na TOMTÉŽ objektu, takže dřív viděli všichni pozdější konzumenti platbu bez slevy:
+            // u jednoměsíčního kupónu tvrdil potvrzovací e-mail plnou cenu místo zaplacené
+            // a zápis využití kupónu (podmínka discount_amount > 0 výše) se přeskočil úplně.
+            try {
+                if ($subscription->discount_months_remaining > 0) {
+                    app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
+
+                    \Log::info('Decremented discount months after first payment', [
+                        'subscription_id' => $subscription->id,
+                        'discount_months_remaining' => $subscription->fresh()->discount_months_remaining,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                \Log::error('Coupon countdown after first payment failed (platba zůstává platná)', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
         } catch (\Exception $e) {
             \Log::error('Failed to create custom billing subscription', [
@@ -2063,7 +2075,10 @@ class StripeService
             // If no real invoice, create a generic one-time payment
             if (! $hasRealInvoice) {
                 $currency = strtolower($subscription->currency ?? 'CZK');
-                $amount = (int) (round($subscription->pending_invoice_amount) * 100); // Convert to cents
+                $amount = \App\Helpers\SubscriptionPricing::stripeAmount(
+                    (float) $subscription->pending_invoice_amount,
+                    $subscription->currency
+                );
             }
 
             // Create a checkout session for payment
@@ -2555,19 +2570,21 @@ class StripeService
             }
 
             // Calculate amount (with coupon discount if applicable)
-            $amount = $this->calculatePendingAmount($subscription);
+            $breakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
+            $amount = $breakdown->total;
 
             // Use subscription's stored currency (not session currency)
             $subscriptionCurrency = strtolower($subscription->currency ?? 'CZK');
             $isEur = $subscriptionCurrency === 'eur';
+            $unitAmount = \App\Helpers\SubscriptionPricing::stripeAmount($amount, $breakdown->currency);
 
             \Log::info('Attempting to charge subscription', [
                 'subscription_id' => $subscription->id,
                 'subscription_number' => $subscription->subscription_number,
                 'customer_id' => $customerId,
                 'payment_method_id' => $paymentMethodId,
-                'amount' => $amount,
-                'currency' => $subscriptionCurrency,
+                'breakdown' => $breakdown->toArray(),
+                'stripe_unit_amount' => $unitAmount,
             ]);
 
             // Idempotency key stabilní pro daný billing cyklus předplatného.
@@ -2579,7 +2596,7 @@ class StripeService
 
             // Create and confirm payment intent
             $paymentIntent = \Stripe\PaymentIntent::create([
-                'amount' => (int) (round($amount) * 100), // Convert to cents
+                'amount' => $unitAmount,
                 'currency' => $subscriptionCurrency,
                 'customer' => $customerId,
                 'payment_method' => $paymentMethodId,
@@ -2653,11 +2670,6 @@ class StripeService
                 // payment řádek k reálně stržené platbě a příště by hrozilo dvojí stržení.
                 try {
                     $subscription->update($updates);
-
-                    // Handle coupon countdown
-                    if ($subscription->coupon_id && $subscription->discount_amount > 0) {
-                        app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
-                    }
                 } catch (\Throwable $e) {
                     \Log::error('Post-capture subscription update failed (platba zůstává platná)', [
                         'subscription_id' => $subscription->id,
@@ -2732,6 +2744,23 @@ class StripeService
                     \Log::info('Skipping Fakturoid invoice for complimentary subscription', [
                         'subscription_id' => $subscription->id,
                         'payment_id' => $payment->id,
+                    ]);
+                }
+
+                // Handle coupon countdown – AŽ po vystavení faktury.
+                // decrementSubscriptionDiscountMonth() při vyčerpání měsíců vynuluje
+                // discount_amount, takže dřív by poslední zvýhodněná faktura vyšla
+                // bez slevy a nesouhlasila by se stržnou částkou.
+                // (Stejné pořadí drží i cesta první platby, viz handleCustomBillingSubscription.)
+                try {
+                    if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                        app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
+                    }
+                } catch (\Throwable $e) {
+                    \Log::error('Coupon countdown after capture failed (platba zůstává platná)', [
+                        'subscription_id' => $subscription->id,
+                        'payment_id' => $payment->id,
+                        'error' => $e->getMessage(),
                     ]);
                 }
 
@@ -2964,15 +2993,13 @@ class StripeService
 
     /**
      * Calculate the pending payment amount for a subscription (with coupon discount if applicable)
+     *
+     * Doprava se účtuje u každého cyklu, ne jen u prvního – doteď ji tenhle výpočet
+     * vynechával, zatímco faktura ji přidávala, takže faktura přesahovala stržnou částku.
      */
     private function calculatePendingAmount(Subscription $subscription): float
     {
-        $amount = $subscription->configured_price ?? $subscription->plan?->price ?? 0;
-        if ($subscription->discount_amount > 0 && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0)) {
-            $amount -= $subscription->discount_amount;
-        }
-
-        return $amount;
+        return \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription)->total;
     }
 
     /**
@@ -3063,7 +3090,7 @@ class StripeService
             $config = is_array($subscription->configuration) ? $subscription->configuration : json_decode($subscription->configuration, true);
             $amount = $config['amount'] ?? 3;
             $contentId = 'subscription-'.$amount;
-            $value = (float) ($subscription->configured_price - ($subscription->discount_amount ?? 0) + ($subscription->shipping_cost ?? 0));
+            $value = \App\Helpers\SubscriptionPricing::forFirstPayment($subscription)->total;
 
             $success = $metaService->sendPurchaseEvent(
                 eventId: $subscription->meta_event_id,

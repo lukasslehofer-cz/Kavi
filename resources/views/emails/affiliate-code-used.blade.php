@@ -28,7 +28,7 @@
             {{ __('emails.affiliate_code_used.reward_label', [], $locale) }}
         </div>
         <p style="font-size: 24px; color: #4a6741; margin: 0 0 8px 0;">
-            {{ \App\Helpers\CurrencyHelper::formatByCurrency($reward->reward_amount, $reward->currency, 0) }}
+            {{ \App\Helpers\CurrencyHelper::formatByCurrency($reward->reward_amount, $reward->currency) }}
         </p>
         <p style="font-size: 14px; color: #4a6741; margin: 0;">
             {{ __('emails.affiliate_code_used.reward_pending', [], $locale) }}
