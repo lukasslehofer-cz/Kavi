@@ -815,6 +815,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Decaf availability is handled in app.js
+
+        // The split section follows the type, and its steppers follow the matrix -
+        // both the box size and the decaf toggle move it
+        showDistributionLayout();
+
+        if (selectedType === 'mix') {
+            updateMixNoDecafDisplay();
+        }
     }
 
     

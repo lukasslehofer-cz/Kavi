@@ -213,11 +213,17 @@ class SubscriptionController extends Controller
 
         // Validate mix total if type is mix
         if ($validated['type'] === 'mix') {
-            $mixTotal = ($validated['mix']['espresso'] ?? 0) +
-                       ($validated['mix']['filter'] ?? 0);
+            $mixEspresso = $validated['mix']['espresso'] ?? 0;
+            $mixFilter = $validated['mix']['filter'] ?? 0;
 
-            if ($mixTotal != $validated['amount']) {
+            if ($mixEspresso + $mixFilter != $validated['amount']) {
                 return back()->withErrors(['mix' => 'Celkový počet balení v mixu musí být '.$validated['amount']]);
+            }
+
+            // A mix has to hold both kinds of coffee - the configurator never offers
+            // anything else, but a stale session could still post it
+            if ($mixEspresso < 1 || $mixFilter < 1) {
+                return back()->withErrors(['mix' => 'Kombinace musí obsahovat alespoň jednu espresso a jednu filtrovanou kávu.']);
             }
         }
 

@@ -258,6 +258,9 @@ class StockReservationService
      *   'filter'   => same
      *   'mix'      => [2 => ['plain' => [filterCount => bool], 'decaf' => [...]], ...]
      *
+     * Mix splits are keyed by filter bags, 1 to amount - 1 - a split without one of
+     * the two kinds of coffee is not a mix and is left out of the matrix entirely.
+     *
      * @param ShipmentSchedule $schedule
      * @return array
      */
@@ -399,17 +402,27 @@ class StockReservationService
 
             $matrix['mix'][$amount] = ['plain' => [], 'decaf' => []];
 
-            // Keyed by the number of filter bags in the split; espresso takes the rest
-            for ($filterCount = 0; $filterCount <= $amount; $filterCount++) {
+            // Keyed by the number of filter bags in the split; espresso takes the rest.
+            // Only genuine splits count - a mix box has to hold both kinds of coffee,
+            // otherwise it is just an espresso or a filter box sold under a wrong name.
+            for ($filterCount = 1; $filterCount < $amount; $filterCount++) {
                 $mix = ['filter' => $filterCount, 'espresso' => $amount - $filterCount];
 
-                foreach (['plain' => false, 'decaf' => true] as $key => $isDecaf) {
-                    $matrix['mix'][$amount][$key][$filterCount] = $this->configurationFits(
-                        ['amount' => $amount, 'type' => 'mix', 'isDecaf' => $isDecaf, 'mix' => $mix],
-                        $slots,
-                        $stock
-                    );
-                }
+                $plainFits = $this->configurationFits(
+                    ['amount' => $amount, 'type' => 'mix', 'isDecaf' => false, 'mix' => $mix],
+                    $slots,
+                    $stock
+                );
+
+                // Decaf replaces one of the bags, so it can make a split shippable that
+                // holds a single kind of coffee. It is a topping on a mix that works
+                // without it - never what keeps the mix option alive.
+                $matrix['mix'][$amount]['plain'][$filterCount] = $plainFits;
+                $matrix['mix'][$amount]['decaf'][$filterCount] = $plainFits && $this->configurationFits(
+                    ['amount' => $amount, 'type' => 'mix', 'isDecaf' => true, 'mix' => $mix],
+                    $slots,
+                    $stock
+                );
             }
         }
 
