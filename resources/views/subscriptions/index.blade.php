@@ -692,8 +692,10 @@ document.addEventListener('DOMContentLoaded', function() {
             label.style.pointerEvents = 'none';
             label.style.position = 'relative';
             label.style.backgroundColor = '#f3f4f6'; // gray-100
-            label.querySelectorAll('div:not(.sold-out-label)').forEach(div => {
-                div.style.opacity = '0.5';
+            // Direct children only - the decaf pill is a label, not a div, and
+            // nested divs would otherwise stack their opacity
+            label.querySelectorAll(':scope > *:not(.sold-out-label)').forEach(child => {
+                child.style.opacity = '0.5';
             });
 
             if (input) {
@@ -712,8 +714,8 @@ document.addEventListener('DOMContentLoaded', function() {
             label.classList.remove('cursor-not-allowed');
             label.style.pointerEvents = '';
             label.style.backgroundColor = '';
-            label.querySelectorAll('div:not(.sold-out-label)').forEach(div => {
-                div.style.opacity = '';
+            label.querySelectorAll(':scope > *:not(.sold-out-label)').forEach(child => {
+                child.style.opacity = '';
             });
 
             if (input) {
