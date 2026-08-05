@@ -899,7 +899,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Cena
         if (selectedAmount) {
-            let price = pricing[selectedAmount] || 0;
+            let price = Number(pricing[selectedAmount]) || 0;
             if (isDecaf) {
                 price += currentLocale === 'en' ? 5 : 100;
             }
@@ -953,7 +953,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('subscription-configurator')?.addEventListener('submit', function() {
         var amount = document.querySelector('input[name="amount"]:checked')?.value || '3';
         var boxNames = {'2': 'M Box', '3': 'L Box', '4': 'XL Box'};
-        var price = pricing[amount] || 0;
+        var price = Number(pricing[amount]) || 0;
         var currency = currentLocale === 'en' ? 'EUR' : 'CZK';
         var itemId = 'subscription-' + amount;
 

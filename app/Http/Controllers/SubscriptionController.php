@@ -32,17 +32,19 @@ class SubscriptionController extends Controller
             ->get();
 
         // Get subscription pricing configuration based on currency
+        // Cast to float - SubscriptionConfig::get() hands back the raw string unless
+        // the config row is typed, and the configurator adds surcharges to these in JS
         if (CurrencyHelper::isEur()) {
             $subscriptionPricing = [
-                '2' => SubscriptionConfig::get('price_2_bags_eur', 20),
-                '3' => SubscriptionConfig::get('price_3_bags_eur', 29),
-                '4' => SubscriptionConfig::get('price_4_bags_eur', 37),
+                '2' => (float) SubscriptionConfig::get('price_2_bags_eur', 20),
+                '3' => (float) SubscriptionConfig::get('price_3_bags_eur', 29),
+                '4' => (float) SubscriptionConfig::get('price_4_bags_eur', 37),
             ];
         } else {
             $subscriptionPricing = [
-                '2' => SubscriptionConfig::get('price_2_bags', 500),
-                '3' => SubscriptionConfig::get('price_3_bags', 720),
-                '4' => SubscriptionConfig::get('price_4_bags', 920),
+                '2' => (float) SubscriptionConfig::get('price_2_bags', 500),
+                '3' => (float) SubscriptionConfig::get('price_3_bags', 720),
+                '4' => (float) SubscriptionConfig::get('price_4_bags', 920),
             ];
         }
 
