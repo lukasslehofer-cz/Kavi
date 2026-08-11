@@ -126,6 +126,14 @@
                         Odeslané emaily
                     </a>
 
+                    <!-- Mail zákazníkům -->
+                    <a href="{{ route('admin.customer-mail.create') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.customer-mail.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        Mail zákazníkům
+                    </a>
+
                     <!-- Shipping Rates -->
                     <a href="{{ route('admin.shipping.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.shipping.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

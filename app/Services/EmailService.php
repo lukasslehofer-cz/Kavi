@@ -95,9 +95,10 @@ class EmailService
      */
     public static function getSiteUrl(string $locale): string
     {
-        return $locale === 'en' 
-            ? env('APP_URL_EN', 'https://kavibox.com')
-            : env('APP_URL', 'https://kavi.cz');
+        // config(), ne env() – env() vrací pod config:cache null
+        $urls = config('app.site_urls', []);
+
+        return rtrim($urls[$locale] ?? $urls['cs'] ?? config('app.url'), '/');
     }
     
     /**

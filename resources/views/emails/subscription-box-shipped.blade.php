@@ -94,15 +94,13 @@
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0; line-height: 1.8;">
                                     @if($locale === 'cs')
-                                    <span style="color: #CA4136;">01</span> Zásilka dorazí na výdejní místo během 1-2 dnů<br>
-                                    <span style="color: #CA4136;">02</span> Dostanete SMS s kódem pro vyzvednutí<br>
-                                    <span style="color: #CA4136;">03</span> Vyzvedněte si balík na výdejním místě<br>
-                                    <span style="color: #CA4136;">04</span> Vychutnejte si čerstvou kávu
+                                    <span style="color: #CA4136;">01</span> Zásilka dorazí na výdejní místo během 1-3 pracovních dnů<br>                            
+                                    <span style="color: #CA4136;">02</span> Vyzvedněte si balík na výdejním místě<br>
+                                    <span style="color: #CA4136;">03</span> Vychutnejte si čerstvou kávu
                                     @else
-                                    <span style="color: #CA4136;">01</span> The box will arrive at the pickup point within 1-2 days<br>
-                                    <span style="color: #CA4136;">02</span> You'll receive an SMS with pickup code<br>
-                                    <span style="color: #CA4136;">03</span> Pick up your box at the pickup point<br>
-                                    <span style="color: #CA4136;">04</span> Enjoy your fresh coffee
+                                    <span style="color: #CA4136;">01</span> The box will arrive at the pickup point within 2-4 business days<br>                                    
+                                    <span style="color: #CA4136;">02</span> Pick up your box at the pickup point<br>
+                                    <span style="color: #CA4136;">03</span> Enjoy your fresh coffee
                                     @endif
                                 </p>
                             </div>

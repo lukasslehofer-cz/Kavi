@@ -128,7 +128,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/email-logs', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])->name('email-logs.index');
     Route::get('/email-logs/{emailLog}', [\App\Http\Controllers\Admin\EmailLogController::class, 'show'])->name('email-logs.show');
     Route::post('/email-logs/{emailLog}/resend', [\App\Http\Controllers\Admin\EmailLogController::class, 'resend'])->name('email-logs.resend');
-    
+
+    // Mail zákazníkům (vlastní zpráva v Kavi šabloně)
+    Route::get('/mail-zakaznikum', [\App\Http\Controllers\Admin\CustomerMailController::class, 'create'])->name('customer-mail.create');
+    Route::post('/mail-zakaznikum/nahled', [\App\Http\Controllers\Admin\CustomerMailController::class, 'preview'])->name('customer-mail.preview');
+    Route::post('/mail-zakaznikum/test', [\App\Http\Controllers\Admin\CustomerMailController::class, 'sendTest'])->name('customer-mail.send-test');
+    Route::post('/mail-zakaznikum/odeslat', [\App\Http\Controllers\Admin\CustomerMailController::class, 'send'])->name('customer-mail.send');
+
     // Shipping Rates
     Route::get('/doprava', [\App\Http\Controllers\Admin\ShippingRateController::class, 'index'])->name('shipping.index');
     Route::get('/doprava/{rate}/upravit', [\App\Http\Controllers\Admin\ShippingRateController::class, 'edit'])->name('shipping.edit');

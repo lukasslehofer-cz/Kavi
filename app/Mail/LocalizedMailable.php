@@ -29,6 +29,20 @@ abstract class LocalizedMailable extends Mailable
     public string $contactEmail;
 
     /**
+     * Základ URL pro region e-mailu, bez koncového lomítka
+     */
+    public string $siteUrl;
+
+    /**
+     * Odkazy do patičky sdíleného layoutu – musí sedět doména i cesta
+     */
+    public string $homeUrl;
+
+    public string $shopUrl;
+
+    public string $logoUrl;
+
+    /**
      * Set the locale and related properties
      */
     protected function setLocale(string $locale): void
@@ -37,6 +51,11 @@ abstract class LocalizedMailable extends Mailable
         $this->siteName = EmailService::getSiteName($locale);
         $this->contactEmail = EmailService::getContactEmail($locale);
         $this->mailer = EmailService::getMailer($locale);
+
+        $this->siteUrl = EmailService::getSiteUrl($locale);
+        $this->homeUrl = $this->mailUrl('home');
+        $this->shopUrl = $this->mailUrl('products.index');
+        $this->logoUrl = $this->siteUrl.'/images/kavi-logo-white.png';
     }
 
     /**
@@ -97,18 +116,149 @@ abstract class LocalizedMailable extends Mailable
     }
 
     /**
+     * Absolutní URL do e-mailu: doména podle regionu příjemce, cesta podle
+     * jazykové varianty routy.
+     *
+     * route() bere hostitele z requestu (admin posílá EN mail z kavi.cz) nebo
+     * z APP_URL (cron) – obojí je špatně. Doména i cesta musí sedět dohromady,
+     * jinak LocalizedUrlRedirect udělá 301 zpátky na druhou jazykovou variantu.
+     */
+    protected function mailUrl(string $name, array $parameters = []): string
+    {
+        $localized = "{$name}.{$this->emailLocale}";
+
+        $path = \Illuminate\Support\Facades\Route::has($localized)
+            ? route($localized, $parameters, false)
+            : route($name, $parameters, false);
+
+        return $this->siteUrl.$path;
+    }
+
+    /**
      * URL na lokalizovanou routu podle jazyka e-mailu, ne podle jazyka requestu.
      * E-mail se často renderuje z cronu, kde app()->getLocale() nic neříká.
      */
     protected function localizedRouteFor(string $name, array $parameters = []): string
     {
-        $localized = "{$name}.{$this->emailLocale}";
+        return $this->mailUrl($name, $parameters);
+    }
 
-        if (\Illuminate\Support\Facades\Route::has($localized)) {
-            return route($localized, $parameters);
+    /**
+     * Rozdělí prostý text na odstavce (prázdný řádek = nový odstavec).
+     * Používají maily, jejichž tělo píše admin v administraci.
+     *
+     * @return array<int, string>
+     */
+    public static function splitParagraphs(string $bodyText): array
+    {
+        $normalized = str_replace(["\r\n", "\r"], "\n", trim($bodyText));
+
+        return array_values(array_filter(
+            array_map('trim', preg_split("/\n{2,}/", $normalized) ?: []),
+            fn ($paragraph) => $paragraph !== ''
+        ));
+    }
+
+    /**
+     * Rozdělí tělo zprávy na bloky (odstavce a seznamy) a rovnou je vyrenderuje
+     * do bezpečného HTML. Používají maily, jejichž tělo píše admin.
+     *
+     * Podporované značky:
+     *   prázdný řádek  = nový odstavec
+     *   **text**       = tučně
+     *   "- " / "* "    = odrážka
+     *   "1. " / "1) "  = číslovaný seznam
+     *
+     * @return array<int, array{type: string, ordered?: bool, html?: string, items?: array<int, string>}>
+     */
+    public static function parseBlocks(string $bodyText): array
+    {
+        $normalized = str_replace(["\r\n", "\r"], "\n", trim($bodyText));
+
+        $blocks = [];
+        $current = null;
+
+        $flush = function () use (&$blocks, &$current) {
+            if ($current !== null) {
+                $blocks[] = $current;
+                $current = null;
+            }
+        };
+
+        foreach (preg_split("/\n{2,}/", $normalized) ?: [] as $chunk) {
+            $flush();
+
+            foreach (explode("\n", $chunk) as $line) {
+                $line = trim($line);
+
+                if ($line === '') {
+                    continue;
+                }
+
+                // "* " se od **tučně** liší mezerou za značkou
+                if (preg_match('~^[-*•]\s+(.+)$~u', $line, $m)) {
+                    $ordered = false;
+                    $item = $m[1];
+                } elseif (preg_match('~^\d+[.)]\s+(.+)$~u', $line, $m)) {
+                    $ordered = true;
+                    $item = $m[1];
+                } else {
+                    $item = null;
+                }
+
+                if ($item !== null) {
+                    if ($current === null || $current['type'] !== 'list' || $current['ordered'] !== $ordered) {
+                        $flush();
+                        $current = ['type' => 'list', 'ordered' => $ordered, 'items' => []];
+                    }
+
+                    $current['items'][] = self::inlineHtml($item);
+
+                    continue;
+                }
+
+                if ($current === null || $current['type'] !== 'paragraph') {
+                    $flush();
+                    $current = ['type' => 'paragraph', 'lines' => []];
+                }
+
+                $current['lines'][] = self::inlineHtml($line);
+            }
         }
 
-        return route($name, $parameters);
+        $flush();
+
+        return array_map(function (array $block) {
+            if ($block['type'] === 'paragraph') {
+                $block['html'] = implode('<br>', $block['lines']);
+                unset($block['lines']);
+            }
+
+            return $block;
+        }, $blocks);
+    }
+
+    /**
+     * Formátování jednoho řádku. Text se nejdřív escapuje, teprve pak se
+     * doplní značky – z administrace se do mailu záměrně nepouští HTML.
+     */
+    private static function inlineHtml(string $text): string
+    {
+        $html = e($text);
+
+        $html = preg_replace(
+            '~\*\*(.+?)\*\*~u',
+            '<strong style="font-weight: 600; color: #1c1c1c;">$1</strong>',
+            $html
+        );
+
+        // Poslední znak URL nesmí být interpunkce, jinak by se do odkazu
+        // vzala i tečka na konci věty
+        return preg_replace(
+            '~(https?://[^\s<]*[^\s<.,;:!?)\]])~',
+            '<a href="$1" style="color: #CA4136; text-decoration: none;">$1</a>',
+            $html
+        );
     }
 }
 

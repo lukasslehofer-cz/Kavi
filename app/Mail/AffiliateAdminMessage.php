@@ -58,21 +58,6 @@ class AffiliateAdminMessage extends LocalizedMailable
         );
     }
 
-    /**
-     * Rozdělí prostý text na odstavce (prázdný řádek = nový odstavec)
-     *
-     * @return array<int, string>
-     */
-    public static function splitParagraphs(string $bodyText): array
-    {
-        $normalized = str_replace(["\r\n", "\r"], "\n", trim($bodyText));
-
-        return array_values(array_filter(
-            array_map('trim', preg_split("/\n{2,}/", $normalized) ?: []),
-            fn ($paragraph) => $paragraph !== ''
-        ));
-    }
-
     public function content(): Content
     {
         return new Content(

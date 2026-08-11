@@ -39,6 +39,17 @@ return [
     'asset_url' => env('ASSET_URL'),
 
     /*
+    | Základ URL pro každý region. V e-mailech se URL nesmí odvozovat od
+    | hostitele requestu (admin posílá EN maily z kavi.cz) ani od APP_URL
+    | (cron, .env.example). Defaulty odpovídají feedům a sitemapě.
+    */
+
+    'site_urls' => [
+        'cs' => env('APP_URL_CS', 'https://kavi.cz'),
+        'en' => env('APP_URL_EN', 'https://kavibox.com'),
+    ],
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
