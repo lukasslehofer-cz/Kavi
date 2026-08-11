@@ -43,6 +43,8 @@ return [
         'cancelled' => 'Předplatné bylo zrušeno.',
         'resume_no_date' => 'Nelze obnovit předplatné - nepodařilo se určit datum další rozesílky.',
         'resume_out_of_stock' => 'Nelze obnovit předplatné pro :month - kávy (:coffees) jsou vyprodány. Pauza bude ukončena v další rozesílce.',
+        'resume_not_paused' => 'Toto předplatné není pozastavené.',
+        'resume_admin_locked' => 'Toto předplatné pozastavil správce a obnovit ho může jen on. Napište nám prosím na podporu.',
     ],
 
     // One-time box

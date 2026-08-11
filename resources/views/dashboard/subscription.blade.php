@@ -212,6 +212,12 @@
                                 <span class="font-medium text-blue-600">{{ $nextShipment->format('d.m.Y') }}</span>
                             </div>
                             @endif
+                            @elseif($subscription->isAdminLocked())
+                            {{-- Pauza od správce nemá koncové datum, nemá co zobrazovat --}}
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">{{ __('dashboard.status') }}:</span>
+                                <span class="font-medium text-yellow-700">{{ __('dashboard.paused_by_admin') }}</span>
+                            </div>
                             @elseif($subscription->status === 'paused' && $pauseInfo)
                             <div class="flex justify-between">
                                 <span class="text-gray-600">{{ __('dashboard.status_paused_until', ['date' => '']) }}</span>
@@ -533,6 +539,13 @@
                                 {{ __('dashboard.cancel_subscription') }}
                             </button>
                             @elseif($subscription->status === 'paused')
+                            @if($subscription->isAdminLocked())
+                            {{-- Pauzu vyvolal správce, obnovit ji může jen on --}}
+                            <div class="w-full px-4 py-3 text-sm bg-yellow-50 border border-yellow-200 rounded-2xl text-yellow-800">
+                                <p class="font-medium">{{ __('dashboard.paused_by_admin') }}</p>
+                                <p class="mt-1 text-yellow-700">{{ __('dashboard.paused_by_admin_help') }}</p>
+                            </div>
+                            @else
                             <form method="POST" action="{{ localizedRoute('dashboard.subscription.resume') }}">
                                 @csrf
                                 <input type="hidden" name="subscription_id" value="{{ $subscription->id }}">
@@ -540,6 +553,7 @@
                                     {{ __('dashboard.resume_subscription') }}
                                 </button>
                             </form>
+                            @endif
 
                             <button type="button"
                                     class="w-full text-center px-4 py-2 text-sm border border-red-600 text-red-600 rounded-full hover:bg-red-50 transition font-medium"

@@ -43,6 +43,8 @@ return [
         'cancelled' => 'Subscription has been cancelled.',
         'resume_no_date' => 'Cannot resume subscription - unable to determine next shipment date.',
         'resume_out_of_stock' => 'Cannot resume subscription for :month - coffees (:coffees) are out of stock. The pause will end with the next shipment.',
+        'resume_not_paused' => 'This subscription is not paused.',
+        'resume_admin_locked' => 'This subscription was paused by an administrator and only they can resume it. Please contact our support.',
     ],
 
     // One-time box

@@ -340,18 +340,76 @@
                     
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Stav předplatného</label>
-                        <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" onchange="this.form.submit()">
+                        {{-- Pozastavení má vlastní tlačítko níže - musí zneplatnit zásilky, ne jen status --}}
+                        <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500" onchange="this.form.submit()" {{ $subscription->status === 'paused' ? 'disabled' : '' }}>
+                            @if($subscription->status === 'paused')
+                            <option value="paused" selected>Pozastaveno</option>
+                            @endif
                             <option value="pending" {{ $subscription->status === 'pending' ? 'selected' : '' }}>Čeká</option>
                             <option value="active" {{ $subscription->status === 'active' ? 'selected' : '' }}>Aktivní</option>
                             <option value="unpaid" {{ $subscription->status === 'unpaid' ? 'selected' : '' }}>⚠️ Neuhrazeno</option>
-                            <option value="paused" {{ $subscription->status === 'paused' ? 'selected' : '' }}>Pozastaveno</option>
-                            <option value="trialing" {{ $subscription->status === 'trialing' ? 'selected' : '' }}>Zkušební období</option>
-                            <option value="past_due" {{ $subscription->status === 'past_due' ? 'selected' : '' }}>Po splatnosti</option>
                             <option value="cancelled" {{ $subscription->status === 'cancelled' ? 'selected' : '' }}>Zrušeno</option>
                         </select>
+                        @if($subscription->status === 'paused')
+                        <p class="mt-2 text-xs text-gray-500">Předplatné je pozastavené. Použijte tlačítko Obnovit níže.</p>
+                        @endif
                     </div>
                 </form>
-                
+
+                {{-- Pozastavení / obnovení --}}
+                <div class="pt-4 border-t border-gray-200">
+                    @if(in_array($subscription->status, ['active', 'unpaid']))
+                    <button type="button"
+                            onclick="openPauseModal()"
+                            class="w-full px-4 py-2 text-sm border border-yellow-500 text-yellow-700 rounded-lg hover:bg-yellow-50 transition font-medium">
+                        Pozastavit předplatné
+                    </button>
+                    <p class="mt-2 text-xs text-gray-500">Pauza platí do ručního obnovení. Zákazník ji sám neobnoví.</p>
+                    @elseif($subscription->status === 'paused')
+                    <form action="{{ route('admin.subscriptions.resume', $subscription) }}" method="POST"
+                          onsubmit="return confirm('Opravdu obnovit předplatné? Naplánuje se nejbližší možná rozesílka.');">
+                        @csrf
+                        <button type="submit"
+                                class="w-full px-4 py-2 text-sm border border-green-600 text-green-700 rounded-lg hover:bg-green-50 transition font-medium">
+                            Obnovit předplatné
+                        </button>
+                    </form>
+                    @endif
+                </div>
+
+                {{-- Detail pauzy --}}
+                @if($subscription->status === 'paused')
+                <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <h4 class="text-sm font-bold text-yellow-900 mb-2">Detail pozastavení</h4>
+                    <div class="text-xs text-yellow-800 space-y-1">
+                        <div class="flex justify-between">
+                            <span>Důvod:</span>
+                            <span class="font-semibold">
+                                @if($subscription->isAdminLocked())
+                                    Pozastaveno administrátorem
+                                @elseif($subscription->pause_reason === 'payment_failure_skip')
+                                    Neúspěšná platba
+                                @elseif($subscription->pause_reason === 'user_request')
+                                    Žádost zákazníka
+                                @else
+                                    {{ $subscription->pause_reason ?? 'Neuvedeno' }}
+                                @endif
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Pauza do:</span>
+                            <span class="font-semibold">{{ $subscription->paused_until_date?->format('d.m.Y') ?? 'Bez konce (ruční obnovení)' }}</span>
+                        </div>
+                        @if($subscription->paused_iterations)
+                        <div class="flex justify-between">
+                            <span>Přeskočených rozesílek:</span>
+                            <span class="font-semibold">{{ $subscription->paused_iterations }}</span>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 <div class="pt-4 border-t border-gray-200">
                     <div class="text-sm text-gray-600 mb-2">Aktuální stav:</div>
                         @if($subscription->status === 'active')
@@ -770,7 +828,74 @@ document.getElementById('cancelModal')?.addEventListener('click', function(e) {
         closeCancelModal();
     }
 });
+
+function openPauseModal() {
+    document.getElementById('pauseModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePauseModal() {
+    document.getElementById('pauseModal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('pauseModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePauseModal();
+    }
+});
 </script>
+
+<!-- Pause Subscription Modal -->
+<div id="pauseModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-xl border border-gray-200 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">Pozastavit předplatné</h3>
+                    <p class="text-sm text-gray-600 mt-1">Předplatné #{{ $subscription->subscription_number }}</p>
+                </div>
+                <button type="button" onclick="closePauseModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <form action="{{ route('admin.subscriptions.pause', $subscription) }}" method="POST" class="p-6">
+            @csrf
+
+            <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-900">
+                <p class="font-semibold mb-2">Co se stane:</p>
+                <ul class="list-disc list-inside space-y-1 text-yellow-800">
+                    <li>Pauza platí <strong>do ručního obnovení</strong> - nemá koncové datum.</li>
+                    <li>Zákazník ji <strong>nemůže sám obnovit</strong>, jen administrátor.</li>
+                    <li>Zastaví se strhávání plateb i příprava dalších zásilek.</li>
+                    <li>Rezervovaná káva se uvolní zpět na sklad.</li>
+                    <li>Již zaplacené zásilky zůstávají naplánované a odejdou.</li>
+                </ul>
+            </div>
+
+            <label class="flex items-start gap-3 mb-6 cursor-pointer">
+                <input type="checkbox" name="notify_customer" value="1" checked class="mt-1 rounded border-gray-300">
+                <span class="text-sm text-gray-700">
+                    <span class="font-medium">Informovat zákazníka e-mailem</span>
+                    <span class="block text-gray-500">U interních zásahů můžete odškrtnout.</span>
+                </span>
+            </label>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closePauseModal()" class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                    Zpět
+                </button>
+                <button type="submit" class="px-6 py-2.5 text-sm font-medium bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                    Pozastavit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- Cancel Subscription Modal -->
 <div id="cancelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">

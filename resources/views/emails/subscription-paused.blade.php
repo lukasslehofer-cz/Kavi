@@ -51,7 +51,20 @@
                             </div>
                             
                             <!-- Reason -->
-                            @if(isset($reason) && $reason === 'payment_failed')
+                            @if($pauseReason === \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
+                            <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
+                                <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
+                                    {{ $locale === 'cs' ? 'Důvod pozastavení' : 'Reason for pause' }}
+                                </div>
+                                <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
+                                    @if($locale === 'cs')
+                                    Vaše předplatné pozastavil náš tým. Pokud si přejete v odběru pokračovat, ozvěte se nám prosím na e-mail níže.
+                                    @else
+                                    Your subscription has been paused by our team. If you would like to continue, please get in touch using the email below.
+                                    @endif
+                                </p>
+                            </div>
+                            @elseif($pauseReason === 'payment_failure_skip')
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
                                     {{ $locale === 'cs' ? 'Důvod pozastavení' : 'Reason for pause' }}
@@ -104,7 +117,9 @@
                                     {{ $locale === 'cs' ? 'Můžete kdykoliv' : 'You can always' }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
+                                    @if($pauseReason !== \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Obnovit předplatné okamžitě' : 'Resume subscription immediately' }}<br>
+                                    @endif
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Změnit konfiguraci kávy' : 'Change coffee configuration' }}<br>
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Aktualizovat doručovací údaje' : 'Update delivery details' }}
                                 </p>
@@ -122,9 +137,11 @@
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Flexibilní pozastavení' : 'Flexible pause' }}
                                 </span>
+                                @if($pauseReason !== \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Obnovení kdykoliv' : 'Resume anytime' }}
                                 </span>
+                                @endif
                             </div>
                             
                             <!-- Help Text -->

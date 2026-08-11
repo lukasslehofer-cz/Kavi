@@ -40,6 +40,9 @@
         <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 text-center shadow-sm border border-purple-200">
             <p class="text-3xl font-bold text-purple-700">{{ $stats['paused'] }}</p>
             <p class="text-sm text-purple-600 mt-1">Pauza</p>
+            @if($stats['admin_locked'] > 0)
+            <p class="text-xs text-purple-500 mt-1">z toho {{ $stats['admin_locked'] }} zamčeno adminem</p>
+            @endif
         </div>
         <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 text-center shadow-sm border border-indigo-200">
             <p class="text-3xl font-bold text-indigo-700">{{ $stats['complimentary'] }}</p>
@@ -73,6 +76,7 @@
                     <option value="unpaid" {{ request('status') === 'unpaid' ? 'selected' : '' }}>⚠️ Neuhrazeno</option>
                     <option value="trialing" {{ request('status') === 'trialing' ? 'selected' : '' }}>Zkušební</option>
                     <option value="paused" {{ request('status') === 'paused' ? 'selected' : '' }}>Pauza</option>
+                    <option value="admin_locked" {{ request('status') === 'admin_locked' ? 'selected' : '' }}>Zamčeno adminem</option>
                     <option value="complimentary" {{ request('status') === 'complimentary' ? 'selected' : '' }}>Bezplatné</option>
                     <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Zrušeno</option>
                 </select>
@@ -175,6 +179,8 @@
                             @endif
                             @elseif($subscription->status === 'trialing')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Zkušební</span>
+                            @elseif($subscription->isAdminLocked())
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300" title="Pozastaveno administrátorem, obnovit může jen admin">Zamčeno adminem</span>
                             @elseif($subscription->status === 'paused')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Pauza</span>
                             @elseif($subscription->status === 'complimentary')

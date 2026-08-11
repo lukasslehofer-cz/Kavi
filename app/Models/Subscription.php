@@ -9,6 +9,13 @@ class Subscription extends Model
 {
     use HasFactory;
 
+    /**
+     * Pauza vyvolaná adminem. Na rozdíl od ostatních důvodů nemá koncové datum
+     * (paused_until_date = NULL), takže ji žádný cron sám neobnoví - odemknout
+     * ji může jen admin z detailu předplatného.
+     */
+    public const PAUSE_REASON_ADMIN_LOCK = 'admin_lock';
+
     protected $fillable = [
         'subscription_number',
         'user_id',
@@ -172,6 +179,14 @@ class Subscription extends Model
         return $this->status === 'unpaid';
     }
 
+    /**
+     * Pozastaveno adminem - zákazník takovou pauzu nesmí sám obnovit.
+     */
+    public function isAdminLocked(): bool
+    {
+        return $this->isPaused() && $this->pause_reason === self::PAUSE_REASON_ADMIN_LOCK;
+    }
+
     public function hasPaymentIssue(): bool
     {
         return $this->isUnpaid() || $this->payment_failure_count > 0;
@@ -247,21 +262,6 @@ class Subscription extends Model
         \Log::info('Subscription cancelled immediately (no paid coverage)', [
             'subscription_id' => $this->id,
             'ends_at' => now()->toDateString(),
-        ]);
-    }
-
-    public function pause()
-    {
-        $this->update(['status' => 'paused']);
-    }
-
-    public function resume()
-    {
-        $this->update([
-            'status' => 'active',
-            'paused_iterations' => null,
-            // Keep paused_until_date for next shipment calculation
-            'pause_reason' => null,
         ]);
     }
 

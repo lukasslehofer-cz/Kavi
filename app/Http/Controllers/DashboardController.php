@@ -367,6 +367,18 @@ class DashboardController extends Controller
             ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
 
+        if (! $subscription->isPaused()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('flash.subscription.resume_not_paused'));
+        }
+
+        // Pauzu od admina zákazník neobnoví - guard je i ve službě, tady kvůli
+        // přímému POST mimo UI (tlačítko se nerenderuje).
+        if ($subscription->isAdminLocked()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('flash.subscription.resume_admin_locked'));
+        }
+
         // Check availability and resume using the central service
         $shipmentService = app(SubscriptionShipmentService::class);
         $result = $shipmentService->resumeSubscription($subscription);

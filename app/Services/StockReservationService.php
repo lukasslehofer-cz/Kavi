@@ -152,8 +152,9 @@ class StockReservationService
                 $q->whereNotNull('subscription_payment_id')
                   ->orWhereHas('subscription', function($q2) use ($billingDate) {
                       $q2->where(function($q3) use ($billingDate) {
+                          // Pozastavené jen s uplynulou pauzou; pauza bez koncového
+                          // data (admin zámek) kávu nerezervuje.
                           $q3->where('status', '!=', 'paused')
-                             ->orWhereNull('paused_until_date')
                              ->orWhere('paused_until_date', '<=', $billingDate);
                       });
                   });
@@ -166,8 +167,8 @@ class StockReservationService
             ->whereIn('status', ['active', 'paused', 'pending', 'cancelled', 'complimentary'])
             ->whereNotIn('id', $shipmentSubscriptionIds)
             ->where(function($q) use ($billingDate) {
+                // Pauza bez koncového data (admin zámek) kávu nerezervuje.
                 $q->where('status', '!=', 'paused')
-                  ->orWhereNull('paused_until_date')
                   ->orWhere('paused_until_date', '<=', $billingDate);
             })
             ->get()

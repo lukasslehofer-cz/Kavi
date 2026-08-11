@@ -772,8 +772,22 @@ class StripeService
                         $frequencyMonths
                     );
 
+                    // Pauzu od admina webhook nepřebíjí. Race je reálný: zákazník otevře
+                    // "Zaplatit nyní" ve stavu unpaid, admin mezitím předplatné zamkne
+                    // a příchozí platba by zámek zrušila. Platbu zpracujeme normálně,
+                    // jen status necháme na 'paused' - odemyká výhradně admin.
+                    $isAdminLocked = $subscription->isAdminLocked();
+
+                    if ($isAdminLocked) {
+                        \Log::warning('Manual invoice payment received for admin-locked subscription; keeping pause', [
+                            'subscription_id' => $subscription->id,
+                            'subscription_number' => $subscription->subscription_number,
+                            'payment_intent_id' => $paymentIntentId,
+                        ]);
+                    }
+
                     $subscription->update([
-                        'status' => 'active',
+                        'status' => $isAdminLocked ? 'paused' : 'active',
                         'next_billing_date' => $nextBillingDate,
                         'payment_failure_count' => 0,
                         // Ruční doplacení stejně jako úspěšný cron ruší sérii neuhrazených rozesílek.
@@ -2050,9 +2064,9 @@ class StripeService
                             'subscription_id' => $subscription->id,
                         ]);
 
-                        // Clear the unpaid status
+                        // Clear the unpaid status (pauzu od admina ale nepřebíjíme)
                         $subscription->update([
-                            'status' => 'active',
+                            'status' => $subscription->isAdminLocked() ? 'paused' : 'active',
                             'payment_failure_count' => 0,
                             'pending_invoice_id' => null,
                             'pending_invoice_amount' => null,

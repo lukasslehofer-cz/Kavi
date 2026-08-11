@@ -168,6 +168,8 @@ return [
     'skip_3' => '3 shipments',
     'confirm_pause' => 'Confirm pause',
     'resume_subscription' => 'Resume subscription',
+    'paused_by_admin' => 'Paused by our team',
+    'paused_by_admin_help' => 'This subscription was paused by our team. Please contact us to resume it.',
     'cancel_subscription' => 'Cancel subscription',
     'cancel_warning' => 'Are you sure you want to cancel your subscription?',
     'cancel_confirm' => 'Yes, cancel subscription',

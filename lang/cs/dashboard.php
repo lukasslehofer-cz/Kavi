@@ -168,6 +168,8 @@ return [
     'skip_3' => '3 zásilky',
     'confirm_pause' => 'Potvrdit pozastavení',
     'resume_subscription' => 'Obnovit předplatné',
+    'paused_by_admin' => 'Pozastaveno správcem',
+    'paused_by_admin_help' => 'Toto předplatné pozastavil náš tým. Pro obnovení nás prosím kontaktujte.',
     'cancel_subscription' => 'Zrušit předplatné',
     'cancel_warning' => 'Opravdu chcete zrušit předplatné?',
     'cancel_confirm' => 'Ano, zrušit předplatné',

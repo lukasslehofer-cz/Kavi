@@ -143,6 +143,18 @@ class SubscriptionShipmentService
      */
     public function getNextShipment(Subscription $subscription): ?SubscriptionShipment
     {
+        // U pauzy od admina je jediná legitimní nadcházející zásilka ta už zaplacená.
+        // Nezaplacené pending řádky pauza zneplatnila, ale prošlé řádky z dřívějška
+        // (nikdy neodeslané) v tabulce zůstávají a bez tohohle by je zákazník viděl
+        // jako "další rozesílku".
+        if ($subscription->isAdminLocked()) {
+            return $subscription->shipments()
+                ->where('status', 'pending')
+                ->whereNotNull('subscription_payment_id')
+                ->orderBy('shipment_date', 'asc')
+                ->first();
+        }
+
         // First look for existing pending shipment
         $pending = $subscription->shipments()
             ->where('status', 'pending')
@@ -253,6 +265,14 @@ class SubscriptionShipmentService
      */
     public function ensurePendingShipmentExists(Subscription $subscription): ?SubscriptionShipment
     {
+        // Pauza od admina nemá koncové datum, takže tu nelze plánovat další zásilku.
+        // Bez tohohle guardu by stačilo, aby si zákazník otevřel dashboard (getShipmentInfo
+        // -> getNextShipment), vznikl by pending řádek a ten v shouldShipOn() přebíjí status
+        // předplatného - zámek by vydržel do prvního načtení účtu.
+        if ($subscription->isAdminLocked()) {
+            return null;
+        }
+
         $nextDate = $this->calculateNextShipmentDate($subscription);
 
         if (! $nextDate) {
@@ -478,14 +498,115 @@ class SubscriptionShipmentService
     }
 
     /**
+     * Pause subscription indefinitely (admin lock)
+     *
+     * Na rozdíl od pauseSubscription() se neplánuje N přeskočených rozesílek ani
+     * navazující pending řádek - předplatné stojí, dokud ho admin ručně neobnoví.
+     * paused_until_date proto zůstává NULL, čímž předplatné vypadne z billing cronu
+     * i ze subscriptions:resume-paused.
+     */
+    public function pauseIndefinitely(Subscription $subscription, string $reason = Subscription::PAUSE_REASON_ADMIN_LOCK): void
+    {
+        // 1. Zaplacené zásilky zůstávají - zákazník za ně zaplatil a mají mu dojít
+        // (stejný přístup jako pauseSubscription()).
+        $paidPendingShipments = $subscription->shipments()
+            ->where('status', 'pending')
+            ->whereNotNull('subscription_payment_id')
+            ->where('shipment_date', '>=', today())
+            ->orderBy('shipment_date', 'asc')
+            ->get();
+
+        // 2. Všechny budoucí NEZAPLACENÉ zásilky zneplatnit
+        $upcomingUnpaid = $subscription->shipments()
+            ->where('status', 'pending')
+            ->whereNull('subscription_payment_id')
+            ->where('shipment_date', '>=', today())
+            ->orderBy('shipment_date', 'asc')
+            ->get();
+
+        $affectedScheduleIds = collect();
+
+        foreach ($upcomingUnpaid as $shipment) {
+            $shipment->update([
+                'status' => 'skipped',
+                'notes' => 'Paused by admin: '.$reason,
+            ]);
+
+            $this->detachAddonOrders($shipment, 'pause_skip');
+
+            if ($shipment->shipment_schedule_id) {
+                $affectedScheduleIds->push($shipment->shipment_schedule_id);
+            }
+        }
+
+        // 3. next_billing_date záměrně neměníme - kombinace status='paused' a
+        // paused_until_date=NULL nespadne do žádné větve billing query, a nulování
+        // data by rozbilo šablony, které ho formátují.
+        $subscription->update([
+            'status' => 'paused',
+            'paused_iterations' => null,
+            'paused_until_date' => null,
+            'pause_reason' => $reason,
+        ]);
+
+        // 4. Uvolnit rezervace kávy za zneplatněné měsíce
+        $reservationService = app(StockReservationService::class);
+        $updatedSchedules = collect();
+
+        foreach ($affectedScheduleIds->unique() as $scheduleId) {
+            $schedule = ShipmentSchedule::find($scheduleId);
+
+            if (! $schedule) {
+                continue;
+            }
+
+            try {
+                $reservationService->updateReservationsForSchedule($schedule);
+                $updatedSchedules->push($schedule->id);
+            } catch (\Exception $e) {
+                \Log::error('Failed to update reservations after indefinite pause', [
+                    'subscription_id' => $subscription->id,
+                    'schedule_id' => $schedule->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        \Log::info('Subscription paused indefinitely', [
+            'subscription_id' => $subscription->id,
+            'subscription_number' => $subscription->subscription_number,
+            'reason' => $reason,
+            'skipped_dates' => $upcomingUnpaid->pluck('shipment_date')->map->toDateString(),
+            'paid_shipments_preserved' => $paidPendingShipments->pluck('shipment_date')->map->toDateString(),
+            'reservations_updated_for_schedules' => $updatedSchedules->toArray(),
+        ]);
+    }
+
+    /**
      * Resume subscription from pause
      * Handles early resume by cleaning up future skipped/pending records
      * and creating a new pending record for the nearest available shipment
      *
+     * @param  bool  $byAdmin  Admin obnovení - jediná cesta, jak uvolnit pauzu od admina
      * @return array ['success' => bool, 'message' => string, 'next_shipment' => ?Carbon]
      */
-    public function resumeSubscription(Subscription $subscription): array
+    public function resumeSubscription(Subscription $subscription, bool $byAdmin = false): array
     {
+        // 0. Pauzu vyvolanou adminem smí uvolnit zase jen admin. Default false drží
+        // v bezpečí zákaznickou cestu i cron subscriptions:resume-paused.
+        if ($subscription->isAdminLocked() && ! $byAdmin) {
+            \Log::warning('Blocked customer attempt to resume admin-locked subscription', [
+                'subscription_id' => $subscription->id,
+                'subscription_number' => $subscription->subscription_number,
+            ]);
+
+            return [
+                'success' => false,
+                'message' => __('flash.subscription.resume_admin_locked'),
+                'next_shipment' => null,
+            ];
+        }
+
         // 1. Calculate what would be the next shipment date
         $nextShipmentDate = $this->calculateNextShipmentDate($subscription);
 

@@ -25,7 +25,15 @@ class SubscriptionController extends Controller
 
         // Filter by status if provided
         if ($request->has('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
+            // Zámek od admina není samostatný status, ale kombinace paused + pause_reason.
+            // MonitorSubscriptionBilling ho nehlídá (nemá paused_until_date), takže je
+            // tenhle filtr jediné místo, kde na taková předplatná někdo narazí.
+            if ($request->status === 'admin_locked') {
+                $query->where('status', 'paused')
+                    ->where('pause_reason', Subscription::PAUSE_REASON_ADMIN_LOCK);
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         // Search by user name or email
@@ -47,6 +55,9 @@ class SubscriptionController extends Controller
             'unpaid' => Subscription::where('status', 'unpaid')->count(),
             'trialing' => Subscription::where('status', 'trialing')->count(),
             'paused' => Subscription::where('status', 'paused')->count(),
+            'admin_locked' => Subscription::where('status', 'paused')
+                ->where('pause_reason', Subscription::PAUSE_REASON_ADMIN_LOCK)
+                ->count(),
             'complimentary' => Subscription::where('status', 'complimentary')->count(),
             'cancelled' => Subscription::where('status', 'cancelled')->count(),
         ];
@@ -71,8 +82,11 @@ class SubscriptionController extends Controller
      */
     public function update(Request $request, Subscription $subscription)
     {
+        // Pozastavení jde přes pause() - potřebuje zneplatnit zásilky, ne jen status.
+        // trialing/past_due/canceled tu byly historicky, ale v DB enumu nejsou a ve
+        // strict módu MySQL by shodily request chybou 1265.
         $request->validate([
-            'status' => 'required|in:active,unpaid,paused,pending,trialing,past_due,canceled,cancelled',
+            'status' => 'required|in:active,unpaid,pending,cancelled',
         ]);
 
         $subscription->update([
@@ -132,6 +146,133 @@ class SubscriptionController extends Controller
 
         return redirect()->route('admin.subscriptions.show', $subscription)
             ->with('success', 'Dodací adresa byla úspěšně aktualizována.');
+    }
+
+    /**
+     * Pause the subscription indefinitely (admin-triggered)
+     *
+     * Pauza nemá koncové datum a zákazník ji sám neobnoví - odemknout ji jde
+     * jedině přes resume() níže.
+     */
+    public function pause(Request $request, Subscription $subscription, SubscriptionShipmentService $shipmentService)
+    {
+        $validated = $request->validate([
+            'notify_customer' => 'nullable|boolean',
+        ]);
+
+        if (! in_array($subscription->status, ['active', 'unpaid'])) {
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('error', 'Pozastavit lze jen aktivní nebo neuhrazené předplatné.');
+        }
+
+        try {
+            $shipmentService->pauseIndefinitely($subscription);
+
+            Log::info('Admin paused subscription indefinitely', [
+                'subscription_id' => $subscription->id,
+                'admin_user_id' => auth()->id(),
+            ]);
+
+            // Ve Stripe zastavit fakturaci; metoda umí vyhodit výjimku, ale lokální
+            // pauza už proběhla a je závazná - jen to zalogujeme.
+            try {
+                app(\App\Services\StripeService::class)->pauseSubscription($subscription);
+            } catch (\Exception $e) {
+                Log::error('Failed to pause Stripe subscription from admin', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            $notified = false;
+
+            if ($request->boolean('notify_customer')) {
+                try {
+                    $email = $subscription->shipping_address['email'] ?? null;
+                    if (! $email && $subscription->user) {
+                        $email = $subscription->user->email;
+                    }
+
+                    if ($email) {
+                        \Mail::to($email)->send(new \App\Mail\SubscriptionPaused($subscription, Subscription::PAUSE_REASON_ADMIN_LOCK));
+                        $notified = true;
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to send SubscriptionPaused email from admin', [
+                        'subscription_id' => $subscription->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            $successMessage = $notified
+                ? 'Předplatné bylo pozastaveno a uživatel byl informován emailem. Obnovit ho může jen administrátor.'
+                : 'Předplatné bylo pozastaveno. Obnovit ho může jen administrátor.';
+
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('success', $successMessage);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to pause subscription from admin', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('error', 'Nepodařilo se pozastavit předplatné. Zkuste to prosím znovu.');
+        }
+    }
+
+    /**
+     * Resume a paused subscription (admin-triggered)
+     * Jediná cesta, jak uvolnit pauzu vyvolanou adminem
+     */
+    public function resume(Subscription $subscription, SubscriptionShipmentService $shipmentService)
+    {
+        if (! $subscription->isPaused()) {
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('error', 'Obnovit lze jen pozastavené předplatné.');
+        }
+
+        try {
+            $result = $shipmentService->resumeSubscription($subscription, byAdmin: true);
+
+            // Typicky nedostupná káva na cílový měsíc - zásilku bez pokrytí skladem
+            // vytvářet nechceme ani adminovi.
+            if (! $result['success']) {
+                return redirect()->route('admin.subscriptions.show', $subscription)
+                    ->with('error', $result['message']);
+            }
+
+            Log::info('Admin resumed subscription', [
+                'subscription_id' => $subscription->id,
+                'admin_user_id' => auth()->id(),
+                'next_shipment' => $result['next_shipment']?->toDateString(),
+            ]);
+
+            try {
+                app(\App\Services\StripeService::class)->resumeSubscription($subscription);
+            } catch (\Exception $e) {
+                Log::error('Failed to resume Stripe subscription from admin', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('success', $result['message']);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to resume subscription from admin', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('error', 'Nepodařilo se obnovit předplatné. Zkuste to prosím znovu.');
+        }
     }
 
     /**
@@ -244,8 +385,9 @@ class SubscriptionController extends Controller
                     // Never ship an unpaid subscription (no successful payment yet)
                     $q2->where('status', '!=', 'unpaid')
                        ->where(function($q3) use ($billingDate) {
+                            // Pozastavené jen tehdy, když pauza má konec a ten už uplynul.
+                            // Pauza bez data (admin zámek) se neodesílá nikdy.
                             $q3->where('status', '!=', 'paused')
-                               ->orWhereNull('paused_until_date')
                                ->orWhere('paused_until_date', '<=', $billingDate);
                        });
                 });
@@ -260,9 +402,9 @@ class SubscriptionController extends Controller
             ->whereIn('status', ['active', 'paused', 'pending', 'cancelled', 'complimentary'])
             ->whereNotIn('id', $subscriptionIds)
             ->where(function($q) use ($billingDate) {
-                // Include if: not paused OR no pause date OR billing_date >= paused_until_date
+                // Include if: not paused OR billing_date >= paused_until_date.
+                // Pauza bez koncového data (admin zámek) se neodesílá nikdy.
                 $q->where('status', '!=', 'paused')
-                  ->orWhereNull('paused_until_date')
                   ->orWhere('paused_until_date', '<=', $billingDate);
             })
             ->get();
@@ -340,8 +482,8 @@ class SubscriptionController extends Controller
                       // Never ship an unpaid subscription (no successful payment yet)
                       $q2->where('status', '!=', 'unpaid')
                          ->where(function($q3) use ($billingDate) {
+                             // Pauza bez koncového data (admin zámek) se nezapočítává.
                              $q3->where('status', '!=', 'paused')
-                                ->orWhereNull('paused_until_date')
                                 ->orWhere('paused_until_date', '<=', $billingDate);
                          });
                   });
@@ -355,8 +497,8 @@ class SubscriptionController extends Controller
             ->whereIn('status', ['active', 'paused', 'pending', 'cancelled', 'complimentary'])
             ->whereNotIn('id', $subscriptionIds)
             ->where(function($q) use ($billingDate) {
+                // Pauza bez koncového data (admin zámek) se nezapočítává.
                 $q->where('status', '!=', 'paused')
-                  ->orWhereNull('paused_until_date')
                   ->orWhere('paused_until_date', '<=', $billingDate);
             })
             ->get();
@@ -614,7 +756,27 @@ class SubscriptionController extends Controller
 
         foreach ($request->subscription_ids as $subscriptionId) {
             $subscription = Subscription::with('user')->find($subscriptionId);
-            
+
+            // Pozastavené adminem se neodesílá, i kdyby zůstalo zaškrtnuté ve formuláři.
+            // Výjimkou je už zaplacená zásilka - tu pauza zachovává a odejít má.
+            // Guard musí být před getOrCreateShipment(), který by řádek jinak založil.
+            if ($subscription->isAdminLocked()) {
+                $lockedSchedule = ShipmentSchedule::getForMonth($targetDate->year, $targetDate->month);
+
+                $paidShipment = $lockedSchedule
+                    ? $subscription->shipments()
+                        ->where('shipment_schedule_id', $lockedSchedule->id)
+                        ->whereNotNull('subscription_payment_id')
+                        ->first()
+                    : null;
+
+                if (! $paidShipment) {
+                    $errors[] = "Předplatné #{$subscription->id}: Pozastaveno administrátorem, nelze odeslat";
+                    $errorCount++;
+                    continue;
+                }
+            }
+
             // Get or create shipment for this date
             $shipment = $this->getOrCreateShipment($subscription, $targetDate);
 
