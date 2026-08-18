@@ -78,6 +78,32 @@ class AffiliateService
     }
 
     /**
+     * Určí pořadové číslo platby pro odměnu.
+     *
+     * Bere VYŠŠÍ ze dvou hodnot:
+     *  - počet zaplacených plateb v této databázi,
+     *  - nejvyšší dosud použité pořadí odměny + 1.
+     *
+     * Samotný COUNT nestačí: u předplatných migrovaných ze starého webu tu první platby
+     * vůbec nejsou, takže COUNT je trvale nižší než skutečné pořadí a znovu trefí číslo,
+     * které už odměnu má - dedupe v createSubscriptionReward() ji pak tiše vrátí a nová
+     * nevznikne (viz KVS-2025-035, srpen 2026). Existující odměny nesou tu chybějící
+     * historii, takže max+1 ji doplní.
+     *
+     * Samotné max+1 zase nestačí tam, kde je v řadě odměn díra po starém bugu
+     * (opakované platby se neodměňovaly do 19. 5. 2026) - tam je pravdivější COUNT.
+     */
+    public function nextSubscriptionPaymentNumber(Subscription $subscription): int
+    {
+        $paidPayments = $subscription->payments()->where('status', 'paid')->count();
+
+        $highestRewardNumber = (int) AffiliateReward::where('subscription_id', $subscription->id)
+            ->max('subscription_payment_number');
+
+        return max($paidPayments, $highestRewardNumber + 1);
+    }
+
+    /**
      * Vytvoří záznam odměny za objednávku
      */
     public function createOrderReward(Order $order, Coupon $coupon): ?AffiliateReward

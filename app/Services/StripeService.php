@@ -1552,7 +1552,11 @@ class StripeService
                     $coupon = $subscription->coupon;
                     if ($coupon && $coupon->hasAffiliateSubscriptionReward()) {
                         $affiliateService = app(\App\Services\AffiliateService::class);
-                        $reward = $affiliateService->createSubscriptionReward($subscription, $coupon, 1);
+                        $reward = $affiliateService->createSubscriptionReward(
+                            $subscription,
+                            $coupon,
+                            $affiliateService->nextSubscriptionPaymentNumber($subscription)
+                        );
 
                         if ($reward) {
                             \Log::info('Affiliate reward created for first subscription payment', [
@@ -2716,10 +2720,9 @@ class StripeService
                         if ($coupon && $coupon->hasAffiliateSubscriptionReward()) {
                             $affiliateService = app(\App\Services\AffiliateService::class);
 
-                            // Zjisti, kolikátá platba to je (včetně právě vytvořené)
-                            $paymentNumber = \App\Models\SubscriptionPayment::where('subscription_id', $subscription->id)
-                                ->where('status', 'paid')
-                                ->count();
+                            // Pořadí řeší AffiliateService – samotný COUNT podstřeluje u předplatných
+                            // migrovaných ze starého webu, kde první platby v téhle DB nejsou.
+                            $paymentNumber = $affiliateService->nextSubscriptionPaymentNumber($subscription);
 
                             $reward = $affiliateService->createSubscriptionReward($subscription, $coupon, $paymentNumber);
 
