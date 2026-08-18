@@ -518,6 +518,88 @@
         </div>
     </div>
 
+    <!-- Invoices Section -->
+    {{-- Čte se přímo z subscription_payments, ne přes vazbu na zásilku: admin musí vidět
+         i platby bez vazby a stavy pending/failed, stejně jako je vidí zákazník na /predplatne. --}}
+    @if($subscription->payments->count() > 0)
+    <div class="mt-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Faktury ({{ $subscription->payments->count() }})
+                </h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zaplaceno</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Období</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Částka</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stav</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faktura</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Navázaná zásilka</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach($subscription->payments as $payment)
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $payment->paid_at ? $payment->paid_at->format('d.m.Y') : '—' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                @if($payment->period_start && $payment->period_end)
+                                    {{ $payment->period_start->format('d.m.Y') }} – {{ $payment->period_end->format('d.m.Y') }}
+                                @else
+                                    —
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {{ \App\Helpers\CurrencyHelper::formatByCurrency($payment->amount, $payment->currency) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($payment->status === 'paid')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Zaplaceno</span>
+                                @elseif($payment->status === 'pending')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Čeká na úhradu</span>
+                                @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Neúspěšná</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                @if($payment->invoice_number || $payment->fakturoid_invoice_id)
+                                <div class="font-medium text-gray-900">{{ $payment->invoice_number ?? 'FID ' . $payment->fakturoid_invoice_id }}</div>
+                                    @if($payment->invoice_pdf_path)
+                                    <a href="{{ route('admin.subscription-payment.invoice', $payment) }}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
+                                        Stáhnout PDF
+                                    </a>
+                                    @endif
+                                @else
+                                <span class="text-gray-400">—</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                @if($payment->shipment)
+                                <span class="text-gray-900">{{ $payment->shipment->shipment_date->format('d.m.Y') }}</span>
+                                @else
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800" title="Platba není navázaná na žádnou zásilku – spusť subscriptions:link-shipment-payments">
+                                    Bez vazby
+                                </span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Shipment History Section -->
     @if($subscription->shipments->count() > 0)
     <div class="mt-8">

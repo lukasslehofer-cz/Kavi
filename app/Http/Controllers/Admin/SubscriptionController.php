@@ -70,9 +70,17 @@ class SubscriptionController extends Controller
      */
     public function show(Subscription $subscription)
     {
-        $subscription->load(['user', 'plan', 'shipments' => function($query) {
-            $query->with('payment')->orderBy('shipment_date', 'desc');
-        }]);
+        $subscription->load([
+            'user',
+            'plan',
+            'shipments' => function($query) {
+                $query->with('payment')->orderBy('shipment_date', 'desc');
+            },
+            // Faktury se čtou PŘÍMO z subscription_payments, ne přes vazbu na zásilku -
+            // jinak admin nevidí platby bez vazby (a taky pending/failed), zatímco
+            // zákazník na /predplatne je vidí. Právě tahle divergence byla podstata bugu.
+            'payments.shipment',
+        ]);
 
         return view('admin.subscriptions.show', compact('subscription'));
     }

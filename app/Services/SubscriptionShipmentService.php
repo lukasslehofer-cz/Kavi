@@ -1144,15 +1144,26 @@ class SubscriptionShipmentService
         $schedule = ShipmentSchedule::getOrCreateForMonth($shipmentDate->year, $shipmentDate->month);
         $shipment = $this->getOrCreateForSchedule($subscription, $schedule);
 
-        // Admin příprava očekává přepočítání vazby platby dle aktuální logiky.
+        // Admin příprava umí vazbu jen DOPLNIT, nikdy ne zrušit. Tahle metoda běží i při
+        // hromadném odesílání do Zásilkovny (sendToPacketa) a při ručním označení jako
+        // odeslané, takže dřívější bezpodmínečný přepis odpojil fakturu od každého
+        // odeslaného boxu. Odpojování patří výhradně subscriptions:dedupe-payment-links.
         $payment = $this->findPaymentForShipment($subscription, $schedule->shipment_date);
-        if ($shipment->subscription_payment_id !== $payment?->id) {
+
+        if (! $shipment->subscription_payment_id && $payment) {
             \Log::info('Updated shipment payment link', [
                 'shipment_id' => $shipment->id,
-                'old_payment_id' => $shipment->subscription_payment_id,
-                'new_payment_id' => $payment?->id,
+                'old_payment_id' => null,
+                'new_payment_id' => $payment->id,
             ]);
-            $shipment->update(['subscription_payment_id' => $payment?->id]);
+            $shipment->update(['subscription_payment_id' => $payment->id]);
+        } elseif ($payment && $shipment->subscription_payment_id !== $payment->id) {
+            // Neshodu jen ohlásíme - existující vazba je závazná a přepis by byl ztráta dat.
+            \Log::warning('Shipment payment link differs from derived payment; keeping existing link', [
+                'shipment_id' => $shipment->id,
+                'linked_payment_id' => $shipment->subscription_payment_id,
+                'derived_payment_id' => $payment->id,
+            ]);
         }
 
         return $shipment;
@@ -1194,30 +1205,52 @@ class SubscriptionShipmentService
     }
 
     /**
-     * Find payment that covers a specific shipment date
+     * Find payment that covers a specific shipment date.
+     *
+     * Platba patří k boxu podle MĚSÍCE svého period_end: period_end je billing date daného
+     * cyklu (15.), zatímco box odchází 20. téhož měsíce. Původní test na rozsah period
+     * (period_end > shipment_date) proto u opakované platby nemohl nikdy vyjít a vracel null -
+     * přežily jen první platby přes fallback níže. Stejné pravidlo (měsíc z period_end)
+     * používá i zápis, viz SubscriptionPayment::getExpectedShipmentDateAttribute().
      */
     protected function findPaymentForShipment(Subscription $subscription, Carbon $shipmentDate): ?SubscriptionPayment
     {
-        // Check for initial payment (first shipment)
-        if (! $subscription->last_shipment_date && ! $subscription->shipments()->where('status', 'sent')->exists()) {
-            // First shipment - check if initial checkout payment exists
-            $initialPayment = $subscription->payments()
-                ->where('status', 'paid')
-                ->orderBy('paid_at', 'asc')
-                ->first();
+        $payment = $subscription->payments()
+            ->where('status', 'paid')
+            ->whereYear('period_end', $shipmentDate->year)
+            ->whereMonth('period_end', $shipmentDate->month)
+            ->orderBy('paid_at', 'desc')
+            ->first();
 
-            if ($initialPayment) {
-                return $initialPayment;
-            }
+        if ($payment) {
+            return $payment;
         }
 
-        // Find payment whose period covers this shipment date
-        // period_end is EXCLUSIVE (it's the next billing date), so use > not >=
-        return $subscription->payments()
+        // Fallback pro historickou konvenci: starší platby psaly period jako [tento billing,
+        // příští billing), takže datum boxu leží UVNITŘ období. Nové platby se sem nedostanou,
+        // ty už zachytilo pravidlo podle měsíce výše.
+        $legacy = $subscription->payments()
             ->where('status', 'paid')
             ->whereDate('period_start', '<=', $shipmentDate->toDateString())
             ->whereDate('period_end', '>', $shipmentDate->toDateString())
+            ->orderBy('paid_at', 'desc')
             ->first();
+
+        if ($legacy) {
+            return $legacy;
+        }
+
+        // Fallback pro první zásilku: platba z checkoutu nemusí mít period_end ve stejném
+        // měsíci a legacy řádky ho nemají vůbec. Až sem, ne dřív - dřív by fallback přebil
+        // korektní shodu podle měsíce.
+        if (! $subscription->last_shipment_date && ! $subscription->shipments()->where('status', 'sent')->exists()) {
+            return $subscription->payments()
+                ->where('status', 'paid')
+                ->orderBy('paid_at', 'asc')
+                ->first();
+        }
+
+        return null;
     }
 
     /**
