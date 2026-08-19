@@ -43,6 +43,7 @@ database/database.sqlite
 !/storage/framework/views/.gitkeep
 /storage/app/invoices/*
 !/storage/app/invoices/.gitkeep
+/storage/app/google-reviews/*
 
 # Temporary files
 test_*.php

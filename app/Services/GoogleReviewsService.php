@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Google recenze z Business Profile API pro zobrazení ve vlastním designu.
@@ -46,13 +46,20 @@ class GoogleReviewsService
      */
     public function latest(int $limit = 3, ?string $locale = null): array
     {
-        $cached = Cache::get($this->cacheKey($this->resolveLocale($locale)));
+        $locale = $this->resolveLocale($locale);
+        $stored = $this->read($locale);
 
-        if (! $this->isFresh($cached)) {
+        if (! $this->isFresh($stored)) {
+            // Po 30 dnech se obsah nesmí jen přestat zobrazovat, musí zmizet.
+            $this->forget($locale);
+
             return [];
         }
 
-        return array_slice($cached['reviews'], 0, $limit);
+        return array_map(
+            $this->hydrate(...),
+            array_slice($stored['reviews'], 0, $limit)
+        );
     }
 
     /**
@@ -82,10 +89,10 @@ class GoogleReviewsService
             return ['ok' => false, 'count' => 0, 'message' => $e->getMessage()];
         }
 
-        Cache::put($this->cacheKey($locale), [
+        $this->write($locale, [
             'fetched_at' => now()->toIso8601String(),
             'reviews' => $reviews,
-        ], now()->addDays(self::MAX_AGE_DAYS));
+        ]);
 
         return ['ok' => true, 'count' => count($reviews), 'message' => 'OK'];
     }
@@ -124,9 +131,9 @@ class GoogleReviewsService
      */
     public function fetchedAt(?string $locale = null): ?Carbon
     {
-        $cached = Cache::get($this->cacheKey($this->resolveLocale($locale)));
+        $stored = $this->read($this->resolveLocale($locale));
 
-        return isset($cached['fetched_at']) ? Carbon::parse($cached['fetched_at']) : null;
+        return isset($stored['fetched_at']) ? Carbon::parse($stored['fetched_at']) : null;
     }
 
     /**
@@ -182,9 +189,61 @@ class GoogleReviewsService
         return array_key_exists($locale, config('services.google_reviews.profiles', [])) ? $locale : 'cs';
     }
 
-    protected function cacheKey(string $locale): string
+    /**
+     * Záměrně mimo aplikační cache: `php artisan optimize:clear` po každém
+     * deployi spouští i cache:clear, což by recenze pokaždé smazalo a web by
+     * do dalšího běhu cronu ukazoval prosbu o hodnocení.
+     */
+    protected function storagePath(string $locale): string
     {
-        return "google_reviews:{$locale}";
+        return "google-reviews/{$locale}.json";
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function read(string $locale): ?array
+    {
+        $path = $this->storagePath($locale);
+
+        if (! Storage::disk('local')->exists($path)) {
+            return null;
+        }
+
+        $decoded = json_decode(Storage::disk('local')->get($path), true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * Z JSONu se datum vrátí jako řetězec, šablona ale potřebuje Carbon.
+     *
+     * @param  array<string, mixed>  $review
+     * @return array<string, mixed>
+     */
+    protected function hydrate(array $review): array
+    {
+        if (! empty($review['created_at']) && ! $review['created_at'] instanceof Carbon) {
+            $review['created_at'] = Carbon::parse($review['created_at']);
+        }
+
+        return $review;
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    protected function write(string $locale, array $payload): void
+    {
+        Storage::disk('local')->put(
+            $this->storagePath($locale),
+            json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        );
+    }
+
+    protected function forget(string $locale): void
+    {
+        Storage::disk('local')->delete($this->storagePath($locale));
     }
 
     /**
@@ -199,13 +258,13 @@ class GoogleReviewsService
     /**
      * Data starší než 30 dnů se podle policy nesmí použít, i když v cache leží.
      */
-    protected function isFresh(mixed $cached): bool
+    protected function isFresh(mixed $stored): bool
     {
-        if (! is_array($cached) || empty($cached['reviews']) || empty($cached['fetched_at'])) {
+        if (! is_array($stored) || empty($stored['reviews']) || empty($stored['fetched_at'])) {
             return false;
         }
 
-        return Carbon::parse($cached['fetched_at'])->diffInDays(now()) < self::MAX_AGE_DAYS;
+        return Carbon::parse($stored['fetched_at'])->diffInDays(now()) < self::MAX_AGE_DAYS;
     }
 
     /**
