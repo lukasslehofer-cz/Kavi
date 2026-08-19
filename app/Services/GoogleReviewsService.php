@@ -50,8 +50,11 @@ class GoogleReviewsService
         $stored = $this->read($locale);
 
         if (! $this->isFresh($stored)) {
-            // Po 30 dnech se obsah nesmí jen přestat zobrazovat, musí zmizet.
-            $this->forget($locale);
+            // Smazat jen skutečně prošlá data. Kdyby se mazalo při každém
+            // nezdařeném čtení, jediný výpadek práv nebo disku by obsah zahodil.
+            if ($this->isExpired($stored)) {
+                $this->forget($locale);
+            }
 
             return [];
         }
@@ -256,7 +259,20 @@ class GoogleReviewsService
     }
 
     /**
-     * Data starší než 30 dnů se podle policy nesmí použít, i když v cache leží.
+     * Prošlá data, která je podle policy nutné smazat. Chybějící nebo nečitelný
+     * soubor sem nepatří - není co mazat a nesmí se to splést s expirací.
+     */
+    protected function isExpired(mixed $stored): bool
+    {
+        if (! is_array($stored) || empty($stored['fetched_at'])) {
+            return false;
+        }
+
+        return Carbon::parse($stored['fetched_at'])->diffInDays(now()) >= self::MAX_AGE_DAYS;
+    }
+
+    /**
+     * Data starší než 30 dnů se podle policy nesmí použít, i když v souboru leží.
      */
     protected function isFresh(mixed $stored): bool
     {
