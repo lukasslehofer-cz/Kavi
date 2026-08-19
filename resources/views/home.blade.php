@@ -534,22 +534,13 @@
       <div class="grid lg:grid-cols-3 gap-6">
 
         @foreach($testimonials as $review)
-        @php
-            // Recenze mají velmi rozdílnou délku. Krátká v kartě sázené na dlouhou
-            // vypadá jako chyba, proto se velikost písma odvozuje od délky textu -
-            // krátký citát se zvětší a prostor zaplní záměrně.
-            $quoteLength = mb_strlen($review['text'] ?? '');
-            $quoteSize = $quoteLength < 90
-                ? 'text-2xl sm:text-3xl'
-                : ($quoteLength < 200 ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl');
-        @endphp
         <!-- Card -->
         <div class="flex flex-col relative z-10">
           <!-- Dark section with quote + beak -->
           <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative flex flex-col">
             <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Google review' : 'Recenze z Googlu' }}</p>
             @if($review['text'])
-            <p class="text-white {{ $quoteSize }} leading-relaxed font-light flex-grow flex items-center">
+            <p class="text-white leading-relaxed font-light flex-grow flex items-center" style="font-size: 1.15rem;">
               "{{ $review['text'] }}"
             </p>
             @endif
@@ -558,12 +549,12 @@
           </div>
           <!-- Light section with author -->
           <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
-            <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden bg-dark-800 flex items-center justify-center">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden flex items-center justify-center">
               @if($review['photo'])
                 {{-- Fotka se hotlinkuje z Google CDN, lokální kopie by spadala pod 30denní limit --}}
                 <img src="{{ $review['photo'] }}" alt="" loading="lazy" referrerpolicy="no-referrer" class="h-full w-full object-cover grayscale" />
               @else
-                <span class="font-display text-white text-xl sm:text-2xl tracking-wide" aria-hidden="true">&#9679;</span>
+                <span class="font-display text-warm-500 text-xl sm:text-2xl tracking-wide" aria-hidden="true">&#9679;</span>
               @endif
             </div>
             <div>
@@ -592,7 +583,7 @@
 
       {{-- Informační povinnost o původu recenzí podle zákona 634/1992 Sb.
            ve znění novely Omnibus účinné od 6. 1. 2023. --}}
-      <p class="text-xs text-warm-500 text-center mt-12 max-w-2xl mx-auto leading-relaxed">
+      <p class="text-xs text-warm-500 text-center mt-12 pb-4 max-w-2xl mx-auto leading-relaxed">
         {{ $currentLocale === 'en'
           ? 'Reviews come from our Google Business Profile. We display them unedited and unfiltered, including negative ones. We do not verify who wrote them, Google does.'
           : 'Recenze pocházejí z našeho profilu na Googlu. Zobrazujeme je neupravené a nefiltrované, včetně negativních. Neověřujeme, kdo je napsal, to dělá Google.' }}
@@ -603,7 +594,7 @@
         </div>
 
   <!-- Full-width red bar with CTA - overlaps with stars -->
-  <div class="bg-primary-500 {{ $hasTestimonials ? 'pt-16 sm:pt-20' : 'pt-8 sm:pt-10' }} pb-8 sm:pb-10">
+  <div class="bg-primary-500 pt-10 pb-8 sm:pb-10">
     <div class="max-w-screen-xl mx-auto px-4 md:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <p class="text-xs uppercase tracking-widest text-dark-800">
         @if($hasTestimonials)
