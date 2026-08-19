@@ -294,9 +294,34 @@ class GoogleReviewsService
             'photo' => $anonymous ? null : ($review['reviewer']['profilePhotoUrl'] ?? null),
             'is_anonymous' => $anonymous,
             'rating' => $this->starRating($review['starRating'] ?? null),
-            'text' => $review['comment'] ?? null,
+            'text' => $this->originalComment($review['comment'] ?? null),
             'created_at' => isset($review['createTime']) ? Carbon::parse($review['createTime']) : null,
         ];
+    }
+
+    /**
+     * Google k recenzi přilepí vlastní strojový překlad, takže na českém webu
+     * svítí i anglická verze téhož textu. Vracíme jen to, co zákazník opravdu
+     * napsal - autorova slova zůstávají nedotčená, odstraňuje se jen to, co
+     * k nim přidal Google.
+     *
+     * Chodí to ve dvou tvarech:
+     *   "originál\n\n(Translated by Google)\npřeklad"
+     *   "(Translated by Google)\npřeklad\n\n(Original)\noriginál"
+     */
+    protected function originalComment(?string $comment): ?string
+    {
+        if (blank($comment)) {
+            return null;
+        }
+
+        if (str_contains($comment, '(Original)')) {
+            $comment = substr($comment, strpos($comment, '(Original)') + strlen('(Original)'));
+        } elseif (str_contains($comment, '(Translated by Google)')) {
+            $comment = substr($comment, 0, strpos($comment, '(Translated by Google)'));
+        }
+
+        return trim($comment) ?: null;
     }
 
     /**

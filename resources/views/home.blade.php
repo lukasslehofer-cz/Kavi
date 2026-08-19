@@ -534,13 +534,22 @@
       <div class="grid lg:grid-cols-3 gap-6">
 
         @foreach($testimonials as $review)
+        @php
+            // Recenze mají velmi rozdílnou délku. Krátká v kartě sázené na dlouhou
+            // vypadá jako chyba, proto se velikost písma odvozuje od délky textu -
+            // krátký citát se zvětší a prostor zaplní záměrně.
+            $quoteLength = mb_strlen($review['text'] ?? '');
+            $quoteSize = $quoteLength < 90
+                ? 'text-2xl sm:text-3xl'
+                : ($quoteLength < 200 ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl');
+        @endphp
         <!-- Card -->
         <div class="flex flex-col relative z-10">
           <!-- Dark section with quote + beak -->
-          <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative">
+          <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative flex flex-col">
             <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Google review' : 'Recenze z Googlu' }}</p>
             @if($review['text'])
-            <p class="text-white text-lg sm:text-xl leading-relaxed font-light">
+            <p class="text-white {{ $quoteSize }} leading-relaxed font-light flex-grow flex items-center">
               "{{ $review['text'] }}"
             </p>
             @endif
