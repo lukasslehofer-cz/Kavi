@@ -87,6 +87,7 @@ return [
         'title' => 'Thank you for your order!',
         'subtitle' => 'Your order has been successfully received and will be shipped soon.',
         'order_number' => 'Order Number',
+        'notice' => 'Notice',
         'order_contents' => 'Order Contents',
         'subtotal_without_vat' => 'Subtotal (excl. VAT)',
         'vat' => 'VAT (21%)',

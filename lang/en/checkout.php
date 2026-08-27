@@ -72,6 +72,11 @@ return [
         'notes_placeholder' => 'E.G. PLEASE RING 2ND FLOOR OR LEAVE AT RECEPTION',
     ],
     
+    // Announcement notice (admin: Hlášky)
+    'announcement' => [
+        'default_title' => 'Notice',
+    ],
+
     // Pickup point
     'pickup_point' => [
         'title' => 'Select pickup point',

@@ -72,6 +72,11 @@ return [
         'notes_placeholder' => 'NAPŘ. PROSÍM ZVONIT NA 2. PATRO NEBO NECHAT U VRÁTNICE',
     ],
     
+    // Announcement notice (admin: Hlášky)
+    'announcement' => [
+        'default_title' => 'Informace',
+    ],
+
     // Pickup point
     'pickup_point' => [
         'title' => 'Výběr výdejního místa',

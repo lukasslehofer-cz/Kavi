@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CurrencyHelper;
 use App\Mail\SubscriptionConfirmation;
+use App\Models\AnnouncementBanner;
 use App\Models\Coupon;
 use App\Models\ShippingRate;
 use App\Models\Subscription;
@@ -558,7 +559,10 @@ class SubscriptionController extends Controller
             ->sort()
             ->toArray();
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'isGiftVoucher', 'giftVoucherShippingCredit', 'packetaVendors', 'shipping', 'availableCountries'));
+        // Informační hláška z adminu (sekce Hlášky)
+        $checkoutNotice = AnnouncementBanner::getCurrentFor(AnnouncementBanner::PLACEMENT_SUBSCRIPTION_CHECKOUT);
+
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'isGiftVoucher', 'giftVoucherShippingCredit', 'packetaVendors', 'shipping', 'availableCountries', 'checkoutNotice'));
     }
 
     /**

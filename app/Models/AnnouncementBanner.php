@@ -13,7 +13,12 @@ class AnnouncementBanner extends Model
     protected $fillable = [
         'message_cs',
         'message_en',
+        'title_cs',
+        'title_en',
         'icon',
+        'show_in_header',
+        'show_in_checkout',
+        'show_in_subscription_checkout',
         'active_from',
         'active_until',
         'is_active',
@@ -23,6 +28,29 @@ class AnnouncementBanner extends Model
         'active_from' => 'datetime',
         'active_until' => 'datetime',
         'is_active' => 'boolean',
+        'show_in_header' => 'boolean',
+        'show_in_checkout' => 'boolean',
+        'show_in_subscription_checkout' => 'boolean',
+    ];
+
+    /**
+     * Where a banner can be displayed (column name => admin label)
+     */
+    public const PLACEMENT_HEADER = 'show_in_header';
+    public const PLACEMENT_CHECKOUT = 'show_in_checkout';
+    public const PLACEMENT_SUBSCRIPTION_CHECKOUT = 'show_in_subscription_checkout';
+
+    public const PLACEMENTS = [
+        self::PLACEMENT_HEADER => 'Záhlaví webu',
+        self::PLACEMENT_CHECKOUT => 'Pokladna – jednorázový nákup',
+        self::PLACEMENT_SUBSCRIPTION_CHECKOUT => 'Pokladna – předplatné',
+    ];
+
+    /** Kratší varianta pro přehledovou tabulku */
+    public const PLACEMENTS_SHORT = [
+        self::PLACEMENT_HEADER => 'Záhlaví',
+        self::PLACEMENT_CHECKOUT => 'Pokladna',
+        self::PLACEMENT_SUBSCRIPTION_CHECKOUT => 'Předplatné',
     ];
 
     /**
@@ -82,13 +110,35 @@ class AnnouncementBanner extends Model
     }
 
     /**
-     * Get the currently active banner (most recently created if multiple)
+     * Scope to banners shown at a given placement
+     */
+    public function scopeForPlacement(Builder $query, string $placement): Builder
+    {
+        // $placement se používá jako název sloupce - povolit jen známé hodnoty
+        if (! array_key_exists($placement, self::PLACEMENTS)) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->where($placement, true);
+    }
+
+    /**
+     * Get the currently active banner for a placement (most recently created if multiple)
+     */
+    public static function getCurrentFor(string $placement): ?self
+    {
+        return static::active()
+            ->forPlacement($placement)
+            ->orderBy('created_at', 'desc')
+            ->first();
+    }
+
+    /**
+     * Get the currently active banner for the site header
      */
     public static function getCurrent(): ?self
     {
-        return static::active()
-            ->orderBy('created_at', 'desc')
-            ->first();
+        return static::getCurrentFor(self::PLACEMENT_HEADER);
     }
 
     /**
@@ -101,6 +151,18 @@ class AnnouncementBanner extends Model
         }
         
         return $this->message_cs;
+    }
+
+    /**
+     * Get the optional title for the current locale (checkout only)
+     */
+    public function getTitle(string $locale = 'cs'): ?string
+    {
+        if ($locale === 'en' && ! empty($this->title_en)) {
+            return $this->title_en;
+        }
+
+        return ! empty($this->title_cs) ? $this->title_cs : null;
     }
 
     /**

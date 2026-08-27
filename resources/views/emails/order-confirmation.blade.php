@@ -521,7 +521,19 @@
                                 </p>
                             </div>
                             @endif
-                            
+
+                            <!-- Checkout Notice (zmrazená hláška z pokladny) -->
+                            @if($order->checkout_notice_text)
+                            <div style="margin: 32px 0; padding: 24px 28px; background-color: #1c1c1c;">
+                                <div style="font-size: 11px; font-weight: 400; color: #e07a71; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 10px;">
+                                    {{ $order->checkout_notice_title ?: __('emails.order_confirmation.notice', [], $locale) }}
+                                </div>
+                                <p style="font-size: 15px; color: #ffffff; margin: 0; line-height: 1.6;">
+                                    {{ $order->checkout_notice_text }}
+                                </p>
+                            </div>
+                            @endif
+
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">

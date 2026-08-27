@@ -425,6 +425,12 @@
                     </div>
                 </div>
 
+                @if($checkoutNotice ?? null)
+                <div class="mb-8">
+                    @include('partials.checkout-notice', ['notice' => $checkoutNotice])
+                </div>
+                @endif
+
                 <!-- Shipping Date Info - Swiss Style -->
                 <div class="mb-8">
                     <p class="text-xs uppercase tracking-widest text-olive-600 mb-2">{{ __('checkout.delivery_info.title') }}</p>

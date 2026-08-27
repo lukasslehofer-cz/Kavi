@@ -87,6 +87,7 @@ return [
         'title' => 'Děkujeme za vaši objednávku!',
         'subtitle' => 'Vaše objednávka byla úspěšně přijata a bude brzy expedována.',
         'order_number' => 'Číslo objednávky',
+        'notice' => 'Informace',
         'order_contents' => 'Obsah objednávky',
         'subtotal_without_vat' => 'Mezisoučet (bez DPH)',
         'vat' => 'DPH (21%)',

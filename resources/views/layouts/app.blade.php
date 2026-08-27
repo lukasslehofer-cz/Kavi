@@ -118,7 +118,9 @@
     @if($announcementBanner)
     <div class="bg-dark-800">
         <div class="flex items-center justify-center gap-3 px-4 py-2.5">
-            <span class="w-1.5 h-1.5 bg-white"></span>
+            <svg class="w-4 h-4 text-primary-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $announcementBanner->getIconPath() }}" />
+            </svg>
             <div class="text-sm text-white font-light tracking-wide">
                 {{ $announcementBanner->getMessage($currentLocale ?? 'cs') }}
             </div>

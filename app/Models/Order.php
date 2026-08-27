@@ -41,6 +41,8 @@ class Order extends Model
         'shipping_address',
         'billing_address',
         'customer_notes',
+        'checkout_notice_title',
+        'checkout_notice_text',
         'admin_notes',
         'paid_at',
         'confirmation_email_sent_at',

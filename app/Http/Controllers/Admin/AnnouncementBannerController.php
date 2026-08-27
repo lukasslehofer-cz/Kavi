@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AnnouncementBanner;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AnnouncementBannerController extends Controller
 {
@@ -20,8 +21,9 @@ class AnnouncementBannerController extends Controller
     {
         $banners = AnnouncementBanner::orderBy('created_at', 'desc')->get();
         $icons = AnnouncementBanner::ICONS;
-        
-        return view('admin.announcements.index', compact('banners', 'icons'));
+        $placements = AnnouncementBanner::PLACEMENTS;
+
+        return view('admin.announcements.index', compact('banners', 'icons', 'placements'));
     }
 
     /**
@@ -29,18 +31,7 @@ class AnnouncementBannerController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'message_cs' => 'required|string|max:500',
-            'message_en' => 'nullable|string|max:500',
-            'icon' => 'required|string|in:' . implode(',', array_keys(AnnouncementBanner::ICONS)),
-            'active_from' => 'nullable|date',
-            'active_until' => 'nullable|date|after_or_equal:active_from',
-            'is_active' => 'boolean',
-        ]);
-
-        $validated['is_active'] = $request->has('is_active');
-
-        AnnouncementBanner::create($validated);
+        AnnouncementBanner::create($this->validatedData($request));
 
         return redirect()->route('admin.announcements.index')
             ->with('success', 'Hláška byla úspěšně vytvořena.');
@@ -51,18 +42,7 @@ class AnnouncementBannerController extends Controller
      */
     public function update(Request $request, AnnouncementBanner $announcement)
     {
-        $validated = $request->validate([
-            'message_cs' => 'required|string|max:500',
-            'message_en' => 'nullable|string|max:500',
-            'icon' => 'required|string|in:' . implode(',', array_keys(AnnouncementBanner::ICONS)),
-            'active_from' => 'nullable|date',
-            'active_until' => 'nullable|date|after_or_equal:active_from',
-            'is_active' => 'boolean',
-        ]);
-
-        $validated['is_active'] = $request->has('is_active');
-
-        $announcement->update($validated);
+        $announcement->update($this->validatedData($request));
 
         return redirect()->route('admin.announcements.index')
             ->with('success', 'Hláška byla úspěšně aktualizována.');
@@ -87,9 +67,43 @@ class AnnouncementBannerController extends Controller
         $announcement->update(['is_active' => !$announcement->is_active]);
 
         $status = $announcement->is_active ? 'aktivována' : 'deaktivována';
-        
+
         return redirect()->route('admin.announcements.index')
             ->with('success', "Hláška byla úspěšně {$status}.");
     }
-}
 
+    /**
+     * Shared validation for store/update
+     */
+    private function validatedData(Request $request): array
+    {
+        $validated = $request->validate([
+            'message_cs' => 'required|string|max:500',
+            'message_en' => 'nullable|string|max:500',
+            'title_cs' => 'nullable|string|max:120',
+            'title_en' => 'nullable|string|max:120',
+            'icon' => 'required|string|in:' . implode(',', array_keys(AnnouncementBanner::ICONS)),
+            'active_from' => 'nullable|date',
+            'active_until' => 'nullable|date|after_or_equal:active_from',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+
+        // Nezaškrtnutý checkbox se neodešle, proto has() místo validace
+        $placements = array_keys(AnnouncementBanner::PLACEMENTS);
+
+        foreach ($placements as $placement) {
+            $validated[$placement] = $request->has($placement);
+        }
+
+        // Hláška bez umístění by se nikde nezobrazila
+        if (! collect($placements)->contains(fn ($placement) => $validated[$placement])) {
+            throw ValidationException::withMessages([
+                AnnouncementBanner::PLACEMENT_HEADER => 'Vyberte alespoň jedno umístění, jinak se hláška nikde nezobrazí.',
+            ]);
+        }
+
+        return $validated;
+    }
+}

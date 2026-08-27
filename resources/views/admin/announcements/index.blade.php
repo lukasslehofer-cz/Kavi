@@ -6,29 +6,39 @@
 <div class="p-6">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Hlášky v záhlaví</h1>
-        <p class="text-gray-600 mt-1">Správa oznámení zobrazených v horním banneru webu</p>
+        <h1 class="text-3xl font-bold text-gray-900">Hlášky</h1>
+        <p class="text-gray-600 mt-1">Správa oznámení v záhlaví webu a v pokladně</p>
     </div>
+
+    @if($errors->any())
+    <div class="mb-8 rounded-xl border border-red-200 bg-red-50 p-4">
+        <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+            @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
 
     <!-- Create New Banner Form -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
         <div class="p-6 border-b border-gray-200">
             <h2 class="text-xl font-bold text-gray-900">Nová hláška</h2>
-            <p class="text-sm text-gray-500 mt-1">Vytvořte novou hlášku pro zobrazení v banneru</p>
+            <p class="text-sm text-gray-500 mt-1">Vytvořte novou hlášku a vyberte, kde se má zobrazit</p>
         </div>
         <form action="{{ route('admin.announcements.store') }}" method="POST" class="p-6">
             @csrf
+            <input type="hidden" name="_submitted" value="1">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Czech Message -->
                 <div>
                     <label for="message_cs" class="block text-sm font-medium text-gray-700 mb-2">
                         Text (CZ) <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="message_cs" id="message_cs" required
+                    <textarea name="message_cs" id="message_cs" rows="2" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        placeholder="Např.: Využijte vánoční slevu 25% na vše s kódem <b>VANOCE25</b>"
-                        value="{{ old('message_cs') }}">
-                    <p class="text-xs text-gray-500 mt-1">Můžete použít HTML tagy jako &lt;b&gt; pro tučné písmo</p>
+                        placeholder="Např.: Od 20. 12. do 3. 1. neprobíhá rozesílka. Objednávky odešleme 5. 1.">{{ old('message_cs') }}</textarea>
+                    <p class="text-xs text-gray-500 mt-1">Pouze prostý text, HTML tagy se vypíšou jako text</p>
                 </div>
 
                 <!-- English Message -->
@@ -36,11 +46,34 @@
                     <label for="message_en" class="block text-sm font-medium text-gray-700 mb-2">
                         Text (EN)
                     </label>
-                    <input type="text" name="message_en" id="message_en"
+                    <textarea name="message_en" id="message_en" rows="2"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        placeholder="Např.: Use Christmas discount 25% on everything with code <b>VANOCE25</b>"
-                        value="{{ old('message_en') }}">
+                        placeholder="Např.: No dispatch between Dec 20 and Jan 3. Orders ship on Jan 5.">{{ old('message_en') }}</textarea>
                     <p class="text-xs text-gray-500 mt-1">Volitelně pro anglickou verzi webu</p>
+                </div>
+
+                <!-- Czech Title -->
+                <div>
+                    <label for="title_cs" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nadpis (CZ)
+                    </label>
+                    <input type="text" name="title_cs" id="title_cs"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Např.: Odesílání zásilek"
+                        value="{{ old('title_cs') }}">
+                    <p class="text-xs text-gray-500 mt-1">Zobrazí se jen v pokladně. Prázdné = „Informace"</p>
+                </div>
+
+                <!-- English Title -->
+                <div>
+                    <label for="title_en" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nadpis (EN)
+                    </label>
+                    <input type="text" name="title_en" id="title_en"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Např.: Shipping"
+                        value="{{ old('title_en') }}">
+                    <p class="text-xs text-gray-500 mt-1">Zobrazí se jen v pokladně. Prázdné = „Notice"</p>
                 </div>
 
                 <!-- Icon Selection -->
@@ -61,6 +94,24 @@
                         </label>
                         @endforeach
                     </div>
+                </div>
+
+                <!-- Placement -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Umístění <span class="text-red-500">*</span>
+                    </label>
+                    <div class="space-y-2">
+                        @foreach($placements as $key => $label)
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="{{ $key }}" value="1"
+                                class="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                                {{ (old('_submitted') ? old($key) : $key === \App\Models\AnnouncementBanner::PLACEMENT_HEADER) ? 'checked' : '' }}>
+                            <span class="text-sm text-gray-700">{{ $label }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Vyberte alespoň jedno</p>
                 </div>
 
                 <!-- Active Status -->
@@ -128,32 +179,45 @@
             <table class="w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ikona</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Text</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platnost</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stav</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akce</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ikona</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Text</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Umístění</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platnost</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stav</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akce</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($banners as $banner)
                     <tr class="hover:bg-gray-50 transition-colors" id="banner-row-{{ $banner->id }}">
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-4 whitespace-nowrap">
                             <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
                                 <svg class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $banner->getIconPath() }}" />
                                 </svg>
                             </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="max-w-md">
+                        <td class="px-4 py-4">
+                            <div class="max-w-xs">
+                                @if($banner->title_cs)
+                                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{{ $banner->title_cs }}</p>
+                                @endif
                                 <p class="text-sm text-gray-900 truncate">{{ $banner->message_cs }}</p>
                                 @if($banner->message_en)
                                 <p class="text-xs text-gray-500 truncate mt-1">EN: {{ $banner->message_en }}</p>
                                 @endif
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-4">
+                            <div class="flex flex-col items-start gap-1">
+                                @foreach(\App\Models\AnnouncementBanner::PLACEMENTS_SHORT as $key => $shortLabel)
+                                    @if($banner->{$key})
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 whitespace-nowrap" title="{{ $placements[$key] }}">{{ $shortLabel }}</span>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-600">
                                 @if($banner->active_from)
                                 <div>Od: {{ $banner->active_from->format('d.m.Y H:i') }}</div>
@@ -167,13 +231,13 @@
                                 @endif
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-4 whitespace-nowrap">
                             @php $statusColor = $banner->getStatusColor(); @endphp
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $statusColor }}-100 text-{{ $statusColor }}-800">
                                 {{ $banner->getStatusLabel() }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-4 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-2">
                                 <!-- Toggle Active -->
                                 <form action="{{ route('admin.announcements.toggle', $banner) }}" method="POST" class="inline">
@@ -218,36 +282,69 @@
         @endif
     </div>
 
-    <!-- Preview Banner -->
+    <!-- Previews -->
+    @php
+        $bannerModel = \App\Models\AnnouncementBanner::class;
+        $headerBanner = $bannerModel::getCurrentFor($bannerModel::PLACEMENT_HEADER);
+        $checkoutBanner = $bannerModel::getCurrentFor($bannerModel::PLACEMENT_CHECKOUT);
+        $subscriptionBanner = $bannerModel::getCurrentFor($bannerModel::PLACEMENT_SUBSCRIPTION_CHECKOUT);
+    @endphp
+
     <div class="mt-8 bg-white rounded-xl shadow-sm border border-gray-200">
         <div class="p-6 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Náhled aktivního banneru</h2>
-            <p class="text-sm text-gray-500 mt-1">Takto vypadá aktuálně zobrazený banner</p>
+            <h2 class="text-xl font-bold text-gray-900">Náhled v záhlaví webu</h2>
+            <p class="text-sm text-gray-500 mt-1">Takto vypadá tmavý pruh nad navigací</p>
         </div>
         <div class="p-6">
-            @php $currentBanner = \App\Models\AnnouncementBanner::getCurrent(); @endphp
-            @if($currentBanner)
-            <div class="bg-gray-900 rounded-lg">
-                <div class="flex items-center justify-center gap-2 px-4 py-2.5">
-                    <svg class="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $currentBanner->getIconPath() }}" />
+            @if($headerBanner)
+            <div class="bg-dark-800 rounded-lg">
+                <div class="flex items-center justify-center gap-3 px-4 py-2.5">
+                    <svg class="w-4 h-4 text-primary-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $headerBanner->getIconPath() }}" />
                     </svg>
-                    <div class="text-sm text-white font-light">
-                        {{ $currentBanner->getMessage('cs') }}
+                    <div class="text-sm text-white font-light tracking-wide">
+                        {{ $headerBanner->getMessage('cs') }}
                     </div>
                 </div>
             </div>
             <p class="text-sm text-gray-500 mt-3">
-                Aktivní hláška: ID #{{ $currentBanner->id }} | Vytvořeno: {{ $currentBanner->created_at->format('d.m.Y H:i') }}
+                Aktivní hláška: ID #{{ $headerBanner->id }} | Vytvořeno: {{ $headerBanner->created_at->format('d.m.Y H:i') }}
             </p>
             @else
             <div class="text-center py-8 text-gray-500">
                 <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                 </svg>
-                <p>Žádná aktivní hláška - banner je skrytý</p>
+                <p>Žádná aktivní hláška - pruh je skrytý</p>
             </div>
             @endif
+        </div>
+    </div>
+
+    <div class="mt-8 bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">Náhled v pokladně</h2>
+            <p class="text-sm text-gray-500 mt-1">Takto vypadá hláška v pokladně a v potvrzovacím e-mailu</p>
+        </div>
+        <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            @foreach([
+                'Jednorázový nákup' => $checkoutBanner,
+                'Předplatné' => $subscriptionBanner,
+            ] as $label => $preview)
+            <div>
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">{{ $label }}</p>
+                @if($preview)
+                <div class="p-6 rounded-lg" style="background-color: #e5e6df;">
+                    @include('partials.checkout-notice', ['notice' => $preview, 'currentLocale' => 'cs'])
+                </div>
+                <p class="text-sm text-gray-500 mt-3">Aktivní hláška: ID #{{ $preview->id }}</p>
+                @else
+                <div class="text-center py-8 text-gray-500 border border-dashed border-gray-300 rounded-lg">
+                    <p class="text-sm">Žádná aktivní hláška</p>
+                </div>
+                @endif
+            </div>
+            @endforeach
         </div>
     </div>
 </div>
@@ -270,18 +367,33 @@
                         <!-- Czech Message -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Text (CZ) *</label>
-                            <input type="text" name="message_cs" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                                value="{{ $banner->message_cs }}">
+                            <textarea name="message_cs" rows="2" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent">{{ $banner->message_cs }}</textarea>
                         </div>
 
                         <!-- English Message -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Text (EN)</label>
-                            <input type="text" name="message_en"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                                value="{{ $banner->message_en }}">
+                            <textarea name="message_en" rows="2"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent">{{ $banner->message_en }}</textarea>
                         </div>
+
+                        <!-- Titles (checkout only) -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nadpis (CZ)</label>
+                                <input type="text" name="title_cs"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->title_cs }}">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nadpis (EN)</label>
+                                <input type="text" name="title_en"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->title_en }}">
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 -mt-2">Nadpis se zobrazí jen v pokladně, v záhlaví se ignoruje.</p>
 
                         <!-- Icon Selection -->
                         <div>
@@ -295,6 +407,21 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $icon['path'] }}" />
                                         </svg>
                                     </div>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Placement -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Umístění *</label>
+                            <div class="space-y-2">
+                                @foreach($placements as $key => $label)
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" name="{{ $key }}" value="1"
+                                        class="w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                                        {{ $banner->{$key} ? 'checked' : '' }}>
+                                    <span class="text-sm text-gray-700">{{ $label }}</span>
                                 </label>
                                 @endforeach
                             </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\VatHelper;
 use App\Mail\OrderConfirmation;
+use App\Models\AnnouncementBanner;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -255,6 +256,9 @@ class CheckoutController extends Controller
             ->sort()
             ->toArray();
 
+        // Informační hláška z adminu (sekce Hlášky)
+        $checkoutNotice = AnnouncementBanner::getCurrentFor(AnnouncementBanner::PLACEMENT_CHECKOUT);
+
         return view('checkout.index', compact(
             'cartItems',
             'subtotal',
@@ -272,7 +276,8 @@ class CheckoutController extends Controller
             'availableSubscriptions',
             'availableCountries',
             'cartQualifiesForFreeShipping',
-            'cartContainsOnlyDigitalProducts'
+            'cartContainsOnlyDigitalProducts',
+            'checkoutNotice'
         ));
     }
 
@@ -619,6 +624,8 @@ class CheckoutController extends Controller
                 ]);
             }
 
+            $checkoutNotice = AnnouncementBanner::getCurrentFor(AnnouncementBanner::PLACEMENT_CHECKOUT);
+
             $orderData = [
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => $userId,
@@ -654,6 +661,9 @@ class CheckoutController extends Controller
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'meta_fbp' => $request->cookie('_fbp'),
                 'meta_fbc' => $request->cookie('_fbc'),
+                // Zmrazit hlášku z pokladny, aby email ukázal to, co zákazník viděl
+                'checkout_notice_title' => $checkoutNotice?->getTitle(app()->getLocale()),
+                'checkout_notice_text' => $checkoutNotice?->getMessage(app()->getLocale()),
             ];
 
             // Pokud je to addon objednávka, přidat subscription údaje

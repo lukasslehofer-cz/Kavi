@@ -130,6 +130,12 @@
     </div>
 </div>
 
+@if($checkoutNotice ?? null)
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+    @include('partials.checkout-notice', ['notice' => $checkoutNotice])
+</div>
+@endif
+
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
         <!-- Checkout Form -->
