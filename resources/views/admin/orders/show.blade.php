@@ -255,6 +255,17 @@
                         <p>{{ $order->shipping_address['billing_postal_code'] ?? '' }} {{ $order->shipping_address['billing_city'] ?? '' }}</p>
                         <p>{{ $order->shipping_address['country'] ?? 'CZ' }}</p>
                     </div>
+
+                    @if($order->user?->invoice_override)
+                    <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                        <p class="text-sm text-amber-900">
+                            Faktura se vystaví na <strong>vlastní fakturační údaje zákazníka</strong>, ne na adresu výše.
+                        </p>
+                        <a href="{{ route('admin.customers.billing.edit', ['user' => $order->user, 'back' => '/'.request()->path()]) }}" class="text-sm text-amber-800 underline hover:text-amber-900">
+                            Zobrazit fakturační údaje
+                        </a>
+                    </div>
+                    @endif
                 </div>
                 
                 <!-- Edit Mode -->
@@ -549,6 +560,17 @@
                     <div>
                         <div class="text-gray-600">Registrován:</div>
                         <div class="font-medium text-gray-900">{{ $order->user->created_at->format('d.m.Y') }}</div>
+                    </div>
+                    <div class="pt-3 border-t border-gray-200">
+                        <a href="{{ route('admin.customers.billing.edit', ['user' => $order->user, 'back' => '/'.request()->path()]) }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                            Fakturační údaje
+                        </a>
+                        @if($order->user->invoice_override)
+                        <div class="mt-2 text-xs text-gray-600">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium">Vlastní údaje</span>
+                            <span class="ml-1">{{ $order->user->invoice_company ?: $order->user->invoice_name }}@if($order->user->invoice_registration_no), IČ {{ $order->user->invoice_registration_no }}@endif</span>
+                        </div>
+                        @endif
                     </div>
                     @endif
                 </div>

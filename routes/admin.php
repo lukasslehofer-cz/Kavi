@@ -79,6 +79,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/orders/send-to-packeta', [\App\Http\Controllers\Admin\OrderController::class, 'sendToPacketa'])->name('orders.send-to-packeta');
     Route::post('/orders/{order}/send-digital-delivery', [\App\Http\Controllers\Admin\OrderController::class, 'sendDigitalDelivery'])->name('orders.send-digital-delivery');
 
+    // Zákazníci – vlastní fakturační údaje pro Fakturoid
+    Route::get('/customers/{user}/billing', [\App\Http\Controllers\Admin\CustomerBillingController::class, 'edit'])->name('customers.billing.edit');
+    Route::put('/customers/{user}/billing', [\App\Http\Controllers\Admin\CustomerBillingController::class, 'update'])->name('customers.billing.update');
+
     // Subscriptions
     Route::resource('subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::put('/subscriptions/{subscription}/update-address', [\App\Http\Controllers\Admin\SubscriptionController::class, 'updateAddress'])->name('subscriptions.update-address');

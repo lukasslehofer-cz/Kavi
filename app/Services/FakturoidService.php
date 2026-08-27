@@ -389,30 +389,79 @@ class FakturoidService
     }
 
     /**
+     * Sestaví data odběratele (subjektu) pro Fakturoid.
+     *
+     * Základ tvoří adresa z objednávky nebo předplatného. Pokud má zákazník
+     * v adminu zapnuté vlastní fakturační údaje, přepíší se jimi jméno, adresa,
+     * IČ a DIČ – e-mail a telefon zůstávají z objednávky.
+     *
+     * Klíče 'full_name', 'registration_no' a 'vat_no' se posílají vždy, i prázdné.
+     * Subjekt se totiž při každé faktuře aktualizuje přes PATCH a chybějící klíč
+     * by Fakturoid nechal beze změny – jednou nastavené IČ by tam zůstalo napořád.
+     */
+    private function buildSubjectData(?User $user, ?array $address, ?string $fallbackCountry = null): array
+    {
+        $address ??= [];
+
+        $subjectData = [
+            'name' => $address['name'] ?? $user?->name ?? $this->getLocalizedText('customer'),
+            'full_name' => '',
+            'email' => $address['email'] ?? $user?->email ?? '',
+            'phone' => $address['phone'] ?? '',
+            'street' => $address['billing_address'] ?? $address['address'] ?? '',
+            'city' => $address['billing_city'] ?? $address['city'] ?? '',
+            'zip' => $address['billing_postal_code'] ?? $address['postal_code'] ?? '',
+            // Skutečná země zákazníka, ne natvrdo CZ – zahraniční odběratel se jinak
+            // ve Fakturoidu založí jako český subjekt.
+            'country' => strtoupper($address['country'] ?? $address['billing_country'] ?? $fallbackCountry ?? 'CZ'),
+            'registration_no' => '',
+            'vat_no' => '',
+        ];
+
+        if ($override = $user?->fakturoidSubjectOverride()) {
+            $subjectData = array_merge($subjectData, $override);
+        }
+
+        return $subjectData;
+    }
+
+    /**
+     * Ručně přenese fakturační údaje zákazníka na jeho subjekt ve Fakturoidu.
+     * Volá se z adminu po uložení údajů, aby si je admin mohl hned zkontrolovat.
+     *
+     * Vrací false, když zákazník subjekt ve Fakturoidu zatím nemá – ten vznikne
+     * až s jeho první fakturou a už rovnou se správnými údaji.
+     */
+    public function syncSubjectForUser(User $user): bool
+    {
+        if (! $user->fakturoid_subject_id) {
+            return false;
+        }
+
+        $this->updateSubject($user->fakturoid_subject_id, $this->buildSubjectData($user, [
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'address' => $user->address,
+            'city' => $user->city,
+            'postal_code' => $user->postal_code,
+            'country' => $user->country,
+        ]));
+
+        return true;
+    }
+
+    /**
      * Get or create subject (customer) in Fakturoid
      */
     private function getOrCreateSubject(Order $order): ?int
     {
         try {
             $user = $order->user;
-            $billingAddress = $order->billing_address;
-            $shippingAddress = $order->shipping_address;
 
             // Use billing address if available, otherwise shipping address
-            $address = $billingAddress ?? $shippingAddress;
+            $address = $order->billing_address ?? $order->shipping_address;
 
-            // Prepare subject data
-            $subjectData = [
-                'name' => $address['name'] ?? $user?->name ?? $this->getLocalizedText('customer'),
-                'email' => $address['email'] ?? $user?->email ?? '',
-                'phone' => $address['phone'] ?? '',
-                'street' => $address['address'] ?? $address['billing_address'] ?? '',
-                'city' => $address['city'] ?? $address['billing_city'] ?? '',
-                'zip' => $address['postal_code'] ?? $address['billing_postal_code'] ?? '',
-                // Skutečná země zákazníka, ne natvrdo CZ – zahraniční odběratel se jinak
-                // ve Fakturoidu založí jako český subjekt.
-                'country' => strtoupper($address['country'] ?? $address['billing_country'] ?? 'CZ'),
-            ];
+            $subjectData = $this->buildSubjectData($user, $address);
 
             // Check if user has cached Fakturoid subject ID
             if ($user && $user->fakturoid_subject_id) {
@@ -938,19 +987,12 @@ class FakturoidService
     {
         try {
             $user = $subscription->user;
-            $shippingAddress = $subscription->shipping_address;
 
-            $subjectData = [
-                'name' => $shippingAddress['name'] ?? $user?->name ?? 'Zákazník',
-                'email' => $shippingAddress['email'] ?? $user?->email ?? '',
-                'phone' => $shippingAddress['phone'] ?? '',
-                'street' => $shippingAddress['billing_address'] ?? $shippingAddress['address'] ?? '',
-                'city' => $shippingAddress['billing_city'] ?? $shippingAddress['city'] ?? '',
-                'zip' => $shippingAddress['billing_postal_code'] ?? $shippingAddress['postal_code'] ?? '',
-                // Skutečná země zákazníka, ne natvrdo CZ – zahraniční odběratel se jinak
-                // ve Fakturoidu založí jako český subjekt.
-                'country' => strtoupper($shippingAddress['country'] ?? $subscription->shipping_country ?? 'CZ'),
-            ];
+            $subjectData = $this->buildSubjectData(
+                $user,
+                $subscription->shipping_address,
+                $subscription->shipping_country
+            );
 
             // Check if user has cached Fakturoid subject ID
             if ($user && $user->fakturoid_subject_id) {

@@ -481,6 +481,15 @@
                         <a href="{{ route('admin.dashboard') }}" class="block text-primary-600 hover:text-primary-700 text-sm font-medium">
                             Zobrazit všechny objednávky zákazníka →
                         </a>
+                        <a href="{{ route('admin.customers.billing.edit', ['user' => $subscription->user, 'back' => '/'.request()->path()]) }}" class="block text-primary-600 hover:text-primary-700 text-sm font-medium">
+                            Fakturační údaje →
+                        </a>
+                        @if($subscription->user->invoice_override)
+                        <div class="text-xs text-gray-600">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium">Vlastní údaje</span>
+                            <span class="ml-1">{{ $subscription->user->invoice_company ?: $subscription->user->invoice_name }}@if($subscription->user->invoice_registration_no), IČ {{ $subscription->user->invoice_registration_no }}@endif</span>
+                        </div>
+                        @endif
                     </div>
                     @else
                     <div class="text-gray-600 italic">

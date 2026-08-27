@@ -21,6 +21,15 @@ class User extends Authenticatable
         'city',
         'postal_code',
         'country',
+        'invoice_override',
+        'invoice_company',
+        'invoice_registration_no',
+        'invoice_vat_no',
+        'invoice_name',
+        'invoice_street',
+        'invoice_city',
+        'invoice_zip',
+        'invoice_country',
         // 'is_admin' a 'is_affiliate_partner' záměrně NEJSOU fillable kvůli ochraně
         // proti mass assignmentu (eskalace oprávnění). Nastavují se explicitně přes forceFill().
         'affiliate_activated_at',
@@ -43,6 +52,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'password_set_by_user' => 'boolean',
+        'invoice_override' => 'boolean',
         'is_admin' => 'boolean',
         'is_affiliate_partner' => 'boolean',
         'affiliate_activated_at' => 'datetime',
@@ -51,6 +61,34 @@ class User extends Authenticatable
         'deleted_at' => 'datetime',
         'anonymized_at' => 'datetime',
     ];
+
+    /**
+     * Přepis odběratele pro Fakturoid, pokud má zákazník nastavené vlastní
+     * fakturační údaje. Vrací null, když se má použít adresa z objednávky
+     * nebo z předplatného.
+     *
+     * Klíče odpovídají polím subjektu ve Fakturoid API. E-mail ani telefon
+     * se záměrně nepřepisují – doklady mají chodit dál na kontakt zákazníka.
+     */
+    public function fakturoidSubjectOverride(): ?array
+    {
+        if (! $this->invoice_override) {
+            return null;
+        }
+
+        return [
+            // Ve Fakturoidu se jako hlavní řádek odběratele tiskne "name",
+            // proto tam patří firma; kontaktní osoba jde do "full_name".
+            'name' => $this->invoice_company ?: ($this->invoice_name ?: $this->name),
+            'full_name' => $this->invoice_company ? (string) $this->invoice_name : '',
+            'street' => (string) $this->invoice_street,
+            'city' => (string) $this->invoice_city,
+            'zip' => (string) $this->invoice_zip,
+            'country' => strtoupper($this->invoice_country ?: 'CZ'),
+            'registration_no' => (string) $this->invoice_registration_no,
+            'vat_no' => (string) $this->invoice_vat_no,
+        ];
+    }
 
     public function orders()
     {

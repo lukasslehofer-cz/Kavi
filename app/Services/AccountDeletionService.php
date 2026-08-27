@@ -376,6 +376,16 @@ class AccountDeletionService
             'packeta_point_id' => null,
             'packeta_point_name' => null,
             'packeta_point_address' => null,
+            // Vlastní fakturační údaje – firma, IČ a DIČ jsou osobní/firemní data
+            'invoice_override' => false,
+            'invoice_company' => null,
+            'invoice_registration_no' => null,
+            'invoice_vat_no' => null,
+            'invoice_name' => null,
+            'invoice_street' => null,
+            'invoice_city' => null,
+            'invoice_zip' => null,
+            'invoice_country' => null,
             'deleted_at' => now(),
             'anonymized_at' => now(),
             // Keep stripe_customer_id and fakturoid_subject_id for accounting/invoice purposes
