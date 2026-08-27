@@ -100,7 +100,7 @@
             <div class="flex items-center gap-2">
                 <label for="sort" class="text-sm font-medium text-gray-700">Řazení:</label>
                 <select name="sort" id="sort" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm focus:ring-gray-500 focus:border-gray-500">
-                    <option value="default" {{ request('sort', 'default') === 'default' ? 'selected' : '' }}>Výchozí (pořadí vložení)</option>
+                    <option value="default" {{ request('sort', 'default') === 'default' ? 'selected' : '' }}>Vlastní pořadí (přetahování)</option>
                     <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Abecedně</option>
                     <option value="stock" {{ request('sort') === 'stock' ? 'selected' : '' }}>Podle skladu</option>
                     <option value="roast_date" {{ request('sort') === 'roast_date' ? 'selected' : '' }}>Podle data pražení</option>
@@ -115,12 +115,28 @@
         </form>
     </div>
 
+    @if($reorderMode)
+    <!-- Reorder hint -->
+    <div class="flex items-center justify-between gap-4 bg-blue-50 border border-blue-200 text-blue-900 rounded-xl px-4 py-3 mb-4">
+        <div class="flex items-center gap-2 text-sm">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+            </svg>
+            <span>Chytněte řádek za úchyt vlevo a přetáhněte ho na nové místo. Pořadí se uloží automaticky a projeví se v e-shopu.</span>
+        </div>
+        <span id="reorder-status" class="text-sm font-medium whitespace-nowrap"></span>
+    </div>
+    @endif
+
     <!-- Products Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50">
                     <tr>
+                        @if($reorderMode)
+                        <th class="w-10 pl-4 pr-2 py-3"><span class="sr-only">Pořadí</span></th>
+                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Název</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategorie</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cena</th>
@@ -129,9 +145,22 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akce</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody id="products-tbody" class="bg-white divide-y divide-gray-200">
                     @forelse($products as $product)
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr data-id="{{ $product->id }}"
+                        @if($reorderMode && $product->is_active) data-sortable="1" @endif
+                        class="hover:bg-gray-50 transition-colors {{ $reorderMode && !$product->is_active ? 'opacity-60' : '' }}">
+                        @if($reorderMode)
+                        <td class="w-10 pl-4 pr-2 py-4">
+                            @if($product->is_active)
+                            <span class="drag-handle inline-flex cursor-move text-gray-300 hover:text-gray-600 transition-colors" title="Přetažením změníte pořadí">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M7 4a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM7 10a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM7 16a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM16 4a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM16 10a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM16 16a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                                </svg>
+                            </span>
+                            @endif
+                        </td>
+                        @endif
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
@@ -212,7 +241,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        <td colspan="{{ $reorderMode ? 7 : 6 }}" class="px-6 py-12 text-center text-gray-500">
                             <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                             </svg>
@@ -226,6 +255,12 @@
         </div>
     </div>
 
+    @if($reorderMode)
+    <!-- Souhrn (v režimu vlastního pořadí se nestránkuje) -->
+    <div class="mt-6 text-sm text-gray-600">
+        Zobrazeno {{ $products->count() }} produktů
+    </div>
+    @else
     <!-- Pagination -->
     <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="text-sm text-gray-600">
@@ -270,7 +305,138 @@
         </nav>
         @endif
     </div>
+    @endif
 </div>
+
+@if($reorderMode)
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tbody = document.getElementById('products-tbody');
+    const status = document.getElementById('reorder-status');
+    if (!tbody) return;
+
+    let draggedRow = null;
+    let saveTimer = null;
+
+    const sortableRows = () => Array.from(tbody.querySelectorAll('tr[data-sortable="1"]'));
+
+    // Úchyt aktivuje tažení - řádek je jinak nepřetahovatelný,
+    // aby fungovalo označování textu i odkazy Upravit/Smazat
+    tbody.addEventListener('mousedown', function (e) {
+        const handle = e.target.closest('.drag-handle');
+        const row = e.target.closest('tr[data-sortable="1"]');
+        if (handle && row) {
+            row.setAttribute('draggable', 'true');
+        }
+    });
+
+    // Na dokumentu, ne na tbody - jinak by řádek zůstal přetahovatelný,
+    // když uživatel pustí tlačítko mimo tabulku
+    document.addEventListener('mouseup', function () {
+        if (draggedRow) return;
+        sortableRows().forEach(row => row.removeAttribute('draggable'));
+    });
+
+    tbody.addEventListener('dragstart', function (e) {
+        const row = e.target.closest('tr[data-sortable="1"]');
+        if (!row || row.getAttribute('draggable') !== 'true') {
+            e.preventDefault();
+            return;
+        }
+        draggedRow = row;
+        e.dataTransfer.effectAllowed = 'move';
+        // Firefox tažení nespustí bez nastavených dat
+        e.dataTransfer.setData('text/plain', row.dataset.id);
+        setTimeout(() => row.classList.add('opacity-40'), 0);
+    });
+
+    tbody.addEventListener('dragover', function (e) {
+        if (!draggedRow) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        const target = rowToInsertBefore(e.clientY);
+        if (target !== draggedRow) {
+            tbody.insertBefore(draggedRow, target);
+        }
+    });
+
+    tbody.addEventListener('drop', function (e) {
+        if (draggedRow) e.preventDefault();
+    });
+
+    tbody.addEventListener('dragend', function () {
+        if (!draggedRow) return;
+        draggedRow.classList.remove('opacity-40');
+        draggedRow.removeAttribute('draggable');
+        draggedRow = null;
+        scheduleSave();
+    });
+
+    /**
+     * Podle svislé pozice kurzoru najde řádek, PŘED který se má tažený vložit.
+     * Vrací null jen tehdy, když neexistuje žádný neaktivní blok - neaktivní
+     * produkty se nepřetahují a musí zůstat na konci seznamu.
+     */
+    function rowToInsertBefore(clientY) {
+        const rows = sortableRows().filter(row => row !== draggedRow);
+
+        for (const row of rows) {
+            const box = row.getBoundingClientRect();
+            if (clientY < box.top + box.height / 2) {
+                return row;
+            }
+        }
+
+        // Za poslední přetahovatelný řádek, ale stále nad neaktivními
+        return tbody.querySelector('tr:not([data-sortable="1"])');
+    }
+
+    function scheduleSave() {
+        setStatus('Ukládám…', 'text-blue-700');
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(save, 400);
+    }
+
+    function save() {
+        const ids = sortableRows().map(row => row.dataset.id);
+
+        fetch('{{ route('admin.products.reorder') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ids: ids })
+        })
+        .then(response => response.ok ? response.json() : Promise.reject(response))
+        .then(data => {
+            if (data.success) {
+                setStatus('Pořadí uloženo', 'text-green-700');
+                setTimeout(() => setStatus('', ''), 2000);
+            } else {
+                failed();
+            }
+        })
+        .catch(failed);
+    }
+
+    function failed() {
+        setStatus('Pořadí se nepodařilo uložit', 'text-red-700');
+        if (confirm('Pořadí se nepodařilo uložit. Načíst stránku znovu?')) {
+            window.location.reload();
+        }
+    }
+
+    function setStatus(text, className) {
+        if (!status) return;
+        status.textContent = text;
+        status.className = 'text-sm font-medium whitespace-nowrap ' + className;
+    }
+});
+</script>
+@endif
 @endsection
 
 

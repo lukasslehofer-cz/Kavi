@@ -366,12 +366,12 @@
             <!-- Sort Order -->
             <div>
                 <label class="block text-sm font-medium text-coffee-900 mb-2">Pořadí řazení</label>
-                <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}" min="0" 
+                <input type="number" name="sort_order" value="{{ old('sort_order') }}" min="0" placeholder="Automaticky na konec"
                        class="input @error('sort_order') border-red-500 @enderror">
                 @error('sort_order')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
-                <p class="text-xs text-coffee-600 mt-1">Čím nižší číslo, tím výše se produkt zobrazí (0 = výchozí)</p>
+                <p class="text-xs text-coffee-600 mt-1">Prázdné = produkt se zařadí na konec. Jinak čím nižší číslo, tím výše se produkt zobrazí. Pořadí lze pohodlněji měnit přetažením ve výpisu produktů.</p>
             </div>
 
             <!-- Discount Section -->
