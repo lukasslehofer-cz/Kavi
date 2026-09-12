@@ -182,10 +182,11 @@ return [
     'cancel_addons_notice' => 'Add-on orders linked to the cancelled shipments (:count) will be detached and handled manually.',
     'cancel_irreversible' => 'Cancellation is irreversible. We will notify you by email once the subscription ends.',
 
-    // Delivery address
-    'delivery_address' => 'Delivery address',
+    // Billing address
+    'delivery_address' => 'Billing address',
     'edit_address' => 'Edit address',
     'pickup_point' => 'Pickup point',
+    'pickup_point_change_notice' => 'The shipment sent on :date is already on its way to the original pickup point. The change will apply from the next shipment.',
     'home_delivery' => 'Home delivery',
     
     // Payment method
@@ -229,9 +230,9 @@ return [
     'no_payment_method' => 'No payment method',
     'no_payment_method_description' => 'You\'ll add a payment card when making your first subscription payment.',
     
-    // Shipping address in profile
-    'shipping_address' => 'Shipping address',
-    'shipping_address_description' => 'Default address for order delivery',
+    // Billing address in profile
+    'shipping_address' => 'Billing address',
+    'shipping_address_description' => 'Default billing details for orders and invoices',
     'street_address' => 'Street address',
     'city' => 'City',
     'postal_code' => 'Postal code',

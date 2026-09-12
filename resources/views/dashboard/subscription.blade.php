@@ -465,6 +465,18 @@
                             <p>{{ __('dashboard.no_payment_method') }}</p>
                         </div>
                         @endif
+
+                        {{-- Odeslaná, dosud nedoručená zásilka už jede na původní místo – změna ji nedožene. --}}
+                        @if($shipmentInfo && $shipmentInfo->lastSentShipment && $shipmentInfo->lastSentShipment->status === 'sent')
+                        <div class="mt-3 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3">
+                            <svg class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="text-sm text-amber-800">
+                                {{ __('dashboard.pickup_point_change_notice', ['date' => $shipmentInfo->lastSentDate()?->format('d.m.Y')]) }}
+                            </p>
+                        </div>
+                        @endif
                     </div>
 
                     <!-- Payment Issue Warning (not shown for complimentary) -->
@@ -837,7 +849,25 @@
 document.addEventListener('DOMContentLoaded', function() {
     const packetaApiKey = '{{ config("services.packeta.widget_key") }}';
     const locale = '{{ app()->getLocale() }}';
-    
+
+    // Země a dopravci, které umí obsloužit sazba dopravy daného předplatného.
+    const pickupOptions = @json($pickupOptions ?? []);
+
+    function widgetOptionsFor(subscriptionId) {
+        const opts = pickupOptions[subscriptionId] || {};
+        const widgetOptions = {
+            country: (opts.country || 'cz').toLowerCase(),
+            language: locale,
+        };
+
+        // Objekty vendorů skládá backend (carrierId u externích, country+group u Zásilkovny).
+        if (opts.vendors && opts.vendors.length > 0) {
+            widgetOptions.vendors = opts.vendors;
+        }
+
+        return widgetOptions;
+    }
+
     function openPacketaWidget(subscriptionId) {
         if (!packetaApiKey) {
             alert('Packeta widget not configured.');
@@ -859,7 +889,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     packeta_point_name: point.name,
                     packeta_point_address: address,
                     carrier_id: point.carrierId || null,
-                    carrier_pickup_point: point.carrierPickupPointId || point.id
+                    // Body vlastní sítě Zásilkovny nemají dopravce – obě pole nechat prázdná
+                    // (stejně jako profil), ať se nesejde nový bod se starým carrierem.
+                    carrier_pickup_point: point.carrierId ? (point.carrierPickupPointId || point.id) : null
                 };
 
                 console.log('Updating pickup point with carrier info:', updateData);
@@ -883,9 +915,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (nameEl) nameEl.textContent = point.name;
                         if (addressEl) addressEl.textContent = address;
                         
-                        alert(locale === 'en' ? 'Pickup point changed successfully!' : 'Výdejní místo bylo úspěšně změněno!');
+                        alert(data.message || (locale === 'en' ? 'Pickup point changed successfully!' : 'Výdejní místo bylo úspěšně změněno!'));
                     } else {
-                        alert(locale === 'en' ? 'Failed to change pickup point. Please try again.' : 'Nepodařilo se změnit výdejní místo. Zkuste to prosím znovu.');
+                        // Server umí vrátit konkrétní důvod (např. nepovolený dopravce).
+                        alert(data.message || (locale === 'en' ? 'Failed to change pickup point. Please try again.' : 'Nepodařilo se změnit výdejní místo. Zkuste to prosím znovu.'));
                     }
                 })
                 .catch(error => {
@@ -893,10 +926,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert(locale === 'en' ? 'An error occurred while saving the pickup point.' : 'Došlo k chybě při ukládání výdejního místa.');
                 });
             }
-        }, {
-            country: locale === 'en' ? 'all' : 'cz',
-            language: locale,
-        });
+        }, widgetOptionsFor(subscriptionId));
     }
 
     // Event listeners for all change buttons

@@ -847,10 +847,16 @@ class SubscriptionController extends Controller
                 $value = min($value, 100);
             }
             
-            // Get Packeta data - prioritize shipment data, then shipping_address JSON
-            $packetaPointId = $shippingAddress['packeta_point_id'] ?? $subscription->packeta_point_id;
-            $carrierId = $shipment->carrier_id ?? $shippingAddress['carrier_id'] ?? $subscription->carrier_id ?? null;
-            $carrierPickupPoint = $shipment->carrier_pickup_point ?? $shippingAddress['carrier_pickup_point'] ?? $subscription->carrier_pickup_point ?? null;
+            // KROK 8: autoritativní je AKTUÁLNÍ konfigurace předplatného. Řádek zásilky nese jen
+            // zastaralou cache z doby svého vzniku (getPackageDimensions) a markAsShipped() ji stejně
+            // přepíše až PO createPacket(). Číst ji tady znamenalo, že změna výdejního místa u externího
+            // dopravce odešla balík na původní místo, zatímco ledger i zákaznická sekce hlásily nové.
+            // Ze stejného důvodu se nesahá ani do shipping_address JSON – ten u předplatných carrier_*
+            // klíče nemá (jen objednávky) a u starých řádků by při přechodu na Z-POINT, kde je
+            // carrier_id legitimně null, vytáhl starého dopravce zpět.
+            $packetaPointId = $subscription->packeta_point_id;
+            $carrierId = $subscription->carrier_id;
+            $carrierPickupPoint = $subscription->carrier_pickup_point;
             
             $packetData = [
                 'name' => $nameParts[0] ?? $name,

@@ -159,6 +159,11 @@ class Subscription extends Model
         return $this->belongsTo(Coupon::class);
     }
 
+    public function shippingRate()
+    {
+        return $this->belongsTo(ShippingRate::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');

@@ -45,6 +45,9 @@ return [
         'resume_out_of_stock' => 'Nelze obnovit předplatné pro :month - kávy (:coffees) jsou vyprodány. Pauza bude ukončena v další rozesílce.',
         'resume_not_paused' => 'Toto předplatné není pozastavené.',
         'resume_admin_locked' => 'Toto předplatné pozastavil správce a obnovit ho může jen on. Napište nám prosím na podporu.',
+        'not_found' => 'Předplatné nenalezeno.',
+        'pickup_point_updated' => 'Výdejní místo bylo úspěšně změněno.',
+        'pickup_point_carrier_not_allowed' => 'Toto výdejní místo nelze pro vaše předplatné použít. Vyberte prosím jiné.',
     ],
 
     // One-time box

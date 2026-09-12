@@ -182,10 +182,11 @@ return [
     'cancel_addons_notice' => 'Doplňkové objednávky navázané na zrušené zásilky (:count) budou odpojeny a vyřešíme je ručně.',
     'cancel_irreversible' => 'Zrušení je nevratné. O ukončení předplatného vás budeme informovat e-mailem.',
 
-    // Delivery address
-    'delivery_address' => 'Doručovací adresa',
+    // Billing address
+    'delivery_address' => 'Fakturační adresa',
     'edit_address' => 'Upravit adresu',
     'pickup_point' => 'Výdejní místo',
+    'pickup_point_change_notice' => 'Zásilka odeslaná :date už míří na původní výdejní místo. Změna se projeví až u příští rozesílky.',
     'home_delivery' => 'Doručení na adresu',
     
     // Payment method
@@ -229,9 +230,9 @@ return [
     'no_payment_method' => 'Žádná platební metoda',
     'no_payment_method_description' => 'Platební kartu přidáte při první platbě předplatného.',
     
-    // Shipping address in profile
-    'shipping_address' => 'Doručovací adresa',
-    'shipping_address_description' => 'Výchozí adresa pro doručení objednávek',
+    // Billing address in profile
+    'shipping_address' => 'Fakturační adresa',
+    'shipping_address_description' => 'Výchozí fakturační údaje pro objednávky a faktury',
     'street_address' => 'Ulice a číslo popisné',
     'city' => 'Město',
     'postal_code' => 'PSČ',

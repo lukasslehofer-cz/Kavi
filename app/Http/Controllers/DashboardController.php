@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\ImpersonatesUser;
 use App\Models\Order;
+use App\Models\ShippingRate;
 use App\Models\Subscription;
 use App\Services\AccountDeletionService;
 use App\Services\SubscriptionShipmentService;
@@ -17,6 +18,9 @@ use Illuminate\Validation\Rules\Password;
 class DashboardController extends Controller
 {
     use ImpersonatesUser;
+
+    /** @var array<string, \App\Models\ShippingRate|null> Cache sazeb podle země v rámci requestu. */
+    protected array $pickupRatesByCountry = [];
 
     public function __construct()
     {
@@ -80,6 +84,8 @@ class DashboardController extends Controller
     {
         $subscriptions = $this->getViewingUser()->subscriptions()
             ->whereIn('status', ['active', 'unpaid', 'paused', 'pending', 'cancelled', 'completed', 'complimentary'])
+            // Dopravci sazby se čtou pro každé předplatné kvůli volbám Packeta widgetu.
+            ->with('shippingRate.packetaCarriers')
             ->orderBy('created_at', 'desc')
             ->get()
             ->filter(function ($subscription) {
@@ -120,7 +126,62 @@ class DashboardController extends Controller
                 return [$subscription->id => $shipmentService->getCancellationPreview($subscription)];
             });
 
-        return view('dashboard.subscription', compact('subscriptions', 'shipmentInfos', 'cancellationPreviews'));
+        // Volby pro Packeta widget: smí nabízet jen zemi a dopravce, které předplatné
+        // umí obsloužit (viz resolvePickupShippingRate).
+        $pickupOptions = $subscriptions->mapWithKeys(function ($subscription) {
+            $rate = $this->resolvePickupShippingRate($subscription);
+
+            return [$subscription->id => [
+                'country' => $this->resolvePickupCountry($subscription),
+                'vendors' => $rate ? $rate->getPacketaWidgetVendors() : [],
+            ]];
+        });
+
+        return view('dashboard.subscription', compact('subscriptions', 'shipmentInfos', 'cancellationPreviews', 'pickupOptions'));
+    }
+
+    /**
+     * Země, na kterou je předplatné zamčené.
+     *
+     * shipping_country / shipping_rate_id / shipping_cost jsou na předplatném zmrazené
+     * z pokladny a nikde se nepřepočítávají, takže widget nesmí nabízet jinou zemi –
+     * jinak bychom vozili do zahraničí za původní sazbu.
+     */
+    protected function resolvePickupCountry(Subscription $subscription): string
+    {
+        $address = is_string($subscription->shipping_address)
+            ? json_decode($subscription->shipping_address, true)
+            : ($subscription->shipping_address ?? []);
+
+        return strtoupper(
+            $subscription->shipping_country
+                ?: ($address['country'] ?? $this->getViewingUser()->country ?? 'CZ')
+        );
+    }
+
+    /**
+     * Sazba dopravy, podle které se určují povolená výdejní místa předplatného.
+     *
+     * Záměrně NEjde přes ShippingService::getPacketaWidgetVendorsForCountry() – ta používá
+     * ShippingRate::getForCountry(), která filtruje podle available_on_cz/available_on_com
+     * dle AKTUÁLNÍ domény. Zákazník kavibox.com prohlížející si účet na kavi.cz by dostal
+     * prázdný seznam a tím zase nefiltrovaný widget.
+     */
+    protected function resolvePickupShippingRate(Subscription $subscription): ?ShippingRate
+    {
+        if ($subscription->shipping_rate_id && $subscription->shippingRate) {
+            return $subscription->shippingRate;
+        }
+
+        // Starší předplatná nemají shipping_rate_id – dohledat podle země, ale jen jednou
+        // na zemi (dashboard prochází všechna předplatná zákazníka).
+        $country = $this->resolvePickupCountry($subscription);
+
+        if (!array_key_exists($country, $this->pickupRatesByCountry)) {
+            $this->pickupRatesByCountry[$country] = ShippingRate::getForCountryAdmin($country);
+        }
+
+        return $this->pickupRatesByCountry[$country];
     }
 
     public function updatePacketaPoint(Request $request)
@@ -142,7 +203,35 @@ class DashboardController extends Controller
             ->first();
 
         if (!$subscription) {
-            return response()->json(['success' => false, 'message' => 'Předplatné nenalezeno.'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => __('flash.subscription.not_found'),
+            ], 404);
+        }
+
+        // Body vlastní sítě Zásilkovny vrací widget bez carrierId; carrier_pickup_point by
+        // pak byl jen matoucí zbytek (profil obě pole čistí stejně).
+        $carrierId = $request->carrier_id ?: null;
+        $carrierPickupPoint = $carrierId ? ($request->carrier_pickup_point ?: null) : null;
+
+        // Filtr ve widgetu je klientský a PacketaService::getPickupPoint() je vypnutý, takže
+        // samotné ID bodu ověřit nejde – ověřitelný je ale dopravce.
+        $rate = $this->resolvePickupShippingRate($subscription);
+        $allowedCarrierIds = $rate ? $rate->packetaCarriers->pluck('carrier_id')->all() : [];
+
+        // Prázdný seznam = starší předplatné bez navázané sazby. Takového zákazníka nechceme
+        // zablokovat, kontrolu přeskočíme.
+        if ($allowedCarrierIds !== []) {
+            $isAllowed = $carrierId === null
+                ? (bool) array_intersect($allowedCarrierIds, ['packeta', 'zpoint'])
+                : in_array($carrierId, $allowedCarrierIds, true);
+
+            if (!$isAllowed) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('flash.subscription.pickup_point_carrier_not_allowed'),
+                ], 422);
+            }
         }
 
         // Update subscription
@@ -150,22 +239,26 @@ class DashboardController extends Controller
             'packeta_point_id' => $request->packeta_point_id,
             'packeta_point_name' => $request->packeta_point_name,
             'packeta_point_address' => $request->packeta_point_address,
-            'carrier_id' => $request->carrier_id,
-            'carrier_pickup_point' => $request->carrier_pickup_point,
+            'carrier_id' => $carrierId,
+            'carrier_pickup_point' => $carrierPickupPoint,
         ]);
+
+        // Řádky dosud neodeslaných zásilek nesou snapshot dopravce z doby svého vzniku –
+        // bez tohohle by ledger tvrdil něco jiného, než kam balík reálně pojede.
+        app(SubscriptionShipmentService::class)->syncPickupPointToPendingShipments($subscription);
 
         // Also update user's default pickup point
         $viewingUser->update([
             'packeta_point_id' => $request->packeta_point_id,
             'packeta_point_name' => $request->packeta_point_name,
             'packeta_point_address' => $request->packeta_point_address,
-            'carrier_id' => $request->carrier_id,
-            'carrier_pickup_point' => $request->carrier_pickup_point,
+            'carrier_id' => $carrierId,
+            'carrier_pickup_point' => $carrierPickupPoint,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Výdejní místo bylo úspěšně změněno.',
+            'message' => __('flash.subscription.pickup_point_updated'),
         ]);
     }
 

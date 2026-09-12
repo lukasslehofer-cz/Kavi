@@ -962,6 +962,37 @@ class SubscriptionShipmentService
     }
 
     /**
+     * Propíše aktuální výdejní místo předplatného do dosud neodeslaných zásilek.
+     *
+     * Řádek zásilky dostane snapshot dopravce při svém vzniku (getPackageDimensions). Když zákazník
+     * potom změní výdejní místo, zůstal by na řádku starý dopravce a ledger by tvrdil něco jiného,
+     * než co se reálně pošle do Packety. Odeslaných/doručených zásilek se to netýká – tam je
+     * zmrazený dopravce záznam o tom, kam balík skutečně jel.
+     *
+     * @return int Počet aktualizovaných řádků
+     */
+    public function syncPickupPointToPendingShipments(Subscription $subscription): int
+    {
+        $updated = $subscription->shipments()
+            ->where('status', 'pending')
+            ->update([
+                'carrier_id' => $subscription->carrier_id,
+                'carrier_pickup_point' => $subscription->carrier_pickup_point,
+            ]);
+
+        if ($updated > 0) {
+            \Log::info('Pickup point synced to pending shipments', [
+                'subscription_id' => $subscription->id,
+                'shipments_updated' => $updated,
+                'carrier_id' => $subscription->carrier_id,
+                'carrier_pickup_point' => $subscription->carrier_pickup_point,
+            ]);
+        }
+
+        return $updated;
+    }
+
+    /**
      * Mark shipment as shipped (called from admin when sending to Packeta or manually)
      */
     public function markAsShipped(
