@@ -151,12 +151,14 @@ class StockReservationService
             ->where(function($q) use ($billingDate) {
                 $q->whereNotNull('subscription_payment_id')
                   ->orWhereHas('subscription', function($q2) use ($billingDate) {
-                      $q2->where(function($q3) use ($billingDate) {
-                          // Pozastavené jen s uplynulou pauzou; pauza bez koncového
-                          // data (admin zámek) kávu nerezervuje.
-                          $q3->where('status', '!=', 'paused')
-                             ->orWhere('paused_until_date', '<=', $billingDate);
-                      });
+                      // Neplacený box zrušeného předplatného neodejde, kávu nerezervuje.
+                      $q2->where('status', '!=', 'cancelled')
+                         ->where(function($q3) use ($billingDate) {
+                             // Pozastavené jen s uplynulou pauzou; pauza bez koncového
+                             // data (admin zámek) kávu nerezervuje.
+                             $q3->where('status', '!=', 'paused')
+                                ->orWhere('paused_until_date', '<=', $billingDate);
+                         });
                   });
             })
             ->pluck('subscription_id')

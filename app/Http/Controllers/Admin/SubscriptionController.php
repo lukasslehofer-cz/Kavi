@@ -297,12 +297,12 @@ class SubscriptionController extends Controller
         $cancelType = $validated['cancel_type'];
 
         try {
+            $shipmentService = app(SubscriptionShipmentService::class);
+
             if ($cancelType === 'immediate') {
-                // Immediate cancellation - cancel right now
-                $subscription->update([
-                    'status' => 'cancelled',
-                    'ends_at' => now(),
-                ]);
+                // Immediate cancellation - cancel right now, včetně zaplacených pending boxů
+                // (bez ohledu na zaplacené období, refund řeší admin ručně)
+                $shipmentService->cancelSubscriptionImmediately($subscription);
 
                 Log::info('Admin immediately cancelled subscription', [
                     'subscription_id' => $subscription->id,
@@ -311,9 +311,9 @@ class SubscriptionController extends Controller
 
                 $emailSubject = 'okamžité zrušení';
             } else {
-                // Standard cancellation - let it run until the end of paid period
-                // Use the model's cancel() method which sets status and ends_at
-                $subscription->cancel();
+                // Standard cancellation - doběhne zaplacené období, neplacené pending boxy se
+                // zruší (stejná cesta jako zrušení zákazníkem v účtu)
+                $shipmentService->cancelSubscription($subscription);
 
                 Log::info('Admin cancelled subscription at period end', [
                     'subscription_id' => $subscription->id,
@@ -390,8 +390,9 @@ class SubscriptionController extends Controller
                 $q->whereNotNull('subscription_payment_id')
                 // 2. OR subscription meets pause criteria
                 ->orWhereHas('subscription', function($q2) use ($billingDate) {
-                    // Never ship an unpaid subscription (no successful payment yet)
-                    $q2->where('status', '!=', 'unpaid')
+                    // Never ship an unpaid subscription (no successful payment yet).
+                    // Zrušené odejde jen se zaplaceným boxem (větev 1), neplacený pending ne.
+                    $q2->whereNotIn('status', ['unpaid', 'cancelled'])
                        ->where(function($q3) use ($billingDate) {
                             // Pozastavené jen tehdy, když pauza má konec a ten už uplynul.
                             // Pauza bez data (admin zámek) se neodesílá nikdy.
@@ -487,8 +488,9 @@ class SubscriptionController extends Controller
             ->where(function($q) use ($billingDate) {
                 $q->whereNotNull('subscription_payment_id')
                   ->orWhereHas('subscription', function($q2) use ($billingDate) {
-                      // Never ship an unpaid subscription (no successful payment yet)
-                      $q2->where('status', '!=', 'unpaid')
+                      // Never ship an unpaid subscription (no successful payment yet).
+                      // Zrušené se počítá jen se zaplaceným boxem (větev 1).
+                      $q2->whereNotIn('status', ['unpaid', 'cancelled'])
                          ->where(function($q3) use ($billingDate) {
                              // Pauza bez koncového data (admin zámek) se nezapočítává.
                              $q3->where('status', '!=', 'paused')
@@ -765,24 +767,12 @@ class SubscriptionController extends Controller
         foreach ($request->subscription_ids as $subscriptionId) {
             $subscription = Subscription::with('user')->find($subscriptionId);
 
-            // Pozastavené adminem se neodesílá, i kdyby zůstalo zaškrtnuté ve formuláři.
-            // Výjimkou je už zaplacená zásilka - tu pauza zachovává a odejít má.
             // Guard musí být před getOrCreateShipment(), který by řádek jinak založil.
-            if ($subscription->isAdminLocked()) {
-                $lockedSchedule = ShipmentSchedule::getForMonth($targetDate->year, $targetDate->month);
-
-                $paidShipment = $lockedSchedule
-                    ? $subscription->shipments()
-                        ->where('shipment_schedule_id', $lockedSchedule->id)
-                        ->whereNotNull('subscription_payment_id')
-                        ->first()
-                    : null;
-
-                if (! $paidShipment) {
-                    $errors[] = "Předplatné #{$subscription->id}: Pozastaveno administrátorem, nelze odeslat";
-                    $errorCount++;
-                    continue;
-                }
+            $blockReason = $this->shipmentBlockReason($subscription, $targetDate);
+            if ($blockReason) {
+                $errors[] = "Předplatné #{$subscription->id}: {$blockReason}";
+                $errorCount++;
+                continue;
             }
 
             // Get or create shipment for this date
@@ -965,6 +955,39 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * Důvod, proč box předplatného v daném termínu nesmí odejít (null = smí).
+     * Pozastavené adminem ani zrušené předplatné se neodesílá, i kdyby zůstalo zaškrtnuté
+     * ve formuláři. Výjimkou je už zaplacená zásilka - tu pauza zachovává a zrušení nechá
+     * doběhnout (box okamžitě zrušeného předplatného je cancelled, takže neprojde).
+     */
+    private function shipmentBlockReason(Subscription $subscription, \Carbon\Carbon $targetDate): ?string
+    {
+        $isCancelled = $subscription->status === 'cancelled';
+
+        if (! $isCancelled && ! $subscription->isAdminLocked()) {
+            return null;
+        }
+
+        $schedule = ShipmentSchedule::getForMonth($targetDate->year, $targetDate->month);
+
+        $paidShipment = $schedule
+            ? $subscription->shipments()
+                ->where('shipment_schedule_id', $schedule->id)
+                ->where('status', '!=', 'cancelled')
+                ->whereNotNull('subscription_payment_id')
+                ->first()
+            : null;
+
+        if ($paidShipment) {
+            return null;
+        }
+
+        return $isCancelled
+            ? 'Zrušené předplatné bez zaplacené zásilky, nelze odeslat'
+            : 'Pozastaveno administrátorem, nelze odeslat';
+    }
+
+    /**
      * Mark selected shipments as shipped and delivered manually (personal handover, no Packeta)
      */
     public function markAsShippedManually(Request $request)
@@ -985,6 +1008,14 @@ class SubscriptionController extends Controller
 
         foreach ($request->subscription_ids as $subscriptionId) {
             $subscription = Subscription::with('user')->find($subscriptionId);
+
+            // Stejný guard jako u Packety - musí být před getOrCreateShipment().
+            $blockReason = $this->shipmentBlockReason($subscription, $targetDate);
+            if ($blockReason) {
+                $errors[] = "Předplatné #{$subscription->id}: {$blockReason}";
+                $errorCount++;
+                continue;
+            }
 
             // Get or create shipment for this date
             $shipment = $this->getOrCreateShipment($subscription, $targetDate);

@@ -273,6 +273,13 @@ class SubscriptionShipmentService
             return null;
         }
 
+        // Zrušené/dokončené předplatné další box neplánuje - doběhnutí zaplaceného období
+        // drží řádky založené už při platbě. Bez guardu odeslání posledního boxu
+        // (markAsShipped) založilo neplacený pending na další měsíc a ten zůstal v rozesílce.
+        if (in_array($subscription->status, ['cancelled', 'completed'], true)) {
+            return null;
+        }
+
         $nextDate = $this->calculateNextShipmentDate($subscription);
 
         if (! $nextDate) {
@@ -863,14 +870,7 @@ class SubscriptionShipmentService
             ->whereDoesntHave('payment', fn ($q) => $q->where('status', 'paid'))
             ->get();
 
-        // KROK 10: addon objednávky rušených boxů odpojit k ruční revizi.
-        foreach ($unpaid as $ship) {
-            $this->detachAddonOrders($ship, 'subscription_cancelled');
-        }
-
-        $subscription->shipments()
-            ->whereIn('id', $unpaid->pluck('id'))
-            ->update(['status' => 'cancelled', 'notes' => 'Subscription cancelled']);
+        $this->cancelPendingShipments($subscription, $unpaid, 'subscription_cancelled', 'Subscription cancelled');
 
         // ends_at = poslední zaplacená zásilka (doběhne do konce období), jinak teď.
         $endsAt = $preview->lastPaidDate ?? now();
@@ -886,6 +886,44 @@ class SubscriptionShipmentService
             'last_paid_shipment' => $preview->lastPaidDate?->toDateString(),
             'ends_immediately' => $preview->endsImmediately,
         ]);
+    }
+
+    /**
+     * Okamžité zrušení (admin) bez ohledu na zaplacené období. Ruší VŠECHNY pending boxy
+     * včetně zaplacených - vrácení peněz řeší admin ručně. Jinak by zaplacený box zůstal
+     * v rozesílce a odešel.
+     */
+    public function cancelSubscriptionImmediately(Subscription $subscription): void
+    {
+        $pending = $subscription->shipments()
+            ->where('status', 'pending')
+            ->get();
+
+        $this->cancelPendingShipments($subscription, $pending, 'subscription_cancelled_immediately', 'Subscription cancelled immediately');
+
+        $subscription->update([
+            'status' => 'cancelled',
+            'ends_at' => now(),
+        ]);
+
+        \Log::info('Subscription cancelled immediately', [
+            'subscription_id' => $subscription->id,
+            'cancelled_shipment_ids' => $pending->pluck('id')->all(),
+        ]);
+    }
+
+    /**
+     * KROK 10: Zruší dané pending zásilky a addon objednávky rušených boxů odpojí k ruční revizi.
+     */
+    protected function cancelPendingShipments(Subscription $subscription, Collection $shipments, string $reason, string $note): void
+    {
+        foreach ($shipments as $ship) {
+            $this->detachAddonOrders($ship, $reason);
+        }
+
+        $subscription->shipments()
+            ->whereIn('id', $shipments->pluck('id'))
+            ->update(['status' => 'cancelled', 'notes' => $note]);
     }
 
     /**
@@ -1304,7 +1342,17 @@ class SubscriptionShipmentService
 
         if ($shipment) {
             // If skipped, don't ship. If pending, ship.
-            return $shipment->status === 'pending';
+            if ($shipment->status !== 'pending') {
+                return false;
+            }
+
+            // Zrušené předplatné odešle jen zaplacený box (doběhnutí období). Neplacený
+            // pending řádek nesmí přebít status, jinak zůstane v rozesílce i v rezervaci kávy.
+            if ($subscription->status === 'cancelled') {
+                return optional($shipment->payment)->status === 'paid';
+            }
+
+            return true;
         }
 
         // 2. For paused subscriptions: check if pause ends before/on billing_date
