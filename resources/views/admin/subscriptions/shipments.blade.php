@@ -511,6 +511,12 @@
                 </svg>
                 Poslat email "Připravujeme box"
             </button>
+            <button type="button" id="bulk-edit-dimensions-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+                Hromadně upravit rozměry
+            </button>
             <button onclick="window.print()" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
@@ -595,6 +601,74 @@
     </div>
 </div>
 
+<!-- Bulk Edit Dimensions Modal -->
+<div id="bulkEditDimensionsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Hromadná úprava rozměrů</h3>
+                <button type="button" onclick="closeBulkEditDimensionsModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <p class="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg mb-4">
+                Změna se použije na <strong id="bulkSelectedCount">0</strong> vybraných zásilek.
+                <span class="block mt-1 text-gray-500">Prázdné pole = hodnota zůstane beze změny.</span>
+            </p>
+
+            <form id="bulk-dimensions-form" action="{{ route('admin.subscriptions.bulk-update-dimensions') }}" method="POST" class="space-y-4">
+                @csrf
+                <input type="hidden" name="target_date" value="{{ $targetDate->format('Y-m-d') }}">
+                <div id="bulk-selected-ids"></div>
+
+                <div>
+                    <label for="bulk_package_length" class="block text-sm font-medium text-gray-700">Délka (cm)</label>
+                    <input type="number" step="0.01" id="bulk_package_length" name="package_length"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="bulk_package_width" class="block text-sm font-medium text-gray-700">Šířka (cm)</label>
+                    <input type="number" step="0.01" id="bulk_package_width" name="package_width"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="bulk_package_height" class="block text-sm font-medium text-gray-700">Výška (cm)</label>
+                    <input type="number" step="0.01" id="bulk_package_height" name="package_height"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="bulk_package_weight" class="block text-sm font-medium text-gray-700">Hmotnost (kg)</label>
+                    <input type="number" step="0.01" id="bulk_package_weight" name="package_weight"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="bulk_notes" class="block text-sm font-medium text-gray-700">Poznámka</label>
+                    <textarea id="bulk_notes" name="notes" rows="2"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div class="flex gap-2 mt-6">
+                    <button type="submit" id="bulk-dimensions-submit"
+                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Uložit u vybraných
+                    </button>
+                    <button type="button" onclick="closeBulkEditDimensionsModal()"
+                            class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                        Zrušit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function openEditShipmentModal(shipmentId, length, width, height, weight, notes) {
     document.getElementById('shipmentId').value = shipmentId;
@@ -608,6 +682,10 @@ function openEditShipmentModal(shipmentId, length, width, height, weight, notes)
 
 function closeEditShipmentModal() {
     document.getElementById('editShipmentModal').classList.add('hidden');
+}
+
+function closeBulkEditDimensionsModal() {
+    document.getElementById('bulkEditDimensionsModal').classList.add('hidden');
 }
 
 async function saveShipment() {
@@ -741,6 +819,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Restore original action (in case submit is prevented)
                 shipmentsForm.action = originalAction;
             }
+        });
+    }
+
+    // Bulk edit dimensions - vlastní formulář, aby se rozměrová pole neposílala
+    // s ostatními hromadnými akcemi (Packeta, osobní předání, emaily).
+    const bulkEditBtn = document.getElementById('bulk-edit-dimensions-btn');
+    const bulkForm = document.getElementById('bulk-dimensions-form');
+
+    if (bulkEditBtn && bulkForm) {
+        bulkEditBtn.addEventListener('click', function() {
+            const checkedBoxes = document.querySelectorAll('.shipment-checkbox:checked');
+
+            if (checkedBoxes.length === 0) {
+                alert('Prosím vyberte alespoň jednu zásilku.');
+                return;
+            }
+
+            document.getElementById('bulkSelectedCount').textContent = checkedBoxes.length;
+            document.getElementById('bulkEditDimensionsModal').classList.remove('hidden');
+        });
+
+        bulkForm.addEventListener('submit', function(event) {
+            const checkedBoxes = document.querySelectorAll('.shipment-checkbox:checked');
+            const hasValue = ['bulk_package_length', 'bulk_package_width', 'bulk_package_height', 'bulk_package_weight', 'bulk_notes']
+                .some(id => document.getElementById(id).value.trim() !== '');
+
+            if (checkedBoxes.length === 0) {
+                event.preventDefault();
+                alert('Prosím vyberte alespoň jednu zásilku.');
+                return;
+            }
+
+            if (!hasValue) {
+                event.preventDefault();
+                alert('Vyplňte alespoň jeden rozměr, hmotnost nebo poznámku.');
+                return;
+            }
+
+            // Znovu poskládat ID vybraných předplatných (kontejner nejdřív vyprázdnit,
+            // aby se při opakovaném otevření modalu nesčítala).
+            const idsContainer = document.getElementById('bulk-selected-ids');
+            idsContainer.innerHTML = '';
+            checkedBoxes.forEach(checkbox => {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'subscription_ids[]';
+                hidden.value = checkbox.value;
+                idsContainer.appendChild(hidden);
+            });
+
+            const submitBtn = document.getElementById('bulk-dimensions-submit');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Ukládám...';
         });
     }
 

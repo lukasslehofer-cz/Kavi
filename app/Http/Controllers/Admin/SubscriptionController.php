@@ -945,12 +945,12 @@ class SubscriptionController extends Controller
         }
 
         if ($errorCount > 0 && count($errors) > 0) {
-            return redirect()->route('admin.subscriptions.shipments')
+            return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
                 ->with('warning', $message)
                 ->with('errors', $errors);
         }
 
-        return redirect()->route('admin.subscriptions.shipments')
+        return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
             ->with('success', $message);
     }
 
@@ -1065,12 +1065,12 @@ class SubscriptionController extends Controller
         }
 
         if ($errorCount > 0 && count($errors) > 0) {
-            return redirect()->route('admin.subscriptions.shipments')
+            return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
                 ->with('warning', $message)
                 ->with('errors', $errors);
         }
 
-        return redirect()->route('admin.subscriptions.shipments')
+        return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
             ->with('success', $message);
     }
 
@@ -1082,7 +1082,13 @@ class SubscriptionController extends Controller
         $request->validate([
             'subscription_ids' => 'required|array|min:1',
             'subscription_ids.*' => 'exists:subscriptions,id',
+            'target_date' => 'nullable|date',
         ]);
+
+        // Drží zvolený termín, aby po akci nespadla obrazovka zpět na výchozí rozesílku.
+        $targetDate = $request->filled('target_date')
+            ? \Carbon\Carbon::parse($request->target_date)
+            : \App\Helpers\SubscriptionHelper::getNextShippingDate();
 
         $sentCount = 0;
         $failedCount = 0;
@@ -1138,12 +1144,12 @@ class SubscriptionController extends Controller
         }
 
         if ($failedCount > 0 && count($errors) > 0) {
-            return redirect()->route('admin.subscriptions.shipments')
+            return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
                 ->with('warning', $message)
                 ->with('errors', $errors);
         }
 
-        return redirect()->route('admin.subscriptions.shipments')
+        return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
             ->with('success', $message);
     }
 
@@ -1237,6 +1243,98 @@ class SubscriptionController extends Controller
             'message' => 'Rozměry balíku byly úspěšně aktualizovány.',
             'shipment' => $shipment->fresh(),
         ]);
+    }
+
+    /**
+     * Hromadně přepsat rozměry/hmotnost u vybraných zásilek jedné rozesílky.
+     *
+     * Vyplní se jen pole, která admin zadal - prázdné pole nechává původní hodnotu.
+     * Zásilky se dohledávají přes shipment_schedule_id (ledger je klíčovaný na rozvrh,
+     * shipment_date je jen denormalizovaná kopie, která se může rozejít s konfigurátorem).
+     * Záměrně se nevolá getOrCreateShipment() - editace rozměrů nesmí zakládat nové řádky.
+     */
+    public function bulkUpdateShipmentDimensions(Request $request)
+    {
+        $validated = $request->validate([
+            'subscription_ids' => 'required|array|min:1',
+            'subscription_ids.*' => 'exists:subscriptions,id',
+            'target_date' => 'nullable|date',
+            'package_weight' => 'nullable|numeric|min:0.1|max:30',
+            'package_length' => 'nullable|numeric|min:1|max:200',
+            'package_width' => 'nullable|numeric|min:1|max:200',
+            'package_height' => 'nullable|numeric|min:1|max:200',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        $targetDate = $request->filled('target_date')
+            ? \Carbon\Carbon::parse($request->target_date)
+            : \App\Helpers\SubscriptionHelper::getNextShippingDate();
+
+        // Přepisují se jen vyplněná pole, zbytek zůstává beze změny.
+        $fields = [];
+        foreach (['package_weight', 'package_length', 'package_width', 'package_height', 'notes'] as $field) {
+            if ($request->filled($field)) {
+                $fields[$field] = $validated[$field];
+            }
+        }
+
+        if (empty($fields)) {
+            return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
+                ->with('error', 'Vyplňte alespoň jeden rozměr, hmotnost nebo poznámku.');
+        }
+
+        $schedule = ShipmentSchedule::getForMonth($targetDate->year, $targetDate->month);
+
+        $shipments = \App\Models\SubscriptionShipment::whereIn('subscription_id', $validated['subscription_ids'])
+            ->when(
+                $schedule,
+                fn ($q) => $q->where('shipment_schedule_id', $schedule->id),
+                fn ($q) => $q->whereDate('shipment_date', $targetDate->toDateString())
+            )
+            ->get();
+
+        $successCount = 0;
+        $skippedCount = 0;
+
+        foreach ($shipments as $shipment) {
+            // Stejný guard jako u jednotlivé editace - podané ani přeskočené se nepřepisují.
+            if (! $shipment->isPending()) {
+                $skippedCount++;
+
+                continue;
+            }
+
+            $shipment->update($fields);
+            $successCount++;
+        }
+
+        // Předplatná bez řádku pro tuto rozesílku (budoucí náhled) se jen přeskočí.
+        $skippedCount += max(0, count($validated['subscription_ids']) - $shipments->count());
+
+        \Log::info('Shipments bulk updated by admin', [
+            'target_date' => $targetDate->toDateString(),
+            'shipment_schedule_id' => $schedule?->id,
+            'updated_count' => $successCount,
+            'skipped_count' => $skippedCount,
+            'fields' => array_keys($fields),
+            'admin_user_id' => auth()->id(),
+        ]);
+
+        if ($successCount === 0) {
+            return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
+                ->with('error', 'Nebyla upravena žádná zásilka. Vybrané zásilky jsou už podané nebo pro tento termín neexistují.');
+        }
+
+        $message = $successCount === 1
+            ? 'Upravena 1 zásilka. '
+            : ($successCount < 5 ? "Upraveny {$successCount} zásilky. " : "Upraveno {$successCount} zásilek. ");
+
+        if ($skippedCount > 0) {
+            $message .= "{$skippedCount} přeskočeno (už podané nebo bez zásilky v této rozesílce).";
+        }
+
+        return redirect()->route('admin.subscriptions.shipments', ['date' => $targetDate->toDateString()])
+            ->with('success', $message);
     }
 
     /**
