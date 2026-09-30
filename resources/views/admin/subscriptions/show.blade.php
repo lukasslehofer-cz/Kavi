@@ -303,6 +303,98 @@
                         </div>
                     </div>
 
+                    <!-- Nákup na firmu -->
+                    @php
+                        $invoiceDetailsErrors = $errors->getBag('invoiceDetails');
+                        $invoiceDetails = $subscription->invoice_details;
+                        // Po chybě validace platí odeslané hodnoty, jinak uložené
+                        $invoiceOld = fn ($key, $default = null) => $invoiceDetailsErrors->any() ? old($key) : $default;
+                        $invoiceIsCompany = (bool) $invoiceOld('is_company', (bool) $invoiceDetails);
+                        $invoiceDifferentAddress = (bool) $invoiceOld('invoice_different_address', ! empty($invoiceDetails['street']));
+                    @endphp
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-semibold text-gray-900">Firemní údaje na fakturách</h3>
+                            <button type="button" onclick="document.getElementById('invoice-details-form').classList.toggle('hidden')" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                Upravit
+                            </button>
+                        </div>
+
+                        @if($invoiceDetails)
+                        @include('admin._invoice-details', ['details' => $invoiceDetails])
+                        @else
+                        <p class="text-sm text-gray-600">Předplatné není na firmu.@if($subscription->user?->invoice_override) Faktury se vystavují na vlastní fakturační údaje zákazníka z adminu.@endif</p>
+                        @endif
+
+                        <form id="invoice-details-form" action="{{ route('admin.subscriptions.update-invoice-details', $subscription) }}" method="POST" class="{{ $invoiceDetailsErrors->any() ? '' : 'hidden' }} mt-4 space-y-4">
+                            @csrf
+                            @method('PUT')
+
+                            <label class="flex items-center gap-2 text-sm font-medium text-gray-900 cursor-pointer">
+                                <input type="checkbox" name="is_company" value="1" class="rounded border-gray-300" {{ $invoiceIsCompany ? 'checked' : '' }}>
+                                Fakturovat na firmu
+                            </label>
+                            <p class="text-xs text-gray-500 -mt-2">Odškrtnutím se firemní údaje odeberou a další faktury se vystaví bez firmy.</p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs text-gray-600 mb-1">Název firmy</label>
+                                    <input type="text" name="invoice_company" value="{{ $invoiceOld('invoice_company', $invoiceDetails['company'] ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    @error('invoice_company', 'invoiceDetails')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">IČ</label>
+                                    <input type="text" name="invoice_registration_no" value="{{ $invoiceOld('invoice_registration_no', $invoiceDetails['registration_no'] ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    @error('invoice_registration_no', 'invoiceDetails')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">DIČ</label>
+                                    <input type="text" name="invoice_vat_no" value="{{ $invoiceOld('invoice_vat_no', $invoiceDetails['vat_no'] ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    @error('invoice_vat_no', 'invoiceDetails')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                                </div>
+                            </div>
+
+                            <label class="flex items-center gap-2 text-sm text-gray-900 cursor-pointer">
+                                <input type="checkbox" name="invoice_different_address" value="1" class="rounded border-gray-300" {{ $invoiceDifferentAddress ? 'checked' : '' }}>
+                                Sídlo firmy je na jiné adrese než fakturační adresa
+                            </label>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs text-gray-600 mb-1">Ulice a číslo</label>
+                                    <input type="text" name="invoice_street" value="{{ $invoiceOld('invoice_street', $invoiceDetails['street'] ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    @error('invoice_street', 'invoiceDetails')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">PSČ</label>
+                                    <input type="text" name="invoice_zip" value="{{ $invoiceOld('invoice_zip', $invoiceDetails['zip'] ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    @error('invoice_zip', 'invoiceDetails')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Město</label>
+                                    <input type="text" name="invoice_city" value="{{ $invoiceOld('invoice_city', $invoiceDetails['city'] ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    @error('invoice_city', 'invoiceDetails')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">Země</label>
+                                    @php $invoiceCountry = $invoiceOld('invoice_country', $invoiceDetails['country'] ?? ''); @endphp
+                                    <select name="invoice_country" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option value="">—</option>
+                                        @foreach(['CZ' => 'Česká republika', 'SK' => 'Slovensko', 'PL' => 'Polsko', 'HU' => 'Maďarsko', 'AT' => 'Rakousko', 'DE' => 'Německo', 'RO' => 'Rumunsko', 'SI' => 'Slovinsko', 'HR' => 'Chorvatsko', 'BG' => 'Bulharsko'] as $code => $label)
+                                        <option value="{{ $code }}" {{ $invoiceCountry === $code ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('invoice_country', 'invoiceDetails')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">Uložit</button>
+                                <button type="button" onclick="document.getElementById('invoice-details-form').classList.add('hidden')" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300">Zrušit</button>
+                            </div>
+                        </form>
+                    </div>
+
                     @if($subscription->payment_method)
                     <div class="mt-4 pt-4 border-t">
                         <h3 class="font-semibold text-gray-900 mb-2">Platební metoda</h3>

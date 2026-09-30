@@ -72,6 +72,8 @@ return [
     // Profile & Account
     'profile' => [
         'updated' => 'Profile has been successfully updated.',
+        'company_updated' => 'Company details saved. They will be used for future purchases and for invoices of your active subscriptions.',
+        'company_removed' => 'Company details removed. Future invoices will be issued without a company.',
         'password_changed' => 'Password has been successfully changed.',
         'account_deleted' => 'Your account has been successfully deleted. We have sent a confirmation to your email.',
         'account_delete_error' => 'An error occurred while deleting your account. Please try again later or contact us.',

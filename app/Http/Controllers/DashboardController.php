@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\InvoiceDetails;
 use App\Http\Controllers\Concerns\ImpersonatesUser;
 use App\Models\Order;
 use App\Models\ShippingRate;
@@ -308,6 +309,34 @@ class DashboardController extends Controller
 
         return redirect()->localizedRoute('dashboard.profile')
             ->with('success', __('flash.profile.updated'));
+    }
+
+    /**
+     * Uloží firemní údaje z profilu a propíše je do všech aktivních předplatných,
+     * aby se použily na jejich dalších fakturách. Samostatný formulář – ostatní
+     * formuláře profilu jdou přes updateProfile() a firemní pole neposílají.
+     */
+    public function updateInvoiceDetails(Request $request)
+    {
+        $viewingUser = $this->getViewingUser();
+
+        $validated = $request->validateWithBag('invoiceDetails', InvoiceDetails::rules());
+        $details = InvoiceDetails::fromInput($validated);
+
+        $viewingUser->update(['invoice_details' => $details]);
+
+        // Po modelech, ne hromadným update() – jinak by se nepoužil JSON cast
+        $viewingUser->subscriptions()
+            ->whereNotIn('status', ['cancelled', 'expired'])
+            ->get()
+            ->each(function (Subscription $subscription) use ($details) {
+                if ($subscription->invoice_details != $details) {
+                    $subscription->update(['invoice_details' => $details]);
+                }
+            });
+
+        return redirect()->localizedRoute('dashboard.profile')
+            ->with('success', __($details ? 'flash.profile.company_updated' : 'flash.profile.company_removed'));
     }
 
     public function updatePassword(Request $request)

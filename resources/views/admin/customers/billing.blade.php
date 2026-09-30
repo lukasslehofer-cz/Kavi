@@ -39,6 +39,7 @@
             <div class="text-sm text-blue-800 space-y-1">
                 <p>Tyto údaje se použijí na <strong>všech budoucích fakturách</strong> tohoto zákazníka – u objednávek i u předplatného. Už vystavené faktury se nemění.</p>
                 <p>Doručovací adresa a štítky Zásilkovny zůstávají beze změny – ty se dál berou z objednávky.</p>
+                <p>Když zákazník v pokladně zaškrtne <strong>nákup na firmu</strong>, mají údaje z dané objednávky nebo předplatného přednost před těmito.</p>
             </div>
         </div>
     </div>
@@ -213,9 +214,12 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-sm font-semibold text-gray-900 mb-3">Fakturoid</h3>
                 @if($user->fakturoid_subject_id)
-                <p class="text-sm text-gray-600">Subjekt <span class="font-mono text-gray-900">#{{ $user->fakturoid_subject_id }}</span></p>
+                <p class="text-sm text-gray-600">Soukromý kontakt <span class="font-mono text-gray-900">#{{ $user->fakturoid_subject_id }}</span></p>
                 @else
-                <p class="text-sm text-gray-600">Zákazník zatím subjekt nemá – vznikne s jeho první fakturou.</p>
+                <p class="text-sm text-gray-600">Zákazník zatím soukromý kontakt nemá – vznikne s jeho první fakturou.</p>
+                @endif
+                @if(! empty($override['registration_no'] ?? null))
+                <p class="text-sm text-gray-600 mt-2">Faktury s IČ jdou na samostatný kontakt firmy, dohledaný podle IČ. Soukromý kontakt zákazníka se u nich nemění.</p>
                 @endif
             </div>
         </div>

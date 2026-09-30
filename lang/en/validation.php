@@ -158,6 +158,13 @@ return [
         'password' => 'password',
         'password_confirmation' => 'password confirmation',
         'token' => 'token',
+        'invoice_company' => 'company name',
+        'invoice_registration_no' => 'company ID',
+        'invoice_vat_no' => 'VAT ID',
+        'invoice_street' => 'street',
+        'invoice_city' => 'city',
+        'invoice_zip' => 'postal code',
+        'invoice_country' => 'country',
     ],
 
 ];

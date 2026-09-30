@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\CurrencyHelper;
+use App\Helpers\InvoiceDetails;
 use App\Helpers\SubscriptionPricing;
 use App\Helpers\VatHelper;
 use App\Models\Order;
@@ -391,15 +392,18 @@ class FakturoidService
     /**
      * Sestaví data odběratele (subjektu) pro Fakturoid.
      *
-     * Základ tvoří adresa z objednávky nebo předplatného. Pokud má zákazník
-     * v adminu zapnuté vlastní fakturační údaje, přepíší se jimi jméno, adresa,
-     * IČ a DIČ – e-mail a telefon zůstávají z objednávky.
+     * Přednost údajů:
+     *  1. firemní údaje zadané zákazníkem v pokladně u konkrétní objednávky
+     *     nebo předplatného ($invoiceDetails, viz App\Helpers\InvoiceDetails),
+     *  2. vlastní fakturační údaje zákazníka nastavené v adminu (users.invoice_*),
+     *  3. adresa z objednávky nebo předplatného.
+     * E-mail a telefon zůstávají vždy z objednávky.
      *
      * Klíče 'full_name', 'registration_no' a 'vat_no' se posílají vždy, i prázdné.
      * Subjekt se totiž při každé faktuře aktualizuje přes PATCH a chybějící klíč
      * by Fakturoid nechal beze změny – jednou nastavené IČ by tam zůstalo napořád.
      */
-    private function buildSubjectData(?User $user, ?array $address, ?string $fallbackCountry = null): array
+    private function buildSubjectData(?User $user, ?array $address, ?string $fallbackCountry = null, ?array $invoiceDetails = null): array
     {
         $address ??= [];
 
@@ -418,6 +422,12 @@ class FakturoidService
             'vat_no' => '',
         ];
 
+        // Údaje z pokladny mají přednost. Override z adminu se pak nepoužije vůbec,
+        // aby se nemíchala firma zadaná zákazníkem se sídlem nastaveným v adminu.
+        if (! empty($invoiceDetails['company'])) {
+            return InvoiceDetails::applyToSubject($subjectData, $invoiceDetails);
+        }
+
         if ($override = $user?->fakturoidSubjectOverride()) {
             $subjectData = array_merge($subjectData, $override);
         }
@@ -426,28 +436,44 @@ class FakturoidService
     }
 
     /**
-     * Ručně přenese fakturační údaje zákazníka na jeho subjekt ve Fakturoidu.
-     * Volá se z adminu po uložení údajů, aby si je admin mohl hned zkontrolovat.
+     * Ručně přenese fakturační údaje zákazníka z adminu do Fakturoidu, aby si je
+     * admin mohl hned zkontrolovat.
      *
-     * Vrací false, když zákazník subjekt ve Fakturoidu zatím nemá – ten vznikne
-     * až s jeho první fakturou a už rovnou se správnými údaji.
+     * Firemní údaje s IČ jdou na samostatný kontakt firmy – ten se dohledá, nebo
+     * založí. Bez IČ se aktualizuje soukromý kontakt zákazníka; když ho zákazník
+     * zatím nemá, vrací false a kontakt vznikne až s první fakturou.
      */
     public function syncSubjectForUser(User $user): bool
     {
-        if (! $user->fakturoid_subject_id) {
+        try {
+            $subjectData = $this->buildSubjectData($user, [
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'address' => $user->address,
+                'city' => $user->city,
+                'postal_code' => $user->postal_code,
+                'country' => $user->country,
+            ]);
+
+            if ($subjectData['registration_no'] !== '') {
+                return $this->resolveCompanySubjectId($user, $subjectData) !== null;
+            }
+
+            if (! $user->fakturoid_subject_id) {
+                return false;
+            }
+
+            $this->updateSubject($user->fakturoid_subject_id, $subjectData);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::warning('Exception syncing Fakturoid subject for user', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
             return false;
         }
-
-        $this->updateSubject($user->fakturoid_subject_id, $this->buildSubjectData($user, [
-            'email' => $user->email,
-            'phone' => $user->phone,
-            'address' => $user->address,
-            'city' => $user->city,
-            'postal_code' => $user->postal_code,
-            'country' => $user->country,
-        ]));
-
-        return true;
     }
 
     /**
@@ -456,99 +482,12 @@ class FakturoidService
     private function getOrCreateSubject(Order $order): ?int
     {
         try {
-            $user = $order->user;
-
             // Use billing address if available, otherwise shipping address
             $address = $order->billing_address ?? $order->shipping_address;
 
-            $subjectData = $this->buildSubjectData($user, $address);
+            $subjectData = $this->buildSubjectData($order->user, $address, null, $order->invoice_details);
 
-            // Check if user has cached Fakturoid subject ID
-            if ($user && $user->fakturoid_subject_id) {
-                Log::info('Using cached Fakturoid subject ID from user', [
-                    'user_id' => $user->id,
-                    'subject_id' => $user->fakturoid_subject_id,
-                ]);
-
-                // Update subject with current data
-                $this->updateSubject($user->fakturoid_subject_id, $subjectData);
-
-                return $user->fakturoid_subject_id;
-            }
-
-            // Try to find existing subject by email
-            if (! empty($subjectData['email'])) {
-                $searchResponse = $this->makeRequest(
-                    'GET',
-                    "{$this->apiUrl}/accounts/{$this->slug}/subjects.json",
-                    ['query' => $subjectData['email']]
-                );
-
-                if ($searchResponse->successful()) {
-                    $subjects = $searchResponse->json();
-                    if (! empty($subjects) && is_array($subjects)) {
-                        // Search API does full-text search, we need to verify email matches
-                        $matchingSubject = collect($subjects)->first(function ($subject) use ($subjectData) {
-                            return ! empty($subject['email']) &&
-                                   strtolower(trim($subject['email'])) === strtolower(trim($subjectData['email']));
-                        });
-
-                        if ($matchingSubject) {
-                            Log::info('Found existing Fakturoid subject with matching email', [
-                                'subject_id' => $matchingSubject['id'],
-                                'email' => $subjectData['email'],
-                            ]);
-
-                            // Update subject with current data
-                            $this->updateSubject($matchingSubject['id'], $subjectData);
-
-                            // Cache subject ID in user
-                            if ($user && ! $user->fakturoid_subject_id) {
-                                $user->fakturoid_subject_id = $matchingSubject['id'];
-                                $user->save();
-                            }
-
-                            return $matchingSubject['id'];
-                        }
-
-                        Log::info('Search returned subjects but none with matching email', [
-                            'searched_email' => $subjectData['email'],
-                            'results_count' => count($subjects),
-                        ]);
-                    }
-                }
-            }
-
-            // Create new subject
-            $response = $this->makeRequest(
-                'POST',
-                "{$this->apiUrl}/accounts/{$this->slug}/subjects.json",
-                $subjectData
-            );
-
-            if (! $response->successful()) {
-                Log::error('Fakturoid subject creation failed', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-
-                return null;
-            }
-
-            $subject = $response->json();
-
-            Log::info('Fakturoid subject created', [
-                'subject_id' => $subject['id'],
-                'name' => $subject['name'],
-            ]);
-
-            // Cache subject ID in user
-            if ($user && ! $user->fakturoid_subject_id) {
-                $user->fakturoid_subject_id = $subject['id'];
-                $user->save();
-            }
-
-            return $subject['id'];
+            return $this->resolveSubjectId($order->user, $subjectData);
         } catch (\Exception $e) {
             Log::error('Exception creating Fakturoid subject', [
                 'error' => $e->getMessage(),
@@ -556,6 +495,181 @@ class FakturoidService
 
             return null;
         }
+    }
+
+    /**
+     * Najde nebo založí subjekt ve Fakturoidu pro připravená data odběratele.
+     *
+     * Faktury s IČ jdou na samostatný kontakt firmy. Soukromý kontakt zákazníka
+     * (cachovaný na users.fakturoid_subject_id) se u nich nepatchuje – jinak by
+     * jeden kontakt "přeskakoval" mezi firmou a osobou podle poslední faktury.
+     */
+    private function resolveSubjectId(?User $user, array $subjectData): ?int
+    {
+        if (($subjectData['registration_no'] ?? '') !== '') {
+            return $this->resolveCompanySubjectId($user, $subjectData);
+        }
+
+        return $this->resolveCustomerSubjectId($user, $subjectData);
+    }
+
+    /**
+     * Kontakt firmy: podle našeho custom_id, jinak podle IČ (třeba kontakt,
+     * který ve Fakturoidu ručně založila účetní), jinak nový. ID se necachuje
+     * na uživatele – na jednu firmu může nakupovat víc lidí.
+     */
+    private function resolveCompanySubjectId(?User $user, array $subjectData): ?int
+    {
+        $registrationNo = preg_replace('/\s+/', '', (string) $subjectData['registration_no']);
+        $customId = 'ico-'.strtoupper($subjectData['country'] ?? 'CZ').'-'.$registrationNo;
+        $subjectData['custom_id'] = $customId;
+
+        $response = $this->makeRequest(
+            'GET',
+            "{$this->apiUrl}/accounts/{$this->slug}/subjects.json",
+            ['custom_id' => $customId]
+        );
+
+        $subject = $response->successful()
+            ? collect($response->json() ?: [])->first(fn ($s) => ($s['custom_id'] ?? null) === $customId)
+            : null;
+
+        if (! $subject) {
+            $searchResponse = $this->makeRequest(
+                'GET',
+                "{$this->apiUrl}/accounts/{$this->slug}/subjects/search.json",
+                ['query' => $registrationNo]
+            );
+
+            if ($searchResponse->successful()) {
+                // Soukromý kontakt zákazníka nepřebíráme, ani když má (z dřívějška) IČ firmy
+                $subject = collect($searchResponse->json() ?: [])->first(function ($s) use ($registrationNo, $user) {
+                    return preg_replace('/\s+/', '', (string) ($s['registration_no'] ?? '')) === $registrationNo
+                        && (int) $s['id'] !== (int) $user?->fakturoid_subject_id;
+                });
+            }
+        }
+
+        if ($subject) {
+            Log::info('Using Fakturoid company subject', [
+                'subject_id' => $subject['id'],
+                'custom_id' => $customId,
+            ]);
+
+            $this->updateSubject($subject['id'], $subjectData);
+
+            return $subject['id'];
+        }
+
+        return $this->createSubject($subjectData);
+    }
+
+    /**
+     * Soukromý kontakt zákazníka: z cache na uživateli, jinak podle e-mailu,
+     * jinak nový (a jeho ID se uloží na uživatele).
+     */
+    private function resolveCustomerSubjectId(?User $user, array $subjectData): ?int
+    {
+        // Check if user has cached Fakturoid subject ID
+        if ($user && $user->fakturoid_subject_id) {
+            Log::info('Using cached Fakturoid subject ID from user', [
+                'user_id' => $user->id,
+                'subject_id' => $user->fakturoid_subject_id,
+            ]);
+
+            // Update subject with current data
+            $this->updateSubject($user->fakturoid_subject_id, $subjectData);
+
+            return $user->fakturoid_subject_id;
+        }
+
+        // Try to find existing subject by email. Fulltextové hledání je jen na
+        // /subjects/search.json – /subjects.json parametr query ignoruje a vrátí
+        // prostě první stránku kontaktů.
+        if (! empty($subjectData['email'])) {
+            $searchResponse = $this->makeRequest(
+                'GET',
+                "{$this->apiUrl}/accounts/{$this->slug}/subjects/search.json",
+                ['query' => $subjectData['email']]
+            );
+
+            if ($searchResponse->successful()) {
+                $subjects = $searchResponse->json();
+                if (! empty($subjects) && is_array($subjects)) {
+                    // Search API does full-text search, we need to verify email matches.
+                    // Kontakty s IČ přeskakujeme – patří firmám a soukromá faktura
+                    // by je jinak přepsala na osobu.
+                    $matchingSubject = collect($subjects)->first(function ($subject) use ($subjectData) {
+                        return ! empty($subject['email']) &&
+                               strtolower(trim($subject['email'])) === strtolower(trim($subjectData['email'])) &&
+                               empty($subject['registration_no']);
+                    });
+
+                    if ($matchingSubject) {
+                        Log::info('Found existing Fakturoid subject with matching email', [
+                            'subject_id' => $matchingSubject['id'],
+                            'email' => $subjectData['email'],
+                        ]);
+
+                        // Update subject with current data
+                        $this->updateSubject($matchingSubject['id'], $subjectData);
+
+                        // Cache subject ID in user
+                        if ($user && ! $user->fakturoid_subject_id) {
+                            $user->fakturoid_subject_id = $matchingSubject['id'];
+                            $user->save();
+                        }
+
+                        return $matchingSubject['id'];
+                    }
+
+                    Log::info('Search returned subjects but none with matching email', [
+                        'searched_email' => $subjectData['email'],
+                        'results_count' => count($subjects),
+                    ]);
+                }
+            }
+        }
+
+        $subjectId = $this->createSubject($subjectData);
+
+        // Cache subject ID in user
+        if ($subjectId && $user && ! $user->fakturoid_subject_id) {
+            $user->fakturoid_subject_id = $subjectId;
+            $user->save();
+        }
+
+        return $subjectId;
+    }
+
+    /**
+     * Založí nový subjekt ve Fakturoidu
+     */
+    private function createSubject(array $subjectData): ?int
+    {
+        $response = $this->makeRequest(
+            'POST',
+            "{$this->apiUrl}/accounts/{$this->slug}/subjects.json",
+            $subjectData
+        );
+
+        if (! $response->successful()) {
+            Log::error('Fakturoid subject creation failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return null;
+        }
+
+        $subject = $response->json();
+
+        Log::info('Fakturoid subject created', [
+            'subject_id' => $subject['id'],
+            'name' => $subject['name'],
+        ]);
+
+        return $subject['id'];
     }
 
     /**
@@ -986,100 +1100,14 @@ class FakturoidService
     private function getOrCreateSubjectForSubscription(\App\Models\Subscription $subscription): ?int
     {
         try {
-            $user = $subscription->user;
-
             $subjectData = $this->buildSubjectData(
-                $user,
+                $subscription->user,
                 $subscription->shipping_address,
-                $subscription->shipping_country
+                $subscription->shipping_country,
+                $subscription->invoice_details
             );
 
-            // Check if user has cached Fakturoid subject ID
-            if ($user && $user->fakturoid_subject_id) {
-                Log::info('Using cached Fakturoid subject ID from user', [
-                    'user_id' => $user->id,
-                    'subject_id' => $user->fakturoid_subject_id,
-                ]);
-
-                // Update subject with current data
-                $this->updateSubject($user->fakturoid_subject_id, $subjectData);
-
-                return $user->fakturoid_subject_id;
-            }
-
-            // Try to find existing subject by email
-            if (! empty($subjectData['email'])) {
-                $searchResponse = $this->makeRequest(
-                    'GET',
-                    "{$this->apiUrl}/accounts/{$this->slug}/subjects.json",
-                    ['query' => $subjectData['email']]
-                );
-
-                if ($searchResponse->successful()) {
-                    $subjects = $searchResponse->json();
-                    if (! empty($subjects) && is_array($subjects)) {
-                        // Search API does full-text search, we need to verify email matches
-                        $matchingSubject = collect($subjects)->first(function ($subject) use ($subjectData) {
-                            return ! empty($subject['email']) &&
-                                   strtolower(trim($subject['email'])) === strtolower(trim($subjectData['email']));
-                        });
-
-                        if ($matchingSubject) {
-                            Log::info('Found existing Fakturoid subject with matching email', [
-                                'subject_id' => $matchingSubject['id'],
-                                'email' => $subjectData['email'],
-                            ]);
-
-                            // Update subject with current data
-                            $this->updateSubject($matchingSubject['id'], $subjectData);
-
-                            // Cache subject ID in user
-                            if ($user && ! $user->fakturoid_subject_id) {
-                                $user->fakturoid_subject_id = $matchingSubject['id'];
-                                $user->save();
-                            }
-
-                            return $matchingSubject['id'];
-                        }
-
-                        Log::info('Search returned subjects but none with matching email', [
-                            'searched_email' => $subjectData['email'],
-                            'results_count' => count($subjects),
-                        ]);
-                    }
-                }
-            }
-
-            // Create new subject
-            $response = $this->makeRequest(
-                'POST',
-                "{$this->apiUrl}/accounts/{$this->slug}/subjects.json",
-                $subjectData
-            );
-
-            if (! $response->successful()) {
-                Log::error('Fakturoid subject creation failed', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-
-                return null;
-            }
-
-            $subject = $response->json();
-
-            Log::info('Fakturoid subject created', [
-                'subject_id' => $subject['id'],
-                'name' => $subject['name'],
-            ]);
-
-            // Cache subject ID in user
-            if ($user && ! $user->fakturoid_subject_id) {
-                $user->fakturoid_subject_id = $subject['id'];
-                $user->save();
-            }
-
-            return $subject['id'];
+            return $this->resolveSubjectId($subscription->user, $subjectData);
         } catch (\Exception $e) {
             Log::error('Exception creating Fakturoid subject for subscription', [
                 'error' => $e->getMessage(),

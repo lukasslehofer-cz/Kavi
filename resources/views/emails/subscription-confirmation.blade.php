@@ -213,6 +213,14 @@
                                     {{ $subscription->shipping_address['billing_address'] }}<br>
                                     {{ $subscription->shipping_address['billing_postal_code'] }} {{ $subscription->shipping_address['billing_city'] }}
                                 </p>
+                                @if(! empty($subscription->invoice_details['company']))
+                                <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
+                                    <span style="color: #1c1c1c;">{{ $subscription->invoice_details['company'] }}</span><br>
+                                    {{ __('checkout.company.registration_no', [], $locale) }}: {{ $subscription->invoice_details['registration_no'] }}
+                                    @if(! empty($subscription->invoice_details['vat_no']))<br>{{ __('checkout.company.vat_no', [], $locale) }}: {{ $subscription->invoice_details['vat_no'] }}@endif
+                                    @if(! empty($subscription->invoice_details['street']))<br>{{ $subscription->invoice_details['street'] }}, {{ $subscription->invoice_details['zip'] ?? '' }} {{ $subscription->invoice_details['city'] ?? '' }}@endif
+                                </p>
+                                @endif
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
                                     {{ $subscription->shipping_address['email'] }}
                                     @if(isset($subscription->shipping_address['phone']))

@@ -311,6 +311,8 @@
                             </div>
                         </div>
                     </div>
+
+                    @include('checkout._company-fields')
                 </div>
 
                 <!-- Subscription Addon Option - Only for logged in users with active subscription (hidden for digital-only orders) -->

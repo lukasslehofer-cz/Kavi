@@ -233,6 +233,12 @@ return [
     // Billing address in profile
     'shipping_address' => 'Fakturační adresa',
     'shipping_address_description' => 'Výchozí fakturační údaje pro objednávky a faktury',
+
+    // Firemní údaje v profilu
+    'company_details' => 'Firemní údaje',
+    'company_details_description' => 'Fakturu vystavíme na firmu u dalších nákupů i u vašich aktivních předplatných. Už vystavené faktury se nemění.',
+    'company_toggle' => 'Fakturovat na firmu',
+    'company_toggle_hint' => 'Odškrtnutím firemní údaje odeberete z profilu i z aktivních předplatných.',
     'street_address' => 'Ulice a číslo popisné',
     'city' => 'Město',
     'postal_code' => 'PSČ',

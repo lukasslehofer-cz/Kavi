@@ -156,6 +156,12 @@
                     <span class="info-label">Telefon</span>
                     <span class="info-value">{{ $order->shipping_address['phone'] ?? 'N/A' }}</span>
                 </div>
+                @if(! empty($order->invoice_details['company']))
+                <div class="info-row">
+                    <span class="info-label">Firma</span>
+                    <span class="info-value">{{ $order->invoice_details['company'] }}, IČ {{ $order->invoice_details['registration_no'] ?? '' }}@if(! empty($order->invoice_details['vat_no'])), DIČ {{ $order->invoice_details['vat_no'] }}@endif</span>
+                </div>
+                @endif
                 <div class="info-row">
                     <span class="info-label">Datum</span>
                     <span class="info-value">{{ $order->created_at->format('d.m.Y H:i') }}</span>
@@ -235,6 +241,12 @@
                     <span class="info-label">Telefon</span>
                     <span class="info-value">{{ $shippingAddr['phone'] ?? 'N/A' }}</span>
                 </div>
+                @if(! empty($subscription->invoice_details['company']))
+                <div class="info-row">
+                    <span class="info-label">Firma</span>
+                    <span class="info-value">{{ $subscription->invoice_details['company'] }}, IČ {{ $subscription->invoice_details['registration_no'] ?? '' }}@if(! empty($subscription->invoice_details['vat_no'])), DIČ {{ $subscription->invoice_details['vat_no'] }}@endif</span>
+                </div>
+                @endif
                 <div class="info-row">
                     <span class="info-label">Datum vytvoření</span>
                     <span class="info-value">{{ $subscription->created_at->format('d.m.Y H:i') }}</span>

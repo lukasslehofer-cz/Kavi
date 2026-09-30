@@ -233,6 +233,12 @@ return [
     // Billing address in profile
     'shipping_address' => 'Billing address',
     'shipping_address_description' => 'Default billing details for orders and invoices',
+
+    // Company details in profile
+    'company_details' => 'Company details',
+    'company_details_description' => 'We will invoice your company for future purchases and for your active subscriptions. Invoices already issued stay unchanged.',
+    'company_toggle' => 'Invoice to a company',
+    'company_toggle_hint' => 'Unticking removes the company details from your profile and from your active subscriptions.',
     'street_address' => 'Street address',
     'city' => 'City',
     'postal_code' => 'Postal code',

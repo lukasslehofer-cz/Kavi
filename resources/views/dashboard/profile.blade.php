@@ -370,6 +370,171 @@
         </div>
     </div>
 
+    <!-- Company Details -->
+    @php
+        $profileCompany = auth()->user()->invoice_details;
+        // Po chybě validace platí hodnoty odeslané tímto formulářem; chyba v jiném
+        // formuláři profilu firemní údaje nepřepisuje.
+        $fromCompanyForm = (bool) old('_company_form');
+        $companyValue = fn ($field, $key) => $fromCompanyForm ? old($field) : ($profileCompany[$key] ?? '');
+        $profileIsCompany = $fromCompanyForm ? (bool) old('is_company') : (bool) $profileCompany;
+        $profileDifferentAddress = $fromCompanyForm ? (bool) old('invoice_different_address') : ! empty($profileCompany['street']);
+        $profileCompanyCountry = $companyValue('invoice_country', 'country');
+    @endphp
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden" id="company-details">
+        <div class="bg-gray-50 p-6 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">{{ __('dashboard.company_details') }}</h2>
+            <p class="text-sm text-gray-600 mt-1 font-light">{{ __('dashboard.company_details_description') }}</p>
+        </div>
+        <div class="p-6">
+            <form method="POST" action="{{ localizedRoute('dashboard.profile.company.update') }}" class="space-y-6" id="company-details-form">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="_company_form" value="1">
+
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" id="is_company" name="is_company" value="1"
+                           class="w-4 h-4 mt-0.5 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                           {{ $profileIsCompany ? 'checked' : '' }}>
+                    <span>
+                        <span class="block text-sm font-medium text-gray-900">{{ __('dashboard.company_toggle') }}</span>
+                        <span class="block text-sm text-gray-600 font-light">{{ __('dashboard.company_toggle_hint') }}</span>
+                    </span>
+                </label>
+
+                <div id="company-fields" class="space-y-6" style="{{ $profileIsCompany ? '' : 'display: none;' }}">
+                    <div>
+                        <label for="invoice_company" class="block text-sm font-medium text-gray-900 mb-2">{{ __('checkout.company.name') }}</label>
+                        <input type="text" id="invoice_company" name="invoice_company" maxlength="255" data-company-required
+                               value="{{ $companyValue('invoice_company', 'company') }}"
+                               class="input @error('invoice_company', 'invoiceDetails') border-red-500 @enderror"
+                               placeholder="{{ __('checkout.company.name_placeholder') }}">
+                        @error('invoice_company', 'invoiceDetails')
+                        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="invoice_registration_no" class="block text-sm font-medium text-gray-900 mb-2">{{ __('checkout.company.registration_no') }}</label>
+                            <input type="text" id="invoice_registration_no" name="invoice_registration_no" maxlength="20" data-company-required
+                                   value="{{ $companyValue('invoice_registration_no', 'registration_no') }}"
+                                   class="input @error('invoice_registration_no', 'invoiceDetails') border-red-500 @enderror"
+                                   placeholder="12345678">
+                            @error('invoice_registration_no', 'invoiceDetails')
+                            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="invoice_vat_no" class="block text-sm font-medium text-gray-900 mb-2">{{ __('checkout.company.vat_no') }}</label>
+                            <input type="text" id="invoice_vat_no" name="invoice_vat_no" maxlength="30"
+                                   value="{{ $companyValue('invoice_vat_no', 'vat_no') }}"
+                                   class="input @error('invoice_vat_no', 'invoiceDetails') border-red-500 @enderror"
+                                   placeholder="CZ12345678">
+                            @error('invoice_vat_no', 'invoiceDetails')
+                            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="invoice_different_address" name="invoice_different_address" value="1"
+                               class="w-4 h-4 mt-0.5 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+                               {{ $profileDifferentAddress ? 'checked' : '' }}>
+                        <span class="text-sm font-medium text-gray-900">{{ __('checkout.company.different_address') }}</span>
+                    </label>
+
+                    <div id="company-address-fields" class="space-y-6" style="{{ $profileIsCompany && $profileDifferentAddress ? '' : 'display: none;' }}">
+                        <div>
+                            <label for="invoice_street" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.street_address') }}</label>
+                            <input type="text" id="invoice_street" name="invoice_street" maxlength="255" data-company-required
+                                   value="{{ $companyValue('invoice_street', 'street') }}"
+                                   class="input @error('invoice_street', 'invoiceDetails') border-red-500 @enderror"
+                                   placeholder="{{ __('dashboard.address_placeholder') }}">
+                            @error('invoice_street', 'invoiceDetails')
+                            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label for="invoice_city" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.city') }}</label>
+                                <input type="text" id="invoice_city" name="invoice_city" maxlength="100" data-company-required
+                                       value="{{ $companyValue('invoice_city', 'city') }}"
+                                       class="input @error('invoice_city', 'invoiceDetails') border-red-500 @enderror"
+                                       placeholder="{{ __('dashboard.city_placeholder') }}">
+                                @error('invoice_city', 'invoiceDetails')
+                                <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="invoice_zip" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.postal_code') }}</label>
+                                <input type="text" id="invoice_zip" name="invoice_zip" maxlength="20" data-company-required
+                                       value="{{ $companyValue('invoice_zip', 'zip') }}"
+                                       class="input @error('invoice_zip', 'invoiceDetails') border-red-500 @enderror">
+                                @error('invoice_zip', 'invoiceDetails')
+                                <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="invoice_country" class="block text-sm font-medium text-gray-900 mb-2">{{ __('dashboard.country') }}</label>
+                                <select id="invoice_country" name="invoice_country" data-company-required
+                                        class="input @error('invoice_country', 'invoiceDetails') border-red-500 @enderror">
+                                    <option value="">{{ __('dashboard.select_country') }}</option>
+                                    @foreach(['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'] as $countryCode)
+                                    <option value="{{ $countryCode }}" {{ $profileCompanyCountry === $countryCode ? 'selected' : '' }}>{{ __('dashboard.country_'.$countryCode) }}</option>
+                                    @endforeach
+                                </select>
+                                @error('invoice_country', 'invoiceDetails')
+                                <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-4 border-t border-gray-200">
+                    <button type="submit" class="bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-2.5 rounded-full transition-all duration-200">
+                        <svg class="w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {{ __('dashboard.save_changes') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        const companyToggle = document.getElementById('is_company');
+        const addressToggle = document.getElementById('invoice_different_address');
+        const companyPanel = document.getElementById('company-fields');
+        const addressPanel = document.getElementById('company-address-fields');
+
+        if (!companyToggle || !companyPanel || !addressPanel) {
+            return;
+        }
+
+        // Povinná pole ve skrytém panelu by zablokovala odeslání formuláře,
+        // proto `required` dostávají jen pole, která jsou právě vidět.
+        function syncCompanyFields() {
+            const companyOn = companyToggle.checked;
+            const addressOn = companyOn && addressToggle.checked;
+
+            companyPanel.style.display = companyOn ? '' : 'none';
+            addressPanel.style.display = addressOn ? '' : 'none';
+
+            companyPanel.querySelectorAll('[data-company-required]').forEach(function (el) { el.required = companyOn; });
+            addressPanel.querySelectorAll('[data-company-required]').forEach(function (el) { el.required = addressOn; });
+        }
+
+        companyToggle.addEventListener('change', syncCompanyFields);
+        addressToggle.addEventListener('change', syncCompanyFields);
+        syncCompanyFields();
+    })();
+    </script>
+
     <!-- Packeta Pickup Point -->
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div class="bg-gray-50 p-6 border-b border-gray-200">

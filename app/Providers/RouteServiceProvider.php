@@ -165,6 +165,7 @@ class RouteServiceProvider extends ServiceProvider
                 Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index'])->name($this->routeName('index', $locale, $isPrimary, false));
                 Route::get('/' . $routes['dashboard-profile'], [\App\Http\Controllers\DashboardController::class, 'profile'])->name($this->routeName('profile', $locale, $isPrimary, false));
                 Route::put('/' . $routes['dashboard-profile'], [\App\Http\Controllers\DashboardController::class, 'updateProfile'])->name($this->routeName('profile.update', $locale, $isPrimary, false));
+                Route::put('/' . $routes['dashboard-profile-company'], [\App\Http\Controllers\DashboardController::class, 'updateInvoiceDetails'])->name($this->routeName('profile.company.update', $locale, $isPrimary, false));
                 Route::put('/' . $routes['dashboard-password'], [\App\Http\Controllers\DashboardController::class, 'updatePassword'])->name($this->routeName('password.update', $locale, $isPrimary, false));
                 Route::delete('/' . $routes['dashboard-profile-delete'], [\App\Http\Controllers\DashboardController::class, 'deleteAccount'])->name($this->routeName('profile.delete', $locale, $isPrimary, false));
                 Route::get('/' . $routes['dashboard-payment-methods'], [\App\Http\Controllers\DashboardController::class, 'managePaymentMethods'])->name($this->routeName('payment-methods.manage', $locale, $isPrimary, false));

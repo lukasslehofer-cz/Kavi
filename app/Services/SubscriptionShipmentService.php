@@ -297,8 +297,10 @@ class SubscriptionShipmentService
     /**
      * Calculate the next shipment date based on history and frequency
      * This is the core logic that replaces SubscriptionHelper::calculateNextShipmentDate
+     *
+     * @param  bool  $paidPendingOnly  Ber jen zaplacené pending - stav, jaký zbude po úklidu v resume
      */
-    public function calculateNextShipmentDate(Subscription $subscription): ?Carbon
+    public function calculateNextShipmentDate(Subscription $subscription, bool $paidPendingOnly = false): ?Carbon
     {
         $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
 
@@ -318,6 +320,7 @@ class SubscriptionShipmentService
         // and downstream availability checks then fail against a month nobody will ship.
         $firstPending = $subscription->shipments()
             ->where('status', 'pending')
+            ->when($paidPendingOnly, fn ($q) => $q->whereNotNull('subscription_payment_id'))
             ->where('shipment_date', '>=', today()->startOfDay())
             ->orderBy('shipment_date', 'asc')
             ->first();
@@ -614,8 +617,9 @@ class SubscriptionShipmentService
             ];
         }
 
-        // 1. Calculate what would be the next shipment date
-        $nextShipmentDate = $this->calculateNextShipmentDate($subscription);
+        // 1. Měsíc, do kterého resume předplatné skutečně obnoví - kontrola skladu
+        // i nový pending řádek níže míří na stejné datum
+        $nextShipmentDate = $this->resolveResumeShipmentDate($subscription);
 
         if (! $nextShipmentDate) {
             return [
@@ -715,55 +719,9 @@ class SubscriptionShipmentService
             'pause_reason' => null,
         ]);
 
-        // 7. Calculate next shipment date and ensure pending shipment exists
-        $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
-        $nextShipmentDate = $this->calculateNextShipmentDate($subscription);
-
-        if (! $nextShipmentDate) {
-            $nextShipmentDate = $this->getFirstShipmentDate($subscription);
-        }
-
-        // Check what exists for this date
-        $existingShipment = $subscription->shipments()
-            ->whereDate('shipment_date', $nextShipmentDate->toDateString())
-            ->first();
-
-        // Get billing date for this shipment
+        // 7. Ensure pending shipment exists for the date resolved in step 1
         $schedule = ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
         $billingDate = $schedule?->billing_date ?? $nextShipmentDate->copy()->day(15);
-
-        // Skip forward until we find a month with a future billing date and no skipped shipment
-        $skippedMonths = 0;
-        while (
-            ($existingShipment && $existingShipment->status === 'skipped')
-            || $billingDate->lte(today())
-        ) {
-            $nextMonth = $nextShipmentDate->copy()->addMonths($frequencyMonths);
-            $schedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
-            $nextShipmentDate = $schedule?->shipment_date ?? $nextMonth->copy()->day(20);
-            $billingDate = $schedule?->billing_date ?? $nextShipmentDate->copy()->day(15);
-
-            $existingShipment = $subscription->shipments()
-                ->whereDate('shipment_date', $nextShipmentDate->toDateString())
-                ->first();
-
-            $skippedMonths++;
-            if ($skippedMonths > 12) {
-                \Log::error('Resume skip loop exceeded 12 months, breaking', [
-                    'subscription_id' => $subscription->id,
-                ]);
-                break;
-            }
-        }
-
-        if ($skippedMonths > 0) {
-            \Log::info('Skipped months after resume to find future billing date', [
-                'subscription_id' => $subscription->id,
-                'skipped_months' => $skippedMonths,
-                'new_shipment_date' => $nextShipmentDate->toDateString(),
-                'new_billing_date' => $billingDate->toDateString(),
-            ]);
-        }
 
         // Ensure pending shipment exists for the correct date (idempotentní, klíč = schedule)
         $resumeSchedule = ShipmentSchedule::getOrCreateForMonth($nextShipmentDate->year, $nextShipmentDate->month);
@@ -814,6 +772,70 @@ class SubscriptionShipmentService
             'message' => __('flash.subscription.resumed'),
             'next_shipment' => $nextShipmentDate,
         ];
+    }
+
+    /**
+     * Datum rozesílky, do které resumeSubscription() předplatné skutečně obnoví.
+     *
+     * Počítá se PŘED úklidem a nic nezapisuje, aby kontrola skladu mířila na stejný
+     * měsíc jako nový pending řádek. Úklid smaže budoucí skipped a nezaplacené pending,
+     * proto se tu berou jen zaplacené pending. Bez toho u pauzy od admina (vše skipped)
+     * vycházel poslední odeslaný box + frekvence, tedy měsíc dávno po billing date,
+     * a resume padal na vyprodané kávě z minulé rozesílky.
+     */
+    protected function resolveResumeShipmentDate(Subscription $subscription): ?Carbon
+    {
+        $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
+        $nextShipmentDate = $this->calculateNextShipmentDate($subscription, paidPendingOnly: true);
+
+        if (! $nextShipmentDate) {
+            // Jednorázový box, který už odešel, nemá kam obnovit
+            if ($subscription->frequency_months == 0) {
+                return null;
+            }
+
+            $nextShipmentDate = $this->getFirstShipmentDate($subscription);
+        }
+
+        // Skipped řádky přežijí úklid jen v minulosti
+        $survivingSkipped = fn (Carbon $date) => $subscription->shipments()
+            ->where('status', 'skipped')
+            ->where('shipment_date', '<', today()->startOfDay())
+            ->whereDate('shipment_date', $date->toDateString())
+            ->exists();
+
+        $schedule = ShipmentSchedule::getForMonth($nextShipmentDate->year, $nextShipmentDate->month);
+        $billingDate = $schedule?->billing_date ?? $nextShipmentDate->copy()->day(15);
+
+        // Skip forward until we find a month with a future billing date and no skipped shipment
+        $skippedMonths = 0;
+        while ($billingDate->lte(today()) || $survivingSkipped($nextShipmentDate)) {
+            $nextMonth = $nextShipmentDate->copy()->addMonths($frequencyMonths);
+            $schedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
+            $nextShipmentDate = $schedule?->shipment_date->copy()->startOfDay() ?? $nextMonth->copy()->day(20)->startOfDay();
+            $billingDate = $schedule?->billing_date ?? $nextShipmentDate->copy()->day(15);
+
+            $skippedMonths++;
+            // Pojistka proti zacyklení hlídá datum, ne počet kroků - dlouho stojící
+            // předplatné startuje od posledního boxu i víc než rok zpátky
+            if ($nextShipmentDate->gt(today()->addYear())) {
+                \Log::error('Resume skip loop went more than a year ahead, breaking', [
+                    'subscription_id' => $subscription->id,
+                ]);
+                break;
+            }
+        }
+
+        if ($skippedMonths > 0) {
+            \Log::info('Skipped months after resume to find future billing date', [
+                'subscription_id' => $subscription->id,
+                'skipped_months' => $skippedMonths,
+                'new_shipment_date' => $nextShipmentDate->toDateString(),
+                'new_billing_date' => $billingDate->toDateString(),
+            ]);
+        }
+
+        return $nextShipmentDate;
     }
 
     /**
@@ -1312,9 +1334,13 @@ class SubscriptionShipmentService
         // Fallback pro první zásilku: platba z checkoutu nemusí mít period_end ve stejném
         // měsíci a legacy řádky ho nemají vůbec. Až sem, ne dřív - dřív by fallback přebil
         // korektní shodu podle měsíce.
+        // Jen platba, která ještě nekryje žádný box: dokud první box nového předplatného
+        // neodejde, platí podmínka i pro další měsíc a checkoutová platba by se navázala
+        // podruhé - box by se tvářil zaplacený a billing cron by ho nevzal jako due.
         if (! $subscription->last_shipment_date && ! $subscription->shipments()->where('status', 'sent')->exists()) {
             return $subscription->payments()
                 ->where('status', 'paid')
+                ->whereDoesntHave('shipment')
                 ->orderBy('paid_at', 'asc')
                 ->first();
         }

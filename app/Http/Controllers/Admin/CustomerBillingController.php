@@ -80,7 +80,7 @@ class CustomerBillingController extends Controller
             // dá otevřít i v prostředí bez nastavených přístupů k Fakturoidu.
             $message .= app(FakturoidService::class)->syncSubjectForUser($user->fresh())
                 ? ' Subjekt ve Fakturoidu byl aktualizován.'
-                : ' Zákazník zatím ve Fakturoidu subjekt nemá – vznikne s jeho první fakturou.';
+                : ' Ve Fakturoidu zatím není co aktualizovat – údaje se propíšou s další fakturou.';
         }
 
         return redirect()

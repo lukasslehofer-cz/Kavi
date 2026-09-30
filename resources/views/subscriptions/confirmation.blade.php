@@ -218,6 +218,15 @@
                                 {{ $subscription->shipping_address['billing_address'] }}<br>
                                 {{ $subscription->shipping_address['billing_postal_code'] }} {{ $subscription->shipping_address['billing_city'] }}
                             </span>
+                            @if(! empty($subscription->invoice_details['company']))
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mt-4 mb-1">{{ __('checkout.company.summary_title') }}</span>
+                            <span class="text-dark-800">
+                                {{ $subscription->invoice_details['company'] }}<br>
+                                {{ __('checkout.company.registration_no') }}: {{ $subscription->invoice_details['registration_no'] }}
+                                @if(! empty($subscription->invoice_details['vat_no']))<br>{{ __('checkout.company.vat_no') }}: {{ $subscription->invoice_details['vat_no'] }}@endif
+                                @if(! empty($subscription->invoice_details['street']))<br>{{ $subscription->invoice_details['street'] }}, {{ $subscription->invoice_details['zip'] ?? '' }} {{ $subscription->invoice_details['city'] ?? '' }}@endif
+                            </span>
+                            @endif
                         </div>
                     </div>
                 </div>

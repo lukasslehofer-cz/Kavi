@@ -30,6 +30,8 @@ class User extends Authenticatable
         'invoice_city',
         'invoice_zip',
         'invoice_country',
+        // Uložené firemní údaje z profilu (tvar viz App\Helpers\InvoiceDetails)
+        'invoice_details',
         // 'is_admin' a 'is_affiliate_partner' záměrně NEJSOU fillable kvůli ochraně
         // proti mass assignmentu (eskalace oprávnění). Nastavují se explicitně přes forceFill().
         'affiliate_activated_at',
@@ -53,6 +55,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'password_set_by_user' => 'boolean',
         'invoice_override' => 'boolean',
+        'invoice_details' => 'array',
         'is_admin' => 'boolean',
         'is_affiliate_partner' => 'boolean',
         'affiliate_activated_at' => 'datetime',

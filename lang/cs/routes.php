@@ -85,6 +85,7 @@ return [
     // Dashboard
     'dashboard' => 'nastenka',
     'dashboard-profile' => 'profil',
+    'dashboard-profile-company' => 'profil/firma',
     'dashboard-password' => 'heslo',
     'dashboard-profile-delete' => 'profil/smazat-ucet',
     'dashboard-payment-methods' => 'platebni-metody/spravovat',

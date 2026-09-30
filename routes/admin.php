@@ -87,6 +87,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Subscriptions
     Route::resource('subscriptions', \App\Http\Controllers\Admin\SubscriptionController::class)->only(['index', 'show', 'update', 'destroy']);
     Route::put('/subscriptions/{subscription}/update-address', [\App\Http\Controllers\Admin\SubscriptionController::class, 'updateAddress'])->name('subscriptions.update-address');
+    Route::put('/subscriptions/{subscription}/invoice-details', [\App\Http\Controllers\Admin\SubscriptionController::class, 'updateInvoiceDetails'])->name('subscriptions.update-invoice-details');
     Route::post('/subscriptions/{subscription}/pause', [\App\Http\Controllers\Admin\SubscriptionController::class, 'pause'])->name('subscriptions.pause');
     Route::post('/subscriptions/{subscription}/resume', [\App\Http\Controllers\Admin\SubscriptionController::class, 'resume'])->name('subscriptions.resume');
     Route::get('/subscription-payment/{payment}/invoice', [\App\Http\Controllers\Admin\SubscriptionController::class, 'downloadInvoice'])->name('subscription-payment.invoice');

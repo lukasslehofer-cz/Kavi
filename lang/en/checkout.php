@@ -71,6 +71,19 @@ return [
         'notes_optional' => '/ OPTIONAL',
         'notes_placeholder' => 'E.G. PLEASE RING 2ND FLOOR OR LEAVE AT RECEPTION',
     ],
+
+    // Buying as a company (optional company details on the invoice)
+    'company' => [
+        'checkbox_label' => 'I am buying as a company',
+        'hint' => 'We will issue the invoice to the company with the registration and VAT number below.',
+        'name' => 'Company name',
+        'name_placeholder' => 'e.g. Coffee Ltd.',
+        'registration_no' => 'Company ID',
+        'vat_no' => 'VAT ID',
+        'different_address' => 'Company seat is at a different address',
+        'address_title' => 'Company seat',
+        'summary_title' => 'Company',
+    ],
     
     // Announcement notice (admin: Hlášky)
     'announcement' => [

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\CurrencyHelper;
+use App\Helpers\InvoiceDetails;
 use App\Models\NewsletterSubscriber;
 use App\Models\Order;
 use App\Models\Subscription;
@@ -331,7 +332,8 @@ class StripeService
         ?int $discountMonths = null,
         float $shipping = 0,
         ?\App\Models\ShippingRate $shippingRate = null,
-        float $giftVoucherShippingCredit = 0
+        float $giftVoucherShippingCredit = 0,
+        ?array $invoiceDetails = null
     ): StripeSession {
         // Core address fields only — Stripe limits each metadata value to 500 chars.
         // Packeta/carrier fields are sent as separate top-level metadata keys below
@@ -430,6 +432,11 @@ class StripeService
         } else {
             $subscriptionMetadata['guest_email'] = $shippingAddress['email'];
         }
+
+        // Firemní údaje (nákup na firmu) jako samostatné ploché klíče – každá hodnota
+        // má max. 255 znaků, takže se vejde do limitu 500 znaků na hodnotu.
+        // Webhook z nich předplatné založí dřív, než vystaví první fakturu.
+        $subscriptionMetadata = array_merge($subscriptionMetadata, InvoiceDetails::toStripeMetadata($invoiceDetails));
 
         // Create session with ONE-TIME payment + save payment method for future
         $sessionData = [
@@ -1462,6 +1469,7 @@ class StripeService
                 'configured_price' => $metadata['configured_price'] ?? null,
                 'currency' => strtoupper($paymentIntentCurrency),
                 'shipping_address' => $shippingAddress,
+                'invoice_details' => InvoiceDetails::fromStripeMetadata($metadata),
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'meta_fbp' => ! empty($metadata['meta_fbp']) ? $metadata['meta_fbp'] : null,
                 'meta_fbc' => ! empty($metadata['meta_fbc']) ? $metadata['meta_fbc'] : null,
@@ -1680,6 +1688,8 @@ class StripeService
                             'packeta_point_name' => $subscription->packeta_point_name ?? null,
                             'packeta_point_address' => $subscription->packeta_point_address ?? null,
                             'stripe_customer_id' => $stripeCustomerId, // Save Stripe customer ID from session
+                            // Firma z pokladny se uloží i do profilu nového účtu
+                            'invoice_details' => $subscription->invoice_details,
                         ]);
 
                         // Link subscription to the new user

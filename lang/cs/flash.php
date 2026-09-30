@@ -72,6 +72,8 @@ return [
     // Profile & Account
     'profile' => [
         'updated' => 'Profil byl úspěšně aktualizován.',
+        'company_updated' => 'Firemní údaje uloženy. Použijí se u dalších nákupů i u faktur vašich aktivních předplatných.',
+        'company_removed' => 'Firemní údaje odebrány. Další faktury vystavíme bez firmy.',
         'password_changed' => 'Heslo bylo úspěšně změněno.',
         'account_deleted' => 'Váš účet byl úspěšně smazán. Na zadaný email jsme vám poslali potvrzení.',
         'account_delete_error' => 'Při mazání účtu došlo k chybě. Zkuste to prosím později nebo nás kontaktujte.',

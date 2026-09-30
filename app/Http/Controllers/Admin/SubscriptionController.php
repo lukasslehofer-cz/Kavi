@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\InvoiceDetails;
 use App\Http\Controllers\Controller;
 use App\Models\Subscription;
 use App\Models\ShipmentSchedule;
@@ -154,6 +155,31 @@ class SubscriptionController extends Controller
 
         return redirect()->route('admin.subscriptions.show', $subscription)
             ->with('success', 'Dodací adresa byla úspěšně aktualizována.');
+    }
+
+    /**
+     * Upraví firemní údaje předplatného (nákup na firmu). Údaje z pokladny mají
+     * na fakturách přednost před nastavením u zákazníka, takže bez této úpravy
+     * by se překlep v IČ táhl na všech budoucích fakturách předplatného.
+     */
+    public function updateInvoiceDetails(Request $request, Subscription $subscription)
+    {
+        $validated = $request->validateWithBag('invoiceDetails', InvoiceDetails::rules());
+
+        $subscription->update([
+            'invoice_details' => InvoiceDetails::fromInput($validated),
+        ]);
+
+        Log::info('Subscription invoice details updated by admin', [
+            'subscription_id' => $subscription->id,
+            'admin_user_id' => auth()->id(),
+            'is_company' => $subscription->invoice_details !== null,
+        ]);
+
+        return redirect()->route('admin.subscriptions.show', $subscription)
+            ->with('success', $subscription->invoice_details
+                ? 'Firemní údaje uloženy. Použijí se na všech dalších fakturách předplatného.'
+                : 'Firemní údaje odebrány. Další faktury předplatného se vystaví bez firmy.');
     }
 
     /**

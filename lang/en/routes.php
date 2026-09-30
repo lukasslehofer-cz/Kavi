@@ -85,6 +85,7 @@ return [
     // Dashboard
     'dashboard' => 'dashboard',
     'dashboard-profile' => 'profile',
+    'dashboard-profile-company' => 'profile/company',
     'dashboard-password' => 'password',
     'dashboard-profile-delete' => 'profile/delete-account',
     'dashboard-payment-methods' => 'payment-methods/manage',

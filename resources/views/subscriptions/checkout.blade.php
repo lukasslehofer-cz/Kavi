@@ -279,6 +279,8 @@
                             </div>
                         </div>
                     </div>
+
+                    @include('checkout._company-fields')
                 </div>
 
                 <!-- Packeta Pickup Point - Swiss Style -->

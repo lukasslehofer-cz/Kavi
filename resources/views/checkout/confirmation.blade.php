@@ -191,6 +191,15 @@
                                 {{ $order->shipping_address['billing_address'] }}<br>
                                 {{ $order->shipping_address['billing_postal_code'] }} {{ $order->shipping_address['billing_city'] }}
                             </span>
+                            @if(! empty($order->invoice_details['company']))
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mt-4 mb-1">{{ __('checkout.company.summary_title') }}</span>
+                            <span class="text-dark-800">
+                                {{ $order->invoice_details['company'] }}<br>
+                                {{ __('checkout.company.registration_no') }}: {{ $order->invoice_details['registration_no'] }}
+                                @if(! empty($order->invoice_details['vat_no']))<br>{{ __('checkout.company.vat_no') }}: {{ $order->invoice_details['vat_no'] }}@endif
+                                @if(! empty($order->invoice_details['street']))<br>{{ $order->invoice_details['street'] }}, {{ $order->invoice_details['zip'] ?? '' }} {{ $order->invoice_details['city'] ?? '' }}@endif
+                            </span>
+                            @endif
                         </div>
                     </div>
                 </div>

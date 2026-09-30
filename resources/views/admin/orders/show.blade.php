@@ -253,10 +253,13 @@
                         <p class="text-sm font-medium text-gray-600 mb-1">Fakturační adresa:</p>
                         <p>{{ $order->shipping_address['billing_address'] ?? 'N/A' }}</p>
                         <p>{{ $order->shipping_address['billing_postal_code'] ?? '' }} {{ $order->shipping_address['billing_city'] ?? '' }}</p>
-                        <p>{{ $order->shipping_address['country'] ?? 'CZ' }}</p>
+                        {{-- Pokladna ukládá billing_country, admin úprava adresy country --}}
+                        <p>{{ $order->shipping_address['country'] ?? $order->shipping_address['billing_country'] ?? 'CZ' }}</p>
                     </div>
 
-                    @if($order->user?->invoice_override)
+                    @if($order->invoice_details)
+                    @include('admin._invoice-details', ['details' => $order->invoice_details])
+                    @elseif($order->user?->invoice_override)
                     <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg">
                         <p class="text-sm text-amber-900">
                             Faktura se vystaví na <strong>vlastní fakturační údaje zákazníka</strong>, ne na adresu výše.

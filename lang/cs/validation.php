@@ -143,6 +143,13 @@ return [
         'password' => 'heslo',
         'password_confirmation' => 'potvrzení hesla',
         'token' => 'token',
+        'invoice_company' => 'název firmy',
+        'invoice_registration_no' => 'IČ',
+        'invoice_vat_no' => 'DIČ',
+        'invoice_street' => 'ulice',
+        'invoice_city' => 'město',
+        'invoice_zip' => 'PSČ',
+        'invoice_country' => 'země',
     ],
 
 ];

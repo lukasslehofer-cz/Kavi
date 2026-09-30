@@ -278,6 +278,8 @@ class AccountDeletionService
                 $order->update([
                     'shipping_address' => $anonymizedShipping,
                     'billing_address' => $anonymizedBilling,
+                    // Firemní údaje z pokladny – u OSVČ jde o osobní údaje
+                    'invoice_details' => null,
                 ]);
 
                 \Log::info('Anonymized order', ['order_id' => $order->id]);
@@ -305,6 +307,8 @@ class AccountDeletionService
                 $subscription->update([
                     'shipping_address' => $anonymizedShipping,
                     'delivery_notes' => null,
+                    // Firemní údaje z pokladny – u OSVČ jde o osobní údaje
+                    'invoice_details' => null,
                 ]);
 
                 \Log::info('Anonymized subscription', ['subscription_id' => $subscription->id]);
@@ -386,6 +390,7 @@ class AccountDeletionService
             'invoice_city' => null,
             'invoice_zip' => null,
             'invoice_country' => null,
+            'invoice_details' => null,
             'deleted_at' => now(),
             'anonymized_at' => now(),
             // Keep stripe_customer_id and fakturoid_subject_id for accounting/invoice purposes

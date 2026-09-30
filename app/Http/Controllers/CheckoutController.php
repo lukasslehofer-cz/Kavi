@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CurrencyHelper;
+use App\Helpers\InvoiceDetails;
 use App\Helpers\VatHelper;
 use App\Mail\OrderConfirmation;
 use App\Models\AnnouncementBanner;
@@ -259,6 +260,9 @@ class CheckoutController extends Controller
         // Informační hláška z adminu (sekce Hlášky)
         $checkoutNotice = AnnouncementBanner::getCurrentFor(AnnouncementBanner::PLACEMENT_CHECKOUT);
 
+        // Firemní údaje uložené v profilu – předvyplní se v pokladně
+        $invoicePrefill = auth()->user()?->invoice_details;
+
         return view('checkout.index', compact(
             'cartItems',
             'subtotal',
@@ -277,7 +281,8 @@ class CheckoutController extends Controller
             'availableCountries',
             'cartQualifiesForFreeShipping',
             'cartContainsOnlyDigitalProducts',
-            'checkoutNotice'
+            'checkoutNotice',
+            'invoicePrefill'
         ));
     }
 
@@ -359,7 +364,12 @@ class CheckoutController extends Controller
             $rules['packeta_point_address'] = 'nullable|string';
         }
 
+        // Volitelný nákup na firmu (název, IČ, DIČ, případně jiné sídlo)
+        $rules = array_merge($rules, InvoiceDetails::rules());
+
         $request->validate($rules);
+
+        $invoiceDetails = InvoiceDetails::fromInput($request->all());
 
         // Check for existing user if guest checkout
         if (! auth()->check()) {
@@ -403,6 +413,10 @@ class CheckoutController extends Controller
                             'order_id' => $existingPendingOrder->id,
                             'order_number' => $existingPendingOrder->order_number,
                         ]);
+
+                        // Zákazník se mohl vrátit ze zrušené platby jen proto, aby zaškrtl
+                        // nákup na firmu – faktura se vystaví až z této objednávky.
+                        $existingPendingOrder->update(['invoice_details' => $invoiceDetails]);
 
                         DB::commit();
 
@@ -614,6 +628,7 @@ class CheckoutController extends Controller
                     'packeta_point_id' => $request->packeta_point_id,
                     'packeta_point_name' => $request->packeta_point_name,
                     'packeta_point_address' => $request->packeta_point_address,
+                    'invoice_details' => $invoiceDetails,
                 ]);
 
                 $userId = $newUser->id;
@@ -656,6 +671,7 @@ class CheckoutController extends Controller
                     'carrier_id' => $carrierId,
                     'carrier_pickup_point' => $carrierPickupPoint,
                 ],
+                'invoice_details' => $invoiceDetails,
                 'customer_notes' => $request->notes, // User's actual notes from form
                 'admin_notes' => null, // Will be set after order creation with cart backup
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
@@ -692,7 +708,10 @@ class CheckoutController extends Controller
                     'packeta_point_id' => $request->packeta_point_id,
                     'packeta_point_name' => $request->packeta_point_name,
                     'packeta_point_address' => $request->packeta_point_address,
-                ]);
+                ] + ($invoiceDetails
+                    // Nákup na firmu uloží firmu do profilu; soukromý nákup ji tam nechá
+                    ? ['invoice_details' => $invoiceDetails]
+                    : []));
             }
 
             foreach ($orderItems as $item) {

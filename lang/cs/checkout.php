@@ -71,6 +71,19 @@ return [
         'notes_optional' => '/ VOLITELNÉ',
         'notes_placeholder' => 'NAPŘ. PROSÍM ZVONIT NA 2. PATRO NEBO NECHAT U VRÁTNICE',
     ],
+
+    // Nákup na firmu (volitelné firemní údaje na faktuře)
+    'company' => [
+        'checkbox_label' => 'Nakupuji na firmu',
+        'hint' => 'Fakturu vystavíme na firmu s uvedeným IČ a DIČ.',
+        'name' => 'Název firmy',
+        'name_placeholder' => 'Např. Kavárna s.r.o.',
+        'registration_no' => 'IČ',
+        'vat_no' => 'DIČ',
+        'different_address' => 'Sídlo firmy je na jiné adrese',
+        'address_title' => 'Sídlo firmy',
+        'summary_title' => 'Firma',
+    ],
     
     // Announcement notice (admin: Hlášky)
     'announcement' => [

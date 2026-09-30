@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CurrencyHelper;
+use App\Helpers\InvoiceDetails;
 use App\Mail\SubscriptionConfirmation;
 use App\Models\AnnouncementBanner;
 use App\Models\Coupon;
@@ -562,7 +563,10 @@ class SubscriptionController extends Controller
         // Informační hláška z adminu (sekce Hlášky)
         $checkoutNotice = AnnouncementBanner::getCurrentFor(AnnouncementBanner::PLACEMENT_SUBSCRIPTION_CHECKOUT);
 
-        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'isGiftVoucher', 'giftVoucherShippingCredit', 'packetaVendors', 'shipping', 'availableCountries', 'checkoutNotice'));
+        // Firemní údaje uložené v profilu – předvyplní se v pokladně
+        $invoicePrefill = auth()->user()?->invoice_details;
+
+        return view('subscriptions.checkout', compact('configuration', 'price', 'priceWithoutVat', 'vat', 'shippingInfo', 'appliedCoupon', 'discount', 'adjustedDiscount', 'isGiftVoucher', 'giftVoucherShippingCredit', 'packetaVendors', 'shipping', 'availableCountries', 'checkoutNotice', 'invoicePrefill'));
     }
 
     /**
@@ -594,7 +598,7 @@ class SubscriptionController extends Controller
             'payment_method' => 'required|in:card,transfer',
             'delivery_notes' => 'nullable|string|max:500',
             'coupon_code' => 'nullable|string', // Kupón z hidden input
-        ]);
+        ] + InvoiceDetails::rules()); // + volitelný nákup na firmu (název, IČ, DIČ, jiné sídlo)
 
         try {
             // Zpracování kupónu - z formuláře (POST) nebo fallback na session/cookie
@@ -674,6 +678,8 @@ class SubscriptionController extends Controller
 
             // Save contact info, billing address and Packeta pickup point to user for future use (if authenticated)
             if (auth()->check()) {
+                $invoiceDetails = InvoiceDetails::fromInput($validated);
+
                 auth()->user()->update([
                     'phone' => $validated['phone'],
                     'address' => $validated['billing_address'],
@@ -683,7 +689,10 @@ class SubscriptionController extends Controller
                     'packeta_point_id' => $validated['packeta_point_id'],
                     'packeta_point_name' => $validated['packeta_point_name'],
                     'packeta_point_address' => $validated['packeta_point_address'],
-                ]);
+                ] + ($invoiceDetails
+                    // Nákup na firmu uloží firmu do profilu; soukromý nákup ji tam nechá
+                    ? ['invoice_details' => $invoiceDetails]
+                    : []));
             }
 
             // Check if this is a one-time box order (frequency = 0)
@@ -757,7 +766,9 @@ class SubscriptionController extends Controller
                     $discountMonths,
                     $shipping,
                     $shippingRate,
-                    $giftVoucherShippingCredit
+                    $giftVoucherShippingCredit,
+                    // Předplatné kartou vzniká až ve webhooku ze Stripe metadat
+                    InvoiceDetails::fromInput($validated)
                 );
 
                 // Redirect to Stripe Checkout
@@ -789,6 +800,7 @@ class SubscriptionController extends Controller
                     'status' => 'pending', // Will be activated after payment confirmation
                     'starts_at' => now(),
                     'next_billing_date' => $nextBillingDate,
+                    'invoice_details' => InvoiceDetails::fromInput($validated),
                     'shipping_address' => [
                         'name' => $validated['name'],
                         'email' => $validated['email'],
@@ -1028,6 +1040,7 @@ class SubscriptionController extends Controller
                         'packeta_point_id' => $validated['packeta_point_id'],
                         'packeta_point_name' => $validated['packeta_point_name'],
                         'packeta_point_address' => $validated['packeta_point_address'],
+                        'invoice_details' => InvoiceDetails::fromInput($validated),
                     ]);
 
                     auth()->login($newUser);
@@ -1054,6 +1067,7 @@ class SubscriptionController extends Controller
                     'status' => 'pending',
                     'starts_at' => now(),
                     'next_billing_date' => null, // No next billing for one-time
+                    'invoice_details' => InvoiceDetails::fromInput($validated),
                     'shipping_address' => [
                         'name' => $validated['name'],
                         'email' => $validated['email'],
@@ -1143,6 +1157,7 @@ class SubscriptionController extends Controller
                 'status' => 'pending',
                 'starts_at' => now(),
                 'next_billing_date' => null, // No next billing for one-time
+                'invoice_details' => InvoiceDetails::fromInput($validated),
                 'shipping_address' => [
                     'name' => $validated['name'],
                     'email' => $validated['email'],
@@ -1280,6 +1295,7 @@ class SubscriptionController extends Controller
                     'packeta_point_id' => $validated['packeta_point_id'],
                     'packeta_point_name' => $validated['packeta_point_name'],
                     'packeta_point_address' => $validated['packeta_point_address'],
+                    'invoice_details' => InvoiceDetails::fromInput($validated),
                 ]);
 
                 // Auto-login
@@ -1326,6 +1342,7 @@ class SubscriptionController extends Controller
                 'status' => 'active', // Immediately active
                 'starts_at' => now(),
                 'next_billing_date' => $nextBillingDate,
+                'invoice_details' => InvoiceDetails::fromInput($validated),
                 'shipping_address' => [
                     'name' => $validated['name'],
                     'email' => $validated['email'],
