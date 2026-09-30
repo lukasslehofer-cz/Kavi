@@ -41,6 +41,8 @@ class GoogleReviewsService
      * Recenze k zobrazení, od nejnovějších.
      *
      * Záměrně se neřadí ani nevybírá podle hvězdiček - viz pravidla v hlavičce třídy.
+     * Vynechávají se jen recenze bez textu (samotné hvězdičky), a to bez ohledu
+     * na hodnocení, takže výběr nezvýhodňuje pozitivní ani negativní recenze.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -59,9 +61,16 @@ class GoogleReviewsService
             return [];
         }
 
+        // Filtrovat před ořezem na limit, ať se místo recenze bez textu
+        // doplní další v pořadí a sekce nespadne pod tři karty.
+        $withText = array_filter(
+            $stored['reviews'],
+            fn (array $review) => filled($review['text'] ?? null)
+        );
+
         return array_map(
             $this->hydrate(...),
-            array_slice($stored['reviews'], 0, $limit)
+            array_slice(array_values($withText), 0, $limit)
         );
     }
 
