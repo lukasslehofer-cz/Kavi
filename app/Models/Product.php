@@ -25,6 +25,7 @@ class Product extends Model
         'image',
         'images',
         'facebook_image',
+        'google_image',
         'category',
         'roastery_id',
         'attributes',

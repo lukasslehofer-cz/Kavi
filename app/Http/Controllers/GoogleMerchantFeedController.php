@@ -111,15 +111,17 @@ class GoogleMerchantFeedController extends Controller
         $productPath = $locale === 'en' ? '/product/' : '/produkt/';
         $this->addGoogleElement($dom, $item, 'link', $baseUrl . $productPath . $product->slug);
 
-        // g:image_link - Main product image
-        if ($product->image) {
-            $imageUrl = $this->getAbsoluteImageUrl($product->image, $baseUrl);
+        // g:image_link - Use dedicated Google image if available, otherwise fall back to main image
+        $mainImage = $product->google_image ?? $product->image;
+        if ($mainImage) {
+            $imageUrl = $this->getAbsoluteImageUrl($mainImage, $baseUrl);
             $this->addGoogleElement($dom, $item, 'image_link', $imageUrl);
         }
 
-        // g:additional_image_link - Additional images
+        // g:additional_image_link - Gallery images, without the one already used as image_link
         if (!empty($product->images) && is_array($product->images)) {
-            foreach (array_slice($product->images, 0, 10) as $image) {
+            $additionalImages = array_values(array_filter($product->images, fn ($image) => $image !== $mainImage));
+            foreach (array_slice($additionalImages, 0, 10) as $image) {
                 $imageUrl = $this->getAbsoluteImageUrl($image, $baseUrl);
                 $this->addGoogleElement($dom, $item, 'additional_image_link', $imageUrl);
             }
