@@ -44,6 +44,7 @@ database/database.sqlite
 /storage/app/invoices/*
 !/storage/app/invoices/.gitkeep
 /storage/app/google-reviews/*
+/storage/app/billing-cron/*
 
 # Temporary files
 test_*.php

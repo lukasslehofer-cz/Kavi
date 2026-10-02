@@ -123,16 +123,16 @@ else
     echo -e "${GREEN}✓ Shipping rates již existují ($SHIPPING_COUNT zemí)${NC}"
 fi
 
-# 6.9 ZÁLOHA BILLING CACHE
-echo -e "${YELLOW}💾 Zálohuji billing cache...${NC}"
-BILLING_CACHE_FILE="/tmp/kavi_billing_cache_$$.json"
-php artisan tinker --execute="file_put_contents('$BILLING_CACHE_FILE', json_encode(['last_run' => \Cache::get('subscription_billing_cron_last_run')?->toIso8601String(), 'last_summary' => \Cache::get('subscription_billing_cron_last_summary')]));" 2>/dev/null || true
-echo -e "${GREEN}✓ Billing cache zálohována${NC}"
-
 # 7. CACHE CLEAR
 echo -e "${YELLOW}🧹 Čistím cache...${NC}"
 php artisan config:clear > /dev/null 2>&1
-php artisan cache:clear > /dev/null 2>&1
+# cache:clear u Redis driveru dělá FLUSHDB na celou Redis databázi (ignoruje
+# prefix) — bez vlastního čísla DB by smazal i cache ostatních projektů na serveru
+if grep -qE '^REDIS_CACHE_DB=' .env; then
+    php artisan cache:clear > /dev/null 2>&1
+else
+    echo -e "${RED}⚠  REDIS_CACHE_DB není v .env — přeskakuji cache:clear (FLUSHDB by smazal cache jiných projektů)${NC}"
+fi
 php artisan view:clear > /dev/null 2>&1
 php artisan route:clear > /dev/null 2>&1
 echo -e "${GREEN}✓ Cache vyčištěna${NC}"
@@ -148,14 +148,6 @@ echo -e "${GREEN}✓ Cache obnovena${NC}"
 echo -e "${YELLOW}⚡ Optimalizuji aplikaci...${NC}"
 php artisan optimize > /dev/null 2>&1
 echo -e "${GREEN}✓ Optimalizace dokončena${NC}"
-
-# 9.5 OBNOVENÍ BILLING CACHE
-if [ -f "$BILLING_CACHE_FILE" ]; then
-    echo -e "${YELLOW}💾 Obnovuji billing cache...${NC}"
-    php artisan tinker --execute="\$d=json_decode(file_get_contents('$BILLING_CACHE_FILE'),true); if(!empty(\$d['last_run'])){\Cache::put('subscription_billing_cron_last_run',\Carbon\Carbon::parse(\$d['last_run']),now()->addDay());} if(!empty(\$d['last_summary'])){\Cache::put('subscription_billing_cron_last_summary',\$d['last_summary'],now()->addDay());}" 2>/dev/null || true
-    rm -f "$BILLING_CACHE_FILE" 2>/dev/null || true
-    echo -e "${GREEN}✓ Billing cache obnovena${NC}"
-fi
 
 # 10. STORAGE LINK
 echo -e "${YELLOW}🔗 Kontroluji storage link...${NC}"

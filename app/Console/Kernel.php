@@ -32,11 +32,8 @@ class Kernel extends ConsoleKernel
             ->dailyAt('06:00')
             ->timezone('Europe/Prague')
             ->withoutOverlapping(10)
-            ->when(function () {
-                // Only run if midnight run didn't complete successfully
-                $lastRun = \Cache::get('subscription_billing_cron_last_run');
-                return !$lastRun || $lastRun->isYesterday();
-            })
+            // Only run if the 01:00 run didn't complete successfully
+            ->when(fn () => ! \App\Helpers\BillingCronHeartbeat::ranToday())
             ->appendOutputTo($cronLog);
 
         // Monitor billing system health (hourly during business hours)

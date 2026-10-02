@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\BillingCronHeartbeat;
 use App\Models\Subscription;
 use App\Services\StripeService;
 use Illuminate\Console\Command;
@@ -80,8 +81,17 @@ class ChargeSubscriptionPayments extends Command
                 $this->error("✗ Subscription ID {$specificSubscriptionId} not found or not active.");
             } else {
                 $this->info('✓ No subscriptions due for payment today.');
-                // Mark cron as run successfully
-                \Cache::put('subscription_billing_cron_last_run', now(), now()->addDay());
+                // Mark cron as run successfully (dry-run se nepočítá - zablokoval by záložní běh v 06:00)
+                if (! $isDryRun) {
+                    BillingCronHeartbeat::record([
+                        'timestamp' => now()->toDateTimeString(),
+                        'total' => 0,
+                        'successful' => 0,
+                        'failed' => 0,
+                        'skipped' => 0,
+                        'results' => [],
+                    ]);
+                }
             }
 
             return 0;
@@ -358,20 +368,19 @@ class ChargeSubscriptionPayments extends Command
             ]
         );
 
-        // Mark cron as run successfully (only for full runs, not single subscription)
-        if (! $specificSubscriptionId) {
-            \Cache::put('subscription_billing_cron_last_run', now(), now()->addDay());
-            \Cache::put('subscription_billing_cron_last_summary', [
+        // Mark cron as run successfully (only for full runs, not single subscription or dry-run)
+        if (! $specificSubscriptionId && ! $isDryRun) {
+            BillingCronHeartbeat::record([
                 'timestamp' => now()->toDateTimeString(),
                 'total' => $subscriptions->count(),
                 'successful' => $successCount,
                 'failed' => $failedCount,
                 'skipped' => $skippedCount,
                 'results' => $results,
-            ], now()->addWeek());
+            ]);
 
             // Send alert if there were failures
-            if ($failedCount > 0 && ! $isDryRun) {
+            if ($failedCount > 0) {
                 $this->sendFailureAlert($failedCount, $results);
             }
         }

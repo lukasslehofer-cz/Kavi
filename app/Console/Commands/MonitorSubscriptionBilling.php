@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\BillingCronHeartbeat;
 use App\Models\Subscription;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -33,9 +34,10 @@ class MonitorSubscriptionBilling extends Command
         $alerts = [];
 
         // Check 1: Has cron run today?
-        $lastRun = Cache::get('subscription_billing_cron_last_run');
-        if (! $lastRun || $lastRun->isYesterday()) {
-            $alert = '⚠️ Billing cron has NOT run today!';
+        // Jen dnešní běh - starší záznam (i předevčírem) je výpadek, ne jen "včera"
+        $lastRun = BillingCronHeartbeat::lastRun();
+        if (! BillingCronHeartbeat::ranToday()) {
+            $alert = '⚠️ Billing cron has NOT run today! (last run: '.($lastRun?->toDateTimeString() ?? 'no record').')';
             $this->error($alert);
             $alerts[] = $alert;
         } else {
@@ -65,7 +67,7 @@ class MonitorSubscriptionBilling extends Command
         }
 
         // Check 4: Multiple payment failures today?
-        $lastSummary = Cache::get('subscription_billing_cron_last_summary');
+        $lastSummary = BillingCronHeartbeat::lastSummary();
         if ($lastSummary && $lastSummary['failed'] > 3) {
             $alert = "⚠️ High failure rate: {$lastSummary['failed']} failures out of {$lastSummary['total']} attempts";
             $this->error($alert);
