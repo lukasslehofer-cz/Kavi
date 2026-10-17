@@ -119,7 +119,7 @@
         {{ __('gifts.mail.recipient_about_title', [], $locale) }}
     </div>
     <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 0;">
-        {{ __('gifts.mail.recipient_about', [], $locale) }}
+        {{ __($isSubscription ? 'gifts.mail.recipient_about' : 'gifts.mail.recipient_about_voucher', [], $locale) }}
     </p>
     @if($lineupNames)
     <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 0 0;">

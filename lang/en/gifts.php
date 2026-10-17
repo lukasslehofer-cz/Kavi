@@ -299,6 +299,7 @@ return [
         'recipient_valid_subscription' => 'Redeem the gift by :date. It is fully paid; nothing is charged or renewed.',
         'recipient_about_title' => 'What is KAVI',
         'recipient_about' => 'KAVI is a specialty coffee subscription. Every month we pick coffees from three European roasters and send them freshly roasted, always as whole beans.',
+        'recipient_about_voucher' => 'KAVI is a specialty coffee subscription and shop. With the subscription we send you coffees from three European roasters every month, freshly roasted and always as whole beans. In the shop you can buy coffee and accessories one at a time, without a subscription.',
         'recipient_lineup' => 'In this month\'s box: :names.',
         'recipient_features' => ['Freshly roasted coffee', 'Three European roasters', 'Always whole beans'],
         'activated_subject' => 'Your gift is activated, the first box ships on :date',

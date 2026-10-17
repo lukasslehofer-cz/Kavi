@@ -302,6 +302,7 @@ return [
         'recipient_valid_subscription' => 'Dárek uplatněte do :date. Je celý zaplacený, nic se neúčtuje ani neobnovuje.',
         'recipient_about_title' => 'Co je KAVI',
         'recipient_about' => 'KAVI je předplatné výběrové kávy. Každý měsíc vybíráme kávy od tří evropských pražíren a posíláme je čerstvě pražené, vždy v zrnech.',
+        'recipient_about_voucher' => 'KAVI je předplatné výběrové kávy a e-shop. V předplatném vám každý měsíc pošleme kávy od tří evropských pražíren, čerstvě pražené a vždy v zrnech. V e-shopu si kávu i příslušenství koupíte jednorázově, bez předplatného.',
         'recipient_lineup' => 'Tento měsíc v boxu: :names.',
         'recipient_features' => ['Čerstvě pražená káva', 'Tři evropské pražírny', 'Vždy v zrnech'],
         'activated_subject' => 'Dárek je aktivovaný, první box odchází :date',
