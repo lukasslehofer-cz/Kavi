@@ -93,7 +93,7 @@
             <table cellpadding="0" cellspacing="0" style="width: 366px; margin-top: 8px; border-collapse: collapse; background: #1c1c1c;">
                 <tr>
                     <td style="height: 29px; padding: 11px 0 11px 16px; vertical-align: middle; color: #bcbeb1; {{ $eyebrow }}"><span style="{{ $fix(12, 17, 'roboto') }}">{{ $tr('code') }}</span></td>
-                    <td style="height: 29px; padding: 11px 16px 11px 0; vertical-align: middle; text-align: right; white-space: nowrap; color: #ffffff; {{ $display }} font-size: 20px; {{ $lh(20, 29) }} letter-spacing: 0.08em;"><span data-cert-field="code" style="{{ $fix(20, 29) }}">{{ $c['code'] ?? 'KAVI-XXXX-XXXX' }}</span></td>
+                    <td style="height: 29px; padding: 11px 16px 11px 0; vertical-align: middle; text-align: right; white-space: nowrap; color: #ffffff; {{ $display }} font-size: 20px; {{ $lh(20, 29) }} letter-spacing: 0.08em;"><span data-cert-field="code" style="{{ $fix(20, 29) }}">{{ $c['code'] ?? 'XXXX-XXXX' }}</span></td>
                 </tr>
             </table>
 

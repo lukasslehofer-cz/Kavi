@@ -155,7 +155,7 @@ return [
 
         'intro_eyebrow' => 'Dárek od KAVI',
         'intro_title' => ['Kód najdete', 'na certifikátu'],
-        'intro_text' => 'Na přední straně v černém pruhu. Má tvar KAVI-XXXX-XXXX, velká a malá písmena nehrají roli.',
+        'intro_text' => 'Na přední straně v černém pruhu. Má tvar XXXX-XXXX, velká a malá písmena nehrají roli.',
         'intro_steps' => [
             ['t' => 'Zadáte kód', 'd' => 'Ověříme ho a ukážeme, co vám kdo daroval.'],
             ['t' => 'Vyberete kávu', 'd' => 'Espresso, filtr nebo kombinaci a kdy začít.'],

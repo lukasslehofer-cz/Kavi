@@ -56,7 +56,7 @@ class GiftController extends Controller
             'recipient' => __('gifts.certificate.sample.recipient'),
             'giver' => __('gifts.certificate.sample.giver'),
             'note' => __('gifts.certificate.sample.note'),
-            'code' => 'KAVI-XXXX-XXXX',
+            'code' => 'XXXX-XXXX',
             'valid_until' => DateFormat::full(now()->addMonths((int) config('gifts.validity_months', 12)), $locale),
             'redeem_display' => GiftPurchase::redeemDisplayFor($locale),
             'redeem_url' => GiftPurchase::redeemBaseUrl($locale),

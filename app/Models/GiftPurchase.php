@@ -256,7 +256,7 @@ class GiftPurchase extends Model
             'recipient' => $this->recipient_name,
             'giver' => $this->giver_name,
             'note' => $this->note,
-            'code' => $this->code ?? 'KAVI-XXXX-XXXX',
+            'code' => $this->code ?? 'XXXX-XXXX',
             'valid_until' => $this->valid_until ? DateFormat::full($this->valid_until, $this->locale) : null,
             'redeem_display' => $this->redeemDisplay(),
             'redeem_url' => $this->redeemUrl(),

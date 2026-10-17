@@ -154,7 +154,7 @@ return [
 
         'intro_eyebrow' => 'A gift from KAVI',
         'intro_title' => ['Your code is', 'on the certificate'],
-        'intro_text' => 'On the front, in the black strip. It looks like KAVI-XXXX-XXXX, upper and lower case do not matter.',
+        'intro_text' => 'On the front, in the black strip. It looks like XXXX-XXXX, upper and lower case do not matter.',
         'intro_steps' => [
             ['t' => 'Enter the code', 'd' => 'We check it and show you what you got and from whom.'],
             ['t' => 'Choose your coffee', 'd' => 'Espresso, filter or mix, and when to start.'],

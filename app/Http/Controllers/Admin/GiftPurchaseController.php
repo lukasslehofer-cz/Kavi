@@ -26,6 +26,7 @@ class GiftPurchaseController extends Controller
                 $like = '%' . $search . '%';
                 $q->where(function ($q) use ($like, $search) {
                     $q->where('code', 'like', $like)
+                        ->orWhere('code', \App\Helpers\GiftCode::normalize($search))
                         ->orWhere('buyer_email', 'like', $like)
                         ->orWhere('buyer_name', 'like', $like)
                         ->orWhere('giver_name', 'like', $like)

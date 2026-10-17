@@ -94,7 +94,7 @@
                         <form data-redeem-verify class="flex flex-col sm:flex-row sm:items-end gap-3" novalidate>
                             <div class="flex-1">
                                 <label for="redeem-code" class="block mb-2 text-xs uppercase tracking-widest text-warm-600">{{ __('gifts.redeem.code_label') }}</label>
-                                <input id="redeem-code" name="code" type="text" value="{{ $prefill }}" placeholder="KAVI-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40"
+                                <input id="redeem-code" name="code" type="text" value="{{ $prefill }}" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40"
                                        aria-describedby="redeem-code-message"
                                        class="w-full px-4 py-3 bg-white border border-warm-300 text-dark-800 font-display text-[22px] uppercase tracking-[0.08em] placeholder-warm-400 focus:outline-none focus:border-dark-800 focus:ring-0">
                             </div>

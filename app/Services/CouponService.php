@@ -20,12 +20,14 @@ class CouponService
         string $type = 'order', // 'order' nebo 'subscription'
         ?float $orderValue = null
     ): array {
-        // Dárkové kódy (KAVI-XXXX-XXXX) projdou i s mezerami nebo bez pomlček
-        if (\App\Helpers\GiftCode::looksLikeGiftCode($code)) {
-            $code = \App\Helpers\GiftCode::normalize($code);
-        }
+        $coupon = Coupon::where('code', trim($code))->first();
 
-        $coupon = Coupon::where('code', $code)->first();
+        // Dárkové kódy (XXXX-XXXX) projdou i s mezerami nebo bez pomlčky. Až po přesné
+        // shodě, aby se běžný kupon stejného tvaru (VANOCE25) nepřepsal na VANO-CE25.
+        if (! $coupon && \App\Helpers\GiftCode::looksLikeGiftCode($code)) {
+            $code = \App\Helpers\GiftCode::normalize($code);
+            $coupon = Coupon::where('code', $code)->whereNotNull('gift_type')->first();
+        }
 
         if (! $coupon) {
             return ['valid' => false, 'message' => __('checkout.coupon.not_found')];
