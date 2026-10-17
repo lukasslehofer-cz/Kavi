@@ -40,8 +40,26 @@ class GiftCertificateForRecipient extends LocalizedMailable
                 'gift' => $this->gift,
                 'validUntil' => $this->gift->valid_until ? DateFormat::full($this->gift->valid_until, $this->emailLocale) : null,
                 'redeemUrl' => $this->gift->redeemUrl(),
+                'monthsLabel' => $this->gift->months
+                    ? trans_choice('gifts.months', $this->gift->months, ['count' => $this->gift->months], $this->emailLocale)
+                    : null,
+                'amountLabel' => \App\Helpers\CurrencyHelper::formatByCurrency((float) $this->gift->amount, $this->gift->currency, 0),
+                'siteDisplay' => GiftPurchase::siteDisplayFor($this->gift->locale ?: 'cs'),
+                'lineupNames' => $this->gift->isSubscription() ? $this->lineupNames() : '',
             ],
         );
+    }
+
+    /**
+     * Pražírny aktuálního měsíce do odstavce "Co je KAVI" (bez nich se řádek vynechá)
+     */
+    private function lineupNames(): string
+    {
+        try {
+            return app(\App\Services\CoffeeOfMonthService::class)->lineup()->roasteryNames();
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 
     public function attachments(): array
