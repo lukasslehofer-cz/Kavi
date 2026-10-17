@@ -1079,6 +1079,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const subtotal = {{ $subtotal }};
     // Doprava a doprava zdarma od částky se počítají jen z fyzického zboží (bez dárků)
     const physicalSubtotal = {{ $physicalSubtotal ?? $subtotal }};
+    // Uplatněný kupon: přepočet dopravy po změně země ho nesmí z celkové ceny vypustit
+    const couponDiscount = {{ $adjustedDiscount ?? 0 }};
+    const couponFreeShipping = {{ ($appliedCoupon?->free_shipping ?? false) ? 'true' : 'false' }};
     const shippingCostElement = document.getElementById('shipping-cost');
     const totalElement = document.getElementById('total-cost');
     
@@ -1133,14 +1136,16 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.available) {
+                const shippingCost = couponFreeShipping ? 0 : parseFloat(data.shipping);
+
                 // Update shipping cost
                 if (shippingCostElement) {
-                    shippingCostElement.textContent = data.shipping_formatted;
+                    shippingCostElement.textContent = couponFreeShipping ? '{{ $currentLocale === 'en' ? 'FREE' : 'ZDARMA' }}' : data.shipping_formatted;
                 }
-                
+
                 // Update total
                                 if (totalElement) {
-                                    const newTotal = subtotal + parseFloat(data.shipping);
+                                    const newTotal = Math.max(0, subtotal + shippingCost - couponDiscount);
                                     totalElement.textContent = formatCurrency(newTotal);
                                 }
                                 
