@@ -59,10 +59,18 @@ class CartController extends Controller
         $remainingForFreeShippingEur = null;
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
         
+        // Dárky (certifikát e-mailem) mají vlastní košík a do dopravy se nepočítají
+        $giftItems = app(\App\Services\GiftCartService::class)->lines();
+
         // Check if cart qualifies for free shipping (all products have free_shipping flag)
         $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
-        
-        if ($cartQualifiesForFreeShipping) {
+
+        if (empty($cart) && ! empty($giftItems)) {
+            // Jen dárky - nic se neposílá balíkem
+            $shipping = 0;
+            $shippingEur = 0;
+            $shippingMessage = __('gifts.cart.delivery');
+        } elseif ($cartQualifiesForFreeShipping) {
             // All products in cart have free_shipping - no shipping charge
             $shipping = 0;
             $shippingEur = 0;
@@ -114,8 +122,17 @@ class CartController extends Controller
                 ->get();
         }
 
+        // Součet dárků v aktuální měně (doprava se z nich nepočítá, proto až tady)
+        $giftTotal = collect($giftItems)->sum('price');
+        if (CurrencyHelper::isEur()) {
+            $totalEur += $giftTotal;
+        } else {
+            $total += $giftTotal;
+        }
+
         return view('cart.index', compact(
-            'cartItems', 
+            'giftItems',
+            'cartItems',
             'total', 
             'totalEur',
             'shipping', 
@@ -203,6 +220,7 @@ class CartController extends Controller
     public function clear()
     {
         session()->forget('cart');
+        app(\App\Services\GiftCartService::class)->clear();
         $successMessage = app()->getLocale() === 'en' 
             ? 'Cart cleared.'
             : 'Košík byl vyprázdněn.';

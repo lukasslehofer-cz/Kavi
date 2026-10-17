@@ -311,6 +311,10 @@ class SitemapController extends Controller
      */
     private function getStaticPages(): array
     {
+        $gifts = \App\Helpers\GiftHelper::enabled()
+            ? [['route' => 'gifts.index', 'priority' => 0.8, 'changefreq' => 'monthly']]
+            : [];
+
         return [
             ['route' => 'home', 'priority' => 1.0, 'changefreq' => 'daily'],
             ['route' => 'products.index', 'priority' => 0.9, 'changefreq' => 'daily'],
@@ -323,6 +327,7 @@ class SitemapController extends Controller
             ['route' => 'contact', 'priority' => 0.5, 'changefreq' => 'monthly'],
             ['route' => 'privacy-policy', 'priority' => 0.3, 'changefreq' => 'yearly'],
             ['route' => 'terms-of-service', 'priority' => 0.3, 'changefreq' => 'yearly'],
+            ...$gifts,
         ];
     }
 

@@ -124,6 +124,12 @@
                                         @endif
                                         <div>
                                             <span class="font-medium text-gray-900">{{ $item->product_name }}</span>
+                                            @if($item->is_gift && $item->giftPurchase)
+                                            <div class="text-sm">
+                                                <a href="{{ route('admin.gifts.show', $item->giftPurchase) }}" class="text-blue-600 hover:underline">Dárek {{ $item->giftPurchase->code ?? '(nevystaveno)' }}</a>
+                                                <span class="text-gray-500">· {{ $item->giftPurchase->status }}</span>
+                                            </div>
+                                            @endif
                                             @if($item->product?->roastery)
                                             <div class="text-sm text-gray-500">
                                                 {{ $item->product->roastery->name }}

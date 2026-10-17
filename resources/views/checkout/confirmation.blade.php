@@ -236,6 +236,26 @@
                 </div>
                 @endif
 
+                {{-- Dárky: certifikát e-mailem, ke stažení po vystavení --}}
+                @if($order->payment_status === 'paid' && $order->giftPurchases->isNotEmpty())
+                <div class="border-t-2 border-primary-500 pt-6">
+                    <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight mb-6">{{ __('gifts.cart.section') }}</h2>
+                    <p class="text-sm text-warm-600 mb-4">{{ __('gifts.cart.confirmation', ['email' => $order->shipping_address['email'] ?? $order->user?->email]) }}</p>
+                    <div class="space-y-3">
+                        @foreach($order->giftPurchases as $gift)
+                        <div class="flex flex-wrap items-baseline justify-between gap-2 py-3 border-b border-warm-300">
+                            <span class="font-display text-dark-800 uppercase tracking-tight">{{ __('gifts.cart.for', ['name' => $gift->recipient_name]) }} @if($gift->code)· {{ $gift->code }}@endif</span>
+                            @if($gift->isIssued())
+                            <a href="{{ localizedRoute('gifts.certificate', ['gift' => $gift->id]) }}" class="text-xs uppercase tracking-widest text-primary-500 hover:text-primary-600">{{ __('gifts.cart.download') }} &rarr;</a>
+                            @else
+                            <span class="text-xs uppercase tracking-widest text-warm-600">{{ __('gifts.cart.preparing') }}</span>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 @if($order->customer_notes)
                 <!-- Notes -->
                 <div class="border-t-2 border-primary-500 pt-6">

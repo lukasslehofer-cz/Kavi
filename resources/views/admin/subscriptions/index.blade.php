@@ -183,6 +183,8 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300" title="Pozastaveno administrátorem, obnovit může jen admin">Zamčeno adminem</span>
                             @elseif($subscription->status === 'paused')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Pauza</span>
+                            @elseif($subscription->status === 'complimentary' && $subscription->gift_purchase_id)
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Dárek</span>
                             @elseif($subscription->status === 'complimentary')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Bezplatné</span>
                             @elseif($subscription->status === 'cancelled')

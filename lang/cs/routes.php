@@ -28,6 +28,15 @@ return [
 
     // Monthly feature
     'monthly-feature' => 'kava-mesice',
+    'landing-europe' => 'evropa-v-boxu',
+    'gifts' => 'darky',
+    'gifts-add' => 'darky/do-kosiku',
+    'gifts-remove' => 'darky/odebrat/{line}',
+    'gift-certificate' => 'darky/certifikat/{gift}',
+    // kavi.cz/darek je vytištěné na certifikátu, neměnit
+    'gift-redeem' => 'darek',
+    'gift-redeem-verify' => 'darek/overit',
+    'gift-redeem-prepare' => 'darek/pokracovat',
 
     // Blog
     'blog' => 'blog',

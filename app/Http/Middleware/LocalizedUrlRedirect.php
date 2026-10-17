@@ -30,6 +30,11 @@ class LocalizedUrlRedirect
         
         // Monthly feature
         'monthly-feature.index' => 'monthly-feature',
+        'landing.europe' => 'landing-europe',
+
+        // Dárky
+        'gifts.index' => 'gifts',
+        'gifts.redeem' => 'gift-redeem',
         
         // Subscriptions
         'subscriptions.index' => 'subscription',

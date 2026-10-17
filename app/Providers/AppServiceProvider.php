@@ -21,7 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Jedna instance na request: lineup měsíce se načte jednou pro celou stránku
+        $this->app->scoped(\App\Services\CoffeeOfMonthService::class);
     }
 
     /**

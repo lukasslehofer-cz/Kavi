@@ -43,6 +43,20 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Ověřování dárkových kódů a kuponů - ochrana proti hádání kódů hrubou silou
+        RateLimiter::for('gift-verify', function (Request $request) {
+            return [
+                Limit::perMinute(6)->by('gift-verify-min:' . $request->ip()),
+                Limit::perHour(30)->by('gift-verify-hour:' . $request->ip()),
+            ];
+        });
+        RateLimiter::for('coupon-validate', function (Request $request) {
+            return [
+                Limit::perMinute(20)->by('coupon-validate-min:' . $request->ip()),
+                Limit::perHour(120)->by('coupon-validate-hour:' . $request->ip()),
+            ];
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')
@@ -104,6 +118,18 @@ class RouteServiceProvider extends ServiceProvider
             // Monthly Feature
             Route::get('/' . $routes['monthly-feature'], [\App\Http\Controllers\MonthlyFeatureController::class, 'index'])->name($this->routeName('monthly-feature.index', $locale, $isPrimary));
 
+            // Landing page z reklamy (noindex, mimo sitemapu)
+            Route::get('/' . $routes['landing-europe'], [\App\Http\Controllers\LandingController::class, 'europe'])->name($this->routeName('landing.europe', $locale, $isPrimary));
+
+            // Dárky: nákup (dárkový košík -> standardní pokladna) a uplatnění kódu
+            Route::get('/' . $routes['gifts'], [\App\Http\Controllers\GiftController::class, 'index'])->name($this->routeName('gifts.index', $locale, $isPrimary));
+            Route::post('/' . $routes['gifts-add'], [\App\Http\Controllers\GiftController::class, 'addToCart'])->name($this->routeName('gifts.cart.add', $locale, $isPrimary));
+            Route::delete('/' . $this->replaceParams($routes['gifts-remove']), [\App\Http\Controllers\GiftController::class, 'removeFromCart'])->name($this->routeName('gifts.cart.remove', $locale, $isPrimary));
+            Route::get('/' . $this->replaceParams($routes['gift-certificate']), [\App\Http\Controllers\GiftController::class, 'certificate'])->name($this->routeName('gifts.certificate', $locale, $isPrimary));
+            Route::get('/' . $routes['gift-redeem'], [\App\Http\Controllers\GiftRedeemController::class, 'show'])->name($this->routeName('gifts.redeem', $locale, $isPrimary));
+            Route::post('/' . $routes['gift-redeem-verify'], [\App\Http\Controllers\GiftRedeemController::class, 'verify'])->middleware('throttle:gift-verify')->name($this->routeName('gifts.redeem.verify', $locale, $isPrimary));
+            Route::post('/' . $routes['gift-redeem-prepare'], [\App\Http\Controllers\GiftRedeemController::class, 'prepare'])->name($this->routeName('gifts.redeem.prepare', $locale, $isPrimary));
+
             // Blog (uses same URL in all locales, so register only once with primary name)
             $this->registerUniqueRoute('get', '/' . $routes['blog'], [\App\Http\Controllers\BlogController::class, 'index'], $this->routeName('blog.index', $locale, $isPrimary));
             $this->registerUniqueRoute('get', '/' . $this->replaceParams($routes['blog-show']), [\App\Http\Controllers\BlogController::class, 'show'], $this->routeName('blog.show', $locale, $isPrimary));
@@ -134,7 +160,7 @@ class RouteServiceProvider extends ServiceProvider
             Route::get('/' . $this->replaceParams($routes['payment-card']), [\App\Http\Controllers\PaymentController::class, 'cardPayment'])->name($this->routeName('payment.card', $locale, $isPrimary));
 
             // Coupons
-            Route::post('/' . $routes['coupon-validate'], [\App\Http\Controllers\CouponController::class, 'validateCoupon'])->name($this->routeName('coupon.validate', $locale, $isPrimary));
+            Route::post('/' . $routes['coupon-validate'], [\App\Http\Controllers\CouponController::class, 'validateCoupon'])->middleware('throttle:coupon-validate')->name($this->routeName('coupon.validate', $locale, $isPrimary));
             Route::post('/' . $routes['coupon-remove'], [\App\Http\Controllers\CouponController::class, 'removeCoupon'])->name($this->routeName('coupon.remove', $locale, $isPrimary));
 
             // Newsletter

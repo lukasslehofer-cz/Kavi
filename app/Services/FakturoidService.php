@@ -206,9 +206,14 @@ class FakturoidService
 
             // Add shipping - proporcionálně podle DPH sazeb položek v objednávce
             if ($order->shipping > 0) {
-                // Spočítat proporcionální rozdělení dopravy
+                // Spočítat proporcionální rozdělení dopravy. Dárky (certifikát e-mailem)
+                // se neposílají balíkem, doprava se rozpočítá jen přes fyzické zboží.
+                $shippedItems = $order->items->where('is_gift', false);
+                if ($shippedItems->isEmpty()) {
+                    $shippedItems = $order->items;
+                }
                 $itemsByVatRate = [];
-                foreach ($order->items as $item) {
+                foreach ($shippedItems as $item) {
                     $vatRate = $item->vat_rate;
                     if (! isset($itemsByVatRate[$vatRate])) {
                         $itemsByVatRate[$vatRate] = 0;
@@ -243,7 +248,9 @@ class FakturoidService
                 // Dárkový voucher: 0% DPH (voucher je platební metoda, DPH zůstává na plné ceně)
                 // Běžná sleva: nejvyšší DPH sazba v objednávce (standardní praxe)
                 $isGiftVoucher = $order->coupon?->is_gift_voucher ?? false;
-                $discountVatRate = $isGiftVoucher ? 0 : ($order->items->max('vat_rate') ?? 21);
+                // Kupony se na dárky nevztahují, sazba slevy se proto bere jen z ostatních položek
+                $discountedItems = $order->items->where('is_gift', false);
+                $discountVatRate = $isGiftVoucher ? 0 : (($discountedItems->isNotEmpty() ? $discountedItems : $order->items)->max('vat_rate') ?? 21);
                 $discountName = $isGiftVoucher
                     ? $this->getLocalizedText('gift_voucher', $orderCurrency)
                     : $this->getLocalizedText('discount', $orderCurrency);

@@ -171,15 +171,33 @@ class Order extends Model
         return $this->isUnpaid() || $this->payment_failure_count > 0;
     }
 
+    /**
+     * Prodané dárky (dárkové předplatné, poukaz) v této objednávce
+     */
+    public function giftPurchases()
+    {
+        return $this->hasMany(GiftPurchase::class);
+    }
+
+    /**
+     * Součet dárkových položek (s DPH). Dárek se neposílá balíkem a nezapočítává
+     * se do provize partnera ani do deklarované hodnoty zásilky.
+     */
+    public function giftItemsTotal(): float
+    {
+        return (float) $this->items->where('is_gift', true)->sum('total');
+    }
+
     public function containsDigitalProducts(): bool
     {
-        return $this->items->contains(fn ($item) => $item->product?->is_digital);
+        return $this->items->contains(fn ($item) => $item->is_gift || $item->product?->is_digital);
     }
 
     public function containsOnlyDigitalProducts(): bool
     {
+        // Dárek (certifikát v PDF) se chová jako digitální položka
         return $this->items->isNotEmpty()
-            && $this->items->every(fn ($item) => $item->product?->is_digital);
+            && $this->items->every(fn ($item) => $item->is_gift || $item->product?->is_digital);
     }
 
     public static function generateOrderNumber(): string
@@ -218,8 +236,8 @@ class Order extends Model
             ];
         }
 
-        // Otherwise calculate from order items (current logic)
-        $totalQuantity = $this->items->sum('quantity');
+        // Otherwise calculate from order items (current logic), dárky nejsou v balíku
+        $totalQuantity = $this->items->where('is_gift', false)->sum('quantity');
 
         $sizeCategory = match(true) {
             $totalQuantity <= 2 => 2,
@@ -244,8 +262,8 @@ class Order extends Model
             return (float) $this->package_weight;
         }
 
-        // Calculate from items (0.25 kg per item)
-        $weight = $this->items->sum('quantity') * 0.25;
+        // Calculate from items (0.25 kg per item), dárky nejsou v balíku
+        $weight = $this->items->where('is_gift', false)->sum('quantity') * 0.25;
         return max($weight, 0.1); // Minimum 0.1 kg
     }
 

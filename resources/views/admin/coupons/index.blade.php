@@ -9,6 +9,13 @@
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Slevové kupóny</h1>
             <p class="text-gray-600 mt-1">Správa slevových kupónů pro objednávky a předplatné</p>
+            <p class="text-sm mt-1">
+                @if(request()->boolean('gifts'))
+                <a href="{{ route('admin.coupons.index') }}" class="text-blue-600 hover:underline">Skrýt kupóny z dárků</a>
+                @else
+                <a href="{{ route('admin.coupons.index', ['gifts' => 1]) }}" class="text-blue-600 hover:underline">Zobrazit i kupóny z dárků</a>
+                @endif
+            </p>
         </div>
         <a href="{{ route('admin.coupons.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,6 +24,12 @@
             Nový kupón
         </a>
     </div>
+
+    @if(session('error'))
+    <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+        {{ session('error') }}
+    </div>
+    @endif
 
     <!-- Success Message -->
     @if(session('success'))

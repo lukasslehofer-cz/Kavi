@@ -104,6 +104,26 @@ class Kernel extends ConsoleKernel
             ->timezone('Europe/Prague')
             ->appendOutputTo($cronLog);
 
+        // Dárky: dovystavit / doručit certifikáty a poslat je obdarovaným v zadaný den
+        $schedule->command('gifts:deliver')
+            ->everyFiveMinutes()
+            ->timezone('Europe/Prague')
+            ->withoutOverlapping(10)
+            ->appendOutputTo($cronLog);
+
+        // Dárkový poukaz z nezaplaceného jednorázového boxu zpět k použití
+        $schedule->command('coupons:release-stale-gift-reservations')
+            ->hourly()
+            ->timezone('Europe/Prague')
+            ->withoutOverlapping(10)
+            ->appendOutputTo($cronLog);
+
+        // Dárkové předplatné: e-mail s nabídkou pokračování před posledním boxem
+        $schedule->command('gifts:send-ending-reminders')
+            ->dailyAt('09:00')
+            ->timezone('Europe/Prague')
+            ->appendOutputTo($cronLog);
+
         // Send order payment reminders for pending orders (every hour)
         $schedule->command('orders:send-payment-reminders')
             ->hourly()

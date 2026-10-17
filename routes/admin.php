@@ -101,6 +101,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/subscriptions-shipments/recalculate-reservations', [\App\Http\Controllers\Admin\SubscriptionController::class, 'recalculateReservations'])->name('subscriptions.recalculate-reservations');
     Route::post('/subscriptions-shipments/bulk-update-dimensions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'bulkUpdateShipmentDimensions'])->name('subscriptions.bulk-update-dimensions');
     
+    // Dárky (dárkové předplatné a poukazy)
+    Route::get('/gifts', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'index'])->name('gifts.index');
+    Route::get('/gifts/{gift}', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'show'])->name('gifts.show');
+    Route::get('/gifts/{gift}/pdf', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'downloadPdf'])->name('gifts.pdf');
+    Route::post('/gifts/{gift}/resend-buyer', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'resendBuyer'])->name('gifts.resend-buyer');
+    Route::post('/gifts/{gift}/resend-recipient', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'resendRecipient'])->name('gifts.resend-recipient');
+    Route::post('/gifts/{gift}/regenerate-pdf', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'regeneratePdf'])->name('gifts.regenerate-pdf');
+    Route::post('/gifts/{gift}/void', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'void'])->name('gifts.void');
+
     // Coupons
     Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
     Route::get('/coupons/{coupon}/stats', [\App\Http\Controllers\Admin\CouponController::class, 'stats'])->name('coupons.stats');

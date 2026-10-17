@@ -74,43 +74,14 @@
             "description": "{{ $siteDescription }}",
             "inLanguage": "{{ $currentLocale === 'en' ? 'en-US' : 'cs-CZ' }}"
         },
-        {
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "{{ $currentLocale === 'en' ? 'How do I choose a subscription plan?' : 'Jak si vyberu plán předplatného?' }}",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "{{ $currentLocale === 'en' ? 'Select coffee quantity and delivery frequency according to your needs. We offer M Box (500g), L Box (750g), and XL Box (1000g).' : 'Zvolte množství kávy a frekvenci dodání podle vašich potřeb. Nabízíme M Box (500g), L Box (750g) a XL Box (1000g).' }}"
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "{{ $currentLocale === 'en' ? 'Can I personalize my coffee subscription?' : 'Mohu si předplatné personalizovat?' }}",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "{{ $currentLocale === 'en' ? 'Yes! Choose your preferred coffee type (espresso, filter, decaf), brewing method, and delivery address.' : 'Ano! Vyberte si preferovaný typ kávy (espresso, filtr, bezkofeinová), způsob přípravy a doručovací adresu.' }}"
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "{{ $currentLocale === 'en' ? 'How is the coffee delivered?' : 'Jak je káva doručována?' }}",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "{{ $currentLocale === 'en' ? 'We deliver freshly roasted coffee to your chosen location. Shipping is free for all subscriptions.' : 'Čerstvě praženou kávu doručíme na vámi vybrané místo. Doprava je pro všechna předplatná zdarma.' }}"
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "{{ $currentLocale === 'en' ? 'Can I cancel my subscription anytime?' : 'Mohu předplatné kdykoliv zrušit?' }}",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "{{ $currentLocale === 'en' ? 'Yes, you can cancel or pause your subscription at any time without any fees.' : 'Ano, předplatné můžete kdykoliv zrušit nebo pozastavit bez jakýchkoliv poplatků.' }}"
-                    }
-                }
-            ]
-        }
+        {!! json_encode([
+            '@type' => 'FAQPage',
+            'mainEntity' => array_map(fn ($item) => [
+                '@type' => 'Question',
+                'name' => $item['q'],
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
+            ], $faq),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
     ]
 }
 </script>
@@ -190,689 +161,147 @@
     <!-- Content - Full screen editorial layout -->
     <div class="relative h-full flex flex-col justify-between p-6 sm:p-8 lg:p-10">
         
-        <!-- Top row - only right side text -->
+        <!-- Top row - box měsíce a jeho pražírny -->
         <div class="flex justify-end">
-            <div class="text-xs uppercase tracking-widest text-white/60 text-right max-w-[200px]">
+            <div class="text-xs uppercase tracking-widest text-white/60 text-right max-w-[220px] leading-5">
+                @if(! $lineup->isEmpty())
+                {{ \Illuminate\Support\Str::ucfirst($lineup->monthName('adjective')) }} box: {{ $lineup->roasteryNames() }}
+                @else
                 {{ $currentLocale === 'en' ? 'Specialty coffee subscription from Europe\'s finest roasters.' : 'Předplatné výběrové kávy z nejlepších evropských pražíren.' }}
+                @endif
             </div>
-                </div>
+        </div>
 
         <!-- Center - Main typography -->
         <div class="flex-1 flex flex-col justify-center py-6">
             <!-- Large headline -->
             <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-white uppercase leading-[0.95] sm:leading-[0.9] tracking-tight">
-                        @if($currentLocale === 'en')
-                Discover<br/>
-                <span class="text-primary-500">the best</span> coffee<br/>
-                from Europe
-                        @else
-                Objevte<br/>
-                <span class="text-primary-500">tu nejlepší</span> kávu<br/>
-                z Evropy
-                        @endif
+                @if($currentLocale === 'en')
+                Three European<br/>
+                <span class="text-primary-500">roasters</span><br/>
+                every month
+                @else
+                Tři evropské<br/>
+                <span class="text-primary-500">pražírny</span><br/>
+                každý měsíc
+                @endif
             </h1>
-            
-            <!-- Side description -->
-            <div class="mt-6 flex flex-col sm:flex-row gap-6 sm:gap-12">
-                <p class="text-xs uppercase tracking-widest text-white/60 max-w-[250px] leading-relaxed">
-                    {{ $currentLocale === 'en' ? 'Specialty coffee with regular subscription. Freshly roasted, carefully selected.' : 'Výběrová káva s pravidelným předplatným. Čerstvě pražená, pečlivě vybraná.' }}
-                </p>
-                <!--<p class="text-xs uppercase tracking-widest text-white/60 max-w-[250px] leading-relaxed">
-                    {{ $currentLocale === 'en' ? 'Each month a new selection from exceptional European roasteries.' : 'Každý měsíc nový výběr z výjimečných evropských pražíren.' }}
-                </p> -->
-            </div>
-                </div>
 
-        <!-- Bottom row - CTAs -->
+            <p class="mt-6 text-xs uppercase tracking-widest text-white/60 max-w-[280px] leading-5">
+                {{ $currentLocale === 'en'
+                    ? 'Specialty coffee from micro-roasters you rarely find in local shops. No commitment.'
+                    : 'Výběrová káva z mikropražíren, které v Česku běžně nekoupíte. Doprava zdarma, bez závazku.' }}
+            </p>
+        </div>
+
+        <!-- Bottom row - CTA vlevo, hodnocení z Googlu vpravo -->
         <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-8">
                 <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-white font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-                    <span>{{ $currentLocale === 'en' ? 'Start subscription' : 'Začít předplatné' }}</span>
-                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                    </a>
+                    <span>{{ $currentLocale === 'en' ? 'Build your box' : 'Sestavit box' }}</span>
+                    <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
+                </a>
+                @if($giftsEnabled)
+                <a href="{{ localizedRoute('gifts.index') }}" class="group inline-flex items-center gap-2 text-white/60 font-display uppercase tracking-widest hover:text-white transition-all">
+                    <span>{{ $currentLocale === 'en' ? 'Give a subscription' : 'Darovat předplatné' }}</span>
+                    <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
+                </a>
+                @else
                 <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-white/60 font-display uppercase tracking-widest hover:text-white transition-all">
                     <span>{{ $currentLocale === 'en' ? 'Shop coffee' : 'Obchod' }}</span>
-                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                    </a>
-                </div>
-            
-            
-      </div>
+                    <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
+                </a>
+                @endif
+            </div>
+
+            @if($rating)
+            @php $ratingText = \App\Helpers\RatingFormat::average($rating['average']); @endphp
+            <a href="#recenze" class="flex items-center gap-4" aria-label="{{ __('components.rating.aria', ['rating' => $ratingText, 'count' => $rating['count']]) }}">
+                <span class="font-display text-5xl sm:text-[56px] leading-none tracking-tight text-white">{{ $ratingText }}</span>
+                <span class="flex flex-col gap-1.5" aria-hidden="true">
+                    <span class="text-xl leading-none tracking-[3px]">
+                        @for($i = 1; $i <= 5; $i++)<span class="{{ $i <= round($rating['average']) ? 'text-primary-500' : 'text-white/30' }}">&#9733;</span>@endfor
+                    </span>
+                    <span class="text-xs uppercase tracking-widest text-white/80">{{ trans_choice('components.rating.count', $rating['count'], ['count' => $rating['count']]) }}</span>
+                </span>
+            </a>
+            @endif
+        </div>
 
     </div>
 </div>
 
-<!-- Features Section -->
-<div class="relative py-20 sm:py-24 md:py-28 lg:py-36" style="background-color: #e5e6df;">
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <!-- Section Header -->
-    <div class="mb-16 sm:mb-20 max-w-2xl">
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ $currentLocale === 'en' ? 'Why choose KAVI?' : 'Proč si vybrat KAVI?' }}</h2>
-      <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'We know what makes coffee exceptional. And we love to share it with you.' : 'Víme, co dělá kávu výjimečnou. A rádi se s vámi podělíme.' }}</p>
-    </div>
+<!-- Káva měsíce -->
+<x-coffee-of-month :lineup="$lineup" />
 
-    <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- feature - start -->
-      <div class="group border-t-2 border-primary-500 pt-8">
-        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">01</span>
-        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Fresh Coffee' : 'Čerstvá káva' }}</h3>
-        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Every roastery delivers freshly roasted coffee to your coffee boxes.' : 'Každá pražírna nám dodává čerstvě praženou kávu do vašich kávových boxů.' }}</p>
-      </div>
-      <!-- feature - end -->
-
-      <!-- feature - start -->
-      <div class="group border-t-2 border-primary-500 pt-8">
-        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">02</span>
-        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Exceptional Flavors' : 'Výjimečné chutě' }}</h3>
-        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'No boring and monotonous coffees. Every month you discover new flavors from different corners of the world.' : 'Žádné nudné a monotonní kávy. Každý měsíc objevíte nové chutě z různých koutů světa.' }}</p>        
-      </div>
-      <!-- feature - end -->
-
-      <!-- feature - start -->
-      <div class="group border-t-2 border-primary-500 pt-8">
-        <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">03</span>
-        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Shipped with Care' : 'Doprava zdarma' }}</h3>
-        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Like a clockwork, coffee is lovingly packed by our team, and delivered right to your door.' : 'Doprava zdarma pro všechna předplatná. Ať už si vyberete jakoukoliv velikost boxu.' }}</p>
-      </div>
-      <!-- feature - end -->
-    </div>
-  </div>
-</div>
-
-<!-- Love Your Coffee Section - Editorial Magazine Style -->
+<!-- Co přijde domů - two-tone -->
 <div class="relative overflow-hidden bg-[#e5e6df]">
-  
-  <!-- Two-tone background -->
   <div class="grid lg:grid-cols-2 max-w-[2400px] mx-auto">
-    
-    <!-- Left Side - Image with Red Accent -->
+
     <div class="relative bg-primary-500">
-        
-      <!-- Photo container - reduced height, grayscale with grain -->
       <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
         <div class="relative aspect-[5/4] overflow-hidden">
-          <img src="/images/kavi-box.jpg" loading="lazy" alt="KAVI box" class="h-full w-full object-cover grayscale" />
-          <!-- Grain overlay for image -->
+          <img src="/images/kavi-box.jpg" loading="lazy" alt="{{ $currentLocale === 'en' ? 'An open KAVI box with three bags of coffee' : 'Otevřený KAVI box se třemi balíčky kávy' }}" class="h-full w-full object-cover grayscale" />
           <div class="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noise%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%275%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noise)%27/%3E%3C/svg%3E');"></div>
-          </div>
         </div>
       </div>
+    </div>
 
-    <!-- Right Side - Content on light background -->
     <div class="bg-[#e5e6df] flex flex-col justify-between p-6 sm:p-8 lg:p-12 xl:p-16">
-      
-      <!-- Main content -->
       <div class="space-y-8">
         <div>
           <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-6 leading-tight tracking-tight uppercase">
-            {{ $currentLocale === 'en' ? 'Coffee you will love' : 'Káva, kterou budete milovat' }}
+            {{ $currentLocale === 'en' ? 'What arrives at your door' : 'Co přijde domů' }}
           </h2>
-          
           <p class="text-lg sm:text-xl text-warm-500 leading-relaxed font-light">
-            {{ $currentLocale === 'en' ? 'We carefully select the highest quality coffee from trusted roasteries. Discover new flavors every month right at your home.' : 'Pečlivě vybíráme nejkvalitnější kávu z ověřených pražíren. Každý měsíc objevte nové chutě přímo u vás doma.' }}
-          </p>
-        </div>
-
-        <!-- Benefits List -->
-        <div class="space-y-4">
-          <div class="flex gap-3 items-start">
-            <span class="text-primary-500">→</span>
-            <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Exclusive European roasters not available elsewhere' : 'Exkluzivní evropské pražírny nedostupné jinde' }}</p>
-            </div>
-          <div class="flex gap-3 items-start">
-            <span class="text-primary-500">→</span>
-            <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Unbeatable value for specialty coffee' : 'Bezkonkurenční cena za výběrovou kávu' }}</p>
-            </div>
-          <div class="flex gap-3 items-start">
-            <span class="text-primary-500">→</span>
-            <p class="text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription, cancel anytime' : 'Flexibilní předplatné, zrušení kdykoliv' }}</p>
-          </div>
-            </div>
-          </div>
-
-      <!-- Bottom section with links -->
-      <div class="mt-auto pt-12 border-t border-stone-300">
-        <div class="flex items-center justify-between">
-          <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-            <span>{{ $currentLocale === 'en' ? 'Subscription' : 'Předplatné' }}</span>
-            <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-          </a>
-          <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-            <span>{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}</span>
-            <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-          </a>
-          </div>
-        </div>
-
-  </div>
-  
-  </div>
-</div>
-
-<!-- Subscription Plans Section - Horizontal Tiers -->
-<div class="relative overflow-hidden" style="background-color: #e5e6df;">
-  
-  <!-- Section Header -->
-  <div class="pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 border-b border-dark-800/10">
-    <div class="max-w-screen-xl mx-auto px-4 md:px-8 text-center">
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ $currentLocale === 'en' ? 'Choose your ideal coffee box' : 'Vyberte si ideální kávový box' }}</h2>
-      <p class="text-lg text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}</p>
-    </div>
-          </div>
-
-  <!-- Tier 1: M Box - Light background -->
-  <div class="border-b border-dark-800/10" style="background-color: #e5e6df;">
-    <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-        <!-- Left: Large title + price -->
-        <div class="lg:w-1/3">
-          <div class="flex items-baseline gap-2">
-            <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">M</span>
-            <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
-            </div>
-          <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">500g · 2 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
-            </div>
-
-        <!-- Middle: Features -->
-        <div class="lg:w-1/3 space-y-2">
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '2 types of specialty coffee' : '2 druhy výběrové kávy' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Lovingly packed' : 'Doprava zdarma' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
-            </div>
-
-        <!-- Right: Price + CTA -->
-        <div class="lg:w-1/3 lg:text-right">
-          <div class="flex items-baseline gap-1 lg:justify-end mb-4">
-            @if($currentLocale === 'en')
-              <span class="font-display text-3xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['2'], 0, '.', ' ') }}</span>
-            @else
-              <span class="font-display text-3xl font-normal text-dark-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }} Kč</span>
-            @endif
-            <span class="text-warm-500 font-light">/box</span>
-          </div>
-          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 2]) }}" class="inline-block border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800 font-medium px-8 py-3 transition-all duration-200">
-            {{ $currentLocale === 'en' ? 'Select M Box' : 'Vybrat M Box' }} →
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tier 2: L Box - Subtle highlight (Most Popular) -->
-  <div class="border-b border-dark-800/10 relative" style="background-color: #e5e6df;">
-    <!-- Subtle left accent -->
-    <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary-500"></div>
-    <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-        <!-- Left: Large title + price -->
-        <div class="lg:w-1/3">
-          <span class="inline-block bg-primary-500 text-white text-xs font-medium uppercase tracking-widest px-3 py-1 mb-4">
-            {{ $currentLocale === 'en' ? 'Most Popular' : 'Nejoblíbenější' }}
-          </span>
-          <div class="flex items-baseline gap-2">
-            <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">L</span>
-            <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
-        </div>
-          <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">750g · 3 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
-          </div>
-
-        <!-- Middle: Features -->
-        <div class="lg:w-1/3 space-y-2">
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Lovingly packed' : 'Doprava zdarma' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
-            </div>
-
-        <!-- Right: Price + CTA -->
-        <div class="lg:w-1/3 lg:text-right">
-          <div class="flex items-baseline gap-1 lg:justify-end mb-4">
-            @if($currentLocale === 'en')
-              <span class="font-display text-3xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['3'], 0, '.', ' ') }}</span>
-            @else
-              <span class="font-display text-3xl font-normal text-dark-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }} Kč</span>
-            @endif
-            <span class="text-warm-500 font-light">/box</span>
-          </div>
-          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 3]) }}" class="inline-block bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 transition-all duration-200">
-            {{ $currentLocale === 'en' ? 'Select L Box' : 'Vybrat L Box' }} →
-          </a>
-        </div>
-      </div>
-          </div>
-            </div>
-
-  <!-- Tier 3: XL Box -->
-  <div style="background-color: #e5e6df;">
-    <div class="max-w-screen-xl mx-auto px-4 md:px-8 py-12 sm:py-16">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-        <!-- Left: Large title + price -->
-        <div class="lg:w-1/3">
-          <div class="flex items-baseline gap-2">
-            <span class="font-display text-7xl sm:text-8xl lg:text-9xl font-normal text-dark-800 leading-none tracking-tight">XL</span>
-            <span class="font-display text-3xl sm:text-4xl lg:text-5xl font-normal text-dark-800 uppercase">Box</span>
-            </div>
-          <p class="text-warm-500 uppercase tracking-widest text-sm mt-2">1000g · 4 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
-            </div>
-
-        <!-- Middle: Features -->
-        <div class="lg:w-1/3 space-y-2">
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? '3 types of specialty coffee' : '3 druhy výběrové kávy' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Lovingly packed' : 'Doprava zdarma' }}</p>
-          <p class="text-dark-700 font-light">{{ $currentLocale === 'en' ? 'Cancel or pause anytime' : 'Zrušení nebo přestávka kdykoliv' }}</p>
-        </div>
-
-        <!-- Right: Price + CTA -->
-        <div class="lg:w-1/3 lg:text-right">
-          <div class="flex items-baseline gap-1 lg:justify-end mb-4">
-            @if($currentLocale === 'en')
-              <span class="font-display text-3xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['4'], 0, '.', ' ') }}</span>
-            @else
-              <span class="font-display text-3xl font-normal text-dark-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }} Kč</span>
-            @endif
-            <span class="text-warm-500 font-light">/box</span>
-          </div>
-          <a href="{{ localizedRoute('subscriptions.index', ['plan' => 4]) }}" class="inline-block border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800 font-medium px-8 py-3 transition-all duration-200">
-            {{ $currentLocale === 'en' ? 'Select XL Box' : 'Vybrat XL Box' }} →
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Bottom note -->
-  <div class="py-8 border-t border-dark-800/10" style="background-color: #e5e6df;">
-    <div class="max-w-screen-xl mx-auto px-4 md:px-8">
-      <p class="text-center text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Further customization of your coffee subscription follows in the next step.' : 'Další nastavení vašeho kávového předplatného následuje v dalším kroku.' }}</p>
-    </div>
-  </div>
-</div>
-
-{{-- Dokud nejsou aspoň tři schválená hodnocení, místo vymyšlených referencí
-     se zobrazí prosba o hodnocení. Odkaz na veřejný profil je v obou stavech. --}}
-@php $hasTestimonials = count($testimonials) >= 3; @endphp
-
-<!-- Testimonials Section - Card Style -->
-<div class="relative">
-
-  <!-- Top section with cards -->
-  <div class="pt-16 sm:pt-20 lg:pt-24" style="background-color: #e5e6df;">
-    <div class="max-w-screen-xl mx-auto px-4 md:px-8">
-
-      <!-- Section Header -->
-      <div class="text-center mb-12 sm:mb-16">
-        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-          @if($hasTestimonials)
-            {{ $currentLocale === 'en' ? 'What our customers say' : 'Co říkají naši zákazníci' }}
-          @else
-            {{ $currentLocale === 'en' ? 'Share your experience' : 'Podělte se o svou zkušenost' }}
-          @endif
-        </h2>
-        </div>
-
-      @if(! $hasTestimonials)
-      <!-- Prosba o hodnocení - dokud nemáme dost reálných recenzí -->
-      <div class="max-w-3xl mx-auto pb-12 sm:pb-16">
-        <div class="bg-dark-800 p-8 sm:p-12">
-          <p class="text-xs uppercase tracking-widest text-white/50 mb-6">
-            {{ $currentLocale === 'en' ? 'Your review' : 'Vaše hodnocení' }}
-          </p>
-          <p class="text-white text-xl sm:text-2xl leading-relaxed font-light mb-10">
             {{ $currentLocale === 'en'
-              ? 'Have you ordered from us? Tell us how the coffee tasted. You will help others choose, and show us what to improve.'
-              : 'Nakupovali jste u nás? Napište, jak vám káva chutnala. Pomůžete tím ostatním s výběrem a nám ukážete, co zlepšit.' }}
+              ? 'Whole-bean coffee from European roasters, freshly roasted and delivered to your pickup point.'
+              : 'Zrnková káva z evropských pražíren, čerstvě pražená a doručená na výdejní místo.' }}
           </p>
-          <a href="{{ config('services.review_links.'.$currentLocale) }}"
-             target="_blank" rel="noopener"
-             class="inline-flex items-center gap-3 bg-primary-500 hover:bg-white text-dark-800 font-display uppercase tracking-widest text-xs px-8 py-4 transition-colors duration-200">
-            <span>{{ $currentLocale === 'en' ? 'Review on Google' : 'Hodnotit na Googlu' }}</span>
-            <span aria-hidden="true">&rarr;</span>
+        </div>
+
+        @php
+          $homeArrows = $currentLocale === 'en' ? [
+            '2 to 4 bags of 250 g, depending on the box size',
+            'Coffees from three European roasters, different every month',
+            'A postcard with the coffee and roaster profile for every coffee',
+            'Delivered by Packeta, pause or cancel with one click',
+          ] : [
+            '2 až 4 balíčky po 250 g podle velikosti boxu',
+            'Kávy ze tří evropských pražíren, každý měsíc jiných',
+            'Pohlednice s profilem kávy a pražírny ke každé kávě',
+            'Doprava Zásilkovnou zdarma, pauza nebo zrušení jedním klikem',
+          ];
+        @endphp
+        <div class="space-y-4">
+          @foreach($homeArrows as $arrow)
+          <div class="flex gap-3 items-start">
+            <span class="text-primary-500" aria-hidden="true">→</span>
+            <p class="text-warm-500 font-light">{{ $arrow }}</p>
+          </div>
+          @endforeach
+        </div>
+      </div>
+
+      <div class="mt-auto pt-12 border-t border-stone-300">
+        <div class="flex items-center justify-between gap-4">
+          <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+            <span>{{ $currentLocale === 'en' ? 'Build your box' : 'Sestavit box' }}</span>
+            <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
+          </a>
+          <a href="{{ $lineup->isEmpty() ? localizedRoute('monthly-feature.index') : '#kava-mesice' }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+            <span>{{ $currentLocale === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}</span>
+            <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
           </a>
         </div>
       </div>
-      @else
-      <!-- 3 Testimonial Cards -->
-      <div class="grid lg:grid-cols-3 gap-6">
-
-        @foreach($testimonials as $review)
-        <!-- Card -->
-        <div class="flex flex-col relative z-10">
-          <!-- Dark section with quote + beak -->
-          <div class="bg-dark-800 p-6 sm:p-8 flex-grow relative flex flex-col">
-            <p class="text-xs uppercase tracking-widest text-white/50 mb-4">{{ $currentLocale === 'en' ? 'Google review' : 'Recenze z Googlu' }}</p>
-            @if($review['text'])
-            <p class="text-white leading-relaxed font-light flex-grow flex items-center" style="font-size: 1.15rem;">
-              "{{ $review['text'] }}"
-            </p>
-            @endif
-            <!-- Beak/triangle -->
-            <div class="absolute -bottom-4 left-6 w-8 h-4 bg-dark-800" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
-          </div>
-          <!-- Light section with author -->
-          <div class="p-6 sm:p-8 pt-10 pb-0 flex items-center gap-4">
-            <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden flex items-center justify-center">
-              @if($review['photo'])
-                {{-- Fotka se hotlinkuje z Google CDN, lokální kopie by spadala pod 30denní limit --}}
-                <img src="{{ $review['photo'] }}" alt="" loading="lazy" referrerpolicy="no-referrer" class="h-full w-full object-cover grayscale" />
-              @else
-                <span class="font-display text-warm-500 text-xl sm:text-2xl tracking-wide" aria-hidden="true">&#9679;</span>
-              @endif
-            </div>
-            <div>
-              <div class="font-display text-dark-800 uppercase tracking-wide">
-                {{ $review['author'] ?? ($currentLocale === 'en' ? 'Anonymous' : 'Anonymní recenze') }}
-              </div>
-              @if($review['created_at'])
-              <p class="text-sm text-warm-500">{{ $review['created_at']->format('m/Y') }}</p>
-              @endif
-            </div>
-          </div>
-          <!-- Stars - positioned to overlap red bar -->
-          <div class="relative z-20 px-6 sm:px-8 mb-[-2rem]">
-            <div class="inline-flex px-4 py-3" style="background-color: #e5e6df;">
-              <div class="flex gap-0.5 text-lg" aria-label="{{ $review['rating'] }}/5">
-                @for($i = 1; $i <= 5; $i++)
-                  <span class="{{ $i <= $review['rating'] ? 'text-dark-800' : 'text-warm-500/40' }}" aria-hidden="true">&#9733;</span>
-                @endfor
-              </div>
-            </div>
-          </div>
-        </div>
-        @endforeach
-
-          </div>
-
-      {{-- Informační povinnost o původu recenzí podle zákona 634/1992 Sb.
-           ve znění novely Omnibus účinné od 6. 1. 2023. --}}
-      <p class="text-xs text-warm-500 text-center mt-12 pb-4 max-w-2xl mx-auto leading-relaxed">
-        {{ $currentLocale === 'en'
-          ? 'Reviews come from our Google Business Profile. We display them unedited and unfiltered, including negative ones. We do not verify who wrote them, Google does.'
-          : 'Recenze pocházejí z našeho profilu na Googlu. Zobrazujeme je neupravené a nefiltrované, včetně negativních. Neověřujeme, kdo je napsal, to dělá Google.' }}
-      </p>
-      @endif
-
-          </div>
-        </div>
-
-  <!-- Full-width red bar with CTA - overlaps with stars -->
-  <div class="bg-primary-500 pt-10 pb-8 sm:pb-10">
-    <div class="max-w-screen-xl mx-auto px-4 md:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <p class="text-xs uppercase tracking-widest text-dark-800">
-        @if($hasTestimonials)
-          {{ $currentLocale === 'en' ? 'Join our community of coffee lovers' : 'Přidejte se k řadě spokojených milovníků kávy' }}
-        @else
-          {{ $currentLocale === 'en' ? 'Already ordered from us? Let others know' : 'Nakupovali jste u nás? Řekněte to ostatním' }}
-        @endif
-      </p>
-      <a href="{{ config('services.review_links.'.$currentLocale) }}" target="_blank" rel="noopener" class="text-xs uppercase tracking-widest text-dark-800 hover:text-white transition-colors">
-        Google Reviews &rarr;
-      </a>
-    </div>
-  </div>
-
-</div>
-
-<!-- Coffee of the Month Teaser -->
-@if($roasteriesOfMonth->count() > 0 || $coffeesOfMonth->count() > 0)
-@php
-  $today = now();
-  
-  // Get billing_date for current month from ShipmentSchedule
-  $currentSchedule = \App\Models\ShipmentSchedule::getForMonth($today->year, $today->month);
-  
-  // Determine display cutoff date (billing_date + 1 day)
-  if ($currentSchedule && $currentSchedule->billing_date) {
-      $cutoffDate = $currentSchedule->billing_date->copy()->addDay();
-  } else {
-      // Fallback to 16th if no schedule configured
-      $cutoffDate = $today->copy()->day(16);
-  }
-  
-  // If today is on or after cutoff date, show next month
-  $displayMonth = $today->greaterThanOrEqualTo($cutoffDate) ? $today->copy()->addMonthNoOverflow() : $today->copy();
-  
-  // Get month name in nominative case
-  $monthsNominative = $currentLocale === 'en' ? [
-    1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
-    5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
-    9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
-  ] : [
-    1 => 'leden', 2 => 'únor', 3 => 'březen', 4 => 'duben',
-    5 => 'květen', 6 => 'červen', 7 => 'červenec', 8 => 'srpen',
-    9 => 'září', 10 => 'říjen', 11 => 'listopad', 12 => 'prosinec'
-  ];
-  $monthName = $monthsNominative[$displayMonth->month];
-  $displayYear = $displayMonth->year;
-@endphp
-
-<!-- Coffee of the Month - Editorial Grid Layout -->
-<div class="relative pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 lg:pb-20 overflow-hidden" style="background-color: #e5e6df;">
-  
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    
-    <!-- Top Section: Heading + Date on left, CTA on right -->
-    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-16 mb-8 sm:mb-10">
-      
-      <!-- Left: Heading + Date -->
-      <div>
-        <h2 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-primary-500 leading-[0.9] tracking-tight uppercase">
-          {{ $currentLocale === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}
-        </h2>
-        <p class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-normal leading-[0.9] tracking-tight uppercase mt-2" style="color: #BCBEB1;">
-          {{ $monthName }} {{ $displayYear }}
-        </p>
-      </div>
-      
-      <!-- Right: CTA Link -->
-      <div class="lg:pt-4">
-        <a href="{{ localizedRoute('monthly-feature.index') }}" class="group inline-flex items-center gap-3 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all text-sm">
-          <span>{{ $currentLocale === 'en' ? 'Explore coffees for ' . $monthName : 'Prozkoumat kávy na ' . $monthName }}</span>
-          <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-        </a>
     </div>
 
-    </div>
-      
-    @if($coffeesOfMonth->count() > 0)
-    @php
-      // Don't shuffle - use consistent order
-      $allCoffees = $coffeesOfMonth->take(7);
-      $coffeeCount = $allCoffees->count();
-      
-      // Collect unique roasteries (max 3)
-      $roasteries = $allCoffees->pluck('roastery')->filter()->unique('id')->take(3);
-        @endphp
-        
-    <!-- Mobile: Roasteries + Coffee Grid -->
-    <div class="lg:hidden">
-      <!-- Mobile roasteries with images -->
-      <div class="mb-6 grid grid-cols-3 gap-3">
-        @foreach($roasteries as $roastery)
-        <div class="relative overflow-hidden">
-            @if($roastery->image)
-          <img src="{{ asset($roastery->image) }}" alt="{{ $roastery->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
-            @else
-          <div class="w-full aspect-[4/5] bg-warm-300"></div>
-            @endif
-          <!-- Overlay text at top -->
-          <div class="absolute top-0 left-0 right-0 p-2">
-            <span class="inline-block bg-primary-500 px-1.5 py-0.5 font-display text-xs font-normal text-black uppercase tracking-tight leading-tight">{{ $roastery->name }}</span>
-            <br>
-            <span class="inline-block bg-primary-500 px-1.5 py-0.5 text-[10px] text-black uppercase tracking-widest mt-0.5">{{ $roastery->getCountry() ?? '' }}</span>
-          </div>
-            </div>
-        @endforeach
-      </div>
-      <!-- Mobile coffee grid -->
-      <div class="grid grid-cols-3 gap-4">
-        @foreach($allCoffees as $index => $coffee)
-        @php $num = str_pad($index + 1, 2, '0', STR_PAD_LEFT); @endphp
-        <div class="flex flex-col">
-          <span class="text-xs text-warm-400 tracking-widest mb-1">{{ $num }}</span>
-          <div class="w-full">
-            @if($coffee->image)
-            <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-            @else
-            <div class="w-full aspect-[3/4] bg-warm-300 flex items-center justify-center">
-              <span class="text-warm-500 font-display text-lg">{{ substr($coffee->name, 0, 1) }}</span>
-            </div>
-              @endif
-          </div>
-          <p class="mt-1 text-[10px] font-medium text-dark-800 uppercase tracking-wide leading-tight">{{ $coffee->name }}</p>
-        </div>
-        @endforeach
-      </div>
-    </div>
-    
-    <!-- Desktop: Scattered grid layout -->
-    <div class="hidden lg:block">
-      <div class="grid grid-cols-10 gap-x-6 gap-y-2">
-        
-        <!-- Row 1: Coffee 01 + Roastery 1 + Coffee 02 -->
-        <div class="col-span-2 col-start-1">
-          @php $coffee = $allCoffees->get(0); $num = '01'; @endphp
-          @if($coffee)
-          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
-              @if($coffee->image)
-          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-              @else
-          <div class="w-full aspect-[3/4] bg-warm-300"></div>
-          @endif
-              @endif
-            </div>
-        
-        <!-- Roastery 1 - offset down -->
-        @if($roasteries->count() >= 1)
-        @php $r1 = $roasteries->first(); @endphp
-        <div class="col-span-2 col-start-4 mt-16 relative">
-          @if($r1->image)
-          <img src="{{ asset($r1->image) }}" alt="{{ $r1->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
-        @else
-          <div class="w-full aspect-[4/5] bg-warm-300"></div>
-              @endif
-          <div class="absolute top-0 left-0 right-0 p-3">
-            <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r1->name }}</span>
-            <br>
-            <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r1->getCountry() ?? '' }}</span>
-          </div>
-            </div>
-            @endif
-            
-        <div class="col-span-2 col-start-7 mt-8">
-          @php $coffee = $allCoffees->get(1); $num = '02'; @endphp
-          @if($coffee)
-          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
-          @if($coffee->image)
-          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-              @else
-          <div class="w-full aspect-[3/4] bg-warm-300"></div>
-              @endif
-            @endif
-        </div>
-        
-        <div class="col-span-2 col-start-9">
-          @php $coffee = $allCoffees->get(2); $num = '03'; @endphp
-          @if($coffee)
-          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
-          @if($coffee->image)
-          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-              @else
-          <div class="w-full aspect-[3/4] bg-warm-300"></div>
-              @endif
-            @endif
-          </div>
-        
-        <!-- Row 2: Coffee 04 + Roastery 2 + Coffees 05-06 -->
-        <div class="col-span-2 col-start-2 -mt-24">
-          @php $coffee = $allCoffees->get(3); $num = '04'; @endphp
-          @if($coffee)
-          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
-          @if($coffee->image)
-          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-          @else
-          <div class="w-full aspect-[3/4] bg-warm-300"></div>
-        @endif
-      @endif
-    </div>
-
-        <div class="col-span-2 col-start-5 -mt-8">
-          @php $coffee = $allCoffees->get(4); $num = '05'; @endphp
-          @if($coffee)
-          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
-          @if($coffee->image)
-          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-          @else
-          <div class="w-full aspect-[3/4] bg-warm-300"></div>
-          @endif
-          @endif
-    </div>
-
-        <!-- Roastery 2 -->
-        @if($roasteries->count() >= 2)
-        @php $r2 = $roasteries->skip(1)->first(); @endphp
-        <div class="col-span-2 col-start-8 -mt-32 relative">
-          @if($r2->image)
-          <img src="{{ asset($r2->image) }}" alt="{{ $r2->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
-          @else
-          <div class="w-full aspect-[4/5] bg-warm-300"></div>
-          @endif
-          <div class="absolute top-0 left-0 right-0 p-3">
-            <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r2->name }}</span>
-            <br>
-            <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r2->getCountry() ?? '' }}</span>
   </div>
 </div>
-@endif
 
-        <!-- Row 3: Coffees 06-07 + Roastery 3 -->
-        <div class="col-span-2 col-start-1 -mt-16">
-          @php $coffee = $allCoffees->get(5); $num = '06'; @endphp
-          @if($coffee)
-          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
-          @if($coffee->image)
-          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-          @else
-          <div class="w-full aspect-[3/4] bg-warm-300"></div>
-          @endif
-          @endif
-  </div>
-
-        <!-- Roastery 3 -->
-        @if($roasteries->count() >= 3)
-        @php $r3 = $roasteries->skip(2)->first(); @endphp
-        <div class="col-span-2 col-start-3 -mt-16 relative">
-          @if($r3->image)
-          <img src="{{ asset($r3->image) }}" alt="{{ $r3->name }}" class="w-full aspect-[4/5] object-cover grayscale" />
-          @else
-          <div class="w-full aspect-[4/5] bg-warm-300"></div>
-          @endif
-          <div class="absolute top-0 left-0 right-0 p-3">
-            <span class="inline-block bg-primary-500 px-2 py-1 font-display text-base font-normal text-black uppercase tracking-tight leading-tight">{{ $r3->name }}</span>
-            <br>
-            <span class="inline-block bg-primary-500 px-2 py-0.5 text-xs text-black uppercase tracking-widest mt-1">{{ $r3->getCountry() ?? '' }}</span>
-    </div>
-          </div>
-        @endif
-        
-        <div class="col-span-2 col-start-7 -mt-24">
-          @php $coffee = $allCoffees->get(6); $num = '07'; @endphp
-          @if($coffee)
-          <span class="text-xs text-warm-400 tracking-widest mb-2 block">{{ $num }}</span>
-          @if($coffee->image)
-          <img src="{{ asset($coffee->image) }}" alt="{{ $coffee->name }}" class="w-full h-auto object-contain" />
-          @else
-          <div class="w-full aspect-[3/4] bg-warm-300"></div>
-          @endif
-          @endif
-        </div>
-        
-        </div>
-      </div>
-    @endif
-    
-
-        </div>
-        </div>
-@endif
+<!-- Tarify M / L / XL -->
+<x-tiers :tiers="$tiers" />
 
 <!-- How It Works Section - Same style as Features -->
 <div class="relative py-20 sm:py-24 md:py-28 lg:py-36 overflow-hidden" style="background-color: #e5e6df;">
@@ -918,71 +347,76 @@
     </div>
   </div>
   
-<!-- Featured Products Section - Quiet Luxury -->
-@if($featuredProducts->count() > 0)
-<div class="relative py-20 sm:py-24 md:py-28 lg:py-36" style="background-color: #e5e6df;">
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <!-- Section Header -->
-    <div class="mb-12 sm:mb-16 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-      <div>
-        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-2 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ $currentLocale === 'en' ? 'Our Coffees' : 'Naše kávy' }}</h2>
-        <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Hand-picked from the best European roasters' : 'Ručně vybrané z nejlepších pražíren Evropy' }}</p>
-      </div>
-      <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-3 border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800 font-medium px-6 py-3 transition-all duration-200">
-        <span>{{ $currentLocale === 'en' ? 'View more' : 'Zobrazit více' }}</span>
-        <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-      </a>
+<!-- Recenze -->
+<x-reviews :reviews="$testimonials" :summary="$rating" />
+
+@if($giftsEnabled)
+<!-- Darujte kávu -->
+@php
+  $giftCurrency = \App\Helpers\CurrencyHelper::code();
+  $formatGift = fn ($amount) => \App\Helpers\CurrencyHelper::formatByCurrency($amount, $giftCurrency, 0);
+  $voucherAmounts = config('gifts.voucher_amounts.' . $giftCurrency, []);
+  $isGiftSeason = now()->month >= 10 && now()->lte(now()->setDate(now()->year, 12, 24)->endOfDay());
+  $typeParam = $currentLocale === 'en' ? 'type' : 'typ';
+  if ($giftCurrency === 'EUR') {
+      $voucherList = implode(', ', array_map($formatGift, array_slice($voucherAmounts, 0, -1))) . ' or ' . $formatGift(end($voucherAmounts));
+  } else {
+      $voucherList = implode(', ', array_map(fn ($a) => number_format($a, 0, ',', ' '), array_slice($voucherAmounts, 0, -1))) . ' nebo ' . $formatGift(end($voucherAmounts));
+  }
+  $giftRows = [
+      [
+          'name' => $currentLocale === 'en' ? '3 months' : '3 měsíce',
+          'desc' => $currentLocale === 'en' ? '3 boxes, one every month' : '3 boxy, jeden každý měsíc',
+          'price' => $giftFrom['subscription'] * 3,
+          'param' => '3m',
+      ],
+      [
+          'name' => $currentLocale === 'en' ? '6 months' : '6 měsíců',
+          'desc' => $currentLocale === 'en' ? '6 boxes, one every month' : '6 boxů, jeden každý měsíc',
+          'price' => $giftFrom['subscription'] * 6,
+          'param' => '6m',
+      ],
+      [
+          'name' => $currentLocale === 'en' ? 'Voucher' : 'Poukaz',
+          'desc' => $currentLocale === 'en' ? $voucherList . ' for the shop and boxes' : $voucherList . ' na e-shop i boxy',
+          'price' => $giftFrom['voucher'],
+          'param' => $currentLocale === 'en' ? 'voucher' : 'poukaz',
+      ],
+  ];
+@endphp
+<section aria-label="{{ $currentLocale === 'en' ? 'Gifts' : 'Dárky' }}" class="bg-dark-800 text-white">
+  <div class="mx-auto max-w-screen-xl px-4 md:px-8 py-24 lg:py-32 flex flex-wrap items-end gap-x-24 gap-y-16">
+    <div class="flex-[1_1_400px] min-w-0">
+      @if($isGiftSeason)
+      <p class="text-xs uppercase tracking-widest text-warm-300 mb-6">{{ $currentLocale === 'en' ? 'Christmas' : 'Vánoce' }} {{ now()->year }}</p>
+      @endif
+      <h2 class="font-display uppercase text-[64px] sm:text-[96px] leading-[0.9] tracking-tight text-white">
+        {{ $currentLocale === 'en' ? 'Give' : 'Darujte' }}<br>
+        <span class="text-primary-500">{{ $currentLocale === 'en' ? 'coffee' : 'kávu' }}</span>
+      </h2>
+      <p class="mt-8 max-w-[440px] text-lg sm:text-xl leading-relaxed font-light text-warm-300">
+        @if($currentLocale === 'en')
+        The certificate arrives by email straight away as a printable PDF{{ $isGiftSeason ? ', in time even on Christmas Eve' : '' }}. You pay once, nothing renews by itself.
+        @else
+        Certifikát přijde hned e-mailem v PDF k tisku{{ $isGiftSeason ? ', stihnete ho i na Štědrý den' : '' }}. Platíte jednou, nic se samo neobnoví.
+        @endif
+      </p>
     </div>
 
-    <div class="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      @foreach($featuredProducts->take(4) as $product)
-      <!-- product - start -->
-      <div class="group">
-        <a href="{{ localizedRoute('products.show', $product) }}" class="relative block mb-4 h-80 overflow-hidden bg-warm-200 transition-all duration-300">
-          @if($product->image)
-          <img src="{{ asset($product->image) }}" loading="lazy" alt="{{ $product->getName() }}" class="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105" />
-          @else
-          <div class="h-full w-full bg-warm-200 flex items-center justify-center p-8">
-            <span class="font-display text-3xl text-warm-400">{{ substr($product->getName(), 0, 1) }}</span>
-          </div>
-          @endif
-
-          @if($product->is_on_sale ?? false)
-          <span class="absolute left-0 top-4 bg-primary-500 px-4 py-2 text-xs font-medium uppercase tracking-widest text-white">
-            {{ $currentLocale === 'en' ? 'sale' : 'sleva' }}
-          </span>
-          @endif
-        </a>
-
-        <div class="space-y-2">
-          <a href="{{ localizedRoute('products.show', $product) }}" class="block">
-            <h3 class="text-lg font-normal text-dark-800 group-hover:text-primary-500 transition-colors mb-1">{{ $product->getName() }}</h3>
-          </a>
-          
-          <!-- Roaster/Manufacturer -->
-          @if(!empty($product->attributes['roaster']))
-          <p class="text-sm text-warm-500 font-light">
-            {{ $product->attributes['roaster'] }}
-          </p>
-          @elseif(!empty($product->attributes['manufacturer']))
-          <p class="text-sm text-warm-500 font-light">
-            {{ $product->attributes['manufacturer'] }}
-          </p>
-          @endif
-
-          <div class="flex items-baseline gap-2 pt-1">
-            <span class="font-display text-xl font-normal text-dark-800">{{ $product->getFormattedPrice() }}</span>
-            @if($product->original_price ?? false)
-            <span class="text-sm text-warm-500 line-through">{{ number_format($product->original_price, 0, ',', ' ') }} {{ $currentLocale === 'en' ? '€' : 'Kč' }}</span>
-            @endif
-          </div>
-        </div>
-      </div>
-      <!-- product - end -->
+    <div class="flex-[1_1_560px] min-w-0 border-b border-white/20">
+      @foreach($giftRows as $row)
+      <a href="{{ localizedRoute('gifts.index') }}?{{ $typeParam }}={{ $row['param'] }}"
+         class="group grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_160px] items-baseline gap-x-8 gap-y-2 py-7 border-t border-white/20 text-white hover:text-primary-500 transition-colors">
+        <span class="font-display uppercase tracking-tight text-[28px] sm:text-[40px] leading-none">{{ $row['name'] }}</span>
+        <span class="col-span-full row-start-2 sm:col-span-1 sm:row-start-auto text-sm leading-[22px] font-light text-warm-300">{{ $row['desc'] }}</span>
+        <span class="font-display justify-self-end whitespace-nowrap text-lg sm:text-[22px] leading-none">
+          {{ $currentLocale === 'en' ? 'from' : 'od' }} {{ $formatGift($row['price']) }}<span class="inline-block ml-2 transition-transform group-hover:translate-x-1" aria-hidden="true">&rarr;</span>
+        </span>
+      </a>
       @endforeach
     </div>
   </div>
-</div>
+</section>
 @endif
 
 <!-- Impact Section - Editorial Magazine Style -->
@@ -1033,35 +467,8 @@
   </div>
 </div>
 
-<!-- Final CTA Section - Terracotta Background -->
-<div class="relative py-20 sm:py-24 lg:py-32" style="background-color: #e5e6df;">
-  <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
-    <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
-      <!-- Large Editorial Heading -->
-      <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-        {{ $currentLocale === 'en' ? 'Start your coffee journey today' : 'Začněte svou kávovou cestu ještě dnes' }}
-      </h2>
-
-      <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
-        {{ $currentLocale === 'en' ? 'Get access to the best coffee from all over Europe. Flexible subscription, no commitment.' : 'Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.' }}
-      </p>
-
-      <!-- CTA Links -->
-      <div class="flex flex-col sm:flex-row gap-6 sm:gap-10">
-        <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-          <span>{{ $currentLocale === 'en' ? 'Choose subscription' : 'Vybrat předplatné' }}</span>
-          <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-        </a>
-
-        <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-warm-400 font-display uppercase tracking-widest hover:text-dark-800 transition-all">
-          <span>{{ $currentLocale === 'en' ? 'Browse coffees' : 'Procházet kávy' }}</span>
-          <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Časté dotazy -->
+<x-faq :items="$faq" :lead="__('components.faq.contact', ['email' => $currentLocale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz'])" />
 
 </div>
 @endsection
-

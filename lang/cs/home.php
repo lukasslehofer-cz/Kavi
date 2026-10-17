@@ -74,5 +74,14 @@ return [
         'secondary' => 'Procházet kávy',
     ],
 
-];
+    // Časté dotazy na homepage (redesign 2026-10). :cutoff a :shipment doplní
+    // HomeController z aktuálního cyklu v ShipmentSchedule.
+    'faq' => [
+        ['q' => 'Kdy mi přijde první box?', 'a' => 'Objednávky uzavíráme :cutoff o půlnoci a rozesíláme :shipment, Zásilkovnou na výdejní místo. Další boxy pak vždy kolem 20. dne v měsíci.'],
+        ['q' => 'Mohu předplatné pozastavit nebo zrušit?', 'a' => 'Ano, kdykoli v účtu a bez poplatků. Změna platí pro box, jehož uzávěrka ještě neproběhla.'],
+        ['q' => 'Jaké kávy dostanu?', 'a' => 'Každý měsíc kávy ze tří evropských pražíren. Pražírna se vrací zhruba jednou za rok, takže se kávy opakují málokdy.'],
+        ['q' => 'Espresso, nebo filtr?', 'a' => 'Espresso má plné tělo a tmavší pražení, filtr lehčí tělo a světlejší pražení. Kombinace pošle obojí.'],
+        ['q' => 'Mohu předplatné darovat?', 'a' => 'Ano, na 3 nebo 6 měsíců předem, bez automatického obnovení.', 'link' => 'Dárkové předplatné'],
+    ],
 
+];

@@ -88,11 +88,12 @@ class SubscriptionHelper
      * - Before billing_date cutoff: order gets current month's box
      * - After billing_date cutoff: order gets next month's box
      * 
+     * @param Carbon|null $now Okamžik, pro který se počítá (výchozí teď)
      * @return Carbon The target month (year and month components are relevant)
      */
-    public static function getOrderingTargetMonth(): Carbon
+    public static function getOrderingTargetMonth(?Carbon $now = null): Carbon
     {
-        $today = Carbon::now();
+        $today = $now ? $now->copy() : Carbon::now();
         $currentSchedule = ShipmentSchedule::getForMonth($today->year, $today->month);
         
         if ($currentSchedule && $currentSchedule->billing_date) {
@@ -281,14 +282,10 @@ class SubscriptionHelper
             $nextBilling = $targetMonth->copy()->day(15)->startOfDay();
         }
         
-        // Check if we're after the billing cutoff for current month
-        $currentSchedule = ShipmentSchedule::getForMonth($today->year, $today->month);
-        $isAfterCutoff = false;
-        if ($currentSchedule && $currentSchedule->billing_date) {
-            $isAfterCutoff = $today->greaterThan($currentSchedule->billing_date);
-        } else {
-            $isAfterCutoff = $today->day > 15;
-        }
+        // Po uzávěrce aktuálního měsíce už objednávky spadají do dalšího měsíce.
+        // Stejné pravidlo jako getOrderingTargetMonth(): uzávěrka platí do 23:59:59
+        // dne billing_date (dřív se tu porovnávalo s půlnocí na začátku toho dne).
+        $isAfterCutoff = ! $targetMonth->isSameMonth($today);
         
         // Generate locale-aware cutoff message
         if (app()->getLocale() === 'en') {
@@ -301,7 +298,9 @@ class SubscriptionHelper
             'next_shipping_date' => $nextShipping,
             'next_shipping_formatted' => $nextShipping->format('d.m.Y'),
             'next_billing_date' => $nextBilling,
-            'cycle_end' => $nextBilling->endOfDay(), // For backward compatibility
+            // copy(): endOfDay() mutuje instanci a posouval by i next_billing_date na 23:59:59
+            'cycle_end' => $nextBilling->copy()->endOfDay(), // For backward compatibility
+            'cutoff_at' => $nextBilling->copy()->endOfDay(),
             'is_after_cutoff' => $isAfterCutoff,
             'cutoff_message' => $cutoffMessage,
         ];

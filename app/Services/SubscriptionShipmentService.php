@@ -280,6 +280,11 @@ class SubscriptionShipmentService
             return null;
         }
 
+        // Dárkové předplatné: další box jen do vyčerpání dárku, bez kadence a plateb
+        if ($subscription->gift_purchase_id) {
+            return $this->ensureGiftPendingShipment($subscription);
+        }
+
         $nextDate = $this->calculateNextShipmentDate($subscription);
 
         if (! $nextDate) {
@@ -302,6 +307,10 @@ class SubscriptionShipmentService
      */
     public function calculateNextShipmentDate(Subscription $subscription, bool $paidPendingOnly = false): ?Carbon
     {
+        if ($subscription->gift_purchase_id) {
+            return $this->giftNextShipmentDate($subscription);
+        }
+
         $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
 
         // One-time boxes (frequency = 0) ship once
@@ -387,6 +396,14 @@ class SubscriptionShipmentService
      */
     public function pauseSubscription(Subscription $subscription, int $iterations, string $reason = 'user_request'): void
     {
+        // Dárkové předplatné se nepozastavuje (počet boxů je daný dárkem), kontrolery to
+        // odmítnou dřív - tohle je jen pojistka
+        if ($subscription->gift_purchase_id) {
+            \Log::warning('Pause refused for gift subscription', ['subscription_id' => $subscription->id]);
+
+            return;
+        }
+
         $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
 
         // 1. Find all paid pending shipments - these should NOT be affected
@@ -517,6 +534,12 @@ class SubscriptionShipmentService
      */
     public function pauseIndefinitely(Subscription $subscription, string $reason = Subscription::PAUSE_REASON_ADMIN_LOCK): void
     {
+        if ($subscription->gift_purchase_id) {
+            \Log::warning('Indefinite pause refused for gift subscription', ['subscription_id' => $subscription->id]);
+
+            return;
+        }
+
         // 1. Zaplacené zásilky zůstávají - zákazník za ně zaplatil a mají mu dojít
         // (stejný přístup jako pauseSubscription()).
         $paidPendingShipments = $subscription->shipments()
@@ -1087,7 +1110,21 @@ class SubscriptionShipmentService
         } else {
             // For recurring subscriptions, ensure next pending shipment exists
             $subscription = $shipment->subscription->fresh();
-            $this->ensurePendingShipmentExists($subscription);
+            $next = $this->ensurePendingShipmentExists($subscription);
+
+            // Dárkové předplatné po posledním boxu končí (nic se neobnoví ani nestrhne)
+            if ($subscription->gift_purchase_id && ! $next
+                && ! $subscription->shipments()->where('status', 'pending')->exists()) {
+                $subscription->update([
+                    'status' => 'completed',
+                    'ends_at' => $shipment->shipment_date,
+                ]);
+
+                \Log::info('Gift subscription completed after last box', [
+                    'subscription_id' => $subscription->id,
+                    'gift_purchase_id' => $subscription->gift_purchase_id,
+                ]);
+            }
         }
 
         \Log::info('Shipment marked as sent', [
@@ -1381,6 +1418,12 @@ class SubscriptionShipmentService
             return true;
         }
 
+        // Dárkové předplatné: jen měsíce, na které ještě dárek zbývá (bez kadence).
+        // Jinak by rezervace kávy počítaly i měsíce před startem dárku a po posledním boxu.
+        if ($subscription->gift_purchase_id) {
+            return $this->giftWouldShipOn($subscription, $date);
+        }
+
         // 2. For paused subscriptions: check if pause ends before/on billing_date
         // If so, the subscription WILL be active when billing occurs
         if ($subscription->status === 'paused' && $subscription->paused_until_date) {
@@ -1531,6 +1574,114 @@ class SubscriptionShipmentService
     /**
      * Get package dimensions based on subscription configuration
      */
+    /**
+     * Plán dárkového předplatného: kolik boxů zbývá a od kterého měsíce.
+     *
+     * Počítají se řádky ledgeru (pending/sent/delivered), ne kalendářní okno, takže
+     * box přeskočený adminem dárek prodlouží, místo aby propadl.
+     *
+     * @return array{months: int, consumed: int, remaining: int, next: Carbon}|null
+     */
+    public function giftPlan(Subscription $subscription): ?array
+    {
+        if (! $subscription->gift_purchase_id) {
+            return null;
+        }
+
+        $gift = $subscription->giftPurchase;
+        $months = max(1, (int) ($gift?->months ?? 1));
+        $rows = $subscription->shipments()->reorder('shipment_date', 'desc')->get(['id', 'status', 'shipment_date']);
+        $consumed = $rows->whereIn('status', ['pending', 'sent', 'delivered'])->count();
+
+        $latest = $rows->first();
+        if ($latest) {
+            $next = $latest->shipment_date->copy()->startOfMonth()->addMonthNoOverflow();
+        } else {
+            [$year, $month] = array_map('intval', explode('-', $gift?->start_month ?? now()->format('Y-m')));
+            $next = Carbon::create($year, $month, 1)->startOfDay();
+        }
+
+        // Do měsíce, jehož uzávěrka už proběhla, se další box plánovat nemůže
+        $target = \App\Helpers\SubscriptionHelper::getOrderingTargetMonth()->copy()->startOfMonth();
+        if ($next->lt($target)) {
+            $next = $target;
+        }
+
+        return [
+            'months' => $months,
+            'consumed' => $consumed,
+            'remaining' => max(0, $months - $consumed),
+            'next' => $next,
+        ];
+    }
+
+    protected function ensureGiftPendingShipment(Subscription $subscription): ?SubscriptionShipment
+    {
+        $pending = $subscription->shipments()
+            ->where('status', 'pending')
+            ->reorder('shipment_date', 'asc')
+            ->first();
+
+        if ($pending) {
+            return $pending;
+        }
+
+        $plan = $this->giftPlan($subscription);
+
+        if (! $plan || $plan['remaining'] <= 0 || $subscription->status !== 'complimentary') {
+            return null;
+        }
+
+        $schedule = ShipmentSchedule::getOrCreateForMonth($plan['next']->year, $plan['next']->month);
+
+        return $this->getOrCreateForSchedule($subscription, $schedule);
+    }
+
+    protected function giftNextShipmentDate(Subscription $subscription): ?Carbon
+    {
+        $pending = $subscription->shipments()
+            ->where('status', 'pending')
+            ->reorder('shipment_date', 'asc')
+            ->first();
+
+        if ($pending) {
+            return $pending->shipment_date->copy()->startOfDay();
+        }
+
+        $plan = $this->giftPlan($subscription);
+
+        if (! $plan || $plan['remaining'] <= 0 || $subscription->status !== 'complimentary') {
+            return null;
+        }
+
+        $schedule = ShipmentSchedule::getForMonth($plan['next']->year, $plan['next']->month);
+
+        return $schedule
+            ? $schedule->shipment_date->copy()->startOfDay()
+            : $plan['next']->copy()->day(20)->startOfDay();
+    }
+
+    /**
+     * Pošle se dárkové předplatné v měsíci daného data? (bez existujícího řádku zásilky)
+     */
+    protected function giftWouldShipOn(Subscription $subscription, Carbon $date): bool
+    {
+        if ($subscription->status !== 'complimentary') {
+            return false;
+        }
+
+        $plan = $this->giftPlan($subscription);
+
+        if (! $plan || $plan['remaining'] <= 0) {
+            return false;
+        }
+
+        $month = $date->copy()->startOfMonth();
+        $last = $plan['next']->copy()->addMonthsNoOverflow($plan['remaining'] - 1);
+
+        return $month->gte($plan['next']) && $month->lte($last);
+    }
+
     protected function getPackageDimensions(Subscription $subscription): array
     {
         $config = is_string($subscription->configuration)

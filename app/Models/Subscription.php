@@ -22,6 +22,7 @@ class Subscription extends Model
         'subscription_plan_id',
         'coupon_id',
         'coupon_code',
+        'gift_purchase_id',
         'discount_amount',
         'discount_months_remaining',
         'discount_months_total',
@@ -99,6 +100,22 @@ class Subscription extends Model
     public function plan()
     {
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
+    }
+
+    /**
+     * Dárek, jehož uplatněním předplatné vzniklo
+     */
+    public function giftPurchase()
+    {
+        return $this->belongsTo(GiftPurchase::class);
+    }
+
+    /**
+     * Dárkové předplatné: N boxů zdarma, nic se neúčtuje ani neobnovuje
+     */
+    public function isGift(): bool
+    {
+        return $this->gift_purchase_id !== null;
     }
 
     public function orders()

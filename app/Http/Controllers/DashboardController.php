@@ -442,6 +442,12 @@ class DashboardController extends Controller
             ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
 
+        // Dárkové předplatné má pevný počet boxů, nepozastavuje se
+        if ($subscription->isGift()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('gifts.subscription.action_not_allowed'));
+        }
+
         // Apply pause using the central service
         $shipmentService = app(SubscriptionShipmentService::class);
         $shipmentService->pauseSubscription($subscription, (int)$validated['iterations'], 'user_request');
@@ -537,6 +543,12 @@ class DashboardController extends Controller
         $subscription = Subscription::where('id', $validated['subscription_id'])
             ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
+
+        // Dárkové předplatné skončí samo posledním boxem
+        if ($subscription->isGift()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('gifts.subscription.action_not_allowed'));
+        }
 
         // Cancel in Stripe first (cancel_at_period_end)
         try {

@@ -20,10 +20,31 @@ class CouponService
         string $type = 'order', // 'order' nebo 'subscription'
         ?float $orderValue = null
     ): array {
+        // Dárkové kódy (KAVI-XXXX-XXXX) projdou i s mezerami nebo bez pomlček
+        if (\App\Helpers\GiftCode::looksLikeGiftCode($code)) {
+            $code = \App\Helpers\GiftCode::normalize($code);
+        }
+
         $coupon = Coupon::where('code', $code)->first();
 
         if (! $coupon) {
             return ['valid' => false, 'message' => __('checkout.coupon.not_found')];
+        }
+
+        // Kód dárkového předplatného se uplatní jen na stránce uplatnění dárku. V běžné
+        // pokladně by odemkl 100% slevu na libovolný box a založil placené předplatné.
+        if ($coupon->isGiftSubscriptionCode()) {
+            return ['valid' => false, 'message' => __('gifts.cart.subscription_code_redeem_only', [
+                'url' => \App\Models\GiftPurchase::redeemDisplayFor(app()->getLocale()),
+            ])];
+        }
+
+        // Poukaz platí jen v měně, ve které byl koupen (na druhé doméně by sleva vyšla 0)
+        if ($coupon->gift_type === \App\Models\GiftPurchase::TYPE_VOUCHER
+            && $coupon->giftPurchase && $coupon->giftPurchase->currency !== \App\Helpers\CurrencyHelper::code()) {
+            return ['valid' => false, 'message' => __('gifts.cart.voucher_other_currency', [
+                'site' => \App\Models\GiftPurchase::siteDisplayFor($coupon->giftPurchase->locale),
+            ])];
         }
 
         if (! $coupon->isValid()) {
@@ -77,7 +98,13 @@ class CouponService
                 $fixedDiscountValue = $coupon->getSubscriptionDiscountValue();
             }
 
-            if ($fixedDiscountValue !== null && $fixedDiscountValue > $orderValue) {
+            // Dárkový poukaz na předplatné musí být ostře menší než první platba: platba
+            // se zakládá přes Stripe s uložením karty a 0 Kč tam projít nemůže
+            $exceeds = $type === 'subscription' && $coupon->gift_type === \App\Models\GiftPurchase::TYPE_VOUCHER
+                ? $fixedDiscountValue !== null && $fixedDiscountValue >= $orderValue
+                : $fixedDiscountValue !== null && $fixedDiscountValue > $orderValue;
+
+            if ($exceeds) {
                 $formattedDiscount = \App\Helpers\CurrencyHelper::formatAmount($fixedDiscountValue);
                 $formattedTotal = \App\Helpers\CurrencyHelper::formatAmount($orderValue);
 
@@ -211,6 +238,48 @@ class CouponService
     /**
      * Zaznamená použití kupónu
      */
+    /**
+     * Uvolní použití dárkového kódu (poukazu) u nezaplacené objednávky, která propadla
+     * nebo ji zrušil admin. Použití se zapisuje už při vytvoření objednávky, takže
+     * jednorázový kód by jinak spálila i opuštěná platba.
+     *
+     * Záměrně jen pro kupony z dárků (gift_type), účetnictví ostatních kuponů a
+     * statistiky partnerů zůstávají beze změny.
+     */
+    public function releaseOrderUsage(Order $order): int
+    {
+        if ($order->payment_status === 'paid') {
+            return 0;
+        }
+
+        $released = 0;
+
+        $usages = CouponUsage::with('coupon')->where('order_id', $order->id)->get();
+
+        foreach ($usages as $usage) {
+            if (! $usage->coupon || ! $usage->coupon->isGiftCode()) {
+                continue;
+            }
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($usage) {
+                $coupon = Coupon::lockForUpdate()->find($usage->coupon_id);
+                $usage->delete();
+                if ($coupon && $coupon->times_used > 0) {
+                    $coupon->decrement('times_used');
+                }
+            });
+
+            $released++;
+
+            \Log::info('Gift coupon usage released for unpaid order', [
+                'order_id' => $order->id,
+                'coupon_id' => $usage->coupon_id,
+            ]);
+        }
+
+        return $released;
+    }
+
     public function recordUsage(
         Coupon $coupon,
         ?User $user,

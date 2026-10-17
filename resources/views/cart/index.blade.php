@@ -16,7 +16,7 @@
         </h1>
         <div class="mt-6 flex flex-wrap items-baseline gap-x-6 gap-y-2">
             @php
-                $count = count($cartItems ?? []);
+                $count = count($cartItems ?? []) + count($giftItems ?? []);
                 if ($currentLocale === 'en') {
                     $itemsWord = $count === 1 ? __('cart.items_count_1') : __('cart.items_count_5plus');
                 } else {
@@ -45,7 +45,7 @@
 </div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 overflow-x-hidden">
-    @if(empty($cartItems))
+    @if(empty($cartItems) && empty($giftItems))
     <!-- Empty Cart - Minimal Swiss Style -->
     <div class="max-w-2xl mx-auto text-center py-16">
         <div class="mb-8">
@@ -183,6 +183,40 @@
                                     @endif
                                 </span>
                                 @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+
+                {{-- Dárky: certifikát e-mailem, bez množství --}}
+                @foreach($giftItems as $giftId => $giftLine)
+                @php $giftModel = app(\App\Services\GiftCartService::class)->asModel($giftLine); @endphp
+                <div class="py-6 border-b border-warm-300">
+                    <div class="flex gap-4 sm:gap-6">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden bg-white">
+                            <img src="{{ asset($giftLine['type'] === 'voucher' ? 'images/gifts/cert-voucher.jpg' : 'images/gifts/cert-subscription.jpg') }}" alt="" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs uppercase tracking-widest text-warm-600 mb-1">{{ __('gifts.cart.section') }}</p>
+                            <h3 class="font-display text-lg sm:text-xl text-dark-800 uppercase tracking-tight">
+                                {{ $giftModel->isSubscription() ? __('gifts.page.type_subscription') . ' ' . $giftModel->boxCode() . ' Box · ' . trans_choice('gifts.months', $giftModel->months, ['count' => $giftModel->months]) : __('gifts.page.type_voucher') . ' ' . \App\Helpers\CurrencyHelper::formatAmount($giftLine['voucher_amount'], 0) }}
+                            </h3>
+                            <p class="text-sm text-warm-600 font-light mt-1">
+                                {{ __('gifts.cart.for', ['name' => $giftLine['recipient_name']]) }}
+                                @if($giftLine['delivery'] === 'recipient' && $giftLine['send_at'])
+                                · {{ __('gifts.cart.send_to', ['email' => $giftLine['recipient_email'], 'date' => \App\Helpers\DateFormat::full(\Carbon\Carbon::parse($giftLine['send_at']))]) }}
+                                @else
+                                · {{ __('gifts.cart.delivery') }}
+                                @endif
+                            </p>
+                            <div class="flex items-center justify-between mt-3">
+                                <form action="{{ localizedRoute('gifts.cart.remove', ['line' => $giftId]) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs uppercase tracking-widest text-warm-600 hover:text-primary-500 transition-colors">{{ __('gifts.cart.remove') }}</button>
+                                </form>
+                                <span class="font-display text-lg text-dark-800">{{ \App\Helpers\CurrencyHelper::formatAmount($giftLine['price']) }}</span>
                             </div>
                         </div>
                     </div>

@@ -13,26 +13,8 @@ class MonthlyFeatureController extends Controller
      */
     public function index()
     {
-        // Get the target month based on current date
-        $today = now();
-        
-        // Get billing_date for current month from ShipmentSchedule
-        $currentSchedule = \App\Models\ShipmentSchedule::getForMonth($today->year, $today->month);
-        
-        // Determine display cutoff date (billing_date + 1 day)
-        if ($currentSchedule && $currentSchedule->billing_date) {
-            $cutoffDate = $currentSchedule->billing_date->copy()->addDay();
-        } else {
-            // Fallback to 16th if no schedule configured
-            $cutoffDate = $today->copy()->day(16);
-        }
-        
-        // If today is on or after cutoff date, show next month
-        if ($today->greaterThanOrEqualTo($cutoffDate)) {
-            $displayMonth = $today->copy()->addMonthNoOverflow();
-        } else {
-            $displayMonth = $today->copy();
-        }
+        // Cílový měsíc podle uzávěrky v ShipmentSchedule (billing_date + 1 den)
+        $displayMonth = \App\Helpers\SubscriptionHelper::getOrderingTargetMonth();
         
         $targetMonth = $displayMonth->format('Y-m');
         

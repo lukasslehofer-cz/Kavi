@@ -97,6 +97,10 @@
                                     <span class="ml-2 text-yellow-700">{{ __('dashboard.status_paused_until', ['date' => $subscription->paused_until_date->format('d.m.Y')]) }}</span>
                                 @endif
                             </span>
+                        @elseif($subscription->isGift())
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                                {{ __('gifts.subscription.label') }}
+                            </span>
                         @elseif($subscription->status === 'complimentary')
                             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200">
                                 <span class="mr-2">🎁</span>
@@ -114,6 +118,17 @@
                     </div>
                 </div>
                 <div class="text-right">
+                    @if($subscription->isGift())
+                    @php
+                        // Dárek: pořadí boxu místo ceny (nic se neúčtuje)
+                        $giftTotal = (int) ($subscription->giftPurchase?->months ?? 0);
+                        $giftShipped = $subscription->shipments()->whereIn('status', ['sent', 'delivered'])->count();
+                        $giftHasPending = $subscription->shipments()->where('status', 'pending')->exists();
+                        $giftCurrent = min($giftTotal, $giftShipped + ($giftHasPending ? 1 : 0));
+                    @endphp
+                    <div class="text-2xl font-bold text-primary-600">{{ __('gifts.subscription.progress', ['current' => max(1, $giftCurrent), 'total' => $giftTotal]) }}</div>
+                    <div class="text-sm text-gray-600 font-light mt-1">{{ __('gifts.checkout.free_note') }}</div>
+                    @else
                     @php
                     // Rozpad z jednoho místa – fallback na plan->price přes SubscriptionPricing,
                     // aby se u EUR předplatného nevzala syrová CZK cena plánu.
@@ -139,6 +154,7 @@
                         <span class="block text-xs text-gray-500 mt-1">({{ \App\Helpers\CurrencyHelper::formatByCurrency($basePrice, $subscription->currency) }} {{ __('dashboard.subscription_price') }} + {{ \App\Helpers\CurrencyHelper::formatByCurrency($shippingCost, $subscription->currency) }} {{ __('dashboard.shipping') }})</span>
                         @endif
                     </div>
+                    @endif
                 </div>
             </div>
         </div>

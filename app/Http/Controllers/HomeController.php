@@ -2,67 +2,72 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\BoxPricing;
 use App\Helpers\CurrencyHelper;
-use App\Models\Product;
-use App\Models\SubscriptionConfig;
-use App\Models\SubscriptionPlan;
+use App\Helpers\GiftHelper;
+use App\Helpers\ShipmentCycles;
+use App\Services\CoffeeOfMonthService;
 use App\Services\GoogleReviewsService;
 
 class HomeController extends Controller
 {
-    public function index(GoogleReviewsService $googleReviews)
+    public function index(GoogleReviewsService $googleReviews, CoffeeOfMonthService $coffeeOfMonth)
     {
-        $featuredProducts = Product::forShop()
-            ->withPriceInCurrentCurrency()
-            ->featured()
-            ->orderBy('sort_order')
-            ->take(6)
-            ->get();
+        // Pražírny a kávy měsíce podle stejné uzávěrky, jakou mají objednávky
+        $lineup = $coffeeOfMonth->lineup();
 
-        $subscriptionPlans = SubscriptionPlan::active()
-            ->orderBy('price')
-            ->get();
-
-        // Get subscription pricing configuration based on currency
-        if (CurrencyHelper::isEur()) {
-            $subscriptionPricing = [
-                '2' => SubscriptionConfig::get('price_2_bags_eur', 20),
-                '3' => SubscriptionConfig::get('price_3_bags_eur', 29),
-                '4' => SubscriptionConfig::get('price_4_bags_eur', 37),
-            ];
-        } else {
-            $subscriptionPricing = [
-                '2' => SubscriptionConfig::get('price_2_bags', 500),
-                '3' => SubscriptionConfig::get('price_3_bags', 720),
-                '4' => SubscriptionConfig::get('price_4_bags', 920),
-            ];
-        }
-
-        // Get roasteries and coffees of the month
-        $roasteriesOfMonth = \App\Models\Roastery::getRoasteriesOfMonth();
-        
-        // Get coffees of month
-        $today = now();
-        $currentDay = $today->day;
-        $targetMonth = ($currentDay >= 16) 
-            ? $today->copy()->addMonthNoOverflow()->format('Y-m')
-            : $today->format('Y-m');
-        
-        $coffeesOfMonth = Product::with('roastery')
-            ->where('is_coffee_of_month', true)
-            ->where('coffee_of_month_date', $targetMonth)
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->take(7)
-            ->get();
+        // Řádky tarifů M / L / XL s cenou za gram
+        $tiers = BoxPricing::tiers();
 
         // Google recenze do sekce "Co říkají naši zákazníci". Dokud není zdroj
         // nakonfigurovaný, vrátí prázdno a šablona ukáže prosbu o hodnocení.
         $testimonials = $googleReviews->latest(3);
+        // Celkové hodnocení od Googlu (hero a recenze), bez dat se nezobrazí
+        $rating = $googleReviews->summary();
 
-        return view('home', compact('featuredProducts', 'subscriptionPlans', 'subscriptionPricing', 'roasteriesOfMonth', 'coffeesOfMonth', 'testimonials'));
+        $cycle = ShipmentCycles::current();
+        $giftsEnabled = GiftHelper::enabled();
+
+        // Ceny "od" v sekci Darujte kávu: nejlevnější box × počet měsíců, nejnižší poukaz
+        $currency = CurrencyHelper::code();
+        $giftFrom = [
+            'subscription' => BoxPricing::cheapest($currency),
+            'voucher' => min(config('gifts.voucher_amounts.' . $currency, [0])),
+        ];
+
+        $faq = $this->faq($cycle, $giftsEnabled);
+
+        return view('home', compact('lineup', 'tiers', 'testimonials', 'rating', 'cycle', 'giftsEnabled', 'giftFrom', 'faq'));
+    }
+
+    /**
+     * Časté dotazy pro sekci na stránce i pro JSON-LD FAQPage
+     */
+    private function faq($cycle, bool $giftsEnabled): array
+    {
+        $items = [];
+
+        foreach (array_keys(__('home.faq')) as $i) {
+            $item = [
+                'q' => __("home.faq.$i.q"),
+                'a' => __("home.faq.$i.a", [
+                    'cutoff' => $cycle->cutoffShort(),
+                    'shipment' => $cycle->shipmentShort(),
+                ]),
+            ];
+
+            $linkLabel = trans("home.faq.$i.link");
+            if ($linkLabel !== "home.faq.$i.link") {
+                // Otázka na dárky dává smysl jen se zapnutými dárky
+                if (! $giftsEnabled) {
+                    continue;
+                }
+                $item['link'] = ['label' => $linkLabel, 'href' => localizedRoute('gifts.index')];
+            }
+
+            $items[] = $item;
+        }
+
+        return $items;
     }
 }
-
-
-

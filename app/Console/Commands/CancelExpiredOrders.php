@@ -42,6 +42,13 @@ class CancelExpiredOrders extends Command
                     }
                 }
 
+                // Uvolnit dárkový kód (poukaz) z nezaplacené objednávky a označit
+                // neprodané dárky jako propadlé (pozdní platba je ještě vystaví)
+                app(\App\Services\CouponService::class)->releaseOrderUsage($order);
+                $order->giftPurchases()
+                    ->where('status', \App\Models\GiftPurchase::STATUS_PENDING)
+                    ->update(['status' => \App\Models\GiftPurchase::STATUS_EXPIRED]);
+
                 // Cancel the order
                 $order->update([
                     'status' => 'cancelled',

@@ -3071,7 +3071,7 @@ class StripeService
                 eventId: $order->meta_event_id,
                 value: (float) $order->total,
                 currency: $order->currency ?? 'CZK',
-                contentIds: $order->items->pluck('product_id')->toArray(),
+                contentIds: $order->items->pluck('product_id')->filter()->values()->toArray(),
                 contentType: 'product',
                 userData: [
                     'email' => $address['email'] ?? $user?->email,

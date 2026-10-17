@@ -99,9 +99,10 @@
                         <svg class="w-4 h-4 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
-                        @if(session('cart') && count(session('cart')) > 0)
+                        @php $cartCount = array_sum(session('cart', [])) + count(session('gift_cart', [])); @endphp
+                        @if($cartCount > 0)
                         <span class="absolute -top-1 -right-1 bg-primary-500 text-white text-xs w-4 h-4 flex items-center justify-center font-medium rounded-full">
-                            {{ array_sum(session('cart')) }}
+                            {{ $cartCount }}
                         </span>
                         @endif
                     </a>

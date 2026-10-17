@@ -39,6 +39,9 @@
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ url()->current() }}">
+    @hasSection('robots')
+    <meta name="robots" content="@yield('robots')">
+    @endif
 
     <!-- Google Search Console Verification -->
     @if(config('services.google.search_console_verification'))
@@ -111,8 +114,14 @@
     @if(($currentLocale ?? 'cs') === 'en')
     <!-- TrustBox script - only for EN version -->
     @endif
+
+    @stack('head')
 </head>
 <body class="min-h-screen flex flex-col">
+    @hasSection('minimal_chrome')
+    {{-- Landing page z reklamy: jen logo a CTA, bez menu a hlášek --}}
+    @include('partials.header-minimal')
+    @else
     <!-- Top Announcement Banner - Terracotta -->
     @php $announcementBanner = \App\Models\AnnouncementBanner::getCurrent(); @endphp
     @if($announcementBanner)
@@ -123,6 +132,9 @@
             </svg>
             <div class="text-sm text-white font-light tracking-wide">
                 {{ $announcementBanner->getMessage($currentLocale ?? 'cs') }}
+                @if($bannerLink = $announcementBanner->getLink($currentLocale ?? 'cs'))
+                <a href="{{ $bannerLink['url'] }}" class="ml-1 text-white underline underline-offset-2 hover:text-primary-400 transition-colors duration-200">{{ $bannerLink['label'] }}</a>
+                @endif
             </div>
         </div>
     </div>
@@ -155,6 +167,11 @@
                     <a href="{{ localizedRoute('roasteries.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
                         {{ ($currentLocale ?? 'cs') === 'en' ? 'Our Roasteries' : 'Naše pražírny' }}
                     </a>
+                    @if(\App\Helpers\GiftHelper::enabled())
+                    <a href="{{ localizedRoute('gifts.index') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
+                        {{ ($currentLocale ?? 'cs') === 'en' ? 'Gifts' : 'Dárky' }}
+                    </a>
+                    @endif
                     @auth
                     @if(auth()->user()->is_admin)
                     <a href="{{ route('admin.dashboard') }}" class="text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200">
@@ -181,8 +198,9 @@
                     <!-- Cart -->
                     <a href="{{ localizedRoute('cart.index') }}" class="relative text-sm text-dark-800 hover:text-primary-500 tracking-wide uppercase transition-colors duration-200 group" title="{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Cart' : 'Košík' }}</span>
-                        @if(session('cart') && count(session('cart')) > 0)
-                        <span class="text-primary-500 font-medium">({{ array_sum(session('cart')) }})</span>
+                        @php $cartCount = array_sum(session('cart', [])) + count(session('gift_cart', [])); @endphp
+                        @if($cartCount > 0)
+                        <span class="text-primary-500 font-medium">({{ $cartCount }})</span>
                         @endif
                     </a>
                     
@@ -221,6 +239,11 @@
                 <a href="{{ localizedRoute('roasteries.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 uppercase tracking-wide transition-colors duration-200">
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Our Roasteries' : 'Naše pražírny' }}
                 </a>
+                @if(\App\Helpers\GiftHelper::enabled())
+                <a href="{{ localizedRoute('gifts.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 border-b border-warm-100 uppercase tracking-wide transition-colors duration-200">
+                    {{ ($currentLocale ?? 'cs') === 'en' ? 'Gifts' : 'Dárky' }}
+                </a>
+                @endif
                 
                 <!-- Mobile CTA Button -->
                 <div class="pt-6">
@@ -262,6 +285,7 @@
             </div>
         </div>
     </header>
+    @endif
 
     <!-- Flash Messages -->
     @section('flash-messages')
@@ -287,6 +311,9 @@
         @yield('content')
     </main>
 
+    @hasSection('minimal_chrome')
+    @include('partials.footer-minimal')
+    @else
     <!-- Footer - Quiet Luxury -->
     <footer class="relative bg-black text-white">
 
@@ -320,6 +347,9 @@
             <nav class="space-y-3">
               <a href="{{ localizedRoute('subscriptions.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Configurator' : 'Konfigurátor' }}</a>
               <a href="{{ localizedRoute('subscriptions.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'One-time Box' : 'Jednorázový box' }}</a>
+              @if(\App\Helpers\GiftHelper::enabled())
+              <a href="{{ localizedRoute('gifts.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Gift Subscription' : 'Dárkové předplatné' }}</a>
+              @endif
               <a href="{{ localizedRoute('monthly-feature.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}</a>        
             </nav>
           </div>
@@ -396,6 +426,7 @@
         </div>
       </div>
     </footer>
+    @endif
 
     <!-- Mobile Menu Script -->
     <script>
@@ -486,6 +517,7 @@
             }
         });
     </script>
+    @stack('scripts')
 </body>
 </html>
 
