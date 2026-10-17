@@ -18,7 +18,7 @@ return [
 
     'item_name' => [
         'subscription' => 'Dárkové předplatné :box Box, :months',
-        'voucher' => 'Dárkový poukaz :amount (víceúčelový, DPH při uplatnění)',
+        'voucher' => 'Dárkový poukaz :amount',
     ],
 
     'certificate' => [

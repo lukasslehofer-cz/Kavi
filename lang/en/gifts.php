@@ -19,7 +19,7 @@ return [
 
     'item_name' => [
         'subscription' => 'Gift subscription :box Box, :months',
-        'voucher' => 'Gift voucher :amount (multi-purpose, VAT on redemption)',
+        'voucher' => 'Gift voucher :amount',
     ],
 
     'certificate' => [
