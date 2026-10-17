@@ -73,12 +73,13 @@
             <h2 class="font-semibold mb-4">Uplatnění</h2>
             @if($gift->subscription)
             <p class="text-sm">Předplatné <a href="{{ route('admin.subscriptions.show', $gift->subscription) }}" class="text-blue-600 hover:underline">{{ $gift->subscription->subscription_number }}</a>, uplatněno {{ $gift->redeemed_at?->format('d.m.Y H:i') }} ({{ $gift->redeemedBy?->email }}), start {{ $gift->start_month }}, stav {{ $gift->subscription->status }}.</p>
-            @elseif($gift->isVoucher() && $gift->coupon)
-            <p class="text-sm">Použití poukazu: {{ $gift->coupon->times_used }} / {{ $gift->coupon->usage_limit_total }}.
-                @foreach($gift->coupon->usages as $usage)
-                <span class="block">{{ $usage->created_at->format('d.m.Y H:i') }} · {{ $usage->usage_type }} · objednávka #{{ $usage->order_id ?? '–' }} · předplatné #{{ $usage->subscription_id ?? '–' }}</span>
-                @endforeach
+            @elseif($gift->isVoucher() && $gift->coupon && $gift->coupon->usages->isNotEmpty())
+            @foreach($gift->coupon->usages as $usage)
+            <p class="text-sm">
+                Uplatněno {{ $usage->created_at->format('d.m.Y H:i') }}@if($usage->user) ({{ $usage->user->email }})@endif
+                @if($usage->order)na objednávku <a href="{{ route('admin.orders.show', $usage->order) }}" class="text-blue-600 hover:underline">{{ $usage->order->order_number }}</a> (platba: {{ $usage->order->payment_status }})@elseif($usage->subscription)na předplatné <a href="{{ route('admin.subscriptions.show', $usage->subscription) }}" class="text-blue-600 hover:underline">{{ $usage->subscription->subscription_number }}</a> (stav: {{ $usage->subscription->status }})@endif
             </p>
+            @endforeach
             @else
             <p class="text-sm text-gray-500">Zatím neuplatněno.</p>
             @endif

@@ -114,8 +114,20 @@ class CheckSubscriptionConsistency extends Command
             $notIssued[] = ['gift_id' => $gift->id, 'order_id' => $gift->order_id, 'status' => $gift->status];
         }
 
+        // Poukaz: stav dárku musí odpovídat použití kódu (CouponUsage → GiftPurchase::syncVoucherStatus)
+        $voucherMismatch = [];
+        $vouchers = \App\Models\GiftPurchase::where('type', 'voucher')->whereIn('status', ['issued', 'redeemed'])
+            ->get(['id', 'coupon_id', 'status']);
+        foreach ($vouchers as $gift) {
+            $used = $gift->coupon_id && \App\Models\CouponUsage::where('coupon_id', $gift->coupon_id)->exists();
+            if ($used !== ($gift->status === 'redeemed')) {
+                $voucherMismatch[] = ['gift_id' => $gift->id, 'status' => $gift->status, 'code_used' => $used ? 'ano' : 'ne'];
+            }
+        }
+
         $this->record('gift_redeemed_link', 'Uplatněný dárek bez navázaného předplatného', 'blocker', $brokenLink);
         $this->record('gift_paid_not_issued', 'Zaplacený dárek bez vystaveného kódu (spusť gifts:deliver)', 'high', $notIssued);
+        $this->record('gift_voucher_status', 'Stav poukazu neodpovídá použití kódu', 'high', $voucherMismatch);
     }
 
     /* ------------------------------------------------------------------ */

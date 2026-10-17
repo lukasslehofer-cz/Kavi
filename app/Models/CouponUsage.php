@@ -22,6 +22,13 @@ class CouponUsage extends Model
         'discount_amount' => 'decimal:2',
     ];
 
+    protected static function booted(): void
+    {
+        // Dárkový poukaz: stav dárku v adminu sleduje použití kódu (Uplatněno / Vystaveno)
+        static::created(fn (CouponUsage $usage) => GiftPurchase::syncVoucherStatus((int) $usage->coupon_id));
+        static::deleted(fn (CouponUsage $usage) => GiftPurchase::syncVoucherStatus((int) $usage->coupon_id));
+    }
+
     /**
      * Vztah ke kupónu
      */

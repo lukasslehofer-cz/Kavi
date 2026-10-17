@@ -130,6 +130,36 @@ class GiftPurchase extends Model
     }
 
     /**
+     * Stav poukazu podle použití jeho kódu: použitý = Uplatněno, po uvolnění rezervace
+     * (nezaplacená objednávka, vypršelá platba) zpět Vystaveno. Volá CouponUsage při
+     * vzniku a smazání záznamu. Dárkové předplatné uplatňuje GiftRedemptionService.
+     */
+    public static function syncVoucherStatus(int $couponId): void
+    {
+        $gift = static::where('coupon_id', $couponId)->where('type', self::TYPE_VOUCHER)->first();
+
+        if (! $gift || ! in_array($gift->status, [self::STATUS_ISSUED, self::STATUS_REDEEMED], true)) {
+            return;
+        }
+
+        $usage = CouponUsage::where('coupon_id', $couponId)->oldest('id')->first();
+
+        if ($usage && $gift->status !== self::STATUS_REDEEMED) {
+            $gift->update([
+                'status' => self::STATUS_REDEEMED,
+                'redeemed_at' => $usage->created_at,
+                'redeemed_by_user_id' => $usage->user_id,
+            ]);
+        } elseif (! $usage && $gift->status === self::STATUS_REDEEMED) {
+            $gift->update([
+                'status' => self::STATUS_ISSUED,
+                'redeemed_at' => null,
+                'redeemed_by_user_id' => null,
+            ]);
+        }
+    }
+
+    /**
      * Kód lze ještě uplatnit (vystavený, neuplatněný, v platnosti, kupon aktivní)
      */
     public function isRedeemable(): bool

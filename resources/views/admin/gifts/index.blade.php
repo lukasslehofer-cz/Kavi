@@ -68,7 +68,6 @@
                         <td class="px-4 py-3">@if($gift->order)<a href="{{ route('admin.orders.show', $gift->order) }}" class="text-blue-600 hover:underline">{{ $gift->order->order_number }}</a>@endif</td>
                         <td class="px-4 py-3">
                             <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium {{ $class }}">{{ $label }}</span>
-                            @if($gift->isVoucher() && $gift->coupon && $gift->coupon->times_used > 0)<span class="block text-xs text-gray-500 mt-1">poukaz použit</span>@endif
                             @if($gift->last_delivery_error)<span class="block text-xs text-red-600 mt-1">chyba doručení</span>@endif
                         </td>
                         <td class="px-4 py-3">{{ $gift->valid_until?->format('d.m.Y') }}</td>
