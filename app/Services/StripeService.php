@@ -1036,12 +1036,18 @@ class StripeService
                 'paid_at' => now(),
             ];
 
+            // Pauzu od admina webhook nepřebíjí. Race je reálný: zákazník otevře "Zaplatit nyní"
+            // ve stavu unpaid a admin mezitím předplatné zamkne. Platbu započteme normálně
+            // (zaplacený box odejde i během zámku, stejně jako u pauseIndefinitely), jen status
+            // necháme na 'paused' - odemyká výhradně admin.
+            $isAdminLocked = $subscription->isAdminLocked();
+
             // Checkout jde otevřít jen ve stavu unpaid. Když předplatné mezitím přešlo jinam
-            // (retry cronu uspěl, 3. selhání ho pozastavilo jako payment_failure_skip, admin ho
-            // zamkl, auto-zrušení), platbu nejde započíst automaticky: obnovení by zrušilo pauzu
-            // nebo zámek a posun next_billing_date by přeskočil měsíc. Zapíšeme ji bez období
+            // (retry cronu uspěl, 3. selhání ho pozastavilo jako payment_failure_skip,
+            // auto-zrušení), platbu nejde započíst automaticky: obnovení by zrušilo pauzu
+            // a posun next_billing_date by přeskočil měsíc. Zapíšeme ji bez období
             // a bez vazby na zásilku, rozhodne admin.
-            if ($subscription->status !== 'unpaid') {
+            if ($subscription->status !== 'unpaid' && ! $isAdminLocked) {
                 return [
                     'subscription' => $subscription,
                     'payment' => \App\Models\SubscriptionPayment::create($paymentData),
@@ -1062,7 +1068,7 @@ class StripeService
             );
 
             $subscription->update([
-                'status' => 'active',
+                'status' => $isAdminLocked ? 'paused' : 'active',
                 'next_billing_date' => $nextBillingDate,
                 'payment_failure_count' => 0,
                 // Ruční doplacení stejně jako úspěšný cron ruší sérii neuhrazených rozesílek.
@@ -1077,6 +1083,7 @@ class StripeService
                 'subscription' => $subscription,
                 'payment' => $payment,
                 'applied' => true,
+                'admin_locked' => $isAdminLocked,
                 'next_billing_date' => $nextBillingDate,
             ];
         });
@@ -1114,6 +1121,13 @@ class StripeService
             );
 
             return;
+        }
+
+        if ($result['admin_locked']) {
+            \Log::warning('Manual invoice payment received for admin-locked subscription; keeping pause', $logContext + [
+                'payment_id' => $payment->id,
+                'subscription_number' => $subscription->subscription_number,
+            ]);
         }
 
         // Legacy Stripe-managed billing: skutečnou Stripe fakturu (in_…) jen označíme jako
