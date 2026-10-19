@@ -2656,7 +2656,7 @@ class StripeService
                 ],
                 // Stripe vyžaduje aspoň 30 minut od vytvoření
                 'expires_at' => max(now()->addMinutes(31)->timestamp, now()->endOfDay()->timestamp),
-                'success_url' => localizedRoute('subscriptions.pay-skipped.done').'?status=success',
+                'success_url' => localizedRoute('subscriptions.pay-skipped.done').'?status=success&session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => localizedRoute('subscriptions.pay-skipped.done').'?status=cancelled',
                 'metadata' => [
                     'type' => 'skipped_shipment_payment',
@@ -2683,6 +2683,54 @@ class StripeService
 
             return null;
         }
+    }
+
+    /**
+     * Údaje pro děkovací stránku po doplacení vynechané rozesílky. Čte přímo Checkout
+     * session, takže funguje i dřív, než dorazí webhook. Null pro cizí nebo neznámou session.
+     *
+     * @return array{subscription: Subscription, shipment: \App\Models\SubscriptionShipment, paid: bool, amount: ?string, card: ?string}|null
+     */
+    public function describeSkippedShipmentPaymentSession(string $sessionId): ?array
+    {
+        try {
+            $session = StripeSession::retrieve([
+                'id' => $sessionId,
+                'expand' => ['payment_intent.payment_method'],
+            ]);
+        } catch (\Throwable $e) {
+            \Log::warning('Cannot retrieve skipped shipment payment session', [
+                'session_id' => $sessionId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+
+        if (($session->metadata['type'] ?? null) !== 'skipped_shipment_payment') {
+            return null;
+        }
+
+        $shipment = \App\Models\SubscriptionShipment::with('subscription')
+            ->whereKey($session->metadata['shipment_id'] ?? 0)
+            ->where('subscription_id', $session->metadata['subscription_id'] ?? 0)
+            ->first();
+
+        if (! $shipment?->subscription) {
+            return null;
+        }
+
+        $card = $session->payment_intent?->payment_method?->card ?? null;
+
+        return [
+            'subscription' => $shipment->subscription,
+            'shipment' => $shipment,
+            'paid' => $session->payment_status === 'paid',
+            'amount' => $session->amount_total !== null
+                ? CurrencyHelper::formatByCurrency(CurrencyHelper::fromSmallestUnit((int) $session->amount_total), $session->currency)
+                : null,
+            'card' => $card ? ucfirst($card->brand).' •••• '.$card->last4 : null,
+        ];
     }
 
     /**

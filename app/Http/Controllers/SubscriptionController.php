@@ -1671,6 +1671,31 @@ class SubscriptionController extends Controller
             ? $request->query('status')
             : 'done';
 
-        return view('subscriptions.skipped-payment-result', ['status' => $status]);
+        $details = null;
+        $nextBilling = null;
+
+        if ($status === 'success' && is_string($request->query('session_id'))) {
+            $details = $this->stripeService->describeSkippedShipmentPaymentSession($request->query('session_id'));
+        }
+
+        if ($details) {
+            // Další platba = billing date první čekající rozesílky po té zaplacené. Nezávisí
+            // na tom, jestli webhook už stihl obnovit pauzu a posunout next_billing_date.
+            $nextShipment = $details['subscription']->shipments()
+                ->where('status', 'pending')
+                ->where('shipment_date', '>', $details['shipment']->shipment_date)
+                ->reorder('shipment_date')
+                ->first();
+
+            $nextBilling = $nextShipment
+                ? \App\Models\ShipmentSchedule::getBillingDateForMonth($nextShipment->shipment_date->year, $nextShipment->shipment_date->month)
+                : $details['subscription']->next_billing_date;
+        }
+
+        return view('subscriptions.skipped-payment-result', [
+            'status' => $status,
+            'details' => $details,
+            'nextBilling' => $nextBilling,
+        ]);
     }
 }

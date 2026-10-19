@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\DateFormat;
 use App\Helpers\SubscriptionPricing;
+use App\Helpers\SubscriptionSummary;
 use App\Models\Subscription;
 use App\Models\SubscriptionShipment;
 use App\Services\EmailService;
@@ -33,7 +34,9 @@ class SubscriptionSkippedShipmentPayment extends LocalizedMailable
     {
         return new Envelope(
             from: $this->getFromAddress(),
-            subject: $this->trans('emails.subscription_skipped_payment.subject'),
+            subject: $this->trans('emails.subscription_skipped_payment.subject', [
+                'number' => $this->subscription->subscription_number ?? '#'.$this->subscription->id,
+            ]),
         );
     }
 
@@ -46,7 +49,8 @@ class SubscriptionSkippedShipmentPayment extends LocalizedMailable
             with: [
                 'shipmentDate' => DateFormat::full($this->shipment->shipment_date, $this->emailLocale),
                 'amount' => CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency),
-                'validUntil' => DateFormat::full(now(), $this->emailLocale),
+                'today' => DateFormat::full(now(), $this->emailLocale),
+                'summaryRows' => SubscriptionSummary::rows($this->subscription, $this->emailLocale),
                 // Relativní podpis jako u dárkového certifikátu - doména se liší podle jazyka
                 'payUrl' => $this->siteUrl.URL::temporarySignedRoute(
                     $this->emailLocale === 'en' ? 'subscriptions.pay-skipped.en' : 'subscriptions.pay-skipped',
