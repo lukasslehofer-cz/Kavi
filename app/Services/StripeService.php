@@ -729,133 +729,7 @@ class StripeService
 
         // Handle manual invoice payment for subscription
         if (isset($session['metadata']['type']) && $session['metadata']['type'] === 'manual_invoice_payment') {
-            $subscriptionId = $session['metadata']['subscription_id'] ?? null;
-            $invoiceId = $session['metadata']['invoice_id'] ?? null;
-
-            if ($subscriptionId) {
-                $subscription = Subscription::find($subscriptionId);
-
-                if ($subscription) {
-                    // If there's a real Stripe invoice, try to pay it
-                    if ($invoiceId && $invoiceId !== 'manual_payment' && ! str_starts_with($invoiceId, 'in_test_')) {
-                        try {
-                            $invoice = \Stripe\Invoice::retrieve($invoiceId);
-                            if ($invoice->status !== 'paid') {
-                                $invoice->pay();
-                            }
-                            \Log::info('Stripe invoice paid after manual payment', [
-                                'subscription_id' => $subscription->id,
-                                'invoice_id' => $invoiceId,
-                            ]);
-                        } catch (\Exception $e) {
-                            \Log::error('Failed to pay Stripe invoice after manual payment', [
-                                'subscription_id' => $subscription->id,
-                                'invoice_id' => $invoiceId,
-                                'error' => $e->getMessage(),
-                            ]);
-                        }
-                    }
-
-                    // Record payment
-                    $paymentIntentId = $session['payment_intent'] ?? null;
-                    $amount = $subscription->pending_invoice_amount;
-                    $currency = $subscription->currency ?? 'CZK';
-                    $frequencyMonths = $subscription->frequency_months ?? 1;
-
-                    $payment = \App\Models\SubscriptionPayment::create([
-                        'subscription_id' => $subscription->id,
-                        'stripe_payment_intent_id' => $paymentIntentId,
-                        'amount' => $amount,
-                        'currency' => $currency,
-                        'status' => 'paid',
-                        'paid_at' => now(),
-                        'period_start' => $subscription->next_billing_date?->copy()->subMonths($frequencyMonths),
-                        'period_end' => $subscription->next_billing_date,
-                    ]);
-
-                    // Clear unpaid status, restore subscription and advance billing date
-                    $nextBillingDate = $this->calculateNextBillingDate(
-                        $subscription->next_billing_date,
-                        $frequencyMonths
-                    );
-
-                    // Pauzu od admina webhook nepřebíjí. Race je reálný: zákazník otevře
-                    // "Zaplatit nyní" ve stavu unpaid, admin mezitím předplatné zamkne
-                    // a příchozí platba by zámek zrušila. Platbu zpracujeme normálně,
-                    // jen status necháme na 'paused' - odemyká výhradně admin.
-                    $isAdminLocked = $subscription->isAdminLocked();
-
-                    if ($isAdminLocked) {
-                        \Log::warning('Manual invoice payment received for admin-locked subscription; keeping pause', [
-                            'subscription_id' => $subscription->id,
-                            'subscription_number' => $subscription->subscription_number,
-                            'payment_intent_id' => $paymentIntentId,
-                        ]);
-                    }
-
-                    $subscription->update([
-                        'status' => $isAdminLocked ? 'paused' : 'active',
-                        'next_billing_date' => $nextBillingDate,
-                        'payment_failure_count' => 0,
-                        // Ruční doplacení stejně jako úspěšný cron ruší sérii neuhrazených rozesílek.
-                        'consecutive_unpaid_shipments' => 0,
-                        'last_payment_failure_at' => null,
-                        'last_payment_failure_reason' => null,
-                        'pending_invoice_id' => null,
-                        'pending_invoice_amount' => null,
-                    ]);
-
-                    // Handle coupon countdown
-                    if ($subscription->coupon_id && $subscription->discount_amount > 0) {
-                        app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
-                    }
-
-                    // Link payment to shipment
-                    try {
-                        $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
-                        $shipmentService->linkPaymentToShipment($payment, $subscription);
-                    } catch (\Exception $e) {
-                        \Log::error('Failed to link manual payment to shipment', [
-                            'payment_id' => $payment->id,
-                            'subscription_id' => $subscription->id,
-                            'error' => $e->getMessage(),
-                        ]);
-                    }
-
-                    // Create Fakturoid invoice
-                    if (! $subscription->isComplimentary()) {
-                        try {
-                            $fakturoidService = app(\App\Services\FakturoidService::class);
-                            $fakturoidService->processInvoiceForSubscriptionPayment($payment);
-                        } catch (\Exception $e) {
-                            \Log::error('Failed to create Fakturoid invoice for manual payment', [
-                                'payment_id' => $payment->id,
-                                'error' => $e->getMessage(),
-                            ]);
-                        }
-                    }
-
-                    // Send confirmation email
-                    try {
-                        $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
-                        if ($email) {
-                            \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentSuccess($subscription, $payment));
-                        }
-                    } catch (\Exception $e) {
-                        \Log::error('Failed to send manual payment confirmation email', [
-                            'subscription_id' => $subscription->id,
-                            'error' => $e->getMessage(),
-                        ]);
-                    }
-
-                    \Log::info('Manual invoice payment successful - subscription restored', [
-                        'subscription_id' => $subscription->id,
-                        'payment_id' => $payment->id,
-                        'invoice_id' => $invoiceId ?? 'manual_payment',
-                        'next_billing_date' => $nextBillingDate->toDateString(),
-                    ]);
-                }
-            }
+            $this->handleManualInvoicePayment($session);
 
             return;
         }
@@ -1092,6 +966,251 @@ class StripeService
                     'order_number' => $order->order_number,
                 ]);
             }
+        }
+    }
+
+    /**
+     * Ruční doplacení přes "Zaplatit nyní" u předplatného ve stavu unpaid.
+     *
+     * Stripe doručuje události opakovaně (a po HTTP 400 vždy znovu), proto je zpracování
+     * idempotentní podle PaymentIntentu. Dokud platba není zapsaná, smí chyba probublat –
+     * Stripe to zkusí znovu. Po zápisu už žádný krok webhook neshodí.
+     */
+    private function handleManualInvoicePayment(array $session): void
+    {
+        $subscriptionId = $session['metadata']['subscription_id'] ?? null;
+        $invoiceId = $session['metadata']['invoice_id'] ?? null;
+        $paymentIntentId = $session['payment_intent'] ?? null;
+        $logContext = [
+            'subscription_id' => $subscriptionId,
+            'session_id' => $session['id'] ?? null,
+            'payment_intent_id' => $paymentIntentId,
+        ];
+
+        // Checkout je jen kartou, takže completed znamená zaplaceno. S asynchronní
+        // platební metodou by peníze dorazily až s checkout.session.async_payment_succeeded.
+        if (($session['payment_status'] ?? null) !== 'paid') {
+            \Log::warning('Manual invoice payment session completed but not paid; ignoring', $logContext + [
+                'payment_status' => $session['payment_status'] ?? null,
+            ]);
+
+            return;
+        }
+
+        if (! $subscriptionId || ! $paymentIntentId || ! Subscription::whereKey($subscriptionId)->exists()) {
+            \Log::error('Manual invoice payment cannot be matched to a subscription', $logContext);
+            $this->alertAdminAboutManualPayment(
+                'Ruční platba předplatného bez párování',
+                "Stripe potvrdil ruční platbu předplatného, ale nejde ji spárovat (chybí předplatné nebo PaymentIntent). Nic se nezapsalo.\n\n"
+                    .'Předplatné ID: '.($subscriptionId ?? '—')."\n"
+                    .'Checkout session: '.($session['id'] ?? '—')."\n"
+                    .'PaymentIntent: '.($paymentIntentId ?? '—')
+            );
+
+            return;
+        }
+
+        // Částka a měna podle toho, co zákazník reálně zaplatil – pending_invoice_amount
+        // se mezi otevřením checkoutu a zaplacením mohl přepočítat nebo vynulovat.
+        $amount = isset($session['amount_total'])
+            ? CurrencyHelper::fromSmallestUnit((int) $session['amount_total'])
+            : null;
+        $currency = $session['currency'] ?? null;
+
+        // Zámek řádku předplatného serializuje souběžná doručení téže události,
+        // takže kontrola duplicity uvnitř transakce je spolehlivá.
+        $result = \DB::transaction(function () use ($subscriptionId, $paymentIntentId, $amount, $currency) {
+            $subscription = Subscription::lockForUpdate()->findOrFail($subscriptionId);
+
+            $existing = \App\Models\SubscriptionPayment::where('stripe_payment_intent_id', $paymentIntentId)->first();
+            if ($existing) {
+                return ['duplicate' => $existing];
+            }
+
+            $paymentData = [
+                'subscription_id' => $subscription->id,
+                'stripe_payment_intent_id' => $paymentIntentId,
+                'amount' => $amount ?? (float) $subscription->pending_invoice_amount,
+                'currency' => $currency ?? $subscription->currency ?? 'CZK',
+                'status' => 'paid',
+                'paid_at' => now(),
+            ];
+
+            // Checkout jde otevřít jen ve stavu unpaid. Když předplatné mezitím přešlo jinam
+            // (retry cronu uspěl, 3. selhání ho pozastavilo jako payment_failure_skip, admin ho
+            // zamkl, auto-zrušení), platbu nejde započíst automaticky: obnovení by zrušilo pauzu
+            // nebo zámek a posun next_billing_date by přeskočil měsíc. Zapíšeme ji bez období
+            // a bez vazby na zásilku, rozhodne admin.
+            if ($subscription->status !== 'unpaid') {
+                return [
+                    'subscription' => $subscription,
+                    'payment' => \App\Models\SubscriptionPayment::create($paymentData),
+                    'applied' => false,
+                ];
+            }
+
+            $frequencyMonths = $subscription->frequency_months ?? 1;
+
+            $payment = \App\Models\SubscriptionPayment::create($paymentData + [
+                'period_start' => $subscription->next_billing_date?->copy()->subMonths($frequencyMonths),
+                'period_end' => $subscription->next_billing_date,
+            ]);
+
+            $nextBillingDate = $this->calculateNextBillingDate(
+                $subscription->next_billing_date,
+                $frequencyMonths
+            );
+
+            $subscription->update([
+                'status' => 'active',
+                'next_billing_date' => $nextBillingDate,
+                'payment_failure_count' => 0,
+                // Ruční doplacení stejně jako úspěšný cron ruší sérii neuhrazených rozesílek.
+                'consecutive_unpaid_shipments' => 0,
+                'last_payment_failure_at' => null,
+                'last_payment_failure_reason' => null,
+                'pending_invoice_id' => null,
+                'pending_invoice_amount' => null,
+            ]);
+
+            return [
+                'subscription' => $subscription,
+                'payment' => $payment,
+                'applied' => true,
+                'next_billing_date' => $nextBillingDate,
+            ];
+        });
+
+        if (isset($result['duplicate'])) {
+            \Log::info('Manual invoice payment already processed; ignoring duplicate delivery', $logContext + [
+                'payment_id' => $result['duplicate']->id,
+            ]);
+
+            return;
+        }
+
+        $subscription = $result['subscription'];
+        $payment = $result['payment'];
+        $subscriptionLabel = $subscription->subscription_number ?? '#'.$subscription->id;
+
+        if (! $result['applied']) {
+            \Log::warning('Manual invoice payment for subscription that is no longer unpaid; recorded without applying', $logContext + [
+                'payment_id' => $payment->id,
+                'status' => $subscription->status,
+                'pause_reason' => $subscription->pause_reason,
+                'amount' => $payment->amount,
+            ]);
+            $this->alertAdminAboutManualPayment(
+                'Ruční platba k vyřešení - '.$subscriptionLabel,
+                "Zákazník zaplatil přes „Zaplatit nyní“, ale předplatné už není ve stavu unpaid, takže se platba automaticky nezapočetla.\n\n"
+                    .'Předplatné: '.$subscriptionLabel."\n"
+                    .'Stav: '.$subscription->status.($subscription->pause_reason ? ' ('.$subscription->pause_reason.')' : '')."\n"
+                    .'Částka: '.$payment->amount.' '.$payment->currency."\n"
+                    .'Platba ID: '.$payment->id."\n"
+                    .'PaymentIntent: '.$paymentIntentId."\n\n"
+                    .'Platba je zapsaná jako zaplacená, ale bez období, bez vazby na zásilku a bez faktury. Stav ani next_billing_date se nezměnily. '
+                    .'Peníze buď vrať ve Stripe, nebo platbu ručně navaž na zásilku a vystav fakturu. '
+                    .'Do té doby ji subscriptions:check-consistency hlásí jako zaplacenou platbu bez zásilky.'
+            );
+
+            return;
+        }
+
+        // Legacy Stripe-managed billing: skutečnou Stripe fakturu (in_…) jen označíme jako
+        // zaplacenou mimo Stripe – peníze už přišly přes checkout a pay() by kartu strhl
+        // podruhé. Vlastní billing zapisuje 'manual_…', na to se Stripe neptáme.
+        if ($invoiceId && str_starts_with($invoiceId, 'in_') && ! str_starts_with($invoiceId, 'in_test_')) {
+            try {
+                $invoice = \Stripe\Invoice::retrieve($invoiceId);
+                if ($invoice->status !== 'paid') {
+                    $invoice->pay(['paid_out_of_band' => true]);
+                }
+                \Log::info('Stripe invoice marked paid after manual payment', [
+                    'subscription_id' => $subscription->id,
+                    'invoice_id' => $invoiceId,
+                ]);
+            } catch (\Throwable $e) {
+                \Log::error('Failed to mark Stripe invoice paid after manual payment', [
+                    'subscription_id' => $subscription->id,
+                    'invoice_id' => $invoiceId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        try {
+            app(\App\Services\SubscriptionShipmentService::class)->linkPaymentToShipment($payment, $subscription);
+        } catch (\Throwable $e) {
+            \Log::error('Failed to link manual payment to shipment', [
+                'payment_id' => $payment->id,
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        if (! $subscription->isComplimentary()) {
+            try {
+                app(\App\Services\FakturoidService::class)->processInvoiceForSubscriptionPayment($payment);
+            } catch (\Throwable $e) {
+                \Log::error('Failed to create Fakturoid invoice for manual payment', [
+                    'payment_id' => $payment->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Odpočet kupónu AŽ po vystavení faktury – při vyčerpání měsíců vynuluje
+        // discount_amount a poslední zvýhodněná faktura by vyšla bez slevy (stejně jako cron).
+        try {
+            if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Coupon countdown after manual payment failed (platba zůstává platná)', [
+                'subscription_id' => $subscription->id,
+                'payment_id' => $payment->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        try {
+            $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
+            if ($email) {
+                \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentSuccess($subscription, $payment));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Failed to send manual payment confirmation email', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        \Log::info('Manual invoice payment successful - subscription restored', [
+            'subscription_id' => $subscription->id,
+            'payment_id' => $payment->id,
+            'payment_intent_id' => $paymentIntentId,
+            'invoice_id' => $invoiceId ?? 'manual_payment',
+            'next_billing_date' => $result['next_billing_date']->toDateString(),
+        ]);
+    }
+
+    /**
+     * Upozornění adminovi k ruční platbě předplatného. Nikdy nevyhodí výjimku.
+     */
+    private function alertAdminAboutManualPayment(string $subject, string $body): void
+    {
+        try {
+            $adminEmail = config('mail.from.address');
+            if ($adminEmail) {
+                \Mail::raw($body, function ($message) use ($adminEmail, $subject) {
+                    $message->to($adminEmail)->subject($subject);
+                });
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Failed to send admin manual payment alert', [
+                'subject' => $subject,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
