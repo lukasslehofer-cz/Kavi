@@ -45,6 +45,9 @@ database/database.sqlite
 !/storage/app/invoices/.gitkeep
 /storage/app/google-reviews/*
 /storage/app/billing-cron/*
+# Vygenerované PDF certifikáty dárků a ručně nahrané poukazy (deploy.sh by je jinak smazal)
+/storage/app/gifts/*
+/storage/app/vouchers/*
 
 # Temporary files
 test_*.php

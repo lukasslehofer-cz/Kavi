@@ -78,5 +78,11 @@ return [
         'step4_desc' => 'Užijte si skvělou výběrovou kávu a těšte se na další kávový box',
     ],
 
-];
+    // Časté dotazy pod konfigurátorem (redesign 2026-10)
+    'faq' => [
+        ['q' => 'Co když mi káva nebude chutnat?', 'a' => 'Napište nám na info@kavi.cz. Typ kávy si můžete kdykoli změnit v účtu, například z filtru na espresso.'],
+        ['q' => 'Jak předplatné zruším?', 'a' => 'V účtu jedním klikem, bez poplatků. Můžete také dát pauzu nebo zmenšit box.'],
+        ['q' => 'Posíláte kávu mletou?', 'a' => 'Ne, posíláme jen zrnkovou kávu. Nejlépe chutná čerstvě namletá, proto ji doporučujeme mlít až těsně před přípravou.'],
+    ],
 
+];

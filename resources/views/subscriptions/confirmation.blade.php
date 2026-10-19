@@ -3,13 +3,17 @@
 @section('title', $subscription->frequency_months == 0 ? __('confirmation.page_title') : __('confirmation.page_title_subscription'))
 
 @section('content')
+@php
+$gift = $subscription->isGift() ? $subscription->giftPurchase : null;
+$giftDates = $gift?->boxDates();
+@endphp
 
 <!-- Success Header -->
 <div style="background-color: #e5e6df;">
   <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
     <div class="flex items-center gap-3 mb-6">
       <span class="w-3 h-3 rounded-full bg-green-500"></span>
-      <span class="text-xs uppercase tracking-widest text-green-600">{{ $subscription->frequency_months == 0 ? __('confirmation.success.badge_order') : __('confirmation.success.badge_subscription') }}</span>
+      <span class="text-xs uppercase tracking-widest text-green-600">{{ $gift ? __('gifts.checkout.confirmation_title') : ($subscription->frequency_months == 0 ? __('confirmation.success.badge_order') : __('confirmation.success.badge_subscription')) }}</span>
     </div>
 
     <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-8">
@@ -19,7 +23,9 @@
 
     <div class="flex justify-end">
       <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
-        @if($subscription->frequency_months == 0)
+        @if($gift && $giftDates)
+        {{ __('gifts.checkout.confirmation_text', ['first' => \App\Helpers\DateFormat::full($giftDates['first']), 'last' => \App\Helpers\DateFormat::full($giftDates['last']), 'email' => $subscription->shipping_address['email'] ?? '']) }}
+        @elseif($subscription->frequency_months == 0)
         {{ __('confirmation.success.desc_onetime') }}
         @else
         {{ __('confirmation.success.desc_subscription') }}
@@ -99,6 +105,17 @@
                             @endif
                         </div>
 
+                        @if($gift)
+                        <div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">{{ __('gifts.redeem.row_count') }}</span>
+                            <span class="font-display text-lg text-dark-800 uppercase tracking-tight">{{ __('gifts.redeem.row_count_value', ['count' => $gift->months]) }}</span>
+                        </div>
+
+                        <div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">{{ __('gifts.redeem.from') }}</span>
+                            <span class="font-display text-lg text-dark-800 uppercase tracking-tight">{{ $gift->giver_name }}</span>
+                        </div>
+                        @else
                         <div>
                             <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">{{ __('confirmation.subscription_details.frequency') }}</span>
                             <span class="font-display text-lg text-dark-800 uppercase tracking-tight">{{ $frequencyText }}</span>
@@ -113,6 +130,7 @@
                             <span class="text-xs text-warm-500 uppercase tracking-widest block mt-1">{{ $frequencyText }}</span>
                             @endif
                         </div>
+                        @endif
                     </div>
 
                     @if($subscription->discount_amount > 0 && $subscription->coupon && ($subscription->discount_months_remaining === null || $subscription->discount_months_remaining > 0))
@@ -171,6 +189,17 @@
 
                     <!-- Shipping and Payment Dates -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-warm-300">
+                        @if($gift && $giftDates)
+                        <div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">{{ __('gifts.redeem.summary_first') }}</span>
+                            <span class="font-display text-lg text-primary-500">{{ $giftDates['first']->format(__('confirmation.date_format')) }}</span>
+                        </div>
+                        <div>
+                            <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">{{ __('gifts.redeem.summary_last') }}</span>
+                            <span class="font-display text-lg text-dark-800">{{ $giftDates['last']->format(__('confirmation.date_format')) }}</span>
+                            <span class="text-xs text-warm-500 block mt-1">{{ __('gifts.checkout.free_note') }}</span>
+                        </div>
+                        @else
                         <div>
                             <span class="text-xs uppercase tracking-widest text-warm-400 block mb-2">{{ $isOneTime ? __('confirmation.subscription_details.shipment') : __('confirmation.subscription_details.first_shipment') }}</span>
                             <span class="font-display text-lg text-primary-500">{{ $shippingInfo['next_shipping_date']->format(__('confirmation.date_format')) }}</span>
@@ -183,6 +212,7 @@
                             <span class="font-display text-lg text-dark-800">{{ $nextPaymentDate->format(__('confirmation.date_format')) }}</span>
                             <span class="text-xs text-warm-500 block mt-1">{{ __('confirmation.subscription_details.payment_day_note') }}</span>
                         </div>
+                        @endif
                         @endif
                     </div>
                 </div>
@@ -212,6 +242,7 @@
                             </div>
                             @endif
                         </div>
+                        @if(! empty($subscription->shipping_address['billing_address']))
                         <div>
                             <span class="text-xs uppercase tracking-widest text-warm-400 block mb-1">{{ __('checkout.billing_address') }}</span>
                             <span class="text-dark-800">
@@ -228,6 +259,7 @@
                             </span>
                             @endif
                         </div>
+                        @endif
                     </div>
                 </div>
                 @endif
@@ -279,14 +311,17 @@
                             <span class="text-xs uppercase tracking-widest text-primary-500 w-8">02</span>
                             <div>
                                 <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">{{ $isOneTime ? __('confirmation.next_steps.shipment_title') : __('confirmation.next_steps.first_shipment_title') }}</div>
-                                <div class="text-xs text-dark-800/70">{{ __('confirmation.next_steps.shipment_desc') }}</div>
+                                <div class="text-xs text-dark-800/70">{{ $giftDates ? __('gifts.checkout.confirmation_shipment', ['date' => \App\Helpers\DateFormat::full($giftDates['first'])]) : __('confirmation.next_steps.shipment_desc') }}</div>
                             </div>
                         </div>
 
                         <div class="flex gap-4">
                             <span class="text-xs uppercase tracking-widest text-primary-500 w-8">03</span>
                             <div>
-                                @if($isOneTime)
+                                @if($gift)
+                                <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">{{ __('confirmation.next_steps.manage_title') }}</div>
+                                <div class="text-xs text-dark-800/70">{{ __('gifts.checkout.confirmation_manage') }}</div>
+                                @elseif($isOneTime)
                                 <div class="font-display text-sm text-dark-800 uppercase tracking-tight mb-1">{{ __('confirmation.next_steps.no_commitment_title') }}</div>
                                 <div class="text-xs text-dark-800/70">{{ __('confirmation.next_steps.no_commitment_desc') }}</div>
                                 @else

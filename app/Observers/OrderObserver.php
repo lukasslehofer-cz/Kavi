@@ -34,6 +34,20 @@ class OrderObserver
      */
     public function updated(Order $order): void
     {
+        // Zaplacená objednávka s dárky: vystavit kódy (PDF a e-maily po odeslání odpovědi).
+        // Pokrývá návrat ze Stripe, webhook i ruční změnu v adminu. Chyba nesmí shodit platbu,
+        // dovystaví ji příkaz gifts:deliver.
+        if ($order->wasChanged('payment_status') && $order->payment_status === 'paid') {
+            try {
+                app(\App\Services\GiftFulfilmentService::class)->onOrderPaid($order);
+            } catch (\Throwable $e) {
+                \Log::error('Gift fulfilment after payment failed', [
+                    'order_id' => $order->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         // Send "order shipped" email when shipped_at is set
         // Skip for digital-only orders where voucher email replaces shipped email
         if ($order->isDirty('shipped_at') && $order->shipped_at !== null) {

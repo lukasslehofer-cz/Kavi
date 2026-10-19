@@ -64,57 +64,13 @@
     <!-- 2-Column Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
       
-      <!-- LEFT COLUMN - Editorial Profile Card Style -->
+      <!-- LEFT COLUMN - Odpočet do uzávěrky + promo karta měsíce -->
       <div class="lg:col-span-5">
-        <div class="lg:sticky lg:top-16">
-          
-          <!-- Photo Section with Red Stripe overlapping -->
-          <div class="relative">
-            <!-- Product Photo - Square, Grayscale with grain -->
-            <div class="relative aspect-square overflow-hidden" style="background-color: #e5e6df;">
-              @php
-              $imageSrc = str_starts_with($promoImage, 'promo-images/') 
-                  ? asset('storage/' . $promoImage) 
-                  : asset($promoImage);
-            @endphp
-            <img src="{{ $imageSrc }}" 
-                 alt="Kávový box" 
-                 class="w-full h-full object-cover">
-            </div>
-            
-            <!-- Red vertical stripe with rotated text - top-left corner, ~40% height -->
-            <div class="absolute left-0 top-0 w-10 sm:w-12 bg-primary-500 flex items-center justify-center z-10" style="height: 40%;">
-              <span class="font-display text-dark-800 text-xs sm:text-sm uppercase tracking-[0.2em] transform -rotate-90 whitespace-nowrap">
-                {{ $monthName }} {{ $displayYear }}
-              </span>
-                    </div>
-                  </div>
-          
-          <!-- Info Section Below Photo - Roastery List -->
-          <div class="bg-warm-200">
-            
-            <!-- Roastery Rows -->
-            @if($roasteriesOfMonth && $roasteriesOfMonth->count() > 0)
-              @foreach($roasteriesOfMonth->take(3) as $index => $roastery)
-                <div class="flex items-center justify-between py-3 px-6 @if($index < $roasteriesOfMonth->count() - 1) border-b border-warm-300 @endif">
-                  <span class="font-display text-lg sm:text-xl md:text-2xl font-normal text-dark-800 uppercase tracking-tight">{{ $roastery->getName() }}</span>
-                  <span class="font-display text-lg sm:text-xl md:text-2xl font-normal text-warm-500 uppercase tracking-tight">{{ $roastery->getCountry() }}</span>
-              </div>
-              @endforeach
-            @endif
-            
-            <!-- Bottom Row: Description + Link -->
-            <div class="flex items-end justify-between gap-4 px-6 py-5 border-t border-warm-300">
-              <p class="text-xs text-warm-500 max-w-[60%] leading-relaxed font-light">
-                {{ $currentLocale === 'en' ? 'Premium specialty coffees from European micro-roasteries, freshly roasted and delivered to your door.' : 'Prémiové výběrové kávy z evropských mikropražíren, čerstvě pražené a doručené až k vašim dveřím.' }}
-              </p>
-            <a href="{{ localizedRoute('monthly-feature.index') }}" 
-                 class="text-sm text-dark-800 hover:text-primary-500 transition-colors whitespace-nowrap flex items-center gap-1">
-                {{ $currentLocale === 'en' ? 'View More' : 'Více info' }} <span class="text-lg">→</span>
-            </a>
-            </div>
-            
-          </div>
+        <div class="lg:sticky lg:top-[72px]">
+          @if(! $availability['allSoldOut'])
+          <x-countdown :cycle="$cycle" />
+          @endif
+          <x-promo-card :lineup="$lineup" :more="true" />
         </div>
       </div>
 
@@ -201,13 +157,16 @@
                   <p class="text-warm-500 uppercase tracking-widest text-xs">500g · 2 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
                   <p class="text-sm text-dark-700 font-light hidden sm:block">{{ $currentLocale === 'en' ? 'Ideal for individuals or couples' : 'Ideální pro jednotlivce nebo páry' }}</p>
                   </div>
-                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex items-baseline gap-1">
+                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex flex-col sm:items-end">
+                  <div class="flex items-baseline gap-1">
                     @if($currentLocale === 'en')
                     <span class="font-display text-2xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['2'], 0, '.', ' ') }}</span>
                     @else
                     <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['2'], 0, ',', ' ') }} Kč</span>
                     @endif
-                  <span class="text-warm-500 font-light text-sm">/box</span>
+                    <span class="text-warm-500 font-light text-sm">/box</span>
+                  </div>
+                  <span class="text-xs leading-4 text-warm-600">{{ \App\Helpers\BoxPricing::formatUnitPrice(2) }}</span>
                 </div>
               </label>
 
@@ -227,13 +186,16 @@
                   </p>
                   <p class="text-sm text-dark-700 font-light hidden sm:block">{{ $currentLocale === 'en' ? 'Most popular choice' : 'Nejpopulárnější volba' }}</p>
                   </div>
-                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex items-baseline gap-1">
+                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex flex-col sm:items-end">
+                  <div class="flex items-baseline gap-1">
                     @if($currentLocale === 'en')
                     <span class="font-display text-2xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['3'], 0, '.', ' ') }}</span>
                     @else
                     <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['3'], 0, ',', ' ') }} Kč</span>
                     @endif
-                  <span class="text-warm-500 font-light text-sm">/box</span>
+                    <span class="text-warm-500 font-light text-sm">/box</span>
+                  </div>
+                  <span class="text-xs leading-4 text-warm-600">{{ \App\Helpers\BoxPricing::formatUnitPrice(3) }}</span>
                 </div>
               </label>
 
@@ -250,13 +212,16 @@
                   <p class="text-warm-500 uppercase tracking-widest text-xs">1000g · 4 {{ $currentLocale === 'en' ? 'bags' : 'balíčky' }}</p>
                   <p class="text-sm text-dark-700 font-light hidden sm:block">{{ $currentLocale === 'en' ? 'For coffee enthusiasts' : 'Pro kávové nadšence' }}</p>
                   </div>
-                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex items-baseline gap-1">
+                <div class="pl-4 sm:pl-0 mt-2 sm:mt-0 flex flex-col sm:items-end">
+                  <div class="flex items-baseline gap-1">
                     @if($currentLocale === 'en')
                     <span class="font-display text-2xl font-normal text-dark-800">€{{ number_format($subscriptionPricing['4'], 0, '.', ' ') }}</span>
                     @else
                     <span class="font-display text-2xl font-normal text-dark-800">{{ number_format($subscriptionPricing['4'], 0, ',', ' ') }} Kč</span>
                     @endif
-                  <span class="text-warm-500 font-light text-sm">/box</span>
+                    <span class="text-warm-500 font-light text-sm">/box</span>
+                  </div>
+                  <span class="text-xs leading-4 text-warm-600">{{ \App\Helpers\BoxPricing::formatUnitPrice(4) }}</span>
                 </div>
               </label>
             </div>
@@ -415,6 +380,19 @@
                 <span class="font-display text-lg text-dark-800">+{{ $currentLocale === 'en' ? '€5' : '100 Kč' }}</span>
               </label>
             </div>
+
+            <!-- Po výběru "Jednorázově": nabídka předplatného -->
+            <div id="onetime-upsell" class="hidden mt-4 px-5 py-4 bg-warm-300/40 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+              <span class="flex-[1_1_300px] text-sm leading-[22px] text-dark-800">
+                {{ $currentLocale === 'en'
+                  ? 'With a subscription you save €5 on every box. You can cancel it anytime with one click.'
+                  : 'S předplatným ušetříte 100 Kč za každý box. Zrušit ho můžete kdykoli, jedním klikem.' }}
+              </span>
+              <button type="button" id="switch-to-subscription" class="group inline-flex items-center gap-2 text-sm text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-colors">
+                <span>{{ $currentLocale === 'en' ? 'Switch to subscription' : 'Přepnout na předplatné' }}</span>
+                <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
           </div>
 
           <!-- Shrnutí a Submit -->
@@ -441,14 +419,14 @@
             </div>
 
             <div class="flex justify-between items-end py-4 border-t-2 border-primary-500 mb-6">
-              <span class="text-primary-500 font-display text-xl font-normal uppercase">{{ $currentLocale === 'en' ? 'Total price:' : 'Celková cena:' }}</span>
+              <span id="summary-total-label" class="text-primary-500 font-display text-xl font-normal uppercase">{{ $currentLocale === 'en' ? 'Price per box:' : 'Cena za box:' }}</span>
                 <div class="text-right">
                   @if($currentLocale === 'en')
                   <span class="font-display text-5xl font-normal text-dark-800" id="summary-price">-</span><span class="text-lg text-warm-500 ml-1">€</span>
                   @else
                   <span class="font-display text-5xl font-normal text-dark-800" id="summary-price">-</span><span class="text-lg text-warm-500 ml-1">Kč</span>
                   @endif
-                <p id="summary-price-note" class="text-xs text-warm-500 mt-1 uppercase tracking-widest">{{ $currentLocale === 'en' ? 'per delivery' : 'při každé dodávce' }}</p>
+                <p id="summary-price-note" class="text-xs text-warm-600 mt-1 uppercase tracking-widest">{{ $currentLocale === 'en' ? 'per delivery' : 'při každé dodávce' }}</p>
               </div>
             </div>
 
@@ -480,13 +458,13 @@
         <div class="mt-8 p-5 bg-warm-200">
           <h3 class="font-display text-lg font-normal text-dark-800 mb-2 uppercase">{{ $currentLocale === 'en' ? 'Next shipping date' : 'Termín následující rozesílky' }}</h3>
           <p class="text-sm text-dark-800 font-medium mb-2">{{ $shippingInfo['cutoff_message'] }}</p>
-          <p class="text-sm text-warm-500 font-light">
+          <p class="text-sm text-warm-600 font-light">
                 @if($currentLocale === 'en')
-            Orders close on the <strong class="text-dark-800">15th of each month at midnight</strong>.
-            Coffee shipping usually happens on the <strong class="text-dark-800">20th of each month</strong>.
+            Orders for this box close <strong class="text-dark-800">{{ $cycle->cutoffShort() }} at midnight</strong>.
+            The coffee ships on <strong class="text-dark-800">{{ $cycle->shipmentShort() }}</strong>.
                 @else
-            Objednávky uzavíráme <strong class="text-dark-800">15. dne v měsíci o půlnoci</strong>.
-            Rozesílka kávy probíhá nejčastěji <strong class="text-dark-800">20. dne v měsíci</strong>.
+            Objednávky na tento box uzavíráme <strong class="text-dark-800">{{ $cycle->cutoffShort() }} o půlnoci</strong>.
+            Rozesílka kávy proběhne <strong class="text-dark-800">{{ $cycle->shipmentShort() }}</strong>.
                 @endif
               </p>
         </div>
@@ -496,6 +474,19 @@
 
   </div>
 </div>
+
+
+{{-- Kávy měsíce, které mohou přijít v boxu --}}
+<x-coffee-of-month
+    :lineup="$lineup"
+    variant="h2"
+    id="v-boxu"
+    :title="$currentLocale === 'en' ? 'In the ' . $lineup->monthName('adjective') . ' box' : 'V ' . $lineup->monthName('adjective_locative') . ' boxu'"
+    :lead="$currentLocale === 'en' ? 'Your box will contain two to four of these coffees, depending on its size.' : 'Do boxu vám přijdou dvě až čtyři z těchto káv podle velikosti.'"
+    :link-label="$currentLocale === 'en' ? 'More about the coffee of the month' : 'Více o kávě měsíce'"
+    padding="pt-20 sm:pt-24 lg:pt-28 pb-20 sm:pb-24 lg:pb-28" />
+
+<x-faq :items="__('subscriptions.faq')" padding="pt-8 pb-20 sm:pb-24 lg:pb-28" />
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -885,17 +876,37 @@ document.addEventListener('DOMContentLoaded', function() {
         const summaryPriceNote = document.getElementById('summary-price-note');
         const onetimeSurcharge = document.getElementById('onetime-surcharge');
         
+        const summaryTotalLabel = document.getElementById('summary-total-label');
+        const onetimeUpsell = document.getElementById('onetime-upsell');
+        // Pod cenou: frekvence (+ doprava zdarma na kavi.cz)
+        const frequencyNotes = currentLocale === 'en' ? {
+            0: 'one-time order',
+            1: 'every month',
+            2: 'every 2 months',
+            3: 'every 3 months'
+        } : {
+            0: 'jednorázová objednávka · doprava zdarma',
+            1: 'každý měsíc · doprava zdarma',
+            2: 'jednou za 2 měsíce · doprava zdarma',
+            3: 'jednou za 3 měsíce · doprava zdarma'
+        };
+
         if (selectedFrequency === 0) {
             // Jednorázová objednávka
             summaryTitle.textContent = currentLocale === 'en' ? 'Order summary' : 'Shrnutí objednávky';
-            summaryPriceNote.textContent = currentLocale === 'en' ? 'one-time' : 'jednorázově';
+            summaryTotalLabel.textContent = currentLocale === 'en' ? 'Total price:' : 'Celková cena:';
             onetimeSurcharge.classList.remove('hidden');
+            onetimeUpsell.classList.remove('hidden');
         } else {
             // Předplatné
             summaryTitle.textContent = currentLocale === 'en' ? 'Subscription summary' : 'Shrnutí předplatného';
-            summaryPriceNote.textContent = currentLocale === 'en' ? 'per delivery' : 'při každé dodávce';
+            summaryTotalLabel.textContent = currentLocale === 'en' ? 'Price per box:' : 'Cena za box:';
             onetimeSurcharge.classList.add('hidden');
+            onetimeUpsell.classList.add('hidden');
         }
+        summaryPriceNote.textContent = selectedFrequency !== null
+            ? frequencyNotes[selectedFrequency]
+            : (currentLocale === 'en' ? 'per delivery' : 'při každé dodávce');
         
         // Cena
         if (selectedAmount) {
@@ -922,6 +933,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // "Přepnout na předplatné" v nabídce pod jednorázovým boxem
+    document.getElementById('switch-to-subscription')?.addEventListener('click', function() {
+        const monthly = document.querySelector('input[name="frequency"][value="1"]');
+        if (monthly) {
+            monthly.checked = true;
+            monthly.dispatchEvent(new Event('change'));
+        }
+    });
+
     // Automatický výběr plánu z URL parametru
     // (Musí být až ZA definicí všech event listenerů!)
     const urlParams = new URLSearchParams(window.location.search);

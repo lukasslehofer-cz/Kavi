@@ -19,13 +19,23 @@ class OrderItem extends Model
         'quantity',
         'total',
         'vat_rate',
+        'is_gift',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'total' => 'decimal:2',
         'vat_rate' => 'decimal:2',
+        'is_gift' => 'boolean',
     ];
+
+    /**
+     * Dárek k této položce (jen u is_gift)
+     */
+    public function giftPurchase()
+    {
+        return $this->hasOne(GiftPurchase::class);
+    }
 
     public function order()
     {

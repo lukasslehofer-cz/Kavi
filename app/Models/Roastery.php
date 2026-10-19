@@ -154,31 +154,8 @@ class Roastery extends Model
      */
     public static function getRoasteriesOfMonth()
     {
-        $today = now();
-        
-        // Get billing_date for current month from ShipmentSchedule
-        $currentSchedule = \App\Models\ShipmentSchedule::getForMonth($today->year, $today->month);
-        
-        // Determine display cutoff date (billing_date + 1 day)
-        if ($currentSchedule && $currentSchedule->billing_date) {
-            $cutoffDate = $currentSchedule->billing_date->copy()->addDay();
-        } else {
-            // Fallback to 16th if no schedule configured
-            $cutoffDate = $today->copy()->day(16);
-        }
-        
-        // If today is on or after cutoff date, show next month
-        if ($today->greaterThanOrEqualTo($cutoffDate)) {
-            $targetMonth = $today->copy()->addMonthNoOverflow()->format('Y-m');
-        } else {
-            $targetMonth = $today->format('Y-m');
-        }
-        
-        return self::where('featured_month', $targetMonth)
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->get();
+        // Měsíc i dotaz určuje CoffeeOfMonthService (stejná uzávěrka jako objednávky)
+        return app(\App\Services\CoffeeOfMonthService::class)->lineup()->roasteries;
     }
 
     /**

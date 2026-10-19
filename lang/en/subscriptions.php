@@ -78,5 +78,11 @@ return [
         'step4_desc' => 'Savor exceptional specialty coffee and look forward to your next box',
     ],
 
-];
+    // FAQ below the configurator (redesign 2026-10)
+    'faq' => [
+        ['q' => 'What if I don\'t like the coffee?', 'a' => 'Write to us at info@kavibox.com. You can change your coffee type in your account at any time, for example from filter to espresso.'],
+        ['q' => 'How do I cancel my subscription?', 'a' => 'With one click in your account, no fees. You can also pause it or switch to a smaller box.'],
+        ['q' => 'Do you send ground coffee?', 'a' => 'No, we only send whole beans. Coffee tastes best freshly ground, so we recommend grinding it just before brewing.'],
+    ],
 
+];

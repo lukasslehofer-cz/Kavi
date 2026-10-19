@@ -76,6 +76,39 @@
                     <p class="text-xs text-gray-500 mt-1">Zobrazí se jen v pokladně. Prázdné = „Notice"</p>
                 </div>
 
+                <!-- Link (optional) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="link_label_cs" class="block text-sm font-medium text-gray-700 mb-2">Odkaz – text (CZ)</label>
+                        <input type="text" name="link_label_cs" id="link_label_cs" maxlength="80"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: Darovat kávu"
+                            value="{{ old('link_label_cs') }}">
+                    </div>
+                    <div>
+                        <label for="link_url_cs" class="block text-sm font-medium text-gray-700 mb-2">Odkaz – adresa (CZ)</label>
+                        <input type="text" name="link_url_cs" id="link_url_cs"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="/darky"
+                            value="{{ old('link_url_cs') }}">
+                    </div>
+                    <div>
+                        <label for="link_label_en" class="block text-sm font-medium text-gray-700 mb-2">Odkaz – text (EN)</label>
+                        <input type="text" name="link_label_en" id="link_label_en" maxlength="80"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: Give coffee"
+                            value="{{ old('link_label_en') }}">
+                    </div>
+                    <div>
+                        <label for="link_url_en" class="block text-sm font-medium text-gray-700 mb-2">Odkaz – adresa (EN)</label>
+                        <input type="text" name="link_url_en" id="link_url_en"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="/gifts"
+                            value="{{ old('link_url_en') }}">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 -mt-2">Nepovinné. Odkaz se zobrazí za textem hlášky v záhlaví. Adresa začíná „/“ nebo „https://“.</p>
+
                 <!-- Icon Selection -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -394,6 +427,35 @@
                             </div>
                         </div>
                         <p class="text-xs text-gray-500 -mt-2">Nadpis se zobrazí jen v pokladně, v záhlaví se ignoruje.</p>
+
+                        <!-- Link (optional) -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Odkaz – text (CZ)</label>
+                                <input type="text" name="link_label_cs" maxlength="80"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->link_label_cs }}">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Odkaz – adresa (CZ)</label>
+                                <input type="text" name="link_url_cs"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->link_url_cs }}">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Odkaz – text (EN)</label>
+                                <input type="text" name="link_label_en" maxlength="80"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->link_label_en }}">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Odkaz – adresa (EN)</label>
+                                <input type="text" name="link_url_en"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->link_url_en }}">
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 -mt-2">Odkaz za textem hlášky v záhlaví. Adresa začíná „/“ nebo „https://“.</p>
 
                         <!-- Icon Selection -->
                         <div>

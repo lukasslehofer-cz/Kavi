@@ -147,6 +147,12 @@ class OrderController extends Controller
             }
         }
 
+        // Uvolnit dárkový kód a zneplatnit nevystavené dárky
+        app(\App\Services\CouponService::class)->releaseOrderUsage($order);
+        $order->giftPurchases()
+            ->where('status', \App\Models\GiftPurchase::STATUS_PENDING)
+            ->update(['status' => \App\Models\GiftPurchase::STATUS_EXPIRED]);
+
         $order->update(['status' => 'cancelled']);
 
         return redirect()->route('admin.orders.index')
@@ -211,7 +217,8 @@ class OrderController extends Controller
             }
             
             // Convert value to target currency if needed
-            $value = $order->total ?? 500;
+            // Deklarovaná hodnota zásilky bez dárků (certifikát se posílá e-mailem)
+            $value = ($order->total - $order->giftItemsTotal()) ?: 500;
             if ($currency !== 'CZK') {
                 // Simple conversion: CZK to EUR (~25:1), CZK to USD (~23:1)
                 $value = match($currency) {

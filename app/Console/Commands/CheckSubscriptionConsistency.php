@@ -53,8 +53,81 @@ class CheckSubscriptionConsistency extends Command
         $this->checkPaymentOnMultipleShipments();
         $this->checkOrphanedAddonOrders();
         $this->checkLegacyStripeSubscriptions($subscriptions);
+        $this->checkGiftSubscriptions($subscriptions);
+        $this->checkGiftPurchases();
 
         return $this->report($limit);
+    }
+
+    /**
+     * Dárková předplatná: nesmí se účtovat a nesmí mít víc boxů, než kolik dárek kryje.
+     */
+    protected function checkGiftSubscriptions($subscriptions): void
+    {
+        $billable = [];
+        $overplanned = [];
+
+        $gifts = \App\Models\GiftPurchase::whereIn('id', $subscriptions->pluck('gift_purchase_id')->filter())->get()->keyBy('id');
+
+        foreach ($subscriptions->whereNotNull('gift_purchase_id') as $sub) {
+            if (in_array($sub->status, ['active', 'unpaid', 'paused', 'pending'], true)
+                || $sub->next_billing_date !== null
+                || $sub->payments->isNotEmpty()) {
+                $billable[] = [
+                    'subscription_id' => $sub->id,
+                    'status' => $sub->status,
+                    'next_billing_date' => $sub->next_billing_date?->toDateString(),
+                    'payments' => $sub->payments->count(),
+                ];
+            }
+
+            $months = (int) ($gifts[$sub->gift_purchase_id]->months ?? 0);
+            $planned = $sub->shipments->whereIn('status', ['pending', 'sent', 'delivered'])->count();
+            if ($months > 0 && $planned > $months) {
+                $overplanned[] = ['subscription_id' => $sub->id, 'months' => $months, 'planned' => $planned];
+            }
+        }
+
+        $this->record('gift_billable', 'Dárkové předplatné, které by se mohlo účtovat', 'blocker', $billable);
+        $this->record('gift_overplanned', 'Dárkové předplatné s víc boxy, než dárek kryje', 'high', $overplanned);
+    }
+
+    /**
+     * Prodané dárky: uplatněný musí mít předplatné, zaplacený musí být vystavený.
+     */
+    protected function checkGiftPurchases(): void
+    {
+        $brokenLink = [];
+        $notIssued = [];
+
+        $redeemed = \App\Models\GiftPurchase::where('type', 'subscription')->where('status', 'redeemed')->with('subscription')->get();
+        foreach ($redeemed as $gift) {
+            if (! $gift->subscription || (int) $gift->subscription->gift_purchase_id !== (int) $gift->id) {
+                $brokenLink[] = ['gift_id' => $gift->id, 'subscription_id' => $gift->subscription_id];
+            }
+        }
+
+        $stuck = \App\Models\GiftPurchase::whereIn('status', ['pending', 'expired', 'issuing'])
+            ->whereHas('order', fn ($q) => $q->where('payment_status', 'paid')->where('paid_at', '<', now()->subMinutes(30)))
+            ->get(['id', 'order_id', 'status']);
+        foreach ($stuck as $gift) {
+            $notIssued[] = ['gift_id' => $gift->id, 'order_id' => $gift->order_id, 'status' => $gift->status];
+        }
+
+        // Poukaz: stav dárku musí odpovídat použití kódu (CouponUsage → GiftPurchase::syncVoucherStatus)
+        $voucherMismatch = [];
+        $vouchers = \App\Models\GiftPurchase::where('type', 'voucher')->whereIn('status', ['issued', 'redeemed'])
+            ->get(['id', 'coupon_id', 'status']);
+        foreach ($vouchers as $gift) {
+            $used = $gift->coupon_id && \App\Models\CouponUsage::where('coupon_id', $gift->coupon_id)->exists();
+            if ($used !== ($gift->status === 'redeemed')) {
+                $voucherMismatch[] = ['gift_id' => $gift->id, 'status' => $gift->status, 'code_used' => $used ? 'ano' : 'ne'];
+            }
+        }
+
+        $this->record('gift_redeemed_link', 'Uplatněný dárek bez navázaného předplatného', 'blocker', $brokenLink);
+        $this->record('gift_paid_not_issued', 'Zaplacený dárek bez vystaveného kódu (spusť gifts:deliver)', 'high', $notIssued);
+        $this->record('gift_voucher_status', 'Stav poukazu neodpovídá použití kódu', 'high', $voucherMismatch);
     }
 
     /* ------------------------------------------------------------------ */

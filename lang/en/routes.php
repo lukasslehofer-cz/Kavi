@@ -28,6 +28,15 @@ return [
 
     // Monthly feature
     'monthly-feature' => 'coffee-of-the-month',
+    'landing-europe' => 'europe-in-a-box',
+    'gifts' => 'gifts',
+    'gifts-add' => 'gifts/add-to-cart',
+    'gifts-remove' => 'gifts/remove/{line}',
+    'gift-certificate' => 'gifts/certificate/{gift}',
+    // kavibox.com/redeem is printed on the certificate, do not change
+    'gift-redeem' => 'redeem',
+    'gift-redeem-verify' => 'redeem/verify',
+    'gift-redeem-prepare' => 'redeem/continue',
 
     // Blog
     'blog' => 'blog',

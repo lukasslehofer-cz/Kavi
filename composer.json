@@ -6,6 +6,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
+        "endroid/qr-code": "^5.1 || ^6.0",
         "guzzlehttp/guzzle": "^7.8",
         "laravel/framework": "^10.0",
         "laravel/tinker": "^2.8",
@@ -60,6 +62,9 @@
     },
     "config": {
         "optimize-autoloader": true,
+        "platform": {
+            "php": "8.2.0"
+        },
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {

@@ -1,6 +1,9 @@
 import './bootstrap';
 import * as CookieConsent from 'vanilla-cookieconsent';
 import 'vanilla-cookieconsent/dist/cookieconsent.css';
+import { initCountdowns } from './components/countdown';
+import { initGiftPreview } from './components/gift-preview';
+import { initGiftRedeem } from './components/gift-redeem';
 
 // Google Consent Mode v2 - Update consent state
 function updateGoogleConsent() {
@@ -54,6 +57,9 @@ function initCookieConsent() {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize cookie consent
     initCookieConsent();
+    initCountdowns();
+    initGiftPreview();
+    initGiftRedeem();
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
 

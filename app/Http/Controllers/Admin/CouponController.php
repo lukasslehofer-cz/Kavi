@@ -16,11 +16,14 @@ class CouponController extends Controller
     /**
      * Display a listing of coupons
      */
-    public function index()
+    public function index(Request $request)
     {
+        // Kupony vygenerované z dárků mají vlastní přehled (Dárky), tady jen na vyžádání
         $coupons = Coupon::withCount('usages')
+            ->when(! $request->boolean('gifts'), fn ($q) => $q->whereNull('gift_type'))
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.coupons.index', compact('coupons'));
     }
@@ -198,6 +201,12 @@ class CouponController extends Controller
      */
     public function destroy(Coupon $coupon)
     {
+        // Kupon dárku je kód na vytištěném certifikátu - jen zneplatnit v přehledu dárků
+        if ($coupon->isGiftCode()) {
+            return redirect()->route('admin.coupons.index')
+                ->with('error', 'Kupón dárku nejde smazat. Zneplatnit ho můžete v sekci Dárky.');
+        }
+
         $coupon->delete();
 
         return redirect()->route('admin.coupons.index')

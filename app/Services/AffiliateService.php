@@ -116,7 +116,8 @@ class AffiliateService
         $currency = $order->currency ?? CurrencyHelper::stripeCode();
 
         // Vypočítej odměnu
-        $rewardAmount = $this->calculateOrderReward($coupon, $order->total, $currency);
+        // Dárky se do provize nepočítají (kupon se na ně nevztahuje)
+        $rewardAmount = $this->calculateOrderReward($coupon, $order->total - $order->giftItemsTotal(), $currency);
 
         if ($rewardAmount <= 0) {
             return null;

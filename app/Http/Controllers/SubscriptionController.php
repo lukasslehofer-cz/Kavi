@@ -33,25 +33,16 @@ class SubscriptionController extends Controller
             ->orderBy('price')
             ->get();
 
-        // Get subscription pricing configuration based on currency
-        // Cast to float - SubscriptionConfig::get() hands back the raw string unless
-        // the config row is typed, and the configurator adds surcharges to these in JS
-        if (CurrencyHelper::isEur()) {
-            $subscriptionPricing = [
-                '2' => (float) SubscriptionConfig::get('price_2_bags_eur', 20),
-                '3' => (float) SubscriptionConfig::get('price_3_bags_eur', 29),
-                '4' => (float) SubscriptionConfig::get('price_4_bags_eur', 37),
-            ];
-        } else {
-            $subscriptionPricing = [
-                '2' => (float) SubscriptionConfig::get('price_2_bags', 500),
-                '3' => (float) SubscriptionConfig::get('price_3_bags', 720),
-                '4' => (float) SubscriptionConfig::get('price_4_bags', 920),
-            ];
-        }
+        // Ceny boxů v aktuální měně jako float ['2' => 890.0, ...] - konfigurátor
+        // k nim v JS přičítá příplatky, takže nesmí přijít jako řetězce
+        $subscriptionPricing = \App\Helpers\BoxPricing::pricingMap();
 
         // Get shipping date info
         $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
+
+        // Aktuální cyklus (uzávěrka + rozesílka) pro odpočet a pražírny/kávy měsíce
+        $cycle = \App\Helpers\ShipmentCycles::current();
+        $lineup = app(\App\Services\CoffeeOfMonthService::class)->lineup();
 
         // Get roasteries of the month (same as homepage)
         $roasteriesOfMonth = \App\Models\Roastery::getRoasteriesOfMonth();
@@ -149,7 +140,9 @@ class SubscriptionController extends Controller
             'availability',
             'availabilityMatrix',
             'nextAvailableMonthName',
-            'nextAvailableDate'
+            'nextAvailableDate',
+            'cycle',
+            'lineup'
         ));
     }
 
@@ -180,6 +173,9 @@ class SubscriptionController extends Controller
      */
     public function configureCheckout(Request $request)
     {
+        // Nový box z konfigurátoru vždy přebije rozpracované uplatnění dárku
+        session()->forget(GiftRedeemController::SESSION_REDEMPTION);
+
         // Log incoming data for debugging
         logger()->info('=== FORMULÁŘ ODESLÁN ===');
         logger()->info('URL: '.$request->fullUrl());
@@ -442,6 +438,11 @@ class SubscriptionController extends Controller
             }
         }
 
+        // Uplatnění dárkového předplatného: pokladna bez platby a fakturační adresy
+        if ($redemption = session(GiftRedeemController::SESSION_REDEMPTION)) {
+            return $this->renderGiftCheckout($redemption);
+        }
+
         $configuration = session('subscription_configuration');
         $price = session('subscription_price');
         $priceWithoutVat = session('subscription_price_without_vat');
@@ -574,6 +575,10 @@ class SubscriptionController extends Controller
      */
     public function processCheckout(Request $request)
     {
+        if (session(GiftRedeemController::SESSION_REDEMPTION)) {
+            return $this->processGiftCheckout($request);
+        }
+
         $configuration = session('subscription_configuration');
         $price = session('subscription_price');
 
@@ -1442,6 +1447,160 @@ class SubscriptionController extends Controller
                 ->withInput()
                 ->with('error', __('flash.subscription.creation_error'));
         }
+    }
+
+    /**
+     * Pokladna při uplatnění dárkového předplatného: kontakt, země a výdejní místo.
+     * Velikost boxu a počet boxů jsou z dárku a nejdou změnit, nic se neplatí.
+     */
+    private function renderGiftCheckout(array $redemption)
+    {
+        $gift = GiftRedeemController::verifiedGift();
+
+        if (! $gift || $gift->id !== ($redemption['gift_id'] ?? null) || ! $gift->isSubscription()) {
+            session()->forget(GiftRedeemController::SESSION_REDEMPTION);
+
+            return redirect()->to(localizedRoute('gifts.redeem'))->with('error', __('gifts.checkout.error_invalid'));
+        }
+
+        $configuration = $redemption['configuration'];
+        [$year, $month] = array_map('intval', explode('-', $redemption['start']));
+        $first = \App\Helpers\ShipmentCycles::forMonth($year, $month);
+        $lastMonth = $first->month()->addMonthsNoOverflow(max(0, (int) $gift->months - 1));
+        $last = \App\Helpers\ShipmentCycles::forMonth($lastMonth->year, $lastMonth->month);
+
+        $typeLabel = __('gifts.redeem.types.' . $configuration['type'] . '.name');
+        if ($configuration['type'] === 'mix') {
+            $typeLabel .= ' ' . ($configuration['mix']['espresso'] ?? 0) . '+' . ($configuration['mix']['filter'] ?? 0);
+        }
+
+        $giftRedemption = [
+            'gift' => $gift,
+            'box' => $gift->boxLabel(),
+            'type' => $typeLabel,
+            'count' => (int) $gift->months,
+            'first' => \App\Helpers\DateFormat::full($first->shipmentDate),
+            'last' => \App\Helpers\DateFormat::full($last->shipmentDate),
+        ];
+
+        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
+
+        return view('subscriptions.checkout', [
+            'configuration' => $configuration,
+            'price' => 0,
+            'priceWithoutVat' => 0,
+            'vat' => 0,
+            'shippingInfo' => \App\Helpers\SubscriptionHelper::getShippingDateInfo(),
+            'appliedCoupon' => null,
+            'discount' => 0,
+            'adjustedDiscount' => 0,
+            'isGiftVoucher' => false,
+            'giftVoucherShippingCredit' => 0,
+            'packetaVendors' => $userCountry ? $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry) : [],
+            'shipping' => 0,
+            'availableCountries' => ShippingRate::getAllEnabled()
+                ->mapWithKeys(fn ($rate) => [$rate->country_code => __('countries.'.$rate->country_name)])
+                ->sort()
+                ->toArray(),
+            'checkoutNotice' => AnnouncementBanner::getCurrentFor(AnnouncementBanner::PLACEMENT_SUBSCRIPTION_CHECKOUT),
+            'invoicePrefill' => null,
+            'giftRedemption' => $giftRedemption,
+        ]);
+    }
+
+    /**
+     * Dokončení uplatnění dárku: založí dárkové předplatné (bez platby a bez Stripe)
+     */
+    private function processGiftCheckout(Request $request)
+    {
+        $redemption = session(GiftRedeemController::SESSION_REDEMPTION);
+        $gift = GiftRedeemController::verifiedGift();
+
+        if (! $gift || $gift->id !== ($redemption['gift_id'] ?? null) || ! $gift->isSubscription()) {
+            session()->forget(GiftRedeemController::SESSION_REDEMPTION);
+
+            return redirect()->to(localizedRoute('gifts.redeem'))->with('error', __('gifts.checkout.error_invalid'));
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => ['required', 'string', 'max:20', new PhoneNumber],
+            'billing_country' => 'required|string|size:2',
+            'packeta_point_id' => 'required|string',
+            'packeta_point_name' => 'required|string',
+            'packeta_point_address' => 'nullable|string',
+            'carrier_id' => 'nullable|string',
+            'carrier_pickup_point' => 'nullable|string',
+            'delivery_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $shippingRate = ShippingRate::getForCountry($validated['billing_country']);
+        if (! $shippingRate || ! $shippingRate->enabled) {
+            return back()->withInput()->with('error', __('checkout.errors.subscription_country_unavailable'));
+        }
+
+        $user = auth()->user();
+        $newUser = false;
+
+        if (! $user) {
+            // Stejné pravidlo jako u běžné pokladny: existující účet se musí přihlásit,
+            // rozpracované uplatnění dárku v session přihlášení přežije
+            if (\App\Models\User::where('email', $validated['email'])->exists()) {
+                return back()->withInput()->with('error', __('gifts.checkout.login_required', ['email' => $validated['email']]));
+            }
+        }
+
+        $start = \App\Helpers\ShipmentCycles::forMonth(...array_map('intval', explode('-', $redemption['start'])));
+
+        try {
+            $subscription = DB::transaction(function () use ($validated, $gift, $redemption, $start, $shippingRate, &$user, &$newUser) {
+                if (! $user) {
+                    $user = \App\Models\User::create([
+                        'name' => $validated['name'],
+                        'email' => $validated['email'],
+                        'locale' => app()->getLocale(),
+                        'password' => \Hash::make(\Str::random(32)),
+                        'password_set_by_user' => false,
+                        'phone' => $validated['phone'],
+                        'country' => $validated['billing_country'],
+                        'packeta_point_id' => $validated['packeta_point_id'],
+                        'packeta_point_name' => $validated['packeta_point_name'],
+                        'packeta_point_address' => $validated['packeta_point_address'] ?? null,
+                    ]);
+                    $newUser = true;
+                } elseif (! $user->phone) {
+                    // Profil přihlášeného zákazníka se nepřepisuje, jen doplní chybějící telefon
+                    $user->update(['phone' => $validated['phone']]);
+                }
+
+                return app(\App\Services\GiftRedemptionService::class)
+                    ->redeem($gift, $redemption['configuration'], $start, $validated, $user, $shippingRate);
+            });
+        } catch (\Throwable $e) {
+            \Log::error('Gift redemption failed', ['gift_id' => $gift->id, 'error' => $e->getMessage()]);
+
+            return redirect()->to(localizedRoute('gifts.redeem'))->with('error', __('gifts.checkout.error_invalid'));
+        }
+
+        if ($newUser) {
+            auth()->login($user);
+        }
+
+        \App\Models\NewsletterSubscriber::firstOrCreate(
+            ['email' => $validated['email']],
+            ['source' => 'customer', 'user_id' => $user->id]
+        );
+
+        session()->forget([GiftRedeemController::SESSION_REDEMPTION, GiftRedeemController::SESSION_VERIFIED]);
+
+        try {
+            Mail::to($validated['email'])->send(new \App\Mail\GiftSubscriptionActivated($subscription));
+        } catch (\Throwable $e) {
+            \Log::error('Failed to send gift activation email', ['subscription_id' => $subscription->id, 'error' => $e->getMessage()]);
+        }
+
+        return redirect()->localizedRoute('subscriptions.confirmation', $subscription);
     }
 
     /**

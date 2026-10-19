@@ -18,7 +18,9 @@ use Illuminate\Support\Facades\Storage;
  *  - "It must be stored temporarily for no more than 30 calendar days" - proto tvrdý
  *    strop v isFresh(). Po jeho překročení se nezobrazuje nic, i kdyby data v cache byla.
  *  - "It cannot be manipulated or aggregated in any way" - proto tu není žádný výpočet
- *    průměrného hodnocení a nefiltruje se podle počtu hvězdiček.
+ *    průměrného hodnocení a nefiltruje se podle počtu hvězdiček. Celkové hodnocení
+ *    (summary) je číslo, které vrací přímo Google (averageRating, totalReviewCount),
+ *    ukládá se beze změny a platí pro něj stejný 30denní strop.
  *  - Atribuci nesmíme měnit, takže jméno autora i jeho fotka jdou ven tak, jak přijdou.
  *
  * Filtrování negativních recenzí navíc zakazuje i zákon 634/1992 Sb. po novele Omnibus
@@ -36,6 +38,13 @@ class GoogleReviewsService
     protected const ENDPOINT = 'https://mybusiness.googleapis.com/v4';
 
     protected const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
+
+    /**
+     * Celkové hodnocení z první stránky posledního stažení (vyplní fetchAll)
+     *
+     * @var array{average: float, count: int}|null
+     */
+    protected ?array $fetchedSummary = null;
 
     /**
      * Recenze k zobrazení, od nejnovějších.
@@ -75,6 +84,31 @@ class GoogleReviewsService
     }
 
     /**
+     * Celkové hodnocení profilu tak, jak ho uvádí Google, nebo null.
+     *
+     * Používá stejnou kontrolu čerstvosti jako latest(), ale nic nemaže.
+     * Bez dat se blok s hodnocením na webu vůbec nezobrazí.
+     *
+     * @return array{average: float, count: int}|null
+     */
+    public function summary(?string $locale = null): ?array
+    {
+        $stored = $this->read($this->resolveLocale($locale));
+
+        if (! $this->isFresh($stored)) {
+            return null;
+        }
+
+        $summary = $stored['summary'] ?? null;
+
+        if (! is_array($summary) || empty($summary['average']) || empty($summary['count'])) {
+            return null;
+        }
+
+        return ['average' => (float) $summary['average'], 'count' => (int) $summary['count']];
+    }
+
+    /**
      * Stáhne recenze jednoho profilu a uloží je do cache.
      *
      * @return array{ok: bool, count: int, message: string}
@@ -104,6 +138,7 @@ class GoogleReviewsService
         $this->write($locale, [
             'fetched_at' => now()->toIso8601String(),
             'reviews' => $reviews,
+            'summary' => $this->fetchedSummary,
         ]);
 
         return ['ok' => true, 'count' => count($reviews), 'message' => 'OK'];
@@ -335,6 +370,7 @@ class GoogleReviewsService
         $reviews = [];
         $pageToken = null;
         $guard = 0;
+        $this->fetchedSummary = null;
 
         do {
             $response = Http::withToken($token)->get($url, array_filter([
@@ -349,6 +385,14 @@ class GoogleReviewsService
 
             foreach ($response->json('reviews', []) as $review) {
                 $reviews[] = $this->normalize($review);
+            }
+
+            // Celkové hodnocení posílá Google s každou stránkou, stačí první
+            if ($this->fetchedSummary === null && $response->json('totalReviewCount')) {
+                $this->fetchedSummary = [
+                    'average' => (float) $response->json('averageRating'),
+                    'count' => (int) $response->json('totalReviewCount'),
+                ];
             }
 
             $pageToken = $response->json('nextPageToken');

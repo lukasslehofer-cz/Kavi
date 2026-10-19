@@ -24,6 +24,7 @@ class Coupon extends Model
         'allow_repeated_subscription_usage',
         'free_shipping',
         'is_gift_voucher',
+        'gift_type',
         'min_order_value',
         'min_order_value_eur',
         'valid_from',
@@ -96,6 +97,30 @@ class Coupon extends Model
         }
 
         return CurrencyHelper::price($this->min_order_value ?? 0, $this->min_order_value_eur ?? 0);
+    }
+
+    /**
+     * Dárek, ze kterého kupon vznikl (jen u kuponů s gift_type)
+     */
+    public function giftPurchase()
+    {
+        return $this->hasOne(GiftPurchase::class);
+    }
+
+    /**
+     * Kupon vygenerovaný z prodaného dárku (předplatné nebo poukaz)
+     */
+    public function isGiftCode(): bool
+    {
+        return $this->gift_type !== null;
+    }
+
+    /**
+     * Kód dárkového předplatného - uplatní se jen přes stránku uplatnění dárku
+     */
+    public function isGiftSubscriptionCode(): bool
+    {
+        return $this->gift_type === GiftPurchase::TYPE_SUBSCRIPTION;
     }
 
     /**

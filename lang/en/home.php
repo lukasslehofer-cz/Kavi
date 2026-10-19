@@ -74,5 +74,14 @@ return [
         'secondary' => 'Browse Coffees',
     ],
 
-];
+    // Homepage FAQ (redesign 2026-10). HomeController fills in :cutoff and
+    // :shipment from the current ShipmentSchedule cycle.
+    'faq' => [
+        ['q' => 'When will my first box arrive?', 'a' => 'Orders close :cutoff at midnight and ship on :shipment via Packeta to your pickup point. After that, boxes ship around the 20th of each month.'],
+        ['q' => 'Can I pause or cancel my subscription?', 'a' => 'Yes, anytime in your account and without fees. Changes apply to every box whose order deadline has not passed yet.'],
+        ['q' => 'Which coffees will I get?', 'a' => 'Every month, coffees from three European roasters. A roaster returns roughly once a year, so coffees rarely repeat.'],
+        ['q' => 'Espresso or filter?', 'a' => 'Espresso has a fuller body and a darker roast, filter a lighter body and a lighter roast. Mix sends both.'],
+        ['q' => 'Can I give a subscription as a gift?', 'a' => 'Yes, for 3 or 6 months paid upfront, with no automatic renewal.', 'link' => 'Gift subscription'],
+    ],
 
+];

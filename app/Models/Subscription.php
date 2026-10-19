@@ -16,12 +16,19 @@ class Subscription extends Model
      */
     public const PAUSE_REASON_ADMIN_LOCK = 'admin_lock';
 
+    /**
+     * Pauza po 3 neúspěšných platbách - vynechá jednu rozesílku a obnoví ji cron
+     * subscriptions:resume-paused. Zákazník ji sám neobnovuje, jen vymění kartu.
+     */
+    public const PAUSE_REASON_PAYMENT_FAILURE = 'payment_failure_skip';
+
     protected $fillable = [
         'subscription_number',
         'user_id',
         'subscription_plan_id',
         'coupon_id',
         'coupon_code',
+        'gift_purchase_id',
         'discount_amount',
         'discount_months_remaining',
         'discount_months_total',
@@ -99,6 +106,22 @@ class Subscription extends Model
     public function plan()
     {
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
+    }
+
+    /**
+     * Dárek, jehož uplatněním předplatné vzniklo
+     */
+    public function giftPurchase()
+    {
+        return $this->belongsTo(GiftPurchase::class);
+    }
+
+    /**
+     * Dárkové předplatné: N boxů zdarma, nic se neúčtuje ani neobnovuje
+     */
+    public function isGift(): bool
+    {
+        return $this->gift_purchase_id !== null;
     }
 
     public function orders()
@@ -192,6 +215,14 @@ class Subscription extends Model
     public function isAdminLocked(): bool
     {
         return $this->isPaused() && $this->pause_reason === self::PAUSE_REASON_ADMIN_LOCK;
+    }
+
+    /**
+     * Pozastaveno po 3 neúspěšných platbách - zákazník takovou pauzu nesmí sám obnovit.
+     */
+    public function isPaymentFailurePause(): bool
+    {
+        return $this->isPaused() && $this->pause_reason === self::PAUSE_REASON_PAYMENT_FAILURE;
     }
 
     public function hasPaymentIssue(): bool

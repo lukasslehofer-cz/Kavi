@@ -442,6 +442,12 @@ class DashboardController extends Controller
             ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
 
+        // Dárkové předplatné má pevný počet boxů, nepozastavuje se
+        if ($subscription->isGift()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('gifts.subscription.action_not_allowed'));
+        }
+
         // Apply pause using the central service
         $shipmentService = app(SubscriptionShipmentService::class);
         $shipmentService->pauseSubscription($subscription, (int)$validated['iterations'], 'user_request');
@@ -501,6 +507,13 @@ class DashboardController extends Controller
                 ->with('error', __('flash.subscription.resume_admin_locked'));
         }
 
+        // Pauzu po neúspěšných platbách obnoví cron po vynechané rozesílce. Ruční
+        // obnovení by ji zrušilo bez zaplacení (tlačítko se nerenderuje, guard pro přímý POST).
+        if ($subscription->isPaymentFailurePause()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('flash.subscription.resume_payment_failure'));
+        }
+
         // Check availability and resume using the central service
         $shipmentService = app(SubscriptionShipmentService::class);
         $result = $shipmentService->resumeSubscription($subscription);
@@ -537,6 +550,12 @@ class DashboardController extends Controller
         $subscription = Subscription::where('id', $validated['subscription_id'])
             ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
+
+        // Dárkové předplatné skončí samo posledním boxem
+        if ($subscription->isGift()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('gifts.subscription.action_not_allowed'));
+        }
 
         // Cancel in Stripe first (cancel_at_period_end)
         try {

@@ -193,6 +193,27 @@
                     </div>
                 </div>
 
+                @if($giftRedemption ?? null)
+                {{-- Dárek: obdarovaný nic nekupuje, fakturační adresa není potřeba, jen země výdejního místa --}}
+                <div class="mb-16 border-t-2 border-primary-500 pt-6">
+                    <div class="flex items-baseline gap-4 mb-6">
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">02</span>
+                        <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">{{ __('gifts.checkout.country') }}</h2>
+                    </div>
+                    <div class="swiss-field max-w-sm">
+                        <label for="billing_country" class="swiss-field-label swiss-field-label-required">{{ __('checkout.fields.country') }}</label>
+                        <select id="billing_country" name="billing_country" required class="swiss-field-select">
+                            <option value="">{{ __('checkout.fields.select_country') }}</option>
+                            @foreach($availableCountries as $code => $name)
+                                <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? ($code === 'CZ' ? 'CZ' : '')) == $code ? 'selected' : '' }}>{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error('billing_country')
+                        <p class="text-red-600 text-xs mt-2 uppercase tracking-widest">{{ $message }}</p>
+                    @enderror
+                </div>
+                @else
                 <!-- Billing Address - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
@@ -282,6 +303,7 @@
 
                     @include('checkout._company-fields')
                 </div>
+                @endif
 
                 <!-- Packeta Pickup Point - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
@@ -335,6 +357,7 @@
                     </div>
                 </div>
 
+                @unless($giftRedemption ?? null)
                 <!-- Payment Method - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
@@ -351,14 +374,15 @@
                         </p>
                     </div>
                 </div>
+                @endunless
 
                 <!-- Additional Notes - Swiss Style -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <div class="flex items-baseline gap-4 mb-6">
-                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">05</span>
+                        <span class="text-primary-500 font-display text-2xl sm:text-3xl md:text-4xl font-normal">{{ ($giftRedemption ?? null) ? '04' : '05' }}</span>
                         <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal text-dark-800 uppercase tracking-tight">
                             {{ __('checkout.fields.notes') }}
-                            <span class="text-xs uppercase tracking-widest text-warm-500 ml-2">/ {{ __('checkout.fields.notes_optional') }}</span>
+                            <span class="text-xs uppercase tracking-widest text-warm-500 ml-2">{{ __('checkout.fields.notes_optional') }}</span>
                         </h2>
                     </div>
                     
@@ -379,8 +403,11 @@
         <!-- Order Summary - On Olive Background -->
         <div class="lg:col-span-5">
             <div class="sticky top-24 bg-[#BCBEB1] p-8">
+                @if($giftRedemption ?? null)
+                @include('subscriptions._gift-checkout-summary', ['giftRedemption' => $giftRedemption])
+                @else
                 <h3 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-8">{{ __('checkout.subscription_summary') }}</h3>
-                
+
                 @php
                 $frequencyTexts = [
                     1 => __('checkout.subscription.every_month'),
@@ -588,6 +615,7 @@
                         {{ __('checkout.trust.free_shipping_always') }}
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>
@@ -682,7 +710,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Update total cost (gift voucher credit reduces effective shipping)
-                const frequencyText = '{{ $frequencyText }}';
+                const frequencyText = '{{ $frequencyText ?? '' }}';
                 const effectiveShipping = Math.max(0, shippingCost - giftVoucherShippingCredit);
                 const newTotal = subscriptionPrice + effectiveShipping;
                 if (totalCostElement) {

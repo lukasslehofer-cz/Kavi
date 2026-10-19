@@ -104,6 +104,8 @@ class SendReviewRequests extends Command
         $sent = 0;
 
         $orders = Order::where('status', 'delivered')
+            // Objednávka jen s dárky (certifikát e-mailem) nemá co hodnotit
+            ->whereHas('items', fn ($q) => $q->where('is_gift', false))
             ->whereBetween('delivered_at', [
                 now()->subDays(config('reviews.max_age_days'))->startOfDay(),
                 now()->subDays(config('reviews.delay_days'))->endOfDay(),

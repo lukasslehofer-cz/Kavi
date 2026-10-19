@@ -64,16 +64,16 @@
                                     @endif
                                 </p>
                             </div>
-                            @elseif($pauseReason === 'payment_failure_skip')
+                            @elseif($pauseReason === \App\Models\Subscription::PAUSE_REASON_PAYMENT_FAILURE)
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
                                     {{ $locale === 'cs' ? 'Důvod pozastavení' : 'Reason for pause' }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
                                     @if($locale === 'cs')
-                                    Vaše předplatné bylo pozastaveno z důvodu neúspěšné platby. Aktualizujte prosím svou platební metodu, abychom mohli předplatné obnovit.
+                                    Platbu za předplatné se nám nepodařilo strhnout ani na třetí pokus, proto tuto rozesílku vynecháváme. Předplatné pak pokračuje samo, nic obnovovat nemusíte. Před další platbou prosím zkontrolujte nebo vyměňte platební kartu ve svém účtu.
                                     @else
-                                    Your subscription has been paused due to a failed payment. Please update your payment method so we can resume your subscription.
+                                    We could not charge your subscription even on the third attempt, so we are skipping this shipment. Your subscription then continues on its own, there is nothing to resume. Please check or replace your payment card in your account before the next payment.
                                     @endif
                                 </p>
                             </div>
@@ -102,7 +102,11 @@
                                     <span style="color: #CA4136;">→</span> {{ $subscription->paused_until_date->format('j. n. Y') }}
                                 </p>
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
-                                    @if($locale === 'cs')
+                                    @if($pauseReason === \App\Models\Subscription::PAUSE_REASON_PAYMENT_FAILURE)
+                                    {{ $locale === 'cs'
+                                        ? 'Předplatné se automaticky obnoví v uvedený den a platbu za další rozesílku zkusíme strhnout znovu.'
+                                        : 'Your subscription will automatically resume on this date and we will try to charge the next shipment again.' }}
+                                    @elseif($locale === 'cs')
                                     Předplatné se automaticky obnoví v uvedený den. Pokud budete chtít obnovit dříve, můžete tak učinit ve vašem účtu.
                                     @else
                                     Your subscription will automatically resume on this date. If you want to resume earlier, you can do so from your account.
@@ -117,7 +121,9 @@
                                     {{ $locale === 'cs' ? 'Můžete kdykoliv' : 'You can always' }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
-                                    @if($pauseReason !== \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
+                                    @if($pauseReason === \App\Models\Subscription::PAUSE_REASON_PAYMENT_FAILURE)
+                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Vyměnit platební kartu' : 'Replace your payment card' }}<br>
+                                    @elseif($pauseReason !== \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Obnovit předplatné okamžitě' : 'Resume subscription immediately' }}<br>
                                     @endif
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Změnit konfiguraci kávy' : 'Change coffee configuration' }}<br>

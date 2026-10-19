@@ -15,6 +15,10 @@ class AnnouncementBanner extends Model
         'message_en',
         'title_cs',
         'title_en',
+        'link_label_cs',
+        'link_url_cs',
+        'link_label_en',
+        'link_url_en',
         'icon',
         'show_in_header',
         'show_in_checkout',
@@ -163,6 +167,23 @@ class AnnouncementBanner extends Model
         }
 
         return ! empty($this->title_cs) ? $this->title_cs : null;
+    }
+
+    /**
+     * Volitelný odkaz za textem hlášky pro daný jazyk, nebo null
+     *
+     * @return array{label: string, url: string}|null
+     */
+    public function getLink(string $locale = 'cs'): ?array
+    {
+        $label = $locale === 'en' ? $this->link_label_en : $this->link_label_cs;
+        $url = $locale === 'en' ? $this->link_url_en : $this->link_url_cs;
+
+        if (empty($label) || empty($url)) {
+            return null;
+        }
+
+        return ['label' => $label, 'url' => $url];
     }
 
     /**

@@ -14,6 +14,7 @@ use App\Models\ShippingRate;
 use App\Rules\PhoneNumber;
 use App\Services\CouponService;
 use App\Services\FakturoidService;
+use App\Services\GiftCartService;
 use App\Services\ShippingService;
 use App\Services\StripeService;
 use App\Services\SubscriptionAddonService;
@@ -29,7 +30,8 @@ class CheckoutController extends Controller
         private CouponService $couponService,
         private ShippingService $shippingService,
         private SubscriptionAddonService $addonService,
-        private StripeService $stripeService
+        private StripeService $stripeService,
+        private GiftCartService $giftCart
     ) {}
 
     public function index(Request $request)
@@ -53,6 +55,8 @@ class CheckoutController extends Controller
                     $adminNotes = json_decode($order->admin_notes, true);
                     if (isset($adminNotes['cart_backup'])) {
                         session(['cart' => $adminNotes['cart_backup']]);
+                        // Dárky z objednávky zpátky do dárkového košíku
+                        $this->giftCart->restoreFromOrder($order);
 
                         \Log::info('Cart restored from cancelled order', [
                             'order_id' => $order->id,
@@ -72,8 +76,11 @@ class CheckoutController extends Controller
         }
 
         $cart = session()->get('cart', []);
+        // Dárky (dárkové předplatné, poukaz) mají vlastní košík. Všechny výpočty níže
+        // (kupon, doprava, DPH dopravy) běží jen nad fyzickým zbožím, dárky se přičtou na konci.
+        $giftItems = $this->giftCart->lines();
 
-        if (empty($cart)) {
+        if (empty($cart) && empty($giftItems)) {
             return redirect()->localizedRoute('cart.index')
                 ->with('error', __('flash.checkout.cart_empty'));
         }
@@ -103,10 +110,14 @@ class CheckoutController extends Controller
         }
 
         // Check if cart qualifies for free shipping (all products have free_shipping flag)
-        $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
+        // Jen dárky = nic se neposílá balíkem
+        $cartQualifiesForFreeShipping = empty($cart) || Product::cartQualifiesForFreeShipping($cart);
 
         // Check if cart contains only digital products (no physical shipping needed)
-        $cartContainsOnlyDigitalProducts = Product::cartContainsOnlyDigitalProducts($cart);
+        $cartContainsOnlyDigitalProducts = empty($cart) || Product::cartContainsOnlyDigitalProducts($cart);
+
+        // Mezisoučet fyzického zboží (pro dopravu zdarma od částky, AJAX v pokladně)
+        $physicalSubtotal = $subtotal;
 
         // Calculate shipping dynamically based on user country
         $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : 'CZ'; // Default to Czech Republic for guests
@@ -138,7 +149,11 @@ class CheckoutController extends Controller
         $isGiftVoucher = false;
         $errorMessage = null;
 
-        if ($couponCode) {
+        // Na dárky se kupony nevztahují. Jen s dárky v košíku se kupon nevaliduje
+        // ani nemaže (zůstane uložený na příští nákup), zákazník jen dostane informaci.
+        $giftCouponNotice = $couponCode && empty($cart) && ! $isAffiliateCoupon;
+
+        if ($couponCode && ! empty($cart)) {
             $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'order', $subtotal);
 
             if ($result['valid']) {
@@ -202,6 +217,15 @@ class CheckoutController extends Controller
             $totalWithVat = $subtotal + $shipping;
         }
 
+        // Dárky se přičtou až teď, aby se na ně nevztahoval kupon ani doprava
+        if (! empty($giftItems)) {
+            $giftTotals = $this->giftCart->totals();
+            $subtotal += $giftTotals['total'];
+            $totalWithVat += $giftTotals['total'];
+            $totalWithoutVat += $giftTotals['net'];
+            $vat += $giftTotals['vat'];
+        }
+
         // Calculate adjusted discount for display (same as sent to Stripe)
         // This ensures the displayed discount matches what Stripe receives
         $adjustedDiscount = 0;
@@ -221,7 +245,7 @@ class CheckoutController extends Controller
         $subscriptionShipmentInfo = [];
         $availableSubscriptions = [];
 
-        if (auth()->check()) {
+        if (auth()->check() && ! empty($cart)) {
             $cartQuantity = array_sum($cart);
 
             // Získat všechna aktivní předplatná s dostupnými sloty
@@ -282,7 +306,10 @@ class CheckoutController extends Controller
             'cartQualifiesForFreeShipping',
             'cartContainsOnlyDigitalProducts',
             'checkoutNotice',
-            'invoicePrefill'
+            'invoicePrefill',
+            'giftItems',
+            'physicalSubtotal',
+            'giftCouponNotice'
         ));
     }
 
@@ -301,7 +328,7 @@ class CheckoutController extends Controller
 
         // Check if cart qualifies for free shipping (all products have free_shipping flag)
         $cart = session()->get('cart', []);
-        $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
+        $cartQualifiesForFreeShipping = empty($cart) || Product::cartQualifiesForFreeShipping($cart);
 
         // Calculate shipping (0 if all products have free_shipping)
         $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($country, $subtotal, $isSubscription);
@@ -340,7 +367,10 @@ class CheckoutController extends Controller
     {
         // Check if cart contains only digital products
         $cart = session()->get('cart', []);
-        $cartContainsOnlyDigitalProducts = Product::cartContainsOnlyDigitalProducts($cart);
+        // Dárky (vlastní košík), přičtou se k objednávce až po výpočtu kuponu a dopravy
+        $giftLines = $this->giftCart->lines();
+        // Jen dárky = certifikát e-mailem, výdejní místo není potřeba
+        $cartContainsOnlyDigitalProducts = empty($cart) ? ! empty($giftLines) : Product::cartContainsOnlyDigitalProducts($cart);
 
         // Dynamická validace - Packeta data jsou required pouze pokud se neposílá s předplatným
         $rules = [
@@ -384,7 +414,7 @@ class CheckoutController extends Controller
 
         $cart = session()->get('cart', []);
 
-        if (empty($cart)) {
+        if (empty($cart) && empty($giftLines)) {
             return redirect()->localizedRoute('cart.index')
                 ->with('error', __('flash.checkout.cart_empty'));
         }
@@ -407,8 +437,9 @@ class CheckoutController extends Controller
                     $adminNotes = json_decode($existingPendingOrder->admin_notes, true);
                     $savedCart = $adminNotes['cart_backup'] ?? [];
 
-                    // If cart matches, reuse this order
-                    if ($savedCart === $cart) {
+                    // If cart matches, reuse this order. U dárků musí sedět i jejich obsah
+                    // (jména, věnování, e-mail), jinak by se vystavil certifikát se starými údaji.
+                    if ($savedCart === $cart && ($adminNotes['gift_cart_hash'] ?? null) === $this->giftCart->hash()) {
                         \Log::info('Reusing existing pending order', [
                             'order_id' => $existingPendingOrder->id,
                             'order_number' => $existingPendingOrder->order_number,
@@ -493,7 +524,8 @@ class CheckoutController extends Controller
             }
 
             // Check if cart qualifies for free shipping (all products have free_shipping flag)
-            $cartQualifiesForFreeShipping = Product::cartQualifiesForFreeShipping($cart);
+            // Jen dárky = nic se neposílá balíkem
+            $cartQualifiesForFreeShipping = empty($cart) || Product::cartQualifiesForFreeShipping($cart);
 
             // Calculate shipping based on selected country or subscription addon
             // Free shipping if: shipped with subscription OR all products have free_shipping flag
@@ -501,12 +533,12 @@ class CheckoutController extends Controller
             $shipping = ($shipWithSubscription || $cartQualifiesForFreeShipping) ? 0 : $this->shippingService->calculateShippingCost($shippingCountry, $subtotal, false);
             $shippingRate = ShippingRate::getForCountry($shippingCountry);
 
-            // Zpracování kupónu
+            // Zpracování kupónu (jen nad fyzickým zbožím, na dárky se kupony nevztahují)
             $coupon = null;
             $discount = 0;
             $couponCode = $request->coupon_code ?? $this->couponService->getCouponFromStorage();
 
-            if ($couponCode) {
+            if ($couponCode && ! empty($cart)) {
                 $result = $this->couponService->validateCoupon($couponCode, auth()->user(), 'order', $subtotal);
 
                 if ($result['valid']) {
@@ -592,6 +624,15 @@ class CheckoutController extends Controller
 
                 $totalWithoutVat = $totalNet;
                 $totalWithVat = $subtotal + $shipping;
+            }
+
+            // Dárky se přičtou až po kuponu a dopravě (ceny přepočítané z aktuálních cen)
+            if (! empty($giftLines)) {
+                $giftTotals = $this->giftCart->totals();
+                $subtotal += $giftTotals['total'];
+                $totalWithVat += $giftTotals['total'];
+                $totalWithoutVat += $giftTotals['net'];
+                $tax += $giftTotals['vat'];
             }
 
             // Pokud se posílá s předplatným, použít Packeta údaje z předplatného
@@ -730,6 +771,47 @@ class CheckoutController extends Controller
                 $item['product']->decrement('stock', $item['quantity']);
             }
 
+            // Dárky: položka objednávky bez produktu (neskladem se nehlídá) a řádek
+            // gift_purchases s daty certifikátu. Kód a PDF vzniknou až po zaplacení.
+            foreach ($giftLines as $line) {
+                $giftItem = OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => null,
+                    'product_name' => $this->giftCart->itemName($line),
+                    'product_image' => $line['type'] === \App\Models\GiftPurchase::TYPE_VOUCHER
+                        ? 'images/gifts/cert-voucher.jpg'
+                        : 'images/gifts/cert-subscription.jpg',
+                    'price' => $line['price'],
+                    'quantity' => 1,
+                    'total' => $line['price'],
+                    'vat_rate' => $line['vat_rate'],
+                    'is_gift' => true,
+                ]);
+
+                \App\Models\GiftPurchase::create([
+                    'order_id' => $order->id,
+                    'order_item_id' => $giftItem->id,
+                    'type' => $line['type'],
+                    'status' => \App\Models\GiftPurchase::STATUS_PENDING,
+                    'bags' => $line['bags'],
+                    'months' => $line['months'],
+                    'amount' => $line['type'] === \App\Models\GiftPurchase::TYPE_VOUCHER ? $line['voucher_amount'] : $line['price'],
+                    'currency' => $line['currency'],
+                    'vat_rate' => $line['vat_rate'],
+                    'locale' => $line['locale'],
+                    'recipient_name' => $line['recipient_name'],
+                    'giver_name' => $line['giver_name'],
+                    'note' => $line['note'],
+                    'delivery' => $line['delivery'],
+                    'recipient_email' => $line['recipient_email'],
+                    'send_at' => $line['send_at']
+                        ? \Carbon\Carbon::parse($line['send_at'])->setTime((int) config('gifts.recipient_send_hour', 8), 0)
+                        : null,
+                    'buyer_name' => $request->name,
+                    'buyer_email' => $request->email,
+                ]);
+            }
+
             // Zaznamenat použití kupónu
             if ($coupon) {
                 $this->couponService->recordUsage(
@@ -762,7 +844,11 @@ class CheckoutController extends Controller
 
             // Store cart in order's admin_notes (internal use only) for potential restoration if payment fails
             $order->update([
-                'admin_notes' => json_encode(['cart_backup' => $cart]),
+                'admin_notes' => json_encode(array_filter([
+                    'cart_backup' => $cart,
+                    // Otisk dárkového košíku, viz kontrola znovupoužití čekající objednávky
+                    'gift_cart_hash' => $this->giftCart->hash(),
+                ], fn ($value) => $value !== null)),
                 'customer_notes' => $request->notes, // Preserve user's actual notes
             ]);
 
@@ -913,7 +999,7 @@ class CheckoutController extends Controller
                                 eventId: $order->meta_event_id,
                                 value: (float) $order->total,
                                 currency: $order->currency ?? 'CZK',
-                                contentIds: $order->items->pluck('product_id')->toArray(),
+                                contentIds: $order->items->pluck('product_id')->filter()->values()->toArray(),
                                 contentType: 'product',
                                 userData: [
                                     'email' => $address['email'] ?? $user?->email,
@@ -959,6 +1045,7 @@ class CheckoutController extends Controller
         // Clear cart only after successful payment (not if cancelled)
         if (! $cancelled && $order->payment_status === 'paid') {
             session()->forget('cart');
+            $this->giftCart->clear();
             \Log::info('Cart cleared after successful payment', [
                 'order_id' => $order->id,
             ]);

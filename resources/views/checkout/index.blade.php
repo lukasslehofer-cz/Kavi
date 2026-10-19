@@ -840,6 +840,21 @@
                         <p class="text-xs uppercase tracking-widest text-dark-800">{{ \App\Helpers\CurrencyHelper::formatAmount($item['subtotal']) }}</p>
                     </div>
                     @endforeach
+
+                    {{-- Dárky (certifikát e-mailem) --}}
+                    @foreach($giftItems ?? [] as $giftLine)
+                    @php $giftModel = app(\App\Services\GiftCartService::class)->asModel($giftLine); @endphp
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 flex-shrink-0 bg-white overflow-hidden">
+                            <img src="{{ asset($giftLine['type'] === 'voucher' ? 'images/gifts/cert-voucher.jpg' : 'images/gifts/cert-subscription.jpg') }}" alt="" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-display text-sm text-dark-800 uppercase tracking-tight">{{ $giftModel->isSubscription() ? __('gifts.page.type_subscription') . ' ' . $giftModel->boxCode() . ' Box · ' . trans_choice('gifts.months', $giftModel->months, ['count' => $giftModel->months]) : __('gifts.page.type_voucher') }}</p>
+                            <p class="text-xs uppercase tracking-widest text-olive-600">{{ __('gifts.cart.for', ['name' => $giftLine['recipient_name']]) }} · {{ __('gifts.cart.delivery') }}</p>
+                        </div>
+                        <p class="text-xs uppercase tracking-widest text-dark-800">{{ \App\Helpers\CurrencyHelper::formatAmount($giftLine['price']) }}</p>
+                    </div>
+                    @endforeach
                 </div>
 
                 <!-- Coupon Section - On Olive -->
@@ -848,7 +863,10 @@
                         <p class="text-xs uppercase tracking-widest text-red-600 mb-4">STATUS / {{ strtoupper(session('coupon_error')) }}</p>
                     @endif
                     
-                    @if($appliedCoupon ?? null)
+                    @if(empty($cartItems) && ! empty($giftItems ?? []))
+                        {{-- Jen dárky: kupony ani poukazy se na ně nevztahují --}}
+                        <p class="text-xs uppercase tracking-widest text-olive-600">{{ __('gifts.cart.coupon_not_for_gifts') }}</p>
+                    @elseif($appliedCoupon ?? null)
                         <div class="flex items-baseline justify-between mb-2">
                             <span class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.coupon.applied') }}</span>
                             <a href="#" class="text-xs uppercase tracking-widest text-olive-500 hover:text-primary-500 transition-colors" id="remove-coupon-btn">
@@ -915,7 +933,10 @@
                     <!-- VAT -->
                     <div class="flex justify-between items-baseline">
                         @php
-                            $uniqueVatRates = collect($cartItems)->pluck('product.vat_rate')->unique();
+                            $uniqueVatRates = collect($cartItems)->pluck('product.vat_rate')
+                                ->merge(collect($giftItems ?? [])->pluck('vat_rate'))
+                                ->map(fn ($rate) => (float) $rate)
+                                ->unique();
                             $vatWord = app()->getLocale() === 'cs' ? 'DPH' : 'VAT';
                             $vatLabel = $uniqueVatRates->count() === 1
                                 ? $vatWord . ' (' . number_format($uniqueVatRates->first(), 0) . '%)'
@@ -1056,6 +1077,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Dynamic shipping calculation
     const subtotal = {{ $subtotal }};
+    // Doprava a doprava zdarma od částky se počítají jen z fyzického zboží (bez dárků)
+    const physicalSubtotal = {{ $physicalSubtotal ?? $subtotal }};
+    // Uplatněný kupon: přepočet dopravy po změně země ho nesmí z celkové ceny vypustit
+    const couponDiscount = {{ $adjustedDiscount ?? 0 }};
+    const couponFreeShipping = {{ ($appliedCoupon?->free_shipping ?? false) ? 'true' : 'false' }};
     const shippingCostElement = document.getElementById('shipping-cost');
     const totalElement = document.getElementById('total-cost');
     
@@ -1066,12 +1092,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Clear Packeta selection when country changes
-        document.getElementById('packeta_point_id').value = '';
-        document.getElementById('packeta_point_name').value = '';
-        document.getElementById('packeta_point_address').value = '';
-        document.getElementById('carrier_id').value = '';
-        document.getElementById('carrier_pickup_point').value = '';
+        // Clear Packeta selection when country changes (u digitálního košíku pole chybí)
+        ['packeta_point_id', 'packeta_point_name', 'packeta_point_address', 'carrier_id', 'carrier_pickup_point'].forEach(function(id) {
+            const input = document.getElementById(id);
+            if (input) input.value = '';
+        });
         
                         // Reset Packeta UI to initial state
                         const selectionDiv = document.getElementById('packeta-selection');
@@ -1104,21 +1129,23 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 country: country,
-                subtotal: subtotal,
+                subtotal: physicalSubtotal,
                 is_subscription: false
             })
         })
         .then(response => response.json())
         .then(data => {
             if (data.available) {
+                const shippingCost = couponFreeShipping ? 0 : parseFloat(data.shipping);
+
                 // Update shipping cost
                 if (shippingCostElement) {
-                    shippingCostElement.textContent = data.shipping_formatted;
+                    shippingCostElement.textContent = couponFreeShipping ? '{{ $currentLocale === 'en' ? 'FREE' : 'ZDARMA' }}' : data.shipping_formatted;
                 }
-                
+
                 // Update total
                                 if (totalElement) {
-                                    const newTotal = subtotal + parseFloat(data.shipping);
+                                    const newTotal = Math.max(0, subtotal + shippingCost - couponDiscount);
                                     totalElement.textContent = formatCurrency(newTotal);
                                 }
                                 
@@ -1306,7 +1333,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ code: code, type: 'order', order_value: {{ $subtotal ?? 0 }} })
+                    body: JSON.stringify({ code: code, type: 'order', order_value: {{ $physicalSubtotal ?? $subtotal ?? 0 }} })
                 }).then(function(res) {
                     return res.json().then(function(data) { return { ok: res.ok, data: data }; });
                 }).then(function(result) {
