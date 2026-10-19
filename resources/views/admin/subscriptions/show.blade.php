@@ -567,6 +567,26 @@
                     </div>
                 </div>
                 @endif
+
+                {{-- Výzva k doplacení rozesílky vynechané kvůli neplacení --}}
+                @php
+                    $skippedAwaitingPayment = app(\App\Services\SubscriptionShipmentService::class)->skippedShipmentAwaitingPayment($subscription);
+                    $skippedPaymentBreakdown = $skippedAwaitingPayment ? \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription) : null;
+                @endphp
+                @if($skippedAwaitingPayment)
+                <form action="{{ route('admin.subscriptions.skipped-payment-request', $subscription) }}" method="POST" class="mt-4"
+                      onsubmit="return confirm('Poslat zákazníkovi výzvu k doplacení rozesílky {{ $skippedAwaitingPayment->shipment_date->format('d.m.Y') }}? Odkaz platí jen do dnešní půlnoci.');">
+                    @csrf
+                    <button type="submit"
+                            class="w-full px-4 py-2 text-sm border border-red-600 text-red-700 rounded-lg hover:bg-red-50 transition font-medium">
+                        Poslat výzvu k doplacení rozesílky {{ $skippedAwaitingPayment->shipment_date->format('d.m.Y') }}
+                    </button>
+                    <p class="mt-2 text-xs text-gray-500">
+                        Zákazník dostane e-mail s odkazem k platbě {{ \App\Helpers\CurrencyHelper::formatByCurrency($skippedPaymentBreakdown->total, $skippedPaymentBreakdown->currency) }}, platným do půlnoci.
+                        Po zaplacení se box vrátí do rozesílky a karta se uloží jako výchozí.
+                    </p>
+                </form>
+                @endif
             </div>
 
             <!-- Customer Info -->

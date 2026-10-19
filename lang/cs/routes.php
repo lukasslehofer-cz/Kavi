@@ -47,6 +47,8 @@ return [
     'subscription-configurator-checkout' => 'predplatne/konfigurator/checkout',
     'subscription-checkout' => 'predplatne/pokladna',
     'subscription-confirmation' => 'predplatne/{subscription}/potvrzeni',
+    'subscription-pay-skipped' => 'predplatne/doplatit/{shipment}',
+    'subscription-pay-skipped-done' => 'predplatne/doplatit/hotovo',
     'subscription-plan' => 'predplatne/{plan}',
     'subscription-subscribe' => 'predplatne/{plan}/registrovat',
 

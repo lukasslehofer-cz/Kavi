@@ -47,6 +47,8 @@ return [
     'subscription-configurator-checkout' => 'subscription/configurator/checkout',
     'subscription-checkout' => 'subscription/checkout',
     'subscription-confirmation' => 'subscription/{subscription}/confirmation',
+    'subscription-pay-skipped' => 'subscription/pay-skipped/{shipment}',
+    'subscription-pay-skipped-done' => 'subscription/pay-skipped/done',
     'subscription-plan' => 'subscription/{plan}',
     'subscription-subscribe' => 'subscription/{plan}/subscribe',
 

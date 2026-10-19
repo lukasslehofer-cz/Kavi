@@ -78,6 +78,27 @@ return [
         'step4_desc' => 'Savor exceptional specialty coffee and look forward to your next box',
     ],
 
+    // Paying for a shipment skipped because of a failed payment (link from e-mail)
+    'pay_skipped' => [
+        'page_title' => 'Shipment payment',
+        'success_badge' => 'Paid',
+        'success_heading' => 'Thank you, your box is on its way',
+        'success_text' => 'Your payment went through. We will send the box with the next shipment and we saved your card for future subscription payments. A confirmation is on its way to your inbox.',
+        'cancelled_badge' => 'Payment cancelled',
+        'cancelled_heading' => 'The payment did not go through',
+        'cancelled_text' => 'You cancelled the payment. If you would like the box, go back to the link in the e-mail, it is valid until midnight today.',
+        'expired_badge' => 'Link expired',
+        'expired_heading' => 'This link is no longer valid',
+        'expired_text' => 'The payment link was valid only on the day the e-mail was sent. Your subscription continues with the next shipment. If you would still like the box, write to us at :email.',
+        'done_badge' => 'Done',
+        'done_heading' => 'This shipment is settled',
+        'done_text' => 'This shipment is already paid or can no longer be paid. You can check your subscription in your account.',
+        'error_badge' => 'Error',
+        'error_heading' => 'We could not open the payment',
+        'error_text' => 'Please try again in a moment or write to us at :email.',
+        'account_link' => 'Go to my account',
+    ],
+
     // FAQ below the configurator (redesign 2026-10)
     'faq' => [
         ['q' => 'What if I don\'t like the coffee?', 'a' => 'Write to us at info@kavibox.com. You can change your coffee type in your account at any time, for example from filter to espresso.'],

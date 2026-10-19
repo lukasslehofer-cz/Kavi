@@ -90,6 +90,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/subscriptions/{subscription}/invoice-details', [\App\Http\Controllers\Admin\SubscriptionController::class, 'updateInvoiceDetails'])->name('subscriptions.update-invoice-details');
     Route::post('/subscriptions/{subscription}/pause', [\App\Http\Controllers\Admin\SubscriptionController::class, 'pause'])->name('subscriptions.pause');
     Route::post('/subscriptions/{subscription}/resume', [\App\Http\Controllers\Admin\SubscriptionController::class, 'resume'])->name('subscriptions.resume');
+    Route::post('/subscriptions/{subscription}/skipped-payment-request', [\App\Http\Controllers\Admin\SubscriptionController::class, 'sendSkippedPaymentRequest'])->name('subscriptions.skipped-payment-request');
     Route::get('/subscription-payment/{payment}/invoice', [\App\Http\Controllers\Admin\SubscriptionController::class, 'downloadInvoice'])->name('subscription-payment.invoice');
     Route::get('/subscriptions-shipments', [\App\Http\Controllers\Admin\SubscriptionController::class, 'shipments'])->name('subscriptions.shipments');
     Route::get('/subscriptions-shipments/history', [\App\Http\Controllers\Admin\SubscriptionController::class, 'shipmentsHistory'])->name('subscriptions.shipments.history');

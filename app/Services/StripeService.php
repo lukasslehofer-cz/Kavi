@@ -734,6 +734,13 @@ class StripeService
             return;
         }
 
+        // Doplacení rozesílky vynechané kvůli neplacení (výzva z adminu)
+        if (isset($session['metadata']['type']) && $session['metadata']['type'] === 'skipped_shipment_payment') {
+            $this->handleSkippedShipmentPayment($session);
+
+            return;
+        }
+
         // Handle one-time box payment
         if (isset($session['metadata']['is_one_time_box']) && $session['metadata']['is_one_time_box'] === 'true') {
             $subscriptionId = $session['metadata']['subscription_id'] ?? null;
@@ -1225,6 +1232,328 @@ class StripeService
                 'subject' => $subject,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Doplacení rozesílky vynechané kvůli neplacení (výzva z adminu).
+     *
+     * Kostra jako handleManualInvoicePayment: idempotence podle PaymentIntentu, zápis
+     * v transakci se zámkem předplatného, po zápisu už žádný krok webhook neshodí.
+     * Platba se ale váže na KONKRÉTNÍ vynechaný řádek a next_billing_date se nemění -
+     * po vynechání už míří na další cyklus.
+     */
+    private function handleSkippedShipmentPayment(array $session): void
+    {
+        $subscriptionId = $session['metadata']['subscription_id'] ?? null;
+        $shipmentId = $session['metadata']['shipment_id'] ?? null;
+        $paymentIntentId = $session['payment_intent'] ?? null;
+        $logContext = [
+            'subscription_id' => $subscriptionId,
+            'shipment_id' => $shipmentId,
+            'session_id' => $session['id'] ?? null,
+            'payment_intent_id' => $paymentIntentId,
+        ];
+
+        if (($session['payment_status'] ?? null) !== 'paid') {
+            \Log::warning('Skipped shipment payment session completed but not paid; ignoring', $logContext + [
+                'payment_status' => $session['payment_status'] ?? null,
+            ]);
+
+            return;
+        }
+
+        $shipmentMatches = $subscriptionId && $shipmentId && \App\Models\SubscriptionShipment::whereKey($shipmentId)
+            ->where('subscription_id', $subscriptionId)
+            ->exists();
+
+        if (! $paymentIntentId || ! $shipmentMatches) {
+            \Log::error('Skipped shipment payment cannot be matched', $logContext);
+            $this->alertAdminAboutManualPayment(
+                'Doplacení rozesílky bez párování',
+                "Stripe potvrdil doplacení vynechané rozesílky, ale nejde ho spárovat (chybí předplatné, zásilka nebo PaymentIntent). Nic se nezapsalo.\n\n"
+                    .'Předplatné ID: '.($subscriptionId ?? '—')."\n"
+                    .'Zásilka ID: '.($shipmentId ?? '—')."\n"
+                    .'Checkout session: '.($session['id'] ?? '—')."\n"
+                    .'PaymentIntent: '.($paymentIntentId ?? '—')
+            );
+
+            return;
+        }
+
+        $amount = isset($session['amount_total'])
+            ? CurrencyHelper::fromSmallestUnit((int) $session['amount_total'])
+            : null;
+        $currency = $session['currency'] ?? null;
+
+        $result = \DB::transaction(function () use ($subscriptionId, $shipmentId, $paymentIntentId, $amount, $currency) {
+            $subscription = Subscription::lockForUpdate()->findOrFail($subscriptionId);
+            $shipment = \App\Models\SubscriptionShipment::lockForUpdate()->findOrFail($shipmentId);
+
+            $existing = \App\Models\SubscriptionPayment::where('stripe_payment_intent_id', $paymentIntentId)->first();
+            if ($existing) {
+                return ['duplicate' => $existing];
+            }
+
+            $paymentData = [
+                'subscription_id' => $subscription->id,
+                'stripe_payment_intent_id' => $paymentIntentId,
+                'amount' => $amount ?? \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription)->total,
+                'currency' => $currency ?? strtolower($subscription->currency ?? 'CZK'),
+                'status' => 'paid',
+                'paid_at' => now(),
+            ];
+
+            // Mezi výzvou a zaplacením se mohlo leccos změnit (box už zaplacený nebo ručně
+            // vyřízený, předplatné zrušené). Pak platbu jen zapíšeme a rozhodne admin -
+            // jinak by box mohl odejít dvakrát.
+            $applicable = $subscription->status !== 'cancelled'
+                && ! $shipment->subscription_payment_id
+                && in_array($shipment->status, ['skipped', 'pending'], true);
+
+            if (! $applicable) {
+                return [
+                    'subscription' => $subscription,
+                    'shipment' => $shipment,
+                    'payment' => \App\Models\SubscriptionPayment::create($paymentData),
+                    'applied' => false,
+                ];
+            }
+
+            // Období jako u cronu: končí billing date měsíce té rozesílky
+            $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
+            $billingDate = \App\Models\ShipmentSchedule::getBillingDateForMonth(
+                $shipment->shipment_date->year,
+                $shipment->shipment_date->month
+            );
+
+            $payment = \App\Models\SubscriptionPayment::create($paymentData + [
+                'period_start' => $billingDate->copy()->subMonths($frequencyMonths),
+                'period_end' => $billingDate,
+            ]);
+
+            // Vrátí řádek ze skipped na pending a naváže platbu
+            app(\App\Services\SubscriptionShipmentService::class)->linkPaymentToShipmentRow($payment, $shipment);
+
+            $subscription->update([
+                'payment_failure_count' => 0,
+                // Doplacená rozesílka ruší sérii neuhrazených rozesílek stejně jako úspěšný cron
+                'consecutive_unpaid_shipments' => 0,
+                'last_payment_failure_at' => null,
+                'last_payment_failure_reason' => null,
+                'pending_invoice_id' => null,
+                'pending_invoice_amount' => null,
+            ]);
+
+            return [
+                'subscription' => $subscription,
+                'shipment' => $shipment,
+                'payment' => $payment,
+                'applied' => true,
+            ];
+        });
+
+        if (isset($result['duplicate'])) {
+            \Log::info('Skipped shipment payment already processed; ignoring duplicate delivery', $logContext + [
+                'payment_id' => $result['duplicate']->id,
+            ]);
+
+            return;
+        }
+
+        $subscription = $result['subscription'];
+        $shipment = $result['shipment'];
+        $payment = $result['payment'];
+        $subscriptionLabel = $subscription->subscription_number ?? '#'.$subscription->id;
+        $shipmentLabel = $shipment->shipment_date->format('d.m.Y');
+
+        if (! $result['applied']) {
+            \Log::warning('Skipped shipment payment for a shipment that is no longer payable; recorded without applying', $logContext + [
+                'payment_id' => $payment->id,
+                'status' => $subscription->status,
+                'shipment_status' => $shipment->status,
+                'shipment_payment_id' => $shipment->subscription_payment_id,
+            ]);
+            $this->alertAdminAboutManualPayment(
+                'Doplacení rozesílky k vyřešení - '.$subscriptionLabel,
+                "Zákazník zaplatil vynechanou rozesílku {$shipmentLabel}, ale ta už nejde doplatit (je zaplacená, vyřízená nebo je předplatné zrušené).\n\n"
+                    .'Předplatné: '.$subscriptionLabel.' (stav '.$subscription->status.")\n"
+                    .'Zásilka: '.$shipment->id.' (stav '.$shipment->status.")\n"
+                    .'Částka: '.$payment->amount.' '.$payment->currency."\n"
+                    .'Platba ID: '.$payment->id."\n"
+                    .'PaymentIntent: '.$paymentIntentId."\n\n"
+                    .'Platba je zapsaná jako zaplacená, ale bez období, bez vazby na zásilku a bez faktury. '
+                    .'Peníze buď vrať ve Stripe, nebo platbu ručně navaž a vystav fakturu.'
+            );
+
+            return;
+        }
+
+        $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+
+        // Pauza po neplacení ještě běží (cron ji obnoví až po dni rozesílky) - obnovit hned.
+        // Zaplacený řádek resume nechá a další platbu nastaví na další cyklus.
+        if ($subscription->isPaymentFailurePause()) {
+            try {
+                $resume = $shipmentService->resumeSubscription($subscription, byAdmin: true);
+
+                if (! $resume['success']) {
+                    \Log::warning('Resume after skipped shipment payment failed; cron resumes it later', $logContext + [
+                        'message' => $resume['message'],
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                \Log::error('Resume after skipped shipment payment threw', $logContext + [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            $subscription->refresh();
+        }
+
+        $this->setDefaultPaymentMethodFromPaymentIntent($paymentIntentId);
+
+        // Pauza za tento měsíc uvolnila rezervaci kávy
+        try {
+            $schedule = $shipment->shipment_schedule_id
+                ? \App\Models\ShipmentSchedule::find($shipment->shipment_schedule_id)
+                : null;
+            if ($schedule) {
+                app(\App\Services\StockReservationService::class)->updateReservationsForSchedule($schedule);
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Failed to update reservations after skipped shipment payment', $logContext + [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        if (! $subscription->isComplimentary()) {
+            try {
+                app(\App\Services\FakturoidService::class)->processInvoiceForSubscriptionPayment($payment);
+            } catch (\Throwable $e) {
+                \Log::error('Failed to create Fakturoid invoice for skipped shipment payment', [
+                    'payment_id' => $payment->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $this->createAffiliateSubscriptionReward($subscription);
+
+        // Odpočet kupónu AŽ po vystavení faktury (stejně jako cron)
+        try {
+            if ($subscription->coupon_id && $subscription->discount_amount > 0) {
+                app(\App\Services\CouponService::class)->decrementSubscriptionDiscountMonth($subscription);
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Coupon countdown after skipped shipment payment failed (platba zůstává platná)', [
+                'subscription_id' => $subscription->id,
+                'payment_id' => $payment->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        try {
+            $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
+            if ($email) {
+                \Mail::to($email)->send(new \App\Mail\SubscriptionPaymentSuccess($subscription, $payment));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Failed to send skipped shipment payment confirmation email', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        $late = $shipment->shipment_date->lt(today());
+        $this->alertAdminAboutManualPayment(
+            'Doplacená rozesílka '.$shipmentLabel.' - '.$subscriptionLabel,
+            "Zákazník doplatil rozesílku {$shipmentLabel} vynechanou kvůli neplacení ({$payment->amount} {$payment->currency}).\n\n"
+                .'Box je zpátky v rozesílce jako zaplacený: '.route('admin.subscriptions.shipments', ['date' => $shipment->shipment_date->toDateString()])."\n"
+                .($late ? "POZOR: den rozesílky už proběhl, box je potřeba poslat zvlášť.\n" : '')
+                .'Doplňkové objednávky odpojené při vynechání zůstávají k ruční revizi.'
+        );
+
+        \Log::info('Skipped shipment payment applied', $logContext + [
+            'payment_id' => $payment->id,
+            'shipment_date' => $shipment->shipment_date->toDateString(),
+            'status' => $subscription->status,
+            'next_billing_date' => $subscription->next_billing_date?->toDateString(),
+        ]);
+    }
+
+    /**
+     * Karta použitá při doplacení jako výchozí pro off-session platby z cronu
+     * (getCustomerDefaultPaymentMethod čte invoice_settings.default_payment_method).
+     */
+    private function setDefaultPaymentMethodFromPaymentIntent(string $paymentIntentId): void
+    {
+        try {
+            $paymentIntent = \Stripe\PaymentIntent::retrieve($paymentIntentId);
+            $paymentMethodId = is_string($paymentIntent->payment_method) ? $paymentIntent->payment_method : $paymentIntent->payment_method?->id;
+            $customerId = is_string($paymentIntent->customer) ? $paymentIntent->customer : $paymentIntent->customer?->id;
+
+            if (! $paymentMethodId || ! $customerId) {
+                \Log::warning('Cannot set default payment method - PaymentIntent has no card or customer', [
+                    'payment_intent_id' => $paymentIntentId,
+                ]);
+
+                return;
+            }
+
+            StripeCustomer::update($customerId, [
+                'invoice_settings' => ['default_payment_method' => $paymentMethodId],
+            ]);
+
+            \Log::info('Default payment method updated from skipped shipment payment', [
+                'payment_intent_id' => $paymentIntentId,
+                'customer_id' => $customerId,
+                'payment_method_id' => $paymentMethodId,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Failed to set default payment method from PaymentIntent', [
+                'payment_intent_id' => $paymentIntentId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Affiliate odměna za zaplacenou rozesílku předplatného (cron i doplacení). Nikdy nevyhodí výjimku.
+     */
+    private function createAffiliateSubscriptionReward(Subscription $subscription): void
+    {
+        if (! $subscription->coupon_id) {
+            return;
+        }
+
+        try {
+            $coupon = $subscription->coupon;
+            if ($coupon && $coupon->hasAffiliateSubscriptionReward()) {
+                $affiliateService = app(\App\Services\AffiliateService::class);
+
+                // Pořadí řeší AffiliateService – samotný COUNT podstřeluje u předplatných
+                // migrovaných ze starého webu, kde první platby v téhle DB nejsou.
+                $paymentNumber = $affiliateService->nextSubscriptionPaymentNumber($subscription);
+
+                $reward = $affiliateService->createSubscriptionReward($subscription, $coupon, $paymentNumber);
+
+                if ($reward) {
+                    \Log::info('Affiliate reward created for subscription payment', [
+                        'subscription_id' => $subscription->id,
+                        'payment_number' => $paymentNumber,
+                        'reward_id' => $reward->id,
+                        'reward_amount' => $reward->reward_amount,
+                        'partner_id' => $reward->affiliate_partner_id,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to create affiliate reward for subscription payment', [
+                'subscription_id' => $subscription->id,
+                'error' => $e->getMessage(),
+            ]);
+            // Don't fail the whole payment if affiliate reward creation fails
         }
     }
 
@@ -2287,6 +2616,76 @@ class StripeService
     }
 
     /**
+     * Checkout pro doplacení rozesílky vynechané kvůli neplacení (odkaz z výzvy admina).
+     *
+     * Karta se uloží pro off-session platby a webhook ji nastaví jako výchozí, takže
+     * další měsíc cron strhává už z ní. Session platí jen do konce dne jako odkaz v mailu.
+     */
+    public function createSkippedShipmentPaymentSession(Subscription $subscription, \App\Models\SubscriptionShipment $shipment): ?string
+    {
+        try {
+            $customerId = $this->getOrCreateCustomer($subscription->user);
+
+            $breakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
+            $isEur = strtolower($breakdown->currency) === 'eur';
+            $shipmentLabel = $shipment->shipment_date->format('d.m.Y');
+            $subscriptionLabel = $subscription->subscription_number ?? '#'.$subscription->id;
+
+            $session = StripeSession::create([
+                'customer' => $customerId,
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => strtolower($breakdown->currency),
+                        'product_data' => [
+                            'name' => ($isEur ? 'Coffee subscription - shipment ' : 'Kávové předplatné - rozesílka ').$shipmentLabel,
+                            'description' => $subscriptionLabel,
+                        ],
+                        'unit_amount' => \App\Helpers\SubscriptionPricing::stripeAmount($breakdown->total, $breakdown->currency),
+                    ],
+                    'quantity' => 1,
+                ]],
+                'mode' => 'payment',
+                'payment_intent_data' => [
+                    'setup_future_usage' => 'off_session',
+                    'description' => ($isEur ? 'Coffee subscription - ' : 'Kávové předplatné - ').$subscriptionLabel.' ('.$shipmentLabel.')',
+                    'metadata' => [
+                        'subscription_id' => $subscription->id,
+                        'shipment_id' => $shipment->id,
+                    ],
+                ],
+                // Stripe vyžaduje aspoň 30 minut od vytvoření
+                'expires_at' => max(now()->addMinutes(31)->timestamp, now()->endOfDay()->timestamp),
+                'success_url' => localizedRoute('subscriptions.pay-skipped.done').'?status=success',
+                'cancel_url' => localizedRoute('subscriptions.pay-skipped.done').'?status=cancelled',
+                'metadata' => [
+                    'type' => 'skipped_shipment_payment',
+                    'subscription_id' => $subscription->id,
+                    'shipment_id' => $shipment->id,
+                ],
+            ]);
+
+            \Log::info('Skipped shipment payment checkout session created', [
+                'subscription_id' => $subscription->id,
+                'shipment_id' => $shipment->id,
+                'session_id' => $session->id,
+                'amount' => $breakdown->total,
+                'currency' => $breakdown->currency,
+            ]);
+
+            return $session->url;
+        } catch (\Throwable $e) {
+            \Log::error('Failed to create skipped shipment payment session', [
+                'subscription_id' => $subscription->id,
+                'shipment_id' => $shipment->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
      * Cancel subscription in Stripe (at period end)
      */
     public function cancelSubscription(Subscription $subscription): void
@@ -2857,36 +3256,7 @@ class StripeService
                 }
 
                 // Create affiliate reward if applicable
-                if ($subscription->coupon_id) {
-                    try {
-                        $coupon = $subscription->coupon;
-                        if ($coupon && $coupon->hasAffiliateSubscriptionReward()) {
-                            $affiliateService = app(\App\Services\AffiliateService::class);
-
-                            // Pořadí řeší AffiliateService – samotný COUNT podstřeluje u předplatných
-                            // migrovaných ze starého webu, kde první platby v téhle DB nejsou.
-                            $paymentNumber = $affiliateService->nextSubscriptionPaymentNumber($subscription);
-
-                            $reward = $affiliateService->createSubscriptionReward($subscription, $coupon, $paymentNumber);
-
-                            if ($reward) {
-                                \Log::info('Affiliate reward created for subscription payment', [
-                                    'subscription_id' => $subscription->id,
-                                    'payment_number' => $paymentNumber,
-                                    'reward_id' => $reward->id,
-                                    'reward_amount' => $reward->reward_amount,
-                                    'partner_id' => $reward->affiliate_partner_id,
-                                ]);
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        \Log::error('Failed to create affiliate reward for subscription payment', [
-                            'subscription_id' => $subscription->id,
-                            'error' => $e->getMessage(),
-                        ]);
-                        // Don't fail the whole payment if affiliate reward creation fails
-                    }
-                }
+                $this->createAffiliateSubscriptionReward($subscription);
 
                 // Create Fakturoid invoice (skip for complimentary subscriptions)
                 if (! $subscription->isComplimentary()) {

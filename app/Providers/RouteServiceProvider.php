@@ -140,6 +140,9 @@ class RouteServiceProvider extends ServiceProvider
             Route::get('/' . $this->replaceParams($routes['subscription-checkout']), [\App\Http\Controllers\SubscriptionController::class, 'checkout'])->name($this->routeName('subscriptions.checkout', $locale, $isPrimary));
             Route::post('/' . $this->replaceParams($routes['subscription-checkout']), [\App\Http\Controllers\SubscriptionController::class, 'processCheckout'])->name($this->routeName('subscriptions.checkout.process', $locale, $isPrimary));
             Route::get('/' . $this->replaceParams($routes['subscription-confirmation']), [\App\Http\Controllers\SubscriptionController::class, 'confirmation'])->name($this->routeName('subscriptions.confirmation', $locale, $isPrimary));
+            // Doplacení rozesílky vynechané kvůli neplacení - podepsaný odkaz z e-mailu, bez přihlášení
+            Route::get('/' . $routes['subscription-pay-skipped-done'], [\App\Http\Controllers\SubscriptionController::class, 'paySkippedShipmentDone'])->name($this->routeName('subscriptions.pay-skipped.done', $locale, $isPrimary));
+            Route::get('/' . $this->replaceParams($routes['subscription-pay-skipped']), [\App\Http\Controllers\SubscriptionController::class, 'paySkippedShipment'])->whereNumber('shipment')->name($this->routeName('subscriptions.pay-skipped', $locale, $isPrimary));
             Route::get('/' . $this->replaceParams($routes['subscription-plan']), [\App\Http\Controllers\SubscriptionController::class, 'show'])->name($this->routeName('subscriptions.show', $locale, $isPrimary));
             Route::post('/' . $this->replaceParams($routes['subscription-subscribe']), [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name($this->routeName('subscriptions.subscribe', $locale, $isPrimary));
 

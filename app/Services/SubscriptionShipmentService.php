@@ -919,6 +919,25 @@ class SubscriptionShipmentService
     }
 
     /**
+     * Rozesílka vynechaná kvůli neplacení, kterou zákazník ještě může doplatit
+     * (výzva k platbě z adminu). Uživatelské pauzy se záměrně nepočítají - poznámku
+     * s payment_failure_skip píše pauseSubscription i krok 5b v resume.
+     */
+    public function skippedShipmentAwaitingPayment(Subscription $subscription): ?SubscriptionShipment
+    {
+        if ($subscription->status === 'cancelled' || $subscription->gift_purchase_id) {
+            return null;
+        }
+
+        return $subscription->shipments()
+            ->where('status', 'skipped')
+            ->whereNull('subscription_payment_id')
+            ->where('notes', 'like', '%'.Subscription::PAUSE_REASON_PAYMENT_FAILURE.'%')
+            ->reorder('shipment_date', 'desc')
+            ->first();
+    }
+
+    /**
      * Náhled zrušení – jediný zdroj pravdy o tom, co zrušení udělá. Použije se pro
      * informativní modal na dashboardu i pro samotné cancelSubscription().
      */

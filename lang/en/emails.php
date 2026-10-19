@@ -291,6 +291,19 @@ return [
     ],
 
     // Subscription Paused
+    'subscription_skipped_payment' => [
+        'subject' => 'Complete your payment and we will still send your box',
+        'title' => 'We can still send your box',
+        'subtitle' => 'We could not charge this shipment',
+        'intro' => 'We could not charge your subscription :number even on the third attempt, so we skipped the :date shipment. If you would like the box, just pay for it today and we will send it with the others.',
+        'shipment' => 'Shipment',
+        'amount' => 'Amount',
+        'reason' => 'Reason the payment failed',
+        'cta' => 'Pay and get the box',
+        'valid_until' => 'This link is valid today only, :date. If you do not want the box, there is nothing to do, your subscription continues with the next shipment.',
+        'card_note' => 'We will save the card you use for future subscription payments.',
+    ],
+
     'subscription_paused' => [
         'subject' => 'Subscription Paused - :subscription_number',
         'title' => 'Subscription Has Been Paused',

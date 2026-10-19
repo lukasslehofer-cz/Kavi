@@ -78,6 +78,27 @@ return [
         'step4_desc' => 'Užijte si skvělou výběrovou kávu a těšte se na další kávový box',
     ],
 
+    // Doplacení rozesílky vynechané kvůli neplacení (odkaz z e-mailu)
+    'pay_skipped' => [
+        'page_title' => 'Doplacení rozesílky',
+        'success_badge' => 'Zaplaceno',
+        'success_heading' => 'Děkujeme, box posíláme',
+        'success_text' => 'Platba proběhla. Box vám pošleme s nejbližší rozesílkou a kartu jsme si uložili pro další platby předplatného. Potvrzení vám přijde e-mailem.',
+        'cancelled_badge' => 'Platba zrušena',
+        'cancelled_heading' => 'Platba neproběhla',
+        'cancelled_text' => 'Platbu jste zrušili. Pokud box chcete, vraťte se k odkazu v e-mailu, platí do dnešní půlnoci.',
+        'expired_badge' => 'Odkaz vypršel',
+        'expired_heading' => 'Odkaz už neplatí',
+        'expired_text' => 'Odkaz k platbě platil jen v den odeslání e-mailu. Předplatné pokračuje další rozesílkou. Pokud o box stále stojíte, napište nám na :email.',
+        'done_badge' => 'Vyřízeno',
+        'done_heading' => 'Tato rozesílka je vyřízená',
+        'done_text' => 'Rozesílka je už zaplacená nebo ji nejde doplatit. Stav předplatného najdete ve svém účtu.',
+        'error_badge' => 'Chyba',
+        'error_heading' => 'Platbu se nepodařilo otevřít',
+        'error_text' => 'Zkuste to prosím za chvíli znovu, nebo nám napište na :email.',
+        'account_link' => 'Přejít do účtu',
+    ],
+
     // Časté dotazy pod konfigurátorem (redesign 2026-10)
     'faq' => [
         ['q' => 'Co když mi káva nebude chutnat?', 'a' => 'Napište nám na info@kavi.cz. Typ kávy si můžete kdykoli změnit v účtu, například z filtru na espresso.'],

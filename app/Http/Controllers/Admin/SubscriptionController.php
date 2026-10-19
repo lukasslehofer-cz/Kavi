@@ -259,6 +259,50 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * Výzva k doplacení rozesílky vynechané kvůli neplacení. Odkaz v e-mailu
+     * platí jen do konce dnešního dne, výzvu jde poslat znovu.
+     */
+    public function sendSkippedPaymentRequest(Subscription $subscription, SubscriptionShipmentService $shipmentService)
+    {
+        $shipment = $shipmentService->skippedShipmentAwaitingPayment($subscription);
+
+        if (! $shipment) {
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('error', 'Předplatné nemá žádnou rozesílku vynechanou kvůli neplacení, kterou by šlo doplatit.');
+        }
+
+        $email = $subscription->shipping_address['email'] ?? $subscription->user?->email;
+
+        if (! $email) {
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('error', 'Předplatné nemá e-mail zákazníka.');
+        }
+
+        try {
+            \Mail::to($email)->send(new \App\Mail\SubscriptionSkippedShipmentPayment($subscription, $shipment));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send skipped shipment payment request', [
+                'subscription_id' => $subscription->id,
+                'shipment_id' => $shipment->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('admin.subscriptions.show', $subscription)
+                ->with('error', 'Výzvu k platbě se nepodařilo odeslat: '.$e->getMessage());
+        }
+
+        Log::info('Admin sent skipped shipment payment request', [
+            'subscription_id' => $subscription->id,
+            'shipment_id' => $shipment->id,
+            'shipment_date' => $shipment->shipment_date->toDateString(),
+            'admin_user_id' => auth()->id(),
+        ]);
+
+        return redirect()->route('admin.subscriptions.show', $subscription)
+            ->with('success', 'Výzva k platbě za rozesílku '.$shipment->shipment_date->format('d.m.Y').' odeslána na '.$email.'. Odkaz platí do půlnoci.');
+    }
+
+    /**
      * Resume a paused subscription (admin-triggered)
      * Jediná cesta, jak uvolnit pauzu vyvolanou adminem
      */

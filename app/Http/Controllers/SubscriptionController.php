@@ -1635,4 +1635,42 @@ class SubscriptionController extends Controller
             return back()->with('error', __('flash.subscription.payment_error'));
         }
     }
+
+    /**
+     * Doplacení rozesílky vynechané kvůli neplacení - odkaz z výzvy admina.
+     * Bez přihlášení: odkaz je podepsaný relativně (doména podle jazyka) a platí do konce dne.
+     */
+    public function paySkippedShipment(Request $request, \App\Models\SubscriptionShipment $shipment)
+    {
+        if (! $request->hasValidRelativeSignature()) {
+            return view('subscriptions.skipped-payment-result', ['status' => 'expired']);
+        }
+
+        $subscription = $shipment->subscription;
+
+        if (! $subscription || ! $subscription->user || $subscription->status === 'cancelled'
+            || $shipment->status !== 'skipped' || $shipment->subscription_payment_id) {
+            return view('subscriptions.skipped-payment-result', ['status' => 'done']);
+        }
+
+        $checkoutUrl = $this->stripeService->createSkippedShipmentPaymentSession($subscription, $shipment);
+
+        if (! $checkoutUrl) {
+            return view('subscriptions.skipped-payment-result', ['status' => 'error']);
+        }
+
+        return redirect($checkoutUrl);
+    }
+
+    /**
+     * Návrat ze Stripe Checkoutu. Platbu zapisuje webhook, tady jen poděkování.
+     */
+    public function paySkippedShipmentDone(Request $request)
+    {
+        $status = in_array($request->query('status'), ['success', 'cancelled'], true)
+            ? $request->query('status')
+            : 'done';
+
+        return view('subscriptions.skipped-payment-result', ['status' => $status]);
+    }
 }

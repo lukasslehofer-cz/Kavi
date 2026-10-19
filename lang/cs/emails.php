@@ -291,6 +291,19 @@ return [
     ],
 
     // Subscription Paused
+    'subscription_skipped_payment' => [
+        'subject' => 'Doplaťte předplatné a box vám ještě pošleme',
+        'title' => 'Box vám ještě pošleme',
+        'subtitle' => 'Platbu za rozesílku se nepodařilo strhnout',
+        'intro' => 'Platbu za vaše předplatné :number se nám nepodařilo strhnout ani na třetí pokus, proto jsme rozesílku :date vynechali. Pokud o box stojíte, stačí ho dnes zaplatit a pošleme ho spolu s ostatními.',
+        'shipment' => 'Rozesílka',
+        'amount' => 'Částka',
+        'reason' => 'Důvod neúspěšné platby',
+        'cta' => 'Zaplatit a dostat box',
+        'valid_until' => 'Odkaz platí jen dnes, :date. Pokud box nechcete, nemusíte nic dělat, předplatné pokračuje další rozesílkou.',
+        'card_note' => 'Kartu, kterou při platbě použijete, si uložíme pro další platby předplatného.',
+    ],
+
     'subscription_paused' => [
         'subject' => 'Předplatné pozastaveno - :subscription_number',
         'title' => 'Předplatné bylo pozastaveno',
