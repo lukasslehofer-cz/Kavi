@@ -539,6 +539,45 @@
                     </div>
                     @endif
 
+                    {{-- Pauza po 3 neúspěšných platbách: obnoví ji cron, zákazník jen vymění kartu --}}
+                    @if($subscription->isPaymentFailurePause())
+                    @php
+                        $failureResumeDate = $shipmentInfo?->pauseInfo?->resumeDate;
+                        $failureNextBilling = $failureResumeDate
+                            ? \App\Models\ShipmentSchedule::getBillingDateForMonth($failureResumeDate->year, $failureResumeDate->month)
+                            : null;
+                    @endphp
+                    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6">
+                        <h4 class="text-base font-bold text-red-900 mb-2">{{ __('dashboard.payment_failure_pause_title') }}</h4>
+                        <p class="text-sm text-red-800 mb-3">
+                            {{ __('dashboard.payment_failure_pause_text') }}
+                            @if($subscription->last_payment_failure_reason)
+                                <span class="block mt-1">
+                                    {{ __('dashboard.reason') }} {{ $subscription->last_payment_failure_reason }}
+                                </span>
+                            @endif
+                        </p>
+                        @if($failureResumeDate)
+                        <div class="bg-white rounded-lg p-4 mb-4 border border-red-200 text-sm space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-gray-700">{{ __('dashboard.shipment_after_pause') }}:</span>
+                                <span class="font-medium">{{ $failureResumeDate->format('d.m.Y') }}</span>
+                            </div>
+                            @if($failureNextBilling)
+                            <div class="flex justify-between">
+                                <span class="text-gray-700">{{ __('dashboard.payment_failure_next_payment') }}:</span>
+                                <span class="font-medium">{{ $failureNextBilling->format('d.m.Y') }}</span>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
+                        <a href="{{ localizedRoute('dashboard.payment-methods.manage') }}"
+                           class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-3 rounded-full transition-colors">
+                            {{ __('dashboard.manage_payment_card') }}
+                        </a>
+                    </div>
+                    @endif
+
                     <!-- Actions (hidden for complimentary subscriptions) -->
                     @if(!$subscription->isComplimentary() && $subscription->frequency_months != 0)
                     {{-- Only show actions for regular subscriptions, not one-time boxes or complimentary --}}
@@ -573,6 +612,8 @@
                                 <p class="font-medium">{{ __('dashboard.paused_by_admin') }}</p>
                                 <p class="mt-1 text-yellow-700">{{ __('dashboard.paused_by_admin_help') }}</p>
                             </div>
+                            @elseif($subscription->isPaymentFailurePause())
+                            {{-- Bez tlačítka Obnovit: vysvětlení a výměna karty jsou v boxu výše --}}
                             @else
                             <form method="POST" action="{{ localizedRoute('dashboard.subscription.resume') }}">
                                 @csrf

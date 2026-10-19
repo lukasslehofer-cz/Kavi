@@ -546,6 +546,26 @@
                         @endif
                     </div>
                 </div>
+                @elseif($subscription->consecutive_unpaid_shipments > 0 && $subscription->status !== 'cancelled')
+                {{-- Po vynechané rozesílce už status není 'unpaid', dluh je vidět jen tady --}}
+                <div class="mt-4 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+                    <h4 class="text-sm font-bold text-yellow-900 mb-2">Vynechané rozesílky kvůli neplacení</h4>
+                    <div class="text-xs text-yellow-800 space-y-1">
+                        <div class="flex justify-between font-semibold">
+                            <span>Neuhrazené rozesílky za sebou:</span>
+                            <span>{{ $subscription->consecutive_unpaid_shipments }} z 3 (pak automatické zrušení)</span>
+                        </div>
+                        @if($subscription->last_payment_failure_at)
+                        <div>Poslední neúspěšná platba: {{ $subscription->last_payment_failure_at->format('d.m.Y H:i') }}</div>
+                        @endif
+                        @if($subscription->last_payment_failure_reason)
+                        <div class="pt-2 border-t border-yellow-300 mt-2">
+                            <strong>Důvod:</strong><br>
+                            {{ $subscription->last_payment_failure_reason }}
+                        </div>
+                        @endif
+                    </div>
+                </div>
                 @endif
             </div>
 

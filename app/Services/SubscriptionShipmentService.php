@@ -642,7 +642,8 @@ class SubscriptionShipmentService
 
         // 1. Měsíc, do kterého resume předplatné skutečně obnoví - kontrola skladu
         // i nový pending řádek níže míří na stejné datum
-        $nextShipmentDate = $this->resolveResumeShipmentDate($subscription);
+        $passedDates = [];
+        $nextShipmentDate = $this->resolveResumeShipmentDate($subscription, $passedDates);
 
         if (! $nextShipmentDate) {
             return [
@@ -714,10 +715,26 @@ class SubscriptionShipmentService
             }
         }
 
+        // Rozesílky mezi dneškem a obnovenou, jejichž billing date už prošel (obnovení
+        // mezi billing date a dnem rozesílky). Úklid níže na ně nesahá a krok 5b je
+        // zapíše jako skipped - bez řádku by je stránka rozesílky dopočítala z kadence
+        // jako nezaplacený pending a box by odešel bez platby.
+        $passedSchedules = collect($passedDates)
+            ->map(fn (Carbon $date) => ShipmentSchedule::getOrCreateForMonth($date->year, $date->month))
+            ->keyBy('id');
+        $passedScheduleIds = $passedSchedules->keys()->all();
+        $keepPassed = function ($query) use ($passedScheduleIds) {
+            if ($passedScheduleIds) {
+                $query->where(fn ($q) => $q->whereNull('shipment_schedule_id')
+                    ->orWhereNotIn('shipment_schedule_id', $passedScheduleIds));
+            }
+        };
+
         // 4. Delete all future skipped shipments (those that haven't happened yet)
         $deletedSkipped = $subscription->shipments()
             ->where('status', 'skipped')
             ->where('shipment_date', '>=', today()->startOfDay())
+            ->tap($keepPassed)
             ->delete();
 
         // 5. Delete all future pending shipments (created when pause was set up)
@@ -726,6 +743,7 @@ class SubscriptionShipmentService
             ->where('status', 'pending')
             ->where('shipment_date', '>', now())
             ->whereNull('subscription_payment_id') // Don't delete paid shipments
+            ->tap($keepPassed)
             ->delete();
 
         \Log::info('Cleaned up future shipments on resume', [
@@ -733,6 +751,31 @@ class SubscriptionShipmentService
             'deleted_skipped' => $deletedSkipped,
             'deleted_pending' => $deletedPending,
         ]);
+
+        // 5b. Nezaplacené rozesílky s prošlým billing date zůstanou skipped
+        foreach ($passedSchedules as $passedSchedule) {
+            $existing = $subscription->shipments()
+                ->where('shipment_schedule_id', $passedSchedule->id)
+                ->first();
+
+            // Zaplacený, už přeskočený nebo odeslaný řádek nech být
+            if ($existing && ($existing->subscription_payment_id || $existing->status !== 'pending')) {
+                continue;
+            }
+
+            $skippedShipment = $this->updateOrCreateForSchedule($subscription, $passedSchedule, [
+                'status' => 'skipped',
+                'notes' => 'Skipped on resume (billing date passed): '.($subscription->pause_reason ?? 'unknown'),
+            ]);
+
+            $this->detachAddonOrders($skippedShipment, 'pause_skip');
+
+            \Log::info('Kept shipment skipped on resume - billing date already passed', [
+                'subscription_id' => $subscription->id,
+                'shipment_id' => $skippedShipment->id,
+                'shipment_date' => $passedSchedule->shipment_date?->toDateString(),
+            ]);
+        }
 
         // 6. Clear pause-related fields
         $subscription->update([
@@ -771,14 +814,20 @@ class SubscriptionShipmentService
             'next_billing_date' => $billingDate,
         ]);
 
-        // 9. Update coffee reservations for this schedule
+        // 9. Update coffee reservations for this schedule (i pro měsíce zapsané v 5b)
+        $reservationSchedules = $passedSchedules->values();
         if ($schedule) {
+            $reservationSchedules->push($schedule);
+        }
+
+        foreach ($reservationSchedules->unique('id') as $reservationSchedule) {
             try {
                 $reservationService = app(\App\Services\StockReservationService::class);
-                $reservationService->updateReservationsForSchedule($schedule);
+                $reservationService->updateReservationsForSchedule($reservationSchedule);
             } catch (\Exception $e) {
                 \Log::error('Failed to update reservations after resume', [
                     'subscription_id' => $subscription->id,
+                    'schedule_id' => $reservationSchedule->id,
                     'error' => $e->getMessage(),
                 ]);
             }
@@ -805,8 +854,11 @@ class SubscriptionShipmentService
      * proto se tu berou jen zaplacené pending. Bez toho u pauzy od admina (vše skipped)
      * vycházel poslední odeslaný box + frekvence, tedy měsíc dávno po billing date,
      * a resume padal na vyprodané kávě z minulé rozesílky.
+     *
+     * Do $passedDates vrací rozesílky, které ještě nenastaly, ale přeskočily se kvůli
+     * prošlému billing date - resume je nenaúčtuje, takže se nesmí odeslat.
      */
-    protected function resolveResumeShipmentDate(Subscription $subscription): ?Carbon
+    protected function resolveResumeShipmentDate(Subscription $subscription, array &$passedDates = []): ?Carbon
     {
         $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
         $nextShipmentDate = $this->calculateNextShipmentDate($subscription, paidPendingOnly: true);
@@ -833,6 +885,11 @@ class SubscriptionShipmentService
         // Skip forward until we find a month with a future billing date and no skipped shipment
         $skippedMonths = 0;
         while ($billingDate->lte(today()) || $survivingSkipped($nextShipmentDate)) {
+            // Přeživší skipped jsou jen v minulosti, budoucí datum tu je tedy kvůli billing date
+            if ($nextShipmentDate->gte(today()->startOfDay())) {
+                $passedDates[] = $nextShipmentDate->copy();
+            }
+
             $nextMonth = $nextShipmentDate->copy()->addMonths($frequencyMonths);
             $schedule = ShipmentSchedule::getForMonth($nextMonth->year, $nextMonth->month);
             $nextShipmentDate = $schedule?->shipment_date->copy()->startOfDay() ?? $nextMonth->copy()->day(20)->startOfDay();

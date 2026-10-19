@@ -507,6 +507,13 @@ class DashboardController extends Controller
                 ->with('error', __('flash.subscription.resume_admin_locked'));
         }
 
+        // Pauzu po neúspěšných platbách obnoví cron po vynechané rozesílce. Ruční
+        // obnovení by ji zrušilo bez zaplacení (tlačítko se nerenderuje, guard pro přímý POST).
+        if ($subscription->isPaymentFailurePause()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('flash.subscription.resume_payment_failure'));
+        }
+
         // Check availability and resume using the central service
         $shipmentService = app(SubscriptionShipmentService::class);
         $result = $shipmentService->resumeSubscription($subscription);

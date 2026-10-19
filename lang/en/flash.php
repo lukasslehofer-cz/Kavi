@@ -45,6 +45,7 @@ return [
         'resume_out_of_stock' => 'Cannot resume subscription for :month - coffees (:coffees) are out of stock. The pause will end with the next shipment.',
         'resume_not_paused' => 'This subscription is not paused.',
         'resume_admin_locked' => 'This subscription was paused by an administrator and only they can resume it. Please contact our support.',
+        'resume_payment_failure' => 'This subscription is paused because of a failed payment and continues on its own after the skipped shipment. Please replace your payment card before the next payment.',
         'not_found' => 'Subscription not found.',
         'pickup_point_updated' => 'Pickup point has been changed successfully.',
         'pickup_point_carrier_not_allowed' => 'This pickup point cannot be used for your subscription. Please choose another one.',
