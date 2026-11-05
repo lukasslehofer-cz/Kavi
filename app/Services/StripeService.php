@@ -370,6 +370,9 @@ class StripeService
         // Add Meta tracking cookies for CAPI deduplication
         $subscriptionMetadata['meta_fbp'] = request()->cookie('_fbp') ?? '';
         $subscriptionMetadata['meta_fbc'] = request()->cookie('_fbc') ?? '';
+        // Webhook nezná IP ani prohlížeč zákazníka, CAPI je ale u webových událostí potřebuje
+        $subscriptionMetadata['meta_client_ip'] = \App\Helpers\MetaPixelHelper::clientIp() ?? '';
+        $subscriptionMetadata['meta_client_user_agent'] = \App\Helpers\MetaPixelHelper::clientUserAgent() ?? '';
 
         // Add coupon info to metadata if present
         if ($coupon) {
@@ -843,7 +846,7 @@ class StripeService
                     }
 
                     // Send Meta CAPI Purchase event
-                    $this->sendMetaCapiForSubscription($subscription);
+                    MetaConversionsService::sendSubscriptionPurchase($subscription);
 
                     \Log::info('One-time box payment successful', [
                         'subscription_id' => $subscription->id,
@@ -966,7 +969,7 @@ class StripeService
                 }
 
                 // Send Meta CAPI Purchase event
-                $this->sendMetaCapiForOrder($order);
+                MetaConversionsService::sendOrderPurchase($order);
 
                 \Log::info('Order payment completed via webhook', [
                     'order_id' => $order->id,
@@ -1833,7 +1836,7 @@ class StripeService
             }
 
             // Send Meta CAPI Purchase event
-            $this->sendMetaCapiForSubscription($subscription);
+            MetaConversionsService::sendSubscriptionPurchase($subscription);
         } catch (\Exception $e) {
             \Log::error('Failed to create subscription', [
                 'error' => $e->getMessage(),
@@ -1935,6 +1938,8 @@ class StripeService
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'meta_fbp' => ! empty($metadata['meta_fbp']) ? $metadata['meta_fbp'] : null,
                 'meta_fbc' => ! empty($metadata['meta_fbc']) ? $metadata['meta_fbc'] : null,
+                'meta_client_ip' => ! empty($metadata['meta_client_ip']) ? $metadata['meta_client_ip'] : null,
+                'meta_client_user_agent' => ! empty($metadata['meta_client_user_agent']) ? $metadata['meta_client_user_agent'] : null,
             ];
 
             // Add Packeta data if available
@@ -1979,6 +1984,11 @@ class StripeService
                 ];
                 if (! $preCreatedSubscription->meta_event_id) {
                     $updateData['meta_event_id'] = (string) \Illuminate\Support\Str::uuid();
+                }
+                // Předplatné založené před uložením meta_client_* v pokladně
+                if (! $preCreatedSubscription->meta_client_ip && ! $preCreatedSubscription->meta_capi_sent_at) {
+                    $updateData['meta_client_ip'] = $subscriptionRecord['meta_client_ip'];
+                    $updateData['meta_client_user_agent'] = $subscriptionRecord['meta_client_user_agent'];
                 }
                 $preCreatedSubscription->update($updateData);
                 $subscription = $preCreatedSubscription;
@@ -2221,7 +2231,7 @@ class StripeService
             }
 
             // Send Meta CAPI Purchase event
-            $this->sendMetaCapiForSubscription($subscription);
+            MetaConversionsService::sendSubscriptionPurchase($subscription);
 
             // Countdown slevových měsíců až úplně nakonec – po faktuře, e-mailech i Meta CAPI.
             // decrementSubscriptionDiscountMonth() při vyčerpání měsíců vynuluje discount_amount
@@ -3627,105 +3637,5 @@ class StripeService
         ]);
 
         return $nextBillingDate;
-    }
-
-    /**
-     * Send Meta CAPI Purchase event for an order.
-     */
-    private function sendMetaCapiForOrder(Order $order): void
-    {
-        try {
-            $region = \App\Helpers\MetaPixelHelper::regionFromCurrency($order->currency);
-            $metaService = MetaConversionsService::forRegion($region);
-            if (! $metaService->isConfigured() || $order->meta_capi_sent_at) {
-                return;
-            }
-
-            $address = $order->shipping_address ?? [];
-            $user = $order->user;
-            $nameParts = explode(' ', $address['name'] ?? '', 2);
-
-            $success = $metaService->sendPurchaseEvent(
-                eventId: $order->meta_event_id,
-                value: (float) $order->total,
-                currency: $order->currency ?? 'CZK',
-                contentIds: $order->items->pluck('product_id')->filter()->values()->toArray(),
-                contentType: 'product',
-                userData: [
-                    'email' => $address['email'] ?? $user?->email,
-                    'phone' => $address['phone'] ?? $user?->phone,
-                    'firstName' => $nameParts[0] ?? null,
-                    'lastName' => $nameParts[1] ?? null,
-                    'city' => $address['billing_city'] ?? null,
-                    'postalCode' => $address['billing_postal_code'] ?? null,
-                    'country' => $address['billing_country'] ?? null,
-                    'externalId' => $user?->id,
-                ],
-                fbp: $order->meta_fbp,
-                fbc: $order->meta_fbc,
-                sourceUrl: route('order.confirmation', $order),
-            );
-
-            if ($success) {
-                $order->update(['meta_capi_sent_at' => now()]);
-            }
-        } catch (\Exception $e) {
-            \Log::error('Meta CAPI failed for order', [
-                'order_id' => $order->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Send Meta CAPI Purchase event for a subscription.
-     */
-    private function sendMetaCapiForSubscription(Subscription $subscription): void
-    {
-        try {
-            $region = \App\Helpers\MetaPixelHelper::regionFromCurrency($subscription->currency);
-            $metaService = MetaConversionsService::forRegion($region);
-            if (! $metaService->isConfigured() || $subscription->meta_capi_sent_at) {
-                return;
-            }
-
-            $address = $subscription->shipping_address ?? [];
-            $user = $subscription->user;
-            $nameParts = explode(' ', $address['name'] ?? '', 2);
-            $config = is_array($subscription->configuration) ? $subscription->configuration : json_decode($subscription->configuration, true);
-            $amount = $config['amount'] ?? 3;
-            $contentId = 'subscription-'.$amount;
-            $value = \App\Helpers\SubscriptionPricing::forFirstPayment($subscription)->total;
-
-            $success = $metaService->sendPurchaseEvent(
-                eventId: $subscription->meta_event_id,
-                value: $value,
-                currency: $subscription->currency ?? 'CZK',
-                contentIds: [$contentId],
-                contentType: 'product',
-                userData: [
-                    'email' => $address['email'] ?? $user?->email,
-                    'phone' => $address['phone'] ?? $user?->phone,
-                    'firstName' => $nameParts[0] ?? null,
-                    'lastName' => $nameParts[1] ?? null,
-                    'city' => $address['billing_city'] ?? null,
-                    'postalCode' => $address['billing_postal_code'] ?? null,
-                    'country' => $address['country'] ?? null,
-                    'externalId' => $user?->id,
-                ],
-                fbp: $subscription->meta_fbp,
-                fbc: $subscription->meta_fbc,
-                sourceUrl: route('subscriptions.confirmation', $subscription),
-            );
-
-            if ($success) {
-                $subscription->update(['meta_capi_sent_at' => now()]);
-            }
-        } catch (\Exception $e) {
-            \Log::error('Meta CAPI failed for subscription', [
-                'subscription_id' => $subscription->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
     }
 }

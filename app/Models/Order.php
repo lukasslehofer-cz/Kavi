@@ -64,6 +64,8 @@ class Order extends Model
         'meta_event_id',
         'meta_fbp',
         'meta_fbc',
+        'meta_client_ip',
+        'meta_client_user_agent',
         'meta_capi_sent_at',
     ];
 

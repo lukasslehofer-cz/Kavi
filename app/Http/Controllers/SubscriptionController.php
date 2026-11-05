@@ -829,6 +829,8 @@ class SubscriptionController extends Controller
                     'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                     'meta_fbp' => request()->cookie('_fbp'),
                     'meta_fbc' => request()->cookie('_fbc'),
+                    'meta_client_ip' => \App\Helpers\MetaPixelHelper::clientIp(),
+                    'meta_client_user_agent' => \App\Helpers\MetaPixelHelper::clientUserAgent(),
                 ]);
 
                 // Zaznamenat použití kupónu
@@ -973,8 +975,10 @@ class SubscriptionController extends Controller
             ]);
         }
 
-        // Prevent duplicate browser Purchase pixel on page reload
-        $shouldFirePixel = ! session()->has('purchase_tracked_sub_'.$subscription->id);
+        // Prevent duplicate browser Purchase pixel on page reload. Po 48 h už Meta Pixel
+        // s CAPI nespáruje – znovuotevření stránky by se počítalo jako další nákup.
+        $shouldFirePixel = ! session()->has('purchase_tracked_sub_'.$subscription->id)
+            && \App\Helpers\MetaPurchaseData::withinBrowserWindow($subscription->created_at);
         if ($shouldFirePixel && $subscription->status === 'active') {
             session()->put('purchase_tracked_sub_'.$subscription->id, true);
         }
@@ -1095,6 +1099,8 @@ class SubscriptionController extends Controller
                     'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                     'meta_fbp' => request()->cookie('_fbp'),
                     'meta_fbc' => request()->cookie('_fbc'),
+                    'meta_client_ip' => \App\Helpers\MetaPixelHelper::clientIp(),
+                    'meta_client_user_agent' => \App\Helpers\MetaPixelHelper::clientUserAgent(),
                 ]);
 
                 // Record coupon usage
@@ -1185,6 +1191,8 @@ class SubscriptionController extends Controller
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'meta_fbp' => request()->cookie('_fbp'),
                 'meta_fbc' => request()->cookie('_fbc'),
+                'meta_client_ip' => \App\Helpers\MetaPixelHelper::clientIp(),
+                'meta_client_user_agent' => \App\Helpers\MetaPixelHelper::clientUserAgent(),
             ]);
 
             // Record coupon usage
@@ -1370,6 +1378,8 @@ class SubscriptionController extends Controller
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'meta_fbp' => request()->cookie('_fbp'),
                 'meta_fbc' => request()->cookie('_fbc'),
+                'meta_client_ip' => \App\Helpers\MetaPixelHelper::clientIp(),
+                'meta_client_user_agent' => \App\Helpers\MetaPixelHelper::clientUserAgent(),
             ]);
 
             // Record coupon usage

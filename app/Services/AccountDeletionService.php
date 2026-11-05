@@ -280,6 +280,11 @@ class AccountDeletionService
                     'billing_address' => $anonymizedBilling,
                     // Firemní údaje z pokladny – u OSVČ jde o osobní údaje
                     'invoice_details' => null,
+                    // Identifikátory pro Meta CAPI (cookies, IP, prohlížeč)
+                    'meta_fbp' => null,
+                    'meta_fbc' => null,
+                    'meta_client_ip' => null,
+                    'meta_client_user_agent' => null,
                 ]);
 
                 \Log::info('Anonymized order', ['order_id' => $order->id]);
@@ -309,6 +314,11 @@ class AccountDeletionService
                     'delivery_notes' => null,
                     // Firemní údaje z pokladny – u OSVČ jde o osobní údaje
                     'invoice_details' => null,
+                    // Identifikátory pro Meta CAPI (cookies, IP, prohlížeč)
+                    'meta_fbp' => null,
+                    'meta_fbc' => null,
+                    'meta_client_ip' => null,
+                    'meta_client_user_agent' => null,
                 ]);
 
                 \Log::info('Anonymized subscription', ['subscription_id' => $subscription->id]);

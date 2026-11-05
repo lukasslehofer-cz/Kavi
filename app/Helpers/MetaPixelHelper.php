@@ -41,4 +41,19 @@ class MetaPixelHelper
     {
         return strtoupper((string) $currency) === 'EUR' ? 'com' : 'cz';
     }
+
+    // IP a prohlížeč zákazníka se ukládají v pokladně (meta_client_*), protože Purchase
+    // pro CAPI často odchází až z webhooku Stripe, kde request() patří Stripe.
+    public static function clientIp(): ?string
+    {
+        return request()->ip() ?: null;
+    }
+
+    // 500 znaků = sloupec meta_client_user_agent i limit hodnoty ve Stripe metadata
+    public static function clientUserAgent(): ?string
+    {
+        $userAgent = request()->userAgent();
+
+        return $userAgent ? mb_substr($userAgent, 0, 500) : null;
+    }
 }

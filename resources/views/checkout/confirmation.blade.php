@@ -372,15 +372,11 @@
         }
     });
 
-    // Meta Pixel - Purchase (with eventID for CAPI deduplication)
+    // Meta Pixel - Purchase. Data i eventID (číslo objednávky) bere stejně jako CAPI
+    // na serveru (MetaPurchaseData), jinak by se události nespárovaly.
+    @php $metaPurchase = \App\Helpers\MetaPurchaseData::forOrder($order); @endphp
     if (typeof fbq !== 'undefined') {
-        fbq('track', 'Purchase', {
-            content_ids: [{!! $order->items->pluck('product_id')->map(fn($id) => "'" . $id . "'")->implode(',') !!}],
-            content_type: 'product',
-            value: {{ $order->total }},
-            currency: '{{ $order->currency }}',
-            num_items: {{ $order->items->count() }}
-        }, {eventID: '{{ $order->meta_event_id }}'});
+        fbq('track', 'Purchase', @json($metaPurchase['custom_data']), {eventID: @json($metaPurchase['event_id'])});
     }
 </script>
 @endif

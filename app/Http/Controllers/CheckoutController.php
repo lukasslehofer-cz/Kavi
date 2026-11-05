@@ -718,6 +718,8 @@ class CheckoutController extends Controller
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'meta_fbp' => $request->cookie('_fbp'),
                 'meta_fbc' => $request->cookie('_fbc'),
+                'meta_client_ip' => \App\Helpers\MetaPixelHelper::clientIp(),
+                'meta_client_user_agent' => \App\Helpers\MetaPixelHelper::clientUserAgent(),
                 // Zmrazit hlášku z pokladny, aby email ukázal to, co zákazník viděl
                 'checkout_notice_title' => $checkoutNotice?->getTitle(app()->getLocale()),
                 'checkout_notice_text' => $checkoutNotice?->getMessage(app()->getLocale()),
@@ -986,48 +988,13 @@ class CheckoutController extends Controller
                         // Continue anyway - webhook will retry
                     }
 
-                    // Send Meta CAPI Purchase event
-                    try {
-                        $region = \App\Helpers\MetaPixelHelper::regionFromCurrency($order->currency);
-                        $metaService = \App\Services\MetaConversionsService::forRegion($region);
-                        if ($metaService->isConfigured() && ! $order->meta_capi_sent_at) {
-                            $address = $order->shipping_address ?? [];
-                            $user = $order->user;
-                            $nameParts = explode(' ', $address['name'] ?? '', 2);
-
-                            $success = $metaService->sendPurchaseEvent(
-                                eventId: $order->meta_event_id,
-                                value: (float) $order->total,
-                                currency: $order->currency ?? 'CZK',
-                                contentIds: $order->items->pluck('product_id')->filter()->values()->toArray(),
-                                contentType: 'product',
-                                userData: [
-                                    'email' => $address['email'] ?? $user?->email,
-                                    'phone' => $address['phone'] ?? $user?->phone,
-                                    'firstName' => $nameParts[0] ?? null,
-                                    'lastName' => $nameParts[1] ?? null,
-                                    'city' => $address['billing_city'] ?? null,
-                                    'postalCode' => $address['billing_postal_code'] ?? null,
-                                    'country' => $address['billing_country'] ?? null,
-                                    'externalId' => $user?->id,
-                                    'clientIpAddress' => request()->ip(),
-                                    'clientUserAgent' => request()->userAgent(),
-                                ],
-                                fbp: $order->meta_fbp,
-                                fbc: $order->meta_fbc,
-                                sourceUrl: route('order.confirmation', $order),
-                            );
-
-                            if ($success) {
-                                $order->update(['meta_capi_sent_at' => now()]);
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        \Log::error('Meta CAPI failed for order (sync)', [
-                            'order_id' => $order->id,
-                            'error' => $e->getMessage(),
-                        ]);
-                    }
+                    // Meta CAPI Purchase – stejné odeslání jako z webhooku, odejde jen jednou.
+                    // IP a prohlížeč z tohoto requestu jen pro objednávky bez uložených meta_client_*.
+                    \App\Services\MetaConversionsService::sendOrderPurchase(
+                        $order,
+                        \App\Helpers\MetaPixelHelper::clientIp(),
+                        \App\Helpers\MetaPixelHelper::clientUserAgent(),
+                    );
                 }
             } catch (\Exception $e) {
                 \Log::error('Failed to verify Stripe session synchronously', [
@@ -1051,8 +1018,10 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // Prevent duplicate browser Purchase pixel on page reload
-        $shouldFirePixel = ! session()->has('purchase_tracked_order_'.$order->id);
+        // Prevent duplicate browser Purchase pixel on page reload. Po 48 h od zaplacení
+        // už Meta Pixel s CAPI nespáruje, takže by se znovuotevření počítalo jako nákup.
+        $shouldFirePixel = ! session()->has('purchase_tracked_order_'.$order->id)
+            && \App\Helpers\MetaPurchaseData::withinBrowserWindow($order->paid_at ?? $order->created_at);
         if ($shouldFirePixel && $order->payment_status === 'paid' && ! $cancelled) {
             session()->put('purchase_tracked_order_'.$order->id, true);
         }

@@ -53,6 +53,9 @@ class CancelExpiredOrders extends Command
                 $order->update([
                     'status' => 'cancelled',
                     'payment_status' => 'failed',
+                    // Purchase za nezaplacenou objednávku neodejde, IP a prohlížeč nejsou potřeba
+                    'meta_client_ip' => null,
+                    'meta_client_user_agent' => null,
                 ]);
 
                 \Log::info('Order cancelled due to expired payment', [

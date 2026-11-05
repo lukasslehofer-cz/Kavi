@@ -370,7 +370,7 @@ $giftDates = $gift?->boxDates();
 @if($subscription->status === 'active' && ($shouldFirePixel ?? false))
 @php
     // Hodnoty pro tracking berou stejný rozpad jako Meta CAPI na serveru
-    // (StripeService::sendMetaCapiForSubscription) – jinak by se události nespárovaly.
+    // (MetaPurchaseData::forSubscription) – jinak by se události nespárovaly.
     $trackingBreakdown = \App\Helpers\SubscriptionPricing::forFirstPayment($subscription);
     $trackingGiftVoucherShippingCredit = $trackingBreakdown->giftVoucherShippingCredit;
     $trackingTotalDiscount = $trackingBreakdown->totalDiscount();
@@ -402,15 +402,11 @@ $giftDates = $gift?->boxDates();
         }
     });
 
-    // Meta Pixel - Purchase (with eventID for CAPI deduplication)
+    // Meta Pixel - Purchase. Data i eventID (číslo předplatného) bere stejně jako CAPI
+    // na serveru (MetaPurchaseData), jinak by se události nespárovaly.
+    @php $metaPurchase = \App\Helpers\MetaPurchaseData::forSubscription($subscription); @endphp
     if (typeof fbq !== 'undefined') {
-        fbq('track', 'Purchase', {
-            content_ids: ['{{ $trackingItemId }}'],
-            content_type: 'product',
-            value: {{ $trackingValue }},
-            currency: '{{ $trackingCurrency }}',
-            num_items: 1
-        }, {eventID: '{{ $subscription->meta_event_id }}'});
+        fbq('track', 'Purchase', @json($metaPurchase['custom_data']), {eventID: @json($metaPurchase['event_id'])});
     }
 </script>
 @endif
