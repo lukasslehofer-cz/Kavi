@@ -189,7 +189,7 @@ return [
         'scheduled_notice' => 'Od boxu :date budete dostávat:',
         'scheduled_notice_no_date' => 'Od dalšího boxu budete dostávat:',
         'cancel_scheduled' => 'Zrušit naplánovanou změnu',
-        'cancel_modal_link' => 'Nechcete rušit úplně? Můžete si změnit velikost boxu nebo frekvenci.',
+        'preselected_notice' => 'Změnu jsme podle vaší volby předvybrali. Zkontrolujte souhrn a uložte ji.',
     ],
     
     // Subscription actions
@@ -218,6 +218,25 @@ return [
     'cancel_immediate_notice' => 'Nemáte žádnou uhrazenou nedoručenou zásilku – předplatné bude ukončeno okamžitě.',
     'cancel_addons_notice' => 'Doplňkové objednávky navázané na zrušené zásilky (:count) budou odpojeny a vyřešíme je ručně.',
     'cancel_irreversible' => 'Zrušení je nevratné. O ukončení předplatného vás budeme informovat e-mailem.',
+
+    // Okno zrušení: otázka na důvod a co nabídnout místo zrušení
+    'cancel_flow' => [
+        'question' => 'Proč předplatné rušíte?',
+        'reason_too_much' => 'Mám kávy moc',
+        'reason_too_little' => 'Mám kávy málo',
+        'reason_price' => 'Je to pro mě drahé',
+        'reason_taste' => 'Káva mi nechutná',
+        'reason_other' => 'Jiný důvod',
+        'alternative_intro' => 'Nemusíte rušit úplně. Můžete:',
+        'lower_frequency' => 'Dostávat box méně často: :frequency',
+        'higher_frequency' => 'Dostávat box častěji: :frequency',
+        'smaller_box' => 'Zmenšit box na :size (:grams g) – :price za zásilku',
+        'bigger_box' => 'Zvětšit box na :size (:grams g) – :price za zásilku',
+        'pause' => 'Předplatné na čas pozastavit',
+        'm_box' => 'M box (:grams g) vás vyjde na :price za zásilku místo dnešních :current.',
+        'm_box_link' => 'Přejít na M box',
+        'note_label' => 'Chcete nám k tomu něco napsat? (nepovinné)',
+    ],
 
     // Billing address
     'delivery_address' => 'Fakturační adresa',

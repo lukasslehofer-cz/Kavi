@@ -987,8 +987,11 @@ class SubscriptionShipmentService
     /**
      * Cancel subscription – ke konci zaplaceného období. Konzumuje getCancellationPreview(),
      * takže se nemůže rozejít s tím, co bylo uživateli ukázáno v modalu.
+     *
+     * $reason a $note uvádí zákazník v okně zrušení (Subscription::CUSTOMER_CANCEL_REASONS).
+     * Bez nich zůstane cancellation_reason, jak je - admin a cancel-cleanly si ho řeší sami.
      */
-    public function cancelSubscription(Subscription $subscription): void
+    public function cancelSubscription(Subscription $subscription, ?string $reason = null, ?string $note = null): void
     {
         $preview = $this->getCancellationPreview($subscription);
 
@@ -1006,10 +1009,14 @@ class SubscriptionShipmentService
         $subscription->update([
             'status' => 'cancelled',
             'ends_at' => $endsAt,
-        ]);
+        ] + ($reason !== null ? [
+            'cancellation_reason' => $reason,
+            'cancellation_note' => $note,
+        ] : []));
 
         \Log::info('Subscription cancelled', [
             'subscription_id' => $subscription->id,
+            'reason' => $reason,
             'ends_at' => $endsAt->toDateString(),
             'last_paid_shipment' => $preview->lastPaidDate?->toDateString(),
             'ends_immediately' => $preview->endsImmediately,

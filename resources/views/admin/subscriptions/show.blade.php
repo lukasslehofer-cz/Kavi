@@ -563,6 +563,29 @@
                 </div>
                 @endif
 
+                {{-- Detail zrušení --}}
+                @if($subscription->status === 'cancelled')
+                <div class="mt-4 mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <h4 class="text-sm font-bold text-gray-900 mb-2">Detail zrušení</h4>
+                    <div class="text-xs text-gray-700 space-y-1">
+                        <div class="flex justify-between gap-4">
+                            <span>Důvod:</span>
+                            <span class="font-semibold text-right">{{ $subscription->cancellationReasonLabel() ?? 'Neuvedeno' }}</span>
+                        </div>
+                        <div class="flex justify-between gap-4">
+                            <span>Konec předplatného:</span>
+                            <span class="font-semibold">{{ $subscription->ends_at?->format('d.m.Y') ?? 'Neuvedeno' }}</span>
+                        </div>
+                        @if($subscription->cancellation_note)
+                        <div class="pt-2">
+                            <span>Poznámka zákazníka:</span>
+                            <p class="mt-1 font-semibold whitespace-pre-line break-words">{{ $subscription->cancellation_note }}</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 <div class="pt-4 border-t border-gray-200">
                     <div class="text-sm text-gray-600 mb-2">Aktuální stav:</div>
                         @if($subscription->status === 'active')

@@ -189,7 +189,7 @@ return [
         'scheduled_notice' => 'From the box on :date you will receive:',
         'scheduled_notice_no_date' => 'From your next box you will receive:',
         'cancel_scheduled' => 'Cancel scheduled change',
-        'cancel_modal_link' => 'Rather not cancel completely? You can change the box size or frequency instead.',
+        'preselected_notice' => 'We have preselected the change you chose. Check the summary and save it.',
     ],
     
     // Subscription actions
@@ -218,6 +218,25 @@ return [
     'cancel_immediate_notice' => 'You have no paid undelivered shipment, so your subscription will end immediately.',
     'cancel_addons_notice' => 'Add-on orders linked to the cancelled shipments (:count) will be detached and handled manually.',
     'cancel_irreversible' => 'Cancellation is irreversible. We will notify you by email once the subscription ends.',
+
+    // Cancel modal: the reason question and what to offer instead of cancelling
+    'cancel_flow' => [
+        'question' => 'Why are you cancelling?',
+        'reason_too_much' => 'I have too much coffee',
+        'reason_too_little' => 'I do not get enough coffee',
+        'reason_price' => 'It is too expensive for me',
+        'reason_taste' => 'I do not like the coffee',
+        'reason_other' => 'Another reason',
+        'alternative_intro' => 'You do not have to cancel completely. You can:',
+        'lower_frequency' => 'Get your box less often: :frequency',
+        'higher_frequency' => 'Get your box more often: :frequency',
+        'smaller_box' => 'Switch to the smaller :size box (:grams g) – :price per shipment',
+        'bigger_box' => 'Switch to the bigger :size box (:grams g) – :price per shipment',
+        'pause' => 'Pause your subscription for a while',
+        'm_box' => 'The M box (:grams g) costs :price per shipment instead of the :current you pay now.',
+        'm_box_link' => 'Switch to the M box',
+        'note_label' => 'Anything you would like to tell us? (optional)',
+    ],
 
     // Billing address
     'delivery_address' => 'Billing address',

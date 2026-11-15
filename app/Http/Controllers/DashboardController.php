@@ -146,6 +146,10 @@ class DashboardController extends Controller
             return [$subscription->id => [
                 'eligibility' => $configurationService->eligibility($subscription),
                 'scheduled' => $subscription->scheduledConfigurationChange,
+                // Co okno zrušení nabídne místo zrušení (jen tam, kde jde zrušit)
+                'alternatives' => in_array($subscription->status, ['active', 'paused'], true)
+                    ? $configurationService->cancellationAlternatives($subscription)
+                    : [],
             ]];
         });
 
@@ -465,6 +469,9 @@ class DashboardController extends Controller
         $shipmentService = app(SubscriptionShipmentService::class);
         $shipmentService->pauseSubscription($subscription, (int)$validated['iterations'], 'user_request');
 
+        // Pauza zvolená v okně zrušení místo zrušení
+        $this->logCancelAlternativeAccepted($request, $subscription, 'paused');
+
         // Pause in Stripe (no billing during pause)
         try {
             app(\App\Services\StripeService::class)->pauseSubscription($subscription);
@@ -570,6 +577,20 @@ class DashboardController extends Controller
                 ->with('error', __('gifts.subscription.action_not_allowed'));
         }
 
+        // Důvod je dobrovolný - zrušení nesmí nic brzdit. Bez výběru se uloží "bez udání
+        // důvodu", aby šlo zákaznické zrušení odlišit od systémového a ručního.
+        $reason = $request->input('cancel_reason');
+        if (! in_array($reason, Subscription::CUSTOMER_CANCEL_REASONS, true)) {
+            $reason = Subscription::CANCEL_REASON_UNSPECIFIED;
+        }
+
+        // Vlastní slova jen u "Jiný důvod". Delší text se zkrátí - poznámka nesmí
+        // zrušení zablokovat.
+        $note = $request->input('cancel_note');
+        $note = $reason === Subscription::CANCEL_REASON_OTHER && is_string($note) && trim($note) !== ''
+            ? mb_substr(trim($note), 0, 1000)
+            : null;
+
         // Cancel in Stripe first (cancel_at_period_end)
         try {
             app(\App\Services\StripeService::class)->cancelSubscription($subscription);
@@ -582,7 +603,7 @@ class DashboardController extends Controller
 
         // Cancel using the central service
         $shipmentService = app(SubscriptionShipmentService::class);
-        $shipmentService->cancelSubscription($subscription);
+        $shipmentService->cancelSubscription($subscription, $reason, $note);
 
         // Send cancellation email
         try {
@@ -607,7 +628,7 @@ class DashboardController extends Controller
     /**
      * Formulář změny konfigurace předplatného (velikost boxu, druh kávy, frekvence)
      */
-    public function configureSubscription($subscription)
+    public function configureSubscription(Request $request, $subscription)
     {
         $subscription = $this->ownedSubscription($subscription);
         $form = app(SubscriptionConfigurationService::class)->formData($subscription);
@@ -617,10 +638,22 @@ class DashboardController extends Controller
                 ->with('error', $form['eligibility']['message']);
         }
 
+        // Předvolba z odkazu (okno zrušení nabízí např. "přejít na M box"). Bere se jen
+        // hodnota, kterou formulář sám nabízí, cokoli jiného se ignoruje.
+        $preselect = [];
+        foreach (['amount' => SubscriptionConfigurationService::AMOUNTS, 'frequency' => SubscriptionConfigurationService::FREQUENCIES] as $field => $allowed) {
+            $value = $request->query($field);
+            if (is_scalar($value) && in_array((int) $value, $allowed, true)) {
+                $preselect[$field] = (int) $value;
+            }
+        }
+
         return view('dashboard.subscription-configure', [
             'subscription' => $subscription,
             'form' => $form,
             'viewAsQuery' => $this->viewAsQuery(),
+            'preselect' => $preselect,
+            'cancelFlow' => $this->cancelFlowContext($request),
         ]);
     }
 
@@ -669,6 +702,9 @@ class DashboardController extends Controller
         }
 
         if (in_array($result['outcome'], ['applied', 'scheduled'], true) && $result['change']) {
+            // Změna, na kterou zákazník přešel z okna zrušení místo zrušení
+            $this->logCancelAlternativeAccepted($request, $subscription, $result['outcome']);
+
             try {
                 $updated = $result['subscription'];
                 $email = $updated->shipping_address['email'] ?? null;
@@ -720,6 +756,46 @@ class DashboardController extends Controller
         return Subscription::where('id', $subscriptionId)
             ->where('user_id', $this->getViewingUser()->id)
             ->firstOrFail();
+    }
+
+    /**
+     * Důvod a alternativa z okna zrušení, se kterými zákazník přišel na změnu konfigurace
+     * nebo pauzu. Slouží jen k záznamu do logu, takže neplatná hodnota znamená "žádný
+     * kontext", ne chybu požadavku.
+     *
+     * @return array{reason: string, alternative: string}|null
+     */
+    private function cancelFlowContext(Request $request): ?array
+    {
+        $reason = $request->input('cancel_reason');
+        $alternative = $request->input('cancel_alternative');
+
+        if (! in_array($reason, Subscription::CUSTOMER_CANCEL_REASONS, true)
+            || ! in_array($alternative, [...SubscriptionConfigurationService::CANCEL_ALTERNATIVES, 'pause'], true)) {
+            return null;
+        }
+
+        return ['reason' => $reason, 'alternative' => $alternative];
+    }
+
+    /**
+     * Zapíše, že zákazník místo zrušení přijal nabídnutou alternativu. Podle těchto
+     * řádků jde spočítat, kolik zrušení krok s důvodem odvrátil.
+     */
+    private function logCancelAlternativeAccepted(Request $request, Subscription $subscription, string $outcome): void
+    {
+        $context = $this->cancelFlowContext($request);
+
+        if ($context === null) {
+            return;
+        }
+
+        \Log::info('Cancel flow: alternative accepted', [
+            'subscription_id' => $subscription->id,
+            'reason' => $context['reason'],
+            'alternative' => $context['alternative'],
+            'outcome' => $outcome,
+        ]);
     }
 
     /**

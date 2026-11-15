@@ -312,6 +312,8 @@ class AccountDeletionService
                 $subscription->update([
                     'shipping_address' => $anonymizedShipping,
                     'delivery_notes' => null,
+                    // Volný text u důvodu zrušení může obsahovat cokoli osobního
+                    'cancellation_note' => null,
                     // Firemní údaje z pokladny – u OSVČ jde o osobní údaje
                     'invoice_details' => null,
                     // Identifikátory pro Meta CAPI (cookies, IP, prohlížeč)

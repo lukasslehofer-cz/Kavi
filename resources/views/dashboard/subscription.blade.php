@@ -697,20 +697,124 @@
 
                     {{-- Cancel modal (jen pro zrušitelná předplatná) --}}
                     @if(in_array($subscription->status, ['active', 'paused']))
-                    @php $cancelPreview = $cancellationPreviews[$subscription->id] ?? null; @endphp
+                    @php
+                        $cancelPreview = $cancellationPreviews[$subscription->id] ?? null;
+                        $cancelAlternatives = $configurationState['alternatives'] ?? [];
+                        $cancelReasons = [
+                            'too_much' => \App\Models\Subscription::CANCEL_REASON_TOO_MUCH,
+                            'too_little' => \App\Models\Subscription::CANCEL_REASON_TOO_LITTLE,
+                            'price' => \App\Models\Subscription::CANCEL_REASON_PRICE,
+                            'taste' => \App\Models\Subscription::CANCEL_REASON_TASTE,
+                            'other' => \App\Models\Subscription::CANCEL_REASON_OTHER,
+                        ];
+
+                        // Odkaz na změnu konfigurace s předvolenou hodnotou. Důvod a alternativa jdou
+                        // s ním, aby se po uložení dalo zapsat, že zákazník místo zrušení zvolil změnu.
+                        $cancelAlternativeLink = function (string $reasonKey, string $key) use ($cancelAlternatives, $cancelReasons, $subscription, $viewAsQuery) {
+                            $alternative = $cancelAlternatives[$key] ?? null;
+                            if (! $alternative) {
+                                return null;
+                            }
+
+                            $isFrequency = isset($alternative['frequency']);
+
+                            return [
+                                'label' => $isFrequency
+                                    ? __('dashboard.cancel_flow.'.$key, [
+                                        'frequency' => \Illuminate\Support\Str::lower(__('confirmation.subscription_details.frequency_'.$alternative['frequency'])),
+                                    ])
+                                    : __('dashboard.cancel_flow.'.$key, [
+                                        'size' => $alternative['code'],
+                                        'grams' => $alternative['grams'],
+                                        'price' => $alternative['total_formatted'],
+                                        'current' => $alternative['current_total_formatted'],
+                                    ]),
+                                'url' => localizedRoute('dashboard.subscription.configure', ['subscription' => $subscription->id]
+                                    + ($isFrequency ? ['frequency' => $alternative['frequency']] : ['amount' => $alternative['amount']])
+                                    + ['cancel_reason' => $cancelReasons[$reasonKey], 'cancel_alternative' => $key]
+                                    + ($viewAsQuery ?? [])),
+                            ];
+                        };
+
+                        // Co se rozbalí pod kterým důvodem
+                        $cancelLinks = [
+                            'too_much' => array_filter([
+                                $cancelAlternativeLink('too_much', 'lower_frequency'),
+                                $cancelAlternativeLink('too_much', 'smaller_box'),
+                            ]),
+                            'too_little' => array_filter([
+                                $cancelAlternativeLink('too_little', 'higher_frequency'),
+                                $cancelAlternativeLink('too_little', 'bigger_box'),
+                            ]),
+                        ];
+                        $cancelMBox = $cancelAlternativeLink('price', 'm_box');
+                        // Pauza jen u běžícího předplatného ($firstUnpaidForModal se plní jen v jeho větvi výše)
+                        $cancelOffersPause = $subscription->status === 'active';
+                        $cancelAlternativeClass = 'block w-full text-center px-4 py-2 text-sm bg-white border border-primary-600 text-primary-700 rounded-full hover:bg-primary-100 transition font-medium';
+                    @endphp
                     <div id="cancel-modal-{{ $subscription->id }}" class="cancel-modal fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-40 p-4">
-                        <div class="bg-white rounded-2xl w-full max-w-lg border border-gray-200 shadow-xl">
-                            <div class="p-6 border-b border-gray-200 flex items-start gap-3">
-                                <span class="shrink-0 mt-0.5 inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-100 text-red-600">
+                        {{-- Patička s tlačítkem Zrušit zůstává vidět, roluje jen obsah --}}
+                        <form method="POST" action="{{ localizedRoute('dashboard.subscription.cancel') }}"
+                              class="cancel-form bg-white rounded-2xl w-full max-w-lg max-h-full flex flex-col border border-gray-200 shadow-xl">
+                            @csrf
+                            <input type="hidden" name="subscription_id" value="{{ $subscription->id }}">
+
+                            <div class="shrink-0 p-6 border-b border-gray-200 flex items-center gap-3">
+                                <span class="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-100 text-red-600">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
                                 </span>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">{{ __('dashboard.cancel_modal_title') }}</h3>
-                                    <p class="text-sm text-gray-600 mt-1">{{ __('dashboard.cancel_modal_intro') }}</p>
-                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900">{{ __('dashboard.cancel_modal_title') }}</h3>
                             </div>
 
-                            <div class="p-6 space-y-3 text-sm">
+                            <div class="p-6 space-y-5 text-sm overflow-y-auto">
+                                {{-- Jedna dobrovolná otázka: důvod. Pod vybraným se rozbalí, co jde udělat místo zrušení. --}}
+                                <fieldset>
+                                    <legend class="text-base font-semibold text-gray-900 mb-3">{{ __('dashboard.cancel_flow.question') }}</legend>
+                                    <div class="space-y-2">
+                                        @foreach($cancelReasons as $reasonKey => $reasonValue)
+                                        @php $reasonId = 'cancel-reason-'.$subscription->id.'-'.$reasonKey; @endphp
+                                        <div class="relative">
+                                            <input type="radio" name="cancel_reason" value="{{ $reasonValue }}" id="{{ $reasonId }}" class="peer sr-only">
+                                            <label for="{{ $reasonId }}"
+                                                   class="block rounded-xl border border-gray-200 px-4 py-3 text-gray-900 cursor-pointer transition hover:border-primary-300 peer-checked:border-primary-500 peer-checked:bg-primary-50 peer-checked:font-medium peer-focus-visible:ring-2 peer-focus-visible:ring-primary-500">
+                                                {{ __('dashboard.cancel_flow.reason_'.$reasonKey) }}
+                                            </label>
+
+                                            @if(in_array($reasonKey, ['too_much', 'too_little'], true) && ($cancelLinks[$reasonKey] || ($reasonKey === 'too_much' && $cancelOffersPause)))
+                                            <div class="hidden peer-checked:block mt-2 rounded-xl bg-primary-50 border border-primary-300 p-3 space-y-2">
+                                                <p class="text-primary-700">{{ __('dashboard.cancel_flow.alternative_intro') }}</p>
+                                                @foreach($cancelLinks[$reasonKey] as $cancelLink)
+                                                <a href="{{ $cancelLink['url'] }}" class="{{ $cancelAlternativeClass }}">{{ $cancelLink['label'] }}</a>
+                                                @endforeach
+                                                @if($reasonKey === 'too_much' && $cancelOffersPause)
+                                                <button type="button" class="open-pause-modal {{ $cancelAlternativeClass }}"
+                                                        data-subscription-id="{{ $subscription->id }}"
+                                                        data-frequency-months="{{ $subscription->frequency_months ?? 1 }}"
+                                                        data-first-unpaid="{{ $firstUnpaidForModal->format('Y-m-d') }}"
+                                                        data-from-cancel="{{ $reasonValue }}">
+                                                    {{ __('dashboard.cancel_flow.pause') }}
+                                                </button>
+                                                @endif
+                                            </div>
+                                            @elseif($reasonKey === 'price' && $cancelMBox)
+                                            <div class="hidden peer-checked:block mt-2 rounded-xl bg-primary-50 border border-primary-300 p-3 space-y-2">
+                                                <p class="text-primary-700">{{ $cancelMBox['label'] }}</p>
+                                                <a href="{{ $cancelMBox['url'] }}" class="{{ $cancelAlternativeClass }}">{{ __('dashboard.cancel_flow.m_box_link') }}</a>
+                                            </div>
+                                            @elseif($reasonKey === 'other')
+                                            <div class="hidden peer-checked:block mt-2">
+                                                <label for="cancel-note-{{ $subscription->id }}" class="block text-gray-700 mb-1">{{ __('dashboard.cancel_flow.note_label') }}</label>
+                                                <textarea name="cancel_note" id="cancel-note-{{ $subscription->id }}" rows="3" maxlength="1000"
+                                                          class="block w-full rounded-xl border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"></textarea>
+                                            </div>
+                                            @endif
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </fieldset>
+
+                                <div class="space-y-3">
+                                <p class="text-gray-600">{{ __('dashboard.cancel_modal_intro') }}</p>
                                 @if($cancelPreview && !$cancelPreview->endsImmediately)
                                     <div class="rounded-xl bg-green-50 border border-green-200 p-3 text-green-800">
                                         @if($cancelPreview->paidCount === 1)
@@ -731,31 +835,21 @@
                                     </div>
                                 @endif
 
-                                {{-- Místo zrušení jde box zmenšit nebo posílat méně často --}}
-                                @if($canConfigure)
-                                    <a href="{{ $configureUrl }}" class="block rounded-xl bg-primary-50 border border-primary-300 p-3 text-primary-700 hover:bg-primary-100 transition">
-                                        {{ __('dashboard.config_change.cancel_modal_link') }}
-                                    </a>
-                                @endif
-
                                 <p class="text-gray-500">{{ __('dashboard.cancel_irreversible') }}</p>
+                                </div>
                             </div>
 
-                            <div class="p-6 border-t border-gray-200 flex items-center justify-end gap-3">
+                            <div class="shrink-0 p-6 border-t border-gray-200 flex flex-wrap items-center justify-end gap-3">
                                 <button type="button"
                                         class="px-4 py-2 text-sm border border-gray-300 rounded-full hover:bg-gray-50"
                                         onclick="closeCancelModal({{ $subscription->id }})">
                                     {{ __('dashboard.keep_subscription') }}
                                 </button>
-                                <form method="POST" action="{{ localizedRoute('dashboard.subscription.cancel') }}">
-                                    @csrf
-                                    <input type="hidden" name="subscription_id" value="{{ $subscription->id }}">
-                                    <button type="submit" class="px-4 py-2 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition font-medium">
-                                        {{ __('dashboard.cancel_confirm') }}
-                                    </button>
-                                </form>
+                                <button type="submit" class="px-4 py-2 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition font-medium">
+                                    {{ __('dashboard.cancel_confirm') }}
+                                </button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                     @endif
                     @endif
@@ -1072,7 +1166,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const subId = this.dataset.subscriptionId;
             const freq = parseInt(this.dataset.frequencyMonths || '1', 10);
             const firstUnpaid = this.dataset.firstUnpaid ? new Date(this.dataset.firstUnpaid) : null;
-            openPauseModal(subId, freq, firstUnpaid);
+            // Pauza zvolená v okně zrušení: okno se zavře a s pauzou odejde i důvod (jen do logu)
+            const cancelReason = this.dataset.fromCancel || '';
+            if (cancelReason) { closeAllCancelModals(); }
+            openPauseModal(subId, freq, firstUnpaid, cancelReason);
         });
     });
 
@@ -1133,6 +1230,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form method="POST" action="{{ localizedRoute('dashboard.subscription.pause') }}" class="p-6 space-y-4">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="subscription_id" id="pause-subscription-id" value="">
+                    <input type="hidden" name="cancel_reason" id="pause-cancel-reason" value="">
+                    <input type="hidden" name="cancel_alternative" value="pause">
                     <div class="space-y-2">
                         <label class="text-sm text-gray-700">${pauseLength}</label>
                         <div class="grid grid-cols-3 gap-2" id="pause-choices">
@@ -1201,10 +1300,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return {
             container,
-            open: (subscriptionId, frequencyMonths, firstUnpaid) => {
+            open: (subscriptionId, frequencyMonths, firstUnpaid, cancelReason) => {
                 state.frequencyMonths = frequencyMonths || 1;
                 state.firstUnpaid = firstUnpaid || null;
                 container.querySelector('#pause-subscription-id').value = subscriptionId;
+                // Vyplněno jen při otevření z okna zrušení, jinak prázdné
+                container.querySelector('#pause-cancel-reason').value = cancelReason || '';
                 updateInfo();
                 applySelectedStyles();
                 container.style.display = 'flex';
@@ -1215,8 +1316,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    function openPauseModal(subscriptionId, frequencyMonths, firstUnpaid) {
-        pauseModal.open(subscriptionId, frequencyMonths, firstUnpaid);
+    function openPauseModal(subscriptionId, frequencyMonths, firstUnpaid, cancelReason) {
+        pauseModal.open(subscriptionId, frequencyMonths, firstUnpaid, cancelReason);
         const cancelBtn = pauseModal.container.querySelector('#pause-cancel');
         cancelBtn.onclick = () => pauseModal.close();
         pauseModal.container.addEventListener('click', (e) => {

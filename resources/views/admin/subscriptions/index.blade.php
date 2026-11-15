@@ -189,6 +189,9 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Bezplatné</span>
                             @elseif($subscription->status === 'cancelled')
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Zrušeno</span>
+                            @if($subscription->cancellationReasonLabel())
+                            <div class="text-xs text-gray-500 mt-1">{{ $subscription->cancellationReasonLabel() }}</div>
+                            @endif
                             @else
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{ $subscription->status }}</span>
                             @endif

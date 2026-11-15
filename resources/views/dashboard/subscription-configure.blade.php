@@ -9,15 +9,28 @@
     $frequencyLocked = $form['eligibility']['frequency_locked'];
     $frequencyBlockedByAddons = $form['frequency_blocked_by_addons'];
 
-    // Po neúspěšném uložení se vrací to, co zákazník zvolil (withInput), jinak stávající stav
+    // Po neúspěšném uložení se vrací to, co zákazník zvolil (withInput), jinak předvolba
+    // z odkazu (okno zrušení nabízí např. M box), jinak stávající stav
+    $preselect = $preselect ?? [];
     $selected = [
-        'amount' => (int) old('amount', $current['amount']),
+        'amount' => (int) old('amount', $preselect['amount'] ?? $current['amount']),
         'type' => old('type', $current['type']),
         'isDecaf' => old('isDecaf', $current['isDecaf'] ? '1' : '0') === '1',
-        'frequency' => (int) old('frequency', $form['current_frequency']),
+        'frequency' => (int) old('frequency', $preselect['frequency'] ?? $form['current_frequency']),
         'mixEspresso' => (int) old('mix.espresso', $current['mix']['espresso'] ?? 0),
         'mixFilter' => (int) old('mix.filter', $current['mix']['filter'] ?? 0),
     ];
+
+    // Upozornění jen tehdy, když předvolba opravdu něco mění (zamčená frekvence se nepředvolí)
+    $isPreselected = old('amount') === null && (
+        ($preselect['amount'] ?? $current['amount']) !== $current['amount']
+        || (! $frequencyLocked && ! $frequencyBlockedByAddons
+            && ($preselect['frequency'] ?? $form['current_frequency']) !== $form['current_frequency'])
+    );
+
+    // Důvod a alternativa z okna zrušení - odejdou s formulářem kvůli záznamu do logu
+    $cancelReasonInput = old('cancel_reason', $cancelFlow['reason'] ?? null);
+    $cancelAlternativeInput = old('cancel_alternative', $cancelFlow['alternative'] ?? null);
 
     $detail = fn (string $key, array $replace = []) => __('confirmation.subscription_details.'.$key, $replace);
     $currentRows = \App\Helpers\SubscriptionSummary::configRows($current, $form['current_frequency']);
@@ -81,6 +94,12 @@
         @if($form['scheduled_change'])
         <p class="mt-3 text-sm text-gray-600">{{ __('dashboard.config_change.scheduled_exists') }}</p>
         @endif
+
+        @if($isPreselected)
+        <p class="mt-4 rounded-xl bg-primary-50 border border-primary-300 p-3 text-sm text-primary-700">
+            {{ __('dashboard.config_change.preselected_notice') }}
+        </p>
+        @endif
     </div>
 
     <form id="subscription-change-form" method="POST"
@@ -89,6 +108,10 @@
         @foreach($viewAsQuery as $name => $value)
         <input type="hidden" name="{{ $name }}" value="{{ $value }}">
         @endforeach
+        @if(is_string($cancelReasonInput) && is_string($cancelAlternativeInput))
+        <input type="hidden" name="cancel_reason" value="{{ $cancelReasonInput }}">
+        <input type="hidden" name="cancel_alternative" value="{{ $cancelAlternativeInput }}">
+        @endif
         <input type="hidden" name="mix[espresso]" id="change-mix-espresso" value="{{ $selected['mixEspresso'] }}">
         <input type="hidden" name="mix[filter]" id="change-mix-filter" value="{{ $selected['mixFilter'] }}">
 

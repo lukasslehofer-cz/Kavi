@@ -22,6 +22,32 @@ class Subscription extends Model
      */
     public const PAUSE_REASON_PAYMENT_FAILURE = 'payment_failure_skip';
 
+    /**
+     * Důvody, které zákazník vybírá při zrušení v účtu (cancellation_reason). Vedle nich
+     * do sloupce píše systém: payment_failure_auto (zrušení pro neplacení) a admin_manual.
+     */
+    public const CANCEL_REASON_TOO_MUCH = 'customer_too_much';
+
+    public const CANCEL_REASON_TOO_LITTLE = 'customer_too_little';
+
+    public const CANCEL_REASON_PRICE = 'customer_price';
+
+    public const CANCEL_REASON_TASTE = 'customer_taste';
+
+    public const CANCEL_REASON_OTHER = 'customer_other';
+
+    /** Zákazník zrušil bez výběru důvodu - výběr je dobrovolný, proto není mezi volbami níže. */
+    public const CANCEL_REASON_UNSPECIFIED = 'customer_unspecified';
+
+    /** Pořadí odpovídá pořadí voleb v okně zrušení. */
+    public const CUSTOMER_CANCEL_REASONS = [
+        self::CANCEL_REASON_TOO_MUCH,
+        self::CANCEL_REASON_TOO_LITTLE,
+        self::CANCEL_REASON_PRICE,
+        self::CANCEL_REASON_TASTE,
+        self::CANCEL_REASON_OTHER,
+    ];
+
     protected $fillable = [
         'subscription_number',
         'user_id',
@@ -43,6 +69,7 @@ class Subscription extends Model
         'pending_invoice_id',
         'pending_invoice_amount',
         'cancellation_reason',
+        'cancellation_note',
         'starts_at',
         'next_billing_date',
         // KROK 9: last_shipment_date se už neukládá – je to accessor odvozený z ledgeru
@@ -124,6 +151,29 @@ class Subscription extends Model
     public function isGift(): bool
     {
         return $this->gift_purchase_id !== null;
+    }
+
+    /**
+     * Důvod zrušení slovy pro administraci (ta je jen česky). Null = důvod není uložen.
+     */
+    public function cancellationReasonLabel(): ?string
+    {
+        if ($this->cancellation_reason === null || $this->cancellation_reason === '') {
+            return null;
+        }
+
+        return match ($this->cancellation_reason) {
+            self::CANCEL_REASON_TOO_MUCH => 'Zákazník: má kávy moc',
+            self::CANCEL_REASON_TOO_LITTLE => 'Zákazník: má kávy málo',
+            self::CANCEL_REASON_PRICE => 'Zákazník: je to drahé',
+            self::CANCEL_REASON_TASTE => 'Zákazník: káva mu nechutná',
+            self::CANCEL_REASON_OTHER => 'Zákazník: jiný důvod',
+            self::CANCEL_REASON_UNSPECIFIED => 'Zákazník: bez udání důvodu',
+            'user_request' => 'Žádost zákazníka',
+            'payment_failure_auto' => 'Automaticky pro neplacení',
+            'admin_manual' => 'Ručně administrátorem',
+            default => $this->cancellation_reason,
+        };
     }
 
     public function orders()

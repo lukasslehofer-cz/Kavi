@@ -41,6 +41,9 @@ class SubscriptionConfigurationService
 
     public const FREQUENCIES = [1, 2, 3];
 
+    /** Změny konfigurace, které okno zrušení nabízí místo zrušení (viz cancellationAlternatives). */
+    public const CANCEL_ALTERNATIVES = ['lower_frequency', 'higher_frequency', 'smaller_box', 'bigger_box', 'm_box'];
+
     public function __construct(
         private SubscriptionShipmentService $shipmentService,
         private StockReservationService $reservationService,
@@ -161,37 +164,7 @@ class SubscriptionConfigurationService
         $eligibility = $this->eligibility($subscription);
         $locked = $this->shipmentService->lockedShipment($subscription);
         $scheduled = $subscription->scheduledConfigurationChange()->first();
-
-        // Ceny pro každou velikost × decaf podle stejného pravidla jako při uložení
-        $prices = [];
-        foreach (self::AMOUNTS as $amount) {
-            foreach ([false, true] as $isDecaf) {
-                $candidate = ['amount' => $amount, 'isDecaf' => $isDecaf];
-                $newPrice = $this->priceFor($subscription, $current, $candidate);
-                $box = $newPrice ?? (float) $subscription->configured_price;
-                // Beze změny ceny se na slevu nesahá, takže platí ta uložená
-                $discount = $newPrice === null
-                    ? SubscriptionPricing::discount($subscription)
-                    : ($this->discountFor($subscription, $box) ?? 0.0);
-                $breakdown = SubscriptionPricing::fromValues(
-                    $box,
-                    $discount,
-                    SubscriptionPricing::shippingCost($subscription),
-                    $currency,
-                );
-
-                $prices[$amount.'-'.(int) $isDecaf] = [
-                    'box' => $breakdown->box,
-                    'discount' => $breakdown->discount,
-                    'shipping' => $breakdown->shipping,
-                    'total' => $breakdown->total,
-                    'box_formatted' => CurrencyHelper::formatByCurrency($breakdown->box, $currency),
-                    'discount_formatted' => CurrencyHelper::formatByCurrency($breakdown->discount, $currency),
-                    'shipping_formatted' => CurrencyHelper::formatByCurrency($breakdown->shipping, $currency),
-                    'total_formatted' => CurrencyHelper::formatByCurrency($breakdown->total, $currency),
-                ];
-            }
-        }
+        $prices = $this->priceTable($subscription, $current, $currency);
 
         // Termín prvního boxu v nové konfiguraci a platby za něj pro každou frekvenci
         $baseDate = $this->currentNextUnpaidDate($subscription, $locked !== null);
@@ -228,10 +201,132 @@ class SubscriptionConfigurationService
             ])->all(),
             'decaf_surcharge_formatted' => CurrencyHelper::formatByCurrency(BoxPricing::decafSurcharge($currency), $currency),
             'dates' => $dates,
-            'frequency_blocked_by_addons' => $locked === null
-                && $subscription->isActive()
-                && $this->shipmentService->nextUnpaidShipmentHasAddons($subscription),
+            'frequency_blocked_by_addons' => $this->frequencyBlockedByAddons($subscription, $locked !== null),
         ];
+    }
+
+    /**
+     * Co okno zrušení v účtu nabídne místo zrušení: frekvence o krok nižší nebo vyšší,
+     * box o velikost menší nebo větší a M box. Null = nabídnout nejde (předplatné je už
+     * na kraji škály, frekvence je zamčená, nebo se konfigurace teď měnit nesmí).
+     *
+     * Ceny jsou celková částka za zásilku (box − sleva + doprava), tedy to, co zákazník
+     * skutečně platí a co vidí na kartě předplatného.
+     *
+     * @return array<string, array|null> Klíče viz CANCEL_ALTERNATIVES
+     */
+    public function cancellationAlternatives(Subscription $subscription): array
+    {
+        $alternatives = array_fill_keys(self::CANCEL_ALTERNATIVES, null);
+        $eligibility = $this->eligibility($subscription);
+
+        if (! $eligibility['allowed']) {
+            return $alternatives;
+        }
+
+        $current = $this->normalize($subscription->configuration);
+        $prices = $this->priceTable($subscription, $current, SubscriptionPricing::currencyOf($subscription));
+        $decaf = (int) $current['isDecaf'];
+        $currentPrice = $prices[$current['amount'].'-'.$decaf];
+
+        $box = fn (int $amount) => [
+            'amount' => $amount,
+            'code' => BoxPricing::SIZES[$amount],
+            'grams' => BoxPricing::grams($amount),
+            'total' => $prices[$amount.'-'.$decaf]['total'],
+            'total_formatted' => $prices[$amount.'-'.$decaf]['total_formatted'],
+            'current_total_formatted' => $currentPrice['total_formatted'],
+        ];
+
+        $sizeIndex = array_search($current['amount'], self::AMOUNTS, true);
+
+        if ($sizeIndex > 0) {
+            $alternatives['smaller_box'] = $box(self::AMOUNTS[$sizeIndex - 1]);
+
+            // "Je to drahé": nejmenší box, ale jen když opravdu vyjde levněji - starší
+            // předplatné může mít za větší box cenu pod dnešním ceníkem
+            $smallest = $box(self::AMOUNTS[0]);
+            if ($smallest['total'] < $currentPrice['total']) {
+                $alternatives['m_box'] = $smallest;
+            }
+        }
+
+        if (isset(self::AMOUNTS[$sizeIndex + 1])) {
+            $alternatives['bigger_box'] = $box(self::AMOUNTS[$sizeIndex + 1]);
+        }
+
+        $frequencyIndex = array_search((int) $subscription->frequency_months, self::FREQUENCIES, true);
+        $frequencyChangeable = $frequencyIndex !== false
+            && ! $eligibility['frequency_locked']
+            && ! $this->frequencyBlockedByAddons(
+                $subscription,
+                $this->shipmentService->lockedShipment($subscription) !== null,
+            );
+
+        if ($frequencyChangeable) {
+            // Delší interval = méně kávy
+            if (isset(self::FREQUENCIES[$frequencyIndex + 1])) {
+                $alternatives['lower_frequency'] = ['frequency' => self::FREQUENCIES[$frequencyIndex + 1]];
+            }
+
+            if ($frequencyIndex > 0) {
+                $alternatives['higher_frequency'] = ['frequency' => self::FREQUENCIES[$frequencyIndex - 1]];
+            }
+        }
+
+        return $alternatives;
+    }
+
+    /**
+     * Ceny pro každou velikost × decaf podle stejného pravidla jako při uložení.
+     *
+     * @return array<string, array> Klíč "{amount}-{0|1 decaf}"
+     */
+    protected function priceTable(Subscription $subscription, ?array $current, string $currency): array
+    {
+        $prices = [];
+
+        foreach (self::AMOUNTS as $amount) {
+            foreach ([false, true] as $isDecaf) {
+                $candidate = ['amount' => $amount, 'isDecaf' => $isDecaf];
+                $newPrice = $this->priceFor($subscription, $current, $candidate);
+                $box = $newPrice ?? (float) $subscription->configured_price;
+                // Beze změny ceny se na slevu nesahá, takže platí ta uložená
+                $discount = $newPrice === null
+                    ? SubscriptionPricing::discount($subscription)
+                    : ($this->discountFor($subscription, $box) ?? 0.0);
+                $breakdown = SubscriptionPricing::fromValues(
+                    $box,
+                    $discount,
+                    SubscriptionPricing::shippingCost($subscription),
+                    $currency,
+                );
+
+                $prices[$amount.'-'.(int) $isDecaf] = [
+                    'box' => $breakdown->box,
+                    'discount' => $breakdown->discount,
+                    'shipping' => $breakdown->shipping,
+                    'total' => $breakdown->total,
+                    'box_formatted' => CurrencyHelper::formatByCurrency($breakdown->box, $currency),
+                    'discount_formatted' => CurrencyHelper::formatByCurrency($breakdown->discount, $currency),
+                    'shipping_formatted' => CurrencyHelper::formatByCurrency($breakdown->shipping, $currency),
+                    'total_formatted' => CurrencyHelper::formatByCurrency($breakdown->total, $currency),
+                ];
+            }
+        }
+
+        return $prices;
+    }
+
+    /**
+     * K nejbližšímu nezaplacenému boxu je přibalená objednávka a změna frekvence by ho
+     * posunula - request() ji odmítne (addons_attached), proto se ani nenabízí.
+     */
+    protected function frequencyBlockedByAddons(Subscription $subscription, bool $hasLockedShipment): bool
+    {
+        return ! $hasLockedShipment
+            && $subscription->isActive()
+            && $this->shipmentService->nextUnpaidShipmentHasAddons($subscription);
     }
 
     /**
