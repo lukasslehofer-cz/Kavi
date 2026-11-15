@@ -63,6 +63,10 @@ deploy.log
 CLAUDE.md
 .claude/
 
+# Pracovní data pro Claude a IG kampaně
+/Meta-Ads-kreativy/
+/analyza-predplatne/
+
 # Uploaded images (user content)
 /public/images/products/*
 !/public/images/products/.gitkeep
