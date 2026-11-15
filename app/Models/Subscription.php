@@ -186,6 +186,25 @@ class Subscription extends Model
         return $this->belongsTo(Coupon::class);
     }
 
+    /**
+     * Historie změn konfigurace (velikost, druh, frekvence) včetně té naplánované
+     */
+    public function configurationChanges()
+    {
+        return $this->hasMany(SubscriptionConfigurationChange::class)->orderByDesc('id');
+    }
+
+    /**
+     * Změna, která čeká na odeslání už zaplaceného boxu. Nejvýš jedna -
+     * novější žádost tu starší nahradí (SubscriptionConfigurationService::request).
+     */
+    public function scheduledConfigurationChange()
+    {
+        return $this->hasOne(SubscriptionConfigurationChange::class)
+            ->where('status', SubscriptionConfigurationChange::STATUS_SCHEDULED)
+            ->orderByDesc('id');
+    }
+
     public function shippingRate()
     {
         return $this->belongsTo(ShippingRate::class);

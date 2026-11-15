@@ -250,6 +250,83 @@ class StockReservationService
     }
 
     /**
+     * Dá se box existujícího předplatného změnit na novou konfiguraci?
+     *
+     * Na rozdíl od checkAvailability() počítá jen s tím, co změna potřebuje NAVÍC.
+     * Sklad má totiž rezervaci stávajícího boxu už odečtenou, takže holá kontrola by
+     * odmítla i zmenšení boxu nebo změnu, která si vystačí s už rezervovanou kávou.
+     *
+     * @param  array  $configuration  Nová konfigurace boxu
+     * @param  array|null  $reservedConfiguration  Stávající konfigurace, pokud předplatné do téhle
+     *                                             rozesílky už patří; null = box do ní teprve přibývá
+     * @return array ['available' => bool, 'out_of_stock' => array of product names, 'missing_slots' => array of slot names]
+     */
+    public function checkAvailabilityForChange(array $configuration, ?array $reservedConfiguration, ShipmentSchedule $schedule): array
+    {
+        try {
+            $slots = $schedule->getCoffeeSlotsArray();
+            $needs = $this->resolveProductNeeds($configuration, $slots);
+
+            if (!empty($needs['missing_slots']) || !$this->allocationIsComplete($configuration, $needs)) {
+                return [
+                    'available' => false,
+                    'out_of_stock' => [],
+                    'missing_slots' => $needs['missing_slots'],
+                ];
+            }
+
+            // Stávající box je ve skladu odečtený jen tehdy, když rezervace pro rozesílku existují
+            $reserved = [];
+            if ($reservedConfiguration
+                && StockReservation::where('shipment_schedule_id', $schedule->id)->exists()) {
+                $reserved = $this->resolveProductNeeds($reservedConfiguration, $slots)['products'];
+            }
+
+            $products = \App\Models\Product::whereIn('id', array_keys($needs['products']))->get()->keyBy('id');
+
+            $outOfStock = [];
+
+            foreach ($needs['products'] as $productId => $neededQuantity) {
+                $extraQuantity = $neededQuantity - ($reserved[$productId] ?? 0);
+
+                if ($extraQuantity <= 0) {
+                    continue;
+                }
+
+                $product = $products->get($productId);
+
+                if (!$product) {
+                    $outOfStock[] = '#'.$productId;
+                    continue;
+                }
+
+                if ($product->stock < $extraQuantity) {
+                    $outOfStock[] = $product->name;
+                }
+            }
+
+            return [
+                'available' => empty($outOfStock),
+                'out_of_stock' => $outOfStock,
+                'missing_slots' => [],
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to check availability for configuration change', [
+                'configuration' => $configuration,
+                'reserved_configuration' => $reservedConfiguration,
+                'schedule_id' => $schedule->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'available' => false,
+                'out_of_stock' => ['Chyba při kontrole dostupnosti'],
+                'missing_slots' => [],
+            ];
+        }
+    }
+
+    /**
      * Build the full availability matrix for a shipment
      *
      * Every purchasable combination is evaluated so the configurator can disable

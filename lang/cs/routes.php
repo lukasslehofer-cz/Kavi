@@ -110,6 +110,8 @@ return [
     'dashboard-subscription-pay' => 'predplatne/{subscription}/zaplatit',
     'dashboard-subscription-invoice' => 'predplatne/platba/{payment}/faktura',
     'dashboard-subscription-packeta' => 'predplatne/update-packeta',
+    'dashboard-subscription-configure' => 'predplatne/{subscription}/zmena',
+    'dashboard-subscription-configure-cancel' => 'predplatne/{subscription}/zmena/zrusit',
     'dashboard-notifications' => 'notifikace',
     'dashboard-affiliate' => 'affiliate',
 

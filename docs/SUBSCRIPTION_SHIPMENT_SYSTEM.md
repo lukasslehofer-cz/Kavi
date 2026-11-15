@@ -278,6 +278,82 @@ $shipmentService->markAsShipped($shipment, $packetId, $trackingUrl);
 
 ---
 
+## Změna konfigurace předplatného
+
+Zákazník si v účtu (`/nastenka/predplatne/{id}/zmena`, EN `/dashboard/subscription/{id}/change`)
+mění velikost boxu, druh kávy (včetně mixu a decaf) a frekvenci. Změna platí **od dalšího
+nezaplaceného boxu**. Rozhoduje `SubscriptionConfigurationService`, audit i naplánované změny
+jsou v tabulce `subscription_configuration_changes`.
+
+### Proč to nejde udělat prostým přepsáním
+
+Ledger nemá snapshot konfigurace ani ceny. Strhávání, faktura, stránka rozesílky, rezervace
+skladu i Packeta čtou předplatné živě. Drží se proto jediný invariant:
+
+> živá konfigurace předplatného = konfigurace nejbližšího boxu, který má odejít
+
+**Zamčený box** (`SubscriptionShipmentService::lockedShipment`) je zaplacený `pending` řádek,
+nebo `sent` řádek, jehož den rozesílky ještě neskončil – „sent" znamená jen vytvořený štítek
+a stránka rozesílky ho dál ukazuje s živou konfigurací.
+
+Zaplacený `pending` řádek zamyká nejdéle 14 dní po datu své rozesílky
+(`PAID_SHIPMENT_LOCK_GRACE_DAYS`). Bez toho by box, který se předal osobně a nikdo ho neoznačil
+jako odeslaný, držel změnu napořád. Lhůta končí s rezervou před dalším billing date, takže se
+další box strhne už v nové ceně.
+
+| Stav | Chování |
+|------|---------|
+| Žádný zamčený box | Změna se použije hned |
+| Zamčený box existuje | Změna se uloží jako `scheduled`, použije ji `subscriptions:apply-configuration-changes` (denně 00:30), jakmile žádný zamčený box nezbývá |
+| Pauza zadaná zákazníkem | Jen obsah boxu. Frekvence je zamčená – resume nezaplacený řádek maže a datum přepočítává z živé frekvence |
+| `unpaid`, pauza po neúspěšných platbách, zámek admina, právě splatná platba | Odmítnuto. Naplánovaná změna v těchto stavech čeká |
+| Dárek, complimentary, jednorázový box, ukončené | Bez vstupu do změny |
+
+`markAsShipped` ani billing cron se kvůli tomu nemění.
+
+### Změna frekvence přesouvá box
+
+`replanNextUnpaidShipment()`:
+
+1. Kotva = poslední řádek `sent` / `delivered` / zaplacený `pending`.
+2. Cíl = měsíc kotvy + nová frekvence; po jednom měsíci se přeskakují rozesílky, jejichž
+   billing date je dnes nebo v minulosti.
+3. Budoucí nezaplacené pending řádky mimo cíl se **mažou** (ne `cancelled` / `skipped` –
+   `getOrCreateForSchedule` by takový řádek vracel jako platnou zásilku).
+4. `next_billing_date` se nastaví na billing date cílové rozesílky. Obě hodnoty musí sedět,
+   jinak catch-up smyčka v `chargeSubscriptionPayment` posune celý cyklus.
+
+Box s navázanou doplňkovou objednávkou se nepřesouvá – změna frekvence se odmítne, dokud neodejde.
+
+### Cena a sleva
+
+- `configured_price` se bere z aktuálního ceníku (`BoxPricing::configuredPrice`) jen při změně
+  velikosti nebo decaf. Změna druhu nebo frekvence cenu nemění.
+- Běžící procentní kupón se přepočítá z nové ceny; fixní sleva se jen zastropuje novou cenou.
+- Měna se vždy bere ze `subscription->currency`.
+
+### Dostupnost káv
+
+Hlídá se jen nejbližší rozesílka otevřená pro objednávky (`getOrderingTargetMonth()`) a jen
+když má nastavené sloty. Kontrola (`StockReservationService::checkAvailabilityForChange`)
+počítá jen to, co změna potřebuje navíc proti už rezervovanému boxu, takže zmenšení projde vždy.
+Naplánovaná změna se při zadání nekontroluje (platí až pro pozdější rozesílku); když ji noční
+příkaz použije do rozesílky, kde káva nestačí, použije ji a pošle adminovi upozornění.
+
+### Co hlídá `subscriptions:check-consistency`
+
+- víc než jedna naplánovaná změna na předplatné,
+- naplánovaná změna, která se nepoužila (2 dny bez zamčeného boxu, nebo 45 dní celkem).
+
+### Známá omezení
+
+- Odeslané řádky nemají snapshot konfigurace. Starší stránky rozesílky proto po změně ukážou
+  aktuální konfiguraci; historii drží `subscription_configuration_changes`.
+- Zaplacený box, který zůstane neodeslaný déle než 14 dní po datu rozesílky, změnu přestane
+  držet. Pokud pak přece jen odejde, odejde už v nové konfiguraci, i když byl zaplacený ve staré.
+
+---
+
 ## Migrace a nasazení
 
 ### Nové tabulky/sloupce

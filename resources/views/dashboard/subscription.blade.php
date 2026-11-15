@@ -39,6 +39,16 @@
     </div>
 
     @foreach($subscriptions as $subscription)
+    @php
+        // Změna konfigurace: smí se nabídnout a nečeká už nějaká na odeslání zaplaceného boxu?
+        // Nastavuje se pro každé předplatné znovu - proměnné v šabloně přežívají mezi iteracemi.
+        $configurationState = $configurationStates[$subscription->id] ?? null;
+        $canConfigure = (bool) ($configurationState['eligibility']['allowed'] ?? false);
+        $scheduledChange = $configurationState['scheduled'] ?? null;
+        $configureUrl = $canConfigure
+            ? localizedRoute('dashboard.subscription.configure', ['subscription' => $subscription->id] + ($viewAsQuery ?? []))
+            : null;
+    @endphp
     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden border border-gray-200" id="subscription-{{ $subscription->id }}">
         <!-- Subscription Header -->
         <div class="bg-gray-100 p-6 border-b border-gray-200">
@@ -264,7 +274,14 @@
                     <!-- Configuration -->
                     @if($subscription->configuration)
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 mb-3">{{ __('dashboard.subscription_config') }}</h3>
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-medium text-gray-900">{{ __('dashboard.subscription_config') }}</h3>
+                            @if($canConfigure)
+                            <a href="{{ $configureUrl }}" class="text-sm text-blue-600 hover:text-blue-700 underline">
+                                {{ __('messages.shipping.change') }}
+                            </a>
+                            @endif
+                        </div>
                         <div class="space-y-2 text-sm">
                             @php
                                 $config = is_string($subscription->configuration) 
@@ -297,7 +314,7 @@
                             @if(isset($config['isDecaf']) && $config['isDecaf'])
                             <div class="flex justify-between">
                                 <span class="text-gray-600">{{ __('dashboard.decaf') }}:</span>
-                                <span class="font-medium text-blue-600">{{ __('dashboard.yes_extra', ['amount' => \App\Helpers\CurrencyHelper::formatByCurrency(100, $subscription->currency)]) }}</span>
+                                <span class="font-medium text-blue-600">{{ __('dashboard.yes_extra', ['amount' => \App\Helpers\CurrencyHelper::formatByCurrency(\App\Helpers\BoxPricing::decafSurcharge($subscription->currency), $subscription->currency)]) }}</span>
                             </div>
                             @endif
 
@@ -350,6 +367,44 @@
                             </div>
                             @endif
                         </div>
+
+                        {{-- Naplánovaná změna: zaplacený box odejde postaru, tohle platí až od dalšího --}}
+                        @if($scheduledChange)
+                        <div class="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm">
+                            <p class="font-semibold text-amber-900">{{ __('dashboard.config_change.scheduled_notice_title') }}</p>
+                            <p class="mt-1 text-amber-800">
+                                {{ $scheduledChange->effective_shipment_date
+                                    ? __('dashboard.config_change.scheduled_notice', ['date' => $scheduledChange->effective_shipment_date->format('j. n. Y')])
+                                    : __('dashboard.config_change.scheduled_notice_no_date') }}
+                            </p>
+                            <dl class="mt-2 space-y-1">
+                                @foreach(\App\Helpers\SubscriptionSummary::configRows($scheduledChange->new_configuration ?? [], $scheduledChange->new_frequency_months) as $row)
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-amber-800">{{ $row['label'] }}</dt>
+                                    <dd class="text-amber-900 font-medium text-right">{{ $row['value'] }}</dd>
+                                </div>
+                                @endforeach
+                                @if($scheduledChange->changesPrice())
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-amber-800">{{ __('dashboard.subscription_price') }}</dt>
+                                    <dd class="text-amber-900 font-medium text-right">{{ \App\Helpers\CurrencyHelper::formatByCurrency($scheduledChange->resultingPrice(), $subscription->currency) }}</dd>
+                                </div>
+                                @endif
+                            </dl>
+                            <form method="POST" class="mt-3"
+                                  action="{{ localizedRoute('dashboard.subscription.configure.cancel', ['subscription' => $subscription->id]) }}">
+                                @csrf
+                                @foreach(($viewAsQuery ?? []) as $name => $value)
+                                <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+                                @endforeach
+                                <button type="submit" class="text-sm text-amber-900 underline hover:text-amber-700">
+                                    {{ __('dashboard.config_change.cancel_scheduled') }}
+                                </button>
+                            </form>
+                        </div>
+                        @elseif(($configurationState['eligibility']['reason'] ?? null) === 'billing_in_progress')
+                        <p class="mt-3 text-sm text-gray-500">{{ $configurationState['eligibility']['message'] }}</p>
+                        @endif
                     </div>
                     @endif
 
@@ -586,6 +641,13 @@
                         <h3 class="text-lg font-medium text-gray-900 mb-3">{{ __('dashboard.actions') }}</h3>                    
                     @endif
                         <div class="space-y-2">
+                            @if($canConfigure && in_array($subscription->status, ['active', 'paused']))
+                            <a href="{{ $configureUrl }}"
+                               class="block w-full text-center px-4 py-2 text-sm border border-primary-600 text-primary-600 rounded-full hover:bg-primary-50 transition font-medium">
+                                {{ __('dashboard.edit_configuration') }}
+                            </a>
+                            @endif
+
                             @if($subscription->status === 'active')
                             @php
                                 // Use service to get first UNPAID shipment date (skips already paid shipments)
@@ -667,6 +729,13 @@
                                     <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-3 text-yellow-800">
                                         {{ __('dashboard.cancel_addons_notice', ['count' => $cancelPreview->addonToDetachCount]) }}
                                     </div>
+                                @endif
+
+                                {{-- Místo zrušení jde box zmenšit nebo posílat méně často --}}
+                                @if($canConfigure)
+                                    <a href="{{ $configureUrl }}" class="block rounded-xl bg-primary-50 border border-primary-300 p-3 text-primary-700 hover:bg-primary-100 transition">
+                                        {{ __('dashboard.config_change.cancel_modal_link') }}
+                                    </a>
                                 @endif
 
                                 <p class="text-gray-500">{{ __('dashboard.cancel_irreversible') }}</p>

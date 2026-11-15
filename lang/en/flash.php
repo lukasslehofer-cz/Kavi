@@ -49,6 +49,23 @@ return [
         'not_found' => 'Subscription not found.',
         'pickup_point_updated' => 'Pickup point has been changed successfully.',
         'pickup_point_carrier_not_allowed' => 'This pickup point cannot be used for your subscription. Please choose another one.',
+
+        // Changing the configuration of an existing subscription
+        'config_changed' => 'Your subscription has been changed.',
+        'config_change_scheduled' => 'Your change has been scheduled.',
+        'config_change_applies_from' => 'It applies from the box on :date.',
+        'config_change_scheduled_cancelled' => 'The scheduled change has been cancelled.',
+        'config_change_nothing_scheduled' => 'There is no scheduled change.',
+        'config_unchanged' => 'Your subscription stays as it is.',
+        'config_change_not_allowed' => 'This subscription cannot be changed right now.',
+        'config_change_contact_support' => 'This subscription cannot be changed in your account. Please contact our support and we will adjust it for you.',
+        'config_change_unpaid' => 'Please settle the unpaid payment first. You can change the subscription right after.',
+        'config_change_payment_failure' => 'This subscription is paused because of a failed payment. You can change it once it is active again.',
+        'config_change_billing_in_progress' => 'We are processing the payment for your next box. You can change the subscription tomorrow.',
+        'config_change_out_of_stock' => 'This combination is no longer available for the shipment on :date (:coffees). Please choose another one.',
+        'config_change_unavailable' => 'We cannot put this combination together for the shipment on :date. Please choose another one.',
+        'config_change_addons_attached' => 'An extra order is packed with your next box. You can change the frequency after it ships.',
+        'config_change_frequency_paused' => 'You can change the frequency once the subscription is resumed.',
     ],
 
     // One-time box

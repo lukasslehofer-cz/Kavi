@@ -49,6 +49,23 @@ return [
         'not_found' => 'Předplatné nenalezeno.',
         'pickup_point_updated' => 'Výdejní místo bylo úspěšně změněno.',
         'pickup_point_carrier_not_allowed' => 'Toto výdejní místo nelze pro vaše předplatné použít. Vyberte prosím jiné.',
+
+        // Změna konfigurace existujícího předplatného
+        'config_changed' => 'Konfigurace předplatného byla změněna.',
+        'config_change_scheduled' => 'Změna konfigurace je naplánovaná.',
+        'config_change_applies_from' => 'Platí od boxu :date.',
+        'config_change_scheduled_cancelled' => 'Naplánovaná změna konfigurace byla zrušena.',
+        'config_change_nothing_scheduled' => 'Žádná změna konfigurace není naplánovaná.',
+        'config_unchanged' => 'Konfigurace zůstává beze změny.',
+        'config_change_not_allowed' => 'U tohoto předplatného teď konfiguraci změnit nejde.',
+        'config_change_contact_support' => 'Tohle předplatné v účtu změnit nejde. Napište nám prosím na podporu, upravíme ho ručně.',
+        'config_change_unpaid' => 'Nejdřív prosím uhraďte nezaplacenou platbu. Konfiguraci půjde změnit hned potom.',
+        'config_change_payment_failure' => 'Předplatné je pozastavené kvůli neúspěšné platbě. Konfiguraci půjde změnit, až bude znovu aktivní.',
+        'config_change_billing_in_progress' => 'Právě zpracováváme platbu za další box. Konfiguraci půjde změnit zítra.',
+        'config_change_out_of_stock' => 'Pro rozesílku :date už tato kombinace není k dispozici (:coffees). Zvolte prosím jinou.',
+        'config_change_unavailable' => 'Pro rozesílku :date tuto kombinaci neumíme složit. Zvolte prosím jinou.',
+        'config_change_addons_attached' => 'K nejbližšímu boxu máte přibalenou objednávku. Frekvenci půjde změnit po jeho odeslání.',
+        'config_change_frequency_paused' => 'Frekvenci půjde změnit po obnovení předplatného.',
     ],
 
     // One-time box

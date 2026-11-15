@@ -7,7 +7,9 @@ use App\Http\Controllers\Concerns\ImpersonatesUser;
 use App\Models\Order;
 use App\Models\ShippingRate;
 use App\Models\Subscription;
+use App\Models\SubscriptionConfigurationChange;
 use App\Services\AccountDeletionService;
+use App\Services\SubscriptionConfigurationService;
 use App\Services\SubscriptionShipmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -86,7 +88,7 @@ class DashboardController extends Controller
         $subscriptions = $this->getViewingUser()->subscriptions()
             ->whereIn('status', ['active', 'unpaid', 'paused', 'pending', 'cancelled', 'completed', 'complimentary'])
             // Dopravci sazby se čtou pro každé předplatné kvůli volbám Packeta widgetu.
-            ->with('shippingRate.packetaCarriers')
+            ->with(['shippingRate.packetaCarriers', 'scheduledConfigurationChange'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->filter(function ($subscription) {
@@ -138,7 +140,18 @@ class DashboardController extends Controller
             ]];
         });
 
-        return view('dashboard.subscription', compact('subscriptions', 'shipmentInfos', 'cancellationPreviews', 'pickupOptions'));
+        // Změna konfigurace: smí se nabídnout a nečeká už nějaká na odeslání zaplaceného boxu?
+        $configurationService = app(SubscriptionConfigurationService::class);
+        $configurationStates = $subscriptions->mapWithKeys(function ($subscription) use ($configurationService) {
+            return [$subscription->id => [
+                'eligibility' => $configurationService->eligibility($subscription),
+                'scheduled' => $subscription->scheduledConfigurationChange,
+            ]];
+        });
+
+        $viewAsQuery = $this->viewAsQuery();
+
+        return view('dashboard.subscription', compact('subscriptions', 'shipmentInfos', 'cancellationPreviews', 'pickupOptions', 'configurationStates', 'viewAsQuery'));
     }
 
     /**
@@ -589,6 +602,134 @@ class DashboardController extends Controller
 
         return redirect()->localizedRoute('dashboard.subscription')
             ->with('success', __('flash.subscription.cancelled'));
+    }
+
+    /**
+     * Formulář změny konfigurace předplatného (velikost boxu, druh kávy, frekvence)
+     */
+    public function configureSubscription($subscription)
+    {
+        $subscription = $this->ownedSubscription($subscription);
+        $form = app(SubscriptionConfigurationService::class)->formData($subscription);
+
+        if (! $form['eligibility']['allowed']) {
+            return redirect()->localizedRoute('dashboard.subscription', $this->viewAsQuery())
+                ->with('error', $form['eligibility']['message']);
+        }
+
+        return view('dashboard.subscription-configure', [
+            'subscription' => $subscription,
+            'form' => $form,
+            'viewAsQuery' => $this->viewAsQuery(),
+        ]);
+    }
+
+    /**
+     * Uloží změnu konfigurace. Jestli se použije hned, nebo počká za už zaplacený box,
+     * rozhoduje SubscriptionConfigurationService.
+     */
+    public function updateSubscriptionConfiguration(Request $request, $subscription)
+    {
+        $subscription = $this->ownedSubscription($subscription);
+
+        $validated = $request->validate([
+            'amount' => ['required', 'integer', 'in:2,3,4'],
+            'type' => ['required', 'in:espresso,filter,mix'],
+            'isDecaf' => ['nullable', 'in:0,1'],
+            'mix' => ['nullable', 'array'],
+            'mix.espresso' => ['nullable', 'integer', 'min:0'],
+            'mix.filter' => ['nullable', 'integer', 'min:0'],
+            'frequency' => ['required', 'integer', 'in:1,2,3'],
+        ]);
+
+        // Admin v náhledu účtu (view_as) mění konfiguraci za zákazníka - do auditu jde jeho jméno
+        $actor = auth()->user();
+        $source = $actor && $actor->id !== $subscription->user_id
+            ? SubscriptionConfigurationChange::SOURCE_ADMIN
+            : SubscriptionConfigurationChange::SOURCE_CUSTOMER;
+
+        $result = app(SubscriptionConfigurationService::class)->request(
+            $subscription,
+            [
+                'amount' => $validated['amount'],
+                'type' => $validated['type'],
+                'isDecaf' => ($validated['isDecaf'] ?? '0') === '1',
+                'mix' => $validated['mix'] ?? null,
+            ],
+            (int) $validated['frequency'],
+            $actor,
+            $source,
+        );
+
+        if (! $result['success']) {
+            return redirect()
+                ->localizedRoute('dashboard.subscription.configure', ['subscription' => $subscription->id] + $this->viewAsQuery())
+                ->withInput()
+                ->with('error', $result['message']);
+        }
+
+        if (in_array($result['outcome'], ['applied', 'scheduled'], true) && $result['change']) {
+            try {
+                $updated = $result['subscription'];
+                $email = $updated->shipping_address['email'] ?? null;
+                if (! $email && $updated->user) {
+                    $email = $updated->user->email;
+                }
+                if ($email) {
+                    \Mail::to($email)->send(new \App\Mail\SubscriptionConfigurationChanged($updated, $result['change']));
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send SubscriptionConfigurationChanged email', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return redirect()->localizedRoute('dashboard.subscription', $this->viewAsQuery())
+            ->with('success', $result['message']);
+    }
+
+    /**
+     * Zruší změnu konfigurace, která teprve čeká na odeslání zaplaceného boxu
+     */
+    public function cancelScheduledConfiguration($subscription)
+    {
+        $subscription = $this->ownedSubscription($subscription);
+
+        $actor = auth()->user();
+        $cancelled = app(SubscriptionConfigurationService::class)->cancelScheduled(
+            $subscription,
+            $actor && $actor->id !== $subscription->user_id ? 'admin' : 'customer',
+        );
+
+        return redirect()->localizedRoute('dashboard.subscription', $this->viewAsQuery())
+            ->with(
+                $cancelled ? 'success' : 'error',
+                $cancelled
+                    ? __('flash.subscription.config_change_scheduled_cancelled')
+                    : __('flash.subscription.config_change_nothing_scheduled'),
+            );
+    }
+
+    /**
+     * Předplatné z URL, které patří zobrazenému uživateli (jinak 404, stejně jako u ostatních akcí).
+     */
+    private function ownedSubscription($subscriptionId): Subscription
+    {
+        return Subscription::where('id', $subscriptionId)
+            ->where('user_id', $this->getViewingUser()->id)
+            ->firstOrFail();
+    }
+
+    /**
+     * Parametr view_as pro odkazy a přesměrování, když admin prochází účet zákazníka.
+     */
+    private function viewAsQuery(): array
+    {
+        return request()->has('view_as') && auth()->user()?->is_admin
+            ? ['view_as' => request()->get('view_as')]
+            : [];
     }
 
     /**

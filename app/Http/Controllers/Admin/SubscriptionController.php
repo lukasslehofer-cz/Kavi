@@ -81,6 +81,7 @@ class SubscriptionController extends Controller
             // jinak admin nevidí platby bez vazby (a taky pending/failed), zatímco
             // zákazník na /predplatne je vidí. Právě tahle divergence byla podstata bugu.
             'payments.shipment',
+            'configurationChanges.requestedBy',
         ]);
 
         return view('admin.subscriptions.show', compact('subscription'));

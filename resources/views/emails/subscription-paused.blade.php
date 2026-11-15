@@ -126,7 +126,10 @@
                                     @elseif($pauseReason !== \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Obnovit předplatné okamžitě' : 'Resume subscription immediately' }}<br>
                                     @endif
+                                    {{-- Při pauze z neplacení a při zámku od admina změna konfigurace v účtu nejde --}}
+                                    @if(! in_array($pauseReason, [\App\Models\Subscription::PAUSE_REASON_PAYMENT_FAILURE, \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK], true))
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Změnit konfiguraci kávy' : 'Change coffee configuration' }}<br>
+                                    @endif
                                     <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Aktualizovat doručovací údaje' : 'Update delivery details' }}
                                 </p>
                             </div>

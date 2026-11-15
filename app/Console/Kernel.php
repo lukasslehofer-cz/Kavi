@@ -18,6 +18,13 @@ class Kernel extends ConsoleKernel
         // SUBSCRIPTION BILLING (Custom Billing System)
         // ============================================
         
+        // Použít naplánované změny konfigurace (velikost, druh, frekvence), jakmile zaplacený
+        // box odešel. Schválně před strháváním v 01:00 - další box se účtuje už v nové ceně.
+        $schedule->command('subscriptions:apply-configuration-changes')
+            ->dailyAt('00:30')
+            ->timezone('Europe/Prague')
+            ->appendOutputTo($cronLog);
+
         // Charge subscription payments (primary run at 1:00 AM Prague time)
         // Note: Using 01:00 instead of 00:00 to avoid timezone issues with UTC
         // (00:00 Prague = 23:00 UTC previous day, which could cause idempotency check issues)

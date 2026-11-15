@@ -208,6 +208,10 @@ class RouteServiceProvider extends ServiceProvider
                 Route::post('/' . $this->replaceParams($routes['dashboard-subscription-pay']), [\App\Http\Controllers\SubscriptionController::class, 'payInvoice'])->name($this->routeName('subscription.pay', $locale, $isPrimary, false));
                 Route::get('/' . $this->replaceParams($routes['dashboard-subscription-invoice']), [\App\Http\Controllers\DashboardController::class, 'downloadSubscriptionInvoice'])->name($this->routeName('subscription.payment.invoice', $locale, $isPrimary, false));
                 Route::post('/' . $routes['dashboard-subscription-packeta'], [\App\Http\Controllers\DashboardController::class, 'updatePacketaPoint'])->name($this->routeName('subscription.update-packeta', $locale, $isPrimary, false));
+                // Změna konfigurace existujícího předplatného (velikost, druh, frekvence)
+                Route::get('/' . $this->replaceParams($routes['dashboard-subscription-configure']), [\App\Http\Controllers\DashboardController::class, 'configureSubscription'])->whereNumber('subscription')->name($this->routeName('subscription.configure', $locale, $isPrimary, false));
+                Route::post('/' . $this->replaceParams($routes['dashboard-subscription-configure']), [\App\Http\Controllers\DashboardController::class, 'updateSubscriptionConfiguration'])->whereNumber('subscription')->middleware('throttle:10,1')->name($this->routeName('subscription.configure.update', $locale, $isPrimary, false));
+                Route::post('/' . $this->replaceParams($routes['dashboard-subscription-configure-cancel']), [\App\Http\Controllers\DashboardController::class, 'cancelScheduledConfiguration'])->whereNumber('subscription')->middleware('throttle:10,1')->name($this->routeName('subscription.configure.cancel', $locale, $isPrimary, false));
                 Route::get('/' . $routes['dashboard-notifications'], [\App\Http\Controllers\DashboardController::class, 'notifications'])->name($this->routeName('notifications', $locale, $isPrimary, false));
                 
                 // Affiliate dashboard

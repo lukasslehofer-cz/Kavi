@@ -29,6 +29,9 @@ class BoxPricing
     /** Příplatek za jednorázový box (stejná částka jako v SubscriptionController::configureCheckout) */
     private const ONE_TIME_SURCHARGE = ['CZK' => 100, 'EUR' => 5];
 
+    /** Příplatek za decaf (stejná částka jako v SubscriptionController::configureCheckout) */
+    private const DECAF_SURCHARGE = ['CZK' => 100, 'EUR' => 5];
+
     public static function boxPrice(int $bags, ?string $currency = null): float
     {
         $currency = self::currency($currency);
@@ -113,6 +116,25 @@ class BoxPricing
     public static function oneTimeSurcharge(?string $currency = null): float
     {
         return (float) self::ONE_TIME_SURCHARGE[self::currency($currency)];
+    }
+
+    /**
+     * Příplatek za bezkofeinový balíček v boxu
+     */
+    public static function decafSurcharge(?string $currency = null): float
+    {
+        return (float) self::DECAF_SURCHARGE[self::currency($currency)];
+    }
+
+    /**
+     * Ceníková cena opakovaného boxu = to, co se ukládá do subscriptions.configured_price.
+     *
+     * Používá ji změna konfigurace existujícího předplatného. Měnu je tam nutné předat
+     * výslovně (subscription->currency) - výchozí hodnota se bere ze session.
+     */
+    public static function configuredPrice(int $bags, bool $isDecaf, ?string $currency = null): float
+    {
+        return self::boxPrice($bags, $currency) + ($isDecaf ? self::decafSurcharge($currency) : 0.0);
     }
 
     /**

@@ -18,6 +18,24 @@ class SubscriptionSummary
         $config = is_string($subscription->configuration)
             ? json_decode($subscription->configuration, true)
             : ($subscription->configuration ?? []);
+
+        $rows = self::configRows($config ?? [], (int) $subscription->frequency_months, $locale);
+
+        if ($subscription->packeta_point_name) {
+            $rows[] = ['label' => __('dashboard.pickup_point', [], $locale), 'value' => $subscription->packeta_point_name];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Řádky pro holou konfiguraci bez předplatného - používá je změna konfigurace,
+     * která ukazuje stav "před" a "po" (ten druhý na předplatném ještě není).
+     *
+     * @return array<int, array{label: string, value: string}>
+     */
+    public static function configRows(array $config, ?int $frequencyMonths, ?string $locale = null): array
+    {
         $t = fn (string $key, array $replace = []) => __('confirmation.subscription_details.'.$key, $replace, $locale);
 
         $rows = [];
@@ -50,12 +68,8 @@ class SubscriptionSummary
             ])];
         }
 
-        if (in_array((int) $subscription->frequency_months, [1, 2, 3], true)) {
-            $rows[] = ['label' => $t('frequency'), 'value' => $t('frequency_'.(int) $subscription->frequency_months)];
-        }
-
-        if ($subscription->packeta_point_name) {
-            $rows[] = ['label' => __('dashboard.pickup_point', [], $locale), 'value' => $subscription->packeta_point_name];
+        if (in_array((int) $frequencyMonths, [1, 2, 3], true)) {
+            $rows[] = ['label' => $t('frequency'), 'value' => $t('frequency_'.(int) $frequencyMonths)];
         }
 
         return $rows;

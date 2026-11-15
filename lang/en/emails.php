@@ -309,6 +309,27 @@ return [
         'card_note' => 'We will save the card you use for future subscription payments.',
     ],
 
+    // Changing the configuration of an existing subscription
+    'subscription_configuration_changed' => [
+        'subject' => 'Your subscription :number has changed',
+        'title' => 'Your subscription is updated',
+        'subtitle_applied' => 'The new setup applies from the box on :date',
+        'subtitle_applied_no_date' => 'The new setup applies from your next box',
+        'subtitle_scheduled' => 'The new setup will apply from the box on :date',
+        'subtitle_scheduled_no_date' => 'The new setup will apply from your next box',
+        'intro_applied' => 'We have updated subscription :number as you asked. Below is a summary of what you will receive from now on.',
+        'intro_scheduled' => 'Your box for :locked is already paid for, so it still ships as originally configured. We will update subscription :number right after it.',
+        'intro_scheduled_no_date' => 'Your next box is already paid for, so it still ships as originally configured. We will update subscription :number right after it.',
+        'new' => 'New',
+        'old' => 'Previously',
+        'subscription' => 'Subscription number',
+        'applies_from' => 'Applies from box',
+        'price' => 'Price per shipment',
+        'next_payment' => 'Next payment',
+        'cta' => 'View subscription',
+        'not_you' => 'If you did not make this change, please write to us at :email.',
+    ],
+
     'subscription_paused' => [
         'subject' => 'Subscription Paused - :subscription_number',
         'title' => 'Subscription Has Been Paused',

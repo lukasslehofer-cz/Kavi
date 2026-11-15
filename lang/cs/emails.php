@@ -309,6 +309,27 @@ return [
         'card_note' => 'Kartu, kterou při platbě použijete, si uložíme pro další platby předplatného.',
     ],
 
+    // Změna konfigurace existujícího předplatného
+    'subscription_configuration_changed' => [
+        'subject' => 'Změna předplatného :number',
+        'title' => 'Předplatné je upravené',
+        'subtitle_applied' => 'Nová konfigurace platí od boxu :date',
+        'subtitle_applied_no_date' => 'Nová konfigurace platí od dalšího boxu',
+        'subtitle_scheduled' => 'Nová konfigurace bude platit od boxu :date',
+        'subtitle_scheduled_no_date' => 'Nová konfigurace bude platit od dalšího boxu',
+        'intro_applied' => 'Předplatné :number jsme upravili podle vašeho zadání. Níže je shrnutí toho, co budete nově dostávat.',
+        'intro_scheduled' => 'Box na :locked už máte zaplacený, proto odejde ještě v původní podobě. Předplatné :number upravíme hned po něm.',
+        'intro_scheduled_no_date' => 'Nejbližší box už máte zaplacený, proto odejde ještě v původní podobě. Předplatné :number upravíme hned po něm.',
+        'new' => 'Nově',
+        'old' => 'Původně',
+        'subscription' => 'Číslo předplatného',
+        'applies_from' => 'Platí od boxu',
+        'price' => 'Cena za zásilku',
+        'next_payment' => 'Další platba',
+        'cta' => 'Zobrazit předplatné',
+        'not_you' => 'Pokud jste změnu nezadali vy, napište nám prosím na :email.',
+    ],
+
     'subscription_paused' => [
         'subject' => 'Předplatné pozastaveno - :subscription_number',
         'title' => 'Předplatné bylo pozastaveno',

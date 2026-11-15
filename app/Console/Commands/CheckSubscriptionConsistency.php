@@ -55,8 +55,60 @@ class CheckSubscriptionConsistency extends Command
         $this->checkLegacyStripeSubscriptions($subscriptions);
         $this->checkGiftSubscriptions($subscriptions);
         $this->checkGiftPurchases();
+        $this->checkConfigurationChanges();
 
         return $this->report($limit);
+    }
+
+    /**
+     * Naplánované změny konfigurace (velikost, druh, frekvence): na předplatné smí čekat
+     * nejvýš jedna a žádná nesmí viset. Změna čeká jen do odeslání zaplaceného boxu a pak
+     * ji použije subscriptions:apply-configuration-changes - když se nepoužije, jede
+     * předplatné dál ve staré konfiguraci a ceně, i když má zákazník změnu potvrzenou.
+     */
+    protected function checkConfigurationChanges(): void
+    {
+        $duplicates = [];
+        $stuck = [];
+
+        // Před nasazením migrace tabulka neexistuje - kontrola pak nemá co hlásit
+        if (\Illuminate\Support\Facades\Schema::hasTable('subscription_configuration_changes')) {
+            $shipmentService = app(\App\Services\SubscriptionShipmentService::class);
+            $scheduled = \App\Models\SubscriptionConfigurationChange::scheduled()
+                ->with('subscription')
+                ->orderBy('id')
+                ->get();
+
+            foreach ($scheduled->groupBy('subscription_id') as $subscriptionId => $changes) {
+                if ($changes->count() > 1) {
+                    $duplicates[] = [
+                        'subscription_id' => $subscriptionId,
+                        'scheduled_changes' => $changes->pluck('id')->implode(', '),
+                    ];
+                }
+            }
+
+            foreach ($scheduled as $change) {
+                $sub = $change->subscription;
+                $locked = $sub ? $shipmentService->lockedShipment($sub) : null;
+                $ageDays = (int) $change->created_at->diffInDays(now());
+
+                // Bez zamčeného boxu má změna proběhnout nejbližší noc; se zamčeným boxem
+                // je podezřelé až čekání delší než jeden cyklus rozesílky
+                if ((! $locked && $ageDays >= 2) || $ageDays >= 45) {
+                    $stuck[] = [
+                        'change_id' => $change->id,
+                        'subscription' => $sub?->subscription_number ?? '#'.$change->subscription_id,
+                        'status' => $sub?->status ?? '-',
+                        'waiting_days' => $ageDays,
+                        'locked_shipment' => $locked ? $locked->shipment_date->toDateString().' ('.$locked->status.')' : '-',
+                    ];
+                }
+            }
+        }
+
+        $this->record('config_change_duplicate', 'Víc naplánovaných změn konfigurace na jedno předplatné', 'high', $duplicates);
+        $this->record('config_change_stuck', 'Naplánovaná změna konfigurace, která se nepoužila', 'warn', $stuck);
     }
 
     /**

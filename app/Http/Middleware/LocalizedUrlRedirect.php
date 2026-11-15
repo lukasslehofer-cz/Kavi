@@ -59,6 +59,7 @@ class LocalizedUrlRedirect
         'dashboard.orders' => 'dashboard-orders',
         'dashboard.order.detail' => 'dashboard-order-detail',
         'dashboard.subscription' => 'dashboard-subscription',
+        'dashboard.subscription.configure' => 'dashboard-subscription-configure',
         'dashboard.notifications' => 'dashboard-notifications',
         'dashboard.payment-methods.manage' => 'dashboard-payment-methods',
     ];

@@ -113,6 +113,13 @@ class CancellationPreview
 class SubscriptionShipmentService
 {
     /**
+     * Jak dlouho po datu rozesílky drží zaplacený, ale neodeslaný box změnu konfigurace
+     * (viz lockedShipment). Rozesílka je 20., další billing date 15. - čtrnáct dní pokryje
+     * opožděné odeslání a skončí s rezervou před další platbou.
+     */
+    public const PAID_SHIPMENT_LOCK_GRACE_DAYS = 14;
+
+    /**
      * Get complete shipment information for a subscription
      * Use this from dashboards, emails, admin panels
      */
@@ -1149,6 +1156,276 @@ class SubscriptionShipmentService
         }
 
         return $updated;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Změna konfigurace předplatného (velikost, druh, frekvence)
+    |--------------------------------------------------------------------------
+    |
+    | Ledger nemá snapshot konfigurace - rozesílka, sklad i faktura čtou předplatné živě.
+    | Tyhle metody proto odpovídají na dvě otázky: smí se živá konfigurace změnit teď
+    | (lockedShipment, isBillingInFlight) a kam se má při změně frekvence přesunout
+    | další nezaplacený box (replanNextUnpaidShipment). Rozhoduje a zapisuje
+    | SubscriptionConfigurationService.
+    |
+    | Pozor: relace shipments() má v sobě orderBy(shipment_date desc), takže další
+    | orderBy(..., 'asc') se jen připojí za něj. Tady se proto všude řadí přes reorder().
+    */
+
+    /**
+     * Zamčený box = box, který musí odejít ve STÁVAJÍCÍ konfiguraci.
+     *
+     * Je to buď zaplacený pending řádek (zákazník ho koupil v původní podobě), nebo
+     * řádek odeslaný dnes / s dnešním či budoucím dnem rozesílky - "sent" znamená jen
+     * vytvořený štítek a stránka rozesílky ho dál ukazuje (i v tisku a CSV) s živou
+     * konfigurací předplatného.
+     *
+     * Zaplacený pending řádek zamyká nejdéle PAID_SHIPMENT_LOCK_GRACE_DAYS po datu své
+     * rozesílky. Box, který se předal osobně a nikdo ho neoznačil jako odeslaný, by jinak
+     * změnu držel napořád (na produkci takové řádky jsou) - takhle se změna použije
+     * s rezervou před dalším billing date a další box se strhne už v nové ceně.
+     */
+    public function lockedShipment(Subscription $subscription): ?SubscriptionShipment
+    {
+        return $subscription->shipments()
+            ->reorder('shipment_date', 'asc')
+            ->where(function ($q) {
+                $q->where(function ($paid) {
+                    $paid->where('status', 'pending')
+                        ->whereNotNull('subscription_payment_id')
+                        ->whereDate('shipment_date', '>=', today()->subDays(self::PAID_SHIPMENT_LOCK_GRACE_DAYS));
+                })->orWhere(function ($sent) {
+                    $sent->where('status', 'sent')
+                        ->where(function ($day) {
+                            $day->whereDate('shipment_date', '>=', today())
+                                ->orWhere('sent_at', '>=', today()->startOfDay());
+                        });
+                });
+            })
+            ->first();
+    }
+
+    /**
+     * Nejbližší nezaplacený pending řádek - stejný predikát, jakým si ho hledá billing cron.
+     */
+    public function nextUnpaidShipment(Subscription $subscription): ?SubscriptionShipment
+    {
+        return $subscription->shipments()
+            ->reorder('shipment_date', 'asc')
+            ->where('status', 'pending')
+            ->whereNull('subscription_payment_id')
+            ->whereDate('shipment_date', '>=', today())
+            ->first();
+    }
+
+    /**
+     * Je právě splatná platba za další box?
+     *
+     * Zrcadlí bránu v subscriptions:charge-payments (next_billing_date <= dnes a billing
+     * date nezaplaceného řádku už nastal). V tom okně cron buď za chvíli strhne, nebo už
+     * má předplatné načtené v paměti - změna ceny by se s platbou minula a retry by pod
+     * stejným Stripe idempotency klíčem poslal jinou částku.
+     */
+    public function isBillingInFlight(Subscription $subscription): bool
+    {
+        if (! $subscription->next_billing_date || $subscription->next_billing_date->gt(today())) {
+            return false;
+        }
+
+        $nextUnpaid = $this->nextUnpaidShipment($subscription);
+
+        if (! $nextUnpaid) {
+            return true;
+        }
+
+        $schedule = ShipmentSchedule::getForMonth($nextUnpaid->shipment_date->year, $nextUnpaid->shipment_date->month);
+        $billingDate = $schedule?->billing_date ?? $nextUnpaid->shipment_date->copy()->day(15);
+
+        return today()->gte($billingDate);
+    }
+
+    /**
+     * Má box, který by změna frekvence přesunula, přibalenou doplňkovou objednávku?
+     */
+    public function nextUnpaidShipmentHasAddons(Subscription $subscription): bool
+    {
+        $nextUnpaid = $this->nextUnpaidShipment($subscription);
+
+        return $nextUnpaid !== null
+            && $nextUnpaid->addonOrders()
+                ->whereNotIn('status', ['shipped', 'delivered', 'cancelled'])
+                ->exists();
+    }
+
+    /**
+     * Datum boxu, na které by další nezaplacený box připadl při dané frekvenci.
+     * Nic nezapisuje - slouží náhledu ve formuláři. Null = není od čeho počítat
+     * (žádný odeslaný ani zaplacený box), datum se pak nemění.
+     */
+    public function previewReplannedShipmentDate(Subscription $subscription, int $frequencyMonths): ?Carbon
+    {
+        return $this->resolveReplanTarget($subscription, $frequencyMonths)['shipment_date'] ?? null;
+    }
+
+    /**
+     * Billing date rozesílky z previewReplannedShipmentDate().
+     */
+    public function previewReplannedBillingDate(Subscription $subscription, int $frequencyMonths): ?Carbon
+    {
+        return $this->resolveReplanTarget($subscription, $frequencyMonths)['billing_date'] ?? null;
+    }
+
+    /**
+     * Přesune další nezaplacený box podle AKTUÁLNÍ frequency_months předplatného:
+     * poslední zaplacený/odeslaný box + frekvence, nejdřív ale rozesílka, jejíž billing
+     * date je ještě v budoucnu.
+     *
+     * Volá se uvnitř transakce ze SubscriptionConfigurationService, až když je nová
+     * frekvence na modelu. next_billing_date nenastavuje - to dělá volající z vráceného
+     * billing_date (obě hodnoty musí sedět, jinak catch-up smyčka v
+     * StripeService::chargeSubscriptionPayment posune celý cyklus).
+     *
+     * Starý nezaplacený řádek se MAŽE, nepřepíná se na cancelled/skipped: klíč řádku je
+     * (subscription, schedule) přes všechny statusy a getOrCreateForSchedule by takový
+     * náhrobek vracel jako platnou zásilku, takže by měsíc zůstal navždy zablokovaný.
+     *
+     * @return array{old_date: ?Carbon, new_date: Carbon, billing_date: Carbon, shipment: SubscriptionShipment, moved: bool}|null
+     *                                                                                                                             Null = není kotva, nic se nepřesouvá.
+     *
+     * @throws \RuntimeException když v cílovém měsíci leží zaplacený nebo odeslaný řádek
+     */
+    public function replanNextUnpaidShipment(Subscription $subscription, string $reason = 'frequency_change'): ?array
+    {
+        $frequencyMonths = max(1, (int) ($subscription->frequency_months ?? 1));
+        $target = $this->resolveReplanTarget($subscription, $frequencyMonths);
+
+        if (! $target) {
+            return null;
+        }
+
+        $targetSchedule = ShipmentSchedule::getOrCreateForMonth($target['year'], $target['month']);
+        $oldDate = $this->nextUnpaidShipment($subscription)?->shipment_date?->copy();
+
+        // 1. Budoucí nezaplacené pending řádky mimo cílový měsíc pryč
+        $obsolete = $subscription->shipments()
+            ->reorder('shipment_date', 'asc')
+            ->where('status', 'pending')
+            ->whereNull('subscription_payment_id')
+            ->whereDate('shipment_date', '>=', today())
+            ->where(fn ($q) => $q->whereNull('shipment_schedule_id')
+                ->orWhere('shipment_schedule_id', '!=', $targetSchedule->id))
+            ->get();
+
+        foreach ($obsolete as $shipment) {
+            // Bez odpojení by FK nullOnDelete addon osiřel bez poznámky pro admina
+            $this->detachAddonOrders($shipment, $reason);
+            $shipment->delete();
+        }
+
+        // 2. Cílový řádek: oživit nezaplacený skipped/cancelled, jinak založit
+        $existing = $subscription->shipments()
+            ->where('shipment_schedule_id', $targetSchedule->id)
+            ->first();
+
+        if ($existing && ($existing->subscription_payment_id || in_array($existing->status, ['sent', 'delivered'], true))) {
+            throw new \RuntimeException(
+                "Replan target schedule {$targetSchedule->id} already holds a paid or sent shipment #{$existing->id}"
+            );
+        }
+
+        $shipment = $this->updateOrCreateForSchedule($subscription, $targetSchedule, [
+            'status' => 'pending',
+        ]);
+
+        \Log::info('Next unpaid shipment replanned', [
+            'subscription_id' => $subscription->id,
+            'reason' => $reason,
+            'frequency_months' => $frequencyMonths,
+            'old_date' => $oldDate?->toDateString(),
+            'new_date' => $shipment->shipment_date?->toDateString(),
+            'removed_shipments' => $obsolete->pluck('id')->all(),
+        ]);
+
+        return [
+            'old_date' => $oldDate,
+            'new_date' => $shipment->shipment_date->copy(),
+            'billing_date' => $targetSchedule->billing_date->copy(),
+            'shipment' => $shipment,
+            'moved' => ! $oldDate || ! $oldDate->isSameDay($shipment->shipment_date),
+        ];
+    }
+
+    /**
+     * Po změně velikosti boxu srovná váhu a rozměry balíku na nezaplacených pending řádcích
+     * (snapshot z doby vzniku řádku, který sendToPacketa posílá do Packety).
+     *
+     * @return int Počet aktualizovaných řádků
+     */
+    public function syncPackageDimensionsToUnpaidShipments(Subscription $subscription): int
+    {
+        $dimensions = collect($this->getPackageDimensions($subscription))
+            ->only(['package_weight', 'package_length', 'package_width', 'package_height'])
+            ->all();
+
+        return $subscription->shipments()
+            ->where('status', 'pending')
+            ->whereNull('subscription_payment_id')
+            ->update($dimensions);
+    }
+
+    /**
+     * Cílová rozesílka pro přeplánování, bez zápisu (rozvrh, který ještě neexistuje,
+     * se jen dopočítá na 15./20.).
+     *
+     * Kotva = poslední box, který už odešel nebo je zaplacený. Od ní se přičte frekvence
+     * a pak se po JEDNOM měsíci přeskakují rozesílky s billing date dnes nebo v minulosti
+     * (stejný predikát jako resolveResumeShipmentDate). Po měsíci, ne po frekvenci: při
+     * zrychlení má box přijít do nejbližší otevřené rozesílky, ne o celý cyklus později.
+     *
+     * @return array{year: int, month: int, shipment_date: Carbon, billing_date: Carbon}|null
+     */
+    protected function resolveReplanTarget(Subscription $subscription, int $frequencyMonths): ?array
+    {
+        $anchor = $subscription->shipments()
+            ->reorder()
+            ->where(function ($q) {
+                $q->whereIn('status', ['sent', 'delivered'])
+                    ->orWhere(fn ($paid) => $paid->where('status', 'pending')
+                        ->whereNotNull('subscription_payment_id'));
+            })
+            ->max('shipment_date');
+
+        if (! $anchor) {
+            return null;
+        }
+
+        $month = Carbon::parse($anchor)->startOfMonth()->addMonthsNoOverflow(max(1, $frequencyMonths));
+
+        for ($i = 0; $i < 24; $i++) {
+            $schedule = ShipmentSchedule::getForMonth($month->year, $month->month);
+            $billingDate = $schedule?->billing_date?->copy() ?? $month->copy()->day(15);
+            $shipmentDate = $schedule?->shipment_date?->copy() ?? $month->copy()->day(20);
+
+            if ($billingDate->gt(today())) {
+                return [
+                    'year' => $month->year,
+                    'month' => $month->month,
+                    'shipment_date' => $shipmentDate->startOfDay(),
+                    'billing_date' => $billingDate->startOfDay(),
+                ];
+            }
+
+            $month->addMonthNoOverflow();
+        }
+
+        \Log::error('Replan target not found within 24 months', [
+            'subscription_id' => $subscription->id,
+            'anchor' => (string) $anchor,
+            'frequency_months' => $frequencyMonths,
+        ]);
+
+        return null;
     }
 
     /**

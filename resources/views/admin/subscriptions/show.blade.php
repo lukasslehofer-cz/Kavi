@@ -214,8 +214,8 @@
                         @if(isset($config['isDecaf']) && $config['isDecaf'])
                         <div class="flex justify-between py-2 border-b">
                             <span class="text-gray-600">Decaf varianta:</span>
-                            {{-- Příplatek za decaf, viz SubscriptionController::configure() – +5 € / +100 Kč --}}
-                            <span class="font-semibold text-gray-900">Ano (+{!! \App\Helpers\CurrencyHelper::formatByCurrency($subscription->currency === 'EUR' ? 5 : 100, $subscription->currency) !!})</span>
+                            {{-- Příplatek za decaf – jediný zdroj částky je BoxPricing::decafSurcharge() --}}
+                            <span class="font-semibold text-gray-900">Ano (+{!! \App\Helpers\CurrencyHelper::formatByCurrency(\App\Helpers\BoxPricing::decafSurcharge($subscription->currency), $subscription->currency) !!})</span>
                         </div>
                         @endif
 
@@ -246,6 +246,67 @@
                         </div>
                         @endif
                     </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Změny konfigurace (zadává zákazník v účtu, případně admin přes náhled účtu) -->
+            @if($subscription->configurationChanges->isNotEmpty())
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="font-display text-xl font-bold text-gray-900">Změny konfigurace</h2>
+                    <p class="text-sm text-gray-500 mt-1">Naplánovaná změna čeká, až odejde zaplacený box. Použije ji noční příkaz subscriptions:apply-configuration-changes.</p>
+                </div>
+                <div class="p-6 space-y-4">
+                    @foreach($subscription->configurationChanges as $configChange)
+                    @php
+                        $configChangeBadge = match($configChange->status) {
+                            'scheduled' => ['Naplánováno', 'bg-amber-100 text-amber-800'],
+                            'applied' => ['Použito', 'bg-green-100 text-green-800'],
+                            'cancelled' => ['Zrušeno', 'bg-gray-100 text-gray-700'],
+                            'superseded' => ['Nahrazeno novější', 'bg-gray-100 text-gray-700'],
+                            default => [$configChange->status, 'bg-gray-100 text-gray-700'],
+                        };
+                        $describeConfig = fn ($config, $frequency) => collect(\App\Helpers\SubscriptionSummary::configRows($config ?? [], $frequency, 'cs'))
+                            ->pluck('value')->implode(' · ');
+                    @endphp
+                    <div class="border border-gray-200 rounded-lg p-4 text-sm">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $configChangeBadge[1] }}">{{ $configChangeBadge[0] }}</span>
+                                <span class="text-gray-500">
+                                    {{ $configChange->created_at->format('d.m.Y H:i') }}
+                                    · {{ match($configChange->source) { 'admin' => 'admin', 'system' => 'systém', default => 'zákazník' } }}{{ $configChange->requestedBy ? ' ('.$configChange->requestedBy->email.')' : '' }}
+                                </span>
+                            </div>
+                            @if($configChange->effective_shipment_date)
+                            <span class="text-gray-600">od boxu {{ $configChange->effective_shipment_date->format('d.m.Y') }}</span>
+                            @endif
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex gap-3">
+                                <span class="text-gray-500 w-16 shrink-0">Původně</span>
+                                <span class="text-gray-700">{{ $describeConfig($configChange->old_configuration, $configChange->old_frequency_months) }}@if($configChange->old_configured_price !== null) · {!! \App\Helpers\CurrencyHelper::formatByCurrency((float) $configChange->old_configured_price, $subscription->currency) !!}@endif</span>
+                            </div>
+                            <div class="flex gap-3">
+                                <span class="text-gray-500 w-16 shrink-0">Nově</span>
+                                <span class="font-semibold text-gray-900">{{ $describeConfig($configChange->new_configuration, $configChange->new_frequency_months) }}@if($configChange->resultingPrice() !== null) · {!! \App\Helpers\CurrencyHelper::formatByCurrency($configChange->resultingPrice(), $subscription->currency) !!}@endif</span>
+                            </div>
+                            @if($configChange->new_next_shipment_date && $configChange->old_next_shipment_date && ! $configChange->new_next_shipment_date->isSameDay($configChange->old_next_shipment_date))
+                            <div class="flex gap-3">
+                                <span class="text-gray-500 w-16 shrink-0">Box</span>
+                                <span class="text-gray-700">{{ $configChange->old_next_shipment_date->format('d.m.Y') }} → {{ $configChange->new_next_shipment_date->format('d.m.Y') }}, platba {{ $configChange->new_next_billing_date?->format('d.m.Y') ?? '–' }}</span>
+                            </div>
+                            @endif
+                            @if($configChange->cancel_reason)
+                            <div class="flex gap-3">
+                                <span class="text-gray-500 w-16 shrink-0">Důvod</span>
+                                <span class="text-gray-700">{{ $configChange->cancel_reason }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
             @endif

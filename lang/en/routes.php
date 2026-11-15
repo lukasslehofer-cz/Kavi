@@ -110,6 +110,8 @@ return [
     'dashboard-subscription-pay' => 'subscription/{subscription}/pay',
     'dashboard-subscription-invoice' => 'subscription/payment/{payment}/invoice',
     'dashboard-subscription-packeta' => 'subscription/update-packeta',
+    'dashboard-subscription-configure' => 'subscription/{subscription}/change',
+    'dashboard-subscription-configure-cancel' => 'subscription/{subscription}/change/cancel',
     'dashboard-notifications' => 'notifications',
     'dashboard-affiliate' => 'affiliate',
 
