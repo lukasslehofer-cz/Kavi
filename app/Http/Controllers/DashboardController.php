@@ -465,8 +465,27 @@ class DashboardController extends Controller
                 ->with('error', __('gifts.subscription.action_not_allowed'));
         }
 
-        // Apply pause using the central service
+        // Pozastavit, nebo už běžící pauzu prodloužit, smí zákazník jen u aktivního
+        // předplatného a u pauzy, kterou vyvolal sám. Tlačítko se jinde nerenderuje,
+        // guard je tu kvůli přímému POST a odkazům z e-mailů (?pause=ID).
+        if (! $subscription->customerCanPause()) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('flash.subscription.pause_not_allowed'));
+        }
+
         $shipmentService = app(SubscriptionShipmentService::class);
+
+        // Platba za další box je právě splatná - cron ji za chvíli strhne nebo už má
+        // předplatné načtené, přeskočený box by se s platbou minul
+        if ($subscription->isActive() && $shipmentService->isBillingInFlight($subscription)) {
+            return redirect()->localizedRoute('dashboard.subscription')
+                ->with('error', __('flash.subscription.pause_billing_in_progress'));
+        }
+
+        // Pozastavené předplatné = prodloužení pauzy o další rozesílky
+        $extending = $subscription->isPaused();
+
+        // Apply pause using the central service
         $shipmentService->pauseSubscription($subscription, (int)$validated['iterations'], 'user_request');
 
         // Pauza zvolená v okně zrušení místo zrušení
@@ -499,7 +518,7 @@ class DashboardController extends Controller
         }
 
         return redirect()->localizedRoute('dashboard.subscription')
-            ->with('success', __('flash.subscription.paused'));
+            ->with('success', __($extending ? 'flash.subscription.pause_extended' : 'flash.subscription.paused'));
     }
 
     /**

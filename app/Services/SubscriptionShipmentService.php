@@ -494,9 +494,11 @@ class SubscriptionShipmentService
         // 6. Update subscription status
         // Use day after last skipped shipment so resume doesn't collide with shipment date (20th -> 21st)
         $pausedUntilDate = $skippedDates->last()?->copy()->addDay();
+        // Prodloužení už běžící pauzy (zákazník ji prodlužuje z účtu) rozesílky přičítá
+        $alreadyPaused = $subscription->isPaused() && $subscription->pause_reason === $reason;
         $subscription->update([
             'status' => 'paused',
-            'paused_iterations' => $iterations,
+            'paused_iterations' => ($alreadyPaused ? (int) $subscription->paused_iterations : 0) + $iterations,
             'paused_until_date' => $pausedUntilDate?->endOfDay(),
             'pause_reason' => $reason,
         ]);

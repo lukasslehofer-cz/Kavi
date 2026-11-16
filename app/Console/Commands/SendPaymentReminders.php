@@ -49,26 +49,34 @@ class SendPaymentReminders extends Command
         
         $sentCount = 0;
         $failedCount = 0;
-        
+        $withoutContents = 0;
+
         foreach ($subscriptions as $subscription) {
             try {
                 // Get email from shipping_address or user
                 $email = $subscription->shipping_address['email'] ?? $subscription->user->email ?? null;
-                
+
                 if (!$email) {
                     $this->warn("Subscription #{$subscription->id} has no email address. Skipping.");
                     $failedCount++;
                     continue;
                 }
-                
+
+                $reminder = new UpcomingPaymentReminder($subscription);
+
                 // Send reminder email with retry (3 attempts, 5s pause)
-                retry(3, function () use ($email, $subscription) {
-                    Mail::to($email)->send(new UpcomingPaymentReminder($subscription));
+                retry(3, function () use ($email, $reminder) {
+                    Mail::to($email)->send($reminder);
                 }, 5000);
-                
+
                 $this->info("✓ Sent reminder to {$email} for subscription #{$subscription->id}");
                 $sentCount++;
-                
+
+                // E-mail začíná obsahem boxu - bez vyplněných káv měsíce odejde jen s platbou
+                if (! $reminder->hasKnownBoxContents()) {
+                    $withoutContents++;
+                }
+
             } catch (\Exception $e) {
                 $this->error("✗ Failed to send reminder for subscription #{$subscription->id}: " . $e->getMessage());
                 \Log::error('Failed to send payment reminder', [
@@ -82,6 +90,9 @@ class SendPaymentReminders extends Command
         $this->newLine();
         $this->info("Summary:");
         $this->info("- Emails sent: {$sentCount}");
+        if ($withoutContents > 0) {
+            $this->warn("- Sent without box contents (coffees for that month are not set in admin): {$withoutContents}");
+        }
         if ($failedCount > 0) {
             $this->warn("- Failed: {$failedCount}");
         }

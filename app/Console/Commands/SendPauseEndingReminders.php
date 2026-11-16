@@ -49,24 +49,32 @@ class SendPauseEndingReminders extends Command
         
         $sentCount = 0;
         $failedCount = 0;
-        
+        $withoutContents = 0;
+
         foreach ($subscriptions as $subscription) {
             try {
                 // Get email from shipping_address or user
                 $email = $subscription->shipping_address['email'] ?? $subscription->user->email ?? null;
-                
+
                 if (!$email) {
                     $this->warn("Subscription #{$subscription->id} has no email address. Skipping.");
                     $failedCount++;
                     continue;
                 }
-                
+
                 // Send reminder email
-                Mail::to($email)->send(new PauseEndingReminder($subscription));
-                
+                $reminder = new PauseEndingReminder($subscription);
+                Mail::to($email)->send($reminder);
+
                 $this->info("✓ Sent reminder to {$email} for subscription #{$subscription->subscription_number}");
                 $sentCount++;
-                
+
+                // E-mail začíná obsahem prvního boxu po pauze - pražírny dalšího měsíce
+                // se zadávají až kolem 16.-23., bez nich odejde s náhradním úvodem
+                if (! $reminder->hasKnownBoxContents()) {
+                    $withoutContents++;
+                }
+
             } catch (\Exception $e) {
                 $this->error("✗ Failed to send reminder for subscription #{$subscription->id}: " . $e->getMessage());
                 \Log::error('Failed to send pause ending reminder', [
@@ -80,6 +88,9 @@ class SendPauseEndingReminders extends Command
         $this->newLine();
         $this->info("Summary:");
         $this->info("- Emails sent: {$sentCount}");
+        if ($withoutContents > 0) {
+            $this->warn("- Sent without box contents (roasteries for that month are not set in admin): {$withoutContents}");
+        }
         if ($failedCount > 0) {
             $this->warn("- Failed: {$failedCount}");
         }

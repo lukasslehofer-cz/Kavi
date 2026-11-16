@@ -296,6 +296,24 @@ class Subscription extends Model
         return $this->isPaused() && $this->pause_reason === self::PAUSE_REASON_PAYMENT_FAILURE;
     }
 
+    /**
+     * Smí zákazník předplatné sám pozastavit nebo už běžící pauzu prodloužit?
+     * Aktivní ano, pozastavené jen když pauzu vyvolal sám. Dárek, bezplatné
+     * předplatné a jednorázový box se nepozastavují vůbec.
+     */
+    public function customerCanPause(): bool
+    {
+        if ($this->isGift() || $this->isComplimentary() || (int) $this->frequency_months === 0) {
+            return false;
+        }
+
+        if ($this->isPaused()) {
+            return ! $this->isAdminLocked() && ! $this->isPaymentFailurePause();
+        }
+
+        return $this->isActive();
+    }
+
     public function hasPaymentIssue(): bool
     {
         return $this->isUnpaid() || $this->payment_failure_count > 0;

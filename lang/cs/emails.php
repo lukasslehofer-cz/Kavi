@@ -343,13 +343,32 @@ return [
 
     // Pause Ending Reminder
     'pause_ending_reminder' => [
-        'subject' => 'Pauza předplatného končí za 3 dny - :subscription_number',
-        'title' => 'Vaše pauza brzy končí',
-        'subtitle' => 'Za 3 dny se vaše předplatné automaticky obnoví.',
-        'pause_ends' => 'Pauza končí',
-        'what_happens' => 'Co se stane po obnovení?',
-        'options_title' => 'Potřebujete více času?',
-        'manage_button' => 'Spravovat předplatné',
+        'subject' => 'Po pauze přijde :month box: :roasteries',
+        'subject_month' => 'Pauza končí, další box přijde :date',
+        'subject_generic' => 'Vaše pauza brzy končí',
+        'title' => 'Po pauze přijde :month box',
+        'title_generic' => 'Vaše pauza brzy končí',
+        'subtitle' => 'Pauza končí :pause_end, další platba až :payment_date',
+        'subtitle_generic' => 'Předplatné se brzy obnoví',
+        'payment_note' => 'Do té doby nic nestrháváme.',
+        'pause' => 'Prodloužit pauzu',
+        // Bez tečky na konci: datum "14. 12." už tečkou končí
+        'deadline' => 'Prodloužit pauzu nebo změnit box jde do :date',
+    ],
+
+    // Blok "co přijde v boxu" + platba + akce, společný upomínce platby a konci pauzy
+    'upcoming_box' => [
+        'and' => 'a',
+        'contents_label' => 'Ve vašem boxu',
+        'lineup' => 'V :month boxu budou kávy z pražíren :roasteries. Konkrétní kávy ještě ladíme.',
+        'pending' => 'Kávy do dalšího boxu právě vybíráme. Pošleme je s připomínkou platby.',
+        'payment_label' => 'Platba',
+        'payment_date' => 'Datum platby',
+        'shipping' => 'Doprava',
+        'amount' => 'Částka',
+        'actions_label' => 'Nehodí se vám to?',
+        'change' => 'Změnit box',
+        'manage' => 'Spravovat předplatné',
     ],
 
     // Email Change Confirmation
@@ -384,14 +403,16 @@ return [
 
     // Upcoming Payment Reminder
     'upcoming_payment' => [
-        'subject' => 'Připomínka platby předplatného - KAVI.cz',
-        'title' => 'Blíží se platba předplatného',
-        'subtitle' => 'Připomínáme vám blížící se platbu za předplatné.',
-        'subscription_number' => 'Číslo předplatného',
-        'amount' => 'Částka',
-        'payment_date' => 'Datum platby',
-        'card_info' => 'Platba bude stržena z karty končící na',
-        'update_payment' => 'Změnit platební metodu',
+        'subject' => ':Month box: :roasteries',
+        'subject_month' => ':Month box se blíží',
+        'subject_generic' => 'Blíží se platba předplatného',
+        'title' => 'Co přijde v :month boxu',
+        'title_generic' => 'Blíží se platba předplatného',
+        'subtitle' => 'Rozesíláme :date',
+        'subtitle_generic' => 'Platba za další box',
+        'pause' => 'Přeskočit tento box',
+        // Bez tečky na konci: datum "14. 12." už tečkou končí
+        'deadline' => 'Přeskočit nebo změnit box jde do :date',
     ],
 
     // Review Request (shared)

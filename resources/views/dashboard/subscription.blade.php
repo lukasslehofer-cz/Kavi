@@ -684,6 +684,22 @@
                                     {{ __('dashboard.resume_subscription') }}
                                 </button>
                             </form>
+
+                            {{-- Prodloužení pauzy: stejné okno jako pauza, počítá se od prvního boxu po pauze --}}
+                            @if($subscription->customerCanPause())
+                            @php
+                                $firstUnpaidForModal = app(\App\Services\SubscriptionShipmentService::class)
+                                    ->getFirstUnpaidShipmentDate($subscription) ?? now();
+                            @endphp
+                            <button type="button"
+                                    class="open-pause-modal w-full text-center px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 transition font-medium"
+                                    data-subscription-id="{{ $subscription->id }}"
+                                    data-frequency-months="{{ $subscription->frequency_months ?? 1 }}"
+                                    data-first-unpaid="{{ $firstUnpaidForModal->format('Y-m-d') }}"
+                                    data-extend="1">
+                                {{ __('dashboard.extend_pause') }}
+                            </button>
+                            @endif
                             @endif
 
                             <button type="button"
@@ -1169,9 +1185,19 @@ document.addEventListener('DOMContentLoaded', function() {
             // Pauza zvolená v okně zrušení: okno se zavře a s pauzou odejde i důvod (jen do logu)
             const cancelReason = this.dataset.fromCancel || '';
             if (cancelReason) { closeAllCancelModals(); }
-            openPauseModal(subId, freq, firstUnpaid, cancelReason);
+            openPauseModal(subId, freq, firstUnpaid, cancelReason, this.dataset.extend === '1');
         });
     });
+
+    // Odkaz z e-mailu (?pause=ID): po přihlášení rovnou otevřít okno pauzy daného
+    // předplatného. Tlačítko v okně zrušení (data-from-cancel) se přeskakuje.
+    const pauseParam = new URLSearchParams(window.location.search).get('pause');
+    if (pauseParam && /^\d+$/.test(pauseParam)) {
+        const pauseCard = document.getElementById('subscription-' + pauseParam);
+        if (pauseCard) { pauseCard.scrollIntoView({ block: 'start' }); }
+        const pauseButton = document.querySelector('.open-pause-modal[data-subscription-id="' + pauseParam + '"]:not([data-from-cancel])');
+        if (pauseButton) { pauseButton.click(); }
+    }
 
     // Cancel modal (server-rendered, one per subscription)
     window.openCancelModal = function (id) {
@@ -1220,12 +1246,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const nextBoxLabel = locale === 'en' ? 'Next box after pause:' : 'Další box po pauze:';
         const cancelBtn = locale === 'en' ? 'Cancel' : 'Zrušit';
         const confirmBtn = locale === 'en' ? 'Confirm pause' : 'Potvrdit pauzu';
-        
+        // Texty okna: první pauza, nebo prodloužení už běžící pauzy
+        const modeTexts = {
+            pause: { title: pauseTitle, desc: pauseDesc, confirm: confirmBtn },
+            extend: {
+                title: @json(__('dashboard.extend_pause')),
+                desc: @json(__('dashboard.extend_pause_description')),
+                confirm: @json(__('dashboard.extend_pause_confirm')),
+            },
+        };
+
         container.innerHTML = `
             <div class="bg-white rounded-2xl w-full max-w-lg border border-gray-200 shadow-xl">
                 <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">${pauseTitle}</h3>
-                    <p class="text-sm text-gray-600 mt-1">${pauseDesc}</p>
+                    <h3 class="text-lg font-semibold text-gray-900" id="pause-modal-title">${pauseTitle}</h3>
+                    <p class="text-sm text-gray-600 mt-1" id="pause-modal-desc">${pauseDesc}</p>
                 </div>
                 <form method="POST" action="{{ localizedRoute('dashboard.subscription.pause') }}" class="p-6 space-y-4">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -1255,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="flex items-center justify-end gap-3 pt-2">
                         <button type="button" id="pause-cancel" class="px-4 py-2 text-sm border border-gray-300 rounded-full hover:bg-gray-50">${cancelBtn}</button>
-                        <button type="submit" class="px-4 py-2 text-sm bg-primary-500 text-white rounded-full hover:bg-primary-600">${confirmBtn}</button>
+                        <button type="submit" id="pause-modal-confirm" class="px-4 py-2 text-sm bg-primary-500 text-white rounded-full hover:bg-primary-600">${confirmBtn}</button>
                     </div>
                 </form>
             </div>
@@ -1300,9 +1335,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return {
             container,
-            open: (subscriptionId, frequencyMonths, firstUnpaid, cancelReason) => {
+            open: (subscriptionId, frequencyMonths, firstUnpaid, cancelReason, extend) => {
                 state.frequencyMonths = frequencyMonths || 1;
                 state.firstUnpaid = firstUnpaid || null;
+                const texts = extend ? modeTexts.extend : modeTexts.pause;
+                container.querySelector('#pause-modal-title').textContent = texts.title;
+                container.querySelector('#pause-modal-desc').textContent = texts.desc;
+                container.querySelector('#pause-modal-confirm').textContent = texts.confirm;
                 container.querySelector('#pause-subscription-id').value = subscriptionId;
                 // Vyplněno jen při otevření z okna zrušení, jinak prázdné
                 container.querySelector('#pause-cancel-reason').value = cancelReason || '';
@@ -1316,8 +1355,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    function openPauseModal(subscriptionId, frequencyMonths, firstUnpaid, cancelReason) {
-        pauseModal.open(subscriptionId, frequencyMonths, firstUnpaid, cancelReason);
+    function openPauseModal(subscriptionId, frequencyMonths, firstUnpaid, cancelReason, extend) {
+        pauseModal.open(subscriptionId, frequencyMonths, firstUnpaid, cancelReason, extend);
         const cancelBtn = pauseModal.container.querySelector('#pause-cancel');
         cancelBtn.onclick = () => pauseModal.close();
         pauseModal.container.addEventListener('click', (e) => {

@@ -343,13 +343,31 @@ return [
 
     // Pause Ending Reminder
     'pause_ending_reminder' => [
-        'subject' => 'Your Subscription Pause Ends in 3 Days - :subscription_number',
-        'title' => 'Your Pause Is Ending Soon',
-        'subtitle' => 'Your subscription will automatically resume in 3 days.',
-        'pause_ends' => 'Pause Ends',
-        'what_happens' => 'What happens after resuming?',
-        'options_title' => 'Need more time?',
-        'manage_button' => 'Manage Subscription',
+        'subject' => 'After your pause: :month box with :roasteries',
+        'subject_month' => 'Your pause is ending, next box ships :date',
+        'subject_generic' => 'Your Pause Is Ending Soon',
+        'title' => 'Your :month box comes after the pause',
+        'title_generic' => 'Your Pause Is Ending Soon',
+        'subtitle' => 'Pause ends :pause_end, next payment not until :payment_date',
+        'subtitle_generic' => 'Your subscription will resume soon',
+        'payment_note' => 'Nothing is charged until then.',
+        'pause' => 'Extend the pause',
+        'deadline' => 'You can extend the pause or change your box until :date.',
+    ],
+
+    // "What's in the box" + payment + actions, shared by the payment reminder and the pause-ending reminder
+    'upcoming_box' => [
+        'and' => 'and',
+        'contents_label' => 'In your box',
+        'lineup' => 'Your :month box will feature coffees from :roasteries. We are still finalising the exact coffees.',
+        'pending' => 'We are still choosing the coffees for your next box. We will send them with your payment reminder.',
+        'payment_label' => 'Payment',
+        'payment_date' => 'Payment date',
+        'shipping' => 'Shipping',
+        'amount' => 'Amount',
+        'actions_label' => 'Not a good time?',
+        'change' => 'Change your box',
+        'manage' => 'Manage subscription',
     ],
 
     // Email Change Confirmation
@@ -384,14 +402,15 @@ return [
 
     // Upcoming Payment Reminder
     'upcoming_payment' => [
-        'subject' => 'Subscription Payment Reminder - KAVI',
-        'title' => 'Upcoming Subscription Payment',
-        'subtitle' => 'This is a reminder about your upcoming subscription payment.',
-        'subscription_number' => 'Subscription Number',
-        'amount' => 'Amount',
-        'payment_date' => 'Payment Date',
-        'card_info' => 'Payment will be charged to the card ending in',
-        'update_payment' => 'Change Payment Method',
+        'subject' => ':Month box: :roasteries',
+        'subject_month' => 'Your :month box is coming up',
+        'subject_generic' => 'Upcoming Subscription Payment',
+        'title' => 'What\'s in your :month box',
+        'title_generic' => 'Upcoming Subscription Payment',
+        'subtitle' => 'Shipping :date',
+        'subtitle_generic' => 'Payment for your next box',
+        'pause' => 'Skip this box',
+        'deadline' => 'You can skip or change this box until :date.',
     ],
 
     // Review Request (shared)

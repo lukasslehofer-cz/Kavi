@@ -41,6 +41,17 @@ class ResumeExpiredPausedSubscriptions extends Command
             $this->line("Processing: {$subscriptionNumber}");
 
             try {
+                // Zákazník mohl pauzu prodloužit mezi načtením seznamu a tímto krokem.
+                // Obnovení maže budoucí skipped řádky, takže by prodloužení zrušilo.
+                $subscription->refresh();
+
+                if (! $subscription->isPaused() || ! $subscription->paused_until_date
+                    || $subscription->paused_until_date->toDateString() > now()->toDateString()) {
+                    $this->line('  ⏭ Pause changed in the meantime, nothing to resume.');
+
+                    continue;
+                }
+
                 $result = $shipmentService->resumeSubscription($subscription);
 
                 if (! $result['success']) {
