@@ -143,6 +143,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Statistiky žádostí o hodnocení
     Route::get('/hodnoceni', [\App\Http\Controllers\Admin\ReviewStatsController::class, 'index'])->name('reviews.index');
 
+    // Nabídka předplatného po nákupu v e-shopu: přechod kupců na předplatné do 60 dnů
+    Route::get('/nabidka-predplatneho', [\App\Http\Controllers\Admin\SubscriptionOfferController::class, 'index'])->name('subscription-offer.index');
+
     // Email Logs
     Route::get('/email-logs', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])->name('email-logs.index');
     Route::get('/email-logs/{emailLog}', [\App\Http\Controllers\Admin\EmailLogController::class, 'show'])->name('email-logs.show');

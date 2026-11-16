@@ -271,6 +271,19 @@ return [
         'pickup_deadline' => 'Pickup By',
     ],
 
+    // Subscription offer in the order-delivered e-mail for shop orders
+    'subscription_offer' => [
+        'label' => 'When this coffee runs out',
+        'title' => 'The next one can already be on its way',
+        // Order without coffee (voucher, accessories)
+        'label_generic' => 'The KAVI box',
+        'title_generic' => 'Fresh coffee, delivered regularly',
+        'text' => 'The KAVI box regularly brings you freshly roasted coffee from European roasteries, different ones every month.',
+        'lineup' => 'The :month box features :roasteries.',
+        'terms' => 'From :price per box. Skip or cancel any time.',
+        'cta' => 'Build your box',
+    ],
+
     // Subscription Box Delivered
     'subscription_box_delivered' => [
         'subject' => 'Your Coffee Box Has Been Delivered - :subscription_number',

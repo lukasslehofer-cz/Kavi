@@ -118,11 +118,19 @@ class OrderObserver
             $email = $order->shipping_address['email'] ?? $order->user?->email ?? null;
             
             if ($email) {
-                Mail::to($email)->send(new OrderDelivered($order));
+                $mail = new OrderDelivered($order);
+                Mail::to($email)->send($mail);
+
+                // E-mail nesl nabídku předplatného: od teď se kupci počítá 60 dnů na přechod
+                if ($mail->includesSubscriptionOffer()) {
+                    app(\App\Services\SubscriptionOfferService::class)->markOffered($order);
+                }
+
                 \Log::info('Order delivered email sent', [
                     'order_id' => $order->id,
                     'order_number' => $order->order_number,
-                    'email' => $email
+                    'email' => $email,
+                    'subscription_offer' => $mail->includesSubscriptionOffer(),
                 ]);
             } else {
                 \Log::warning('Could not send order delivered email - no email found', [

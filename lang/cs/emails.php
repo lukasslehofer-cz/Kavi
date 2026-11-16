@@ -271,6 +271,19 @@ return [
         'pickup_deadline' => 'Vyzvednout do',
     ],
 
+    // Nabídka předplatného v e-mailu o doručení objednávky z e-shopu
+    'subscription_offer' => [
+        'label' => 'Až tahle káva dojde',
+        'title' => 'Další může být už na cestě',
+        // Objednávka bez kávy (poukaz, příslušenství)
+        'label_generic' => 'Kávový box',
+        'title_generic' => 'Čerstvá káva pravidelně až k vám',
+        'text' => 'Kávový box vám pravidelně přiveze čerstvě praženou kávu od evropských pražíren, každý měsíc jiných.',
+        'lineup' => 'V :month boxu jsou :roasteries.',
+        'terms' => 'Od :price za box. Přeskočit nebo zrušit jde kdykoli.',
+        'cta' => 'Sestavit si box',
+    ],
+
     // Subscription Box Delivered
     'subscription_box_delivered' => [
         'subject' => 'Váš kávový box byl doručen - :subscription_number',

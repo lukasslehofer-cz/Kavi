@@ -123,7 +123,12 @@
                                     {{ __('emails.order_confirmation.view_order', [], $locale) }} →
                                 </a>
                             </div>
-                            
+
+                            <!-- Nabídka předplatného (jen kupcům bez předplatného) -->
+                            @if(! empty($subscriptionOffer))
+                            @include('emails.partials.subscription-offer')
+                            @endif
+
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">

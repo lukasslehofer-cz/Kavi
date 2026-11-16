@@ -126,6 +126,14 @@
                         Žádosti o hodnocení
                     </a>
 
+                    <!-- Nabídka předplatného po nákupu -->
+                    <a href="{{ route('admin.subscription-offer.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.subscription-offer.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        Nabídka předplatného
+                    </a>
+
                     <!-- Email Logs -->
                     <a href="{{ route('admin.email-logs.index') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.email-logs.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
