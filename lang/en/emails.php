@@ -360,7 +360,7 @@ return [
         'and' => 'and',
         'contents_label' => 'In your box',
         'lineup' => 'Your :month box will feature coffees from :roasteries. We are still finalising the exact coffees.',
-        'pending' => 'We are still choosing the coffees for your next box. We will send them with your payment reminder.',
+        'pending' => 'We are still choosing the coffees for your next box.',
         'payment_label' => 'Payment',
         'payment_date' => 'Payment date',
         'shipping' => 'Shipping',

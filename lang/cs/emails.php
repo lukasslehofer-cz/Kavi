@@ -361,7 +361,7 @@ return [
         'and' => 'a',
         'contents_label' => 'Ve vašem boxu',
         'lineup' => 'V :month boxu budou kávy z pražíren :roasteries. Konkrétní kávy ještě ladíme.',
-        'pending' => 'Kávy do dalšího boxu právě vybíráme. Pošleme je s připomínkou platby.',
+        'pending' => 'Kávy do dalšího boxu právě vybíráme.',
         'payment_label' => 'Platba',
         'payment_date' => 'Datum platby',
         'shipping' => 'Doprava',
