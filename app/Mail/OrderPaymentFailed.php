@@ -33,6 +33,9 @@ class OrderPaymentFailed extends LocalizedMailable
     {
         return new Content(
             view: 'emails.order-payment-failed',
+            with: [
+                'ordersUrl' => $this->mailUrl('dashboard.orders'),
+            ],
         );
     }
 

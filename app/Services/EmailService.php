@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Models\User;
+use Illuminate\Support\Facades\Route;
 
 class EmailService
 {
@@ -100,7 +101,37 @@ class EmailService
 
         return rtrim($urls[$locale] ?? $urls['cs'] ?? config('app.url'), '/');
     }
-    
+
+    /**
+     * Absolutní URL do e-mailu: doména podle jazyka příjemce, cesta podle jazykové
+     * varianty routy.
+     *
+     * route() bere hostitele z requestu (admin posílá EN mail z kavi.cz) nebo
+     * z APP_URL (cron) – obojí je špatně. Doména i cesta musí sedět dohromady,
+     * jinak LocalizedUrlRedirect udělá 301 zpátky na druhou jazykovou variantu.
+     *
+     * Mailable třídy ji volají přes LocalizedMailable::mailUrl(), přímo ji používají
+     * e-maily, které z LocalizedMailable nedědí (reset hesla, upozornění adminům).
+     */
+    public static function routeUrl(string $locale, string $name, array $parameters = []): string
+    {
+        $localized = "{$name}.{$locale}";
+
+        $path = Route::has($localized)
+            ? route($localized, $parameters, false)
+            : route($name, $parameters, false);
+
+        return self::getSiteUrl($locale).$path;
+    }
+
+    /**
+     * Logo do hlavičky e-mailu na doméně podle jazyka příjemce
+     */
+    public static function getLogoUrl(string $locale): string
+    {
+        return self::getSiteUrl($locale).'/images/kavi-logo-white.png';
+    }
+
     /**
      * Get contact email based on locale
      */

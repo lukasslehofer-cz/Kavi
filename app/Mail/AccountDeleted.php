@@ -28,6 +28,9 @@ class AccountDeleted extends LocalizedMailable
     {
         return new Content(
             view: 'emails.account-deleted',
+            with: [
+                'subscriptionsUrl' => $this->mailUrl('subscriptions.index'),
+            ],
         );
     }
 

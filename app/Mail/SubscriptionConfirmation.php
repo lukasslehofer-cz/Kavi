@@ -29,6 +29,9 @@ class SubscriptionConfirmation extends LocalizedMailable
     {
         return new Content(
             view: 'emails.subscription-confirmation',
+            with: [
+                'manageUrl' => $this->mailUrl('dashboard.subscription'),
+            ],
         );
     }
 

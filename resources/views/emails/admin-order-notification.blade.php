@@ -217,7 +217,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 24px;">
-                    <a href="{{ route('admin.orders.show', $order) }}" class="button">
+                    <a href="{{ $adminUrl }}" class="button">
                         Zobrazit v administraci
                     </a>
                 </div>
@@ -365,7 +365,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 24px;">
-                    <a href="{{ route('admin.subscriptions.show', $subscription) }}" class="button">
+                    <a href="{{ $adminUrl }}" class="button">
                         Zobrazit v administraci
                     </a>
                 </div>

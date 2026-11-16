@@ -43,6 +43,8 @@ class OrderDelivered extends LocalizedMailable
             view: 'emails.order-delivered',
             with: [
                 'subscriptionOffer' => $this->subscriptionOffer(),
+                'orderUrl' => $this->mailUrl('dashboard.order.detail', ['order' => $this->order->id]),
+                'dashboardUrl' => $this->mailUrl('dashboard.index'),
             ],
         );
     }

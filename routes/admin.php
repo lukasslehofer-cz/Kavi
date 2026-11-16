@@ -188,11 +188,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             ? \App\Models\Order::with('items')->findOrFail($orderId)
             : \App\Models\Order::with('items')->latest()->firstOrFail();
         
-        $locale = 'cs';
-        $siteName = 'KAVI.cz';
-        $contactEmail = 'info@kavi.cz';
-        
-        return view('emails.order-confirmation', compact('order', 'locale', 'siteName', 'contactEmail'));
+        // Přes Mailable, aby náhled dostal stejná data (včetně odkazů) jako odeslaný e-mail
+        return (new \App\Mail\OrderConfirmation($order, 'cs'))->render();
     })->name('email-preview.order-confirmation');
 });
 

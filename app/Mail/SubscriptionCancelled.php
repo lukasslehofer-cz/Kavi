@@ -29,6 +29,9 @@ class SubscriptionCancelled extends LocalizedMailable
     {
         return new Content(
             view: 'emails.subscription-cancelled',
+            with: [
+                'subscriptionsUrl' => $this->mailUrl('subscriptions.index'),
+            ],
         );
     }
 

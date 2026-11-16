@@ -35,6 +35,9 @@ class SubscriptionBoxDelivered extends LocalizedMailable implements ShouldQueue
     {
         return new Content(
             view: 'emails.subscription-box-delivered',
+            with: [
+                'manageUrl' => $this->mailUrl('dashboard.subscription'),
+            ],
         );
     }
 

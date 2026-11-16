@@ -33,6 +33,9 @@ class SubscriptionPaused extends LocalizedMailable
     {
         return new Content(
             view: 'emails.subscription-paused',
+            with: [
+                'manageUrl' => $this->mailUrl('dashboard.subscription'),
+            ],
         );
     }
 

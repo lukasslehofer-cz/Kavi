@@ -31,6 +31,9 @@ class OneTimeBoxConfirmation extends LocalizedMailable
     {
         return new Content(
             view: 'emails.onetime-box-confirmation',
+            with: [
+                'manageUrl' => $this->mailUrl('dashboard.subscription'),
+            ],
         );
     }
 

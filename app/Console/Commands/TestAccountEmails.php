@@ -70,8 +70,11 @@ class TestAccountEmails extends Command
             $count = 60; // minutes
             $siteName = 'KAVI.cz';
             $contactEmail = 'info@kavi.cz';
-            
-            Mail::send('emails.reset-password', compact('url', 'locale', 'count', 'siteName', 'contactEmail'), function ($message) use ($email) {
+            $logoUrl = \App\Services\EmailService::getLogoUrl($locale);
+            $homeUrl = \App\Services\EmailService::routeUrl($locale, 'home');
+            $loginUrl = \App\Services\EmailService::routeUrl($locale, 'login');
+
+            Mail::send('emails.reset-password', compact('url', 'locale', 'count', 'siteName', 'contactEmail', 'logoUrl', 'homeUrl', 'loginUrl'), function ($message) use ($email) {
                 $message->to($email)
                     ->subject('Reset hesla - KAVI.cz');
             });

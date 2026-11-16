@@ -37,6 +37,7 @@ class OrderReviewRequestMail extends LocalizedMailable implements ShouldQueue
                 'order' => $this->order,
                 'reviewLink' => $this->reviewLink(),
                 'starLinks' => $this->starLinks(),
+                'dashboardUrl' => $this->mailUrl('dashboard.index'),
                 'locale' => $this->emailLocale,
                 'siteName' => $this->siteName,
                 'contactEmail' => $this->contactEmail,

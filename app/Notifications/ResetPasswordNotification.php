@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Services\EmailService;
 use Illuminate\Auth\Notifications\ResetPassword as BaseResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
 
@@ -15,10 +16,11 @@ class ResetPasswordNotification extends BaseResetPassword
         // Generate password reset URL
         // If password.reset route doesn't exist, use a fallback URL
         try {
-            $url = url(route('password.reset', [
+            // Doména i cesta podle jazyka, ne podle hostitele requestu (viz EmailService::routeUrl)
+            $url = EmailService::routeUrl($locale, 'password.reset', [
                 'token' => $this->token,
                 'email' => $notifiable->getEmailForPasswordReset(),
-            ], false));
+            ]);
         } catch (\Exception $e) {
             // Fallback URL for testing or custom implementation
             $url = url('/reset-password/' . $this->token . '?email=' . urlencode($notifiable->getEmailForPasswordReset()));
@@ -31,6 +33,10 @@ class ResetPasswordNotification extends BaseResetPassword
                 'user' => $notifiable,
                 'count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire'),
                 'locale' => $locale,
+                // Hlavička a patička na doméně podle jazyka, stejně jako u LocalizedMailable
+                'logoUrl' => EmailService::getLogoUrl($locale),
+                'homeUrl' => EmailService::routeUrl($locale, 'home'),
+                'loginUrl' => EmailService::routeUrl($locale, 'login'),
             ])
             ->withSymfonyMessage(function ($message) use ($notifiable, $locale) {
                 $headers = $message->getHeaders();

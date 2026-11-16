@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Services\EmailService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -61,6 +62,13 @@ class AdminOrderNotification extends Mailable
     {
         return new Content(
             view: 'emails.admin-order-notification',
+            with: [
+                // Administrace běží na české doméně; route() by vzalo hostitele z requestu
+                // zákazníka, takže u objednávky z kavibox.com by odkaz vedl tam
+                'adminUrl' => $this->type === 'order'
+                    ? EmailService::routeUrl('cs', 'admin.orders.show', ['order' => $this->order])
+                    : EmailService::routeUrl('cs', 'admin.subscriptions.show', ['subscription' => $this->subscription]),
+            ],
         );
     }
 

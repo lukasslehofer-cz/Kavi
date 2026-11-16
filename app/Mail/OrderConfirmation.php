@@ -30,6 +30,10 @@ class OrderConfirmation extends LocalizedMailable
     {
         return new Content(
             view: 'emails.order-confirmation',
+            with: [
+                'orderUrl' => $this->mailUrl('dashboard.order.detail', ['order' => $this->order->id]),
+                'dashboardUrl' => $this->mailUrl('dashboard.index'),
+            ],
         );
     }
 

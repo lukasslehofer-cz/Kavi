@@ -36,7 +36,7 @@
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="email-container" width="100%" style="width: 100%; max-width: 600px; background-color: #ffffff !important; border: 1px solid #e5e7eb !important; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" bgcolor="#ffffff">
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                            <img src="{{ $logoUrl }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     <tr>
@@ -86,7 +86,7 @@
                             </div>
                             
                             <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('dashboard.subscription') }}" class="button">
+                                <a href="{{ $manageUrl }}" class="button">
                                     {{ $locale === 'cs' ? 'Spravovat platby' : 'Manage payments' }}
                                 </a>
                             </div>
@@ -143,9 +143,9 @@
                                 {{ __('emails.common.tagline', [], $locale) }}
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link">{{ __('emails.common.subscription', [], $locale) }}</a>
-                                <a href="{{ route('dashboard.profile') }}" class="footer-link">{{ __('emails.common.my_account', [], $locale) }}</a>
+                                <a href="{{ $homeUrl }}" class="footer-link">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ $manageUrl }}" class="footer-link">{{ __('emails.common.subscription', [], $locale) }}</a>
+                                <a href="{{ $profileUrl }}" class="footer-link">{{ __('emails.common.my_account', [], $locale) }}</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
                                 {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}

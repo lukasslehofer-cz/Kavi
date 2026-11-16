@@ -31,6 +31,9 @@ class OrderPaymentReminder extends LocalizedMailable
     {
         return new Content(
             view: 'emails.order-payment-reminder',
+            with: [
+                'ordersUrl' => $this->mailUrl('dashboard.orders'),
+            ],
         );
     }
 

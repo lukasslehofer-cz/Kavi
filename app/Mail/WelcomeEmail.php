@@ -29,6 +29,10 @@ class WelcomeEmail extends LocalizedMailable
     {
         return new Content(
             view: 'emails.welcome',
+            with: [
+                'subscriptionsUrl' => $this->mailUrl('subscriptions.index'),
+                'profileUrl' => $this->mailUrl('dashboard.profile'),
+            ],
         );
     }
 

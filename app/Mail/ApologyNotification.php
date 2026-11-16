@@ -25,6 +25,9 @@ class ApologyNotification extends LocalizedMailable
     {
         return new Content(
             view: 'emails.apology-notification',
+            with: [
+                'manageUrl' => $this->mailUrl('dashboard.subscription'),
+            ],
         );
     }
 

@@ -35,7 +35,7 @@
                     <!-- Header -->
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                            <img src="{{ $logoUrl }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
@@ -88,9 +88,9 @@
                                 Výběrová káva s příběhem
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">Domů</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">E-shop</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link" style="color: #e6305a;">Moje předplatné</a>
+                                <a href="{{ $homeUrl }}" class="footer-link" style="color: #e6305a;">Domů</a>
+                                <a href="{{ $shopUrl }}" class="footer-link" style="color: #e6305a;">E-shop</a>
+                                <a href="{{ $manageUrl }}" class="footer-link" style="color: #e6305a;">Moje předplatné</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
                                 © {{ date('Y') }} {{ $siteName }}. Všechna práva vyhrazena.

@@ -43,6 +43,7 @@ class SubscriptionReviewRequestMail extends LocalizedMailable implements ShouldQ
                 'reviewLink' => $this->reviewLink(),
                 'starLinks' => $this->starLinks(),
                 'deliveredOrdersCount' => $deliveredOrdersCount,
+                'dashboardUrl' => $this->mailUrl('dashboard.index'),
                 'locale' => $this->emailLocale,
                 'siteName' => $this->siteName,
                 'contactEmail' => $this->contactEmail,

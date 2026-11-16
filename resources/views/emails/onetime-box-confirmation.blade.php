@@ -44,7 +44,7 @@
                     
                     <tr>
                         <td class="header">
-                            <img src="{{ asset('images/kavi-logo-white.png') }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
+                            <img src="{{ $logoUrl }}" alt="{{ $siteName }}" class="logo" width="120" style="max-width: 120px !important; width: 120px !important; height: auto !important; display: block !important; margin: 0 auto !important; border: 0; outline: none;">
                         </td>
                     </tr>
                     
@@ -155,7 +155,7 @@
                             </div>
                             
                             <div style="text-align: center; margin: 32px 0;">
-                                <a href="{{ route('dashboard.subscription') }}" class="button">
+                                <a href="{{ $manageUrl }}" class="button">
                                     {{ __('emails.onetime_box.view_order', [], $locale) }}
                                 </a>
                             </div>
@@ -185,9 +185,9 @@
                                 {{ __('emails.common.tagline', [], $locale) }}
                             </p>
                             <div class="footer-links">
-                                <a href="{{ route('home') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.home', [], $locale) }}</a>
-                                <a href="{{ route('products.index') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ route('dashboard.subscription') }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.my_account', [], $locale) }}</a>
+                                <a href="{{ $homeUrl }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.home', [], $locale) }}</a>
+                                <a href="{{ $shopUrl }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.shop', [], $locale) }}</a>
+                                <a href="{{ $manageUrl }}" class="footer-link" style="color: #e6305a;">{{ __('emails.common.my_account', [], $locale) }}</a>
                             </div>
                             <p class="footer-text" style="font-size: 12px; margin-top: 16px;">
                                 {{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}

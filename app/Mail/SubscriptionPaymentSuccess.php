@@ -32,6 +32,9 @@ class SubscriptionPaymentSuccess extends LocalizedMailable
     {
         return new Content(
             view: 'emails.subscription-payment-success',
+            with: [
+                'manageUrl' => $this->mailUrl('dashboard.subscription'),
+            ],
         );
     }
 

@@ -30,6 +30,9 @@ class MagicLoginLink extends LocalizedMailable
     {
         return new Content(
             view: 'emails.magic-login-link',
+            with: [
+                'dashboardUrl' => $this->mailUrl('dashboard.index'),
+            ],
         );
     }
 

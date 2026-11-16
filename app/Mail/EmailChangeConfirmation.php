@@ -33,6 +33,9 @@ class EmailChangeConfirmation extends LocalizedMailable
     {
         return new Content(
             view: 'emails.email-change-confirmation',
+            with: [
+                'profileUrl' => $this->mailUrl('dashboard.profile'),
+            ],
         );
     }
 

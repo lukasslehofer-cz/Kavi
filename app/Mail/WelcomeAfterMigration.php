@@ -29,7 +29,8 @@ class WelcomeAfterMigration extends LocalizedMailable
         
         // Generate password reset token
         $token = Password::createToken($user);
-        $this->passwordSetUrl = route('password.reset', [
+        // Posílá se z konzole, route() by vzalo hostitele z APP_URL
+        $this->passwordSetUrl = $this->mailUrl('password.reset', [
             'token' => $token,
         ]) . '?email=' . urlencode($user->email);
     }
@@ -46,6 +47,9 @@ class WelcomeAfterMigration extends LocalizedMailable
     {
         return new Content(
             view: 'emails.welcome-after-migration',
+            with: [
+                'subscriptionsUrl' => $this->mailUrl('subscriptions.index'),
+            ],
         );
     }
 

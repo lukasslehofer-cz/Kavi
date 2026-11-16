@@ -33,6 +33,10 @@ class PaymentMethodChanged extends LocalizedMailable
     {
         return new Content(
             view: 'emails.payment-method-changed',
+            with: [
+                'manageUrl' => $this->mailUrl('dashboard.subscription'),
+                'profileUrl' => $this->mailUrl('dashboard.profile'),
+            ],
         );
     }
 

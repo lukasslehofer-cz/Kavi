@@ -31,6 +31,9 @@ class SubscriptionBoxShipped extends LocalizedMailable
     {
         return new Content(
             view: 'emails.subscription-box-shipped',
+            with: [
+                'manageUrl' => $this->mailUrl('dashboard.subscription'),
+            ],
         );
     }
 

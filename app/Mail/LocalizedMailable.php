@@ -55,7 +55,7 @@ abstract class LocalizedMailable extends Mailable
         $this->siteUrl = EmailService::getSiteUrl($locale);
         $this->homeUrl = $this->mailUrl('home');
         $this->shopUrl = $this->mailUrl('products.index');
-        $this->logoUrl = $this->siteUrl.'/images/kavi-logo-white.png';
+        $this->logoUrl = EmailService::getLogoUrl($locale);
     }
 
     /**
@@ -117,21 +117,11 @@ abstract class LocalizedMailable extends Mailable
 
     /**
      * Absolutní URL do e-mailu: doména podle regionu příjemce, cesta podle
-     * jazykové varianty routy.
-     *
-     * route() bere hostitele z requestu (admin posílá EN mail z kavi.cz) nebo
-     * z APP_URL (cron) – obojí je špatně. Doména i cesta musí sedět dohromady,
-     * jinak LocalizedUrlRedirect udělá 301 zpátky na druhou jazykovou variantu.
+     * jazykové varianty routy. Proč ne route(), viz EmailService::routeUrl().
      */
     protected function mailUrl(string $name, array $parameters = []): string
     {
-        $localized = "{$name}.{$this->emailLocale}";
-
-        $path = \Illuminate\Support\Facades\Route::has($localized)
-            ? route($localized, $parameters, false)
-            : route($name, $parameters, false);
-
-        return $this->siteUrl.$path;
+        return EmailService::routeUrl($this->emailLocale, $name, $parameters);
     }
 
     /**
