@@ -385,10 +385,26 @@
                                 </div>
                                 @endforeach
                                 @if($scheduledChange->changesPrice())
+                                @php
+                                    // Cena po změně včetně běžící slevy z kupónu - stejný výpočet jako při použití změny
+                                    $scheduledBreakdown = app(\App\Services\SubscriptionConfigurationService::class)->breakdownAfter($subscription, $scheduledChange);
+                                @endphp
                                 <div class="flex justify-between gap-4">
                                     <dt class="text-amber-800">{{ __('dashboard.subscription_price') }}</dt>
-                                    <dd class="text-amber-900 font-medium text-right">{{ \App\Helpers\CurrencyHelper::formatByCurrency($scheduledChange->resultingPrice(), $subscription->currency) }}</dd>
+                                    <dd class="text-amber-900 font-medium text-right">{{ \App\Helpers\CurrencyHelper::formatByCurrency($scheduledBreakdown->box, $scheduledBreakdown->currency) }}</dd>
                                 </div>
+                                @if($scheduledBreakdown->discount > 0)
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-amber-800">{{ __('dashboard.discount') }}@if($subscription->coupon_code) ({{ $subscription->coupon_code }})@endif</dt>
+                                    <dd class="text-amber-900 font-medium text-right">−{{ \App\Helpers\CurrencyHelper::formatByCurrency($scheduledBreakdown->discount, $scheduledBreakdown->currency) }}</dd>
+                                </div>
+                                @endif
+                                @if($scheduledBreakdown->discount > 0 || $scheduledBreakdown->shipping > 0)
+                                <div class="flex justify-between gap-4">
+                                    <dt class="text-amber-800">{{ __('dashboard.total') }}</dt>
+                                    <dd class="text-amber-900 font-semibold text-right">{{ \App\Helpers\CurrencyHelper::formatByCurrency($scheduledBreakdown->total, $scheduledBreakdown->currency) }}</dd>
+                                </div>
+                                @endif
                                 @endif
                             </dl>
                             <form method="POST" class="mt-3"

@@ -292,6 +292,13 @@
                                 <span class="text-gray-500 w-16 shrink-0">Nově</span>
                                 <span class="font-semibold text-gray-900">{{ $describeConfig($configChange->new_configuration, $configChange->new_frequency_months) }}@if($configChange->resultingPrice() !== null) · {!! \App\Helpers\CurrencyHelper::formatByCurrency($configChange->resultingPrice(), $subscription->currency) !!}@endif</span>
                             </div>
+                            {{-- Sleva z kupónu se při změně ceny přepočítává; u naplánované změny je to odhad ze dne zadání --}}
+                            @if($configChange->new_discount_amount !== null && ((float) $configChange->old_discount_amount > 0 || (float) $configChange->new_discount_amount > 0))
+                            <div class="flex gap-3">
+                                <span class="text-gray-500 w-16 shrink-0">Sleva</span>
+                                <span class="text-gray-700">{!! \App\Helpers\CurrencyHelper::formatByCurrency((float) $configChange->old_discount_amount, $subscription->currency) !!} → {!! \App\Helpers\CurrencyHelper::formatByCurrency((float) $configChange->new_discount_amount, $subscription->currency) !!}</span>
+                            </div>
+                            @endif
                             @if($configChange->new_next_shipment_date && $configChange->old_next_shipment_date && ! $configChange->new_next_shipment_date->isSameDay($configChange->old_next_shipment_date))
                             <div class="flex gap-3">
                                 <span class="text-gray-500 w-16 shrink-0">Box</span>

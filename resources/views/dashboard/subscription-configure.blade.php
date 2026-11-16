@@ -122,17 +122,33 @@
                 <fieldset class="bg-white rounded-2xl border border-gray-200 p-6">
                     <legend class="sr-only">{{ __('dashboard.config_change.size_title') }}</legend>
                     <h2 class="text-base font-bold text-gray-900 mb-4" aria-hidden="true">{{ __('dashboard.config_change.size_title') }}</h2>
+
+                    @if($form['discount'])
+                    {{-- Běžící sleva z kupónu platí i pro novou konfiguraci - ceny níže jsou už po ní --}}
+                    <p class="mb-4 rounded-xl bg-green-50 border border-green-200 p-3 text-sm text-green-800">
+                        {{ $form['discount']['code']
+                            ? __('dashboard.config_change.discount_note', ['code' => $form['discount']['code']])
+                            : __('dashboard.config_change.discount_note_no_code') }}
+                        @if($form['discount']['months_remaining'] !== null)
+                        {{ trans_choice('dashboard.config_change.discount_payments_left', $form['discount']['months_remaining'], ['count' => $form['discount']['months_remaining']]) }}
+                        @endif
+                    </p>
+                    @endif
+
                     <div class="space-y-3">
                         @foreach(\App\Helpers\BoxPricing::SIZES as $bags => $code)
+                        @php $sizePrice = $form['prices'][$bags.'-'.(int) $selected['isDecaf']]; @endphp
                         <label class="{{ $optionClass }}">
                             <input type="radio" name="amount" value="{{ $bags }}" class="sr-only" @checked($selected['amount'] === $bags) required>
                             <span class="flex items-baseline gap-3">
                                 <span class="font-display text-2xl text-gray-900 w-10">{{ $code }}</span>
                                 <span class="text-sm text-gray-600">{{ __('dashboard.config_change.size_bags', ['count' => $bags, 'grams' => \App\Helpers\BoxPricing::grams($bags)]) }}</span>
                             </span>
-                            <span class="text-sm text-gray-900 whitespace-nowrap">
-                                <span class="font-semibold" data-size-price="{{ $bags }}">{{ $form['prices'][$bags.'-'.(int) $selected['isDecaf']]['box_formatted'] }}</span>
+                            <span class="text-sm text-gray-900 whitespace-nowrap text-right">
+                                <span class="font-semibold" data-size-price="{{ $bags }}">{{ $sizePrice['discounted_formatted'] }}</span>
                                 <span class="text-gray-500">{{ __('dashboard.config_change.per_box') }}</span>
+                                {{-- Cena před slevou, jen když sleva z kupónu běží --}}
+                                <span class="block text-xs text-gray-500 line-through {{ $sizePrice['discount'] > 0 ? '' : 'hidden' }}" data-size-list-price="{{ $bags }}">{{ $sizePrice['box_formatted'] }}</span>
                             </span>
                         </label>
                         @endforeach
@@ -264,7 +280,7 @@
                             <dd class="text-gray-900 text-right tabular-nums" data-summary="box"></dd>
                         </div>
                         <div class="flex justify-between gap-4" data-summary-row="discount">
-                            <dt class="text-gray-600">{{ __('dashboard.discount') }}</dt>
+                            <dt class="text-gray-600">{{ __('dashboard.discount') }}@if($form['discount']['code'] ?? null) ({{ $form['discount']['code'] }})@endif</dt>
                             <dd class="text-green-700 text-right tabular-nums" data-summary="discount"></dd>
                         </div>
                         <div class="flex justify-between gap-4" data-summary-row="shipping">
@@ -359,9 +375,15 @@ document.addEventListener('DOMContentLoaded', function () {
             button.disabled = delta > 0 ? other <= 1 : own <= 1;
         });
 
-        // Ceny u velikostí se mění s decaf
+        // Ceny u velikostí se mění s decaf. Ukazuje se cena po slevě z kupónu a u ní
+        // přeškrtnutá cena před slevou.
         form.querySelectorAll('[data-size-price]').forEach(el => {
-            el.textContent = data.prices[el.dataset.sizePrice + '-' + (s.isDecaf ? 1 : 0)].box_formatted;
+            el.textContent = data.prices[el.dataset.sizePrice + '-' + (s.isDecaf ? 1 : 0)].discounted_formatted;
+        });
+        form.querySelectorAll('[data-size-list-price]').forEach(el => {
+            const sizePrice = data.prices[el.dataset.sizeListPrice + '-' + (s.isDecaf ? 1 : 0)];
+            el.textContent = sizePrice.box_formatted;
+            el.classList.toggle('hidden', !(sizePrice.discount > 0));
         });
 
         let typeLabel = data.labels.types[s.type];

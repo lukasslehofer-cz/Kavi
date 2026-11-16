@@ -46,6 +46,23 @@
         <td style="padding: 12px 0; border-bottom: 1px solid #bcbeb1; font-size: 14px; color: #1c1c1c; text-align: right;">{{ $nextPayment }}</td>
     </tr>
     @endif
+    {{-- Běžící sleva z kupónu platí i pro novou konfiguraci --}}
+    @if($discountAmount)
+    <tr>
+        <td style="padding: 12px 0; border-bottom: 1px solid #bcbeb1; font-size: 14px; color: #76716C;">{{ $t('box_price') }}</td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #bcbeb1; font-size: 14px; color: #1c1c1c; text-align: right;">{{ $boxPrice }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 12px 0; border-bottom: 1px solid #bcbeb1; font-size: 14px; color: #76716C;">{{ $t('discount') }}@if($discountCode) ({{ $discountCode }})@endif</td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #bcbeb1; font-size: 14px; color: #1c1c1c; text-align: right;">&minus;{{ $discountAmount }}</td>
+    </tr>
+    @if($shippingAmount)
+    <tr>
+        <td style="padding: 12px 0; border-bottom: 1px solid #bcbeb1; font-size: 14px; color: #76716C;">{{ $t('shipping') }}</td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #bcbeb1; font-size: 14px; color: #1c1c1c; text-align: right;">{{ $shippingAmount }}</td>
+    </tr>
+    @endif
+    @endif
     <tr>
         <td style="padding: 16px 0; font-size: 14px; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.1em;">{{ $t('price') }}</td>
         <td style="padding: 16px 0; font-size: 22px; color: #1c1c1c; text-align: right;">{{ $amount }}</td>

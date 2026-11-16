@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Helpers\CurrencyHelper;
 use App\Helpers\DateFormat;
-use App\Helpers\SubscriptionPricing;
 use App\Helpers\SubscriptionSummary;
 use App\Models\Subscription;
 use App\Models\SubscriptionConfigurationChange;
@@ -46,18 +45,12 @@ class SubscriptionConfigurationChanged extends LocalizedMailable
     public function content(): Content
     {
         $scheduled = $this->change->isScheduled();
-        $breakdown = SubscriptionPricing::forRecurringPayment($this->subscription);
 
-        // Naplánovaná změna na předplatném ještě není - cenu je potřeba dopočítat z ní
-        if ($scheduled && $this->change->new_configured_price !== null) {
-            $box = (float) $this->change->new_configured_price;
-            $breakdown = SubscriptionPricing::fromValues(
-                $box,
-                app(SubscriptionConfigurationService::class)->discountFor($this->subscription, $box) ?? 0.0,
-                SubscriptionPricing::shippingCost($this->subscription),
-                $breakdown->currency,
-            );
-        }
+        // Cena po změně včetně běžící slevy z kupónu. Naplánovaná změna na předplatném
+        // ještě není, služba ji proto dopočítá z ní.
+        $configurationService = app(SubscriptionConfigurationService::class);
+        $breakdown = $configurationService->breakdownAfter($this->subscription, $this->change);
+        $discount = $breakdown->discount > 0 ? $configurationService->activeDiscount($this->subscription) : null;
 
         $lockedDate = $scheduled
             ? app(SubscriptionShipmentService::class)->lockedShipment($this->subscription)?->shipment_date
@@ -88,6 +81,13 @@ class SubscriptionConfigurationChanged extends LocalizedMailable
                 'lockedDate' => $lockedDate ? DateFormat::full($lockedDate, $this->emailLocale) : null,
                 'nextPayment' => $nextPayment ? DateFormat::full($nextPayment, $this->emailLocale) : null,
                 'amount' => CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency),
+                // Rozpad se ukazuje jen tehdy, když sleva z kupónu běží
+                'boxPrice' => $breakdown->discount > 0 ? CurrencyHelper::formatByCurrency($breakdown->box, $breakdown->currency) : null,
+                'discountAmount' => $breakdown->discount > 0 ? CurrencyHelper::formatByCurrency($breakdown->discount, $breakdown->currency) : null,
+                'discountCode' => $discount['code'] ?? null,
+                'shippingAmount' => $breakdown->discount > 0 && $breakdown->shipping > 0
+                    ? CurrencyHelper::formatByCurrency($breakdown->shipping, $breakdown->currency)
+                    : null,
                 'manageUrl' => $this->mailUrl('dashboard.subscription'),
             ],
         );

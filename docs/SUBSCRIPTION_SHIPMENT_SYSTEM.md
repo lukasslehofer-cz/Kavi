@@ -329,7 +329,15 @@ Box s navázanou doplňkovou objednávkou se nepřesouvá – změna frekvence s
 
 - `configured_price` se bere z aktuálního ceníku (`BoxPricing::configuredPrice`) jen při změně
   velikosti nebo decaf. Změna druhu nebo frekvence cenu nemění.
-- Běžící procentní kupón se přepočítá z nové ceny; fixní sleva se jen zastropuje novou cenou.
+- Běžící sleva z kupónu platí i pro upravenou konfiguraci (`discountFor()`):
+  - procentní kupón se spočítá z nové ceny,
+  - fixní kupón dál dává svou částku, nejvýš do ceny boxu. Když byla sleva dřív zastropená
+    levnějším boxem, u dražšího se vrátí až na hodnotu kupónu; níž než dosud nespadne,
+  - dárkový poukaz a smazaný kupón: dosavadní částka, nejvýš do ceny boxu.
+- Počet zbývajících plateb se slevou (`discount_months_remaining`) se změnou nemění.
+- Slevu ukazuje formulář (ceny velikostí jsou po slevě, původní cena je přeškrtnutá), box
+  s naplánovanou změnou na kartě předplatného i potvrzovací e-mail. U naplánované změny je
+  `new_discount_amount` jen odhad ze dne zadání; při použití se sleva počítá znovu.
 - Měna se vždy bere ze `subscription->currency`.
 
 ### Dostupnost káv

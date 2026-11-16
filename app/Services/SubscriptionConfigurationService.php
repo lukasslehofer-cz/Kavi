@@ -195,6 +195,7 @@ class SubscriptionConfigurationService
             'mode' => $locked ? 'scheduled' : 'immediate',
             'locked_shipment_date' => $locked?->shipment_date,
             'scheduled_change' => $scheduled,
+            'discount' => $this->activeDiscount($subscription),
             'prices' => $prices,
             'list_prices' => collect(self::AMOUNTS)->mapWithKeys(fn ($amount) => [
                 $amount => CurrencyHelper::formatByCurrency(BoxPricing::boxPrice($amount, $currency), $currency),
@@ -302,13 +303,18 @@ class SubscriptionConfigurationService
                     $currency,
                 );
 
+                // Cena boxu po slevě z kupónu, bez dopravy - ukazuje se přímo u velikostí
+                $discounted = SubscriptionPricing::roundFor(max(0.0, $breakdown->box - $breakdown->discount), $currency);
+
                 $prices[$amount.'-'.(int) $isDecaf] = [
                     'box' => $breakdown->box,
                     'discount' => $breakdown->discount,
+                    'discounted' => $discounted,
                     'shipping' => $breakdown->shipping,
                     'total' => $breakdown->total,
                     'box_formatted' => CurrencyHelper::formatByCurrency($breakdown->box, $currency),
                     'discount_formatted' => CurrencyHelper::formatByCurrency($breakdown->discount, $currency),
+                    'discounted_formatted' => CurrencyHelper::formatByCurrency($discounted, $currency),
                     'shipping_formatted' => CurrencyHelper::formatByCurrency($breakdown->shipping, $currency),
                     'total_formatted' => CurrencyHelper::formatByCurrency($breakdown->total, $currency),
                 ];
@@ -438,6 +444,11 @@ class SubscriptionConfigurationService
                     ? ($this->shipmentService->previewReplannedShipmentDate($sub, $frequency)
                         ?? $this->currentNextUnpaidDate($sub, true))
                     : $this->currentNextUnpaidDate($sub, true);
+                // Sleva z kupónu po změně - jen pro zobrazení (karta, admin). Při použití
+                // změny se počítá znovu, do té doby mohla sleva doběhnout.
+                $change->new_discount_amount = $change->new_configured_price !== null
+                    ? $this->discountFor($sub, (float) $change->new_configured_price)
+                    : null;
                 $change->save();
 
                 Log::info('Subscription configuration change scheduled', [
@@ -639,11 +650,18 @@ class SubscriptionConfigurationService
     }
 
     /**
-     * Sleva po změně ceny, nebo null, když se na slevu nemá sahat (žádná neběží).
+     * Sleva z běžícího kupónu pro novou cenu boxu, nebo null, když žádná sleva neběží
+     * (pak se na ni nesahá).
      *
-     * Procentní kupón se přepočítá z nové ceny. Všechno ostatní (fixní, dárkový poukaz,
-     * smazaný kupón) se jen zastropuje novou cenou - Coupon::calculateSubscriptionDiscount
-     * se pro fixní slevu použít nedá, bere měnu ze session.
+     * Běžící sleva platí i pro upravenou konfiguraci:
+     *  - procentní kupón se spočítá z nové ceny,
+     *  - fixní kupón dál dává svou částku, nejvýš do ceny boxu. Když byla sleva dřív
+     *    zastropená levnějším boxem, u dražšího se vrátí až na hodnotu kupónu - níž než
+     *    dosud ale nespadne (kupón mohl mezitím někdo v adminu změnit),
+     *  - dárkový poukaz a smazaný kupón: dosavadní částka, nejvýš do ceny boxu.
+     *
+     * Počet zbývajících plateb se slevou (discount_months_remaining) se nemění.
+     * Coupon::calculateSubscriptionDiscount se tu použít nedá, bere měnu ze session.
      */
     public function discountFor(Subscription $subscription, float $price): ?float
     {
@@ -652,12 +670,63 @@ class SubscriptionConfigurationService
         }
 
         $coupon = $subscription->coupon;
+        $stored = (float) $subscription->discount_amount;
 
         if ($coupon && $coupon->discount_type_subscription === 'percentage') {
             return round($price * ((float) $coupon->discount_value_subscription / 100), 2);
         }
 
-        return min((float) $subscription->discount_amount, $price);
+        if ($coupon && $coupon->discount_type_subscription === 'fixed' && ! $coupon->is_gift_voucher) {
+            $couponValue = (float) (SubscriptionPricing::currencyOf($subscription) === 'EUR'
+                ? $coupon->discount_value_subscription_eur
+                : $coupon->discount_value_subscription);
+
+            return min(max($stored, $couponValue), $price);
+        }
+
+        return min($stored, $price);
+    }
+
+    /**
+     * Popis běžící slevy pro formulář změny, kartu předplatného a e-mail. Null = žádná
+     * sleva neběží.
+     *
+     * @return array{code: ?string, months_remaining: ?int}|null
+     */
+    public function activeDiscount(Subscription $subscription): ?array
+    {
+        if (! SubscriptionPricing::hasActiveDiscount($subscription)) {
+            return null;
+        }
+
+        return [
+            'code' => $subscription->coupon_code ?: $subscription->coupon?->code,
+            // null = sleva bez omezení, jinak počet plateb, na které ještě platí
+            'months_remaining' => $subscription->discount_months_remaining === null
+                ? null
+                : (int) $subscription->discount_months_remaining,
+        ];
+    }
+
+    /**
+     * Rozpad ceny, kterou bude předplatné platit po dané změně - box, sleva z běžícího
+     * kupónu, doprava a celkem. U naplánované změny se počítá z ní, protože na předplatném
+     * ještě není; po jejím použití odpovídá SubscriptionPricing::forRecurringPayment().
+     */
+    public function breakdownAfter(Subscription $subscription, SubscriptionConfigurationChange $change): \App\Helpers\SubscriptionPriceBreakdown
+    {
+        if (! $change->isScheduled() || $change->new_configured_price === null) {
+            return SubscriptionPricing::forRecurringPayment($subscription);
+        }
+
+        $box = (float) $change->new_configured_price;
+
+        return SubscriptionPricing::fromValues(
+            $box,
+            $this->discountFor($subscription, $box) ?? 0.0,
+            SubscriptionPricing::shippingCost($subscription),
+            SubscriptionPricing::currencyOf($subscription),
+        );
     }
 
     /**
