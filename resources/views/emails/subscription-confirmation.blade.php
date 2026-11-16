@@ -207,12 +207,15 @@
                                     {{ __('emails.order_confirmation.billing_info', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> {{ $subscription->shipping_address['name'] }}
+                                    <span style="color: #CA4136;">→</span> {{ $subscription->shipping_address['name'] ?? '' }}
                                 </p>
+                                {{-- Fakturační adresu nemají např. předplatná z dárku nebo zadaná ručně --}}
+                                @if(! empty($subscription->shipping_address['billing_address']))
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
                                     {{ $subscription->shipping_address['billing_address'] }}<br>
-                                    {{ $subscription->shipping_address['billing_postal_code'] }} {{ $subscription->shipping_address['billing_city'] }}
+                                    {{ $subscription->shipping_address['billing_postal_code'] ?? '' }} {{ $subscription->shipping_address['billing_city'] ?? '' }}
                                 </p>
+                                @endif
                                 @if(! empty($subscription->invoice_details['company']))
                                 <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
                                     <span style="color: #1c1c1c;">{{ $subscription->invoice_details['company'] }}</span><br>
@@ -222,7 +225,7 @@
                                 </p>
                                 @endif
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
-                                    {{ $subscription->shipping_address['email'] }}
+                                    {{ $subscription->shipping_address['email'] ?? '' }}
                                     @if(isset($subscription->shipping_address['phone']))
                                     <br>{{ $subscription->shipping_address['phone'] }}
                                     @endif

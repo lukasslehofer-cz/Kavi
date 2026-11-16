@@ -489,12 +489,15 @@
                                     {{ __('emails.order_confirmation.billing_info', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> {{ $order->shipping_address['name'] }}
+                                    <span style="color: #CA4136;">→</span> {{ $order->shipping_address['name'] ?? '' }}
                                 </p>
+                                {{-- Fakturační adresu nemají např. objednávky k předplatnému z dárku nebo zadanému ručně --}}
+                                @if(! empty($order->shipping_address['billing_address']))
                                 <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
                                     {{ $order->shipping_address['billing_address'] }}<br>
-                                    {{ $order->shipping_address['billing_postal_code'] }} {{ $order->shipping_address['billing_city'] }}
+                                    {{ $order->shipping_address['billing_postal_code'] ?? '' }} {{ $order->shipping_address['billing_city'] ?? '' }}
                                 </p>
+                                @endif
                                 @if(! empty($order->invoice_details['company']))
                                 <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
                                     <span style="color: #1c1c1c;">{{ $order->invoice_details['company'] }}</span><br>
@@ -504,8 +507,10 @@
                                 </p>
                                 @endif
                                 <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
-                                    {{ $order->shipping_address['email'] }}<br>
-                                    {{ $order->shipping_address['phone'] }}
+                                    {{ $order->shipping_address['email'] ?? $order->user?->email ?? '' }}
+                                    @if(! empty($order->shipping_address['phone']))
+                                    <br>{{ $order->shipping_address['phone'] }}
+                                    @endif
                                 </p>
                             </div>
                             
@@ -581,7 +586,7 @@
                             </div>
                             <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
                                 <p style="margin: 0 0 8px 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>
-                                <p style="margin: 0;">{{ __('emails.order_confirmation.footer_text', ['email' => $order->shipping_address['email']], $locale) }}</p>
+                                <p style="margin: 0;">{{ __('emails.order_confirmation.footer_text', ['email' => $order->shipping_address['email'] ?? $order->user?->email ?? ''], $locale) }}</p>
                             </div>
                         </td>
                     </tr>
