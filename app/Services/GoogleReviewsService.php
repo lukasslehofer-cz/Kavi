@@ -184,6 +184,49 @@ class GoogleReviewsService
     }
 
     /**
+     * Časy vzniku recenzí jednoho profilu - podklad pro párování s kliknutími
+     * z e-mailu (reviews:send). Ven jdou jen časy, žádné jméno ani text.
+     *
+     * null = nevíme: profil neexistuje, soubor chybí nebo je stažení starší než
+     * $maxAgeHours. Prázdné pole = profil je čerstvě stažený a recenzi nemá.
+     * Proto se tu nepoužívá isFresh() - ta prázdný profil odmítne, což je
+     * správně pro zobrazení na webu, ale ne pro otázku "napsal někdo recenzi?".
+     *
+     * @return array<int, Carbon>|null
+     */
+    public function reviewTimes(string $locale, int $maxAgeHours): ?array
+    {
+        // Bez tichého přepnutí na cs jako v resolveLocale(): cizí profil by
+        // spároval recenze se špatnými zákazníky.
+        if (! array_key_exists($locale, config('services.google_reviews.profiles', []))) {
+            return null;
+        }
+
+        $stored = $this->read($locale);
+
+        if (! is_array($stored) || empty($stored['fetched_at']) || ! is_array($stored['reviews'] ?? null)) {
+            return null;
+        }
+
+        if (Carbon::parse($stored['fetched_at'])->lt(now()->subHours($maxAgeHours))) {
+            return null;
+        }
+
+        $times = [];
+
+        foreach ($stored['reviews'] as $review) {
+            if (empty($review['created_at'])) {
+                continue;
+            }
+
+            // V souboru je UTC, kliknutí se ukládají v pásmu aplikace
+            $times[] = Carbon::parse($review['created_at'])->setTimezone(config('app.timezone'));
+        }
+
+        return $times;
+    }
+
+    /**
      * Vypíše účty a provozovny, ke kterým má token přístup. Slouží ke zjištění
      * account_id a location_id, které jinde v rozhraní Googlu nejsou po ruce.
      *

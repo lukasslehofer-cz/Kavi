@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Order;
+use App\Models\ReviewRequest;
 use App\Models\Subscription;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Support\Facades\Hash;
@@ -95,10 +96,13 @@ class AccountDeletionService
             // 5. Anonymize subscriptions
             $this->anonymizeSubscriptions($user);
 
-            // 6. Remove from newsletter
+            // 6. Anonymize review requests
+            $this->anonymizeReviewRequests($user);
+
+            // 7. Remove from newsletter
             $this->removeFromNewsletter($user);
 
-            // 7. Anonymize user account
+            // 8. Anonymize user account
             $originalEmail = $user->email;
             $this->anonymizeUser($user);
 
@@ -109,7 +113,7 @@ class AccountDeletionService
                 'original_email' => $originalEmail,
             ]);
 
-            // 8. Send confirmation email (before session logout)
+            // 9. Send confirmation email (before session logout)
             try {
                 \Mail::to($originalEmail)->send(new \App\Mail\AccountDeleted($originalEmail, $locale));
             } catch (\Exception $e) {
@@ -295,6 +299,23 @@ class AccountDeletionService
                 ]);
             }
         }
+    }
+
+    /**
+     * Žádosti o hodnocení si drží e-mail příjemce a IP kliknutí. Řádky
+     * zůstávají kvůli statistikám, osobní údaje z nich mizí - bez toho by
+     * reviews:send na původní adresu poslal ještě připomínku nebo výzvu.
+     *
+     * Musí běžet před anonymizeUser(), dokud je e-mail účtu ještě původní.
+     */
+    protected function anonymizeReviewRequests(User $user): void
+    {
+        $count = ReviewRequest::forIdentity($user->id, $user->email)->update([
+            'email' => null,
+            'clicked_ip' => null,
+        ]);
+
+        \Log::info('Anonymized review requests', ['user_id' => $user->id, 'count' => $count]);
     }
 
     /**

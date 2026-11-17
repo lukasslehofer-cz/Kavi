@@ -434,10 +434,25 @@ return [
         'subject' => 'How Did You Like Your Coffee? ⭐',
         'title' => 'How Did You Like Your Coffee? ⭐',
         'subtitle' => 'Your feedback helps us improve our selection.',
-        'rate_label' => 'Rate with a single click',
-        'time_note' => 'It takes half a minute. Your review helps others choose and shows us what to improve.',
-        'fallback_link' => 'Or write your review here',
+        // The star is not carried over to Google, so the copy does not promise a one-click rating
+        'rate_label' => 'How many stars would you give us?',
+        'time_note' => 'Clicking a star opens Google. Your rating is saved once you confirm it there. It takes about a minute.',
+        'fallback_link' => 'Or write your review directly on Google',
         'ignore_note' => 'Not interested? Just ignore this email.',
+        'reminder_subject' => 'One more request for your rating',
+        'reminder_title' => 'One more request',
+        'reminder_subtitle' => 'A few days ago we asked for your rating. We won\'t send another reminder.',
+    ],
+
+    // Nudge for those who clicked in the email but did not finish the review on Google
+    'review_nudge' => [
+        'subject' => 'Did you manage to finish your Google review?',
+        'title' => 'One last step',
+        'subtitle' => 'Your Google review',
+        'intro' => 'Thank you for the stars in our email. Google only saves your rating once you confirm it there.',
+        'steps' => 'Just pick the stars again and click Post.',
+        'button' => 'Finish the review on Google',
+        'done_note' => 'Already posted it? Thank you, please ignore this email. We will not remind you again.',
     ],
 
     // Order Review Request

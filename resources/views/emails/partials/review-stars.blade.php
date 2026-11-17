@@ -1,5 +1,6 @@
-{{-- Hvězdičky jako samostatné odkazy. Klik rovnou uloží hodnocení a otevře
-     formulář s předvyplněnou hvězdičkou. --}}
+{{-- Hvězdičky jako samostatné odkazy. Klik si hvězdičku zapamatuje u nás
+     a otevře formulář Googlu. Tam se hvězdička nepřenese a hodnotí se znovu,
+     proto to text pod hvězdičkami říká předem. --}}
 <div style="margin: 32px 0; padding: 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
     <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 18px; text-align: center;">
         {{ __('emails.review_request.rate_label', [], $locale) }}

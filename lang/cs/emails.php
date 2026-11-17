@@ -436,10 +436,25 @@ return [
         'subject' => 'Jak se vám líbila káva? ⭐',
         'title' => 'Jak se vám líbila káva? ⭐',
         'subtitle' => 'Vaše zpětná vazba nám pomáhá zlepšovat naši nabídku.',
-        'rate_label' => 'Ohodnoťte jedním kliknutím',
-        'time_note' => 'Zabere to půl minuty. Vaše hodnocení pomůže ostatním s výběrem a nám ukáže, co zlepšit.',
-        'fallback_link' => 'Nebo napište hodnocení tady',
+        // Hvězdička se na Google nepřenese, proto text neslibuje hodnocení jedním klikem
+        'rate_label' => 'Kolik hvězdiček byste nám dali?',
+        'time_note' => 'Kliknutím na hvězdičku se otevře Google. Hodnocení se uloží, až ho tam potvrdíte. Zabere to asi minutu.',
+        'fallback_link' => 'Nebo napište hodnocení rovnou na Googlu',
         'ignore_note' => 'Nechcete hodnotit? Stačí tenhle e-mail ignorovat.',
+        'reminder_subject' => 'Ještě jedna prosba o hodnocení',
+        'reminder_title' => 'Ještě jedna prosba',
+        'reminder_subtitle' => 'Před pár dny jsme vás poprosili o hodnocení. Další připomínku už nepošleme.',
+    ],
+
+    // Výzva k dokončení pro toho, kdo v e-mailu kliknul, ale recenzi na Googlu nedopsal
+    'review_nudge' => [
+        'subject' => 'Podařilo se vám dokončit hodnocení na Googlu?',
+        'title' => 'Chybí poslední krok',
+        'subtitle' => 'Hodnocení na Googlu',
+        'intro' => 'Děkujeme za hvězdičky v našem e-mailu. Na Googlu se ale hodnocení uloží, až ho tam potvrdíte.',
+        'steps' => 'Stačí znovu vybrat hvězdičky a kliknout na Zveřejnit.',
+        'button' => 'Dokončit hodnocení na Googlu',
+        'done_note' => 'Už jste hodnocení odeslali? Děkujeme, tenhle e-mail prosím ignorujte. Znovu už se nepřipomeneme.',
     ],
 
     // Order Review Request

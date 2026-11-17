@@ -3,11 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Mail\OrderReviewRequestMail;
+use App\Mail\ReviewNudgeMail;
 use App\Mail\SubscriptionReviewRequestMail;
 use App\Models\Order;
 use App\Models\ReviewRequest;
 use App\Models\SubscriptionShipment;
+use App\Services\GoogleReviewsService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -43,9 +46,32 @@ class SendReviewRequests extends Command
     protected array $askedThisRun = [];
 
     /**
+     * Kliknuté žádosti načtené jednou pro párování i výzvy. V dry-runu se
+     * spárování nikam neukládá, takže musí platit aspoň na těchhle modelech.
+     *
+     * @var Collection<int, ReviewRequest>
+     */
+    protected Collection $clickedRequests;
+
+    /**
+     * Identity, které už recenzi na Googlu mají (klíče u:{id} i e:{email}).
+     *
+     * @var array<string, true>
+     */
+    protected array $reviewedIdentities = [];
+
+    /**
+     * Profily, pro které je čerstvé stažení recenzí. Bez něj nevíme, kdo
+     * recenzi dopsal, a výzva naslepo by šla i těm, kdo ji mají hotovou.
+     *
+     * @var array<string, bool>
+     */
+    protected array $profileKnown = [];
+
+    /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(GoogleReviewsService $googleReviews)
     {
         $type = $this->option('type') ?? 'all';
         $this->dryRun = (bool) $this->option('dry-run');
@@ -67,6 +93,9 @@ class SendReviewRequests extends Command
         ));
         $this->newLine();
 
+        // Nejdřív zjistit, kdo recenzi dopsal - řídí se tím žádosti i výzvy
+        $this->matchGoogleReviews($googleReviews);
+
         $ordersSent = 0;
         $subscriptionsSent = 0;
 
@@ -79,6 +108,7 @@ class SendReviewRequests extends Command
         }
 
         $remindersSent = $this->sendReminders();
+        $nudgesSent = $this->sendNudges();
 
         $this->newLine();
         $this->table(
@@ -87,11 +117,101 @@ class SendReviewRequests extends Command
                 ['Objednávky', $ordersSent],
                 ['Předplatné', $subscriptionsSent],
                 ['Připomínky', $remindersSent],
-                ['Celkem', $ordersSent + $subscriptionsSent + $remindersSent],
+                ['Výzvy k dokončení', $nudgesSent],
+                ['Celkem', $ordersSent + $subscriptionsSent + $remindersSent + $nudgesSent],
             ]
         );
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Spáruje recenze z Googlu s kliknutími z e-mailu.
+     *
+     * Hvězdička z e-mailu se na Google nepřenese, takže jediné, co kliknutí
+     * a recenzi spojuje, je čas: recenze vzniká pár minut po kliku. Jméno
+     * autora ani text se s nikým neporovnávají a u žádosti se uloží jen
+     * okamžik zjištění.
+     *
+     * Prochází se pokaždé všechny recenze proti všem kliknutím, i těm už
+     * spárovaným. Když nejbližší klik recenzi má, recenze se přeskočí - kdyby
+     * si místo toho hledala další klik v okně, označila by cizího člověka.
+     */
+    protected function matchGoogleReviews(GoogleReviewsService $googleReviews): void
+    {
+        $this->info('Recenze na Googlu');
+
+        $window = (int) config('reviews.match_window_hours');
+        $maxAge = (int) config('reviews.google_max_age_hours');
+
+        $this->clickedRequests = ReviewRequest::real()
+            ->whereNotNull('clicked_at')
+            ->with(['user', 'order.user', 'subscription.user'])
+            ->orderBy('clicked_at')
+            ->get();
+
+        $byProfile = $this->clickedRequests->groupBy(
+            fn (ReviewRequest $reviewRequest) => $reviewRequest->profileLocale()
+        );
+
+        $paired = 0;
+
+        foreach (array_keys(config('services.review_links', [])) as $locale) {
+            $times = $googleReviews->reviewTimes($locale, $maxAge);
+
+            if ($times === null) {
+                $this->profileKnown[$locale] = false;
+                $this->warn("  Profil {$locale}: chybí čerstvé stažení recenzí, nepáruji a výzvy pro něj přeskočím");
+
+                continue;
+            }
+
+            $this->profileKnown[$locale] = true;
+
+            $candidates = $byProfile->get($locale, collect());
+
+            // Od nejstarší, ať je výsledek stejný při každém běhu
+            usort($times, fn ($a, $b) => $a->getTimestamp() <=> $b->getTimestamp());
+
+            foreach ($times as $reviewTime) {
+                $best = null;
+                $bestGap = null;
+
+                foreach ($candidates as $candidate) {
+                    $gap = $candidate->clickGapTo($reviewTime, $window);
+
+                    if ($gap !== null && ($bestGap === null || $gap < $bestGap)) {
+                        $best = $candidate;
+                        $bestGap = $gap;
+                    }
+                }
+
+                if (! $best || $best->google_review_found_at) {
+                    continue;
+                }
+
+                $this->line("  ✓ žádost #{$best->id}: recenze nalezena (klik {$best->clicked_at->format('d.m.Y H:i')})");
+
+                $best->google_review_found_at = now();
+
+                if (! $this->dryRun) {
+                    $best->save();
+                }
+
+                $paired++;
+            }
+        }
+
+        foreach ($this->clickedRequests as $reviewRequest) {
+            if ($reviewRequest->google_review_found_at) {
+                foreach ($this->identityKeys($reviewRequest->user_id, $reviewRequest->email) as $key) {
+                    $this->reviewedIdentities[$key] = true;
+                }
+            }
+        }
+
+        $this->info("  Nově spárováno: {$paired}");
+        $this->newLine();
     }
 
     /**
@@ -305,11 +425,7 @@ class SendReviewRequests extends Command
                 break;
             }
 
-            // Žádosti založené před přidáním sloupce 'email' ho mají prázdný,
-            // příjemce se u nich dohledá z objednávky nebo účtu.
-            $email = $reviewRequest->email
-                ?? $reviewRequest->order?->shipping_address['email']
-                ?? $reviewRequest->user?->email;
+            $email = $this->resolveRecipient($reviewRequest);
 
             if (! $email) {
                 continue;
@@ -323,8 +439,8 @@ class SendReviewRequests extends Command
             }
 
             $mailable = $reviewRequest->review_type === 'order'
-                ? ($reviewRequest->order ? new OrderReviewRequestMail($reviewRequest->order, $reviewRequest) : null)
-                : ($reviewRequest->subscription ? new SubscriptionReviewRequestMail($reviewRequest->subscription, $reviewRequest) : null);
+                ? ($reviewRequest->order ? new OrderReviewRequestMail($reviewRequest->order, $reviewRequest, reminder: true) : null)
+                : ($reviewRequest->subscription ? new SubscriptionReviewRequestMail($reviewRequest->subscription, $reviewRequest, reminder: true) : null);
 
             if (! $mailable) {
                 continue;
@@ -342,6 +458,109 @@ class SendReviewRequests extends Command
         }
 
         $this->info("  Odesláno: {$sent}");
+        $this->newLine();
+
+        return $sent;
+    }
+
+    /**
+     * Jedna výzva pro toho, kdo v e-mailu kliknul, ale recenzi na Googlu
+     * nedopsal. Hvězdičku kliknutou v e-mailu snadno považuje za hotové
+     * hodnocení, takže bez výzvy by o chybějícím kroku nevěděl.
+     *
+     * Jde všem bez ohledu na počet hvězdiček. Vyzývat jen spokojené by bylo
+     * filtrování recenzí - viz GoogleReviewsService.
+     */
+    protected function sendNudges(): int
+    {
+        $after = (int) config('reviews.nudge_after_days');
+
+        if ($after <= 0) {
+            return 0;
+        }
+
+        $this->info('Výzvy k dokončení');
+
+        $sent = 0;
+        $maxAge = (int) config('reviews.nudge_max_age_days');
+        $cooldown = now()->subMonths((int) config('reviews.click_cooldown_months'));
+
+        $pending = $this->clickedRequests->filter(
+            fn (ReviewRequest $reviewRequest) => ! $reviewRequest->google_review_found_at
+                && ! $reviewRequest->nudged_at
+                && ($reviewRequest->last_clicked_at ?? $reviewRequest->clicked_at)->lte(now()->subDays($after))
+                && $reviewRequest->clicked_at->gte(now()->subDays($maxAge))
+        );
+
+        $this->line("  Ve výběru: {$pending->count()} kliknutí bez recenze");
+
+        $nudgedThisRun = [];
+
+        foreach ($pending as $reviewRequest) {
+            if ($this->exhausted()) {
+                break;
+            }
+
+            if (! ($this->profileKnown[$reviewRequest->profileLocale()] ?? false)) {
+                $this->line("  - žádost #{$reviewRequest->id}: bez čerstvých recenzí z Googlu, přeskakuji");
+
+                continue;
+            }
+
+            $email = $this->resolveRecipient($reviewRequest);
+
+            if (! $email) {
+                continue;
+            }
+
+            $keys = $this->identityKeys($reviewRequest->user_id, $email);
+
+            // Recenzi má pod jinou žádostí, nebo už výzvu dostal
+            if (array_intersect_key(array_flip($keys), $this->reviewedIdentities + $nudgedThisRun)) {
+                continue;
+            }
+
+            if (ReviewRequest::wasNudgedSince($reviewRequest->user_id, $email, $cooldown)) {
+                continue;
+            }
+
+            $subject = $reviewRequest->review_type === 'order'
+                ? $reviewRequest->order
+                : $reviewRequest->subscription;
+
+            if (! $subject) {
+                continue;
+            }
+
+            $this->line("  ✓ výzva → {$email} (žádost #{$reviewRequest->id})");
+
+            if (! $this->dryRun) {
+                // Fronta je sync, takže chyba SMTP by jinak shodila celý běh.
+                // nudged_at až po úspěchu, ať se nezdařená výzva zkusí zítra.
+                try {
+                    Mail::to($email)->send(new ReviewNudgeMail($reviewRequest, $subject));
+                    $reviewRequest->update(['nudged_at' => now()]);
+                } catch (\Throwable $e) {
+                    $this->error("    odeslání selhalo: {$e->getMessage()}");
+
+                    Log::warning('Výzva k dokončení hodnocení se neodeslala', [
+                        'review_request_id' => $reviewRequest->id,
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    continue;
+                }
+            }
+
+            foreach ($keys as $key) {
+                $nudgedThisRun[$key] = true;
+            }
+
+            $this->consume();
+            $sent++;
+        }
+
+        $this->info("  Odesláno: {$sent}");
 
         return $sent;
     }
@@ -352,6 +571,12 @@ class SendReviewRequests extends Command
     protected function canAsk(?int $userId, ?string $email): bool
     {
         if (isset($this->askedThisRun[$this->identityKey($userId, $email)])) {
+            return false;
+        }
+
+        // Google dovolí jednu recenzi na účet a místo. Kdo ji napsal, už se
+        // o další neprosí - na rozdíl od kliknutí bez časového omezení.
+        if (array_intersect_key(array_flip($this->identityKeys($userId, $email)), $this->reviewedIdentities)) {
             return false;
         }
 
@@ -408,9 +633,45 @@ class SendReviewRequests extends Command
         return $sentAt->diffInDays($deliveredAt) > 30;
     }
 
+    /**
+     * Komu připomínka nebo výzva půjde. Žádosti založené před přidáním sloupce
+     * 'email' ho mají prázdný, příjemce se u nich dohledá z objednávky nebo účtu.
+     *
+     * Smazaný účet nedostane nic: AccountDeletionService adresu u žádosti
+     * maže, tohle je pojistka pro řádky anonymizované dřív.
+     */
+    protected function resolveRecipient(ReviewRequest $reviewRequest): ?string
+    {
+        $user = $reviewRequest->user
+            ?? $reviewRequest->order?->user
+            ?? $reviewRequest->subscription?->user;
+
+        if ($user?->anonymized_at) {
+            return null;
+        }
+
+        return $reviewRequest->email
+            ?? $reviewRequest->order?->shipping_address['email']
+            ?? $user?->email;
+    }
+
     protected function identityKey(?int $userId, ?string $email): string
     {
         return $userId ? "u:{$userId}" : 'e:'.strtolower((string) $email);
+    }
+
+    /**
+     * Oba klíče naráz. ReviewRequest::forIdentity() páruje přes účet NEBO
+     * e-mail, takže jeden klíč z identityKey() by hosta s účtem minul.
+     *
+     * @return array<int, string>
+     */
+    protected function identityKeys(?int $userId, ?string $email): array
+    {
+        return array_values(array_filter([
+            $userId ? "u:{$userId}" : null,
+            $email ? 'e:'.strtolower($email) : null,
+        ]));
     }
 
     protected function markAsked(?int $userId, ?string $email): void

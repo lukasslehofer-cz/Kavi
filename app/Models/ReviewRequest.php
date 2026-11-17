@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\EmailService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -21,14 +22,20 @@ class ReviewRequest extends Model
         'email_sent_at',
         'reminded_at',
         'clicked_at',
+        'last_clicked_at',
         'clicked_ip',
         'rating',
+        'google_review_found_at',
+        'nudged_at',
     ];
 
     protected $casts = [
         'email_sent_at' => 'datetime',
         'reminded_at' => 'datetime',
         'clicked_at' => 'datetime',
+        'last_clicked_at' => 'datetime',
+        'google_review_found_at' => 'datetime',
+        'nudged_at' => 'datetime',
         'milestone' => 'integer',
         'rating' => 'integer',
     ];
@@ -90,9 +97,55 @@ class ReviewRequest extends Model
     {
         $this->update([
             'clicked_at' => $this->clicked_at ?? now(),
+            // Po nalezené recenzi se poslední klik už neposouvá, jinak by
+            // pozdější zvědavé kliknutí odtrhlo žádost od její recenze.
+            'last_clicked_at' => $this->google_review_found_at ? $this->last_clicked_at : now(),
             'clicked_ip' => $ip,
             'rating' => $rating ?? $this->rating,
         ]);
+    }
+
+    /**
+     * Každá doména má vlastní Google profil, vybírá se podle měny objednávky
+     * nebo předplatného - stejně jako jazyk e-mailu.
+     */
+    public function profileLocale(): string
+    {
+        $currency = $this->order?->currency
+            ?? $this->subscription?->currency
+            ?? 'CZK';
+
+        return EmailService::getLocaleFromCurrency($currency);
+    }
+
+    /**
+     * Jak dobře klik téhle žádosti sedí na recenzi vzniklou v daný čas.
+     *
+     * Vrací skóre (nižší = lepší) nebo null, když žádný klik do okna nepadne.
+     * Klik před recenzí má vždy přednost před klikem v toleranci po ní: ta
+     * pokrývá jen člověka, který po odeslání recenze kliknul v e-mailu znovu.
+     */
+    public function clickGapTo(\DateTimeInterface $reviewTime, int $windowHours, int $toleranceSeconds = 120): ?int
+    {
+        $window = $windowHours * 3600;
+        $best = null;
+
+        foreach (array_filter([$this->clicked_at, $this->last_clicked_at]) as $click) {
+            // Přes timestampy, ať výsledek nezávisí na pásmu ani verzi Carbonu
+            $secondsBefore = $reviewTime->getTimestamp() - $click->getTimestamp();
+
+            if ($secondsBefore >= 0 && $secondsBefore <= $window) {
+                $score = $secondsBefore;
+            } elseif ($secondsBefore < 0 && -$secondsBefore <= $toleranceSeconds) {
+                $score = $window - $secondsBefore;
+            } else {
+                continue;
+            }
+
+            $best = $best === null ? $score : min($best, $score);
+        }
+
+        return $best;
     }
 
     /**
@@ -129,15 +182,27 @@ class ReviewRequest extends Model
     }
 
     /**
-     * Kliknutí je jediný signál, který o spokojenosti máme - recenze žijí na
-     * Googlu, takže nevíme, jestli ji člověk opravdu napsal. Kdo kliknul,
-     * dostane pokoj na zadanou dobu.
+     * Kdo kliknul, dostane od dalších žádostí pokoj na zadanou dobu. Jestli
+     * recenzi opravdu dopsal, říká až google_review_found_at - komu chybí,
+     * tomu jde jedna výzva k dokončení (reviews:send).
      */
     public static function hasClickedSince(?int $userId, ?string $email, $since): bool
     {
         return static::forIdentity($userId, $email)
             ->whereNotNull('clicked_at')
             ->where('clicked_at', '>=', $since)
+            ->exists();
+    }
+
+    /**
+     * Výzva k dokončení chodí jednou. Dvě kliknuté žádosti téhož člověka
+     * (objednávka a předplatné) by jinak znamenaly dvě výzvy.
+     */
+    public static function wasNudgedSince(?int $userId, ?string $email, $since): bool
+    {
+        return static::forIdentity($userId, $email)
+            ->whereNotNull('nudged_at')
+            ->where('nudged_at', '>=', $since)
             ->exists();
     }
 

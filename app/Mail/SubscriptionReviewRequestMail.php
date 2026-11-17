@@ -14,10 +14,17 @@ class SubscriptionReviewRequestMail extends LocalizedMailable implements ShouldQ
     public Subscription $subscription;
     public ReviewRequest $reviewRequest;
 
-    public function __construct(Subscription $subscription, ReviewRequest $reviewRequest, ?string $locale = null)
+    /**
+     * Připomínka nesmí vypadat jako omylem odeslaná kopie: má vlastní předmět,
+     * nadpis a žádnou nabídku obchodu. Odkazy a token zůstávají stejné.
+     */
+    public bool $reminder = false;
+
+    public function __construct(Subscription $subscription, ReviewRequest $reviewRequest, ?string $locale = null, bool $reminder = false)
     {
         $this->subscription = $subscription;
         $this->reviewRequest = $reviewRequest;
+        $this->reminder = $reminder;
         $this->setLocale($locale ?? EmailService::getLocaleFromSubscription($subscription));
     }
 
@@ -25,7 +32,9 @@ class SubscriptionReviewRequestMail extends LocalizedMailable implements ShouldQ
     {
         return new Envelope(
             from: $this->getFromAddress(),
-            subject: $this->trans('emails.subscription_review.subject'),
+            subject: $this->trans($this->reminder
+                ? 'emails.review_request.reminder_subject'
+                : 'emails.subscription_review.subject'),
         );
     }
 
@@ -40,6 +49,12 @@ class SubscriptionReviewRequestMail extends LocalizedMailable implements ShouldQ
             view: 'emails.subscription-review-request',
             with: [
                 'subscription' => $this->subscription,
+                'heading' => $this->trans($this->reminder
+                    ? 'emails.review_request.reminder_title'
+                    : 'emails.subscription_review.title'),
+                'subheading' => $this->trans($this->reminder
+                    ? 'emails.review_request.reminder_subtitle'
+                    : 'emails.subscription_review.subtitle'),
                 'reviewLink' => $this->reviewLink(),
                 'starLinks' => $this->starLinks(),
                 'deliveredOrdersCount' => $deliveredOrdersCount,
@@ -62,7 +77,8 @@ class SubscriptionReviewRequestMail extends LocalizedMailable implements ShouldQ
     }
 
     /**
-     * Každá hvězdička je samostatný odkaz, takže hodnocení vznikne jedním klikem.
+     * Každá hvězdička je samostatný odkaz. Klik ji uloží u nás a otevře Google,
+     * kde zákazník hodnotí znovu - hvězdička se tam nepřenese.
      *
      * @return array<int, string>
      */

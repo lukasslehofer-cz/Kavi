@@ -62,10 +62,10 @@
                             
                             <!-- Title -->
                             <h1 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; font-weight: 400; color: #1c1c1c; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase;">
-                                {{ __('emails.review_request.title', [], $locale) }}
+                                {{ $heading }}
                             </h1>
                             <p style="font-size: 14px; color: #76716C; margin: 0 0 40px 0; font-weight: 400; text-transform: uppercase; letter-spacing: 0.1em;">
-                                {{ __('emails.review_request.subtitle', [], $locale) }}
+                                {{ $subheading }}
                             </p>
                             
                             <!-- Order Number -->
@@ -105,6 +105,8 @@
                                 {{ __('emails.review_request.ignore_note', [], $locale) }}
                             </div>
 
+                            {{-- Připomínka má jediný cíl, nabídka obchodu by od hodnocení odváděla --}}
+                            @unless($reminder)
                             <!-- Explore More -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em; text-align: center;">
@@ -119,7 +121,8 @@
                                     </a>
                                 </div>
                             </div>
-                            
+                            @endunless
+
                             <!-- Help Text -->
                             <p style="font-size: 13px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
                                 {{ __('emails.common.questions', [], $locale) }} 

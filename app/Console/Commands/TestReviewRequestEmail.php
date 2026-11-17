@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Mail\OrderReviewRequestMail;
+use App\Mail\ReviewNudgeMail;
 use App\Mail\SubscriptionReviewRequestMail;
 use App\Models\Order;
 use App\Models\ReviewRequest;
@@ -16,6 +17,7 @@ class TestReviewRequestEmail extends Command
     protected $signature = 'email:test-review-request
                             {email? : Kam poslat}
                             {--type=subscription : order nebo subscription}
+                            {--variant=request : request (první žádost), reminder (připomínka) nebo nudge (výzva k dokončení)}
                             {--id= : Konkrétní objednávka nebo předplatné, jinak poslední}
                             {--cleanup : Smaže všechny testovací žádosti a skončí}';
 
@@ -48,6 +50,14 @@ class TestReviewRequestEmail extends Command
             return Command::FAILURE;
         }
 
+        $variant = $this->option('variant');
+
+        if (! in_array($variant, ['request', 'reminder', 'nudge'], true)) {
+            $this->error("Neznámá varianta '{$variant}'. Použij request, reminder nebo nudge.");
+
+            return Command::FAILURE;
+        }
+
         $subject = $this->resolveSubject($type);
 
         if (! $subject) {
@@ -70,9 +80,11 @@ class TestReviewRequestEmail extends Command
         ]);
 
         try {
-            $mailable = $type === 'order'
-                ? new OrderReviewRequestMail($subject, $reviewRequest)
-                : new SubscriptionReviewRequestMail($subject, $reviewRequest);
+            $mailable = match (true) {
+                $variant === 'nudge' => new ReviewNudgeMail($reviewRequest, $subject),
+                $type === 'order' => new OrderReviewRequestMail($subject, $reviewRequest, reminder: $variant === 'reminder'),
+                default => new SubscriptionReviewRequestMail($subject, $reviewRequest, reminder: $variant === 'reminder'),
+            };
 
             Mail::to($email)->send($mailable);
         } catch (\Throwable $e) {
@@ -85,12 +97,20 @@ class TestReviewRequestEmail extends Command
         $label = $type === 'order' ? $subject->order_number : $subject->subscription_number;
 
         $this->info("Odesláno na {$email}");
-        $this->line("  podklad: {$label}");
-        $this->line('  žádost:  #'.$reviewRequest->id);
+        $this->line("  podklad:  {$label}");
+        $this->line("  varianta: {$variant}");
+        $this->line('  žádost:   #'.$reviewRequest->id);
         $this->newLine();
-        $this->line('  Hvězdičky v e-mailu jsou funkční - klik uloží hodnocení a přesměruje na Google.');
-        $this->line('  Odkaz na 5 hvězdiček:');
-        $this->line('  '.route('review.track.rating', ['token' => $reviewRequest->tracking_token, 'rating' => 5]));
+
+        if ($variant === 'nudge') {
+            $this->line('  Tlačítko ve výzvě je funkční - klik se zaznamená a přesměruje na Google.');
+            $this->line('  '.route('review.track', ['token' => $reviewRequest->tracking_token]));
+        } else {
+            $this->line('  Hvězdičky v e-mailu jsou funkční - klik hvězdičku uloží a přesměruje na Google.');
+            $this->line('  Odkaz na 5 hvězdiček:');
+            $this->line('  '.route('review.track.rating', ['token' => $reviewRequest->tracking_token, 'rating' => 5]));
+        }
+
         $this->newLine();
         $this->line('  Až budeš hotov, ukliď: php artisan email:test-review-request --cleanup');
 

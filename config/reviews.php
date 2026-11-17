@@ -50,4 +50,31 @@ return [
     // Kdo jen kliknul a hodnocení nedokončil, dostane pokoj na tolik měsíců
     'click_cooldown_months' => 12,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Dokončení na Googlu
+    |--------------------------------------------------------------------------
+    |
+    | Hvězdička z e-mailu se na Google nepřenese, tam se hodnotí znovu. Recenze
+    | stažené příkazem reviews:refresh-google se proto párují s kliknutími
+    | podle času a kdo kliknul, ale recenzi nedopsal, dostane jednu výzvu.
+    |
+    | 'match_window_hours' + 'google_max_age_hours' musí být nejvýš
+    | 'nudge_after_days' * 24, jinak by výzva mohla odejít dřív, než se
+    | recenze z konce okna stihne stáhnout.
+    |
+    */
+
+    // Za kolik dní po posledním kliku bez recenze odejde výzva (0 = vypnuto)
+    'nudge_after_days' => 3,
+
+    // Starší kliknutí už se nevyzývají - i tohle je pojistka proti backfillu
+    'nudge_max_age_days' => 30,
+
+    // Recenze patří ke kliku, který jí předcházel nejvýš o tolik hodin
+    'match_window_hours' => 12,
+
+    // Starší stažení recenzí se nepovažuje za směrodatné a výzvy se neposílají
+    'google_max_age_hours' => 36,
+
 ];
