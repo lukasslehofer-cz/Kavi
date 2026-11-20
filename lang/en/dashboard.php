@@ -249,6 +249,7 @@ return [
     'edit_address' => 'Edit address',
     'pickup_point' => 'Pickup point',
     'pickup_point_change_notice' => 'The shipment sent on :date is already on its way to the original pickup point. The change will apply from the next shipment.',
+    'pickup_point_profile_hint' => 'The change also applies to your subscription. A box that is already on its way will arrive at the original pickup point.',
     'home_delivery' => 'Home delivery',
     
     // Payment method

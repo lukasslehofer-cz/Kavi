@@ -93,6 +93,8 @@ return [
     // Profile & Account
     'profile' => [
         'updated' => 'Profile has been successfully updated.',
+        'pickup_point_applied' => 'The pickup point has also been changed for your subscription.',
+        'pickup_point_not_applied' => 'The new pickup point cannot be used for one of your subscriptions. Please choose it for that subscription in the Subscription section.',
         'company_updated' => 'Company details saved. They will be used for future purchases and for invoices of your active subscriptions.',
         'company_removed' => 'Company details removed. Future invoices will be issued without a company.',
         'password_changed' => 'Password has been successfully changed.',

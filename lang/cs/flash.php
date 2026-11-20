@@ -93,6 +93,8 @@ return [
     // Profile & Account
     'profile' => [
         'updated' => 'Profil byl úspěšně aktualizován.',
+        'pickup_point_applied' => 'Výdejní místo bylo změněno i u vašeho předplatného.',
+        'pickup_point_not_applied' => 'U některého z vašich předplatných nové výdejní místo použít nejde. Vyberte ho prosím v sekci Předplatné u daného předplatného.',
         'company_updated' => 'Firemní údaje uloženy. Použijí se u dalších nákupů i u faktur vašich aktivních předplatných.',
         'company_removed' => 'Firemní údaje odebrány. Další faktury vystavíme bez firmy.',
         'password_changed' => 'Heslo bylo úspěšně změněno.',

@@ -540,6 +540,9 @@
         <div class="bg-gray-50 p-6 border-b border-gray-200">
             <h2 class="text-xl font-bold text-gray-900">{{ __('dashboard.pickup_point') }}</h2>
             <p class="text-sm text-gray-600 mt-1 font-light">{{ __('messages.shipping.select_pickup_point') }}</p>
+            @if(auth()->user()->subscriptions()->whereNotIn('status', ['cancelled', 'expired', 'completed'])->exists())
+            <p class="text-sm text-gray-600 mt-1 font-light">{{ __('dashboard.pickup_point_profile_hint') }}</p>
+            @endif
         </div>
         <div class="p-6">
             <form method="POST" action="{{ localizedRoute('dashboard.profile.update') }}" id="packeta-form" class="space-y-6">

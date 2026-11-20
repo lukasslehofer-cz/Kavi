@@ -227,11 +227,56 @@ class DashboardController extends Controller
             ], 404);
         }
 
-        // Body vlastní sítě Zásilkovny vrací widget bez carrierId; carrier_pickup_point by
-        // pak byl jen matoucí zbytek (profil obě pole čistí stejně).
-        $carrierId = $request->carrier_id ?: null;
-        $carrierPickupPoint = $carrierId ? ($request->carrier_pickup_point ?: null) : null;
+        $point = $this->normalizePickupPoint($request->only([
+            'packeta_point_id', 'packeta_point_name', 'packeta_point_address', 'carrier_id', 'carrier_pickup_point',
+        ]));
 
+        if (!$this->applyPickupPointToSubscription($subscription, $point)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('flash.subscription.pickup_point_carrier_not_allowed'),
+            ], 422);
+        }
+
+        // Also update user's default pickup point
+        $viewingUser->update($point);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('flash.subscription.pickup_point_updated'),
+        ]);
+    }
+
+    /**
+     * Body vlastní sítě Zásilkovny vrací widget bez carrierId; carrier_pickup_point by
+     * pak byl jen matoucí zbytek (profil obě pole čistí stejně).
+     *
+     * @param  array<string, mixed>  $input
+     * @return array{packeta_point_id: string, packeta_point_name: ?string, packeta_point_address: ?string, carrier_id: ?string, carrier_pickup_point: ?string}
+     */
+    protected function normalizePickupPoint(array $input): array
+    {
+        $carrierId = ($input['carrier_id'] ?? null) ?: null;
+
+        return [
+            'packeta_point_id' => (string) $input['packeta_point_id'],
+            'packeta_point_name' => $input['packeta_point_name'] ?? null,
+            'packeta_point_address' => $input['packeta_point_address'] ?? null,
+            'carrier_id' => $carrierId,
+            'carrier_pickup_point' => $carrierId ? (($input['carrier_pickup_point'] ?? null) ?: null) : null,
+        ];
+    }
+
+    /**
+     * Nastaví předplatnému výdejní místo, včetně řádků dosud neodeslaných zásilek.
+     * Vrací false, když dopravce místa pro sazbu předplatného není povolený (nic se nezmění).
+     *
+     * Admin rozesílky i odeslání do Packety čtou místo jen z předplatného, ne z profilu.
+     *
+     * @param  array{packeta_point_id: string, packeta_point_name: ?string, packeta_point_address: ?string, carrier_id: ?string, carrier_pickup_point: ?string}  $point
+     */
+    protected function applyPickupPointToSubscription(Subscription $subscription, array $point): bool
+    {
         // Filtr ve widgetu je klientský a PacketaService::getPickupPoint() je vypnutý, takže
         // samotné ID bodu ověřit nejde – ověřitelný je ale dopravce.
         $rate = $this->resolvePickupShippingRate($subscription);
@@ -240,44 +285,84 @@ class DashboardController extends Controller
         // Prázdný seznam = starší předplatné bez navázané sazby. Takového zákazníka nechceme
         // zablokovat, kontrolu přeskočíme.
         if ($allowedCarrierIds !== []) {
-            $isAllowed = $carrierId === null
+            $isAllowed = $point['carrier_id'] === null
                 ? (bool) array_intersect($allowedCarrierIds, ['packeta', 'zpoint'])
-                : in_array($carrierId, $allowedCarrierIds, true);
+                : in_array($point['carrier_id'], $allowedCarrierIds, true);
 
             if (!$isAllowed) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('flash.subscription.pickup_point_carrier_not_allowed'),
-                ], 422);
+                return false;
             }
         }
 
-        // Update subscription
-        $subscription->update([
-            'packeta_point_id' => $request->packeta_point_id,
-            'packeta_point_name' => $request->packeta_point_name,
-            'packeta_point_address' => $request->packeta_point_address,
-            'carrier_id' => $carrierId,
-            'carrier_pickup_point' => $carrierPickupPoint,
-        ]);
+        $subscription->update($point);
 
         // Řádky dosud neodeslaných zásilek nesou snapshot dopravce z doby svého vzniku –
         // bez tohohle by ledger tvrdil něco jiného, než kam balík reálně pojede.
         app(SubscriptionShipmentService::class)->syncPickupPointToPendingShipments($subscription);
 
-        // Also update user's default pickup point
-        $viewingUser->update([
-            'packeta_point_id' => $request->packeta_point_id,
-            'packeta_point_name' => $request->packeta_point_name,
-            'packeta_point_address' => $request->packeta_point_address,
-            'carrier_id' => $carrierId,
-            'carrier_pickup_point' => $carrierPickupPoint,
-        ]);
+        return true;
+    }
 
-        return response()->json([
-            'success' => true,
-            'message' => __('flash.subscription.pickup_point_updated'),
-        ]);
+    /**
+     * Výdejní místo uložené v profilu propíše do předplatných zákazníka, která ještě
+     * něco odešlou. Dřív se měnil jen profil a balík odešel na původní místo.
+     *
+     * Předplatné v jiné zemi, než pro kterou profil otevírá widget, nebo s nepovoleným
+     * dopravcem se přeskočí – zákazník si místo vybere v detailu předplatného.
+     *
+     * @return array{applied: int[], skipped: int[]}
+     */
+    protected function applyProfilePickupPointToSubscriptions(\App\Models\User $user): array
+    {
+        $point = $this->normalizePickupPoint($user->only([
+            'packeta_point_id', 'packeta_point_name', 'packeta_point_address', 'carrier_id', 'carrier_pickup_point',
+        ]));
+
+        // Stejná výchozí země, se kterou profil otevírá widget
+        $widgetCountry = strtoupper($user->country ?: 'CZ');
+
+        // Zrušené předplatné se zaplaceným boxem rozesílka pořád odesílá
+        $subscriptions = $user->subscriptions()
+            ->with('shippingRate.packetaCarriers')
+            ->where(function ($query) {
+                $query->whereNotIn('status', ['cancelled', 'expired', 'completed'])
+                    ->orWhereHas('shipments', fn ($shipments) => $shipments
+                        ->where('status', 'pending')
+                        ->whereNotNull('subscription_payment_id'));
+            })
+            ->get();
+
+        $result = ['applied' => [], 'skipped' => []];
+
+        foreach ($subscriptions as $subscription) {
+            $samePoint = (string) $subscription->packeta_point_id === $point['packeta_point_id']
+                && ($subscription->carrier_id ?: null) === $point['carrier_id'];
+
+            if ($samePoint) {
+                continue;
+            }
+
+            if ($this->resolvePickupCountry($subscription) !== $widgetCountry
+                || !$this->applyPickupPointToSubscription($subscription, $point)) {
+                $result['skipped'][] = $subscription->id;
+
+                continue;
+            }
+
+            $result['applied'][] = $subscription->id;
+        }
+
+        if ($result['applied'] !== [] || $result['skipped'] !== []) {
+            \Log::info('Profile pickup point applied to subscriptions', [
+                'user_id' => $user->id,
+                'packeta_point_id' => $point['packeta_point_id'],
+                'carrier_id' => $point['carrier_id'],
+                'applied_subscription_ids' => $result['applied'],
+                'skipped_subscription_ids' => $result['skipped'],
+            ]);
+        }
+
+        return $result;
     }
 
     public function profile()
@@ -319,13 +404,34 @@ class DashboardController extends Controller
             'carrier_pickup_point' => ['nullable', 'string'],
         ]);
 
+        $pickupFields = ['packeta_point_id', 'carrier_id', 'carrier_pickup_point'];
+        $pickupBefore = $viewingUser->only($pickupFields);
+
         $viewingUser->update($validated);
-        
+
+        // Výdejní místo posílá jen jeho vlastní formulář profilu. Propisuje se jen skutečná
+        // změna, aby opětovné uložení nepřepsalo místo nastavené u předplatného zvlášť.
+        // (Ne wasChanged() – po uložení bez změn drží změny z dřívějšího save().)
+        $pickupPointChanged = $request->filled('packeta_point_id')
+            && array_map('strval', $pickupBefore) !== array_map('strval', $viewingUser->only($pickupFields));
+
         // Refresh the user instance to ensure we have latest data
         $viewingUser->refresh();
 
-        return redirect()->localizedRoute('dashboard.profile')
-            ->with('success', __('flash.profile.updated'));
+        $pickupResult = $pickupPointChanged && $viewingUser->packeta_point_id
+            ? $this->applyProfilePickupPointToSubscriptions($viewingUser)
+            : null;
+
+        $redirect = redirect()->localizedRoute('dashboard.profile')
+            ->with('success', $pickupResult && $pickupResult['applied'] !== []
+                ? __('flash.profile.pickup_point_applied')
+                : __('flash.profile.updated'));
+
+        if ($pickupResult && $pickupResult['skipped'] !== []) {
+            $redirect->with('error', __('flash.profile.pickup_point_not_applied'));
+        }
+
+        return $redirect;
     }
 
     /**

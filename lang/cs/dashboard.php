@@ -249,6 +249,7 @@ return [
     'edit_address' => 'Upravit adresu',
     'pickup_point' => 'Výdejní místo',
     'pickup_point_change_notice' => 'Zásilka odeslaná :date už míří na původní výdejní místo. Změna se projeví až u příští rozesílky.',
+    'pickup_point_profile_hint' => 'Změna platí i pro vaše předplatné. Box, který už je na cestě, dorazí na původní místo.',
     'home_delivery' => 'Doručení na adresu',
     
     // Payment method
