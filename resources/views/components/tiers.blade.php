@@ -62,7 +62,7 @@
                         <span class="text-warm-500 font-light">{{ __('components.tiers.per_box') }}</span>
                     </div>
                     <a href="{{ $href($tier['bags']) }}"
-                       class="inline-block font-medium px-8 py-3 transition-all duration-200 {{ $tier['popular'] ? 'bg-primary-500 hover:bg-primary-600 text-white' : 'border border-dark-800 hover:bg-dark-800 hover:text-white text-dark-800' }}">
+                       class="{{ $tier['popular'] ? 'btn-fill' : 'btn-outline' }}">
                         {{ __('components.tiers.select', ['box' => $tier['code']]) }} &rarr;
                     </a>
                 </div>

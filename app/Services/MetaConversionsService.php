@@ -189,6 +189,53 @@ class MetaConversionsService
             $eventData['event_source_url'] = $sourceUrl;
         }
 
+        return $this->postEvent($eventData, [
+            'value' => $customData['value'] ?? null,
+            'currency' => $customData['currency'] ?? null,
+            'content_category' => $customData['content_category'] ?? null,
+        ]);
+    }
+
+    /**
+     * Lead za odeslaný formulář (poptávka firemních dárků). Pixel v prohlížeči posílá
+     * Lead se stejným event_id, Meta je podle něj spáruje.
+     */
+    public function sendLeadEvent(
+        string $eventId,
+        array $userData,
+        array $customData = [],
+        ?string $fbp = null,
+        ?string $fbc = null,
+        ?string $sourceUrl = null,
+    ): bool {
+        if (!$this->isConfigured()) {
+            return false;
+        }
+
+        $eventData = [
+            'event_name' => 'Lead',
+            'event_time' => time(),
+            'event_id' => $eventId,
+            'action_source' => 'website',
+            'user_data' => $this->buildUserData($userData, $fbp, $fbc),
+        ];
+
+        if ($customData) {
+            $eventData['custom_data'] = $customData;
+        }
+        if ($sourceUrl) {
+            $eventData['event_source_url'] = $sourceUrl;
+        }
+
+        return $this->postEvent($eventData, [
+            'content_name' => $customData['content_name'] ?? null,
+        ]);
+    }
+
+    private function postEvent(array $eventData, array $logContext): bool
+    {
+        $eventName = $eventData['event_name'];
+
         $payload = [
             'data' => [$eventData],
         ];
@@ -197,11 +244,7 @@ class MetaConversionsService
             $payload['test_event_code'] = $this->testEventCode;
         }
 
-        $logContext = [
-            'event_id' => $eventId,
-            'value' => $customData['value'] ?? null,
-            'currency' => $customData['currency'] ?? null,
-            'content_category' => $customData['content_category'] ?? null,
+        $logContext = ['event_id' => $eventData['event_id']] + $logContext + [
             'user_data_keys' => array_keys($eventData['user_data']),
             'region' => $this->region,
             'pixel_id' => $this->pixelId,
@@ -215,17 +258,17 @@ class MetaConversionsService
                 ->post($url, $payload);
 
             if ($response->successful()) {
-                Log::info('Meta CAPI Purchase event sent', $logContext);
+                Log::info("Meta CAPI {$eventName} event sent", $logContext);
                 return true;
             }
 
-            Log::error('Meta CAPI Purchase event failed', $logContext + [
+            Log::error("Meta CAPI {$eventName} event failed", $logContext + [
                 'status' => $response->status(),
                 'response' => $response->json(),
             ]);
             return false;
         } catch (\Exception $e) {
-            Log::error('Meta CAPI Purchase event exception', $logContext + [
+            Log::error("Meta CAPI {$eventName} event exception", $logContext + [
                 'error' => $e->getMessage(),
             ]);
             return false;

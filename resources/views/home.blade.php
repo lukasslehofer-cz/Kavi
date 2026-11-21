@@ -108,15 +108,7 @@
                 display: none !important;
                 -webkit-appearance: none;
             }
-            /* Grain overlay */
-            .grain-overlay {
-                position: absolute;
-                inset: 0;
-                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-                opacity: 0.35;
-                pointer-events: none;
-                mix-blend-mode: overlay;
-            }
+            /* Grain overlay: .grain-overlay v resources/css/app.css */
         </style>
         
         <video 
@@ -363,26 +355,36 @@
   } else {
       $voucherList = implode(', ', array_map(fn ($a) => number_format($a, 0, ',', ' '), array_slice($voucherAmounts, 0, -1))) . ' nebo ' . $formatGift(end($voucherAmounts));
   }
+  $giftFromLabel = fn ($price) => ($currentLocale === 'en' ? 'from' : 'od') . ' ' . $formatGift($price);
   $giftRows = [
       [
           'name' => $currentLocale === 'en' ? '3 months' : '3 měsíce',
           'desc' => $currentLocale === 'en' ? '3 boxes, one every month' : '3 boxy, jeden každý měsíc',
-          'price' => $giftFrom['subscription'] * 3,
-          'param' => '3m',
+          'right' => $giftFromLabel($giftFrom['subscription'] * 3),
+          'href' => localizedRoute('gifts.index') . '?' . $typeParam . '=3m',
       ],
       [
           'name' => $currentLocale === 'en' ? '6 months' : '6 měsíců',
           'desc' => $currentLocale === 'en' ? '6 boxes, one every month' : '6 boxů, jeden každý měsíc',
-          'price' => $giftFrom['subscription'] * 6,
-          'param' => '6m',
+          'right' => $giftFromLabel($giftFrom['subscription'] * 6),
+          'href' => localizedRoute('gifts.index') . '?' . $typeParam . '=6m',
       ],
       [
           'name' => $currentLocale === 'en' ? 'Voucher' : 'Poukaz',
           'desc' => $currentLocale === 'en' ? $voucherList . ' for the shop and boxes' : $voucherList . ' na e-shop i boxy',
-          'price' => $giftFrom['voucher'],
-          'param' => $currentLocale === 'en' ? 'voucher' : 'poukaz',
+          'right' => $giftFromLabel($giftFrom['voucher']),
+          'href' => localizedRoute('gifts.index') . '?' . $typeParam . '=' . ($currentLocale === 'en' ? 'voucher' : 'poukaz'),
       ],
   ];
+  // Firemní dárky jen na kavi.cz
+  if (\App\Helpers\CorporateHelper::enabled()) {
+      $giftRows[] = [
+          'name' => __('corporate.links.home_name'),
+          'desc' => __('corporate.links.home_desc'),
+          'right' => __('corporate.links.home_from', ['min' => config('corporate.min_quantity', 10)]),
+          'href' => route('corporate.index'),
+      ];
+  }
 @endphp
 <section aria-label="{{ $currentLocale === 'en' ? 'Gifts' : 'Dárky' }}" class="bg-dark-800 text-white">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8 py-24 lg:py-32 flex flex-wrap items-end gap-x-24 gap-y-16">
@@ -405,12 +407,12 @@
 
     <div class="flex-[1_1_560px] min-w-0 border-b border-white/20">
       @foreach($giftRows as $row)
-      <a href="{{ localizedRoute('gifts.index') }}?{{ $typeParam }}={{ $row['param'] }}"
-         class="group grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_160px] items-baseline gap-x-8 gap-y-2 py-7 border-t border-white/20 text-white hover:text-primary-500 transition-colors">
+      <a href="{{ $row['href'] }}"
+         class="group grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[minmax(216px,1fr)_minmax(0,1.2fr)_150px] items-baseline gap-x-6 gap-y-2 py-7 border-t border-white/20 text-white hover:text-primary-500 transition-colors">
         <span class="font-display uppercase tracking-tight text-[28px] sm:text-[40px] leading-none">{{ $row['name'] }}</span>
         <span class="col-span-full row-start-2 sm:col-span-1 sm:row-start-auto text-sm leading-[22px] font-light text-warm-300">{{ $row['desc'] }}</span>
         <span class="font-display justify-self-end whitespace-nowrap text-lg sm:text-[22px] leading-none">
-          {{ $currentLocale === 'en' ? 'from' : 'od' }} {{ $formatGift($row['price']) }}<span class="inline-block ml-2 transition-transform group-hover:translate-x-1" aria-hidden="true">&rarr;</span>
+          {{ $row['right'] }}<span class="inline-block ml-2 transition-transform group-hover:translate-x-1" aria-hidden="true">&rarr;</span>
         </span>
       </a>
       @endforeach

@@ -380,7 +380,7 @@
                     {{ $currentLocale === 'en' ? 'We are currently selecting exceptional coffees for ' . $monthNameWithYear . '. We will surprise you soon!' : 'Právě vybíráme výjimečné kávy pro měsíc ' . $monthNameWithYear . '. Brzy vás překvapíme!' }}
                 </p>
                 <a href="{{ localizedRoute('subscriptions.index') }}" 
-                   class="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white font-medium rounded-full hover:bg-primary-600 transition-all duration-200">
+                   class="btn-fill">
                     <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />

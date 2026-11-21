@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\BoxPricing;
+use App\Helpers\CorporateHelper;
 use App\Helpers\CurrencyHelper;
 use App\Helpers\DateFormat;
+use App\Helpers\FaqHelper;
 use App\Helpers\ShipmentCycles;
 use App\Models\GiftPurchase;
 use App\Services\EmailService;
@@ -87,10 +89,11 @@ class GiftController extends Controller
             'noteVoucher' => __('gifts.page.total_note_voucher'),
         ];
 
-        $faq = [];
-        foreach (array_keys(__('gifts.page.faq')) as $i) {
-            $faq[] = ['q' => __("gifts.page.faq.$i.q"), 'a' => __("gifts.page.faq.$i.a")];
-        }
+        // Otázka na firemní dárky jen na kavi.cz (FaqHelper)
+        $faq = FaqHelper::items('gifts.page.faq', [
+            'min' => config('corporate.min_quantity', 10),
+            'max' => CorporateHelper::formatNumber(CorporateHelper::maxDiscount()),
+        ]);
 
         return view('gifts.index', [
             'tiers' => $tiers,

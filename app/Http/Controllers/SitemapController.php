@@ -314,6 +314,10 @@ class SitemapController extends Controller
         $gifts = \App\Helpers\GiftHelper::enabled()
             ? [['route' => 'gifts.index', 'priority' => 0.8, 'changefreq' => 'monthly']]
             : [];
+        // Pro firmy jen na kavi.cz (locale nastavil detectLocaleAndBaseUrl)
+        $corporate = \App\Helpers\CorporateHelper::enabled()
+            ? [['route' => 'corporate.index', 'priority' => 0.7, 'changefreq' => 'monthly']]
+            : [];
 
         return [
             ['route' => 'home', 'priority' => 1.0, 'changefreq' => 'daily'],
@@ -328,6 +332,7 @@ class SitemapController extends Controller
             ['route' => 'privacy-policy', 'priority' => 0.3, 'changefreq' => 'yearly'],
             ['route' => 'terms-of-service', 'priority' => 0.3, 'changefreq' => 'yearly'],
             ...$gifts,
+            ...$corporate,
         ];
     }
 

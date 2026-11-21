@@ -48,7 +48,7 @@
             </div>
 
             <div>
-                <a href="{{ $boxUrl() }}" class="inline-block bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 transition-colors duration-200">{{ $t('hero.cta') }} &rarr;</a>
+                <a href="{{ $boxUrl() }}" class="btn-fill">{{ $t('hero.cta') }} &rarr;</a>
             </div>
         </div>
 
@@ -156,7 +156,7 @@
         <h2 class="font-display mb-8 max-w-4xl text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 uppercase tracking-tight leading-[1.05]">{{ $t('final.title') }}</h2>
         <p class="mb-12 max-w-2xl text-lg sm:text-xl leading-relaxed font-light text-warm-500">{{ $t('final.lead') }}</p>
         <div class="flex flex-wrap justify-center items-center gap-x-10 gap-y-6">
-            <a href="{{ $boxUrl() }}" class="inline-block bg-primary-500 hover:bg-primary-600 text-white font-medium px-8 py-3 transition-colors duration-200">{{ $t('final.cta') }} &rarr;</a>
+            <a href="{{ $boxUrl() }}" class="btn-fill">{{ $t('final.cta') }} &rarr;</a>
             <a href="#ceny" class="group inline-flex items-center gap-2 font-display uppercase tracking-widest text-warm-600 hover:text-dark-800 transition-colors">
                 <span>{{ $t('final.compare') }}</span>
                 <span aria-hidden="true">&uarr;</span>

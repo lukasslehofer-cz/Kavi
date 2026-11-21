@@ -56,6 +56,10 @@ class RouteServiceProvider extends ServiceProvider
                 Limit::perHour(120)->by('coupon-validate-hour:' . $request->ip()),
             ];
         });
+        // Poptávka firemních dárků
+        RateLimiter::for('corporate-inquiry', function (Request $request) {
+            return Limit::perMinutes(10, 5)->by('corporate-inquiry:' . $request->ip());
+        });
 
         $this->routes(function () {
             Route::middleware('api')
@@ -129,6 +133,12 @@ class RouteServiceProvider extends ServiceProvider
             Route::get('/' . $routes['gift-redeem'], [\App\Http\Controllers\GiftRedeemController::class, 'show'])->name($this->routeName('gifts.redeem', $locale, $isPrimary));
             Route::post('/' . $routes['gift-redeem-verify'], [\App\Http\Controllers\GiftRedeemController::class, 'verify'])->middleware('throttle:gift-verify')->name($this->routeName('gifts.redeem.verify', $locale, $isPrimary));
             Route::post('/' . $routes['gift-redeem-prepare'], [\App\Http\Controllers\GiftRedeemController::class, 'prepare'])->name($this->routeName('gifts.redeem.prepare', $locale, $isPrimary));
+
+            // Firemní dárky: stránka je jen česky. Na kavibox.com vrací controller 404 (CorporateHelper::enabled).
+            if ($isPrimary) {
+                Route::get('/' . $routes['corporate'], [\App\Http\Controllers\CorporateGiftController::class, 'index'])->name('corporate.index');
+                Route::post('/' . $routes['corporate-send'], [\App\Http\Controllers\CorporateGiftController::class, 'send'])->middleware('throttle:corporate-inquiry')->name('corporate.send');
+            }
 
             // Blog (uses same URL in all locales, so register only once with primary name)
             $this->registerUniqueRoute('get', '/' . $routes['blog'], [\App\Http\Controllers\BlogController::class, 'index'], $this->routeName('blog.index', $locale, $isPrimary));

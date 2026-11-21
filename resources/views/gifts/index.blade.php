@@ -18,6 +18,8 @@
     $barClass = 'absolute left-0 top-0 bottom-0 w-1 bg-transparent group-has-[:checked]:bg-primary-500 transition-colors';
     $labelClass = 'block mb-2 text-xs uppercase tracking-widest text-warm-600';
     $inputClass = 'w-full px-4 py-3 bg-white border border-warm-300 text-dark-800 placeholder-warm-400 focus:outline-none focus:border-dark-800 focus:ring-0 transition-colors';
+    // Odkazy na Pro firmy jen na kavi.cz
+    $corporateEnabled = \App\Helpers\CorporateHelper::enabled();
 
     $howSteps = [];
     foreach (array_keys(__('gifts.page.how_steps')) as $i) {
@@ -60,7 +62,8 @@
             <div class="flex flex-wrap items-start gap-12">
 
                 {{-- Levý sloupec: náhled certifikátu, cena, tlačítko --}}
-                <aside class="flex-[5_1_380px] min-w-0 min-[1012px]:sticky min-[1012px]:top-[88px]" aria-label="{{ __('gifts.page.preview_label') }}">
+                {{-- S bannerem Firemní dárky je aside vysoký ~760 px: sticky jen tam, kde se vejde do okna --}}
+                <aside class="flex-[5_1_380px] min-w-0 {{ $corporateEnabled ? '[@media(min-width:1012px)_and_(min-height:860px)]:sticky' : 'min-[1012px]:sticky' }} min-[1012px]:top-[88px]" aria-label="{{ __('gifts.page.preview_label') }}">
                     <div class="flex justify-between gap-4 mb-3 text-xs uppercase tracking-widest text-warm-600">
                         <span>{{ __('gifts.page.preview_label') }}</span>
                         <span>{{ __('gifts.page.preview_format') }}</span>
@@ -91,6 +94,18 @@
                         <span class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-primary-500" aria-hidden="true"></span>{{ $bullet }}</span>
                         @endforeach
                     </div>
+
+                    @if($corporateEnabled)
+                    {{-- Firemní dárky (jen kavi.cz) --}}
+                    <a href="{{ route('corporate.index') }}" class="group relative mt-7 flex items-center justify-between gap-4 py-4 pr-5 pl-6 bg-warm-300/40 text-dark-800 transition-colors duration-200 hover:bg-warm-300/65">
+                        <span class="absolute left-0 inset-y-0 w-1 bg-primary-500" aria-hidden="true"></span>
+                        <span class="min-w-0">
+                            <span class="block font-display text-base leading-[21px] uppercase tracking-wide">{{ __('corporate.links.gifts_banner_title') }}</span>
+                            <span class="block mt-1 text-sm leading-5 font-medium text-primary-500">{{ __('corporate.links.gifts_banner_sub', ['min' => config('corporate.min_quantity', 10)]) }}</span>
+                        </span>
+                        <span class="flex-shrink-0 font-display text-[22px] leading-none text-primary-500 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true">&rarr;</span>
+                    </a>
+                    @endif
                 </aside>
 
                 {{-- Pravý sloupec: kroky --}}
@@ -323,8 +338,12 @@
     {{-- Firemní dárky --}}
     <div class="bg-primary-500 py-10">
         <div class="max-w-screen-xl mx-auto px-4 md:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <p class="text-xs uppercase tracking-widest text-dark-800">{{ __('gifts.page.corporate') }}</p>
+            <p class="text-xs uppercase tracking-widest text-dark-800">{{ __('gifts.page.corporate', ['min' => config('corporate.min_quantity', 10)]) }}</p>
+            @if($corporateEnabled)
+            <a href="{{ route('corporate.index') }}" class="text-xs uppercase tracking-widest text-dark-800 hover:text-white transition-colors">{{ __('gifts.page.corporate_cta') }} &rarr;</a>
+            @else
             <a href="mailto:{{ $contactEmail }}" class="text-xs uppercase tracking-widest text-dark-800 hover:text-white transition-colors">{{ __('gifts.page.corporate_cta', ['email' => $contactEmail]) }} &rarr;</a>
+            @endif
         </div>
     </div>
 

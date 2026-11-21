@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\BoxPricing;
+use App\Helpers\CorporateHelper;
 use App\Helpers\CurrencyHelper;
+use App\Helpers\FaqHelper;
 use App\Helpers\GiftHelper;
 use App\Helpers\ShipmentCycles;
 use App\Services\CoffeeOfMonthService;
@@ -35,39 +37,15 @@ class HomeController extends Controller
             'voucher' => min(config('gifts.voucher_amounts.' . $currency, [0])),
         ];
 
-        $faq = $this->faq($cycle, $giftsEnabled);
+        // Časté dotazy pro sekci na stránce i pro JSON-LD FAQPage. Otázka na dárky jen se
+        // zapnutými dárky, otázka na firemní dárky jen na kavi.cz (FaqHelper).
+        $faq = FaqHelper::items('home.faq', [
+            'cutoff' => $cycle->cutoffShort(),
+            'shipment' => $cycle->shipmentShort(),
+            'min' => config('corporate.min_quantity', 10),
+            'max' => CorporateHelper::formatNumber(CorporateHelper::maxDiscount()),
+        ]);
 
         return view('home', compact('lineup', 'tiers', 'testimonials', 'rating', 'cycle', 'giftsEnabled', 'giftFrom', 'faq'));
-    }
-
-    /**
-     * Časté dotazy pro sekci na stránce i pro JSON-LD FAQPage
-     */
-    private function faq($cycle, bool $giftsEnabled): array
-    {
-        $items = [];
-
-        foreach (array_keys(__('home.faq')) as $i) {
-            $item = [
-                'q' => __("home.faq.$i.q"),
-                'a' => __("home.faq.$i.a", [
-                    'cutoff' => $cycle->cutoffShort(),
-                    'shipment' => $cycle->shipmentShort(),
-                ]),
-            ];
-
-            $linkLabel = trans("home.faq.$i.link");
-            if ($linkLabel !== "home.faq.$i.link") {
-                // Otázka na dárky dává smysl jen se zapnutými dárky
-                if (! $giftsEnabled) {
-                    continue;
-                }
-                $item['link'] = ['label' => $linkLabel, 'href' => localizedRoute('gifts.index')];
-            }
-
-            $items[] = $item;
-        }
-
-        return $items;
     }
 }

@@ -205,7 +205,7 @@
                     </a>
                     
                     <!-- CTA Button - Desktop -->
-                    <a href="{{ localizedRoute('subscriptions.index') }}" class="hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm px-5 py-2.5 uppercase tracking-wide transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="btn-type hidden lg:inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm px-5 py-2.5 transition-all duration-200">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Build Your Box' : 'Sestavte si box' }}</span>
                         <span>&rarr;</span>
                     </a>
@@ -247,7 +247,7 @@
                 
                 <!-- Mobile CTA Button -->
                 <div class="pt-6">
-                    <a href="{{ localizedRoute('subscriptions.index') }}" class="flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-4 uppercase tracking-wide transition-all duration-200">
+                    <a href="{{ localizedRoute('subscriptions.index') }}" class="btn-type flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-4 transition-all duration-200">
                         <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Build Your Box' : 'Sestavte si box' }}</span>
                         <span>&rarr;</span>
                     </a>
@@ -277,7 +277,7 @@
                         <a href="{{ localizedRoute('login') }}" class="block text-dark-800 hover:text-primary-500 py-3 transition-colors duration-200">
                             {{ ($currentLocale ?? 'cs') === 'en' ? 'Sign In' : 'Přihlásit se' }}
                         </a>
-                        <a href="{{ localizedRoute('register') }}" class="flex items-center justify-center gap-2 bg-dark-800 hover:bg-black text-white px-6 py-4 transition-all duration-200 text-center mt-4">
+                        <a href="{{ localizedRoute('register') }}" class="btn-type flex items-center justify-center gap-2 bg-dark-800 hover:bg-black text-white px-6 py-4 transition-all duration-200 text-center mt-4">
                             {{ ($currentLocale ?? 'cs') === 'en' ? 'Register' : 'Registrovat' }}
                         </a>
                     @endauth
@@ -350,6 +350,9 @@
               @if(\App\Helpers\GiftHelper::enabled())
               <a href="{{ localizedRoute('gifts.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Gift Subscription' : 'Dárkové předplatné' }}</a>
               @endif
+              @if(\App\Helpers\CorporateHelper::enabled())
+              <a href="{{ route('corporate.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ __('corporate.links.footer') }}</a>
+              @endif
               <a href="{{ localizedRoute('monthly-feature.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}</a>        
             </nav>
           </div>
@@ -406,7 +409,7 @@
                 required
                 class="flex-1 px-5 py-3 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-white/40 transition-all text-sm"
               >
-              <button type="submit" class="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white transition-all duration-200 whitespace-nowrap text-sm">
+              <button type="submit" class="btn-type px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white transition-all duration-200 whitespace-nowrap text-sm">
                 {{ ($currentLocale ?? 'cs') === 'en' ? 'Subscribe' : 'Odebírat' }}
               </button>
             </form>

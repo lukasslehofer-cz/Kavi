@@ -81,7 +81,9 @@ return [
         ['q' => 'Mohu předplatné pozastavit nebo zrušit?', 'a' => 'Ano, kdykoli v účtu a bez poplatků. Změna platí pro box, jehož uzávěrka ještě neproběhla.'],
         ['q' => 'Jaké kávy dostanu?', 'a' => 'Každý měsíc kávy ze tří evropských pražíren. Pražírna se vrací zhruba jednou za rok, takže se kávy opakují málokdy.'],
         ['q' => 'Espresso, nebo filtr?', 'a' => 'Espresso má plné tělo a tmavší pražení, filtr lehčí tělo a světlejší pražení. Kombinace pošle obojí.'],
-        ['q' => 'Mohu předplatné darovat?', 'a' => 'Ano, na 3 nebo 6 měsíců předem, bez automatického obnovení.', 'link' => 'Dárkové předplatné'],
+        ['q' => 'Mohu předplatné darovat?', 'a' => 'Ano, na 3 nebo 6 měsíců předem, bez automatického obnovení.', 'link' => ['label' => 'Dárkové předplatné', 'route' => 'gifts.index']],
+        // Jen kavi.cz: odkaz i otázka se schovají, když stránka Pro firmy není (HomeController::faq)
+        ['q' => 'Nabízíte dárky pro firmy?', 'a' => 'Ano, od :min kusů s logem vaší firmy na pásce boxu a kartičkou se vzkazem. Množstevní sleva až :max %, faktura na firmu.', 'link' => ['label' => 'Firemní dárky', 'route' => 'corporate.index']],
     ],
 
 ];

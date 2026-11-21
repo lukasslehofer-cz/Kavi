@@ -134,8 +134,9 @@ return [
             ['t' => 'První box :day. dne', 'd' => 'Odejde v nejbližší rozesílce. Uzávěrka je vždy :cutoff_day. dne v měsíci.'],
         ],
 
-        'corporate' => 'Firemní dárky od 10 kusů, s fakturou na firmu a společným věnováním',
-        'corporate_cta' => 'Napsat na :email',
+        // Červený pruh nad FAQ. Na kavi.cz odkaz na stránku Pro firmy, jinde mailto
+        'corporate' => 'Firemní dárky od :min kusů, s vaším logem a fakturou na firmu',
+        'corporate_cta' => 'Firemní dárky',
 
         'faq_title' => 'Časté dotazy k dárkům',
         'faq' => [
@@ -143,6 +144,8 @@ return [
             ['q' => 'Stihnu to do Vánoc?', 'a' => 'Certifikát ano, přijde hned po zaplacení. Krabice s kávou pak odchází podle data aktivace, v nejbližší rozesílce.'],
             ['q' => 'Co když obdarovaný nepije espresso?', 'a' => 'Typ kávy si při aktivaci zvolí sám: espresso, filtr, nebo kombinaci obojího.'],
             ['q' => 'Na co platí poukaz?', 'a' => 'Na kávu a příslušenství v e-shopu i na první platbu kávového boxu. Uplatníte ho najednou v pokladně, nákup musí mít hodnotu alespoň jako poukaz a nevyčerpaný zůstatek se nevrací. Platí 12 měsíců od nákupu.'],
+            // Jen kavi.cz (FaqHelper otázku vynechá, když stránka Pro firmy není)
+            ['q' => 'Nabízíte dárky pro firmy?', 'a' => 'Ano, od :min kusů s logem vaší firmy na pásce boxu a kartičkou se vzkazem. Množstevní sleva až :max %, faktura na firmu.', 'link' => ['label' => 'Firemní dárky', 'route' => 'corporate.index']],
         ],
     ],
 

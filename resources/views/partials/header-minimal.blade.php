@@ -5,7 +5,7 @@
             <a href="{{ route('home') }}" class="flex items-center" aria-label="{{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI, home page' : 'KAVI.cz, úvodní stránka' }}">
                 <img src="/images/kavi-logo-black.png" alt="{{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}" class="h-9 w-auto">
             </a>
-            <a href="@yield('minimal_cta_href', localizedRoute('subscriptions.index'))" class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm px-5 py-2.5 uppercase tracking-wide transition-all duration-200">
+            <a href="@yield('minimal_cta_href', localizedRoute('subscriptions.index'))" class="btn-type inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white text-sm px-5 py-2.5 transition-all duration-200">
                 <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Build Your Box' : 'Sestavte si box' }}</span>
                 <span aria-hidden="true">&rarr;</span>
             </a>

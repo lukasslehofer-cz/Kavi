@@ -38,6 +38,10 @@ return [
     'gift-redeem-verify' => 'darek/overit',
     'gift-redeem-prepare' => 'darek/pokracovat',
 
+    // Firemní dárky (jen kavi.cz)
+    'corporate' => 'pro-firmy',
+    'corporate-send' => 'pro-firmy/odeslat',
+
     // Blog
     'blog' => 'blog',
     'blog-show' => 'blog/{post}',

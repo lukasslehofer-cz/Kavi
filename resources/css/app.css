@@ -67,6 +67,33 @@
     .input {
         @apply w-full px-4 py-3 border border-warm-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all;
     }
+
+    /*
+     * Tlačítka webu: jedno písmo všude (TeX Gyre Heros 400, verzálky, tracking-wide).
+     * .btn / .btn-primary výše patří administraci a zůstávají, jak jsou.
+     * Velikost a odsazení: plné / obrysové 16/24 px, 12 × 32 px.
+     */
+    .btn-type {
+        @apply font-display font-normal uppercase tracking-wide;
+    }
+
+    .btn-fill {
+        @apply btn-type inline-flex items-center justify-center gap-2 px-8 py-3 text-base bg-primary-500 text-white transition-colors duration-200 hover:bg-primary-600 hover:text-white;
+    }
+
+    .btn-outline {
+        @apply btn-type inline-flex items-center justify-center gap-2 px-8 py-3 text-base border border-dark-800 text-dark-800 transition-colors duration-200 hover:bg-dark-800 hover:text-white;
+    }
+
+    /* Zrnitá textura přes ČB fotky (homepage, Pro firmy) */
+    .grain-overlay {
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        opacity: 0.35;
+        pointer-events: none;
+        mix-blend-mode: overlay;
+    }
 }
 
 /* Cookie Consent Customization - Quiet Luxury */

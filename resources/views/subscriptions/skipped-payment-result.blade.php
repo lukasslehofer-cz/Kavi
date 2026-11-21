@@ -91,7 +91,7 @@
     @endif
 
     <a href="{{ localizedRoute('dashboard.subscription') }}"
-       class="inline-block bg-primary-500 hover:bg-primary-600 text-white px-7 py-3.5 text-sm uppercase tracking-widest transition-colors">
+       class="btn-fill">
       {{ __('subscriptions.pay_skipped.account_link') }} &rarr;
     </a>
   </div>
