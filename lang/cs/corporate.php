@@ -28,7 +28,7 @@ return [
     'hero' => [
         'label' => 'Úvod',
         'xmas' => 'Vánoce :year',
-        'xmas_inquiry' => 'Poptejte do',
+        'xmas_inquiry' => 'Objednejte do',
         'xmas_deliver' => 'doručíme do',
         'title' => 'Dárek, na který si klienti vzpomenou',
         'title_accent' => 'každé ráno.',
