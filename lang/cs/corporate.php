@@ -150,7 +150,7 @@ return [
     'faq' => [
         ['q' => 'Jaký je minimální počet kusů?', 'a' => ':min kusů. Páska s vaším logem a kartička se vzkazem jsou u každého boxu.'],
         ['q' => 'Můžeme si vybrat konkrétní kávu?', 'a' => 'Kávu vybíráme my, vždy to nejlepší, co pražírny právě nabízejí. Domluvit se můžeme na espressu, filtru i kávě bez kofeinu a na chuťovém profilu. Vždy ale půjde o výběrovou kávu, která je ovocnější než běžná káva z obchodu.'],
-        ['q' => 'Jak dlouho trvá doručení?', 'a' => 'Termín potvrdíme v nabídce.', 'a_christmas' => 'Na Vánoce platí: když poptáte do :inquiry_by, dárky doručíme do :deliver_by.'],
+        ['q' => 'Jak dlouho trvá doručení?', 'a' => 'Termín potvrdíme v nabídce.', 'a_christmas' => 'Na Vánoce platí: když objednáte do :inquiry_by, dárky doručíme do :deliver_by.'],
         ['q' => 'Jak probíhá platba?', 'a' => 'Na fakturu převodem. Vystavíme ji na vaši firmu po schválení náhledu.'],
         ['q' => 'Umíte poslat dárek přímo klientům?', 'a' => 'Ano. Pošlete nám seznam adres a každý dárek doručíme zvlášť. Množstevní sleva platí jen při doručení na jednu adresu.'],
         ['q' => 'Co se stane, když předplatné skončí?', 'a' => 'Nic se automaticky neobnovuje a nic dalšího neplatíte. Klient si může předplatné objednat sám, pokud mu káva zachutná.'],
