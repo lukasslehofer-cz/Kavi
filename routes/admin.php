@@ -104,6 +104,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Dárky (dárkové předplatné a poukazy)
     Route::get('/gifts', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'index'])->name('gifts.index');
+    // Firemní dárky (poptávky z Pro firmy) – před /gifts/{gift}, jinak by "corporate" spadlo do {gift}
+    Route::get('/gifts/corporate', [\App\Http\Controllers\Admin\CorporateInquiryController::class, 'index'])->name('gifts.corporate.index');
+    Route::get('/gifts/corporate/{inquiry}', [\App\Http\Controllers\Admin\CorporateInquiryController::class, 'show'])->name('gifts.corporate.show');
+    Route::put('/gifts/corporate/{inquiry}', [\App\Http\Controllers\Admin\CorporateInquiryController::class, 'update'])->name('gifts.corporate.update');
     Route::get('/gifts/{gift}', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'show'])->name('gifts.show');
     Route::get('/gifts/{gift}/pdf', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'downloadPdf'])->name('gifts.pdf');
     Route::post('/gifts/{gift}/resend-buyer', [\App\Http\Controllers\Admin\GiftPurchaseController::class, 'resendBuyer'])->name('gifts.resend-buyer');

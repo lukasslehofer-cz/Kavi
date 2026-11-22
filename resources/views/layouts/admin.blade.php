@@ -99,6 +99,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/>
                         </svg>
                         Dárky
+                        @php $newCorporateInquiries = \App\Models\CorporateInquiry::where('status', \App\Models\CorporateInquiry::STATUS_NEW)->count(); @endphp
+                        @if($newCorporateInquiries)
+                        <span class="ml-auto inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-600 text-white text-xs font-semibold" title="Nové firemní poptávky">{{ $newCorporateInquiries }}</span>
+                        @endif
                     </a>
 
                     <!-- Configurator Settings -->

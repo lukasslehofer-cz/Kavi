@@ -15,10 +15,12 @@
 
 @section('content')
 <div class="p-6">
-    <div class="mb-8">
+    <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900">Dárky</h1>
         <p class="text-gray-600 mt-1">Prodané dárkové předplatné a poukazy. Kód dohledáte podle jména, e-mailu nebo čísla objednávky.</p>
     </div>
+
+    @include('admin.gifts._tabs')
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div class="bg-white rounded-xl border border-gray-200 p-4"><p class="text-2xl font-bold">{{ $stats['issued'] }}</p><p class="text-sm text-gray-600">Vystaveno, neuplatněno</p></div>

@@ -44,7 +44,8 @@
                             @if($utm)
                             <p style="margin: 16px 0 0; font-size: 12px; line-height: 18px; color: #76716c;">Zdroj: @foreach($utm as $key => $value){{ $key }}={{ $value }}{{ $loop->last ? '' : ', ' }}@endforeach</p>
                             @endif
-                            <p style="margin: 16px 0 0; font-size: 12px; line-height: 18px; color: #76716c;">Poptávka #{{ $inquiry->id }} je uložená v tabulce corporate_inquiries.</p>
+                            <p style="margin: 20px 0 0;"><a href="{{ route('admin.gifts.corporate.show', $inquiry) }}" style="display: inline-block; padding: 10px 18px; background-color: #1c1c1c; color: #ffffff; text-decoration: none; font-size: 14px;">Otevřít poptávku v adminu</a></p>
+                            <p style="margin: 12px 0 0; font-size: 12px; line-height: 18px; color: #76716c;">Poptávka #{{ $inquiry->id }}. V adminu (Dárky › Firemní dárky) jí nastavíte stav a doplníte detaily dealu.</p>
                         </td>
                     </tr>
                 </table>
