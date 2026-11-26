@@ -40,6 +40,16 @@ class SubscriptionPaymentSuccess extends LocalizedMailable
 
     public function attachments(): array
     {
-        return [];
+        $attachments = [];
+
+        // Faktura z Fakturoidu – PDF se stahuje synchronně před odesláním mailu
+        if ($this->payment->invoice_pdf_path && \Storage::exists($this->payment->invoice_pdf_path)) {
+            $invoicePrefix = $this->emailLocale === 'cs' ? 'Faktura-' : 'Invoice-';
+            $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromStorage($this->payment->invoice_pdf_path)
+                ->as($invoicePrefix.($this->subscription->subscription_number ?? 'subscription').'.pdf')
+                ->withMime('application/pdf');
+        }
+
+        return $attachments;
     }
 }
