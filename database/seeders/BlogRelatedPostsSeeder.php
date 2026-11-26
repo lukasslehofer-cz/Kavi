@@ -26,6 +26,18 @@ class BlogRelatedPostsSeeder extends Seeder
         'jak-pripravit-espresso' => ['kava-na-espresso-nebo-na-filtr', 'zrnkova-vs-mleta-kava', 'chutovy-profil-kavy-proc-vas-kysela-kava-nemusi-desit'],
         'kava-na-espresso-nebo-na-filtr' => ['svetle-vs-tmave-prazeni-kavy', 'jak-pripravit-espresso', 'jak-pripravit-kavu-doma'],
         'kolik-kofeinu-ma-kava' => ['bezkofeinova-kava-myty-a-fakta-pro-rok-2026', 'arabica-vs-robusta-rozdil', 'svetle-vs-tmave-prazeni-kavy'],
+
+        // Druhá várka (BlogSeoArticlesBatch2Seeder)
+        'darek-pro-milovnika-kavy' => ['predplatne-kavy-jak-vybrat', 'nejlepsi-prazirny-kavy-v-evrope', 'jak-ochutnavat-kavu-doma-cupping'],
+        'predplatne-kavy-jak-vybrat' => ['kolik-salku-kavy-z-250-g', 'jak-vybrat-zrnkovou-kavu', 'darek-pro-milovnika-kavy'],
+        'nejlepsi-prazirny-kavy-v-evrope' => ['z-jake-zeme-je-nejlepsi-kava', 'svetle-vs-tmave-prazeni-kavy', 'predplatne-kavy-jak-vybrat'],
+        'z-jake-zeme-je-nejlepsi-kava' => ['odrudy-kavy-gesha', 'metody-zpracovani-kavy', 'jak-ochutnavat-kavu-doma-cupping'],
+        'kolik-salku-kavy-z-250-g' => ['jak-pripravit-kavu-doma', 'jak-pripravit-espresso', 'predplatne-kavy-jak-vybrat'],
+        'jak-dlouho-nechat-kavu-odpocinout-po-prazeni' => ['jak-skladovat-kavu-cerstvost', 'jak-vybrat-zrnkovou-kavu', 'kava-na-espresso-nebo-na-filtr'],
+        'jak-ochutnavat-kavu-doma-cupping' => ['chutovy-profil-kavy-proc-vas-kysela-kava-nemusi-desit', 'z-jake-zeme-je-nejlepsi-kava', 'metody-zpracovani-kavy'],
+        'jak-vybrat-zrnkovou-kavu' => ['jak-dlouho-nechat-kavu-odpocinout-po-prazeni', 'odrudy-kavy-gesha', 'kava-na-espresso-nebo-na-filtr'],
+        'odrudy-kavy-gesha' => ['z-jake-zeme-je-nejlepsi-kava', 'arabica-vs-robusta-rozdil', 'metody-zpracovani-kavy'],
+        'vyberova-kava-s-mlekem' => ['jak-pripravit-espresso', 'kava-na-espresso-nebo-na-filtr', 'kolik-salku-kavy-z-250-g'],
     ];
 
     public function run(): void
