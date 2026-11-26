@@ -2,8 +2,9 @@
 
 @php
     $seoSiteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
-    $seoTitle = $currentLocale === 'en' ? 'Coffee Subscription | Specialty Coffee from Europe | KAVI' : 'Kávové předplatné | Výběrová káva z Evropy | KAVI.cz';
-    $seoDescription = $currentLocale === 'en' ? 'Build your custom coffee subscription box. Choose quantity, coffee type and delivery frequency. Flexible, no commitment, free shipping. Premium specialty coffee from Europe.' : 'Sestavte si vlastní kávový box. Vyberte množství, typ kávy a frekvenci dodání. Flexibilní, bez závazků, doprava zdarma. Prémiová výběrová káva z Evropy.';
+    // Konfigurátor necílí na „kávové předplatné“, na ten dotaz má Google ukazovat HP
+    $seoTitle = $currentLocale === 'en' ? 'Build your coffee box – size, coffee, frequency | KAVI' : 'Sestavte si kávový box – velikost, káva, frekvence | KAVI.cz';
+    $seoDescription = $currentLocale === 'en' ? 'Choose your box size, coffee type and how often you want it delivered. No commitment, free shipping.' : 'Vyberte velikost boxu, typ kávy a jak často ho chcete dostávat. Bez závazků, doprava zdarma.';
     // Stálá fotka boxu místo promo fotky měsíce z hero (tu si jinak Google bere jako náhled)
     $seoImage = $seoSiteUrl . '/images/kavi-box.jpg';
 @endphp
@@ -56,11 +57,22 @@
       <span class="text-primary-500">{{ $currentLocale === 'en' ? 'coffee box' : 'kávový box' }}</span>
       </h1>
       
-    <!-- Description - Right aligned -->
-    <div class="flex justify-end">
-      <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
-        {{ $currentLocale === 'en' ? 'Choose the quantity, coffee type and delivery frequency. Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Vyberte si množství, typ kávy a frekvenci dodání. Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}
+    <!-- Úvodní odstavec vlevo (pro příchozí z Googlu odkaz na HP), popis vpravo -->
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+      <p class="text-base text-warm-600 leading-relaxed font-light max-w-xl">
+        @if($currentLocale === 'en')
+        Every month we send you coffees from three European roasteries you rarely find in local shops. Here you set the size and frequency. New to KAVI?
+        <a href="{{ localizedRoute('home') }}" class="text-primary-500 underline underline-offset-2 hover:text-primary-600 transition-colors duration-200">See how KAVI works &rarr;</a>
+        @else
+        Každý měsíc vám pošleme kávy ze tří evropských pražíren, které v Česku běžně nekoupíte. Tady si nastavíte velikost a frekvenci. Poprvé u nás?
+        <a href="{{ localizedRoute('home') }}" class="text-primary-500 underline underline-offset-2 hover:text-primary-600 transition-colors duration-200">Podívejte se, jak KAVI funguje &rarr;</a>
+        @endif
       </p>
+      <div class="flex justify-end">
+        <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
+          {{ $currentLocale === 'en' ? 'Choose the quantity, coffee type and delivery frequency. Flexible subscription tailored to your needs. Cancel anytime without fee.' : 'Vyberte si množství, typ kávy a frekvenci dodání. Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.' }}
+        </p>
+      </div>
   </div>
   
   </div>
