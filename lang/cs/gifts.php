@@ -61,6 +61,7 @@ return [
     'page' => [
         'title' => 'Dárkové předplatné a poukazy na kávu | KAVI.cz',
         'meta_description' => 'Darujte výběrovou kávu: dárkové předplatné na 3 nebo 6 měsíců, nebo poukaz na celý e-shop. Certifikát přijde hned e-mailem v PDF k tisku.',
+        'hero_kicker' => 'Dárkové předplatné kávy',
         'hero_title' => ['Darujte', 'kávu'],
         'hero_text' => 'Dárkové předplatné na 3 nebo 6 měsíců, nebo poukaz na celý e-shop. Certifikát přijde hned e-mailem v PDF k tisku.',
 

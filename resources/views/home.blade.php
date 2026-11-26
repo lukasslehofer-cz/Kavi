@@ -166,8 +166,13 @@
 
         <!-- Center - Main typography -->
         <div class="flex-1 flex flex-col justify-center py-6">
+            <!-- Kicker = jediné H1 stránky (SEO), headline pod ním je jen vizuální -->
+            <h1 class="mb-6 text-xs uppercase tracking-widest text-white/60 leading-5">
+                {{ $currentLocale === 'en' ? 'Coffee subscription' : 'Kávové předplatné' }}
+            </h1>
+
             <!-- Large headline -->
-            <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-white uppercase leading-[0.95] sm:leading-[0.9] tracking-tight">
+            <p class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-white uppercase leading-[0.95] sm:leading-[0.9] tracking-tight">
                 @if($currentLocale === 'en')
                 Three European<br/>
                 <span class="text-primary-500">roasters</span><br/>
@@ -177,7 +182,7 @@
                 <span class="text-primary-500">pražírny</span><br/>
                 každý měsíc
                 @endif
-            </h1>
+            </p>
 
             <p class="mt-6 text-xs uppercase tracking-widest text-white/60 max-w-[280px] leading-5">
                 {{ $currentLocale === 'en'

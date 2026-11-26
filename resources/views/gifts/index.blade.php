@@ -35,10 +35,12 @@
 
     {{-- Hero --}}
     <div class="max-w-screen-xl mx-auto px-4 md:px-8 pt-16 lg:pt-24 pb-8 lg:pb-12">
-        <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
+        {{-- Kicker = jediné H1 stránky (SEO), headline pod ním je jen vizuální --}}
+        <h1 class="mb-6 text-xs uppercase tracking-widest text-warm-600 leading-5">{{ __('gifts.page.hero_kicker') }}</h1>
+        <p class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
             <span class="text-dark-800">{{ __('gifts.page.hero_title')[0] }}</span><br>
             <span class="text-primary-500">{{ __('gifts.page.hero_title')[1] }}</span>
-        </h1>
+        </p>
         <div class="flex justify-end">
             <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-600 max-w-md text-right leading-relaxed">{{ __('gifts.page.hero_text') }}</p>
         </div>

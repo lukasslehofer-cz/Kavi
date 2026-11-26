@@ -61,6 +61,7 @@ return [
     'page' => [
         'title' => 'Gift Subscriptions and Coffee Vouchers | KAVI',
         'meta_description' => 'Give specialty coffee: a gift subscription for 3 or 6 months, or a voucher for the whole shop. The certificate arrives by email straight away as a printable PDF.',
+        'hero_kicker' => 'Coffee gift subscription',
         'hero_title' => ['Give', 'coffee'],
         'hero_text' => 'A gift subscription for 3 or 6 months, or a voucher for the whole shop. The certificate arrives by email straight away as a printable PDF.',
 
