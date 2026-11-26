@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\PostSlugRedirect;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
@@ -41,9 +42,31 @@ class BlogController extends Controller
 
     /**
      * Display a single blog post
+     *
+     * Bez implicitního route model bindingu: ten běží před DetectRegion, takže by
+     * neznal jazyk domény, a potřebujeme rozlišit ID, aktuální a starý slug.
      */
-    public function show(Post $post)
+    public function show(string $post)
     {
+        // Číselné ID (staré URL ze sitemap) → 301 na URL se slugem
+        if (ctype_digit($post)) {
+            $byId = Post::find((int) $post);
+            abort_unless($byId && $byId->isPublished(), 404);
+
+            return redirect()->to(localizedRoute('blog.show', ['post' => $byId->getSlug()]), 301);
+        }
+
+        $slug = $post;
+        $post = Post::findBySlug($slug);
+
+        // Starý slug přejmenovaného článku → 301 na aktuální
+        if (! $post) {
+            $redirect = PostSlugRedirect::with('post')->where('old_slug', $slug)->first();
+            abort_unless($redirect && $redirect->post && $redirect->post->isPublished(), 404);
+
+            return redirect()->to(localizedRoute('blog.show', ['post' => $redirect->post->getSlug()]), 301);
+        }
+
         // Only show published posts
         if (!$post->isPublished()) {
             abort(404);

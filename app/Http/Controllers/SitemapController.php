@@ -271,10 +271,12 @@ class SitemapController extends Controller
 
         foreach ($posts as $post) {
             try {
-                $url = localizedRoute('blog.show', $post);
+                // URL se slugem (ne s ID): /blog/{id} jen přesměrovává
+                $slug = ($locale === 'en' && !empty($post->slug_en)) ? $post->slug_en : $post->slug_cs;
+                $url = localizedRoute('blog.show', ['post' => $slug]);
 
-                // Use published_at or updated_at for lastmod
-                $lastmod = $post->published_at ? $post->published_at->toIso8601String() : $post->updated_at->toIso8601String();
+                // Skutečná poslední změna článku
+                $lastmod = ($post->updated_at ?? $post->published_at)->toIso8601String();
 
                 $this->addUrl($dom, $urlset, [
                     'loc' => $url,

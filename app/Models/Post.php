@@ -86,6 +86,24 @@ class Post extends Model
     }
 
     /**
+     * Staré slugy, ze kterých se přesměrovává na aktuální
+     */
+    public function slugRedirects()
+    {
+        return $this->hasMany(PostSlugRedirect::class);
+    }
+
+    /**
+     * Najde článek podle aktuálního slugu (přednost má slug jazyka domény)
+     */
+    public static function findBySlug(string $slug): ?self
+    {
+        [$first, $second] = app()->getLocale() === 'en' ? ['slug_en', 'slug_cs'] : ['slug_cs', 'slug_en'];
+
+        return self::where($first, $slug)->first() ?? self::where($second, $slug)->first();
+    }
+
+    /**
      * Scope for published posts only
      */
     public function scopePublished($query)

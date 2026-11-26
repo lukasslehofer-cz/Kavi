@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Models\Order;
+use App\Models\Post;
 use App\Models\Product;
 use App\Models\Subscription;
 use App\Models\SubscriptionShipment;
 use App\Observers\OrderObserver;
+use App\Observers\PostObserver;
 use App\Observers\ProductObserver;
 use App\Observers\SubscriptionShipmentObserver;
 use App\Observers\SubscriptionStockObserver;
@@ -34,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         
         Order::observe(OrderObserver::class);
         Product::observe(ProductObserver::class);
+        Post::observe(PostObserver::class);
         Subscription::observe(SubscriptionStockObserver::class);
         SubscriptionShipment::observe(SubscriptionShipmentObserver::class);
 
