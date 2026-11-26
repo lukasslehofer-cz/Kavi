@@ -135,7 +135,7 @@ class BlogSeoArticlesBatch2Seeder extends Seeder
                 'title_cs' => 'Jak dlouho nechat kávu odpočinout po pražení? Průvodce odplyněním',
                 'title_en' => 'How Long to Rest Coffee After Roasting: Filter vs. Espresso',
                 'perex_cs' => 'Čerstvě upražená káva není hned nejlepší. Co je odplynění, kolik dní nechat kávu odpočinout na filtr a na espresso a kdy chutná nejlépe.',
-                'perex_en' => 'How long to rest coffee after roasting: 3–7 days for filter, 7–14 for espresso. Learn what degassing does and how to tell when your coffee is at its peak.',
+                'perex_en' => 'How long to rest coffee after roasting: 1–2 weeks for filter, 2–4 for espresso. What degassing does, when light roasts peak and how long they stay fresh.',
                 'tag' => 'tipy',
                 'published_at' => '2026-10-15 11:20:00',
             ],

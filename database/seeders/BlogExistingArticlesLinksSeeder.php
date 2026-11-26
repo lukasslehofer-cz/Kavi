@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * Doplní do dříve publikovaných článků odkazy na druhou várku článků
  * (BlogSeoArticlesBatch2Seeder), v EN verzích opraví odkazy na české cesty
- * a opraví terminologii (zrna místo bobů, promytá místo praná).
+ * a opraví terminologii (zrna místo bobů, promytá místo praná) a údaje
+ * o čerstvosti (sladěné s článkem o odpočinku kávy po pražení).
  *
  * Nepřepisuje celý obsah, jen nahradí přesné úryvky z blog/existing-links.php.
  * Úryvek se nahradí, jen když je v obsahu právě jednou; když už je nahrazený,
