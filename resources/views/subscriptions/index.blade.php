@@ -1,9 +1,40 @@
 @extends('layouts.app')
 
-@section('title', $currentLocale === 'en' ? 'Coffee Subscription - KAVI' : 'Kávové předplatné - KAVI.cz')
+@php
+    $seoSiteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+    $seoTitle = $currentLocale === 'en' ? 'Coffee Subscription | Specialty Coffee from Europe | KAVI' : 'Kávové předplatné | Výběrová káva z Evropy | KAVI.cz';
+    $seoDescription = $currentLocale === 'en' ? 'Build your custom coffee subscription box. Choose quantity, coffee type and delivery frequency. Flexible, no commitment, free shipping. Premium specialty coffee from Europe.' : 'Sestavte si vlastní kávový box. Vyberte množství, typ kávy a frekvenci dodání. Flexibilní, bez závazků, doprava zdarma. Prémiová výběrová káva z Evropy.';
+    // Stálá fotka boxu místo promo fotky měsíce z hero (tu si jinak Google bere jako náhled)
+    $seoImage = $seoSiteUrl . '/images/kavi-box.jpg';
+@endphp
+
+@section('title', $seoTitle)
 
 @section('meta_description')
-{{ $currentLocale === 'en' ? 'Build your custom coffee subscription box. Choose quantity, coffee type and delivery frequency. Flexible, no commitment, free shipping. Premium specialty coffee from Europe.' : 'Sestavte si vlastní kávový box. Vyberte množství, typ kávy a frekvenci dodání. Flexibilní, bez závazků, doprava zdarma. Prémiová výběrová káva z Evropy.' }}
+{{ $seoDescription }}
+@endsection
+
+@section('og_image', $seoImage)
+
+@section('structured_data')
+<script type="application/ld+json">
+{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'WebPage',
+    '@id' => url()->current() . '#webpage',
+    'url' => url()->current(),
+    'name' => $seoTitle,
+    'description' => $seoDescription,
+    'isPartOf' => ['@id' => $seoSiteUrl . '/#website'],
+    'primaryImageOfPage' => [
+        '@type' => 'ImageObject',
+        'url' => $seoImage,
+        'width' => 1000,
+        'height' => 1000,
+    ],
+    'inLanguage' => $currentLocale === 'en' ? 'en-US' : 'cs-CZ',
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+</script>
 @endsection
 
 @section('og_title')
