@@ -366,7 +366,7 @@ $giftDates = $gift?->boxDates();
     </div>
 </div>
 
-{{-- Conversion Tracking: dataLayer + Meta Pixel --}}
+{{-- Conversion Tracking: Google tag (GA4 + Google Ads) + Meta Pixel --}}
 @if($subscription->status === 'active' && ($shouldFirePixel ?? false))
 @php
     // Hodnoty pro tracking berou stejný rozpad jako Meta CAPI na serveru
@@ -380,26 +380,22 @@ $giftDates = $gift?->boxDates();
     $trackingItemName = 'Subscription ' . (($config['amount'] ?? 3) == 2 ? 'M' : (($config['amount'] ?? 3) == 4 ? 'XL' : 'L')) . ' Box';
 @endphp
 <script>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'purchase',
-        'ecommerce': {
-            'transaction_id': 'SUB-{{ $subscription->id }}',
-            'value': {{ $trackingValue }},
-            'currency': '{{ $trackingCurrency }}',
-            'shipping': {{ ($subscription->shipping_cost ?? 0) - $trackingGiftVoucherShippingCredit }},
-            @if($trackingTotalDiscount > 0)
-            'coupon': '{{ $subscription->coupon_code }}',
-            'discount': {{ $trackingTotalDiscount }},
-            @endif
-            'items': [{
-                'item_id': '{{ $trackingItemId }}',
-                'item_name': '{{ $trackingItemName }}',
-                'price': {{ $subscription->configured_price - ($subscription->discount_amount ?? 0) }},
-                'quantity': 1,
-                'item_category': 'subscription'
-            }]
-        }
+    gtag('event', 'purchase', {
+        'transaction_id': 'SUB-{{ $subscription->id }}',
+        'value': {{ $trackingValue }},
+        'currency': '{{ $trackingCurrency }}',
+        'shipping': {{ ($subscription->shipping_cost ?? 0) - $trackingGiftVoucherShippingCredit }},
+        @if($trackingTotalDiscount > 0)
+        'coupon': '{{ $subscription->coupon_code }}',
+        'discount': {{ $trackingTotalDiscount }},
+        @endif
+        'items': [{
+            'item_id': '{{ $trackingItemId }}',
+            'item_name': '{{ $trackingItemName }}',
+            'price': {{ $subscription->configured_price - ($subscription->discount_amount ?? 0) }},
+            'quantity': 1,
+            'item_category': 'subscription'
+        }]
     });
 
     // Meta Pixel - Purchase. Data i eventID (číslo předplatného) bere stejně jako CAPI

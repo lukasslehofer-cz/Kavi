@@ -1372,25 +1372,21 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-{{-- Tracking: InitiateCheckout (dataLayer + Meta Pixel) --}}
+{{-- Tracking: InitiateCheckout (Google tag + Meta Pixel) --}}
 <script>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'begin_checkout',
-        'ecommerce': {
-            'currency': '{{ \App\Helpers\CurrencyHelper::code() }}',
-            'value': {{ $totalWithVat }},
-            'items': [
-                @foreach($cartItems as $item)
-                {
-                    'item_id': '{{ $item['product']->id }}',
-                    'item_name': '{{ addslashes($item['product']->getName()) }}',
-                    'price': {{ $item['product']->getPrice() }},
-                    'quantity': {{ $item['quantity'] }}
-                }@if(!$loop->last),@endif
-                @endforeach
-            ]
-        }
+    gtag('event', 'begin_checkout', {
+        'currency': '{{ \App\Helpers\CurrencyHelper::code() }}',
+        'value': {{ $totalWithVat }},
+        'items': [
+            @foreach($cartItems as $item)
+            {
+                'item_id': '{{ $item['product']->id }}',
+                'item_name': @json($item['product']->getName()),
+                'price': {{ $item['product']->getPrice() }},
+                'quantity': {{ $item['quantity'] }}
+            }@if(!$loop->last),@endif
+            @endforeach
+        ]
     });
 
     // Meta Pixel - InitiateCheckout

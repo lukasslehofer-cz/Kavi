@@ -909,7 +909,7 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-{{-- Tracking: InitiateCheckout (dataLayer + Meta Pixel) --}}
+{{-- Tracking: InitiateCheckout (Google tag + Meta Pixel) --}}
 @php
     $trackingAmount = $configuration['amount'] ?? 3;
     $trackingItemId = 'subscription-' . $trackingAmount;
@@ -918,20 +918,16 @@ document.addEventListener('DOMContentLoaded', function() {
     $trackingCurrency = \App\Helpers\CurrencyHelper::code();
 @endphp
 <script>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'begin_checkout',
-        'ecommerce': {
-            'currency': '{{ $trackingCurrency }}',
-            'value': {{ $trackingValue }},
-            'items': [{
-                'item_id': '{{ $trackingItemId }}',
-                'item_name': '{{ $trackingItemName }}',
-                'price': {{ $trackingValue }},
-                'quantity': 1,
-                'item_category': 'subscription'
-            }]
-        }
+    gtag('event', 'begin_checkout', {
+        'currency': '{{ $trackingCurrency }}',
+        'value': {{ $trackingValue }},
+        'items': [{
+            'item_id': '{{ $trackingItemId }}',
+            'item_name': '{{ $trackingItemName }}',
+            'price': {{ $trackingValue }},
+            'quantity': 1,
+            'item_category': 'subscription'
+        }]
     });
 
     // Meta Pixel - InitiateCheckout

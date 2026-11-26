@@ -14,7 +14,9 @@ class GoogleAnalyticsHelper
     }
 
     // `gtag('config', ...)` must remain centralized in the layout templates — downstream
-    // `dataLayer.push({event: ...})` calls fire to whichever measurement ID the layout configured.
+    // `gtag('event', ...)` calls fire to every destination of that Google tag (GA4 and the
+    // linked Google Ads account). Never send events as `dataLayer.push({event: ...})`:
+    // only Google Tag Manager reads that shape, gtag.js silently drops it.
     public static function currentMeasurementId(): ?string
     {
         return self::measurementIdFor(CurrencyHelper::region());

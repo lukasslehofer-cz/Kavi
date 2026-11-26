@@ -343,33 +343,29 @@
     </div>
 </div>
 
-{{-- Conversion Tracking: dataLayer + Meta Pixel --}}
+{{-- Conversion Tracking: Google tag (GA4 + Google Ads) + Meta Pixel --}}
 @if($order->payment_status === 'paid' && !($cancelled ?? false) && ($shouldFirePixel ?? false))
 <script>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'purchase',
-        'ecommerce': {
-            'transaction_id': '{{ $order->order_number ?? $order->id }}',
-            'value': {{ $order->total }},
-            'currency': '{{ $order->currency }}',
-            'tax': {{ $order->tax }},
-            'shipping': {{ $order->shipping }},
-            @if($order->discount_amount > 0)
-            'coupon': '{{ $order->coupon_code }}',
-            'discount': {{ $order->discount_amount }},
-            @endif
-            'items': [
-                @foreach($order->items as $item)
-                {
-                    'item_name': '{{ addslashes($item->product_name) }}',
-                    'item_id': '{{ $item->product_id }}',
-                    'price': {{ $item->price }},
-                    'quantity': {{ $item->quantity }}
-                }@if(!$loop->last),@endif
-                @endforeach
-            ]
-        }
+    gtag('event', 'purchase', {
+        'transaction_id': '{{ $order->order_number ?? $order->id }}',
+        'value': {{ $order->total }},
+        'currency': '{{ $order->currency }}',
+        'tax': {{ $order->tax }},
+        'shipping': {{ $order->shipping }},
+        @if($order->discount_amount > 0)
+        'coupon': '{{ $order->coupon_code }}',
+        'discount': {{ $order->discount_amount }},
+        @endif
+        'items': [
+            @foreach($order->items as $item)
+            {
+                'item_name': @json($item->product_name),
+                'item_id': '{{ $item->product_id }}',
+                'price': {{ $item->price }},
+                'quantity': {{ $item->quantity }}
+            }@if(!$loop->last),@endif
+            @endforeach
+        ]
     });
 
     // Meta Pixel - Purchase. Data i eventID (číslo objednávky) bere stejně jako CAPI

@@ -969,7 +969,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Apply availability restrictions on page load
     updateAvailabilityUI();
     
-    // Tracking: add_to_cart (dataLayer + Meta Pixel)
+    // Tracking: add_to_cart (Google tag + Meta Pixel)
     document.getElementById('subscription-configurator')?.addEventListener('submit', function() {
         var amount = document.querySelector('input[name="amount"]:checked')?.value || '3';
         var boxNames = {'2': 'M Box', '3': 'L Box', '4': 'XL Box'};
@@ -977,20 +977,16 @@ document.addEventListener('DOMContentLoaded', function() {
         var currency = currentLocale === 'en' ? 'EUR' : 'CZK';
         var itemId = 'subscription-' + amount;
 
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-            'event': 'add_to_cart',
-            'ecommerce': {
-                'currency': currency,
-                'value': price,
-                'items': [{
-                    'item_id': itemId,
-                    'item_name': 'Subscription ' + boxNames[amount],
-                    'price': price,
-                    'quantity': 1,
-                    'item_category': 'subscription'
-                }]
-            }
+        gtag('event', 'add_to_cart', {
+            'currency': currency,
+            'value': price,
+            'items': [{
+                'item_id': itemId,
+                'item_name': 'Subscription ' + boxNames[amount],
+                'price': price,
+                'quantity': 1,
+                'item_category': 'subscription'
+            }]
         });
 
         // Meta Pixel - AddToCart

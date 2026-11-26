@@ -478,8 +478,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Měření jen u skutečně uložené poptávky (honeypot event_id nevrací)
         if (!data.event_id) return;
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: 'generate_lead', form: 'corporate', audience: payload.audience, quantity: payload.quantity });
+        gtag('event', 'generate_lead', { form: 'corporate', audience: payload.audience, quantity: payload.quantity });
         if (typeof fbq !== 'undefined') {
             fbq('track', 'Lead', { content_name: 'Firemní dárky' }, { eventID: data.event_id });
         }

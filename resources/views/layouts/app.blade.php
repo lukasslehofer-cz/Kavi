@@ -490,9 +490,8 @@
                             newsletterMessage.textContent = data.message;
                             newsletterEmail.value = '';
 
-                            // Tracking: Lead (dataLayer + Meta Pixel)
-                            window.dataLayer = window.dataLayer || [];
-                            window.dataLayer.push({'event': 'generate_lead'});
+                            // Tracking: Lead (Google tag + Meta Pixel)
+                            gtag('event', 'generate_lead', {'form': 'newsletter'});
                             if (typeof fbq !== 'undefined') {
                                 fbq('track', 'Lead', {content_name: 'Newsletter'});
                             }

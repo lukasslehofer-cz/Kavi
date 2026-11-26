@@ -91,7 +91,7 @@ class MetaPurchaseData
         $breakdown = SubscriptionPricing::forFirstPayment($subscription);
 
         $contents = [[
-            // Stejné ID jako item_id v dataLayer na děkovací stránce
+            // Stejné ID jako item_id v GA4 purchase na děkovací stránce
             'id' => 'subscription-'.($config['amount'] ?? 3),
             'quantity' => 1,
             'item_price' => round(max(0, $breakdown->box - $breakdown->discount), 2),

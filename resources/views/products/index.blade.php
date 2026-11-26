@@ -239,30 +239,26 @@
   </div>
 </div>
 
-{{-- Tracking: ViewContent / view_item_list (dataLayer + Meta Pixel) --}}
+{{-- Tracking: ViewContent / view_item_list (Google tag + Meta Pixel) --}}
 <script>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'view_item_list',
-        'ecommerce': {
-            'currency': '{{ \App\Helpers\CurrencyHelper::code() }}',
-            'items': [
-                @foreach($products as $index => $product)
-                {
-                    'item_id': '{{ $product->id }}',
-                    'item_name': '{{ addslashes($product->getName()) }}',
-                    'price': {{ $product->getPrice() }},
-                    'index': {{ $index }}
-                    @if($product->roastery)
-                    ,'item_brand': '{{ addslashes($product->roastery->getName()) }}'
-                    @endif
-                    @if(is_array($product->category) && !empty($product->category))
-                    ,'item_category': '{{ $product->category[0] }}'
-                    @endif
-                }@if(!$loop->last),@endif
-                @endforeach
-            ]
-        }
+    gtag('event', 'view_item_list', {
+        'currency': '{{ \App\Helpers\CurrencyHelper::code() }}',
+        'items': [
+            @foreach($products as $index => $product)
+            {
+                'item_id': '{{ $product->id }}',
+                'item_name': @json($product->getName()),
+                'price': {{ $product->getPrice() }},
+                'index': {{ $index }}
+                @if($product->roastery)
+                ,'item_brand': @json($product->roastery->getName())
+                @endif
+                @if(is_array($product->category) && !empty($product->category))
+                ,'item_category': '{{ $product->category[0] }}'
+                @endif
+            }@if(!$loop->last),@endif
+            @endforeach
+        ]
     });
 
     // Meta Pixel - ViewContent

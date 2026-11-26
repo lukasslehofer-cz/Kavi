@@ -564,7 +564,7 @@ function switchImage(imageUrl, index) {
 }
 </script>
 
-{{-- Tracking: add_to_cart event (dataLayer + Meta Pixel) --}}
+{{-- Tracking: add_to_cart event (Google tag + Meta Pixel) --}}
 @php
     $trackingPrice = $product->getPrice();
     $trackingCurrency = \App\Helpers\CurrencyHelper::code();
@@ -574,19 +574,15 @@ document.getElementById('add-to-cart-form')?.addEventListener('submit', function
     var quantity = parseInt(document.querySelector('input[name="quantity"]:checked')?.value || 1);
     var price = {{ $trackingPrice }};
 
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'add_to_cart',
-        'ecommerce': {
-            'currency': '{{ $trackingCurrency }}',
-            'value': price * quantity,
-            'items': [{
-                'item_id': '{{ $product->id }}',
-                'item_name': '{{ addslashes($product->getName()) }}',
-                'price': price,
-                'quantity': quantity
-            }]
-        }
+    gtag('event', 'add_to_cart', {
+        'currency': '{{ $trackingCurrency }}',
+        'value': price * quantity,
+        'items': [{
+            'item_id': '{{ $product->id }}',
+            'item_name': @json($product->getName()),
+            'price': price,
+            'quantity': quantity
+        }]
     });
 
     // Meta Pixel - AddToCart
@@ -601,27 +597,23 @@ document.getElementById('add-to-cart-form')?.addEventListener('submit', function
 });
 </script>
 
-{{-- Tracking: view_item + ViewContent event (dataLayer + Meta Pixel) --}}
+{{-- Tracking: view_item + ViewContent event (Google tag + Meta Pixel) --}}
 <script>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'view_item',
-        'ecommerce': {
-            'currency': '{{ $trackingCurrency }}',
-            'value': {{ $trackingPrice }},
-            'items': [{
-                'item_id': '{{ $product->id }}',
-                'item_name': '{{ addslashes($product->getName()) }}',
-                'price': {{ $trackingPrice }},
-                'quantity': 1
-                @if($product->roastery)
-                ,'item_brand': '{{ addslashes($product->roastery->getName()) }}'
-                @endif
-                @if(is_array($product->category) && !empty($product->category))
-                ,'item_category': '{{ $product->category[0] }}'
-                @endif
-            }]
-        }
+    gtag('event', 'view_item', {
+        'currency': '{{ $trackingCurrency }}',
+        'value': {{ $trackingPrice }},
+        'items': [{
+            'item_id': '{{ $product->id }}',
+            'item_name': @json($product->getName()),
+            'price': {{ $trackingPrice }},
+            'quantity': 1
+            @if($product->roastery)
+            ,'item_brand': @json($product->roastery->getName())
+            @endif
+            @if(is_array($product->category) && !empty($product->category))
+            ,'item_category': '{{ $product->category[0] }}'
+            @endif
+        }]
     });
 
     // Meta Pixel - ViewContent
