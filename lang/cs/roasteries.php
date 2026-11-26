@@ -23,7 +23,7 @@ return [
     'want_to_try_this_coffee' => 'Chcete tuto kávu vyzkoušet?',
     'want_to_try_these_coffees' => 'Chcete tyto kávy vyzkoušet?',
     'subscription_promo_text' => 'Připojte se k našemu předplatnému a dostávejte každý měsíc exkluzivní kávy přímo od :name a dalších skvělých pražíren!',
-    'choose_subscription' => 'Vybrat předplatné',
+    'choose_subscription' => 'Sestavit kávový box',
     'modal_subscription_text' => 'Tato káva je dostupná pouze v našem měsíčním předplatném. Připojte se a každý měsíc objevujte nové chuti!',
     'coffee_in_subscription' => 'Tato káva je součástí aktuálního předplatného',
 

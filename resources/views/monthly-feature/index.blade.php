@@ -379,7 +379,7 @@
                 <p class="text-lg text-gray-600 mb-8 font-light">
                     {{ $currentLocale === 'en' ? 'We are currently selecting exceptional coffees for ' . $monthNameWithYear . '. We will surprise you soon!' : 'Právě vybíráme výjimečné kávy pro měsíc ' . $monthNameWithYear . '. Brzy vás překvapíme!' }}
                 </p>
-                <a href="{{ localizedRoute('subscriptions.index') }}" 
+                <a href="{{ localizedRoute('home') }}" 
                    class="btn-fill">
                     <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -406,7 +406,7 @@
       </p>
 
       <!-- CTA Link -->
-      <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+      <a href="{{ localizedRoute('home') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
         <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
         <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
       </a>

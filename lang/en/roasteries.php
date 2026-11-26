@@ -23,7 +23,7 @@ return [
     'want_to_try_this_coffee' => 'Want to try this coffee?',
     'want_to_try_these_coffees' => 'Want to try these coffees?',
     'subscription_promo_text' => 'Join our subscription and receive exclusive coffees directly from :name and other great roasteries every month!',
-    'choose_subscription' => 'Choose Subscription',
+    'choose_subscription' => 'Build Your Coffee Box',
     'modal_subscription_text' => 'This coffee is only available in our monthly subscription. Join us and discover new flavors every month!',
     'coffee_in_subscription' => 'This coffee is part of the current subscription',
 

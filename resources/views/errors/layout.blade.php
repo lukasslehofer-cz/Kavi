@@ -34,6 +34,11 @@
                     <a href="{{ localizedRoute('products.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
                         {{ $detectedLocale === 'en' ? 'Shop' : 'Obchod' }}
                     </a>
+                    @if(\App\Helpers\GiftHelper::enabled())
+                    <a href="{{ localizedRoute('gifts.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ $detectedLocale === 'en' ? 'Gifts' : 'Dárky' }}
+                    </a>
+                    @endif
                     <a href="{{ localizedRoute('contact') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
                         {{ $detectedLocale === 'en' ? 'Contact' : 'Kontakt' }}
                     </a>
@@ -57,13 +62,18 @@
         <div class="mx-auto max-w-screen-xl px-4 md:px-8">
             <div class="py-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-xs uppercase tracking-widest">© {{ date('Y') }} KAVI</p>
-                <div class="flex gap-6">
+                <div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
                     <a href="{{ localizedRoute('terms-of-service') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
                         {{ $detectedLocale === 'en' ? 'Terms' : 'Podmínky' }}
                     </a>
                     <a href="{{ localizedRoute('privacy-policy') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
                         {{ $detectedLocale === 'en' ? 'Privacy' : 'Ochrana údajů' }}
                     </a>
+                    @if(\App\Helpers\GiftHelper::enabled())
+                    <a href="{{ localizedRoute('gifts.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ $detectedLocale === 'en' ? 'Gifts' : 'Dárky' }}
+                    </a>
+                    @endif
                     <a href="{{ localizedRoute('contact') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
                         {{ $detectedLocale === 'en' ? 'Contact' : 'Kontakt' }}
                     </a>

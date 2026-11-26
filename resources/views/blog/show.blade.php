@@ -207,9 +207,16 @@
       <!-- CTA Links -->
       <div class="flex flex-col sm:flex-row gap-6 sm:gap-10">
         <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-          <span>{{ $currentLocale === 'en' ? 'Choose subscription' : 'Vybrat předplatné' }}</span>
+          <span>{{ $currentLocale === 'en' ? 'Build your coffee box' : 'Sestavit kávový box' }}</span>
           <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
+
+        @if(\App\Helpers\GiftHelper::blogCtaVisible())
+        <a href="{{ localizedRoute('gifts.index') }}" class="group inline-flex items-center gap-2 text-warm-400 font-display uppercase tracking-widest hover:text-dark-800 transition-all">
+          <span>{{ $currentLocale === 'en' ? 'Gift subscription' : 'Dárkové předplatné' }}</span>
+          <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+        </a>
+        @endif
 
         <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-warm-400 font-display uppercase tracking-widest hover:text-dark-800 transition-all">
           <span>{{ $currentLocale === 'en' ? 'Browse coffees' : 'Procházet kávy' }}</span>

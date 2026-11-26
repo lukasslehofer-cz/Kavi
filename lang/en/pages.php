@@ -89,7 +89,7 @@ return [
         'cta_title' => 'Have more questions?',
         'cta_text' => 'Contact us and we\'ll be happy to answer all your questions about subscriptions or coffee.',
         'cta_contact' => 'Contact us',
-        'cta_subscription' => 'Choose subscription',
+        'cta_subscription' => 'Build your coffee box',
     ],
 
     // About page
@@ -115,7 +115,7 @@ return [
         
         'cta_title' => 'Start your coffee journey today',
         'cta_text' => 'Get access to the best coffee from all over Europe. Flexible subscription, no commitment.',
-        'cta_subscription' => 'Choose subscription',
+        'cta_subscription' => 'Build your coffee box',
         'cta_browse' => 'Browse coffees',
     ],
 
@@ -154,7 +154,7 @@ return [
         
         'cta_title' => 'Start your coffee journey today',
         'cta_text' => 'Get access to the best coffee from all over Europe. Flexible subscription, no commitment.',
-        'cta_subscription' => 'Choose subscription',
+        'cta_subscription' => 'Build your coffee box',
         'cta_browse' => 'Browse coffees',
     ],
 

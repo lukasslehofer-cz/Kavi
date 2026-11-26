@@ -231,7 +231,7 @@
       </p>
 
       <!-- CTA Link -->
-      <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
+      <a href="{{ localizedRoute('home') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
         <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
         <span class="text-primary-500 group-hover:translate-x-1 transition-transform">→</span>
       </a>

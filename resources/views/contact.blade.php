@@ -152,7 +152,7 @@
                             <span>{{ __('pages.contact.link_faq') }}</span>
                             <span class="group-hover:translate-x-1 transition-transform">→</span>
                         </a>
-                        <a href="{{ localizedRoute('subscriptions.index') }}" class="group flex items-center gap-2 text-warm-500 hover:text-dark-800 transition-colors text-xs uppercase tracking-widest">
+                        <a href="{{ localizedRoute('home') }}" class="group flex items-center gap-2 text-warm-500 hover:text-dark-800 transition-colors text-xs uppercase tracking-widest">
                             <span>{{ __('pages.contact.link_subscription') }}</span>
                             <span class="group-hover:translate-x-1 transition-transform">→</span>
                         </a>

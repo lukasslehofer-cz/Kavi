@@ -89,7 +89,7 @@ return [
         'cta_title' => 'Máte další otázky?',
         'cta_text' => 'Kontaktujte nás a my vám rádi odpovíme na všechny vaše dotazy ohledně předplatného nebo kávy.',
         'cta_contact' => 'Napište nám',
-        'cta_subscription' => 'Vybrat předplatné',
+        'cta_subscription' => 'Sestavit kávový box',
     ],
 
     // About page
@@ -115,7 +115,7 @@ return [
         
         'cta_title' => 'Začněte svou kávovou cestu ještě dnes',
         'cta_text' => 'Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.',
-        'cta_subscription' => 'Vybrat předplatné',
+        'cta_subscription' => 'Sestavit kávový box',
         'cta_browse' => 'Procházet kávy',
     ],
 
@@ -154,7 +154,7 @@ return [
         
         'cta_title' => 'Začněte svou kávovou cestu ještě dnes',
         'cta_text' => 'Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.',
-        'cta_subscription' => 'Vybrat předplatné',
+        'cta_subscription' => 'Sestavit kávový box',
         'cta_browse' => 'Procházet kávy',
     ],
 

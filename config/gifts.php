@@ -15,6 +15,10 @@ return [
 
     'enabled' => (bool) env('GIFTS_ENABLED', false),
 
+    // Dočasný odkaz „Dárkové předplatné →“ v CTA pod blogovými články. Zobrazuje se
+    // do tohoto dne včetně (Y-m-d), pak se sám vypne. Prázdná hodnota = nezobrazovat.
+    'blog_cta_until' => env('GIFTS_BLOG_CTA_UNTIL', '2027-01-06'),
+
     // Délky dárkového předplatného v měsících (= počet boxů)
     'months' => [3, 6],
 
