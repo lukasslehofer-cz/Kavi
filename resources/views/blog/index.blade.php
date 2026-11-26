@@ -106,7 +106,7 @@
             @endif
             
             <!-- Post Title -->
-            <h3 class="font-display text-lg sm:text-xl font-normal text-dark-800 uppercase tracking-tight pt-[5px] pb-[8px] group-hover:text-primary-500 transition-colors line-clamp-2" style="line-height: 1.25;">
+            <h3 class="font-display text-lg sm:text-xl font-normal text-dark-800 uppercase tracking-tight pt-[5px] pb-[8px] group-hover:text-primary-500 transition-colors" style="line-height: 1.25;">
               {{ $post->getTitle() }}
             </h3>
             
