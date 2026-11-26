@@ -26,8 +26,10 @@ return [
     ],
 
     // Vánoční štítek v hero a věta v FAQ. Zobrazí se jen od října do data poptávky
-    // (včetně, do 23:59:59 Europe/Prague). Na příští Vánoce stačí změnit data.
+    // (včetně, do 23:59:59 Europe/Prague). Na příští Vánoce změnit data a zapnout.
     'christmas' => [
+        // Vypnuto 26. 11. 2026: na vánoční rozvoz už nezbývá káva.
+        'enabled' => false,
         'inquiry_by' => env('CORPORATE_XMAS_INQUIRY_BY', '2026-12-01'),
         'deliver_by' => env('CORPORATE_XMAS_DELIVER_BY', '2026-12-20'),
     ],

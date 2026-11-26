@@ -61,7 +61,8 @@ class CorporateHelper
 
     /**
      * Vánoční termíny pro štítek v hero a větu v FAQ, nebo null, když se nemají ukázat:
-     * data nejsou vyplněná, termín poptávky už minul (platí celý den), nebo je před říjnem.
+     * jsou vypnuté v configu, data nejsou vyplněná, termín poptávky už minul (platí celý den),
+     * nebo je před říjnem.
      *
      * @return array{year: int, inquiry_by: string, deliver_by: string}|null
      */
@@ -70,7 +71,7 @@ class CorporateHelper
         $inquiryBy = config('corporate.christmas.inquiry_by');
         $deliverBy = config('corporate.christmas.deliver_by');
 
-        if (! $inquiryBy || ! $deliverBy) {
+        if (! config('corporate.christmas.enabled', true) || ! $inquiryBy || ! $deliverBy) {
             return null;
         }
 
