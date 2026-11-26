@@ -408,6 +408,7 @@
   </div>
   
   <!-- Product Description - Editorial Two Columns -->
+  @php $blogTip = \App\Helpers\BlogTipHelper::forProduct($product); @endphp
   @if($product->getDescription())
   <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-16 lg:py-24">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
@@ -434,6 +435,16 @@
       </div>
       @endif
     </div>
+
+    @if($blogTip)
+    <div class="mt-10 lg:mt-12">
+      @include('products._blog-tip')
+    </div>
+    @endif
+  </div>
+  @elseif($blogTip)
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-12 lg:py-16">
+    @include('products._blog-tip')
   </div>
   @endif
 
