@@ -187,6 +187,9 @@
                 @endif
             </div>
 
+            <!-- Related posts -->
+            @include('admin.posts._related')
+
             <!-- Status -->
             <div class="bg-primary-50 border-2 border-primary-200 p-6 rounded-lg">
                 <label class="block text-sm font-medium text-coffee-900 mb-3">Stav článku</label>

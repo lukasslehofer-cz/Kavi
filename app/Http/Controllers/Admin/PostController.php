@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
@@ -59,12 +60,16 @@ class PostController extends Controller
     public function create()
     {
         $tags = Tag::orderBy('name_cs')->get();
-        
-        return view('admin.posts.create', compact('tags'));
+        $relatedOptions = Post::orderByDesc('published_at')->orderByDesc('id')->get(['id', 'title_cs', 'status']);
+        $selectedRelated = [];
+
+        return view('admin.posts.create', compact('tags', 'relatedOptions', 'selectedRelated'));
     }
 
     public function store(Request $request)
     {
+        $this->normalizeRelatedInput($request);
+
         $validated = $request->validate([
             'title_cs' => 'required|string|max:255',
             'title_en' => 'nullable|string|max:255',
@@ -80,6 +85,8 @@ class PostController extends Controller
             'published_at' => 'nullable|date',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
+            'related' => 'nullable|array|max:3',
+            'related.*' => 'integer|distinct|exists:posts,id',
         ]);
 
         // Generate Czech slug if not provided
@@ -105,9 +112,10 @@ class PostController extends Controller
             $validated['featured_image'] = 'images/blog/' . $filename;
         }
 
-        // Remove tags from validated data (will be synced separately)
+        // Remove tags and related posts from validated data (will be synced separately)
         $tagIds = $validated['tags'] ?? [];
-        unset($validated['tags']);
+        $relatedIds = $validated['related'] ?? [];
+        unset($validated['tags'], $validated['related']);
 
         $post = Post::create($validated);
 
@@ -115,6 +123,8 @@ class PostController extends Controller
         if (!empty($tagIds)) {
             $post->tags()->sync($tagIds);
         }
+
+        $post->syncRelatedPosts($relatedIds);
 
         return redirect()->route('admin.posts.index')
             ->with('success', 'Článek byl úspěšně vytvořen.');
@@ -124,12 +134,18 @@ class PostController extends Controller
     {
         $tags = Tag::orderBy('name_cs')->get();
         $selectedTags = $post->tags->pluck('id')->toArray();
-        
-        return view('admin.posts.edit', compact('post', 'tags', 'selectedTags'));
+        $relatedOptions = Post::where('id', '!=', $post->id)
+            ->orderByDesc('published_at')->orderByDesc('id')
+            ->get(['id', 'title_cs', 'status']);
+        $selectedRelated = $post->relatedPosts()->pluck('posts.id')->toArray();
+
+        return view('admin.posts.edit', compact('post', 'tags', 'selectedTags', 'relatedOptions', 'selectedRelated'));
     }
 
     public function update(Request $request, Post $post)
     {
+        $this->normalizeRelatedInput($request);
+
         $validated = $request->validate([
             'title_cs' => 'required|string|max:255',
             'title_en' => 'nullable|string|max:255',
@@ -145,6 +161,8 @@ class PostController extends Controller
             'published_at' => 'nullable|date',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
+            'related' => 'nullable|array|max:3',
+            'related.*' => ['integer', 'distinct', 'exists:posts,id', Rule::notIn([$post->id])],
         ]);
 
         // Generate Czech slug if not provided
@@ -175,14 +193,17 @@ class PostController extends Controller
             $validated['featured_image'] = 'images/blog/' . $filename;
         }
 
-        // Remove tags from validated data (will be synced separately)
+        // Remove tags and related posts from validated data (will be synced separately)
         $tagIds = $validated['tags'] ?? [];
-        unset($validated['tags']);
+        $relatedIds = $validated['related'] ?? [];
+        unset($validated['tags'], $validated['related']);
 
         $post->update($validated);
 
         // Sync tags
         $post->tags()->sync($tagIds);
+
+        $post->syncRelatedPosts($relatedIds);
 
         return redirect()->route('admin.posts.index')
             ->with('success', 'Článek byl úspěšně aktualizován.');
@@ -199,5 +220,15 @@ class PostController extends Controller
 
         return redirect()->route('admin.posts.index')
             ->with('success', 'Článek byl úspěšně smazán.');
+    }
+
+    /**
+     * Prázdné selecty souvisejících článků zahodí, ať je validace (distinct) nepočítá.
+     */
+    private function normalizeRelatedInput(Request $request): void
+    {
+        $related = array_values(array_filter((array) $request->input('related', []), fn ($id) => $id !== null && $id !== ''));
+
+        $request->merge(['related' => $related]);
     }
 }

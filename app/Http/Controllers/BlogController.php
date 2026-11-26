@@ -75,16 +75,27 @@ class BlogController extends Controller
         // Load tags relationship
         $post->load('tags');
 
-        // Get related posts (same tags, excluding current)
-        $relatedPosts = Post::with('tags')
+        // Ručně přiřazené související články mají přednost
+        $relatedPosts = $post->relatedPosts()
+            ->with('tags')
             ->published()
-            ->where('id', '!=', $post->id)
-            ->whereHas('tags', function ($query) use ($post) {
-                $query->whereIn('tags.id', $post->tags->pluck('id'));
-            })
-            ->orderByNewest()
             ->limit(3)
             ->get();
+
+        // Doplnění (nebo bez ručního přiřazení): stejné štítky (excluding current)
+        if ($relatedPosts->count() < 3) {
+            $excludeIds = $relatedPosts->pluck('id')->push($post->id)->toArray();
+            $byTags = Post::with('tags')
+                ->published()
+                ->whereNotIn('id', $excludeIds)
+                ->whereHas('tags', function ($query) use ($post) {
+                    $query->whereIn('tags.id', $post->tags->pluck('id'));
+                })
+                ->orderByNewest()
+                ->limit(3 - $relatedPosts->count())
+                ->get();
+            $relatedPosts = $relatedPosts->concat($byTags);
+        }
 
         // If not enough related posts, fill with recent posts
         if ($relatedPosts->count() < 3) {

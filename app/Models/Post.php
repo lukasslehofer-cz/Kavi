@@ -86,6 +86,35 @@ class Post extends Model
     }
 
     /**
+     * Ručně přiřazené související články v nastaveném pořadí
+     */
+    public function relatedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'post_related_posts', 'post_id', 'related_post_id')
+            ->withPivot('position')
+            ->withTimestamps()
+            ->orderBy('post_related_posts.position');
+    }
+
+    /**
+     * Uloží související články v daném pořadí (max. 3, bez duplicit a bez sebe sama)
+     */
+    public function syncRelatedPosts(array $ids): void
+    {
+        $ids = array_values(array_unique(array_filter(
+            array_map('intval', $ids),
+            fn (int $id) => $id > 0 && $id !== $this->id
+        )));
+
+        $sync = [];
+        foreach (array_slice($ids, 0, 3) as $index => $id) {
+            $sync[$id] = ['position' => $index + 1];
+        }
+
+        $this->relatedPosts()->sync($sync);
+    }
+
+    /**
      * Staré slugy, ze kterých se přesměrovává na aktuální
      */
     public function slugRedirects()
