@@ -401,7 +401,12 @@
             <h3 class="text-white font-normal text-sm mb-5 uppercase tracking-widest">{{ ($currentLocale ?? 'cs') === 'en' ? 'Coffee guide' : 'Průvodce kávou' }}</h3>
             <nav class="space-y-3">
               @foreach($footerGuide as $guideSlug => $guideLabel)
+              @if(request()->routeIs('blog.show') && request()->route('post') === $guideSlug)
+              {{-- Článek neodkazuje sám na sebe --}}
+              <span class="block text-white/60 text-sm font-light" aria-current="page">{{ $guideLabel }}</span>
+              @else
               <a href="{{ localizedRoute('blog.show', ['post' => $guideSlug]) }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ $guideLabel }}</a>
+              @endif
               @endforeach
               <a href="{{ localizedRoute('blog.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'All articles' : 'Všechny články' }}</a>
             </nav>
