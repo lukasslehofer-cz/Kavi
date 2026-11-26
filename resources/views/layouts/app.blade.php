@@ -319,9 +319,9 @@
 
       <div class="mx-auto max-w-screen-xl px-4 md:px-8">
         <!-- Main Footer Content -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.25fr_repeat(5,minmax(0,1fr))] gap-10 lg:gap-x-8 pt-16 pb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 pt-16 pb-12">
           <!-- Brand Section -->
-          <div>
+          <div class="lg:col-span-2">
             <a href="{{ route('home') }}" class="inline-flex items-center gap-2 mb-6" aria-label="logo">
               <img src="/images/kavi-logo-white.png" alt="{{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}" class="h-9 w-auto">
             </a>
@@ -368,17 +368,6 @@
             </nav>
           </div>
 
-          <!-- Information -->
-          <div>
-            <h3 class="text-white font-normal text-sm mb-5 uppercase tracking-widest">{{ ($currentLocale ?? 'cs') === 'en' ? 'Information' : 'Informace' }}</h3>
-            <nav class="space-y-3">
-              <a href="{{ localizedRoute('how-it-works') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'How It Works' : 'Jak to funguje' }}</a>
-              <a href="{{ localizedRoute('about') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'About Us' : 'O nás' }}</a>
-              <a href="{{ localizedRoute('how-it-works') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">FAQ</a>
-              <a href="{{ localizedRoute('blog.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">Blog</a>
-            </nav>
-          </div>
-
           <!-- Coffee guide (interní odkazy na články, které chceme posílit) -->
           @php
             $footerGuide = ($currentLocale ?? 'cs') === 'en'
@@ -412,10 +401,14 @@
             </nav>
           </div>
 
-          <!-- Contact -->
+          <!-- Information (včetně kontaktu) -->
           <div>
-            <h3 class="text-white font-normal text-sm mb-5 uppercase tracking-widest">{{ ($currentLocale ?? 'cs') === 'en' ? 'Contact' : 'Kontakt' }}</h3>
+            <h3 class="text-white font-normal text-sm mb-5 uppercase tracking-widest">{{ ($currentLocale ?? 'cs') === 'en' ? 'Information' : 'Informace' }}</h3>
             <nav class="space-y-3">
+              <a href="{{ localizedRoute('how-it-works') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'How It Works' : 'Jak to funguje' }}</a>
+              <a href="{{ localizedRoute('about') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">{{ ($currentLocale ?? 'cs') === 'en' ? 'About Us' : 'O nás' }}</a>
+              <a href="{{ localizedRoute('how-it-works') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">FAQ</a>
+              <a href="{{ localizedRoute('blog.index') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">Blog</a>
               <a href="{{ localizedRoute('contact') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">
                 {{ ($currentLocale ?? 'cs') === 'en' ? 'Write Us' : 'Napište nám' }}
               </a>
