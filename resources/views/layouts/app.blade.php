@@ -373,14 +373,12 @@
             $footerGuide = ($currentLocale ?? 'cs') === 'en'
               ? [
                   'specialty-coffee-vs-regular-coffee' => 'Specialty vs. regular coffee',
-                  'light-vs-dark-roast-coffee' => 'Light vs. dark roast',
                   'arabica-vs-robusta-difference' => 'Arabica vs. robusta',
                   'how-to-make-espresso' => 'How to make espresso at home',
                   'how-to-make-coffee-at-home' => 'How to make coffee at home',
                 ]
               : [
                   'vyberova-kava-vs-klasicka-kava' => 'Výběrová vs. klasická káva',
-                  'svetle-vs-tmave-prazeni-kavy' => 'Světlé vs. tmavé pražení',
                   'arabica-vs-robusta-rozdil' => 'Arabica vs. robusta',
                   'jak-pripravit-espresso' => 'Jak připravit espresso doma',
                   'jak-pripravit-kavu-doma' => 'Jak připravit kávu doma',
