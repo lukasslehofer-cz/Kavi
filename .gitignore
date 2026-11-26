@@ -48,6 +48,9 @@ database/database.sqlite
 # Vygenerované PDF certifikáty dárků a ručně nahrané poukazy (deploy.sh by je jinak smazal)
 /storage/app/gifts/*
 /storage/app/vouchers/*
+# Zálohy obsahu článků z blog:* příkazů a snapshoty seo:audit-links (deploy.sh by je jinak smazal)
+/storage/app/blog-content-backups/*
+/storage/app/seo-audit/*
 
 # Temporary files
 test_*.php
