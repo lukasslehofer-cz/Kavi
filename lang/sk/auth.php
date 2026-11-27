@@ -1,0 +1,101 @@
+<?php
+
+return [
+    // Login
+    'login_title' => 'Prihlásenie',
+    'welcome_back' => 'Vitajte späť',
+    'login_subtitle' => 'Prihláste sa do svojho účtu',
+    'credentials' => 'PRIHLASOVACIE ÚDAJE',
+    'email' => 'E-MAIL',
+    'email_placeholder' => 'vas@email.sk',
+    'password' => 'HESLO',
+    'password_placeholder' => '••••••••',
+    'password_placeholder_min' => 'Minimálne 8 znakov',
+    'remember_me' => 'ZAPAMÄTAŤ SI MA',
+    'forgot_password' => 'ZABUDNUTÉ HESLO?',
+    'login_button' => 'PRIHLÁSIŤ SA',
+    'or' => 'alebo',
+    'magic_link_title' => 'PRIHLÁSENIE BEZ HESLA',
+    'magic_link_button' => 'ODOSLAŤ PRIHLASOVACÍ ODKAZ',
+    'magic_link_info' => 'ZADAJTE SVOJ E-MAIL VYŠŠIE A MY VÁM POŠLEME JEDNORAZOVÝ PRIHLASOVACÍ ODKAZ. ŽIADNE HESLO NIE JE POTREBNÉ.',
+    'no_account' => 'EŠTE NEMÁTE ÚČET?',
+    'register_free' => 'ZAREGISTROVAŤ SA',
+    'secure' => 'Bezpečné',
+    'fast' => 'Rýchle',
+    'enter_email_alert' => 'Prosím, zadajte svoj e-mail',
+    'invalid_email_alert' => 'Prosím, zadajte platný e-mail',
+    'why_account' => 'PREČO MAŤ ÚČET?',
+    'benefit_orders' => 'HISTÓRIA OBJEDNÁVOK A SLEDOVANIE ZÁSIELOK',
+    'benefit_subscription' => 'SPRÁVA PREDPLATNÉHO ONLINE',
+    'benefit_faster' => 'RÝCHLEJŠIE OBJEDNÁVANIE',
+
+    // Registration
+    'register_title' => 'Registrácia',
+    'create_account' => 'Vytvorte si účet',
+    'register_subtitle' => 'Začnite svoju kávovú cestu s nami',
+    'full_name' => 'Celé meno',
+    'name_placeholder' => 'Ján Novák',
+    'confirm_password' => 'Potvrdenie hesla',
+    'confirm_password_placeholder' => 'Zadajte heslo znova',
+    'terms_agree' => 'Súhlasím s',
+    'terms_of_service' => 'obchodnými podmienkami',
+    'and' => 'a',
+    'privacy_policy' => 'zásadami ochrany osobných údajov',
+    'register_button' => 'Zaregistrovať sa zadarmo',
+    'have_account' => 'Už máte účet?',
+    'login_here' => 'Prihláste sa',
+
+    // Registration benefits
+    'benefits_title' => 'Čo získate registráciou:',
+    'benefit_exclusive' => 'Prístup k exkluzívnym ponukám',
+    'benefit_subscription' => 'Správa predplatného online',
+    'benefit_orders' => 'História objednávok a sledovanie zásielok',
+
+    // Forgot password
+    'forgot_password_title' => 'Zabudnuté heslo',
+    'forgot_password_subtitle' => 'Zadajte svoj e-mail a my vám pošleme odkaz na obnovenie hesla',
+    'check_spam' => 'Nezabudnite skontrolovať aj priečinok so spamom.',
+    'how_it_works' => 'Ako to funguje?',
+    'how_it_works_text' => 'Po zadaní e-mailu vám pošleme odkaz, ktorý je platný 60 minút. Kliknutím na odkaz si budete môcť nastaviť nové heslo.',
+    'send_reset_link' => 'Odoslať odkaz na obnovenie hesla',
+    'back_to_login' => 'Späť na prihlásenie',
+    'encrypted' => 'Šifrované',
+
+    // Reset password
+    'reset_password_title' => 'Nastavenie nového hesla',
+    'set_new_password' => 'Nastavte si nové heslo',
+    'set_new_password_subtitle' => 'Zvoľte si bezpečné heslo pre svoj účet',
+    'new_password' => 'Nové heslo',
+    'password_requirements' => 'Požiadavky na heslo:',
+    'password_min_8' => 'Minimálne 8 znakov',
+    'password_recommendation' => 'Odporúčame kombináciu písmen a číslic',
+    'password_unique' => 'Nepoužívajte rovnaké heslo ako na iných stránkach',
+    'set_password_button' => 'Nastaviť nové heslo',
+    'remembered_password' => 'Spomenuli ste si na heslo?',
+    'secure_encryption' => 'Bezpečné šifrovanie',
+    'ssl_protected' => 'Chránené SSL',
+
+    // Veľké nadpisy stránok prihlásenia, registrácie a hesla. *_accent je farebná časť
+    // za predchádzajúcim textom (ten preto končí medzerou).
+    'headings' => [
+        'login' => 'PRIHLÁSENIE',
+        'login_credentials' => 'PRIHLASOVACIE ',
+        'login_credentials_accent' => 'ÚDAJE',
+        'login_magic' => 'PRIHLÁSENIE ',
+        'login_magic_accent' => 'BEZ HESLA',
+        'register' => 'REGISTRÁCIA',
+        'register_details' => 'VAŠE ',
+        'register_details_accent' => 'ÚDAJE',
+        'forgot' => 'OBNOVENIE HESLA',
+        'forgot_email' => 'VÁŠ ',
+        'forgot_email_accent' => 'E-MAIL',
+        'reset' => 'NOVÉ HESLO',
+        'reset_password' => 'NASTAVTE SI NOVÉ ',
+        'reset_password_accent' => 'HESLO',
+    ],
+
+    // Messages
+    'failed' => 'Tieto prihlasovacie údaje nezodpovedajú žiadnemu záznamu.',
+    'password_incorrect' => 'Zadané heslo je nesprávne.',
+    'throttle' => 'Príliš veľa pokusov o prihlásenie. Skúste to prosím znova o :seconds sekúnd.',
+];

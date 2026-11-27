@@ -522,7 +522,7 @@
     :lineup="$lineup"
     variant="h2"
     id="v-boxu"
-    :title="__('subscriptions.builder.lineup.title', ['month' => $lineup->monthName('adjective_locative')])"
+    :title="trans_choice('subscriptions.builder.lineup.title', $lineup->month->month, ['month' => $lineup->monthName('adjective_locative')])"
     :lead="__('subscriptions.builder.lineup.lead')"
     :link-label="__('subscriptions.builder.lineup.link')"
     padding="pt-20 sm:pt-24 lg:pt-28 pb-20 sm:pb-24 lg:pb-28" />
