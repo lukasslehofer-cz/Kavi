@@ -9,12 +9,13 @@
         <p class="text-coffee-600">Vytvořte nový produkt v eshopu</p>
     </div>
 
-    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="card p-8">
+    <form data-i18n-form data-active-lang="cs" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="card p-8">
         @csrf
+        @include('admin.partials.translation-tabs')
 
         <div class="space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div>
+            <div class="grid grid-cols-1 gap-4">
+                <div data-lang-pane="cs">
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Název produktu 🇨🇿</label>
                     <input type="text" name="name" id="name" value="{{ old('name') }}" required 
                            class="input @error('name') border-red-500 @enderror">
@@ -22,7 +23,7 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <div>
+                <div data-lang-pane="en" data-source='#name'>
                     <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                         <span>Product Name 🇬🇧</span>
                         <button type="button" onclick="translateField('name', 'name_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -37,7 +38,7 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <div>
+                <div data-lang-pane="sk" data-source='#name'>
                     <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                         <span>Název produktu 🇸🇰</span>
                         <button type="button" onclick="translateField('name', 'name_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -95,8 +96,8 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div>
+            <div class="grid grid-cols-1 gap-4">
+                <div data-lang-pane="cs">
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Krátký popis 🇨🇿</label>
                     <input type="text" name="short_description" id="short_description" value="{{ old('short_description') }}" 
                            class="input @error('short_description') border-red-500 @enderror">
@@ -104,7 +105,7 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <div>
+                <div data-lang-pane="en" data-source='#short_description'>
                     <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                         <span>Short Description 🇬🇧</span>
                         <button type="button" onclick="translateField('short_description', 'short_description_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -119,7 +120,7 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <div>
+                <div data-lang-pane="sk" data-source='#short_description'>
                     <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                         <span>Krátký popis 🇸🇰</span>
                         <button type="button" onclick="translateField('short_description', 'short_description_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -136,8 +137,8 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div>
+            <div class="grid grid-cols-1 gap-4">
+                <div data-lang-pane="cs">
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Detailní popis 🇨🇿</label>
                     <textarea name="description" id="description" rows="6" required 
                               class="input @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
@@ -146,7 +147,7 @@
                     @enderror
                     <p class="text-xs text-coffee-600 mt-1">Povolené HTML tagy: &lt;a&gt;, &lt;strong&gt;, &lt;b&gt;, &lt;em&gt;, &lt;i&gt;, &lt;br&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</p>
                 </div>
-                <div>
+                <div data-lang-pane="en" data-source='#description'>
                     <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                         <span>Detailed Description 🇬🇧</span>
                         <button type="button" onclick="translateField('description', 'description_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -161,7 +162,7 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-                <div>
+                <div data-lang-pane="sk" data-source='#description'>
                     <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                         <span>Detailní popis 🇸🇰</span>
                         <button type="button" onclick="translateField('description', 'description_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -257,8 +258,8 @@
                     <span class="text-xs text-coffee-600 italic">Zobrazeno pro kategorii: Espresso, Filtr, Bezkofeinová</span>
                 </div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div data-lang-pane="cs">
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Původ kávy 🇨🇿</label>
                         <input type="text" name="origin" id="origin" value="{{ old('origin') }}" 
                                placeholder="např. Etiopie, Keňa, Honduras..."
@@ -267,7 +268,7 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div>
+                    <div data-lang-pane="en" data-source='#origin'>
                         <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                             <span>Origin 🇬🇧</span>
                             <button type="button" onclick="translateField('origin', 'origin_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -282,7 +283,7 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div>
+                    <div data-lang-pane="sk" data-source='#origin'>
                         <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                             <span>Původ kávy 🇸🇰</span>
                             <button type="button" onclick="translateField('origin', 'origin_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -310,8 +311,8 @@
                     <p class="text-xs text-coffee-600 mt-1">Pouze číslo nebo rozsah v metrech, jednotka se na webu doplní automaticky (CZ: m n.m., EN: masl).</p>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div data-lang-pane="cs">
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Zpracování 🇨🇿</label>
                         <input type="text" name="processing" id="processing" value="{{ old('processing') }}" 
                                placeholder="např. Praná, Přírodní, Honey..."
@@ -320,7 +321,7 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div>
+                    <div data-lang-pane="en" data-source='#processing'>
                         <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                             <span>Processing 🇬🇧</span>
                             <button type="button" onclick="translateField('processing', 'processing_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -335,7 +336,7 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div>
+                    <div data-lang-pane="sk" data-source='#processing'>
                         <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                             <span>Zpracování 🇸🇰</span>
                             <button type="button" onclick="translateField('processing', 'processing_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -352,8 +353,8 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div data-lang-pane="cs">
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Odrůda 🇨🇿</label>
                         <input type="text" name="variety" id="variety" value="{{ old('variety') }}" 
                                placeholder="např. Arabica, Bourbon, Caturra..."
@@ -362,7 +363,7 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div>
+                    <div data-lang-pane="en" data-source='#variety'>
                         <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                             <span>Variety 🇬🇧</span>
                             <button type="button" onclick="translateField('variety', 'variety_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -377,7 +378,7 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div>
+                    <div data-lang-pane="sk" data-source='#variety'>
                         <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                             <span>Odrůda 🇸🇰</span>
                             <button type="button" onclick="translateField('variety', 'variety_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -394,8 +395,8 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div data-lang-pane="cs">
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Chuťové tóny 🇨🇿</label>
                         <textarea name="flavor_notes" id="flavor_notes" rows="3" 
                                   placeholder="např. citrus, čokoláda, karamel, oříšky..."
@@ -404,7 +405,7 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div>
+                    <div data-lang-pane="en" data-source='#flavor_notes'>
                         <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                             <span>Flavor Notes 🇬🇧</span>
                             <button type="button" onclick="translateField('flavor_notes', 'flavor_notes_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -419,7 +420,7 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div>
+                    <div data-lang-pane="sk" data-source='#flavor_notes'>
                         <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
                             <span>Chuťové tóny 🇸🇰</span>
                             <button type="button" onclick="translateField('flavor_notes', 'flavor_notes_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -849,11 +850,11 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
     const index = customAttrIndex++;
 
     const row = document.createElement('div');
-    row.className = 'grid grid-cols-1 lg:grid-cols-3 gap-2 p-4 bg-white rounded-lg border border-blue-200 mb-3';
+    row.className = 'grid grid-cols-1 lg:grid-cols-2 gap-2 p-4 bg-white rounded-lg border border-blue-200 mb-3';
     row.id = `custom-attr-${index}`;
 
     row.innerHTML = `
-        <div>
+        <div data-lang-pane="cs">
             <label class="block text-xs font-medium text-coffee-900 mb-1">Název 🇨🇿</label>
             <input type="text"
                    name="custom_attributes[${index}][label_cs]"
@@ -862,7 +863,7 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    class="input text-sm"
                    required>
         </div>
-        <div>
+        <div data-lang-pane="en" data-source='[name="custom_attributes[${index}][label_cs]"]'>
             <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
                 <span>Name 🇬🇧</span>
                 <button type="button"
@@ -878,7 +879,7 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    class="input text-sm"
                    id="custom-attr-label-en-${index}">
         </div>
-        <div>
+        <div data-lang-pane="sk" data-source='[name="custom_attributes[${index}][label_cs]"]'>
             <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
                 <span>Název 🇸🇰</span>
                 <button type="button"
@@ -894,7 +895,7 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    class="input text-sm"
                    id="custom-attr-label-sk-${index}">
         </div>
-        <div>
+        <div data-lang-pane="cs">
             <label class="block text-xs font-medium text-coffee-900 mb-1">Hodnota 🇨🇿</label>
             <input type="text"
                    name="custom_attributes[${index}][value_cs]"
@@ -904,7 +905,7 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    required
                    id="custom-attr-value-cs-${index}">
         </div>
-        <div>
+        <div data-lang-pane="en" data-source='#custom-attr-value-cs-${index}'>
             <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
                 <span>Value 🇬🇧</span>
                 <button type="button"
@@ -920,7 +921,7 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    class="input text-sm"
                    id="custom-attr-value-en-${index}">
         </div>
-        <div>
+        <div data-lang-pane="sk" data-source='#custom-attr-value-cs-${index}'>
             <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
                 <span>Hodnota 🇸🇰</span>
                 <button type="button"

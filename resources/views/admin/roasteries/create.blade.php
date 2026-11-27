@@ -10,8 +10,9 @@
             <p class="text-gray-600 mt-1">Vytvořte novou pražírnu v systému</p>
         </div>
 
-        <form action="{{ route('admin.roasteries.store') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <form data-i18n-form data-active-lang="cs" action="{{ route('admin.roasteries.store') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
             @csrf
+            @include('admin.partials.translation-tabs')
 
             <div class="space-y-6">
                 <!-- Basic Info -->
@@ -19,8 +20,8 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Základní informace</h2>
                     
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            <div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div data-lang-pane="cs">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Název pražírny 🇨🇿 *</label>
                                 <input type="text" name="name" id="name" value="{{ old('name') }}" required 
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror">
@@ -28,7 +29,7 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
+                            <div data-lang-pane="en" data-source='#name'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Roastery Name 🇬🇧</span>
                                     <button type="button" onclick="translateField('name', 'name_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -43,7 +44,7 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
+                            <div data-lang-pane="sk" data-source='#name'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Název pražírny 🇸🇰</span>
                                     <button type="button" onclick="translateField('name', 'name_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -60,8 +61,8 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            <div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div data-lang-pane="cs">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Země 🇨🇿 *</label>
                                 <select name="country" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('country') border-red-500 @enderror" id="country-select">
                                     <option value="">Vyberte zemi</option>
@@ -75,7 +76,7 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
+                            <div data-lang-pane="en" data-source='#country-select'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Country 🇬🇧</span>
                                     <button type="button" onclick="translateCountry('country_en', 'EN')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -90,7 +91,7 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
+                            <div data-lang-pane="sk" data-source='#country-select'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Země 🇸🇰</span>
                                     <button type="button" onclick="translateCountry('country_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -107,8 +108,8 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            <div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div data-lang-pane="cs">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Město 🇨🇿</label>
                                 <input type="text" name="city" id="city" value="{{ old('city') }}" 
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('city') border-red-500 @enderror">
@@ -116,7 +117,7 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
+                            <div data-lang-pane="en" data-source='#city'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>City 🇬🇧</span>
                                     <button type="button" onclick="translateField('city', 'city_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -131,7 +132,7 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
+                            <div data-lang-pane="sk" data-source='#city'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Město 🇸🇰</span>
                                     <button type="button" onclick="translateField('city', 'city_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -189,8 +190,8 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Popisy / Descriptions</h2>
                     
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            <div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div data-lang-pane="cs">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Krátký popis 🇨🇿 (max 500 znaků)</label>
                                 <textarea name="short_description" id="short_description" rows="3" maxlength="500" 
                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('short_description') border-red-500 @enderror">{{ old('short_description') }}</textarea>
@@ -199,7 +200,7 @@
                                 @enderror
                                 <p class="text-xs text-gray-500 mt-1">Zobrazí se v přehledu pražíren</p>
                             </div>
-                            <div>
+                            <div data-lang-pane="en" data-source='#short_description'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Short Description 🇬🇧 (max 500 chars)</span>
                                     <button type="button" onclick="translateField('short_description', 'short_description_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -214,7 +215,7 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
+                            <div data-lang-pane="sk" data-source='#short_description'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Krátký popis 🇸🇰 (max 500 znaků)</span>
                                     <button type="button" onclick="translateField('short_description', 'short_description_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -231,8 +232,8 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            <div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div data-lang-pane="cs">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Plný popis 🇨🇿</label>
                                 <textarea name="full_description" id="full_description" rows="8" 
                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('full_description') border-red-500 @enderror">{{ old('full_description') }}</textarea>
@@ -241,7 +242,7 @@
                                 @enderror
                                 <p class="text-xs text-gray-500 mt-1">Zobrazí se v detailu pražírny</p>
                             </div>
-                            <div>
+                            <div data-lang-pane="en" data-source='#full_description'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Full Description 🇬🇧</span>
                                     <button type="button" onclick="translateField('full_description', 'full_description_en')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
@@ -256,7 +257,7 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <div>
+                            <div data-lang-pane="sk" data-source='#full_description'>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Plný popis 🇸🇰</span>
                                     <button type="button" onclick="translateField('full_description', 'full_description_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
