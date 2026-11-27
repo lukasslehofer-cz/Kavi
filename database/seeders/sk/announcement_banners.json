@@ -1,0 +1,69 @@
+[
+    {
+        "id": 1,
+        "fields": {
+            "message_sk": {
+                "src": "54ae3c9a4a666aac1249cb4c7a4dc228717d6d85",
+                "text": "Prvé kávy roku 2026 už na vás čakajú!"
+            }
+        }
+    },
+    {
+        "id": 2,
+        "fields": {
+            "message_sk": {
+                "src": "21fcc808b69c481784b4b0f418dc57b46145aa47",
+                "text": "POSLEDNÝ DEŇ zľavy 26% na kávy skladom!"
+            }
+        }
+    },
+    {
+        "id": 3,
+        "fields": {
+            "message_sk": {
+                "src": "a182e893598ed538d1a2937dc440ffc36d907095",
+                "text": "Objednávky aprílových boxov končia už <b>dnes o polnoci!</b>"
+            }
+        }
+    },
+    {
+        "id": 4,
+        "fields": {
+            "message_sk": {
+                "src": "34f54688ef0b21469db236228933d21e360972a3",
+                "text": "Od stredy <b>22.4. do pondelka 27.4.</b> neodosielame nové objednávky"
+            }
+        }
+    },
+    {
+        "id": 5,
+        "fields": {
+            "message_sk": {
+                "src": "8c0eb947fb78941828169a375cd6c6dd925f4be5",
+                "text": "Od 12.8.2026 kvôli pravidlám EÚ pozastavujeme dodávky mimo ČR."
+            }
+        }
+    },
+    {
+        "id": 6,
+        "fields": {
+            "message_sk": {
+                "src": "aa4134d61670cd461151a333b007dcac43b028bb",
+                "text": "Augustový výpredaj! Zľava 20% na vybrané kávy až do 28.8."
+            }
+        }
+    },
+    {
+        "id": 7,
+        "fields": {
+            "title_sk": {
+                "src": "ce62fbcd71a1aedfdd81c110ba3394eb91d1b454",
+                "text": "Expedícia až 7.9."
+            },
+            "message_sk": {
+                "src": "c45e9f2eed5b63ed6f7eb945798dae227212f17b",
+                "text": "Máme oneskorenú dovolenku! Od 31.8. do 4.9. žiaľ nebudeme odosielať zásielky. Čokoľvek v tomto týždni objednáte, odošleme v pondelok 7.9. Ďakujeme za pochopenie."
+            }
+        }
+    }
+]
