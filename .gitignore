@@ -41,6 +41,10 @@ database/database.sqlite
 !/storage/framework/sessions/.gitkeep
 /storage/framework/views/*
 !/storage/framework/views/.gitkeep
+# Údržbový režim (php artisan down): deploy.sh dělá `git stash --include-untracked`,
+# který by soubory uklidil a web by během nasazení běžel dál
+/storage/framework/down
+/storage/framework/maintenance.php
 /storage/app/invoices/*
 !/storage/app/invoices/.gitkeep
 /storage/app/google-reviews/*
