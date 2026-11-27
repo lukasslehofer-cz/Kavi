@@ -1,0 +1,784 @@
+[
+    {
+        "id": 1,
+        "fields": {
+            "country_sk": {
+                "src": "0e71dd22daa74f9dec1936dad9c73af2537cb26d",
+                "text": "Nemecko"
+            },
+            "short_description_sk": {
+                "src": "9d793f1386b3dbdf52c78f543c2642e01f47da09",
+                "text": "Five Elephant je berlínska pražiareň a kaviareň, ktorú v roku 2010 založili Kris a Sophie Schackmanovci. Od začiatku stavia na transparentných a dlhodobých vzťahoch s pestovateľmi, udržateľnej produkcii a maximálnej kvalite výberovej kávy. Typické sú ich čisté single-origin profily aj minimalistický dizajn obalov."
+            },
+            "full_description_sk": {
+                "src": "1712cdffd1c78172d2bfb9941ef7c478060772e0",
+                "text": "Sídlo pražiarne je v Kreuzbergu, kde vznikla aj ich prvá kaviareň, dnes doplnená o ďalšie pobočky po Berlíne. Okrem kávy sa preslávili aj svojím ikonickým cheesecakom, ktorý sa stal neoddeliteľnou súčasťou zážitku z návštevy. Five Elephant stavia na priamom nákupe od farmárov, férových cenách a vysokých štandardoch kvality, ktoré prenáša do spolupráce s kaviarňami, reštauráciami aj hotelmi."
+            }
+        }
+    },
+    {
+        "id": 2,
+        "fields": {
+            "country_sk": {
+                "src": "38f4817e52acbaf216ede0c7eeb0214fdb0ce0f1",
+                "text": "Francúzsko"
+            },
+            "city_sk": {
+                "src": "4664170d0ca903832edc319d12e228284a6e9c9d",
+                "text": "Paríž"
+            },
+            "short_description_sk": {
+                "src": "1765e0550b991801e94dcbfbbcb74bca39dc42a3",
+                "text": "Pražiareň TANAT Coffee vznikla v roku 2016 v Paríži a postupne sa rozšírila do ďalších miest ako Lille, Nantes či Marseille.  Zakladateľom TANAT je Alexis Gagnaire – skúsený pražiar a barista. Jeho kávová dráha sa začínala okrem iného v Londýne, postupne sa dostal do baristických súťaží a ako roaster priviedol TANAT k štýlu, ktorý kombinuje technickú presnosť s chuťovým experimentom."
+            },
+            "full_description_sk": {
+                "src": "87ad75fb0b83e7b6424a81c5ff8c67a8a4dea587",
+                "text": "TANAT kladie dôraz na transparentné obchodné reťazce, dlhodobé partnerstvo s farmármi a ochranu kvality aj v časoch trhových turbulencií. Preto volia menšie série, pracujú s výraznými pôvodmi a netlačia cenu nadol za každú cenu – prístup, ktorý oslovuje milovníkov kávy hľadajúcich autenticitu, pôvod a premyslený chuťový profil."
+            }
+        }
+    },
+    {
+        "id": 3,
+        "fields": {
+            "country_sk": {
+                "src": "a9883c6b9d0b2924a557fc1554032d7078759ccc",
+                "text": "Holandsko"
+            },
+            "short_description_sk": {
+                "src": "3c9e626ccdcdab93bda594f08117cc1f2bad1d20",
+                "text": "Pražiareň Ripsnorter Coffee vznikla v Rotterdame ako pokračovanie kaviarenskej prevádzky a baristickej dráhy Zjevaun Lemar Janga. Zjevaun pochádza z Aruby, v kávovom svete sa presadil ako barista-šampión a rozhodol sa vytvoriť značku, ktorá kombinuje technickú precíznosť a originálny vizuálny štýl — napríklad obaly s komiksovými prvkami."
+            },
+            "full_description_sk": {
+                "src": "c7e0b8a0947344727ea9f8b8fc8dbb7fbba0be89",
+                "text": "Ripsnorter sa špecializuje na výberovú kávu s jasným pôvodom, malé šarže a úzku spoluprácu s farmármi. Zakladateľ uvádza, že jeho cieľom je „pracovať spolu s producentmi po celom svete a byť vďaka tomu privilegovaní“.  Značka si tiež získala výraznú pozíciu medzi milovníkmi kávy vďaka víťazstvu Zjevauna v holandskej baristickej súťaži"
+            }
+        }
+    },
+    {
+        "id": 4,
+        "fields": {
+            "country_sk": {
+                "src": "88905a26a4a179794429d67cfc02832248e7165d",
+                "text": "Belgicko"
+            },
+            "short_description_sk": {
+                "src": "391d831592ad1118f80bd8df6355ddcfa08cfa03",
+                "text": "Pražiareň Boo! Modern Coffee Co. vznikla v roku 2024 v Bruseli-Anderlechte v priestoroch bývalej továrne COOP.  Jej cieľom bolo od začiatku ukázať, čo podľa nich znamená „moderná káva“: prístupný dizajn značky, inkluzívna komunikácia a dôraz na priame vzťahy s farmármi."
+            },
+            "full_description_sk": {
+                "src": "04732209bce4ce8adb5fb0458b3f1e2d33dae1c1",
+                "text": "Zakladateľmi sú Benjamin a Benoit. Benjamin prináša skúsenosti z baristickej aj pražiarskej dráhy (barista v rôznych kaviarňach v Bruseli), Benoit zase skúsenosti z viacerých krajín a nadšenie pre kávovú kultúru (Austrália, Nový Zéland, Kanada). Spoločne sa rozhodli vybudovať pražiareň, ktorá ponúka výberovú kávu tak, aby bola otvorená aj pre nových milovníkov kávy, a pritom zostala poctivá k farmárom a zdroju."
+            }
+        }
+    },
+    {
+        "id": 5,
+        "fields": {
+            "country_sk": {
+                "src": "f18df878ce4b700fc6e3f6d19f27f14218923052",
+                "text": "Veľká Británia"
+            },
+            "short_description_sk": {
+                "src": "3fc353c4a9cbf2df7e2097c147b3c1956a3cf6fb",
+                "text": "Lucid Coffee Roasters je relatívne mladá, ale ambiciózna pražiareň, ktorú v roku 2021 založil Stephen Houston. Jej cieľom je odstrániť bariéry medzi spotrebiteľom a producentom – zdieľať čo najviac transparentných údajov o nákupe zelenej kávy, profile praženia, výučbe prípravy aj o ľuďoch, ktorí za tým stoja. Pod slovom „lucid“ rozumejú autori jasnosť, zrozumiteľnosť a živosť – hodnoty, ktoré chcú preniesť aj do svojho podnikania s kávou."
+            },
+            "full_description_sk": {
+                "src": "434a0b4a1f3b74a190ac127c4720cf89a9528b98",
+                "text": "Stephen Houston má za sebou viac ako desať rokov skúseností v odbore: od nákupu kávy cez jej spracovanie a riadenie výroby až po online predaj a vzdelávanie.  Medzi jeho úspechy patrí napr. 2. miesto na britskom šampionáte v pražení (2023). V roku 2019 navštívil pestovateľské farmy a spracovateľské stanice v Kolumbii, aby lepšie pochopil výzvy produkcie. Pražiareň spolupracuje s farmármi otvorene, zverejňuje profily praženia, ceny zelenej kávy aj ďalšie dáta – všetko s cieľom, aby každý milovník kávy mohol lepšie porozumieť procesu za každou šálkou."
+            }
+        }
+    },
+    {
+        "id": 6,
+        "fields": {
+            "country_sk": {
+                "src": "7d7b9518a31c50318f5e0bb447c874abdd11c8f0",
+                "text": "Poľsko"
+            },
+            "city_sk": {
+                "src": "965786de7ea7717faac33be0de11bbeb7e8b43e9",
+                "text": "Štetín"
+            },
+            "short_description_sk": {
+                "src": "cf74a9941e8b73b80c917a568a31eeb0e2d5d49c",
+                "text": "MAMAM Coffee Roasters je pražiareň založená v roku 2022 v Štetíne v Poľsku. Stojí za ňou tím skúsených profesionálov, ktorí pôsobili ako baristi, školitelia aj hodnotitelia kávových súťaží. Od začiatku stavia na troch hodnotách – kvalita, transparentnosť a pokora. Vyhľadávajú výberové kávy s jasným pôvodom a príbehom, ktoré chcú priblížiť zákazníkom nielen v šálke, ale aj prostredníctvom vzdelávania a otvoreného zdieľania informácií."
+            },
+            "full_description_sk": {
+                "src": "8e667c54ebb7d797100d322185820b3e01c87dda",
+                "text": "Pražiareň má medzinárodný presah vďaka skúsenostiam z berlínskej kávovej scény a kombinuje technickú precíznosť s kreativitou – ich obaly napríklad pripomínajú štítky z oblečenia. O výber zelenej kávy a profily praženia sa stará Michał Sowiński, logistiku a servis riadi Alicja Borowa a na kvalitu dohliada Adam Rosołowski. Spoločne budujú značku, ktorá prepája farmárov aj zákazníkov do jedného otvoreného kávového dialógu."
+            }
+        }
+    },
+    {
+        "id": 7,
+        "fields": {
+            "country_sk": {
+                "src": "448640a700f970aa427f60b50c08e852705ed627",
+                "text": "Chorvátsko"
+            },
+            "short_description_sk": {
+                "src": "bb7e4820dbc045d1cd6fa7c5a757ee86e7524bde",
+                "text": "Pražiareň kava family vznikla v roku 2018, keď sa Ivana a Marko po rokoch cestovania za svadobnou fotografiou rozhodli otvoriť svoj prvý kávový podnik na ostrove Hvar. Z opusteného priestoru vytvorili kaviareň kava37 a postupne rozšírili svoj projekt o ďalšie podniky v Splite – kaviareň kava2 a vlastnú pražiareň kavaRO. Ich koncept stojí na jednoduchosti: názov „kava“ (chorvátsky káva) doplnený číslom domu, v ktorom kaviareň sídli. Každá lokalita má svoj jedinečný vizuálny štýl inšpirovaný prostredím"
+            },
+            "full_description_sk": {
+                "src": "438d195e2ccde0b8b0d606fce14fce5cc5eca2ef",
+                "text": "Ich prístup ku káve je rovnako osobný ako k ľuďom. Vlastné obaly často nesú prvky rodinnej histórie, napríklad fotografiu Markovho otca z roku 1965. Kava family kladie dôraz na pohostinnosť a na vedomé nadväzovanie na celý kávový reťazec – od farmárov po hostí v kaviarni. Ich motto „krásne kávy od krásnych ľudí pre krásnych ľudí“ sa premieta tak do výberu kávy, ako aj do štýlu praženia a servisu. Ich podniky v Splite aj na Hvare fungujú ako „predĺžená obývačka“ – priestor, kde sa stretáva komunita, pracuje, číta alebo si len užíva šálku poctivej kávy."
+            }
+        }
+    },
+    {
+        "id": 8,
+        "fields": {
+            "short_description_sk": {
+                "src": "9bc0c52483924d40346d61356cef064a5cbf1745",
+                "text": "Pražiareň Kalve Coffee Roasters sídli v Rige v Lotyšsku a založil ju tím skúsených kávových profesionálov. Na prvom mieste u nich stoja hodnoty ako poctivosť, otvorenosť, dôraz na kvalitu a udržateľnosť  ￼. Zároveň si kladú za cieľ ponúknuť prístup k výberovej káve všetkým – od bežných konzumentov až po skutočných kávových nadšencov."
+            },
+            "full_description_sk": {
+                "src": "566d2882356544477b57989f89b614b5792fd8da",
+                "text": "Pražiareň si zakladá na transparentnom obchode a vysokých štandardoch: káva, ktorú nakupuje, má minimálne 82 bodov zo 100 na stupnici SCA￼. Vďaka silnému tímu dokáže zabezpečiť riešenia pre domácnosti aj firemný segment (B2C aj B2B), a to vrátane dodávok, vybavenia aj servisu￼.\r\n\r\nMerateľné úspechy (k roku 2025):\r\n\t•\t8 rokov na trhu\r\n\t•\tmesačná kapacita praženia až 60 000 kg\r\n\t•\tviac ako 76-členný tím\r\n\t•\t210 realizovaných riešení pre firmy\r\n\r\nFirmu založili Gatis a Raimonds, ktorí si stanovili hodnoty ešte skôr, než vymysleli samotný názov. Cieľom bolo sprístupniť výberovú kávu každému – od tých, čo len prechádzajú z bežnej kávy, až po tých, ktorí výberovú kávu už milujú￼."
+            }
+        }
+    },
+    {
+        "id": 9,
+        "fields": {
+            "country_sk": {
+                "src": "a9883c6b9d0b2924a557fc1554032d7078759ccc",
+                "text": "Holandsko"
+            },
+            "short_description_sk": {
+                "src": "d5d833ce753cf661651598321839522944f87331",
+                "text": "Schot Coffee Roasters je renomovaná pražiareň a kávový bar z Rotterdamu, ktorú v roku 2011 založil John Schot po rokoch práce obchodníka s kávou, počas ktorých spoznal vášnivých pestovateľov po celom svete."
+            },
+            "full_description_sk": {
+                "src": "aedf3136b0d4838c8a0b52e62714a4d2995b312e",
+                "text": "Útočisko našli v industriálne rustikálnom priestore historickej budovy Diepeveen, dnes súčasti kultúrneho centra De Huidenclub, kde pražia každý týždeň vo veľmi malých dávkach na Giesen W15 – 12 kg pre espresso, 6 kg pre filter a 4 kg pre súťažné balenia￼. Schot kladie dôraz na priamy nákup od farmárov a férové príplatky, aby podporil udržateľnú a kvalitnú produkciu; v ponuke nájdeme výber washed, honey a natural káv s komplexnou chuťou a čistým profilom vrátane limitovaných anaeróbnych zŕn￼. V kaviarni si hostia môžu vychutnať espresso, batch brew aj hand brew, ideálne v spojení s prostredím plným súčasného umenia, kníh a dizajnu – presne ten autentický zážitok, aký John zamýšľal pri založení pražiarne ."
+            }
+        }
+    },
+    {
+        "id": 10,
+        "fields": {
+            "country_sk": {
+                "src": "e008bed8b6576c8abf1d5f346c6b145fd3694fa9",
+                "text": "Rakúsko"
+            },
+            "city_sk": {
+                "src": "612814015a9da297db0e90bde6027362be12db03",
+                "text": "St. Pölten"
+            },
+            "short_description_sk": {
+                "src": "e362b6ce23cfe1ab7c67e68cf26de31875d045b9",
+                "text": "Felix Teiretzbacher založil pražiareň Kaffeelix (pôvodne FELIX KAFFEE) v roku 2012 v meste St. Pölten v Rakúsku. Začínal ako domáci pražiar vo svojej vtedajšej kaviarni Cimbalino v Kremsi – túžba po vlastnej káve sa stala zárodkom jeho podnikateľskej cesty. Od začiatku sa Kaffeelix zameriava na výberovú kávu s minimálnym hodnotením 80 bodov na cuppingovej stupnici. Prioritou je priamy, transparentný kontakt s farmármi alebo solídnymi distribútormi s cieľom zachovať autenticitu pôvodu a férové podmienky."
+            },
+            "full_description_sk": {
+                "src": "3f6c48dc6f0b8de2e8ce3cd9321162547108ea23",
+                "text": "Pražiareň pracuje s veľmi šetrným, svetlým pražením, aby vynikli prirodzené arómy jednotlivých odrôd, a nie pražené tóny alebo horkosť  ￼. Vysokú kvalitu zabezpečuje kombinácia skúseností a technológií: ručné bubnové pražičky (7,5 kg a 30 kg značky Coffeetool) z Grécka, moderný Giesen W1A a softvér Cropster pre reprodukovateľný a precízny proces praženia. Výsledkom sú čisté, ovocné a hravé profily – za svoj prístup získal Felix titul majstra Rakúska v roku 2019 a potom v roku 2022 obhájil titul na Majstrovstvách sveta v pražení kávy."
+            }
+        }
+    },
+    {
+        "id": 11,
+        "fields": {
+            "short_description_sk": {
+                "src": "b7dd2089b476ba1103753074fd8c12fc915ffeea",
+                "text": "von & vonnie je nezávislá mikropražiareň a kaviareň v portugalskom Porte, ktorú založili Morgan von Mantripp a Yvonne Spresny – partneri v živote aj v podnikaní. Z malej domácej produkcie sa postupne stala plnohodnotná pražiareň s vlastnou kaviarňou v kreatívnej štvrti Bonfim. Ich filozofia je postavená na priamom vzťahu so zákazníkmi, osobnom prístupe a dôslednej starostlivosti o každý detail – od výberu zelených zŕn až po výslednú šálku."
+            },
+            "full_description_sk": {
+                "src": "238d416f9380c9ac761948bbb5cafc52dc75557e",
+                "text": "Hoci sú malým tímom, kladú dôraz na kvalitu, férovosť a zodpovednosť. Vyhľadávajú výberové kávy z celého sveta s jasným pôvodom a spolupracujú s importérmi, ktorí zdieľajú ich hodnoty – transparentnosť, ekológiu a férové ohodnotenie farmárov. Okrem kávy sa venujú aj pečeniu – Yvonne stojí za každým kúskom sladkého pečiva, ktoré kombinuje európske aj brazílske vplyvy. von & vonnie nie je len pražiareň, ale aj komunitný priestor, kde sa stretáva vášeň pre kávu, dizajn a ľudský kontakt."
+            }
+        }
+    },
+    {
+        "id": 12,
+        "fields": {
+            "country_sk": {
+                "src": "48eb110055846a7e600a3547556c6e4b6ef669ef",
+                "text": "Španielsko"
+            },
+            "short_description_sk": {
+                "src": "16b8fc2d8166fc31958b1af94b2458417815a26b",
+                "text": "Pražiareň Nomad Coffee vznikla ako malý kávový stánok v Londýne a vyrástla na jednu z najznámejších specialty pražiarní v Španielsku. Zakladateľom je barista a majster španielskej baristickej súťaže Jordi Mestre, ktorý svoju vášeň pre kávu preniesol do Barcelony. Dnes Nomad kladie dôraz na úplnú vysledovateľnosť od producenta až po šálku, vzdelávanie baristov a udržateľný rozvoj."
+            },
+            "full_description_sk": {
+                "src": "fa8482d3b31fdfcc840980bf07007ac00d0a636b",
+                "text": "Nomad Coffee založil Jordi Mestre po skúsenostiach z londýnskych kaviarní — v roku 2011 začínal ako „nomádsky“ barista s kávovým vozíkom v Londýne. V roku 2014 preniesol svoje skúsenosti do Barcelony, kde otvoril prvú kamennú prevádzku – Coffee Lab. ￼Súčasťou kľúčového vedenia je aj Fran González, ktorý sa k tímu pripojil počas prvých rokov firmy, vypracoval sa na pozíciu Head of Coffee a stal sa partnerom firmy.  ￼\r\n\r\nNomad Coffee si buduje profil nielen ako pražiareň, ale aj ako vzdelávacie centrum pre baristov a kávových profesionálov. V roku 2014 otvorila prvú kaviareň v Barcelone, neskôr pražiareň vo štvrti Poblenou a v roku 2023 sa stala certifikovanou B Corp – čo svedčí o jej záväzku k udržateľnosti, zodpovednému obchodovaniu a rešpektu ku komunitám. Firma pracuje na tom, aby káva nielen skvele chutila, ale bola aj výsledkom priamych a férových vzťahov s producentmi, transparentného spracovania a kvalitného praženia."
+            }
+        }
+    },
+    {
+        "id": 13,
+        "fields": {
+            "short_description_sk": {
+                "src": "4c57ff0411f7b15fb09873dc5d8d1a07546b4473",
+                "text": "Fábrica Coffee Roasters prináša do srdca Portugalska vášeň pre výberovú kávu a intenzívnu starostlivosť o každý krok výrobného procesu. Od výberu kávy cez priamy nákup od pestovateľov až po praženie priamo v Lisabone vytvárajú jedinečný zážitok pre milovníkov kávy. Vďaka viacerým prevádzkam v Lisabone aj v Porte a možnosti mesačného predplatného si môžu ich čerstvo pražené zrná vychutnať aj zákazníci doma."
+            },
+            "full_description_sk": {
+                "src": "d19bf2733548246ddde6be9c0feef74f604ef7e9",
+                "text": "Fábrica Coffee Roasters vznikla s jasným cieľom zdieľať svoju lásku a nadšenie pre výberovú kávu v Portugalsku.  ￼ Od začiatku ako rodinný podnik sa zamerali na nezávislosť a aktívne zapojenie do každého kroku výroby – od nadviazania priamej spolupráce s farmármi (direct trade) až po vlastné praženie v Lisabone. Svoje poslanie vyjadrujú tak, že pre každý druh zrna volia profil praženia podľa jeho jedinečných vlastností – svetlý pre filter, mierne tmavší pre espresso, aby dosiahli mimoriadne výsledky. Dnes majú pobočky nielen v Lisabone (päť), ale aj v Porte (dve) a umožňujú medzinárodné mesačné predplatné čerstvo praženej kávy.  ￼\r\n\r\nFábrica Coffee Roasters kombinuje artisan prístup s transparentnosťou – to znamená, že ich zákazníci môžu zažiť celú cestu od zdroja až po šálku. Tým oslovujú nielen miestnu komunitu, ale aj zákazníkov na medzinárodnej scéne.\r\nAk hľadáte pražiareň, ktorá má „rodinný“ charakter, zodpovedný prístup k pestovateľom a zároveň silný dôraz na chuť a kvalitu, potom je Fábrica Coffee Roasters výbornou voľbou."
+            }
+        }
+    },
+    {
+        "id": 14,
+        "fields": {
+            "short_description_sk": {
+                "src": "4993cac6bdfd938b93e4a46b604c0385abe8dda8",
+                "text": "BOB Coffee Lab prináša do Bukurešti a do celej rumunskej scény výberovej kávy osobitý prístup k praženiu kávy s vášňou pre presné profily a príbeh za každou šálkou. Založené skúsenými majstrami odboru je výkladnou skriňou kvality, inovácií a gurmánskej kávy. Kombinácia súťažných skúseností a tvorivého priestoru dala vzniknúť miestu, kde sa aróma kávy snúbi s dizajnom, vzdelávaním a komunitou."
+            },
+            "full_description_sk": {
+                "src": "13b0f2a6e2661fcd92cf596c17aa75bb13daeea6",
+                "text": "BOB Coffee Lab bola založená v auguste 2017 v Bukurešti v zátoke pri centrálnom parku, na adrese Piața Charles de Gaulle 3. Najprv fungovala ako kaviareň a pražiareň pod skratkou „Lab“, dnes je to uznávaný priestor pre výberovú kávu. Podnik stavia na tom, že pražiareň nie je len výrobné miesto, ale aj miesto stretávania, experimentov a vzdelávania — pražením prešli zrná z Panamy, Indonézie či Etiópie, pričom tím sa usiluje o to, aby bol každý profil „unikátny“ a vynikal.\r\n\r\nZakladateľmi sú Alexandru Niculae – víťaz majstrovstiev sveta v pražení kávy 2016, a Paul Ungureanu – držiteľ tretieho miesta na majstrovstvách sveta „Coffee in Good Spirits“ 2015. Spoločne priniesli do Rumunska profesionalitu, súťažného ducha a dôraz na detail – od kvality suroviny cez vodný systém či mlieko až po dizajn priestoru.  ￼\r\n\r\nBOB Coffee Lab je príkladom pražiarne, ktorá prekračuje bežný rámec – nejde len o výrobu kávy, ale o celkový zážitok. Aj vďaka otvorenému priestoru pražiarne, z ktorej sa vôňa kávy šíri do interiéru, a dizajnovým prvkom sa z nej stáva miesto zážitkov. Oceňovaná je aj ich ochota zdieľať znalosti – školenia baristov, transparentný prístup ku káve, zameranie na kvalitu od farmy až po šálku. Pre záujemcov o výberovú kávu, ktorí hľadajú pražiareň s výrazným príbehom, jasnou identitou a súťažným zázemím, je BOB Coffee Lab skvelou voľbou."
+            }
+        }
+    },
+    {
+        "id": 15,
+        "fields": {
+            "country_sk": {
+                "src": "7d7b9518a31c50318f5e0bb447c874abdd11c8f0",
+                "text": "Poľsko"
+            },
+            "short_description_sk": {
+                "src": "6248362ad4a9fb1a25979df4a4c73045c1a81bba",
+                "text": "HAYB Coffee je moderná pražiareň výberovej kávy so sídlom vo Varšave."
+            },
+            "full_description_sk": {
+                "src": "2f648fdfc1ba0ebcbfbbd11f27b136ace105c4c1",
+                "text": "HAYB Coffee je moderná pražiareň výberovej kávy so sídlom vo Varšave, ktorú založili otec a syn Robert a Wiktor Borowski ako rodinný projekt, pôvodne známy pod názvom Coffee Republic (od roku 2016) a neskôr premenovaný na HAYB (skratka How Are You Brewing?). Ich filozofia „effortless speciality“ znamená, že pražia výberové zrná s dôrazom na kvalitu, prirodzený charakter a radosť z každej šálky, bez komplikácií a zbytočnej pompéznosti￼. Za svoju prácu získali povesť jednej z najzaujímavejších kaviarní a pražiarní v Poľsku, ktorá kombinuje profesionálny prístup s ľahkosťou a kreativitou.\r\n\r\nHAYB sa silne zameriava na transparentný pôvod kávy, dlhodobé vzťahy s malými farmármi a inovatívne prístupy k praženiu aj prezentácii svojich produktov￼. Okrem klasických káv na espresso a filter sú známi aj svojimi sériami Roasters’ Choice a ďalšími sezónnymi výbermi, ktoré odrážajú rozmanitosť svetových kávových regiónov￼. Vďaka tomu je HAYB miestom, kde sa stretávajú milovníci kávy, kreatívny prístup a komunitná energia."
+            }
+        }
+    },
+    {
+        "id": 16,
+        "fields": {
+            "country_sk": {
+                "src": "88905a26a4a179794429d67cfc02832248e7165d",
+                "text": "Belgicko"
+            },
+            "short_description_sk": {
+                "src": "6952e806484cdcc2cf0bc54e310def6407ac2642",
+                "text": "2:AM Coffee je belgická mikropražiareň a škola kávy z Namuru, ktorú založili dve skúsené baristky a pražiarky spojené spoločnou vášňou pre výberovú kávu."
+            },
+            "full_description_sk": {
+                "src": "ce949c061ceb59d70493d3f837d55dba8c244b78",
+                "text": "2:AM Coffee je belgická mikropražiareň a škola kávy z Namuru, ktorú založili Anaïs z Montréalu a Marie z Namuru – dve skúsené baristky a pražiarky spojené spoločnou vášňou pre výberovú kávu. Ich cesta sa začala stretnutím v kaviarni v Montréale, nasledovalo niekoľko mesiacov cestovania po Strednej Amerike, kde osobne navštívili farmárov a spoznávali pôvod aj spracovanie kávových zŕn. To ich inšpirovalo k vytvoreniu projektu, ktorý kladie dôraz na transparentnosť, znalosti a príbeh za každým zrnom.\r\n\r\nV 2:AM Coffee chcú sprístupniť výberovú kávu všetkým – nielen znalcom, ale aj tým, ktorí ešte len objavujú svet kvalitnej kávy. Pražiareň prevádzkujú so svetlým pražením, ktoré zachováva autentickosť arómy a chutí, a svoje skúsenosti odovzdávajú ďalej prostredníctvom kurzov a workshopov vo svojej kaviarni aj škole kávy. Ich misia je jednoduchá: ponúknuť skvelú kávu kedykoľvek počas dňa a zdieľať príbehy z plantáží až do vašej šálky."
+            }
+        }
+    },
+    {
+        "id": 17,
+        "fields": {
+            "country_sk": {
+                "src": "0e71dd22daa74f9dec1936dad9c73af2537cb26d",
+                "text": "Nemecko"
+            },
+            "short_description_sk": {
+                "src": "31cb9ed16c6c00c253867b9f9bf9ccf65409e726",
+                "text": "THE BARN je berlínska pražiareň výberovej kávy a kaviareň, ktorú v roku 2010 založil Ralf Rüller ako odpoveď na obmedzenú ponuku kvalitnej kávy vo vtedajšom Berlíne."
+            },
+            "full_description_sk": {
+                "src": "0bf727f7462c3427295b64eee3a3406f8a03dbb3",
+                "text": "THE BARN je berlínska pražiareň výberovej kávy a kaviareň, ktorú v roku 2010 založil Ralf Rüller ako odpoveď na obmedzenú ponuku kvalitnej kávy vo vtedajšom Berlíne – a rýchlo sa stala jedným z najvplyvnejších hráčov európskej specialty coffee scény. Ich filozofia je založená na nekompromisnom výbere single origin káv, priamom a férovom nakupovaní od farmárov, precíznom pražení a servírovaní tak, aby v šálke vynikli autentické chuťové profily. Ralf aj dnes dohliada na kvalitu a smerovanie značky a spolu s tímom vytvára prostredie, kde káva a komunita idú ruka v ruke.\r\n\r\nPražiareň sa rýchlo rozrástla z jedinej kaviarne vo štvrti Scheunenviertel na medzinárodný koncept s desiatkami pobočiek – od Berlína cez Mníchov až po Londýn, Mallorku, Južnú Kóreu či Dubaj. Napriek expanzii si THE BARN zachováva prísne pravidlá kvality a jednoduchý prístup k servírovaniu kávy, ktorá má byť poctivá, čistá a pripravená s rešpektom k pôvodu zŕn, poľnohospodárom aj zákazníkom."
+            }
+        }
+    },
+    {
+        "id": 18,
+        "fields": {
+            "country_sk": {
+                "src": "0e71dd22daa74f9dec1936dad9c73af2537cb26d",
+                "text": "Nemecko"
+            },
+            "short_description_sk": {
+                "src": "f54b034a0a00c63e96c07da6981e91fb77df3f94",
+                "text": "Fjord Coffee Roasters je renomovaná berlínska pražiareň, ktorej poslaním je odhaľovať a sprostredkúvať tie najexotickejšie a najčistejšie chuťové profily výberovej kávy. Vďaka úzkej spolupráci s farmármi a precíznemu prístupu k praženiu patrí k absolútnej európskej špičke, ktorá definuje modernú kávovú kultúru."
+            },
+            "full_description_sk": {
+                "src": "3bd54d8f20a4903a7e8d68b5a06b700187e1bba5",
+                "text": "Za vznikom pražiarne stojí silné partnerstvo a pragmatické rozhodnutie. V roku 2016 ju založili Morgan Love (spoluzakladateľ kultového Silo Coffee), Kresten Thøgersen (zakladateľ vychýreného Father Carpenter) a James Maguire. Pôvodná myšlienka sa zrodila z potreby zabezpečiť špičkovú kávu pre vlastné podniky v Berlíne – namiesto toho, aby si každý pražil kávu sám, rozhodli sa spojiť svoje skúsenosti a vybudovať spoločnú značku. Tento krok im umožnil plne sa sústrediť na nekompromisnú kvalitu a udržateľnosť celého dodávateľského reťazca, od farmy až po šálku.\r\n\r\nDnes sa Fjord Coffee zameriava predovšetkým na veľkoobchodnú spoluprácu a vzdelávanie kávových nadšencov. Ich filozofia praženia je založená na hlbokom rešpekte k práci farmárov; snažia sa kávové zrná neovplyvňovať, ale iba „vyzdvihnúť“ ich prirodzený charakter. Používajú unikátnu kombináciu kondukčného a konvekčného praženia na liatinovom stroji Probat, čo im umožňuje experimentovať a prinášať na trh limitované edície, ktoré svojou komplexnosťou fascinujú baristov aj domácich milovníkov kávy po celom svete."
+            }
+        }
+    },
+    {
+        "id": 19,
+        "fields": {
+            "country_sk": {
+                "src": "48eb110055846a7e600a3547556c6e4b6ef669ef",
+                "text": "Španielsko"
+            },
+            "city_sk": {
+                "src": "cb01c4996a26a543513bfbc628f4d21484e1de1b",
+                "text": "Sevilla"
+            },
+            "short_description_sk": {
+                "src": "cd69153e2d1bf7692d208f2fc44e6a796d5ac147",
+                "text": "Ineffable Coffee je oceňovaná pražiareň zo Sevilly, ktorej názov v latinčine znamená „neopísateľný“ – presne taký pocit sa snaží vyvolať v každom, kto prvýkrát ochutná jej výberovú kávu. Ako úradujúci španielski šampióni v pražení kávy pre rok 2024 prepájajú vedecký prístup s hlbokou etikou a úctou k pôvodu každého zrna."
+            },
+            "full_description_sk": {
+                "src": "c61d6f29dda3b3ba15958aab2d77f22b18bd94a5",
+                "text": "Príbeh pražiarne sa začal spoločným snom troch priateľov – Joseho, Omara a Alejandra. Keď nazbierali skúsenosti vo svete výberovej kávy v Kapskom Meste, Istanbule a Veľkej Británii, vrátili sa v roku 2013 do rodného Španielska. Zistili, že kávová kultúra v Seville je vtedy v podstate „púšťou“, a rozhodli sa to zmeniť. V roku 2017 oficiálne spustili Ineffable Coffee s jasnou víziou: priniesť do svojej komunity kávu, ktorá je zodpovedná k životnému prostrediu, spravodlivá k farmárom a chuťovo úplne výnimočná.\r\n\r\nDnes je Ineffable symbolom modernej kávovej vedy, v ktorej hrajú kľúčovú úlohu dáta, technológie a precízna kontrola kvality. Napriek svojmu rastu si však zakladatelia zachovávajú remeselnú dušu a osobný prístup a sami vyberajú tie najzaujímavejšie sezónne šarže priamo pri zdroji. Ich cieľom nie je len predávať kávu, ale budovať vzdelanú komunitu milovníkov kávy, pre ktorých je každá šálka nielen nápojom, ale aj príbehom o vytrvalosti a kráse vzdialených kávových regiónov."
+            }
+        }
+    },
+    {
+        "id": 20,
+        "fields": {
+            "country_sk": {
+                "src": "e008bed8b6576c8abf1d5f346c6b145fd3694fa9",
+                "text": "Rakúsko"
+            },
+            "city_sk": {
+                "src": "49014b9a379b4263665c32ee0463adb7655c2b0c",
+                "text": "Viedeň"
+            },
+            "short_description_sk": {
+                "src": "c614aaea4211823a1398eef0459bbe60f284d99c",
+                "text": "Coffee Pirates patria medzi priekopníkov výberovej kávy vo Viedni a ako prvá tamojšia pražiareň „tretej kávovej vlny“ získali bio certifikáciu. Spájajú v sebe úctu k tradičnej viedenskej kaviarenskej kultúre s moderným, nekompromisným prístupom k udržateľnosti a kvalite zŕn."
+            },
+            "full_description_sk": {
+                "src": "f9d1cb0b7c70de0179791320f5626a02bb2c668c",
+                "text": "Za kormidlom tejto pražiarne stojí od roku 2012 zakladateľské duo Evelyn Priesch a Werner Savernik. Ich cestu ku káve poháňala vášeň pre cestovanie a objavovanie – z mnohých ciest po kávových plantážach si priviezli nielen hlboké znalosti o pestovaní, ale aj kolekciu drobností, ktoré dnes zdobia ich vlajkovú kaviareň v 9. viedenskom okrese. Werner a Evelyn sa sami označujú za „tých dobrých a priateľských bojovníkov proti zlej káve“ a ich cieľom bolo od začiatku ukázať, že káva môže chutiť ako ušľachtilý nápoj, a nie ako pripálené uhlie.\r\n\r\nFilozofia „Pirátov“ stojí na transparentnosti a nadštandardných vzťahoch s farmármi, ktorým za špičkovú surovinu platia často aj trojnásobok trhových cien. Vo svojej viedenskej pražiarni pracujú s precíznymi technológiami, ale srdcom ich podnikania zostáva útulná atmosféra kaviarne, kde sa stretávajú študenti z neďalekej univerzity s milovníkmi klasických novín. Coffee Pirates tak dokázali nemožné – v konzervatívnom meste kávových tradícií vybudovali modernú inštitúciu, ktorá si zakladá na tom, že každá šálka je výsledkom etického reťazca a úprimnej lásky k remeslu."
+            }
+        }
+    },
+    {
+        "id": 21,
+        "fields": {
+            "country_sk": {
+                "src": "3d03ef7c7085eaf416563680f2f0b475a37f57cb",
+                "text": "Taliansko"
+            },
+            "short_description_sk": {
+                "src": "40d3d9d1e3658e58fdbd4bbf25de05dbffd35ce1",
+                "text": "Gardelli Specialty Coffees z talianskeho Forlì je synonymom absolútnej špičky vo svete výberovej kávy, definovanej heslom „kyslosť nie je zločin“. Pražiareň, ktorú zdobí titul majstra sveta v pražení kávy, je známa svojím nekompromisným prístupom k výberu zŕn a jedinečným štýlom, ktorý dáva vyniknúť prirodzenej sladkosti a komplexnosti každej úrody."
+            },
+            "full_description_sk": {
+                "src": "e61ed09de320c65b3ef83a6dfdc03ac1bc094688",
+                "text": "Za celým projektom stojí Rubens Gardelli, fascinujúca osobnosť a samouk, ktorý sa vypracoval z rodinného baru až na kávový olymp. Rubens je známy ako neúnavný inovátor – sám si zostrojil svoje prvé pražičky a ako prvý Talian v histórii vyhral World Coffee Roasting Championship (2017). Jeho vášeň ho zaviedla až k vlastným projektom priamo na farmách, napríklad v Ugande, kde v rámci „Mzungu Project“ experimentuje s metódami spracovania, aby dokázal, že aj z menej tradičných regiónov možno získať kávu dosahujúcu astronomické hodnotenia.\r\n\r\nFilozofia pražiarne odmieta akékoľvek kompromisy: pre každú kávu existuje iba jeden ideálny profil praženia, ktorý Rubens osobne ladí, kým nie je dokonalý. Gardelli nehľadí na zavedené pravidlá trhu, ale riadi sa výhradne chuťou a jedinečnosťou, čo z jeho ružových vrecúšok robí vyhľadávaný zberateľský artikel pre kávových fajnšmekrov po celom svete. V každom zrne sa tak odráža kombinácia vedeckej precíznosti, umeleckej intuície a hlbokého rešpektu k práci konkrétnych farmárov."
+            }
+        }
+    },
+    {
+        "id": 22,
+        "fields": {
+            "country_sk": {
+                "src": "38f4817e52acbaf216ede0c7eeb0214fdb0ce0f1",
+                "text": "Francúzsko"
+            },
+            "short_description_sk": {
+                "src": "046d7df506c2096eb025290390c6ce6ab6fd4b73",
+                "text": "Miche Coffee je komorná pražiareň s veľkým srdcom, ktorá sídli v malebnom Cap Ferret na juhozápade Francúzska. Ich prístup definuje skromnosť, hlboký zmysel pre susedskú komunitu a nekompromisný dôraz na ekologickú zodpovednosť a transparentnosť celého dodávateľského reťazca."
+            },
+            "full_description_sk": {
+                "src": "de2e0e85eb4b18233e2de9b5c2709fd148326058",
+                "text": "Pražiareň vznikla zo „skromných začiatkov a veľkých snov“ zakladateľov, ktorí sa rozhodli vybudovať priestor na výrobu výberovej kávy priamo za starým skladom lodí. Ich cieľom bolo od začiatku pražiť kávu pre svojich susedov a priateľov s maximálnym ohľadom na ľudí, ktorí kávu pestujú, aj na planétu. Tento záväzok potvrdzujú aj činy – ako členovia organizácie „1% for the Planet“ venujú jedno percento zo svojich tržieb na ochranu životného prostredia a na balenie používajú výhradne 100% recyklovateľné boxy z recyklovaného papiera.\r\n\r\nV technickej rovine stavia Miche Coffee na precíznosť špičkovej pražičky Giesen, ktorú navyše osadili špeciálnymi filtrami na zníženie emisií pevných častíc o 90 %. Spolupracujú výhradne s dovozcami, ktorí garantujú férové ceny pre farmárov, a vďaka tomu môžu ponúkať zrná, ktoré v sebe nesú príbeh udržateľnosti aj špecifický charakter atlantického pobrežia. Miche Coffee tak dokazuje, že aj malá pražiareň na okraji Európy môže mať globálne pozitívny dopad a ponúkať kávu svetovej úrovne."
+            }
+        }
+    },
+    {
+        "id": 23,
+        "fields": {
+            "country_sk": {
+                "src": "8e9b2234d554c4536746d714caf560157db5d67e",
+                "text": "Fínsko"
+            },
+            "short_description_sk": {
+                "src": "386dfd026ac88542e462fba4232150305b662eee",
+                "text": "Frukt Coffee Roasters je moderná fínska pražiareň, ktorá si zakladá na filozofii „menej, ale lepšie“. Ich prístup sa zameriava na zvyšovanie hodnoty kávy prostredníctvom výberu mimoriadne kvalitných surovín a precízneho praženia, ktoré podčiarkuje prirodzenú ovocnosť a čistotu každého zrna."
+            },
+            "full_description_sk": {
+                "src": "f51464cbe91f14561a74191248950f41cc61de18",
+                "text": "Za projektom stojí Samuli Pääkkönen, výrazná postava severskej kávovej scény, ktorý pražiareň založil v roku 2018 vo svojom rodnom meste Turku. Samuli nazbieral cenné skúsenosti ako pražiar v miestnej Turun Kahvipaahtimo a neskôr v celosvetovo uznávanej kodanskej pražiarni Coffee Collective. Práve dánska škola a dôraz na transparentný dodávateľský reťazec sa stali základným kameňom jeho vlastného podnikania. Samuli verí, že aj malý podnik môže mať veľký dopad, ak sa stane ambasádorom kvality pre každého v celom reťazci – od pestovateľa až po konečného zákazníka.\r\n\r\nPražiareň sídli v blízkosti prístavu v Turku a úzko spolupracuje s miestnymi partnermi vrátane michelinskej reštaurácie Kaskis či vychýrenej remeselnej pekárne bageri Å. Od leta 2024 prevádzkujú aj vlastný showroom a kávový bar v centre mesta, kde prezentujú svoje limitované edície a sezónne výbery. Frukt Coffee Roasters je dnes vyhľadávanou značkou medzi kávovými nadšencami po celom svete, ktorí oceňujú ich jasnú víziu: prinášať kávu, ktorá má nielen skvelú chuť, ale aj hlbší zmysel."
+            }
+        }
+    },
+    {
+        "id": 24,
+        "fields": {
+            "short_description_sk": {
+                "src": "9bdc2e22c55ad7829e5915abffbcdcbb5fd15c10",
+                "text": "Morgon Coffee Roasters je švédska pražiareň, ktorá verí, že výberová káva by mala byť dostupná a zrozumiteľná pre každého, nielen pre úzky okruh expertov. Ich káva je typicky seversky svetlá, svieža a vždy sezónna, balená do ikonických štvorcových balení, ktoré svojou farbou aj tvarom odkazujú na lodné kontajnery v göteborskom prístave."
+            },
+            "full_description_sk": {
+                "src": "2fe23d72ff38e2472405df79c4ae7e3af7cc491d",
+                "text": "Pražiareň založili v lete roku 2018 Markus Vestergaard a Gabriella Sand, ktorí v kávovom svete spolu nazbierali vyše 25 rokov skúseností. Skôr než sa rozhodli otvoriť vlastný podnik, prešli všetkými možnými rolami – od baristov a trénerov až po konzultantov a porotcov na medzinárodných súťažiach. Morgon založili s jednoduchým cieľom: vytvoriť svoju vlastnú najobľúbenejšiu pražiareň, kde budú ponúkať len také zrná, ktoré sami milujú a chcú piť každý deň.\r\n\r\nDôraz kladú predovšetkým na dlhodobé vzťahy s farmármi, z ktorých mnohých poznajú osobne už roky. Tento etický prístup im umožňuje získavať tie najlepšie mikroloty, ktoré následne pražia s maximálnou starostlivosťou, aby vynikol ich jedinečný pôvod a príbeh. Výsledkom je káva s jasným charakterom, ktorú sprevádza hravý vizuálny štýl inšpirovaný pohľadnicami z ciest, vďaka čomu je každé balenie od Morgon malým umeleckým dielom aj chuťovým zážitkom."
+            }
+        }
+    },
+    {
+        "id": 25,
+        "fields": {
+            "country_sk": {
+                "src": "38f4817e52acbaf216ede0c7eeb0214fdb0ce0f1",
+                "text": "Francúzsko"
+            },
+            "city_sk": {
+                "src": "4664170d0ca903832edc319d12e228284a6e9c9d",
+                "text": "Paríž"
+            },
+            "short_description_sk": {
+                "src": "8fa9f180b88add26a50c0a3218c682451a2baa54",
+                "text": "Coutume Café patrí medzi priekopníkov výberovej kávy vo Francúzsku. Austrálčan Tom Clark a Francúz Antoine Nétien založili v roku 2011 pražiareň, ktorá chcela zmeniť to, ako Parížania vnímajú kávu – z ranného rituálu na autopilota na zážitok plný chuti a objavovania."
+            },
+            "full_description_sk": {
+                "src": "b752f22798e310090f561e112113ea719b2cfa92",
+                "text": "Coutume vzniklo v roku 2011, keď sa Tom Clark – Austrálčan zvyknutý na kvalitnú kávovú kultúru – po svojom príchode do Paríža rozhodol zmeniť tamojší prístup ku káve. Spolu s Antoinom Nétiénom vytvorili značku, ktorej názov odkazuje na tradíciu a rituál – coutume znamená po francúzsky zvyk alebo obyčaj. Chceli založiť novú tradíciu: v krajine vína a gastronómie konečne piť aj skvelú kávu.\r\n\r\nDnes má Coutume 15 prevádzok prevažne v Paríži a okolí vrátane vlastných coffee shopov a koncesií na miestach ako Galeries Lafayette alebo La Grande Épicerie. V roku 2020 vstúpila do firmy investičná skupina Labruyère, vďaka čomu v roku 2023 otvorila nový 700m² veľký priestor v Romainville, kde sídli pražiareň aj kaviareň. Ročný obrat sa pohybuje okolo 7 miliónov eur a Coutume dodáva kávu viac ako 350 klientom z radov hotelov, reštaurácií a firiem.\r\n\r\nPražiareň stavia na priamom sourcingu z plantáží po celom svete – od Etiópie cez Kolumbiu až po Kostariku. Každá káva dostáva individuálny profil praženia, ktorý má vyťažiť maximum z aromatického potenciálu daného terroir. Značka ponúka starostlivo vybranú selekciu single origin káv z prísne vybraných oblastí, pražených v regióne Île-de-France a pripravovaných na objednávku baristami. Coutume rozdeľuje svoju ponuku do troch kategórií podľa skúseností zákazníka: dostupné kávy pre nováčikov, výnimočné kávy pre znalcov a vzácne loty pre expertov."
+            }
+        }
+    },
+    {
+        "id": 26,
+        "fields": {
+            "country_sk": {
+                "src": "0e71dd22daa74f9dec1936dad9c73af2537cb26d",
+                "text": "Nemecko"
+            },
+            "short_description_sk": {
+                "src": "f9815c1994f62959935d2363ef3406fab9c17cc4",
+                "text": "Berlínska pražiareň 19grams patrí medzi priekopníkov výberovej kávy v Nemecku. Od roku 2002, keď ešte fungovala pod názvom Tres Cabezas, buduje priame vzťahy s farmármi po celom svete a prináša do Európy kávu najvyššej kvality."
+            },
+            "full_description_sk": {
+                "src": "66ac5a6c1246d54413e929959bba7fad11ec679f",
+                "text": "19grams založili v roku 2002 Sascha Spittel a Robert Stock, dvaja surferi, ktorí prvýkrát objavili svet výberovej kávy počas ciest po Kostarike. V čase, keď v Nemecku ešte nikto o kvalitnej káve zvlášť nehovoril, rozhodli sa priniesť chute a znalosti z Latinskej Ameriky domov do Berlína. Prvú kaviareň otvorili vo štvrti Friedrichshain pod názvom Tres Cabezas (Tri hlavy), podľa troch priateľov, ktorí projekt odštartovali. Paradoxne v krajine, kde sa ročne vypije v priemere 160 litrov kávy na osobu – viac ako piva alebo vody – predstavovala káva v tom čase len praktický nápoj pre pracujúcich, bez emócií či zážitku. 19grams chceli tento prístup zmeniť.\r\n\r\nOd samého začiatku stojí filozofia 19grams na priamom obchode s farmármi, transparentnosti a vzdelávaní zákazníkov. Zakladatelia kávu nielen nakupujú, ale pravidelne cestujú na farmy, kde vznikajú dlhodobé priateľstvá a partnerstvá. Niektoré vzťahy trvajú už vyše 15 rokov, čo umožňuje nielen zabezpečiť férové ceny pre pestovateľov, ale aj spoločne rozvíjať spracovanie a kvalitu. Ich motto pri pražení? Bohatosť, čistota a sladkosť. Každé zrnko musí splniť tieto tri parametre, aby sa dostalo do vašej šálky. V roku 2018 prešla firma rebrandingom – z Tres Cabezas sa stala 19grams, podľa množstva kávy (19 gramov), ktoré tím používal na double espresso. Dnes vedú pražiareň popri zakladateľovi Saschovi Spittelovi aj head roaster Anthony Piper z Austrálie a Gerrit Peters, ktorý v roku 2018 vstúpil do firmy s víziou urobiť z 19grams globálne uznávanú značku.\r\n\r\nDnes má 19grams štyri kaviarne v Berlíne a modernú pražiareň pri Alexanderplatzi, ktorá zároveň slúži ako školiace centrum a event space. Pražiareň spolupracuje s producentmi z celého sveta – od Kostariky cez Kolumbiu a Etiópiu až po Indonéziu či Čínu. Tím sa zúčastňuje na súťažiach Cup of Excellence a stále hľadá nové, vzrušujúce profily. 19grams ide nad rámec klasického chápania specialty kávy – chcú ju sprístupniť každému, či už cez kapsulové kávovary, drippery alebo profesionálne espressové stroje. Okrem kávy venujú veľkú pozornosť aj udržateľnosti – napríklad projekt Roast for the Roar podporuje ochranu jaguárov v kostarickom pralese, kam smeruje časť výťažku z predaja vybraných káv."
+            }
+        }
+    },
+    {
+        "id": 27,
+        "fields": {
+            "country_sk": {
+                "src": "a9883c6b9d0b2924a557fc1554032d7078759ccc",
+                "text": "Holandsko"
+            },
+            "short_description_sk": {
+                "src": "7ff92ccc76fedebd250d6660352d7adbaaea5ab2",
+                "text": "Manhattan Coffee Roasters z Rotterdamu prepája vášeň pre výnimočnú kávu s bohatou históriou prístavu. Pražiareň založili v roku 2017 dvaja veteráni kávovej scény – Esther Maasdam a Ben Morrow, ktorí sa prvýkrát stretli na majstrovstvách v latte arte a spoločne nazbierali vyše tridsať rokov skúseností v odbore."
+            },
+            "full_description_sk": {
+                "src": "66788706d6c7dc7b59a48450c5db87a749c06b2f",
+                "text": "Manhattan Coffee Roasters čerpá inšpiráciu z rotterdamského prístavu a jeho námornej histórie – názov odkazuje na linku Holland-America, ktorá v 19. storočí spájala Rotterdam s New Yorkom. Mesto na rieke Maas s modernou panorámou miestni prezývajú \"Manhattan aan de Maas\", čo dokonale vystihuje DNA tejto pražiarne. Esther a Ben sa nechceli uspokojiť s polovičatosťou – namiesto špecializácie na jeden aspekt kávy ovládli celé spektrum: od baristických zručností cez roasting až po nákup zelenej kávy.\r\n\r\nIch cesta sa začala na súťažiach, kde postupne získavali tituly v latte arte, cup tastingu aj Coffee Masters. Ben, predtým známy ako \"Latte Art Cowboy\", strávil päť rokov ako barista v Melbourne, kým sa v roku 2016 presťahoval do Európy. Esther, prezývaná \"El Patron\", je absolútnou veteránkou odboru. Spoločne vybudovali pražiareň zameranú na malé, výnimočné loty v úzkej spolupráci s producentmi, ktorí zdieľajú ich prístup k udržateľnosti a kvalite.\r\n\r\nManhattan Coffee Roasters spolupracuje priamo s farmami a platí ceny nad úrovňou Fairtrade. Podporujú projekty ako washing station Kinni v Rwande, ktorá priniesla do regiónu školy, cesty a ďalšie investície do komunity. Pražiareň beží na 100% zelenú energiu, ponúka carbon neutral dopravu a používa iba recyklovateľné obaly. Od svojho vzniku v roku 2017 dodávali kávu pre holandských šampiónov a ich vitrína s trofejami je plná ocenení – to všetko vďaka dôrazu na autentickú chuť a inovatívny prístup k praženiu."
+            }
+        }
+    },
+    {
+        "id": 28,
+        "fields": {
+            "country_sk": {
+                "src": "88905a26a4a179794429d67cfc02832248e7165d",
+                "text": "Belgicko"
+            },
+            "short_description_sk": {
+                "src": "6a9f7e0d5ea6e8d7ad4ac9203c6599bc1c996baa",
+                "text": "Andy Roasters nie je meno človeka, ale filozofia antverpskej pražiarne, ktorá pristupuje ku káve ako k umeleckému dielu skrytému v každodennosti. Za projektom stoja kamaráti Dave Haesen a Kjell Maes, ktorí v roku 2020 otvorili vlastnú pražiareň v továrenskej štvrti Hoboken. Ich cieľom je odhaliť komplexný chuťový potenciál každého zrna a ukázať svetu, že káva môže byť oveľa viac než bežný kofeínový kopanec."
+            },
+            "full_description_sk": {
+                "src": "7aea45d2f9bb866358984c30284a8ad8c88bcb35",
+                "text": "Andy Roasters vznikli uprostred pandémie ako logické vyústenie päťročnej cesty dvoch nezávislých majiteľov kaviarní v Antverpách. Dave sa do specialty kávy zamiloval počas rokov strávených v Melbourne, kde pracoval ako barista a manažér. Po návrate do Belgicka v roku 2015 založil Butchers Coffee s výrazne austrálskou estetikou. Keď o päť rokov neskôr rastúci dopyt po kvalitnej káve vyžadoval vlastnú kontrolu nad celým procesom, rozhodol sa spolu s Kjellom a hlavným pražiarom Emielom Rymenansom založiť Andy Roasters. Pražiareň pôvodne postavili v továrenskej budove Blikfabriek, kde začali pražiť najmä pre svoje vlastné kaviarne a wholesale klientov po celých Antverpách.\r\n\r\nFilozofia Andy Roasters stojí na troch pilieroch: Digging – hĺbanie v ponuke európskych špecializovaných obchodníkov, kde hľadajú skryté perly; Playing – experimentovanie s pražením a metódami prípravy s otvorenou mysľou a radosťou z objavovania; a Understanding – neustále vzdelávanie a pokora pred komplexnosťou kávy. V roku 2022 otvorili flagship store na Amerikalei 82, kde spojili retro-futuristický dizajn s minimalistickou estetikou, obchod s vinylmi s DJ deckom a priestrannou terasou. Pražiareň delí svoje kávové portfólio do troch základných kategórií: menej kyslé a ovocné profily s orechovými a čokoládovými tónmi, elegantné washed kávy s čajovým charakterom a \"funky\" natural či honey kávy s plnými tónmi zrelého ovocia. Sobotná Morning Show so živými DJ setmi a bežecký klub v utorok večer dokazujú, že Andy je viac než len pražiareň – je to životný štýl."
+            }
+        }
+    },
+    {
+        "id": 29,
+        "fields": {
+            "country_sk": {
+                "src": "a9883c6b9d0b2924a557fc1554032d7078759ccc",
+                "text": "Holandsko"
+            },
+            "short_description_sk": {
+                "src": "5be9532c406e339611344af10e5071ea06aa3949",
+                "text": "Sprout Coffee Roasters je holandská specialty pražiareň s austrálskou dušou, ktorá od roku 2019 dokazuje, že ani najhoršie načasovanie nezastaví skutočnú vášeň. Bratia Daniell a Ruben priviezli do Eindhovenu to najlepšie z kávy od protinožcov — a odvtedy to tu poriadne kypí."
+            },
+            "full_description_sk": {
+                "src": "e1a4c3c7061447eb1d3e988601bfae1059dea1cf",
+                "text": "Daniell a Ruben sa narodili v Eindhovene, vyrastali však v austrálskom Perthe. Práve tam sa písala prvá kapitola ich kávového príbehu: spoločne vybudovali a prevádzkovali obľúbený espresso bar, ktorý sa stal ich skúšobným terénom. Ruben začal robiť kávu už ako trinásťročný po škole a v skutočnosti sa od nej nikdy úplne nevzdialil — vracala sa k nemu ako bumerang. Daniell medzitým precestoval svetové oblasti pestovania kávy a pochopil, akú zásadnú úlohu zohráva v ekonomikách celých krajín. Keď sa obaja bratia vrátili do Holandska, bolo takmer nevyhnutné, že to skúsia znova — tentoraz ako pražiareň.\r\n\r\nSprout Coffee Roasters nie je len o káve vo vrecku. Filozofia pražiarne stojí na zachovaní hodnoty, ktorú farmári do kávy vkladajú, a na budovaní čo najudržateľnejšieho produkčného reťazca. Názov Sprout — slovensky klíček — nie je náhodný: keď kávovník klíči, je to vzrušujúca chvíľa, začiatok niečoho nového, začiatok rastu. Toto myslenie preniká všetkým — od praženia cez dizajn obalov až po prístup k zákazníkom. Na etiketách každej kávy nájdete zviera symbolizujúce krajinu pôvodu a prírodné prostredie, z ktorého daná káva pochádza. Sortiment zámerne pokrýva celé spektrum: od prístupných klasík pre tých, ktorí chcú spoľahlivú šálku, až po odvážne single originy pre kávových geekov, ktorí chcú byť zaskočení.\r\n\r\nPriamo v Eindhovene prevádzkuje Sprout aj kaviareň v areáli NRE, kde si možno dať kávu na mieste a sledovať praženie naživo. Pražiareň dnes popri Rubenovi a Daniellovi ťahá aj Carlos ako manažér prevádzky a tím sa rozrastá o nové tváre. Austrálčania, Mexičania aj Holanďania — v tíme je to pestrá zmes ľudí, ktorých spája jedno: láska ku káve."
+            }
+        }
+    },
+    {
+        "id": 30,
+        "fields": {
+            "country_sk": {
+                "src": "0e71dd22daa74f9dec1936dad9c73af2537cb26d",
+                "text": "Nemecko"
+            },
+            "short_description_sk": {
+                "src": "c77ff8699f2dbaa6897652902fd39ac69cbfa5fb",
+                "text": "Paso Paso je hannoverská pražiareň s nezvyčajným príbehom: kávu tu nepražia pre farmárov, ale spolu s nimi. Zakladateľ Bram de Hoog postavil celý projekt na princípe „Farmer Owned Coffee\" – teda na modeli, v ktorom majú pestovatelia priamy podiel vo firme, ktorá ich zrno praží a predáva. Výsledkom je nielen výnimočná transparentnosť, ale aj káva s jasne čitateľným pôvodom."
+            },
+            "full_description_sk": {
+                "src": "d19c49c22ec8df7d3dfacbb9896f40c7f69e7046",
+                "text": "Paso Paso vznikla v Hannoveri potom, čo Bram de Hoog – predtým sourcing manažér importéra zelenej kávy Ally Coffee so sedemročnou praxou – kúpil od Thomasa Brinkmanna jeho existujúcu pražiareň. Brinkmann, skúsený pražiar a bývalý šampión v pražení, strávil v pražiarni vyše dvadsať rokov a s Bramom sa stretol v roku 2018 v Nikarague pri hodnotení súťaže Cup of Excellence. Ich stretnutie prerástlo do partnerstva: Brinkmann si splnil sen o vlastnej farme v Nikarague a Paso Paso získala zázemie aj skúsenosti. Firma je formálne registrovaná ako Istmo Producers Collective GmbH a na jej vlastníctve sa podieľajú samotní farmári, Bram de Hoog aj dizajnérsky stratég Jasper van Gils – ktorý priniesol do projektu silnú vizuálnu identitu ocenenú cenou SCA Best Branding na World of Coffee v Kodani.\r\n\r\nČo Paso Paso odlišuje od väčšiny specialty pražiarní, je vertikálna integrácia dotiahnutá do dôsledkov. Zelená káva pochádza výhradne od farmárov-spoluvlastníkov, ceny sa nastavujú v priamom dialógu a zisky z predaja putujú späť k producentom v podobe dividend. Praženie prebieha tradičným bubnovým spôsobom a sortiment zahŕňa espresso, filtrové aj mikrolotové série. Pražiareň sídli na adrese Lagerstraße 1 v Hannoveri a expeduje každý deň do celej EÚ."
+            }
+        }
+    },
+    {
+        "id": 31,
+        "fields": {
+            "short_description_sk": {
+                "src": "d6daac29772eb93f40c27016c9f2d3cc5d16579e",
+                "text": "Backstage Roasters je litovská specialty pražiareň so sídlom vo Vilniuse, ktorá vznikla z nečakaného zdroja – zo sveta fotografie. Na čele projektu stojí Vytenis Petrošius, ktorá pražiareň dodnes vedie ako riaditeľka – a práve fotografická citlivosť na detail a vizuálne myslenie sa premietajú do každého aspektu značky. Výsledkom je miesto, kde sa kaviareň a pražiareň prirodzene prelínajú a kde si každá šálka zachováva jasný charakter a pôvod."
+            },
+            "full_description_sk": {
+                "src": "210f1c65c598e3d271a3006da7fca0ab227377df",
+                "text": "Backstage vznikol v roku 2017 a prvá kaviareň sa otvorila v roku 2018 v industriálnej časti Vilniusu zvanej Naujamiestis – zámerne bokom od turistických trás, skrytá v loftovej štvrti plnej kreatívnych priestorov. Práve táto poloha bola programová: zakladateľky chceli filtrovať zákazníkov a prilákať tých, ktorí si ich naozaj hľadajú. Dnes prevádzkujú tri pobočky vo Vilniuse a pražiareň sa stala plnohodnotnou súčasťou prevádzky s vlastným head roasterom Robertasom Muravskijom. Hoci ide o mikropražiareň, kávu nakupujú priamo od pestovateľov – okrem iného od farmy rodiny Vinhalovcov v Brazílii a od Beanspire Coffee v Thajsku. Cieľom nie je len kvalita v šálke, ale dlhodobý a férový obchodný vzťah s producentom bez ohľadu na sezónne výkyvy.\r\n\r\nFilozofia Backstage Roasters je civilná a bez pózy: kávu berú vážne, ale na zákazníka netlačia. Hoci srdcom ponuky je specialty coffee, v skutočnosti sa približne polovica predaja týka klasickej brazílskej kávy – a to je pre Vytenis v poriadku. Namiesto dogmatizmu ponúka Backstage sprievodcovstvo: ochutnávky, workshopy a priestor pre zvedavosť. Popri káve sa tu pečú vychýrené škoricové rolky, avokádové toasty a raňajkové menu inšpirované litovskými ročnými obdobiami. Backstage jednoducho nie je len pražiareň – je to miesto, kde je dobré tráviť čas."
+            }
+        }
+    },
+    {
+        "id": 32,
+        "fields": {
+            "country_sk": {
+                "src": "1b2247081086d75f1d752f20bd740b225ab0e92f",
+                "text": "Írsko"
+            },
+            "short_description_sk": {
+                "src": "ccd0f12d2fa41200bab917993adf3d606ecd19b7",
+                "text": "Írska pražiareň Calendar Coffee zo západného pobrežia prináša do šálky to, čo väčšina pražiarní prehliada – sezónnosť. Zarah Lawless a Daniel Boobier založili Calendar Coffee v roku 2018 v Galway s jednoduchým presvedčením: káva chutí najlepšie, keď sa s ňou zaobchádza ako s čerstvou úrodou, nie ako s komoditou z regála."
+            },
+            "full_description_sk": {
+                "src": "1b2ba39849f7474e13f16e96d6985d2d6170cbea",
+                "text": "Calendar Coffee stojí na myšlienke, ktorú jej zakladatelia odpozorovali ešte v časoch spoločnej práce v londýnskej pražiarni Workshop Coffee – najchutnejšie kávy boli takmer vždy tie čerstvo zozbierané. Napriek tomu sa dátum zberu na vreckách prakticky neobjavoval. Zarah a Dan sa rozhodli to zmeniť. Názov „Calendar\" nie je náhoda – odkazuje priamo na ročný cyklus zberu v rôznych pestovateľských oblastiach. Pražiareň obmieňa svoju ponuku podľa sezóny a každý týždeň vydáva čerstvo upraženú šaržu. Jeden týždeň to môže byť praný lot z kenského Nyeri, ďalší týždeň natural z guatemalského Huehuetenango.\r\n\r\nZarah, rodáčka z Galway s punkovou muzikantskou minulosťou, predala svoje syntetizátory, aby pomohla financovať rozbeh. Dan, vyštudovaný biológ s vášňou pre gastronómiu, má na starosti sourcing, praženie a kontrolu kvality. Obaja spolu majú vyše dvadsať rokov skúseností v kávovom priemysle. V roku 2017 sa presťahovali z Londýna do Galway, kde pražiareň vybudovali v bývalom počítačovom servise. Calendar Coffee si rýchlo získala medzinárodný rešpekt – v roku 2023 ju platforma Roastful zaradila medzi tri najlepšie pražiarne sveta ako jedinú írsku značku v prvej desiatke.\r\n\r\nOkrem kvality v šálke je pre Calendar Coffee zásadná udržateľnosť. Pražiareň je členom iniciatívy 1% for the Planet, teda jedno percento z tržieb putuje na podporu environmentálnych projektov. Spolu s írskou organizáciou Hometree vysádzajú pôvodné stromy v County Clare, aby kompenzovali uhlíkovú stopu z prepravy kávy. Svojim veľkoobchodným partnerom dodávajú kávu v opakovane použiteľných nádobách, aby obmedzili jednorazové plasty. Cieľom Calendar Coffee nie je len skvelá káva – ale budovanie pražiarne, v ktorej sú farmári ziskoví a biznis funguje v súlade s planétou."
+            }
+        }
+    },
+    {
+        "id": 33,
+        "fields": {
+            "country_sk": {
+                "src": "88905a26a4a179794429d67cfc02832248e7165d",
+                "text": "Belgicko"
+            },
+            "short_description_sk": {
+                "src": "5a382d12468379e1b6cf24acc690c483a32333ab",
+                "text": "Caffenation nie je len pražiareň — je to postoj. Od roku 2003 táto antverpská značka dokazuje, že výberová káva môže byť zároveň prístupná, úprimná a plná charakteru. Zakladateľ Rob Berghmans vtedy stavil na to, čomu v Belgicku málokto veril: že svetlé praženie a transparentný pôvod zŕn môžu zmeniť spôsob, akým ľudia kávu vnímajú aj prežívajú."
+            },
+            "full_description_sk": {
+                "src": "98d24e0073036f120c548c2a76ba129ec77481e9",
+                "text": "Rob Berghmans založil Caffenation v roku 2003 zo vzdoru — bol unavený z toho, ako ľudia v Antverpách pripravujú kávu bez lásky k produktu aj k tým, ktorí ju pijú. Začínal ako malá pražiareň a bar s jasnou misiou: priniesť do mesta zvyknutého na tmavé praženie ľahšiu, chuťovo výraznejšiu kávu tretej vlny. Dnes má Caffenation za sebou vyše dve desaťročia priekopníckej práce, niekoľko kaviarní v Antverpách aj pobočku v Amsterdame a stovky partnerských podnikov naprieč Európou.\r\n\r\nPrístup ku káve je v Caffenation postavený na troch pilieroch: dôveryhodnosť, teplo a pestrosť. Od samého začiatku pracujú otvorene a transparentne — od zrna až po šálku, len s ľuďmi, ktorí zdieľajú ich hodnoty. Specialty coffee pre nich znamená kávu s príbehom — sezónne single origin zrná, nie staršie ako desať mesiacov od zberu, pražené v malých dávkach tak, aby každé zrno mohlo naplno prejaviť svoj charakter. Výsledkom sú espresso blendy s presným profilom aj široká škála filtrových káv, v ktorých prevažujú africké origins — Etiópia, Keňa, Rwanda alebo Burundi. \r\n\r\nCaffenation dnes zásobuje vyše sto prevádzok po celej Európe a ich pražiari — okrem iného viacnásobní medailisti šampionátu v AeroPresse — sú zárukou toho, že kvalita nie je náhoda, ale systém. Motto „One Drug, One Nation\" nie je len slogan. Je to filozofia komunity, ktorá verí, že dobrá káva dokáže zjednotiť."
+            }
+        }
+    },
+    {
+        "id": 34,
+        "fields": {
+            "short_description_sk": {
+                "src": "1da7141c93e0cec330915cc09e28160b0983df0f",
+                "text": "Koppi Roasters vzniklo v roku 2007 v Helsingborgu ako kaviareň s vlastným pražením. Za týmito dvoma dekádami stoja manželia Anne Lunell a Charles Nystrand – baristickí šampióni, ktorí zo svojho koníčka vybudovali jednu z najrešpektovanejších pražiarní sveta. Dnes Koppi zásobuje kávou partnerov na všetkých kontinentoch."
+            },
+            "full_description_sk": {
+                "src": "b57e158ac91e8c24916d49581d4268e12b3577ed",
+                "text": "Charles vyhral švédske majstrovstvá baristov v roku 2005, Anne ho nasledovala o rok neskôr. Obaja potom odišli do Osla, kde Charles pracoval u Roberta Thoresena, vôbec prvého svetového šampióna baristov. Skúsenosti nadobudnuté v Nórsku ich priviedli späť do Švédska – a to doslova zo dňa na deň. Priestor v centre Helsingborgu im ponúkol šéfkuchár Niklas Ekstedt a zmluvu podpísali do dvoch týždňov. Názov Koppi? Pochádza z indonézskeho slova pre kávu, „kopi\" – pridali druhé „p\", pretože sa im to vizuálne páčilo viac.\r\n\r\nV roku 2016 sa dvojica rozhodla kaviareň zatvoriť a sústrediť sa výhradne na praženie, ktoré presťahovala do priestrannej priemyselnej haly. Dnes približne 90 % produkcie Koppi smeruje do zahraničia a meno pražiarne koluje v kávových kruhoch od Wellingtonu po Barcelonu. Filozofia praženia je jednoduchá: maximalizovať sladkosť a kyslosť kávy, minimalizovať horkosť. Anne pritom pravidelne cestuje za producentmi priamo na farmy, aby budovala dlhodobé vzťahy a zabezpečila farmárom spravodlivé ohodnotenie ich práce. V roku 2013 Koppi získalo titul „Årets kaffebar\" – Kaviareň roka – od švédskeho White Guide Café."
+            }
+        }
+    },
+    {
+        "id": 35,
+        "fields": {
+            "country_sk": {
+                "src": "a9883c6b9d0b2924a557fc1554032d7078759ccc",
+                "text": "Holandsko"
+            },
+            "short_description_sk": {
+                "src": "7848ce7553b51c90ae6b3efd90776a6d20c208d3",
+                "text": "Grounded Craft Coffee je rotterdamská specialty mikropražiareň, ktorá vznikla tam, kde začínajú všetky dobré príbehy — v obývačke. Dnes praží výberovú kávu každý týždeň v malých dávkach s dôrazom na etické zdroje, sledovateľnosť a chuť, ktorá jednoducho nie je priemerná."
+            },
+            "full_description_sk": {
+                "src": "875a06fc22bd26bc44e24ad6bb0427919d16891c",
+                "text": "Príbeh Grounded Craft Coffee sa odohral klasicky: najprv malý skúšobný pražič v byte, pár nespokojných susedov, prekofeínovaní priatelia v úlohe ochutnávačov — a potom skutočný prevádzkový pražič. Mikropražiareň funguje v Rotterdame od roku 2018 a odvtedy si buduje reputáciu miesta, kde sa ku káve pristupuje ako k remeslu na pomedzí vedy a kreativity.\r\n\r\nZa Grounded stoja dvaja zakladatelia: Zahir Omar, ktorý zastáva úlohu head roastera a ktorého vášňou je experimentovanie s rôznymi pražiacimi profilmi, a Ibtesam Davids, marketingová a brandová špecialistka. Práve oni spojili sily a svoj spoločný rešpekt ku kvalitnej káve do jedného projektu. Tím dopĺňa Guido Waas, ktorý sa stará o vývoj produktov a vzdelávanie — od výberu správnej kávy až po workshopy pre reštaurácie a firmy.\r\n\r\nGrounded praží pomaly a svetlejšie, než je zvykom, takže výsledná káva nie je horká ani ťažká, ale svieža a vyvážene čistá. Suroviny nakupujú s rozvahou — v súlade s etickými hodnotami, sledovateľnosťou pôvodu a s ohľadom na životné prostredie aj miestne komunity pestovateľov. Preto pracujú výhradne so specialty zrnami. Grounded navyše vedome stavia na opakovane použiteľné PET fľaše namiesto klasických vreciek na kávu — tie možno vracať za zľavu alebo dať znova naplniť, vďaka čomu vzniká menej odpadu."
+            }
+        }
+    },
+    {
+        "id": 36,
+        "fields": {
+            "short_description_sk": {
+                "src": "e79c1b2f178632527805b65ec6e468bda705a279",
+                "text": "MABÓ Coffee je výberová pražiareň z Bukurešti, za ktorou stojí svetový vicemajster v pražení kávy. To, čo začalo ako spojenie dvoch vášní, dnes patrí medzi tri najlepšie specialty pražiarne v celej Európe."
+            },
+            "full_description_sk": {
+                "src": "79bdaae7ff97691cd9d35985750ba7aa89ee8098",
+                "text": "Za názvom MABÓ sa skrývajú dve iniciály a jeden veľký príbeh. Bogdan Georgescu, národný šampión v pražení kávy a vicemajster sveta z majstrovstiev v Tchaj-peji v roku 2019, a Marius Beju, špecialista na komunikáciu a budovanie značiek – spoločne vytvorili projekt, ktorý spája remeslo s estetikou, presnosť s emóciami. Názov pražiarne tak nie je len skratka, ale symbol partnerstva, v ktorom technika a kreativita idú ruka v ruke. A v pozadí celého úsilia stojí rodina – tá, ktorá dodáva zmysel každodennej práci aj každej šálke.\r\n\r\nMABÓ praží výberové kávy v starostlivo vybraných šaržiach z krajín pôvodu s transparentným a udržateľným prístupom, v srdci Bukurešti v priestore MABÓ Roastery Vulturi. Pražiareň dnes prevádzkuje tri vlastné kaviarne, dodáva partnerským prevádzkam v Rumunsku aj v zahraničí a predáva online do celej Európy. Súčasťou sveta MABÓ sú aj kávové kurzy, degustácie a podujatia – všetko postavené na rovnakých hodnotách: rešpekte, vzdelávaní a radosti z dobre pripravenej kávy. To, že nejde len o marketingovú frázu, potvrdzuje aj fakt, že MABÓ je jedinou rumunskou pražiarňou nominovanou a ocenenou na The European Coffee & Hospitality Awards, kde sa umiestnila v TOP 3 najlepších specialty pražiarní Európy.\r\n\r\nFilozofiu značky vystihuje ich vlastný charakterový maskot na obaloch – postavička, ktorá je zvedavá, premenlivá, plná energie, a pritom vždy prítomná. Dnes káva z Kolumbie, zajtra živá Etiópia – každý výber je súčasťou väčšieho celku. Rovnako ako samotné MABÓ: pražiareň s jasnou identitou, ktorá vie, prečo robí to, čo robí."
+            }
+        }
+    },
+    {
+        "id": 37,
+        "fields": {
+            "country_sk": {
+                "src": "38f4817e52acbaf216ede0c7eeb0214fdb0ce0f1",
+                "text": "Francúzsko"
+            },
+            "city_sk": {
+                "src": "4664170d0ca903832edc319d12e228284a6e9c9d",
+                "text": "Paríž"
+            },
+            "short_description_sk": {
+                "src": "985accc14b08f58e4040a0e3181400ed231b4c9f",
+                "text": "Early Bird Coffee Roasters je malá remeselná pražiareň ukrytá v srdci trhoviska Beauvau-Aligre v 12. obvode Paríža — na mieste, kde sa každé ráno stretávajú miestni nakupujúci, gurmáni a milovníci výberovej kávy. Za nenápadnou fasádou trhového stánku sa skrýva káva ocenená celosvetovo uznávanou súťažou Great Taste Award."
+            },
+            "full_description_sk": {
+                "src": "d32297041089e84fc355696d2546e9abdbbb1b18",
+                "text": "Pražiareň založili v auguste 2020 Joseph a Candyce Loughney — ako sami hovoria, dvaja milovníci kávy a výziev. Joseph, pôvodom Ír, svoje remeslo zdokonaľoval v Melbourne, odkiaľ priviezol do Paríža austrálsky prístup k specialty coffee: prísny výber surovín, rešpekt k pôvodu a priamu komunikáciu so zákazníkom. Svoj ateliér otvorili na ikonickom a pulzujúcom mieste s veľkým nadšením — a trhovisko im to vrátilo: stali sa jedným z jeho najcitovanejších stánkov.\r\n\r\nEarly Bird pracuje s výberovými kávami, ktoré praží na mieste každý deň. V ponuke sú výhradne arabiky s certifikáciou specialty coffee z Etiópie, Kolumbie, Kostariky, Sumatry alebo Tanzánie — každá so samostatným profilom, od ovocných a šťavnatých po čokoládovo komplexné. Každý terroir dostane svoj vlastný profil praženia; Joseph a Candyce podporujú farmárov a ich udržateľné metódy. V roku 2023 získal ich Signature Espresso Roast prestížne ocenenie Great Taste Award s tromi hviezdičkami — najvyššie možné hodnotenie. V roku 2022 boli ocenení cenou Prix du Goût d'Entreprendre za odbornosť, kreativitu a kvalitu produktov."
+            }
+        }
+    },
+    {
+        "id": 38,
+        "fields": {
+            "country_sk": {
+                "src": "7d7b9518a31c50318f5e0bb447c874abdd11c8f0",
+                "text": "Poľsko"
+            },
+            "city_sk": {
+                "src": "8ea1f11ac923984048e062f08583412a7081d241",
+                "text": "Racibórz"
+            },
+            "short_description_sk": {
+                "src": "440e6e6fa2909cd729c5e41df0c36e6503dd3ad1",
+                "text": "Miga Coffee je specialty pražiareň z poľského Racibórza, len kúsok od českých hraníc, za ktorej kormidlom stojí certifikovaný Q Grader Wojciech Kamiński. Stavia na starostlivo vybraných zrnách, transparentných cenách a pražení, ktoré sa snaží čo najmenej zaťažovať životné prostredie."
+            },
+            "full_description_sk": {
+                "src": "f1983bfd6e9ae499444849a019fe50592251d596",
+                "text": "Pražiareň založil Wojciech Kamiński, Arabica Q Grader a senzorický porotca poľských majstrovstiev Brewers Cup a Roasters. Spolu s kaviarňou Migawka ju rozbehol v malom Racibórzi na juhu Poľska, kúsok od českých hraníc – na mieste, kde mu mnohí neveštili úspech. Lenže práve pokoj menšieho mesta sa ukázal ako výhoda: ďalej od tvrdej veľkomestskej konkurencie si Miga vybudovala vlastný rukopis a pevnú pozíciu na poľskej specialty scéne. Názov „miga\" v poľštine odkazuje na mihotanie, záblesk – a tak trochu vystihuje aj prístup celej firmy, ktorá sa nechce uspokojiť s jedným zabehnutým profilom šálky.\r\n\r\nZrná Miga praží podľa vlastných štandardov kvality na remeselných pražičoch značiek Loring a Giesen a v šálke sa nebojí ani čistých, ovocných profilov, ani experimentálnejších a „funky\" káv. Kto hľadá klasiku, siahne po brazílskych a afrických zmesiach s tónmi mliečnej čokolády, mandlí a červeného ovocia; kto chce istotu pôvodu, ocení napríklad peruánsky Bourbon z družstva Cenfrocafe s tónmi sušeného ovocia, medu a orieškov. Za výberom vždy stojí Wojciechov cvičený jazyk Q Gradera.\r\n\r\nMiga však nie je len o dobrej káve. Pražiareň bola podľa vlastných slov pravdepodobne prvá v Poľsku, ktorá prešla na plne kompostovateľné obaly, dnes používa aj monomateriály a modernými systémami filtruje dym a pachy z praženia skôr, než opustia komín. Zrná nakupuje eticky a transparentne, časť z nich priamym dovozom, je členom organizácie Roasters United a súčasťou projektu transparency.coffee. Postupne zverejňuje aj nákupné ceny a smeruje k priamej spolupráci s farmármi – pretože, ako sami hovoria, nefiltrujú len kávu."
+            }
+        }
+    },
+    {
+        "id": 39,
+        "fields": {
+            "country_sk": {
+                "src": "0e71dd22daa74f9dec1936dad9c73af2537cb26d",
+                "text": "Nemecko"
+            },
+            "short_description_sk": {
+                "src": "7b3e90daa0cee01cb099816449dfe4e6a20c02d0",
+                "text": "NANO KAFFEE je nezávislá berlínska pražiareň výberovej kávy, ktorú v roku 2014 založil Ramin Massah s jednoduchou, ale radikálnou myšlienkou — robiť biznis, v ktorom majú ekologické a sociálne ciele rovnakú váhu ako finančné čísla. Bio káva, transparentné dodávateľské reťazce a heslo „give coffee purpose\" tvoria DNA značky, ktorá patrí k najuvedomelejšie prevádzkovaným pražiarňam v Berlíne."
+            },
+            "full_description_sk": {
+                "src": "d756511a12006df58c7dafaa064042611624bf6b",
+                "text": "Príbeh NANO KAFFEE sa začína netradične. Ramin Massah desať rokov pracoval ako stolár — vyrábal nábytok a divadelné kulisy — a jeho „dobrodružstvo s kávou\" odštartovalo v roku 2009, keď otvoril svoju prvú kaviareň. Chodil na týždenné cuppingy, nadväzoval kontakty s pražiarňami a nadšený rýchlym rozvojom nemeckej scény sa napokon rozhodol sústrediť výhradne na kávu. V septembri 2014 potom v berlínskom Kreuzbergu otvoril NANO — kultový kávový priestor, ktorý sa stal susedskou legendou. Pôvodne specialty kaviareň sa neskôr rozrástla o praženie a presťahovala sa na dnešnú adresu na Charlottenstraße 1, kde Massah nainštaloval pražiaci stroj Loring. Massah, ktorý medzi stolárstvom a specialty kávou vidí množstvo paralel — v oboch ide o remeselnú prácu s prírodným produktom — navrhol a postavil väčšinu vybavenia kaviarne sám, s pomocou kamaráta kováča. \r\n\r\nPrístup NANO KAFFEE ku káve stojí na priamom obchode, dohľadateľnosti od farmy až po praženie a férových cenách nad úrovňou trhu. Praží sa výhradne bio káva certifikovaná podľa štandardu DE-ÖKO-070, prevažne stopercentná arabika s jasným cupping skóre a čitateľným pôvodom. Sortiment tvoria single origin loty z Brazílie, Mexika, Kolumbie, Rwandy a Indonézie — medzi vrcholy ponuky patrí naturálne spracovaná rwandská káva z družstva Dukunde Kawa Musasa alebo bezkofeínová verzia spracovaná metódou Mountain Water z mexického Chiapasu. Šetrné praženie na technológii Loring pritom dáva vyniknúť terroiru a aromatickej komplexnosti bez dominantnej horkosti.\r\n\r\nTo, čo robí NANO KAFFEE výnimočnou, však siaha ďalej než obsah šálky. Massah zaviazal celú firmu k princípom „Ekonomiky spoločného dobra\" (Economy for the Common Good) a podpísal členský sľub hnutia EcoGood. V praxi to znamená klimaticky neutrálny rozvoz po celom Nemecku, bezemisné doručovanie po Berlíne nákladnými bicyklami, obal bez hliníka a prevádzku na zelenej energii. Pražiareň funguje na sto percent zelenej elektriny, používa recyklované materiály, má účty v etických bankách a všetkým zamestnancom garantuje stále zmluvy s istou mzdou, platenou dovolenkou aj nemocenským. Interná minimálna mzda sa drží citeľne nad zákonným minimom — na začiatku roka 2026 o 23 %. Pre Ramina Massaha totiž platí jednoduchá veta: najvyšším cieľom každého konania je blaho človeka a prírody, nie maximálny zisk."
+            }
+        }
+    },
+    {
+        "id": 40,
+        "fields": {
+            "country_sk": {
+                "src": "88905a26a4a179794429d67cfc02832248e7165d",
+                "text": "Belgicko"
+            },
+            "short_description_sk": {
+                "src": "536b2f88d9ce68f02ef17e12cd29ddb23c7c8d4a",
+                "text": "Replica Roasters je malá pražiareň z belgického Leuvenu, ktorú vedie dvojica Jasper de Clerck a Ester Visker. Praží čisté, sezónne kávy na plne elektrickom stroji poháňanom obnoviteľnou energiou — a v šálke idú po jasnosti, sladkosti a šťavnatosti, nie po experimentoch za každú cenu."
+            },
+            "full_description_sk": {
+                "src": "0a275f25825337784ae055ed3a6ea243d1049967",
+                "text": "Značka Replica Roasters vznikla z fascinácie tým, čo dokáže vytvoriť človek v spojení s prírodou. Za projektom stoja Jasper a Ester, ktorí spolu nazbierali zhruba dvadsať rokov skúseností v káve a gastronómii a chceli vlastný priestor, kde si môžu sourcing, praženie aj vývoj riadiť po svojom. Jasper de Clerck pritom nie je v odbore nováčikom: pražil pre veľkú berlínsku pražiareň, po návrate do Belgicka najprv rozbehol projekt Tane Coffee Collective a Replica je akousi „evolúciou\" jeho predchádzajúcich výprav do sveta výberovej kávy. Leuven, univerzitné mesto kúsok od Bruselu, tak dostalo pražiareň s jasne vyhraneným rukopisom. \r\n\r\nJadrom Replica Roasters je remeslo a konzistentnosť. Pražiareň beží na plne elektrickom stroji Stronghold S9X, ktorý im umožňuje využívať stopercentne miestnu obnoviteľnú energiu zo slnka a vetra — odklon od fosílnych palív tu nebol marketingový doplnok, ale východisková podmienka. V šálke Replica cieli na jasnosť, sladkosť, šťavnatosť a rovnováhu; má slabosť pre svieže prané kávy a veľmi čisté naturály s hodvábnou textúrou a náznakom kvetinovosti. Prefermentované alebo „boozy\" kávy v ich ponuke zásadne nenájdete. Praží sa v malých dávkach podľa pevného týždenného rozvrhu, aby každý batch sedel.\r\n\r\nNemenej dôležitá je pre Replica etika nákupu. Pražiareň spolupracuje len s hŕstkou starostlivo vybraných dovozcov, ktorým verí, že kladú záujem farmárov na prvé miesto — filozofia stojí na presvedčení, že káva má mať pozitívny vplyv všade, kde sa dá. K tomu sa pridáva dôraz na dohľadateľný a udržateľný pôvod, opätovné využívanie materiálov a minimálnu ekologickú stopu. Výsledkom je pražiareň, ktorá nechce byť najväčšia, ale poctivá — od zeleného zrna až po vrecko, ktoré vám dorazí čerstvo upražené."
+            }
+        }
+    },
+    {
+        "id": 41,
+        "fields": {
+            "country_sk": {
+                "src": "a9883c6b9d0b2924a557fc1554032d7078759ccc",
+                "text": "Holandsko"
+            },
+            "short_description_sk": {
+                "src": "e9c00671aa8534f3f32b9a2f4e0aef6b348762d8",
+                "text": "LOT61 Coffee Roasters je amsterdamská pražiareň výberovej kávy, ktorú v roku 2013 založili dvaja kamaráti zo Sydney – Adam Craig a Paul Jenner. Ich vlastný slogan „Born in Sydney. Raised in Brooklyn. Roasting in Amsterdam.\" nie je marketingová póza, ale doslovný opis cesty, ktorú museli prejsť. Dnes patrí LOT61 medzi najvýraznejšie značky holandskej specialty scény a má certifikáciu B Corp."
+            },
+            "full_description_sk": {
+                "src": "08b5dd59911b938af7124fc46e3058467cb2c866",
+                "text": "Príbeh sa začína v New Yorku. Adam Craig strávil pätnásť rokov v NYC, kde vybudoval a prevádzkoval tri kaviarne – všetky ich New York Times uviedli medzi najlepšími v meste. V roku 2013 sa však rozhodol pre nové dobrodružstvo: s manželkou sa presťahoval do Európy, čo znamenalo začať prakticky od nuly. Vybrali si Amsterdam, konkrétne Kinkerstraat v štvrti Oud West, a otvorili tam espresso bar s pražiarňou. Multikultúrna západná časť mesta mu vraj pripomínala Brooklyn. Otvorenie prevádzky malo v tom čase nádych konšpirácie – okoloidúci zazreli za výkladom rohového obchodu na Bilderdijkkade espresso kávovar, o pár dní neskôr pražič a na dverách visel len lístok s nápisom Lot Sixty One Coffee Roasters. LOT61 sa rýchlo stal stálicou mestskej kávovej scény a súčasťou vlny holandských pražiarní, ktorá vrcholila okolo roku 2015. \r\n\r\nPrístup ku káve je v LOT61 nekompromisne remeselný. Základom je nákup zelenej kávy z aktuálnej úrody a praženie priamo na mieste – s dôrazom na to, aby profil rešpektoval charakter kávy od konkrétneho farmára. Stlačiť tlačidlo a podať hosťovi „nejakú\" kávu nie je ich štýl: baristi v LOT61 majú fungovať ako edukátori a inovátori, ktorí ovládajú všetky aktuálne prípravy. V ponuke nájdete klasické blendy na espresso aj single origin loty, ktoré sa neboja ísť do experimentálnejších polôh – napríklad kenskú Waridi Maguta z oblasti Nyeri a Embu, odrody SL28 a SL34, spracovanú karbonickou maceráciou s profilom brusnice, panely a ibišteka. Vlastná pražiareň dnes sídli na Archangelkade v amsterdamskom Westpoorte, kaviarne prevádzkuje LOT61 na Kinkerstraat a Hendrik Jacobszstraat a v roku 2024 pribudla pobočka priamo na hlavnej stanici Amsterdam Centraal. \r\n\r\nDruhým pilierom značky je udržateľnosť – a nezostáva pri frázach. LOT61 je certifikovaná B Corp a definuje sa ako firma, ktorá znižuje uhlíkovú stopu „from seed to cup\". Cieľom je stať sa plne cirkulárnou kávovou značkou: šetrné zaobchádzanie s vodou a energiou, opakovane použiteľné a recyklovateľné obaly a priebežná optimalizácia procesov. Firma navyše zverejnila vlastný report o cirkularite, ktorý spracovala spolu s klimatickým partnerom GreenSwapp. Veľkoobchodne zásobuje LOT61 hotelové a lifestylové značky ako Soho House, Hoxton či Kimpton, ale aj malé rohové kiosky — a k tomu prevádzkuje vlastný vzdelávací program pre baristov a B2B partnerov."
+            }
+        }
+    },
+    {
+        "id": 42,
+        "fields": {
+            "country_sk": {
+                "src": "48eb110055846a7e600a3547556c6e4b6ef669ef",
+                "text": "Španielsko"
+            },
+            "short_description_sk": {
+                "src": "76487aae76729e17aa049d57679bd5837b676fa0",
+                "text": "Dalston Coffee je barcelonská pražiareň výberovej kávy, ktorá si meno aj vizuálnu identitu požičala od jednej londýnskej štvrte. Vlastnú kaviareň otvorila v roku 2017 a dnes zásobuje podniky v Španielsku aj naprieč Európou. Malé dávky, kompostovateľné obaly v tvare domčeka a ocenenie za dizajn — to je Dalston v kocke."
+            },
+            "full_description_sk": {
+                "src": "2c8397ba6e0d2c86faf9c25e98bf8e1f2b324b1c",
+                "text": "Celý príbeh sa začal na východe Londýna. Zakladateľ Borja Roselló tam v roku 2014 prvýkrát narazil na svet výberovej kávy — dovtedy profesionálny kuchár, ktorý prešiel niekoľkými renomovanými podnikmi a o specialty káve prakticky nič nevedel, kým neochutnal flat white a nedošlo mu, že pije niečo úplne iné, než na čo bol zvyknutý. O tri roky neskôr otvoril vlastnú kaviareň priamo v barcelonskom Ravale — malý, výrazný priestor s poriadnou dávkou vlastného charakteru. Išlo doslova o \"one man bar\": pult, dva stolíky vonku, pákový espresso kávovar a filtrovací Moccamaster. \r\n\r\nZlom prišiel v roku 2020. Dovtedy fungoval Dalston ako multiroaster a podával kávy iných pražiarní, potom však prišiel skok k vlastnému praženiu — a s ním možnosť vyberať si presne to, čo chcú ponúkať. Borja začal pražiť s kamarátom, potom sám, a dnes túto kľúčovú časť zveril head roasterovi Sebasovi; cupping však robia spoločne a posledné slovo má stále zakladateľ. V roku 2023 pribudla vlastná pražiareň v La Garrige kúsok od Barcelony. Filozofia zostáva stále rovnaká: uvážený výber zelenej kávy, šetrné praženie v malých dávkach a čistá, príjemná šálka bez aditív. Dôraz kladú aj na dohľadateľnosť — každý lot pochádza z konkrétnej farmy a nesie podrobné informácie o pôvode, odrode aj spracovaní. \r\n\r\nVizuálna stránka je pre Dalston Coffee rovnako dôležitá ako obsah vrecka. Koncept značky vychádza z tehlových domov a farebných markíz typických pre londýnsky Dalston, dizajn obalov podpísala Íngrid Picanyol a v roku 2024 získal zlatý Laus Award. Ilustrácie priečelí domčekov vytvoril umelec Lourenço Providencia. Káva sa balí do 100% kompostovateľných vreciek v dvoch formátoch — 250 g domček a kilové balenie."
+            }
+        }
+    },
+    {
+        "id": 43,
+        "fields": {
+            "country_sk": {
+                "src": "7d7b9518a31c50318f5e0bb447c874abdd11c8f0",
+                "text": "Poľsko"
+            },
+            "city_sk": {
+                "src": "35af1ca2c4b464a384a50a88b4cac5df18b51b5b",
+                "text": "Vroclav"
+            },
+            "short_description_sk": {
+                "src": "f2cafbfd59ec3d054dd7dc5a69f2cc5f8fff44cc",
+                "text": "Paloma Coffee je remeselná pražiareň výberovej kávy z centra Vroclavu, ktorú v roku 2018 založil ukrajinský pár Kateryna a Anton Pisniovci. Názov vznikol spojením dvoch jazykov – po španielsky „paloma\" znamená holubica, po poľsky „palona\" odkazuje na proces praženia. Za pražičom stojí vicemajster Poľska v pražení kávy z roku 2019."
+            },
+            "full_description_sk": {
+                "src": "2f1b85f0bd0f4e6c02a99f1cb625fb97bf979e98",
+                "text": "Príbeh Palomy sa začína ďaleko od Dolného Sliezska. Kateryna a Anton Pisniovci predtým šesť rokov prevádzkovali v ukrajinskom Chersone kaviareň Koko, a keď sa presťahovali do Vroclavu, otvorili na placu Solnym vlastný podnik – prípravy trvali pol roka a najviac formalít si vyžiadala inštalácia pražiča priamo v prevádzke. Kľúčovým momentom však bola cesta do Barcelony. Práve tam sa manželia učili remeslo praženia a kúsok Barcelony si so sebou priniesli aj v názve pražiarne-kaviarne. Holubica pre nich symbolizuje slobodu – teda slobodu vybrať si a vychutnať si svoju obľúbenú kávu. \r\n\r\nTo, že nejde o marketingovú pózu, potvrdil Anton Pisnia hneď rok po štarte: na Majstrovstvách Poľska Roasting 2019, na ktorých sa zúčastnilo trinásť pražiarov z najrešpektovanejších domácich pražiarní, obsadil druhé miesto hneď za Mateuszom Karczewským z Audun Coffee a pred Krzysztofom Zamęckým z Etno Cafe. Dodnes figuruje ako head roaster značky. \r\n\r\nFilozofia Paloma Coffee stojí na kontrole každého kroku. Pražiareň pracuje so zrnami na espresso aj alternatívnu prípravu a sústreďuje sa na starostlivý výber green coffee, vlastné pražiace profily, quality control v každej fáze výroby a ohľad na životné prostredie. Stavia pritom aj na forme – minimalistický, elegantný dizajn obalov. V ponuke nájdete celú šírku chuťového spektra od ovocných káv s vysokou aciditou až po profily s výraznou sladkosťou a orieškovo-čokoládovými tónmi. \r\n\r\nZaujímavý je aj vývoj samotnej prevádzky. Spočiatku Paloma pražila priamo v kaviarni, aby hostia mohli proces sledovať na vlastné oči a stretávať sa pri káve s ostatnými Vroclavčanmi. Dnes už tím funguje vo väčšej, samostatnej pražiarni a rozosiela kávu po celom Poľsku – firemný e-shop tomu s poriadnou dávkou sebairónie hovorí „holubia pošta\". Pražiareň zároveň patrí medzi aktívnych hráčov poľskej specialty scény: hostila napríklad cupping s importérom Mare Terra Coffee, na ktorom sa zúčastnili aj ľudia z Etno Cafe a Figa Coffee."
+            }
+        }
+    },
+    {
+        "id": 44,
+        "fields": {
+            "country_sk": {
+                "src": "0e71dd22daa74f9dec1936dad9c73af2537cb26d",
+                "text": "Nemecko"
+            },
+            "short_description_sk": {
+                "src": "d155efda65a40dcee515409a71d835e2c28d8689",
+                "text": "Populus Coffee je rodinná pražiareň výberovej kávy, ktorú v roku 2016 založili fínski manželia Sari a Henrik Haavistovci v berlínskom Neuköllne. Stavia na svetlom severskom pražení a na vzťahoch s farmármi, ktorých osobne poznajú. Z malej kaviarne pri kanáli sa za desať rokov stala pražiareň, ktorá dnes praží v Berlíne aj v Šanghaji."
+            },
+            "full_description_sk": {
+                "src": "4a966102fcd0bfba31a7293d5a571aeb6479be9e",
+                "text": "Príbeh Populus Coffee sa nezačal v Berlíne, ale v Helsinkách. Sari a Henrik vyrastali vo Fínsku, kde je filtrovaná káva samozrejmou súčasťou dňa, a ako sami hovoria, majú ju v DNA. Zlom prišiel v roku 2014. Henrik vtedy ešte pracoval ako novinár a do Guatemaly odišiel písať esej do knihy o káve. Cesta, ktorá pokračovala aj do Hondurasu, mu ukázala, že výberová káva stojí hlavne na ľuďoch, ktorí ťahajú za jeden povraz. Priviezol si z nej prvé dlhodobé partnerstvá aj meno: latinské populus znamená ľud. Potom niekoľko mesiacov pražil v pražiarni Kaffa v Osle a so Sari začali chystať vlastný podnik. V Helsinkách však narazili, pretože ľudia v centre sa báli, že ich bude obťažovať vôňa praženia. Voľba tak padla na Berlín a jeho otvorenú, medzinárodnú kávovú scénu.\r\n\r\nKaviareň Populus Coffee sa otvorila na nábreží Maybachufer pri Landwehrkanale, kúsok od známeho tureckého trhu. Vlastná pražiareň ešte nebola hotová, a tak podnik začínal ako multi-roaster. Haavistovci nalievali kávy iných európskych pražiarní a napokon v tom videli skôr výhodu, pretože im to rýchlo otvorilo dvere v odbore. Do roka sa už pražilo v zadnej miestnosti za sklenenými dverami. Dnes kaviareň slúži ako výkladná skriňa. Všetky kávy sa tu na bare striedajú v rôznych metódach prípravy, baristi si zapisujú, ako sa ktorá káva správa, a svoje poznatky odovzdávajú veľkoodberateľom. Ku káve sa podávajú zákusky od vlastných pekárov. Praženie sa medzitým presunulo do Communal Coffee, najväčšieho zdieľaného pražiaceho priestoru v Nemecku, ktorý Haavistovci založili spolu s Philippom Reichelom a Januschom Munkwitzom. V neuköllnskej hale na Naumburger Straße praží zhruba desiatka pražiarní, stretávajú sa tu dovozcovia zelenej kávy aj výrobcovia strojov a konajú sa tu verejné cuppingy, školenia a semináre.\r\n\r\nFilozofia Populus Coffee je jednoduchá. Skvelá káva vzniká na farme a úlohou pražiarne je nájsť najlepšie zrná a pražením z nich dostať ich prirodzenú chuť. Haavistovci preto nakupujú čo najpriamejšie, prípadne cez preverených partnerov s rovnakými hodnotami. Kávu berú z viac než desiatich krajín pôvodu a na farmy jazdia najmenej dvakrát ročne. Výsledkom sú svetlé, sladké, jasné a čisté profily, aké človek od severskej školy čaká. V ponuke nájdete napríklad kávy etiópskeho farmára Khalida Shifu z oblasti Jimma, ktorého pranú a naturálnu verziu pražiareň predáva vedľa seba v degustačnom boxe, aby bolo v šálke poznať, čo robí spracovanie. Ďalej vzácne odrody SL9 a Geisha od malých pestovateľov z peruánskej Incahuasi alebo Capim Branco od brazílskej rodiny Andrade."
+            }
+        }
+    },
+    {
+        "id": 45,
+        "fields": {
+            "short_description_sk": {
+                "src": "6327bd4e6401eb793e2554b47eca42e2023f221a",
+                "text": "STOW Coffee Roasters je slovinská pražiareň výberovej kávy, ktorá od roku 2015 sídli v Kamniku pod Kamnickými Alpami. Stojí za ňou pražiar Aleš Turšič, ktorý zo značky postupne vybudoval pražiareň, kaviarne v Ľubľane a kávovú akadémiu pod jednou strechou. Ak hľadáte svetlo praženú sezónnu kávu zo Slovinska, STOW je prvá adresa, na ktorú narazíte."
+            },
+            "full_description_sk": {
+                "src": "64477afa3e0bebbc2e146659b63b77d81d6727f4",
+                "text": "Meno STOW Coffee Roasters nie je anglická slovná hračka. Odkazuje na kedysi slávnu kamnickú továreň STOL, výrobcu stoličiek, v ktorej bývalých priestoroch pražiareň funguje a ktorej názov sa po slovinsky vyslovuje práve „stow“. Aleš Turšič sa ku káve dostal cez techniku. Remeslu sa učil po boku svokra, jedného z prvých servisných technikov espresso strojov v niekdajšej Juhoslávii, a sám zreštauroval okolo 120 historických kávovarov. Praženie ho chytilo v Prahe: základy mu v Coffee Source odovzdal Tomáš Hudec. K vlastnému projektu ho potom prehovoril kamarát a barista Peter Ševič, v čase, keď Turšič ešte pracoval pre veľkú kávovú firmu. \r\n\r\nV prístupe ku káve je STOW Coffee Roasters dôsledne „tretia vlna“. Zelené zrná vyberá po celom svete, praží ich svetlo a predáva výhradne ako zrnkovú kávu. Ponuka sa riadi sezónou a vďaka dlhoročným kontaktom sa do nej dostávajú aj vzácne a súťažné loty zo slávnych fariem. Turšič zastáva názor, že praženie má nechať vyniknúť terroir kávy, a k pražiacemu stroju pristupuje analyticky: profily ladí v softvéri a sortiment drží zámerne úzky, aby neutrpela kvalita. \r\n\r\nPražiareň je však len jedna časť príbehu. STOW Academy vyučuje podľa SCA Coffee Diploma Systemu a organizuje workshopy pre domácich kávových nadšencov, kaviarne značky nájdete v ľubľanskom Mestskom múzeu na Gosposkej 15 a v galérii Cukrarna. Turšič sa navyše zapísal do histórie miestnej scény ako zakladateľ STOW Coffee Festivalu, prvého kávového festivalu v Slovinsku, na ktorom sa konal aj prvý slovinský AeroPress šampionát. O chod firmy sa dnes stará malý tím, v ktorom má Peter Ševič na starosti kontrolu kvality, nákup zelenej kávy aj školenia zákazníkov."
+            }
+        }
+    },
+    {
+        "id": 46,
+        "fields": {
+            "country_sk": {
+                "src": "48eb110055846a7e600a3547556c6e4b6ef669ef",
+                "text": "Španielsko"
+            },
+            "short_description_sk": {
+                "src": "9cd387621575755531036aa6d9fd7f4dee640940",
+                "text": "Three Marks Coffee je barcelonská pražiareň výberovej kávy, za ktorou stoja traja kamaráti s takmer rovnakým menom: Marc Aguyé, Marco De Rebotti a Marco Paccagnella. Dvaja bývalí kolegovia z Nomad Coffee a jeden dizajnér postavili značku, ktorá spája poctivé remeslo s čistou industriálnou estetikou. Od roku 2018 patrí k adresám, ktoré v Barcelone žiadny kávový nadšenec nevynechá."
+            },
+            "full_description_sk": {
+                "src": "7c50173529ba2a2330aa16a571338daeab1070a6",
+                "text": "Názov Three Marks Coffee je slovná hračka: dvaja Marcovia a jeden Marc dali značke meno aj tvár. Aguyé a De Rebotti sa stretli v Nømade, prvý ako head barista, druhý ako pražiar, a Paccagnella k nim chodieval na kávu. Rodák z Padovy vyštudoval dizajn v Benátkach a výberovej káve prepadol počas života v Londýne. Z pravidelných návštev sa stalo priateľstvo a z priateľstva vlastný projekt: prvá kaviareň Three Marks Coffee sa otvorila v roku 2018 v barcelonskej štvrti Fort Pienc. \r\n\r\nZačiatky praženia boli skromné. Trojica si požičiavala stroj od inej barcelonskej firmy, čo komplikovalo plánovanie výroby aj rýchle vybavovanie objednávok. Zlom priniesla pandémia: namiesto čakania si zakladatelia zabezpečili financovanie a počas lockdownov vybudovali vlastný priestor s kaviarňou a pražiacim laboratóriom. Vlastný pražiaci stroj majú od septembra 2020 a ich roasting lab leží kúsok od mora. Úlohy sú rozdelené jasne: De Rebotti má na starosti kávu a praženie, zatiaľ čo Paccagnella vytvoril veľkú časť vizuálnej identity a venuje sa aj nákupu zelenej kávy. \r\n\r\nV prístupe ku káve stavia Three Marks Coffee na sezónnosť a dlhodobé vzťahy s farmármi. Kávy z Burundi a Rwandy vyberajú v spolupráci s Long Miles Coffee a nadviazali aj partnerstvo s producentom v Ekvádore; úzko spolupracujú aj s pestovateľmi v Kolumbii, Etiópii a Keni. Ponuka má dve polohy: kávy, ktoré chutia každému, a popri nich nezvyčajnejšie loty pre fajnšmekrov. Rovnakú starostlivosť venujú priestoru. Kaviareň na Carrer d’Ausiàs Marc je svetlá, minimalistická, postavená na betóne, oceli a dreve. K pražiarni medzitým pribudla aj vlastná akadémia, mladistvú a osobnú energiu si však projekt drží naďalej."
+            }
+        }
+    }
+]
