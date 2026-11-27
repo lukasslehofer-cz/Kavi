@@ -208,22 +208,40 @@ class HreflangHelper
         }
 
         $urls = [];
+        $slugs = [];
         foreach (self::locales() as $postLocale) {
-            $postSlug = $post->getAttribute('slug_' . $postLocale);
+            $postSlug = self::postSlug($post, $postLocale);
             if (blank($postSlug)
                 || blank($post->getAttribute('title_' . $postLocale))
                 || blank($post->getAttribute('content_' . $postLocale))) {
                 continue;
             }
+            $slugs[$postLocale] = $postSlug;
             $urls[$postLocale] = self::siteUrl($postLocale) . '/' . ltrim(route('blog.show', ['post' => $postSlug], false), '/');
         }
 
         // Slug jiného jazyka (BlogController ho přesměruje na slug této domény)
-        if (! isset($urls[$locale]) || $slug !== $post->getAttribute('slug_' . $locale) || count($urls) < 2) {
+        if (! isset($urls[$locale]) || $slug !== $slugs[$locale] || count($urls) < 2) {
             return null;
         }
 
         return $urls;
+    }
+
+    /**
+     * Slug článku v jazyce. Slovenský článek bez vlastního slugu (překlad titulku vyšel
+     * stejně jako česky) běží na českém slugu stejně jako Post::getSlug(); angličtina
+     * musí mít vlastní slug jako dřív.
+     */
+    private static function postSlug(Post $post, string $locale): ?string
+    {
+        $slug = $post->getAttribute('slug_' . $locale);
+
+        if (blank($slug) && ! in_array($locale, [Site::PRIMARY_LOCALE, 'en'], true)) {
+            return $post->slug_cs;
+        }
+
+        return $slug;
     }
 
     /**
