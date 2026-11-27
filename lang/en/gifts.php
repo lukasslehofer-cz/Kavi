@@ -64,6 +64,7 @@ return [
         'hero_kicker' => 'Coffee gift subscription',
         'hero_title' => ['Give', 'coffee'],
         'hero_text' => 'A gift subscription for 3 or 6 months, or a voucher for the whole shop. The certificate arrives by email straight away as a printable PDF.',
+        'hero_intro' => 'With a KAVI gift subscription, the recipient gets a box of specialty coffee from European roasters every month, coffees they rarely find in local shops. They choose the coffee type and pickup point themselves, you just pick how long and how much. A great gift for Christmas, birthdays or as a thank you.',
 
         'preview_label' => 'Certificate preview',
         'preview_format' => 'PDF · A5 landscape',

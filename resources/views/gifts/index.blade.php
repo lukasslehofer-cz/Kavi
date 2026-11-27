@@ -41,8 +41,18 @@
             <span class="text-dark-800">{{ __('gifts.page.hero_title')[0] }}</span><br>
             <span class="text-primary-500">{{ __('gifts.page.hero_title')[1] }}</span>
         </p>
-        <div class="flex justify-end">
-            <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-600 max-w-md text-right leading-relaxed">{{ __('gifts.page.hero_text') }}</p>
+        {{-- Úvod vlevo pro ty, kdo přijdou z Googlu a KAVI neznají (odkazy na sekce pod formulářem), popis vpravo --}}
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+            <div class="max-w-xl">
+                <p class="text-base text-warm-600 leading-relaxed font-light">{{ __('gifts.page.hero_intro') }}</p>
+                <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-base font-light">
+                    <a href="#co-obdarovany-dostane" class="text-primary-500 underline underline-offset-2 hover:text-primary-600 transition-colors duration-200">{{ __('gifts.page.gets_title') }} &darr;</a>
+                    <a href="#jak-to-funguje" class="text-primary-500 underline underline-offset-2 hover:text-primary-600 transition-colors duration-200">{{ __('gifts.page.how_title') }} &darr;</a>
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-600 max-w-md text-right leading-relaxed">{{ __('gifts.page.hero_text') }}</p>
+            </div>
         </div>
     </div>
 
@@ -279,7 +289,7 @@
     </form>
 
     {{-- Co obdarovaný dostane --}}
-    <section aria-label="{{ __('gifts.page.gets_title') }}" class="relative overflow-hidden">
+    <section id="co-obdarovany-dostane" aria-label="{{ __('gifts.page.gets_title') }}" class="relative overflow-hidden scroll-mt-24">
         <div class="grid lg:grid-cols-2 max-w-[2400px] mx-auto">
             <div class="relative bg-primary-500">
                 <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
@@ -319,7 +329,7 @@
     </section>
 
     {{-- Jak to funguje --}}
-    <section aria-label="{{ __('gifts.page.how_title') }}" class="pt-20 sm:pt-24 lg:pt-36 pb-20 lg:pb-28">
+    <section id="jak-to-funguje" aria-label="{{ __('gifts.page.how_title') }}" class="scroll-mt-24 pt-20 sm:pt-24 lg:pt-36 pb-20 lg:pb-28">
         <div class="mx-auto max-w-screen-xl px-4 md:px-8">
             <div class="mb-16 sm:mb-20 max-w-2xl">
                 <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ __('gifts.page.how_title') }}</h2>

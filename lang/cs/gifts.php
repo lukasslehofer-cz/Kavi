@@ -64,6 +64,7 @@ return [
         'hero_kicker' => 'Dárkové předplatné kávy',
         'hero_title' => ['Darujte', 'kávu'],
         'hero_text' => 'Dárkové předplatné na 3 nebo 6 měsíců, nebo poukaz na celý e-shop. Certifikát přijde hned e-mailem v PDF k tisku.',
+        'hero_intro' => 'S dárkovým předplatným KAVI přijde obdarovanému každý měsíc box s výběrovou kávou z evropských pražíren, které v Česku běžně nekoupí. Typ kávy a výdejní místo si zvolí sám, vy jen vyberete, na jak dlouho a kolik kávy. Hodí se k Vánocům, k narozeninám i jako poděkování.',
 
         'preview_label' => 'Náhled certifikátu',
         'preview_format' => 'PDF · A5 na šířku',
