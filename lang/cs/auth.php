@@ -75,6 +75,25 @@ return [
     'secure_encryption' => 'Bezpečné šifrování',
     'ssl_protected' => 'Chráněno SSL',
     
+    // Velké nadpisy stránek přihlášení, registrace a hesla. *_accent je barevná část
+    // za předchozím textem (ten proto končí mezerou).
+    'headings' => [
+        'login' => 'PŘIHLÁŠENÍ',
+        'login_credentials' => 'PŘIHLAŠOVACÍ ',
+        'login_credentials_accent' => 'ÚDAJE',
+        'login_magic' => 'PŘIHLÁŠENÍ ',
+        'login_magic_accent' => 'BEZ HESLA',
+        'register' => 'REGISTRACE',
+        'register_details' => 'VAŠE ',
+        'register_details_accent' => 'ÚDAJE',
+        'forgot' => 'OBNOVA HESLA',
+        'forgot_email' => 'VÁŠ ',
+        'forgot_email_accent' => 'EMAIL',
+        'reset' => 'NOVÉ HESLO',
+        'reset_password' => 'NASTAVTE NOVÉ ',
+        'reset_password_accent' => 'HESLO',
+    ],
+
     // Messages
     'failed' => 'Tyto přihlašovací údaje neodpovídají žádnému záznamu.',
     'password_incorrect' => 'Zadané heslo je nesprávné.',

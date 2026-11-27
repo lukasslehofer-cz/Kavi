@@ -117,6 +117,7 @@ return [
         'send_at' => 'When to send',
 
         'gets_title' => 'What they will get',
+        'gets_image_alt' => 'An open KAVI box with three bags of coffee',
         'gets_lead' => 'Every month a box of specialty coffee from European roasters they rarely find in local shops.',
         'gets_arrows' => [
             '2 to 4 bags of 250 g, depending on the box size',

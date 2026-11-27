@@ -84,16 +84,12 @@
                             <!-- Message -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Co se stalo' : 'What happened' }}
+                                    {{ __('emails.order_cancelled_expired.what_happened', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #5a5a5a; margin: 0; line-height: 1.8;">
-                                    @if($locale === 'cs')
-                                    Vaše objednávka byla automaticky zrušena, protože platba nebyla dokončena včas.<br><br>
-                                    Zboží bylo uvolněno zpět do nabídky. Pokud máte stále zájem, můžete objednávku vytvořit znovu.
-                                    @else
-                                    Your order was automatically cancelled because the payment was not completed in time.<br><br>
-                                    The items have been released back to stock. If you're still interested, you can place a new order.
-                                    @endif
+                                    {{ __('emails.order_cancelled_expired.text_cancelled', [], $locale) }}<br><br>
+                                    {{-- Text s apostrofem byl v šabloně bez escapování, proto {!! !!} --}}
+                                    {!! __('emails.order_cancelled_expired.text_released', [], $locale) !!}
                                 </p>
                             </div>
 

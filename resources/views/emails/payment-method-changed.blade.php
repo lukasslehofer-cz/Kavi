@@ -52,76 +52,57 @@
                             
                             <!-- Confirmation -->
                             <div class="info-box" style="background-color: #d1fae5 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#d1fae5">
-                                <h3 class="info-title" style="color: #065f46;">✓ {{ $locale === 'cs' ? 'Změna potvrzena' : 'Change confirmed' }}</h3>
+                                <h3 class="info-title" style="color: #065f46;">✓ {{ __('emails.payment_method_changed.change_confirmed', [], $locale) }}</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    <strong>{{ $locale === 'cs' ? 'Datum změny' : 'Change date' }}:</strong> {{ now()->format($locale === 'cs' ? 'j. n. Y H:i' : 'M d, Y H:i') }}<br>
-                                    <strong>{{ $locale === 'cs' ? 'Email účtu' : 'Account email' }}:</strong> {{ $user->email }}<br><br>
+                                    <strong>{{ __('emails.payment_method_changed.change_date', [], $locale) }}:</strong> {{ now()->format(__('emails.payment_method_changed.date_format', [], $locale)) }}<br>
+                                    <strong>{{ __('emails.payment_method_changed.account_email', [], $locale) }}:</strong> {{ $user->email }}<br><br>
                                     
-                                    {{ $locale === 'cs' ? 'Vaše nová platební metoda byla úspěšně uložena a bude použita pro budoucí platby.' : 'Your new payment method has been saved and will be used for future payments.' }}
+                                    {{ __('emails.payment_method_changed.saved_text', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- New payment method -->
                             <div class="info-box" style="background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important;" bgcolor="#f3f4f6">
-                                <h3 class="info-title">💳 {{ $locale === 'cs' ? 'Nová platební metoda' : 'New payment method' }}</h3>
+                                <h3 class="info-title">💳 {{ __('emails.payment_method_changed.new_method_title', [], $locale) }}</h3>
                                 <p class="info-text">
-                                    <strong>{{ ucfirst($cardBrand) }}</strong> {{ $locale === 'cs' ? 'končící na' : 'ending in' }} <strong>•••• {{ $cardLast4 }}</strong>
+                                    <strong>{{ ucfirst($cardBrand) }}</strong> {{ __('emails.payment_method_changed.ending_in', [], $locale) }} <strong>•••• {{ $cardLast4 }}</strong>
                                 </p>
                             </div>
                             
                             <!-- What happens next -->
                             <div class="info-box" style="background-color: #dbeafe !important; border: 1px solid #93c5fd !important; border-left: 4px solid #3b82f6 !important;" bgcolor="#dbeafe">
-                                <h3 class="info-title" style="color: #1e40af;">📋 {{ $locale === 'cs' ? 'Co se stane dále?' : 'What happens next?' }}</h3>
+                                <h3 class="info-title" style="color: #1e40af;">📋 {{ __('emails.payment_method_changed.next_title', [], $locale) }}</h3>
                                 <p class="info-text" style="color: #1e3a8a;">
-                                    @if($locale === 'cs')
-                                    • Všechny budoucí platby budou účtovány z této karty<br>
-                                    • Vaše aktivní předplatné bude pokračovat bez přerušení<br>
-                                    • Můžete platební metodu kdykoli změnit ve svém účtu
-                                    @else
-                                    • All future payments will be charged to this card<br>
-                                    • Your active subscription will continue without interruption<br>
-                                    • You can change your payment method anytime in your account
-                                    @endif
+                                    • {{ __('emails.payment_method_changed.next_1', [], $locale) }}<br>
+                                    • {{ __('emails.payment_method_changed.next_2', [], $locale) }}<br>
+                                    • {{ __('emails.payment_method_changed.next_3', [], $locale) }}
                                 </p>
                             </div>
                             
                             <div style="text-align: center; margin: 32px 0;">
                                 <a href="{{ $manageUrl }}" class="button">
-                                    {{ $locale === 'cs' ? 'Spravovat platby' : 'Manage payments' }}
+                                    {{ __('emails.payment_method_changed.manage_payments', [], $locale) }}
                                 </a>
                             </div>
                             
                             <!-- Security -->
                             <div class="info-box" style="background-color: #fef3c7 !important; border: 1px solid #fcd34d !important; border-left: 4px solid #f59e0b !important;" bgcolor="#fef3c7">
-                                <h3 class="info-title" style="color: #92400e;">🔒 {{ $locale === 'cs' ? 'Bezpečnost' : 'Security' }}</h3>
+                                <h3 class="info-title" style="color: #92400e;">🔒 {{ __('emails.payment_method_changed.security_title', [], $locale) }}</h3>
                                 <p class="info-text" style="color: #78350f;">
-                                    @if($locale === 'cs')
-                                    Pokud jste tuto změnu <strong>neprovedli</strong>, okamžitě nás kontaktujte:<br><br>
+                                    {!! __('emails.payment_method_changed.security_text', [], $locale) !!}<br><br>
                                     📧 <a href="mailto:{{ $contactEmail }}" style="color: #e6305a;">{{ $contactEmail }}</a><br><br>
-                                    Doporučujeme také změnit heslo k vašemu účtu.
-                                    @else
-                                    If you did <strong>not make</strong> this change, contact us immediately:<br><br>
-                                    📧 <a href="mailto:{{ $contactEmail }}" style="color: #e6305a;">{{ $contactEmail }}</a><br><br>
-                                    We also recommend changing your account password.
-                                    @endif
+                                    {{ __('emails.payment_method_changed.security_password', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- Card security info -->
                             <div class="info-box" style="background-color: #f0fdf4 !important; border: 1px solid #86efac !important; border-left: 4px solid #10b981 !important;" bgcolor="#f0fdf4">
-                                <h3 class="info-title" style="color: #065f46;">🛡️ {{ $locale === 'cs' ? 'Vaše data jsou v bezpečí' : 'Your data is secure' }}</h3>
+                                <h3 class="info-title" style="color: #065f46;">🛡️ {{ __('emails.payment_method_changed.data_secure_title', [], $locale) }}</h3>
                                 <p class="info-text" style="color: #047857;">
-                                    @if($locale === 'cs')
-                                    • Vše je šifrováno pomocí SSL/TLS<br>
-                                    • Platby zpracovává bezpečný systém Stripe<br>
-                                    • Nikdy neuvidíme vaše kompletní údaje o kartě<br>
-                                    • Splňujeme PCI DSS standardy
-                                    @else
-                                    • Everything is encrypted using SSL/TLS<br>
-                                    • Payments are processed by secure Stripe system<br>
-                                    • We never see your complete card details<br>
-                                    • We comply with PCI DSS standards
-                                    @endif
+                                    • {{ __('emails.payment_method_changed.data_1', [], $locale) }}<br>
+                                    • {{ __('emails.payment_method_changed.data_2', [], $locale) }}<br>
+                                    • {{ __('emails.payment_method_changed.data_3', [], $locale) }}<br>
+                                    • {{ __('emails.payment_method_changed.data_4', [], $locale) }}
                                 </p>
                             </div>
                             

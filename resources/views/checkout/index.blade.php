@@ -2,6 +2,11 @@
 
 @section('title', __('checkout.page_title'))
 
+@php
+    // Vzor ceny pro formatCurrency v JS: symbol a jeho pozici určuje CurrencyHelper (cs „:amount Kč“, en „€:amount“, sk „:amount €“)
+    $jsPricePattern = str_replace('0', ':amount', \App\Helpers\CurrencyHelper::formatAmount(0, 0));
+@endphp
+
 @section('content')
 <style>
 /* Swiss Style Form Inputs - Inline Labels with Light Lines */
@@ -122,7 +127,7 @@
 <div class="relative py-16 sm:py-20 lg:py-24 border-b border-dark-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-tight leading-[0.9]">
-            <span class="text-dark-800">{{ $currentLocale === 'en' ? 'CHECKOUT' : 'POKLADNA' }}</span>
+            <span class="text-dark-800">{{ __('checkout.hero_title') }}</span>
         </h1>
         <div class="mt-6">
             <span class="text-xs uppercase tracking-widest text-warm-500">{{ __('checkout.subtitle') }}</span>
@@ -503,12 +508,15 @@
                     // Currency formatting helper
                     const isEur = {{ \App\Helpers\CurrencyHelper::isEur() ? 'true' : 'false' }};
                     const currencySymbol = '{{ \App\Helpers\CurrencyHelper::symbol() }}';
-                    
+                    // Formát čísla podle jazyka webu, symbol a jeho pozice podle měny ($jsPricePattern)
+                    const priceLocale = @json(__('checkout.number_locale'));
+                    const pricePattern = @json($jsPricePattern);
+
                     window.formatCurrency = function(amount) {
                         if (isEur) {
-                            return '€' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            return pricePattern.replace(':amount', amount.toLocaleString(priceLocale, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
                         } else {
-                            return amount.toLocaleString('cs-CZ') + ' Kč';
+                            return pricePattern.replace(':amount', amount.toLocaleString(priceLocale));
                         }
                     }
                     
@@ -906,7 +914,7 @@
                         <dd class="text-sm uppercase tracking-wide">
                             <span id="shipping-cost">
                                 @if($shipping == 0)
-                                <span class="text-dark-800">{{ $currentLocale === 'en' ? 'FREE' : 'ZDARMA' }}</span>
+                                <span class="text-dark-800">{{ __('checkout.free_caps') }}</span>
                                 @else
                                 <span class="text-dark-800">{{ \App\Helpers\CurrencyHelper::formatAmount($shipping) }}</span>
                                 @endif
@@ -918,7 +926,7 @@
                     @if(($adjustedDiscount ?? 0) > 0)
                     <div class="flex justify-between items-baseline">
                         <dt class="text-xs uppercase tracking-widest text-olive-700">
-                            {{ ($isGiftVoucher ?? false) ? (app()->getLocale() === 'cs' ? 'Dárkový voucher' : 'Gift voucher') : __('checkout.discount') }} {{ $appliedCoupon->code ?? '' }}
+                            {{ ($isGiftVoucher ?? false) ? __('checkout.gift_voucher') : __('checkout.discount') }} {{ $appliedCoupon->code ?? '' }}
                         </dt>
                         <dd class="text-sm text-olive-700 uppercase tracking-wide">-{{ \App\Helpers\CurrencyHelper::formatAmount($adjustedDiscount) }}</dd>
                     </div>
@@ -937,16 +945,15 @@
                                 ->merge(collect($giftItems ?? [])->pluck('vat_rate'))
                                 ->map(fn ($rate) => (float) $rate)
                                 ->unique();
-                            $vatWord = app()->getLocale() === 'cs' ? 'DPH' : 'VAT';
                             $vatLabel = $uniqueVatRates->count() === 1
-                                ? $vatWord . ' (' . number_format($uniqueVatRates->first(), 0) . '%)'
-                                : $vatWord;
+                                ? __('confirmation.pricing.vat', ['rate' => number_format($uniqueVatRates->first(), 0)])
+                                : __('confirmation.pricing.vat_generic');
                         @endphp
                         <dt class="text-xs uppercase tracking-widest text-olive-600">{{ $vatLabel }}</dt>
                         <dd class="text-sm text-dark-800 uppercase tracking-wide">{{ \App\Helpers\CurrencyHelper::formatAmount($vat, 2) }}</dd>
                     </div>
                     @if($isGiftVoucher ?? false)
-                    <p class="text-xs text-olive-500">{{ app()->getLocale() === 'cs' ? 'DPH je vypočtena z ceny před odečtením voucheru' : 'VAT is calculated on the price before voucher deduction' }}</p>
+                    <p class="text-xs text-olive-500">{{ __('checkout.vat_before_voucher') }}</p>
                     @endif
 
                     <!-- Total -->
@@ -962,7 +969,7 @@
                 <!-- CTA Buttons -->
                 <div class="mt-8 space-y-4">
                     <button type="submit" form="checkout-form" class="group w-full flex items-center justify-center gap-3 bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all duration-200">
-                        <span>{{ $currentLocale === 'en' ? 'COMPLETE ORDER' : 'DOKONČIT OBJEDNÁVKU' }}</span>
+                        <span>{{ __('checkout.complete_order_caps') }}</span>
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -1035,11 +1042,14 @@
 <script>
 // Currency formatting helper (must be global for all users)
 const isEur = {{ \App\Helpers\CurrencyHelper::isEur() ? 'true' : 'false' }};
+// Formát čísla podle jazyka webu, symbol a jeho pozice podle měny ($jsPricePattern)
+const priceLocale = @json(__('checkout.number_locale'));
+const pricePattern = @json($jsPricePattern);
 window.formatCurrency = function(amount) {
     if (isEur) {
-        return '€' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        return pricePattern.replace(':amount', amount.toLocaleString(priceLocale, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
     } else {
-        return amount.toLocaleString('cs-CZ') + ' Kč';
+        return pricePattern.replace(':amount', amount.toLocaleString(priceLocale));
     }
 };
 
@@ -1140,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Update shipping cost
                 if (shippingCostElement) {
-                    shippingCostElement.textContent = couponFreeShipping ? '{{ $currentLocale === 'en' ? 'FREE' : 'ZDARMA' }}' : data.shipping_formatted;
+                    shippingCostElement.textContent = couponFreeShipping ? '{{ __('checkout.free_caps') }}' : data.shipping_formatted;
                 }
 
                 // Update total

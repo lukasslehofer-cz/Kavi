@@ -10,8 +10,8 @@
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
     <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
-      <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Get in' : 'Kontaktujte' }}</span><br>
-      <span class="text-primary-500">{{ $currentLocale === 'en' ? 'touch' : 'nás' }}</span>
+      <span class="text-dark-800">{{ __('pages.contact.hero_title') }}</span><br>
+      <span class="text-primary-500">{{ __('pages.contact.hero_accent') }}</span>
     </h1>
       
     <!-- Description - Right aligned -->

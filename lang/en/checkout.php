@@ -36,7 +36,18 @@ return [
     'total_per_month' => 'Total / month',
     'incl_vat' => '(incl. VAT)',
     'plus_shipping' => '+ shipping',
-    
+    'gift_voucher' => 'Gift voucher',
+    'vat_before_voucher' => 'VAT is calculated on the price before voucher deduction',
+
+    // Checkout (upper case by design)
+    'hero_title' => 'CHECKOUT',
+    'hero_title_subscription' => 'SUBSCRIPTION CHECKOUT',
+    'free_caps' => 'FREE',
+    'complete_order_caps' => 'COMPLETE ORDER',
+
+    // Number format of prices in JS (toLocaleString)
+    'number_locale' => 'en-US',
+
     // Contact information
     'contact_info' => 'Contact information',
     'have_account' => 'Already have an account?',

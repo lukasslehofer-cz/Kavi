@@ -288,11 +288,9 @@ class SubscriptionHelper
         $isAfterCutoff = ! $targetMonth->isSameMonth($today);
         
         // Generate locale-aware cutoff message
-        if (app()->getLocale() === 'en') {
-            $cutoffMessage = 'Your first coffee box will be shipped on ' . $nextShipping->format('M d, Y');
-        } else {
-            $cutoffMessage = 'První kávový box bude odeslán ' . $nextShipping->format('d.m.Y');
-        }
+        $cutoffMessage = __('shop.subscription.first_box_shipping', [
+            'date' => $nextShipping->format(__('shop.subscription.first_box_date_format')),
+        ]);
         
         return [
             'next_shipping_date' => $nextShipping,

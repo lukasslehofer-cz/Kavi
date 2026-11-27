@@ -32,8 +32,10 @@ class TagController extends Controller
         $validated = $request->validate([
             'name_cs' => 'required|string|max:255',
             'name_en' => 'nullable|string|max:255',
+            'name_sk' => 'nullable|string|max:255',
             'slug_cs' => 'nullable|string|max:255|unique:tags,slug_cs',
             'slug_en' => 'nullable|string|max:255|unique:tags,slug_en',
+            'slug_sk' => 'nullable|string|max:255|unique:tags,slug_sk',
         ]);
 
         // Generate Czech slug if not provided
@@ -44,6 +46,11 @@ class TagController extends Controller
         // Generate English slug if not provided but name_en exists
         if (empty($validated['slug_en']) && !empty($validated['name_en'])) {
             $validated['slug_en'] = Tag::generateSlug($validated['name_en'], 'en');
+        }
+
+        // Generate Slovak slug if not provided but name_sk exists
+        if (empty($validated['slug_sk']) && !empty($validated['name_sk'])) {
+            $validated['slug_sk'] = Tag::generateSlug($validated['name_sk'], 'sk');
         }
 
         Tag::create($validated);
@@ -62,8 +69,10 @@ class TagController extends Controller
         $validated = $request->validate([
             'name_cs' => 'required|string|max:255',
             'name_en' => 'nullable|string|max:255',
+            'name_sk' => 'nullable|string|max:255',
             'slug_cs' => 'nullable|string|max:255|unique:tags,slug_cs,' . $tag->id,
             'slug_en' => 'nullable|string|max:255|unique:tags,slug_en,' . $tag->id,
+            'slug_sk' => 'nullable|string|max:255|unique:tags,slug_sk,' . $tag->id,
         ]);
 
         // Generate Czech slug if not provided
@@ -74,6 +83,11 @@ class TagController extends Controller
         // Generate English slug if not provided but name_en exists
         if (empty($validated['slug_en']) && !empty($validated['name_en'])) {
             $validated['slug_en'] = Tag::generateSlug($validated['name_en'], 'en', $tag->id);
+        }
+
+        // Generate Slovak slug if not provided but name_sk exists
+        if (empty($validated['slug_sk']) && !empty($validated['name_sk'])) {
+            $validated['slug_sk'] = Tag::generateSlug($validated['name_sk'], 'sk', $tag->id);
         }
 
         $tag->update($validated);

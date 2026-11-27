@@ -54,40 +54,28 @@
                             @if($pauseReason === \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Důvod pozastavení' : 'Reason for pause' }}
+                                    {{ __('emails.subscription_paused.reason_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Vaše předplatné pozastavil náš tým. Pokud si přejete v odběru pokračovat, ozvěte se nám prosím na e-mail níže.
-                                    @else
-                                    Your subscription has been paused by our team. If you would like to continue, please get in touch using the email below.
-                                    @endif
+                                    {{ __('emails.subscription_paused.reason_admin_lock', [], $locale) }}
                                 </p>
                             </div>
                             @elseif($pauseReason === \App\Models\Subscription::PAUSE_REASON_PAYMENT_FAILURE)
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Důvod pozastavení' : 'Reason for pause' }}
+                                    {{ __('emails.subscription_paused.reason_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Platbu za předplatné se nám nepodařilo strhnout ani na třetí pokus, proto tuto rozesílku vynecháváme. Předplatné pak pokračuje samo, nic obnovovat nemusíte. Před další platbou prosím zkontrolujte nebo vyměňte platební kartu ve svém účtu.
-                                    @else
-                                    We could not charge your subscription even on the third attempt, so we are skipping this shipment. Your subscription then continues on its own, there is nothing to resume. Please check or replace your payment card in your account before the next payment.
-                                    @endif
+                                    {{ __('emails.subscription_paused.reason_payment_failure', [], $locale) }}
                                 </p>
                             </div>
                             @else
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Potvrzeno' : 'Confirmed' }}
+                                    {{ __('emails.subscription_paused.confirmed', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #4a6741; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Vaše předplatné bylo úspěšně pozastaveno podle vaší žádosti.
-                                    @else
-                                    Your subscription has been successfully paused as requested.
-                                    @endif
+                                    {{ __('emails.subscription_paused.confirmed_text', [], $locale) }}
                                 </p>
                             </div>
                             @endif
@@ -96,20 +84,16 @@
                             @if($subscription->paused_until_date)
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Obnovení předplatného' : 'Subscription resumption' }}
+                                    {{ __('emails.subscription_paused.resumption_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     <span style="color: #CA4136;">→</span> {{ $subscription->paused_until_date->format('j. n. Y') }}
                                 </p>
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
                                     @if($pauseReason === \App\Models\Subscription::PAUSE_REASON_PAYMENT_FAILURE)
-                                    {{ $locale === 'cs'
-                                        ? 'Předplatné se automaticky obnoví v uvedený den a platbu za další rozesílku zkusíme strhnout znovu.'
-                                        : 'Your subscription will automatically resume on this date and we will try to charge the next shipment again.' }}
-                                    @elseif($locale === 'cs')
-                                    Předplatné se automaticky obnoví v uvedený den. Pokud budete chtít obnovit dříve, můžete tak učinit ve vašem účtu.
+                                    {{ __('emails.subscription_paused.resumption_payment_failure', [], $locale) }}
                                     @else
-                                    Your subscription will automatically resume on this date. If you want to resume earlier, you can do so from your account.
+                                    {{ __('emails.subscription_paused.resumption_text', [], $locale) }}
                                     @endif
                                 </p>
                             </div>
@@ -118,19 +102,19 @@
                             <!-- What you can do -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Můžete kdykoliv' : 'You can always' }}
+                                    {{ __('emails.subscription_paused.you_can_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
                                     @if($pauseReason === \App\Models\Subscription::PAUSE_REASON_PAYMENT_FAILURE)
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Vyměnit platební kartu' : 'Replace your payment card' }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_paused.you_can_replace_card', [], $locale) }}<br>
                                     @elseif($pauseReason !== \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Obnovit předplatné okamžitě' : 'Resume subscription immediately' }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_paused.you_can_resume', [], $locale) }}<br>
                                     @endif
                                     {{-- Při pauze z neplacení a při zámku od admina změna konfigurace v účtu nejde --}}
                                     @if(! in_array($pauseReason, [\App\Models\Subscription::PAUSE_REASON_PAYMENT_FAILURE, \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK], true))
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Změnit konfiguraci kávy' : 'Change coffee configuration' }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_paused.you_can_change_config', [], $locale) }}<br>
                                     @endif
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Aktualizovat doručovací údaje' : 'Update delivery details' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_paused.you_can_update_delivery', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -144,11 +128,11 @@
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Flexibilní pozastavení' : 'Flexible pause' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_paused.feature_flexible', [], $locale) }}
                                 </span>
                                 @if($pauseReason !== \App\Models\Subscription::PAUSE_REASON_ADMIN_LOCK)
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Obnovení kdykoliv' : 'Resume anytime' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_paused.feature_resume_anytime', [], $locale) }}
                                 </span>
                                 @endif
                             </div>

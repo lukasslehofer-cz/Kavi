@@ -135,7 +135,7 @@
                         <div class="flex justify-between items-center text-sm py-2">
                             <span class="text-xs uppercase tracking-widest text-green-600">
                                 @if($order->coupon?->is_gift_voucher)
-                                    {{ app()->getLocale() === 'cs' ? 'Dárkový voucher' : 'Gift voucher' }} ({{ $order->coupon_code }})
+                                    {{ __('checkout.gift_voucher') }} ({{ $order->coupon_code }})
                                 @else
                                     {{ __('confirmation.pricing.discount_label', ['code' => $order->coupon_code]) }}
                                 @endif
@@ -335,7 +335,7 @@
                     <!-- Contact Info -->
                     <div class="mt-8 pt-6 border-t border-dark-800/20 text-center">
                         <span class="text-xs uppercase tracking-widest text-dark-800/60 block mb-2">{{ __('confirmation.help.need_help') }}</span>
-                        @php($helpEmail = \App\Helpers\Site::current()->contactEmail())<a href="mailto:{{ $helpEmail }}" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 transition-colors">{{ $helpEmail }}</a>
+                        <a href="mailto:{{ \App\Helpers\Site::current()->contactEmail() }}" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 transition-colors">{{ \App\Helpers\Site::current()->contactEmail() }}</a>
                     </div>
                 </div>
             </div>

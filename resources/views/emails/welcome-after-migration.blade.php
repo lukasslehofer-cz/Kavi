@@ -43,34 +43,23 @@
                             <!-- Good news -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Skvělé zprávy' : 'Great news' }}
+                                    {{ __('emails.welcome_migration.great_news', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #4a6741; margin: 0; line-height: 1.6;">
-                                    @if($locale === 'cs')
-                                    Právě jsme úspěšně převedli Váš účet a předplatné do našeho nového systému.
-                                    @else
-                                    We have successfully migrated your account and subscription to our new system.
-                                    @endif
+                                    {{ __('emails.welcome_migration.migrated_text', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- What's new -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Co to pro vás znamená' : 'What this means for you' }}
+                                    {{ __('emails.welcome_migration.what_it_means', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
-                                    @if($locale === 'cs')
-                                    <span style="color: #4a6741;">→</span> Vaše stávající předplatné a způsob platby zůstávají aktivní<br>
-                                    <span style="color: #4a6741;">→</span> Nové možnosti nákupu doplňkového sortimentu<br>
-                                    <span style="color: #4a6741;">→</span> Nové varianty kávových boxů<br>
-                                    <span style="color: #4a6741;">→</span> Stejné ceny jako dříve
-                                    @else
-                                    <span style="color: #4a6741;">→</span> Your existing subscription and payment method remain active<br>
-                                    <span style="color: #4a6741;">→</span> New shopping options for additional products<br>
-                                    <span style="color: #4a6741;">→</span> New coffee box variants<br>
-                                    <span style="color: #4a6741;">→</span> Same prices as before
-                                    @endif
+                                    <span style="color: #4a6741;">→</span> {{ __('emails.welcome_migration.means_1', [], $locale) }}<br>
+                                    <span style="color: #4a6741;">→</span> {{ __('emails.welcome_migration.means_2', [], $locale) }}<br>
+                                    <span style="color: #4a6741;">→</span> {{ __('emails.welcome_migration.means_3', [], $locale) }}<br>
+                                    <span style="color: #4a6741;">→</span> {{ __('emails.welcome_migration.means_4', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -78,43 +67,43 @@
                             <!-- Subscription details -->
                             <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
                                 <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Vaše předplatné' : 'Your subscription' }}
+                                    {{ __('emails.welcome_migration.your_subscription', [], $locale) }}
                                 </div>
                                 @php
                                 $breakdown = \App\Helpers\SubscriptionPricing::forRecurringPayment($subscription);
                                 @endphp
                                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Stav' : 'Status' }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.welcome_migration.status', [], $locale) }}:</td>
                                         <td style="padding: 8px 0; font-size: 14px; text-align: right;">
                                             @if($subscription->status === 'active')
-                                                <span style="color: #4a6741;">{{ $locale === 'cs' ? 'Aktivní' : 'Active' }}</span>
+                                                <span style="color: #4a6741;">{{ __('emails.welcome_migration.status_active', [], $locale) }}</span>
                                             @elseif($subscription->status === 'paused')
-                                                <span style="color: #CA4136;">{{ $locale === 'cs' ? 'Pozastaveno' : 'Paused' }}</span>
+                                                <span style="color: #CA4136;">{{ __('emails.welcome_migration.status_paused', [], $locale) }}</span>
                                             @else
                                                 <span style="color: #1c1c1c;">{{ ucfirst($subscription->status) }}</span>
                                             @endif
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Cena' : 'Price' }}:</td>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency) }} / {{ $locale === 'cs' ? 'měsíc' : 'month' }}</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.welcome_migration.price', [], $locale) }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">{{ \App\Helpers\CurrencyHelper::formatByCurrency($breakdown->total, $breakdown->currency) }} / {{ __('emails.welcome_migration.per_month', [], $locale) }}</td>
                                     </tr>
                                     @if($subscription->next_billing_date)
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Další platba' : 'Next payment' }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.welcome_migration.next_payment', [], $locale) }}:</td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">{{ $subscription->next_billing_date->format('j. n. Y') }}</td>
                                     </tr>
                                     @endif
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Frekvence' : 'Frequency' }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.welcome_migration.frequency', [], $locale) }}:</td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">
                                             @if($subscription->frequency_months == 1)
-                                                {{ $locale === 'cs' ? 'Měsíčně' : 'Monthly' }}
+                                                {{ __('emails.frequency.monthly', [], $locale) }}
                                             @elseif($subscription->frequency_months == 3)
-                                                {{ $locale === 'cs' ? 'Čtvrtletně' : 'Quarterly' }}
+                                                {{ __('emails.frequency.quarterly', [], $locale) }}
                                             @else
-                                                {{ $locale === 'cs' ? 'Každých ' . $subscription->frequency_months . ' měsíců' : 'Every ' . $subscription->frequency_months . ' months' }}
+                                                {{ __('emails.welcome_migration.every_n_months', ['count' => $subscription->frequency_months], $locale) }}
                                             @endif
                                         </td>
                                     </tr>
@@ -125,33 +114,29 @@
                             <!-- Action required -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Potřebujeme vaši pomoc' : 'We need your help' }}
+                                    {{ __('emails.welcome_migration.help_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0; line-height: 1.6;">
-                                    @if($locale === 'cs')
-                                    Abyste se mohli přihlásit do nového systému, potřebujete si nastavit heslo:
-                                    @else
-                                    To log in to the new system, you need to set a password:
-                                    @endif
+                                    {{ __('emails.welcome_migration.help_text', [], $locale) }}
                                 </p>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 12px 0 0 0;">
-                                    <span style="color: #CA4136;">01</span> {{ $locale === 'cs' ? 'Klikněte na tlačítko níže' : 'Click the button below' }}<br>
-                                    <span style="color: #CA4136;">02</span> {{ $locale === 'cs' ? 'Nastavte si nové heslo' : 'Set your new password' }}<br>
-                                    <span style="color: #CA4136;">03</span> {{ $locale === 'cs' ? 'Přihlaste se a zkontrolujte své předplatné' : 'Log in and check your subscription' }}
+                                    <span style="color: #CA4136;">01</span> {{ __('emails.welcome_migration.step1', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">02</span> {{ __('emails.welcome_migration.step2', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">03</span> {{ __('emails.welcome_migration.step3', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 40px 0;">
                                 <a href="{{ $passwordSetUrl }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                                    {{ $locale === 'cs' ? 'Nastavit heslo' : 'Set password' }} →
+                                    {{ __('emails.welcome_migration.set_password', [], $locale) }} →
                                 </a>
                             </div>
                             
                             <!-- Alternative link -->
                             <div style="margin: 32px 0; padding: 16px 20px; background-color: #d5d7ca;">
                                 <p style="font-size: 11px; color: #76716C; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.1em;">
-                                    {{ $locale === 'cs' ? 'Nebo zkopírujte tento odkaz do prohlížeče' : 'Or copy this link to your browser' }}
+                                    {{ __('emails.welcome_migration.copy_link', [], $locale) }}
                                 </p>
                                 <p style="font-size: 12px; color: #1c1c1c; word-break: break-all; margin: 0; font-family: monospace;">
                                     {{ $passwordSetUrl }}
@@ -161,28 +146,18 @@
                             <!-- FAQ -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Časté otázky' : 'FAQ' }}
+                                    {{ __('emails.welcome_migration.faq', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
-                                    @if($locale === 'cs')
-                                    <strong>Musím zadávat platební kartu znovu?</strong><br>
-                                    <span style="font-size: 14px; color: #5a5a5a;">Ne, vaše karta zůstává uložená a funguje dál automaticky.</span><br><br>
-                                    <strong>Změní se mi datum platby?</strong><br>
-                                    <span style="font-size: 14px; color: #5a5a5a;">Ne, datum další platby zůstává stejné.</span><br><br>
-                                    <strong>Váš email pro přihlášení:</strong><br>
+                                    <strong>{{ __('emails.welcome_migration.faq_card_q', [], $locale) }}</strong><br>
+                                    <span style="font-size: 14px; color: #5a5a5a;">{{ __('emails.welcome_migration.faq_card_a', [], $locale) }}</span><br><br>
+                                    <strong>{{ __('emails.welcome_migration.faq_date_q', [], $locale) }}</strong><br>
+                                    <span style="font-size: 14px; color: #5a5a5a;">{{ __('emails.welcome_migration.faq_date_a', [], $locale) }}</span><br><br>
+                                    <strong>{{ __('emails.welcome_migration.faq_email_q', [], $locale) }}</strong><br>
                                     <span style="font-size: 14px; color: #5a5a5a;">{{ $user->email }}</span><br><br>
-                                    <strong>Jak dlouho je odkaz platný?</strong><br>
-                                    <span style="font-size: 14px; color: #5a5a5a;">Odkaz je platný 7 dní. Pokud vyprší, použijte "Zapomenuté heslo".</span>
-                                    @else
-                                    <strong>Do I need to enter my payment card again?</strong><br>
-                                    <span style="font-size: 14px; color: #5a5a5a;">No, your card remains saved and continues to work automatically.</span><br><br>
-                                    <strong>Will my payment date change?</strong><br>
-                                    <span style="font-size: 14px; color: #5a5a5a;">No, your next payment date remains the same.</span><br><br>
-                                    <strong>Your login email:</strong><br>
-                                    <span style="font-size: 14px; color: #5a5a5a;">{{ $user->email }}</span><br><br>
-                                    <strong>How long is the link valid?</strong><br>
-                                    <span style="font-size: 14px; color: #5a5a5a;">The link is valid for 7 days. If it expires, use "Forgot password".</span>
-                                    @endif
+                                    <strong>{{ __('emails.welcome_migration.faq_link_q', [], $locale) }}</strong><br>
+                                    {{-- Text s uvozovkami byl v šabloně bez escapování, proto {!! !!} --}}
+                                    <span style="font-size: 14px; color: #5a5a5a;">{!! __('emails.welcome_migration.faq_link_a', [], $locale) !!}</span>
                                 </p>
                             </div>
                             
@@ -192,7 +167,7 @@
                                     <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Nový systém' : 'New system' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.welcome_migration.feature_new_system', [], $locale) }}
                                 </span>
                             </div>
                             
@@ -203,7 +178,7 @@
                             </p>
                             
                             <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin-top: 24px; text-align: center;">
-                                <strong>{{ $locale === 'cs' ? 'Děkujeme za důvěru a těšíme se na mnoho dalších společných kávových zážitků!' : 'Thank you for your trust and we look forward to many more coffee experiences together!' }}</strong>
+                                <strong>{{ __('emails.welcome_migration.thanks', [], $locale) }}</strong>
                             </p>
                             
                             <p style="font-size: 14px; color: #5a5a5a; margin-top: 24px;">

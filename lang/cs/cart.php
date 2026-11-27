@@ -61,4 +61,19 @@ return [
     'updated' => 'Košík aktualizován',
     'removed' => 'Položka odebrána',
 
+    // Stránka košíku (velkými písmeny podle designu)
+    'hero' => [
+        'title_1' => 'NÁKUPNÍ',
+        'title_2' => 'KOŠÍK',
+    ],
+    'free_shipping_achieved' => 'DOPRAVA ZDARMA DOSAŽENA',
+    'remove_caps' => 'ODSTRANIT',
+    'clear_all_caps' => 'VYPRÁZDNIT VŠE',
+    'free_caps' => 'ZDARMA',
+    'proceed_to_payment' => 'POKRAČOVAT K PLATBĚ',
+    'recommendations_heading' => [
+        'title_1' => 'MOHLO BY VÁS',
+        'title_2' => 'TAKÉ ZAJÍMAT',
+    ],
+
 ];

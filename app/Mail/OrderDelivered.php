@@ -76,7 +76,7 @@ class OrderDelivered extends LocalizedMailable
                 return null;
             }
 
-            $currency = $this->order->currency ?: ($this->emailLocale === 'en' ? 'EUR' : 'CZK');
+            $currency = $this->order->currency ?: \App\Helpers\Site::forLocale($this->emailLocale)->currency();
 
             $this->subscriptionOffer = [
                 // UTM jen pro přehled návštěv z e-mailu; přechod na předplatné se počítá

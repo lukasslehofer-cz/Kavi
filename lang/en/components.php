@@ -22,6 +22,7 @@ return [
             'seconds' => 'sec',
         ],
         'aria' => 'Time left until orders close: :days, :hours and :minutes',
+        // Forms for 1 / 2-4 / 5 and more (English has no separate 2-4 form, so the last two are the same)
         'plural' => [
             'days' => ['day', 'days', 'days'],
             'hours' => ['hour', 'hours', 'hours'],
@@ -31,6 +32,7 @@ return [
     ],
 
     'tiers' => [
+        'title' => 'Choose your ideal coffee box',
         'bags' => ':grams g · :count bags',
         'kinds' => [
             2 => '2 specialty coffees',

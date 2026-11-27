@@ -188,7 +188,7 @@ class StripeService
                 'price_data' => [
                     'currency' => CurrencyHelper::stripeCode(),
                     'product_data' => [
-                        'name' => CurrencyHelper::isCzk() ? 'Doprava' : 'Shipping',
+                        'name' => __('shop.stripe.shipping'),
                     ],
                     'unit_amount' => (int) round($order->shipping * 100),
                 ],
@@ -224,7 +224,7 @@ class StripeService
                         'amount_off' => (int) round($adjustedDiscount * 100),
                         'currency' => CurrencyHelper::stripeCode(),
                         'duration' => 'once',
-                        'name' => $order->coupon_code ?? (CurrencyHelper::isCzk() ? 'Sleva' : 'Discount'),
+                        'name' => $order->coupon_code ?? __('shop.stripe.discount'),
                     ]);
 
                     $sessionData['discounts'] = [['coupon' => $stripeCoupon->id]];
@@ -283,7 +283,7 @@ class StripeService
                     'currency' => CurrencyHelper::stripeCode(),
                     'product_data' => [
                         'name' => $productName,
-                        'description' => CurrencyHelper::isCzk() ? 'Jednorázový kávový box bez předplatného' : 'One-time coffee box without subscription',
+                        'description' => __('shop.stripe.one_time_box_description'),
                     ],
                     'unit_amount' => \App\Helpers\SubscriptionPricing::stripeAmount($price, CurrencyHelper::code()),
                 ],
@@ -297,7 +297,7 @@ class StripeService
                 'price_data' => [
                     'currency' => CurrencyHelper::stripeCode(),
                     'product_data' => [
-                        'name' => CurrencyHelper::isCzk() ? 'Doprava' : 'Shipping',
+                        'name' => __('shop.stripe.shipping'),
                     ],
                     'unit_amount' => \App\Helpers\SubscriptionPricing::stripeAmount($shipping, CurrencyHelper::code()),
                 ],
@@ -490,21 +490,17 @@ class StripeService
      */
     private function buildProductName(array $configuration, string $type = 'recurring'): string
     {
-        $isEur = CurrencyHelper::isEur();
-
-        // Box sizes - same in both languages
+        // Box sizes - same in all languages
         $boxSize = [
             '2' => 'M Box (2× 250g)',
             '3' => 'L Box (3× 250g)',
             '4' => 'XL Box (4× 250g)',
         ];
 
-        // Box types - localized
-        $boxType = $isEur
-            ? ['espresso' => 'Espresso', 'filter' => 'Filter', 'mix' => 'Mix']
-            : ['espresso' => 'Espresso', 'filter' => 'Filtr', 'mix' => 'Mix'];
+        // Box types - localized (jazyk webu, na kterém se platí)
+        $boxType = __('shop.stripe.box_types');
 
-        $defaultCoffee = $isEur ? 'Coffee' : 'Káva';
+        $defaultCoffee = __('shop.stripe.default_coffee');
 
         $productName = ($boxSize[$configuration['amount']] ?? 'Box').' - '.($boxType[$configuration['type']] ?? $defaultCoffee);
 
@@ -515,10 +511,10 @@ class StripeService
         // Add suffix based on type
         switch ($type) {
             case 'one_time':
-                $productName .= $isEur ? ' (One-time)' : ' (Jednorázově)';
+                $productName .= __('shop.stripe.suffix_one_time');
                 break;
             case 'first_payment':
-                $productName .= $isEur ? ' (First payment)' : ' (První platba)';
+                $productName .= __('shop.stripe.suffix_first_payment');
                 break;
                 // 'recurring' - no suffix
         }
@@ -2597,8 +2593,8 @@ class StripeService
                     'price_data' => [
                         'currency' => $currency,
                         'product_data' => [
-                            'name' => (CurrencyHelper::isCzk() ? 'Platba předplatného - ' : 'Subscription payment - ').($subscription->subscription_number ?? '#'.$subscription->id),
-                            'description' => CurrencyHelper::isCzk() ? 'Neuhrazená platba za kávové předplatné' : 'Unpaid subscription payment',
+                            'name' => __('shop.stripe.subscription_payment', ['number' => $subscription->subscription_number ?? '#'.$subscription->id], EmailService::getLocaleFromSubscription($subscription)),
+                            'description' => __('shop.stripe.unpaid_subscription_payment', [], EmailService::getLocaleFromSubscription($subscription)),
                         ],
                         'unit_amount' => $amount,
                     ],
@@ -2657,7 +2653,7 @@ class StripeService
                     'price_data' => [
                         'currency' => strtolower($breakdown->currency),
                         'product_data' => [
-                            'name' => ($isEur ? 'Coffee subscription - shipment ' : 'Kávové předplatné - rozesílka ').$shipmentLabel,
+                            'name' => __('shop.stripe.subscription_shipment', ['date' => $shipmentLabel], EmailService::getLocaleFromSubscription($subscription)),
                             'description' => $subscriptionLabel,
                         ],
                         'unit_amount' => \App\Helpers\SubscriptionPricing::stripeAmount($breakdown->total, $breakdown->currency),
@@ -2668,7 +2664,7 @@ class StripeService
                 'mode' => 'payment',
                 'payment_intent_data' => [
                     'setup_future_usage' => 'off_session',
-                    'description' => ($isEur ? 'Coffee subscription - ' : 'Kávové předplatné - ').$subscriptionLabel.' ('.$shipmentLabel.')',
+                    'description' => __('shop.stripe.subscription_with_shipment', ['number' => $subscriptionLabel, 'date' => $shipmentLabel], EmailService::getLocaleFromSubscription($subscription)),
                     'metadata' => [
                         'subscription_id' => $subscription->id,
                         'shipment_id' => $shipment->id,
@@ -3230,7 +3226,7 @@ class StripeService
                 'payment_method' => $paymentMethodId,
                 'confirm' => true,
                 'off_session' => true, // Important: tells Stripe this is automated
-                'description' => ($isEur ? 'Coffee subscription - ' : 'Kávové předplatné - ').($subscription->subscription_number ?? '#'.$subscription->id),
+                'description' => __('shop.stripe.subscription', ['number' => $subscription->subscription_number ?? '#'.$subscription->id], EmailService::getLocaleFromSubscription($subscription)),
                 'metadata' => [
                     'subscription_id' => $subscription->id,
                     'subscription_number' => $subscription->subscription_number ?? '',

@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
-@section('title', $roastery->getName() . ' - ' . __('roasteries.page_title') . ' - ' . (app()->getLocale() === 'en' ? 'KAVI' : 'KAVI.cz'))
+@section('title', $roastery->getName() . ' - ' . __('roasteries.page_title') . ' - ' . \App\Helpers\Site::current()->name())
 
 @php
-    $currentLocale = app()->getLocale();
     $roasteryDescription = Str::limit(strip_tags($roastery->getShortDescription() ?: $roastery->getFullDescription()), 160);
     $siteUrl = \App\Helpers\Site::current()->url();
     
@@ -26,13 +25,13 @@
     $countryCode = $countryCodes[$roastery->country] ?? strtoupper(substr($roastery->country, 0, 2));
 @endphp
 
-@section('meta_description', $roasteryDescription ?: ($currentLocale === 'en' ? 'Discover ' . $roastery->getName() . ' - premium coffee roaster from ' . $roastery->country . '. Explore their exceptional coffees at KAVI.' : 'Objevte ' . $roastery->getName() . ' - prémiovou pražírnu z ' . $roastery->country . '. Prozkoumejte jejich výjimečné kávy na KAVI.cz.'))
+@section('meta_description', $roasteryDescription ?: __('roasteries.show.meta_description', ['name' => $roastery->getName(), 'country' => $roastery->getCountry(), 'site' => \App\Helpers\Site::current()->name()]))
 
 @section('og_title')
-{{ $roastery->getName() }} {{ $roastery->country_flag }} | {{ $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz' }}
+{{ $roastery->getName() }} {{ $roastery->country_flag }} | {{ \App\Helpers\Site::current()->name() }}
 @endsection
 
-@section('og_description', $roasteryDescription ?: ($currentLocale === 'en' ? 'Premium coffee roaster from ' . $roastery->country . '. Discover their exceptional specialty coffees.' : 'Prémiová pražírna z ' . $roastery->country . '. Objevte jejich výjimečné výběrové kávy.'))
+@section('og_description', $roasteryDescription ?: __('roasteries.show.og_description', ['country' => $roastery->getCountry()]))
 
 @section('og_image')
 {{ $roastery->image ? url($roastery->image) : $siteUrl . '/images/og-image.jpg' }}
@@ -81,7 +80,7 @@
                 {
                     "@type": "ListItem",
                     "position": 1,
-                    "name": "{{ $currentLocale === 'en' ? 'Home' : 'Domů' }}",
+                    "name": "{{ __('messages.general.home') }}",
                     "item": "{{ $siteUrl }}"
                 },
                 {
@@ -215,7 +214,7 @@
         @if($roastery->address)
         <div>
           <span class="block text-xs uppercase tracking-widest text-warm-500 mb-2">
-            {{ $currentLocale === 'en' ? 'Address' : 'Adresa' }}
+            {{ __('roasteries.show.address') }}
           </span>
           <span class="text-sm uppercase tracking-widest text-dark-800">{{ $roastery->address }}</span>
         </div>
@@ -250,7 +249,7 @@
     
     <!-- Section Heading -->
     <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight leading-tight sm:leading-[0.95] mb-10">
-      {{ $currentLocale === 'en' ? 'Coffees from' : 'Kávy od' }} <span class="text-primary-500">{{ $roastery->getName() }}</span>
+      {{ __('roasteries.show.coffees_from') }} <span class="text-primary-500">{{ $roastery->getName() }}</span>
     </h2>
 
     @php $sectionNumber = 1; @endphp
@@ -261,7 +260,7 @@
       <!-- Section Label -->
       <div class="mb-2">
         <span class="text-xs uppercase text-primary-500" style="letter-spacing: 0.2em;">{{ str_pad($sectionNumber, 2, '0', STR_PAD_LEFT) }}</span>
-        <span class="text-xs uppercase text-dark-800 ml-2" style="letter-spacing: 0.2em;">/ {{ $currentLocale === 'en' ? 'CURRENT EDIT' : 'V AKTUÁLNÍM PŘEDPLATNÉM' }}</span>
+        <span class="text-xs uppercase text-dark-800 ml-2" style="letter-spacing: 0.2em;">/ {{ __('roasteries.show.section_current') }}</span>
       </div>
       @php $sectionNumber++; @endphp
       
@@ -361,9 +360,13 @@
               @if($product->attributes && is_array($product->attributes))
               <div class="border-t border-b border-dark-800 py-6 sm:py-8 mt-8 grid grid-cols-2 gap-y-4">
                 @php
-                  $mainAttributes = $currentLocale === 'en' ? 
-                    ['origin' => 'Origin', 'altitude' => 'Altitude', 'processing' => 'Processing', 'variety' => 'Variety', 'flavor_notes' => 'Flavor notes'] :
-                    ['origin' => 'Původ', 'altitude' => 'Nadmořská výška', 'processing' => 'Zpracování', 'variety' => 'Odrůda', 'flavor_notes' => 'Chuťové tóny'];
+                  $mainAttributes = [
+                    'origin' => __('roasteries.show.attributes.origin'),
+                    'altitude' => __('roasteries.show.attributes.altitude'),
+                    'processing' => __('roasteries.show.attributes.processing'),
+                    'variety' => __('roasteries.show.attributes.variety'),
+                    'flavor_notes' => __('roasteries.show.attributes.flavor_notes'),
+                  ];
                 @endphp
                 @foreach($mainAttributes as $key => $label)
                   @php $attrValue = $product->getTranslatedAttribute($key); @endphp
@@ -416,7 +419,7 @@
       <!-- Section Label -->
       <div class="mb-2">
         <span class="text-xs uppercase text-primary-500" style="letter-spacing: 0.2em;">{{ str_pad($sectionNumber, 2, '0', STR_PAD_LEFT) }}</span>
-        <span class="text-xs uppercase text-dark-800 ml-2" style="letter-spacing: 0.2em;">/ {{ $currentLocale === 'en' ? 'SHOP COLLECTION' : 'DALŠÍ KÁVY' }}</span>
+        <span class="text-xs uppercase text-dark-800 ml-2" style="letter-spacing: 0.2em;">/ {{ __('roasteries.show.section_shop') }}</span>
       </div>
       @php $sectionNumber++; @endphp
       
@@ -484,7 +487,7 @@
       <!-- Section Label -->
       <div class="mb-2">
         <span class="text-xs uppercase text-primary-500" style="letter-spacing: 0.2em;">{{ str_pad($sectionNumber, 2, '0', STR_PAD_LEFT) }}</span>
-        <span class="text-xs uppercase text-dark-800 ml-2" style="letter-spacing: 0.2em;">/ {{ $currentLocale === 'en' ? 'PAST CURATIONS' : 'MINULÉ KÁVY' }}</span>
+        <span class="text-xs uppercase text-dark-800 ml-2" style="letter-spacing: 0.2em;">/ {{ __('roasteries.show.section_past') }}</span>
       </div>
       @php $sectionNumber++; @endphp
       
@@ -550,16 +553,16 @@
       <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
         <!-- Large Editorial Heading -->
         <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-          {{ $currentLocale === 'en' ? 'Want to taste coffees from ' . $roastery->getName() . '?' : 'Chcete ochutnat kávy od ' . $roastery->getName() . '?' }}
+          {{ __('roasteries.show.cta_heading', ['name' => $roastery->getName()]) }}
         </h2>
 
         <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
-          {{ $currentLocale === 'en' ? 'With our subscription, you can taste coffees from various European roasters every month. Fresh specialty coffee delivered right to your door.' : 'S naším předplatným můžete každý měsíc ochutnat kávy od různých evropských pražíren. Čerstvá výběrová káva přímo k vám domů.' }}
+          {{ __('roasteries.show.cta_text') }}
         </p>
 
         <!-- CTA Link -->
         <a href="{{ localizedRoute('home') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-          <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
+          <span>{{ __('roasteries.learn_more_subscription') }}</span>
           <span class="text-primary-500 group-hover:translate-x-1 transition-transform">→</span>
         </a>
       </div>

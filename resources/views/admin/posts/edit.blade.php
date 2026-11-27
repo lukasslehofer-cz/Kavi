@@ -3,7 +3,7 @@
 @section('title', 'Upravit článek - Admin')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-8">
         <h1 class="font-display text-4xl font-bold text-coffee-900 mb-2">Upravit článek</h1>
         <p class="text-coffee-600">{{ $post->title_cs }}</p>
@@ -15,7 +15,7 @@
 
         <div class="space-y-6">
             <!-- Title -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Název článku 🇨🇿 *</label>
                     <input type="text" name="title_cs" id="title_cs" value="{{ old('title_cs', $post->title_cs) }}" required 
@@ -39,10 +39,25 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Název článku 🇸🇰</span>
+                        <button type="button" onclick="translateField('title_cs', 'title_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <input type="text" name="title_sk" id="title_sk" value="{{ old('title_sk', $post->title_sk) }}"
+                           placeholder="Slovenský název článku"
+                           class="input @error('title_sk') border-red-500 @enderror">
+                    @error('title_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <!-- Slugs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇨🇿</label>
                     <input type="text" name="slug_cs" value="{{ old('slug_cs', $post->slug_cs) }}" 
@@ -60,6 +75,15 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                     <p class="text-xs text-coffee-600 mt-1">e.g. "how-to-brew-coffee"</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇸🇰</label>
+                    <input type="text" name="slug_sk" value="{{ old('slug_sk', $post->slug_sk) }}"
+                           class="input @error('slug_sk') border-red-500 @enderror">
+                    @error('slug_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">napr. "ako-spravne-varit-kavu"</p>
                 </div>
             </div>
 
@@ -92,7 +116,7 @@
             </div>
 
             <!-- Perex -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Perex 🇨🇿</label>
                     <textarea name="perex_cs" id="perex_cs" rows="3" 
@@ -117,10 +141,25 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Perex 🇸🇰</span>
+                        <button type="button" onclick="translateField('perex_cs', 'perex_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <textarea name="perex_sk" id="perex_sk" rows="3"
+                              placeholder="Krátky úvod k článku..."
+                              class="input @error('perex_sk') border-red-500 @enderror">{{ old('perex_sk', $post->perex_sk) }}</textarea>
+                    @error('perex_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <!-- Content -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Obsah článku 🇨🇿 *</label>
                     <textarea name="content_cs" id="content_cs" rows="15" required 
@@ -142,6 +181,21 @@
                               placeholder="English content..."
                               class="input @error('content_en') border-red-500 @enderror">{{ old('content_en', $post->content_en) }}</textarea>
                     @error('content_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Obsah článku 🇸🇰</span>
+                        <button type="button" onclick="translateField('content_cs', 'content_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <textarea name="content_sk" id="content_sk" rows="15"
+                              placeholder="Slovenský obsah..."
+                              class="input @error('content_sk') border-red-500 @enderror">{{ old('content_sk', $post->content_sk) }}</textarea>
+                    @error('content_sk')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -232,8 +286,8 @@ function previewImage(event) {
     }
 }
 
-// AI Translation function
-async function translateField(sourceId, targetId) {
+// AI Translation function (targetLang: 'EN' nebo 'SK')
+async function translateField(sourceId, targetId, targetLang = 'EN') {
     const sourceElement = document.getElementById(sourceId);
     const targetElement = document.getElementById(targetId);
     const button = event.target.closest('button');
@@ -272,7 +326,7 @@ async function translateField(sourceId, targetId) {
             body: JSON.stringify({
                 text: sourceText,
                 source_lang: 'CS',
-                target_lang: 'EN'
+                target_lang: targetLang
             })
         });
         

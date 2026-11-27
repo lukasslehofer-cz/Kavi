@@ -3,7 +3,7 @@
 @section('title', 'Přidat produkt - Admin')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-8">
         <h1 class="font-display text-4xl font-bold text-coffee-900 mb-2">Přidat nový produkt</h1>
         <p class="text-coffee-600">Vytvořte nový produkt v eshopu</p>
@@ -13,7 +13,7 @@
         @csrf
 
         <div class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Název produktu 🇨🇿</label>
                     <input type="text" name="name" id="name" value="{{ old('name') }}" required 
@@ -34,6 +34,21 @@
                            placeholder="English product name"
                            class="input @error('name_en') border-red-500 @enderror">
                     @error('name_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Název produktu 🇸🇰</span>
+                        <button type="button" onclick="translateField('name', 'name_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <input type="text" name="name_sk" id="name_sk" value="{{ old('name_sk') }}"
+                           placeholder="Slovenský název produktu"
+                           class="input @error('name_sk') border-red-500 @enderror">
+                    @error('name_sk')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -80,7 +95,7 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Krátký popis 🇨🇿</label>
                     <input type="text" name="short_description" id="short_description" value="{{ old('short_description') }}" 
@@ -104,9 +119,24 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Krátký popis 🇸🇰</span>
+                        <button type="button" onclick="translateField('short_description', 'short_description_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <input type="text" name="short_description_sk" id="short_description_sk" value="{{ old('short_description_sk') }}"
+                           placeholder="Slovenský krátký popis"
+                           class="input @error('short_description_sk') border-red-500 @enderror">
+                    @error('short_description_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Detailní popis 🇨🇿</label>
                     <textarea name="description" id="description" rows="6" required 
@@ -128,6 +158,21 @@
                               placeholder="English detailed description"
                               class="input @error('description_en') border-red-500 @enderror">{{ old('description_en') }}</textarea>
                     @error('description_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                        <span>Detailní popis 🇸🇰</span>
+                        <button type="button" onclick="translateField('description', 'description_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            Přeložit
+                        </button>
+                    </label>
+                    <textarea name="description_sk" id="description_sk" rows="6"
+                              placeholder="Slovenský detailní popis"
+                              class="input @error('description_sk') border-red-500 @enderror">{{ old('description_sk') }}</textarea>
+                    @error('description_sk')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -212,7 +257,7 @@
                     <span class="text-xs text-coffee-600 italic">Zobrazeno pro kategorii: Espresso, Filtr, Bezkofeinová</span>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Původ kávy 🇨🇿</label>
                         <input type="text" name="origin" id="origin" value="{{ old('origin') }}" 
@@ -237,6 +282,21 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                            <span>Původ kávy 🇸🇰</span>
+                            <button type="button" onclick="translateField('origin', 'origin_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                Přeložit
+                            </button>
+                        </label>
+                        <input type="text" name="origin_sk" id="origin_sk" value="{{ old('origin_sk') }}"
+                               placeholder="napr. Etiópia, Keňa, Honduras..."
+                               class="input @error('origin_sk') border-red-500 @enderror">
+                        @error('origin_sk')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div>
@@ -250,7 +310,7 @@
                     <p class="text-xs text-coffee-600 mt-1">Pouze číslo nebo rozsah v metrech, jednotka se na webu doplní automaticky (CZ: m n.m., EN: masl).</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Zpracování 🇨🇿</label>
                         <input type="text" name="processing" id="processing" value="{{ old('processing') }}" 
@@ -275,9 +335,24 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                            <span>Zpracování 🇸🇰</span>
+                            <button type="button" onclick="translateField('processing', 'processing_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                Přeložit
+                            </button>
+                        </label>
+                        <input type="text" name="processing_sk" id="processing_sk" value="{{ old('processing_sk') }}"
+                               placeholder="napr. Praná, Prírodná, Honey..."
+                               class="input @error('processing_sk') border-red-500 @enderror">
+                        @error('processing_sk')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Odrůda 🇨🇿</label>
                         <input type="text" name="variety" id="variety" value="{{ old('variety') }}" 
@@ -302,9 +377,24 @@
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                            <span>Odrůda 🇸🇰</span>
+                            <button type="button" onclick="translateField('variety', 'variety_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                Přeložit
+                            </button>
+                        </label>
+                        <input type="text" name="variety_sk" id="variety_sk" value="{{ old('variety_sk') }}"
+                               placeholder="napr. Arabica, Bourbon, Caturra..."
+                               class="input @error('variety_sk') border-red-500 @enderror">
+                        @error('variety_sk')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-coffee-900 mb-2">Chuťové tóny 🇨🇿</label>
                         <textarea name="flavor_notes" id="flavor_notes" rows="3" 
@@ -326,6 +416,21 @@
                                   placeholder="e.g. citrus, chocolate, caramel, nuts..."
                                   class="input @error('flavor_notes_en') border-red-500 @enderror">{{ old('flavor_notes_en') }}</textarea>
                         @error('flavor_notes_en')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-coffee-900 mb-2 flex items-center justify-between">
+                            <span>Chuťové tóny 🇸🇰</span>
+                            <button type="button" onclick="translateField('flavor_notes', 'flavor_notes_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                Přeložit
+                            </button>
+                        </label>
+                        <textarea name="flavor_notes_sk" id="flavor_notes_sk" rows="3"
+                                  placeholder="napr. citrus, čokoláda, karamel, oriešky..."
+                                  class="input @error('flavor_notes_sk') border-red-500 @enderror">{{ old('flavor_notes_sk') }}</textarea>
+                        @error('flavor_notes_sk')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -594,8 +699,8 @@ function previewGallery(event) {
     }
 }
 
-// AI Translation function
-async function translateField(sourceId, targetId) {
+// AI Translation function (targetLang: 'EN' nebo 'SK')
+async function translateField(sourceId, targetId, targetLang = 'EN') {
     const sourceElement = document.getElementById(sourceId);
     const targetElement = document.getElementById(targetId);
     const button = event.target.closest('button');
@@ -634,12 +739,12 @@ async function translateField(sourceId, targetId) {
             body: JSON.stringify({
                 text: sourceText,
                 source_lang: 'CS',
-                target_lang: 'EN'
+                target_lang: targetLang
             })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             targetElement.value = data.translation;
             // Flash success
@@ -739,16 +844,16 @@ document.addEventListener('DOMContentLoaded', function() {
 // Custom attributes management
 let customAttrIndex = 0;
 
-function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = '') {
+function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = '', labelSk = '', valueSk = '') {
     const container = document.getElementById('custom-attributes-container');
     const index = customAttrIndex++;
 
     const row = document.createElement('div');
-    row.className = 'grid grid-cols-12 gap-2 p-4 bg-white rounded-lg border border-blue-200 mb-3';
+    row.className = 'grid grid-cols-1 lg:grid-cols-3 gap-2 p-4 bg-white rounded-lg border border-blue-200 mb-3';
     row.id = `custom-attr-${index}`;
 
     row.innerHTML = `
-        <div class="col-span-3">
+        <div>
             <label class="block text-xs font-medium text-coffee-900 mb-1">Název 🇨🇿</label>
             <input type="text"
                    name="custom_attributes[${index}][label_cs]"
@@ -757,11 +862,11 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    class="input text-sm"
                    required>
         </div>
-        <div class="col-span-2">
+        <div>
             <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
                 <span>Name 🇬🇧</span>
                 <button type="button"
-                        onclick="translateCustomLabel(${index})"
+                        onclick="translateCustomLabel(${index}, 'EN')"
                         class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
                     →
                 </button>
@@ -773,7 +878,23 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    class="input text-sm"
                    id="custom-attr-label-en-${index}">
         </div>
-        <div class="col-span-3">
+        <div>
+            <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
+                <span>Název 🇸🇰</span>
+                <button type="button"
+                        onclick="translateCustomLabel(${index}, 'SK')"
+                        class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
+                    →
+                </button>
+            </label>
+            <input type="text"
+                   name="custom_attributes[${index}][label_sk]"
+                   value="${labelSk}"
+                   placeholder="Materiál"
+                   class="input text-sm"
+                   id="custom-attr-label-sk-${index}">
+        </div>
+        <div>
             <label class="block text-xs font-medium text-coffee-900 mb-1">Hodnota 🇨🇿</label>
             <input type="text"
                    name="custom_attributes[${index}][value_cs]"
@@ -783,11 +904,11 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    required
                    id="custom-attr-value-cs-${index}">
         </div>
-        <div class="col-span-3">
+        <div>
             <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
                 <span>Value 🇬🇧</span>
                 <button type="button"
-                        onclick="translateCustomValue(${index})"
+                        onclick="translateCustomValue(${index}, 'EN')"
                         class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
                     →
                 </button>
@@ -799,10 +920,26 @@ function addCustomAttribute(labelCs = '', labelEn = '', valueCs = '', valueEn = 
                    class="input text-sm"
                    id="custom-attr-value-en-${index}">
         </div>
-        <div class="col-span-1 flex items-end">
+        <div>
+            <label class="block text-xs font-medium text-coffee-900 mb-1 flex items-center justify-between">
+                <span>Hodnota 🇸🇰</span>
+                <button type="button"
+                        onclick="translateCustomValue(${index}, 'SK')"
+                        class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-0.5 rounded">
+                    →
+                </button>
+            </label>
+            <input type="text"
+                   name="custom_attributes[${index}][value_sk]"
+                   value="${valueSk}"
+                   placeholder="Nehrdzavejúca oceľ"
+                   class="input text-sm"
+                   id="custom-attr-value-sk-${index}">
+        </div>
+        <div class="col-span-full flex justify-end">
             <button type="button"
                     onclick="removeCustomAttribute(${index})"
-                    class="btn btn-sm bg-red-100 hover:bg-red-200 text-red-700 w-full">×</button>
+                    class="btn btn-sm bg-red-100 hover:bg-red-200 text-red-700">× Odebrat parametr</button>
         </div>
     `;
 
@@ -814,15 +951,13 @@ function removeCustomAttribute(index) {
     if (row) row.remove();
 }
 
-async function translateCustomLabel(index) {
-    const csInput = document.querySelector(`input[name="custom_attributes[${index}][label_cs]"]`);
-    const enInput = document.getElementById(`custom-attr-label-en-${index}`);
-
-    if (!csInput || !enInput) return;
+// Překlad vlastního parametru z CZ do EN/SK (targetLang: 'EN' nebo 'SK')
+async function translateCustomAttribute(csInput, targetInput, targetLang, emptyMessage) {
+    if (!csInput || !targetInput) return;
 
     const sourceText = csInput.value.trim();
     if (!sourceText) {
-        alert('Nejprve vyplňte český název.');
+        alert(emptyMessage);
         return;
     }
 
@@ -837,57 +972,37 @@ async function translateCustomLabel(index) {
             body: JSON.stringify({
                 text: sourceText,
                 source_lang: 'CS',
-                target_lang: 'EN'
+                target_lang: targetLang
             })
         });
 
         const data = await response.json();
         if (data.success) {
-            enInput.value = data.translation;
-            enInput.classList.add('ring-2', 'ring-green-500');
-            setTimeout(() => enInput.classList.remove('ring-2', 'ring-green-500'), 1500);
+            targetInput.value = data.translation;
+            targetInput.classList.add('ring-2', 'ring-green-500');
+            setTimeout(() => targetInput.classList.remove('ring-2', 'ring-green-500'), 1500);
         }
     } catch (error) {
         console.error('Translation error:', error);
     }
 }
 
-async function translateCustomValue(index) {
-    const csInput = document.getElementById(`custom-attr-value-cs-${index}`);
-    const enInput = document.getElementById(`custom-attr-value-en-${index}`);
+function translateCustomLabel(index, targetLang = 'EN') {
+    return translateCustomAttribute(
+        document.querySelector(`input[name="custom_attributes[${index}][label_cs]"]`),
+        document.getElementById(`custom-attr-label-${targetLang.toLowerCase()}-${index}`),
+        targetLang,
+        'Nejprve vyplňte český název.'
+    );
+}
 
-    if (!csInput || !enInput) return;
-
-    const sourceText = csInput.value.trim();
-    if (!sourceText) {
-        alert('Nejprve vyplňte českou hodnotu.');
-        return;
-    }
-
-    try {
-        const response = await fetch('{{ route("admin.translate") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                text: sourceText,
-                source_lang: 'CS',
-                target_lang: 'EN'
-            })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-            enInput.value = data.translation;
-            enInput.classList.add('ring-2', 'ring-green-500');
-            setTimeout(() => enInput.classList.remove('ring-2', 'ring-green-500'), 1500);
-        }
-    } catch (error) {
-        console.error('Translation error:', error);
-    }
+function translateCustomValue(index, targetLang = 'EN') {
+    return translateCustomAttribute(
+        document.getElementById(`custom-attr-value-cs-${index}`),
+        document.getElementById(`custom-attr-value-${targetLang.toLowerCase()}-${index}`),
+        targetLang,
+        'Nejprve vyplňte českou hodnotu.'
+    );
 }
 </script>
 @endsection

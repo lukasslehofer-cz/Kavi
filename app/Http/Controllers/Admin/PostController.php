@@ -29,7 +29,8 @@ class PostController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title_cs', 'like', "%{$search}%")
-                  ->orWhere('title_en', 'like', "%{$search}%");
+                  ->orWhere('title_en', 'like', "%{$search}%")
+                  ->orWhere('title_sk', 'like', "%{$search}%");
             });
         }
 
@@ -73,12 +74,16 @@ class PostController extends Controller
         $validated = $request->validate([
             'title_cs' => 'required|string|max:255',
             'title_en' => 'nullable|string|max:255',
+            'title_sk' => 'nullable|string|max:255',
             'slug_cs' => 'nullable|string|max:255|unique:posts,slug_cs',
             'slug_en' => 'nullable|string|max:255|unique:posts,slug_en',
+            'slug_sk' => 'nullable|string|max:255|unique:posts,slug_sk',
             'perex_cs' => 'nullable|string',
             'perex_en' => 'nullable|string',
+            'perex_sk' => 'nullable|string',
             'content_cs' => 'required|string',
             'content_en' => 'nullable|string',
+            'content_sk' => 'nullable|string',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'author' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published',
@@ -97,6 +102,11 @@ class PostController extends Controller
         // Generate English slug if not provided but title_en exists
         if (empty($validated['slug_en']) && !empty($validated['title_en'])) {
             $validated['slug_en'] = Post::generateSlug($validated['title_en'], 'en');
+        }
+
+        // Generate Slovak slug if not provided but title_sk exists
+        if (empty($validated['slug_sk']) && !empty($validated['title_sk'])) {
+            $validated['slug_sk'] = Post::generateSlug($validated['title_sk'], 'sk');
         }
 
         // Handle published_at
@@ -149,12 +159,16 @@ class PostController extends Controller
         $validated = $request->validate([
             'title_cs' => 'required|string|max:255',
             'title_en' => 'nullable|string|max:255',
+            'title_sk' => 'nullable|string|max:255',
             'slug_cs' => 'nullable|string|max:255|unique:posts,slug_cs,' . $post->id,
             'slug_en' => 'nullable|string|max:255|unique:posts,slug_en,' . $post->id,
+            'slug_sk' => 'nullable|string|max:255|unique:posts,slug_sk,' . $post->id,
             'perex_cs' => 'nullable|string',
             'perex_en' => 'nullable|string',
+            'perex_sk' => 'nullable|string',
             'content_cs' => 'required|string',
             'content_en' => 'nullable|string',
+            'content_sk' => 'nullable|string',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'author' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published',
@@ -173,6 +187,11 @@ class PostController extends Controller
         // Generate English slug if not provided but title_en exists
         if (empty($validated['slug_en']) && !empty($validated['title_en'])) {
             $validated['slug_en'] = Post::generateSlug($validated['title_en'], 'en', $post->id);
+        }
+
+        // Generate Slovak slug if not provided but title_sk exists
+        if (empty($validated['slug_sk']) && !empty($validated['title_sk'])) {
+            $validated['slug_sk'] = Post::generateSlug($validated['title_sk'], 'sk', $post->id);
         }
 
         // Handle published_at

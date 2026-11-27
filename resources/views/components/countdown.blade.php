@@ -17,9 +17,10 @@
         'seconds' => $left % 60,
     ];
     $plural = __('components.countdown.plural');
-    $pluralize = function (string $unit, int $n) use ($plural, $currentLocale) {
+    // Tvary pro 1 / 2–4 / 5 a víc z lang souboru (jazyk bez tvaru pro 2–4 tam má dvakrát stejný tvar)
+    $pluralize = function (string $unit, int $n) use ($plural) {
         $forms = $plural[$unit];
-        $index = $n === 1 ? 0 : (($currentLocale !== 'en' && $n >= 2 && $n <= 4) ? 1 : 2);
+        $index = $n === 1 ? 0 : (($n >= 2 && $n <= 4) ? 1 : 2);
         return $n . ' ' . $forms[$index];
     };
     $ariaLabel = __('components.countdown.aria', [

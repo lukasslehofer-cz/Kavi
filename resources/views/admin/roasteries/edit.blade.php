@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="p-6">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900">Upravit pražírnu</h1>
             <p class="text-gray-600 mt-1">Upravte informace o pražírně</p>
@@ -20,7 +20,7 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Základní informace</h2>
                     
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Název pražírny 🇨🇿 *</label>
                                 <input type="text" name="name" id="name" value="{{ old('name', $roastery->name) }}" required 
@@ -44,9 +44,24 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                                    <span>Název pražírny 🇸🇰</span>
+                                    <button type="button" onclick="translateField('name', 'name_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                        Přeložit
+                                    </button>
+                                </label>
+                                <input type="text" name="name_sk" id="name_sk" value="{{ old('name_sk', $roastery->name_sk) }}"
+                                       placeholder="Slovenský název pražírny"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name_sk') border-red-500 @enderror">
+                                @error('name_sk')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Země 🇨🇿 *</label>
                                 <select name="country" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('country') border-red-500 @enderror" id="country-select">
@@ -64,7 +79,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
                                     <span>Country 🇬🇧</span>
-                                    <button type="button" onclick="translateCountry()" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                    <button type="button" onclick="translateCountry('country_en', 'EN')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
                                         Přeložit
                                     </button>
@@ -76,9 +91,24 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                                    <span>Země 🇸🇰</span>
+                                    <button type="button" onclick="translateCountry('country_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                        Přeložit
+                                    </button>
+                                </label>
+                                <input type="text" name="country_sk" id="country_sk" value="{{ old('country_sk', $roastery->country_sk) }}"
+                                       placeholder="napr. Česko, Nemecko..."
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('country_sk') border-red-500 @enderror">
+                                @error('country_sk')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Město 🇨🇿</label>
                                 <input type="text" name="city" id="city" value="{{ old('city', $roastery->city) }}" 
@@ -99,6 +129,21 @@
                                        placeholder="English city name"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('city_en') border-red-500 @enderror">
                                 @error('city_en')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                                    <span>Město 🇸🇰</span>
+                                    <button type="button" onclick="translateField('city', 'city_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                        Přeložit
+                                    </button>
+                                </label>
+                                <input type="text" name="city_sk" id="city_sk" value="{{ old('city_sk', $roastery->city_sk) }}"
+                                       placeholder="Slovenský název města"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('city_sk') border-red-500 @enderror">
+                                @error('city_sk')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -145,7 +190,7 @@
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Popisy / Descriptions</h2>
                     
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Krátký popis 🇨🇿 (max 500 znaků)</label>
                                 <textarea name="short_description" id="short_description" rows="3" maxlength="500" 
@@ -170,9 +215,24 @@
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                                    <span>Krátký popis 🇸🇰 (max 500 znaků)</span>
+                                    <button type="button" onclick="translateField('short_description', 'short_description_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                        Přeložit
+                                    </button>
+                                </label>
+                                <textarea name="short_description_sk" id="short_description_sk" rows="3" maxlength="500"
+                                          placeholder="Slovenský krátký popis"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('short_description_sk') border-red-500 @enderror">{{ old('short_description_sk', $roastery->short_description_sk) }}</textarea>
+                                @error('short_description_sk')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Plný popis 🇨🇿</label>
                                 <textarea name="full_description" id="full_description" rows="8" 
@@ -194,6 +254,21 @@
                                           placeholder="English full description"
                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('full_description_en') border-red-500 @enderror">{{ old('full_description_en', $roastery->full_description_en) }}</textarea>
                                 @error('full_description_en')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+                                    <span>Plný popis 🇸🇰</span>
+                                    <button type="button" onclick="translateField('full_description', 'full_description_sk', 'SK')" class="translate-btn text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                        Přeložit
+                                    </button>
+                                </label>
+                                <textarea name="full_description_sk" id="full_description_sk" rows="8"
+                                          placeholder="Slovenský plný popis"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('full_description_sk') border-red-500 @enderror">{{ old('full_description_sk', $roastery->full_description_sk) }}</textarea>
+                                @error('full_description_sk')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -367,8 +442,8 @@ function previewGallery(event) {
     });
 }
 
-// AI Translation function
-async function translateField(sourceId, targetId) {
+// AI Translation function (targetLang: 'EN' nebo 'SK')
+async function translateField(sourceId, targetId, targetLang = 'EN') {
     const sourceElement = document.getElementById(sourceId);
     const targetElement = document.getElementById(targetId);
     const button = event.target.closest('button');
@@ -407,7 +482,7 @@ async function translateField(sourceId, targetId) {
             body: JSON.stringify({
                 text: sourceText,
                 source_lang: 'CS',
-                target_lang: 'EN'
+                target_lang: targetLang
             })
         });
         
@@ -433,10 +508,10 @@ async function translateField(sourceId, targetId) {
     }
 }
 
-// Translate country from select dropdown
-async function translateCountry() {
+// Translate country from select dropdown (targetLang: 'EN' nebo 'SK')
+async function translateCountry(targetId = 'country_en', targetLang = 'EN') {
     const countrySelect = document.getElementById('country-select');
-    const targetElement = document.getElementById('country_en');
+    const targetElement = document.getElementById(targetId);
     const button = event.target.closest('button');
     
     if (!countrySelect.value) {
@@ -470,7 +545,7 @@ async function translateCountry() {
             body: JSON.stringify({
                 text: countryText,
                 source_lang: 'CS',
-                target_lang: 'EN'
+                target_lang: targetLang
             })
         });
         

@@ -99,6 +99,7 @@ return [
     // Coupon
     'coupon' => [
         'activated' => 'Sleva :code aktivována',
+        'gift_voucher_activated' => 'Dárkový voucher aktivován',
         'discount' => 'Sleva',
         'discounted_price' => 'Cena se slevou',
         'valid_until' => 'Sleva platí do',

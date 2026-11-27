@@ -74,9 +74,7 @@ class CartController extends Controller
             // All products in cart have free_shipping - no shipping charge
             $shipping = 0;
             $shippingEur = 0;
-            $shippingMessage = app()->getLocale() === 'en' 
-                ? 'Free shipping (digital product)' 
-                : 'Doprava zdarma (digitální produkt)';
+            $shippingMessage = __('shop.cart.free_shipping_digital');
         } elseif ($userCountry) {
             // Košík drží CZK i EUR součet vedle sebe, takže se do výpočtu musí poslat
             // ten ve správné měně – jinak by se porovnával korunový součet s eurovým prahem.
@@ -92,9 +90,7 @@ class CartController extends Controller
             $remainingForFreeShipping = $this->shippingService->getRemainingForFreeShipping($userCountry, $total, 'CZK');
             $remainingForFreeShippingEur = $this->shippingService->getRemainingForFreeShipping($userCountry, $totalEur, 'EUR');
         } else {
-            $shippingMessage = app()->getLocale() === 'en' 
-                ? 'Shipping cost will be calculated at checkout'
-                : 'Cena dopravy bude vypočítána v pokladně po zadání adresy';
+            $shippingMessage = __('shop.cart.shipping_at_checkout');
         }
 
         // Get recommended products from same categories
@@ -152,9 +148,7 @@ class CartController extends Controller
         ]);
 
         if (!$product->is_active || !$product->isInStock()) {
-            $errorMessage = app()->getLocale() === 'en' 
-                ? 'Product is not available.'
-                : 'Produkt není k dispozici.';
+            $errorMessage = __('shop.cart.product_unavailable');
             return back()->with('error', $errorMessage);
         }
 
@@ -170,9 +164,7 @@ class CartController extends Controller
 
         // Check stock
         if ($cart[$productId] > $product->stock) {
-            $errorMessage = app()->getLocale() === 'en' 
-                ? 'Sorry, we don\'t have enough stock.'
-                : 'Omlouváme se, ale nemáme dostatek zásob.';
+            $errorMessage = __('shop.cart.not_enough_stock_sorry');
             return back()->with('error', $errorMessage);
         }
 
@@ -196,9 +188,7 @@ class CartController extends Controller
             if ($product && $request->quantity <= $product->stock) {
                 $cart[$productId] = $request->quantity;
             } else {
-                $errorMessage = app()->getLocale() === 'en' 
-                    ? 'We don\'t have enough stock.'
-                    : 'Nemáme dostatek zásob.';
+                $errorMessage = __('shop.cart.not_enough_stock');
                 return back()->with('error', $errorMessage);
             }
         }
@@ -221,9 +211,7 @@ class CartController extends Controller
     {
         session()->forget('cart');
         app(\App\Services\GiftCartService::class)->clear();
-        $successMessage = app()->getLocale() === 'en' 
-            ? 'Cart cleared.'
-            : 'Košík byl vyprázdněn.';
+        $successMessage = __('shop.cart.cleared');
         return back()->with('success', $successMessage);
     }
 

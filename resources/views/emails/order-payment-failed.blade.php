@@ -84,7 +84,7 @@
                             <!-- Problem -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Co se stalo' : 'What happened' }}
+                                    {{ __('emails.order_payment_failed.what_happened', [], $locale) }}
                                 </div>
                                 @if($failureReason)
                                 <p style="font-size: 14px; color: #5a5a5a; margin: 0 0 12px 0;">
@@ -92,35 +92,22 @@
                                 </p>
                                 @endif
                                 <p style="font-size: 14px; color: #5a5a5a; margin: 0; line-height: 1.8;">
-                                    @if($locale === 'cs')
-                                    Platba za vaši objednávku se nezdařila. Nejčastější příčiny:<br><br>
-                                    <span style="color: #CA4136;">→</span> Nedostatek prostředků na účtu/kartě<br>
-                                    <span style="color: #CA4136;">→</span> Vypršela platnost karty<br>
-                                    <span style="color: #CA4136;">→</span> Banka odmítla transakci<br>
-                                    <span style="color: #CA4136;">→</span> Platební údaje se změnily
-                                    @else
-                                    Payment for your order failed. Common causes:<br><br>
-                                    <span style="color: #CA4136;">→</span> Insufficient funds<br>
-                                    <span style="color: #CA4136;">→</span> Expired card<br>
-                                    <span style="color: #CA4136;">→</span> Transaction declined by bank<br>
-                                    <span style="color: #CA4136;">→</span> Payment details have changed
-                                    @endif
+                                    {{ __('emails.order_payment_failed.causes_intro', [], $locale) }}<br><br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.order_payment_failed.cause_1', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.order_payment_failed.cause_2', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.order_payment_failed.cause_3', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.order_payment_failed.cause_4', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- Next steps -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Co je potřeba udělat' : 'What needs to be done' }}
+                                    {{ __('emails.order_payment_failed.todo_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #5a5a5a; margin: 0;">
-                                    @if($locale === 'cs')
-                                    <strong style="color: #1c1c1c;">Máte 7 dní</strong> na dokončení platby.<br><br>
-                                    Po této době bude vaše objednávka automaticky zrušena.
-                                    @else
-                                    <strong style="color: #1c1c1c;">You have 7 days</strong> to complete the payment.<br><br>
-                                    After this period, your order will be automatically cancelled.
-                                    @endif
+                                    {!! __('emails.order_payment_failed.deadline', [], $locale) !!}<br><br>
+                                    {{ __('emails.order_payment_failed.deadline_note', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -162,7 +149,7 @@
                             <div style="margin: 20px 0;">
                                 <a href="{{ $homeUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
                                 <a href="{{ $shopUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ $ordersUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ $locale === 'cs' ? 'Objednávky' : 'Orders' }}</a>
+                                <a href="{{ $ordersUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.orders', [], $locale) }}</a>
                             </div>
                             <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
                                 <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>

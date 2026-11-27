@@ -82,10 +82,10 @@
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Bezpečné přihlášení' : 'Secure login' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.magic_login.feature_secure', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Bez hesla' : 'No password needed' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.magic_login.feature_no_password', [], $locale) }}
                                 </span>
                             </div>
                             

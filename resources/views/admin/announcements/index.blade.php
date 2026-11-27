@@ -30,50 +30,79 @@
             @csrf
             <input type="hidden" name="_submitted" value="1">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Czech Message -->
-                <div>
-                    <label for="message_cs" class="block text-sm font-medium text-gray-700 mb-2">
-                        Text (CZ) <span class="text-red-500">*</span>
-                    </label>
-                    <textarea name="message_cs" id="message_cs" rows="2" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        placeholder="Např.: Od 20. 12. do 3. 1. neprobíhá rozesílka. Objednávky odešleme 5. 1.">{{ old('message_cs') }}</textarea>
-                    <p class="text-xs text-gray-500 mt-1">Pouze prostý text, HTML tagy se vypíšou jako text</p>
+                <!-- Messages CZ | EN | SK -->
+                <div class="lg:col-span-2 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Czech Message -->
+                    <div>
+                        <label for="message_cs" class="block text-sm font-medium text-gray-700 mb-2">
+                            Text (CZ) <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="message_cs" id="message_cs" rows="2" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: Od 20. 12. do 3. 1. neprobíhá rozesílka. Objednávky odešleme 5. 1.">{{ old('message_cs') }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">Pouze prostý text, HTML tagy se vypíšou jako text</p>
+                    </div>
+
+                    <!-- English Message -->
+                    <div>
+                        <label for="message_en" class="block text-sm font-medium text-gray-700 mb-2">
+                            Text (EN)
+                        </label>
+                        <textarea name="message_en" id="message_en" rows="2"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: No dispatch between Dec 20 and Jan 3. Orders ship on Jan 5.">{{ old('message_en') }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">Volitelně pro anglickou verzi webu</p>
+                    </div>
+
+                    <!-- Slovak Message -->
+                    <div>
+                        <label for="message_sk" class="block text-sm font-medium text-gray-700 mb-2">
+                            Text (SK)
+                        </label>
+                        <textarea name="message_sk" id="message_sk" rows="2"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: Od 20. 12. do 3. 1. neodosielame zásielky. Objednávky odošleme 5. 1.">{{ old('message_sk') }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">Volitelně pro slovenskou verzi webu. Prázdné = český text</p>
+                    </div>
                 </div>
 
-                <!-- English Message -->
-                <div>
-                    <label for="message_en" class="block text-sm font-medium text-gray-700 mb-2">
-                        Text (EN)
-                    </label>
-                    <textarea name="message_en" id="message_en" rows="2"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        placeholder="Např.: No dispatch between Dec 20 and Jan 3. Orders ship on Jan 5.">{{ old('message_en') }}</textarea>
-                    <p class="text-xs text-gray-500 mt-1">Volitelně pro anglickou verzi webu</p>
-                </div>
+                <!-- Titles CZ | EN | SK -->
+                <div class="lg:col-span-2 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Czech Title -->
+                    <div>
+                        <label for="title_cs" class="block text-sm font-medium text-gray-700 mb-2">
+                            Nadpis (CZ)
+                        </label>
+                        <input type="text" name="title_cs" id="title_cs"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: Odesílání zásilek"
+                            value="{{ old('title_cs') }}">
+                        <p class="text-xs text-gray-500 mt-1">Zobrazí se jen v pokladně. Prázdné = „Informace"</p>
+                    </div>
 
-                <!-- Czech Title -->
-                <div>
-                    <label for="title_cs" class="block text-sm font-medium text-gray-700 mb-2">
-                        Nadpis (CZ)
-                    </label>
-                    <input type="text" name="title_cs" id="title_cs"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        placeholder="Např.: Odesílání zásilek"
-                        value="{{ old('title_cs') }}">
-                    <p class="text-xs text-gray-500 mt-1">Zobrazí se jen v pokladně. Prázdné = „Informace"</p>
-                </div>
+                    <!-- English Title -->
+                    <div>
+                        <label for="title_en" class="block text-sm font-medium text-gray-700 mb-2">
+                            Nadpis (EN)
+                        </label>
+                        <input type="text" name="title_en" id="title_en"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: Shipping"
+                            value="{{ old('title_en') }}">
+                        <p class="text-xs text-gray-500 mt-1">Zobrazí se jen v pokladně. Prázdné = „Notice"</p>
+                    </div>
 
-                <!-- English Title -->
-                <div>
-                    <label for="title_en" class="block text-sm font-medium text-gray-700 mb-2">
-                        Nadpis (EN)
-                    </label>
-                    <input type="text" name="title_en" id="title_en"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        placeholder="Např.: Shipping"
-                        value="{{ old('title_en') }}">
-                    <p class="text-xs text-gray-500 mt-1">Zobrazí se jen v pokladně. Prázdné = „Notice"</p>
+                    <!-- Slovak Title -->
+                    <div>
+                        <label for="title_sk" class="block text-sm font-medium text-gray-700 mb-2">
+                            Nadpis (SK)
+                        </label>
+                        <input type="text" name="title_sk" id="title_sk"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: Odosielanie zásielok"
+                            value="{{ old('title_sk') }}">
+                        <p class="text-xs text-gray-500 mt-1">Zobrazí se jen v pokladně. Prázdné = český nadpis</p>
+                    </div>
                 </div>
 
                 <!-- Link (optional) -->
@@ -106,8 +135,22 @@
                             placeholder="/gifts"
                             value="{{ old('link_url_en') }}">
                     </div>
+                    <div>
+                        <label for="link_label_sk" class="block text-sm font-medium text-gray-700 mb-2">Odkaz – text (SK)</label>
+                        <input type="text" name="link_label_sk" id="link_label_sk" maxlength="80"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="Např.: Darovať kávu"
+                            value="{{ old('link_label_sk') }}">
+                    </div>
+                    <div>
+                        <label for="link_url_sk" class="block text-sm font-medium text-gray-700 mb-2">Odkaz – adresa (SK)</label>
+                        <input type="text" name="link_url_sk" id="link_url_sk"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                            placeholder="/darceky"
+                            value="{{ old('link_url_sk') }}">
+                    </div>
                 </div>
-                <p class="text-xs text-gray-500 -mt-2">Nepovinné. Odkaz se zobrazí za textem hlášky v záhlaví. Adresa začíná „/“ nebo „https://“.</p>
+                <p class="text-xs text-gray-500 -mt-2">Nepovinné. Odkaz se zobrazí za textem hlášky v záhlaví. Adresa začíná „/“ nebo „https://“. Slovenská verze bez vlastního odkazu použije český.</p>
 
                 <!-- Icon Selection -->
                 <div>
@@ -238,6 +281,9 @@
                                 <p class="text-sm text-gray-900 truncate">{{ $banner->message_cs }}</p>
                                 @if($banner->message_en)
                                 <p class="text-xs text-gray-500 truncate mt-1">EN: {{ $banner->message_en }}</p>
+                                @endif
+                                @if($banner->message_sk)
+                                <p class="text-xs text-gray-500 truncate mt-1">SK: {{ $banner->message_sk }}</p>
                                 @endif
                             </div>
                         </td>
@@ -411,8 +457,15 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent">{{ $banner->message_en }}</textarea>
                         </div>
 
+                        <!-- Slovak Message -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Text (SK)</label>
+                            <textarea name="message_sk" rows="2"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent">{{ $banner->message_sk }}</textarea>
+                        </div>
+
                         <!-- Titles (checkout only) -->
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Nadpis (CZ)</label>
                                 <input type="text" name="title_cs"
@@ -424,6 +477,12 @@
                                 <input type="text" name="title_en"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                                     value="{{ $banner->title_en }}">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nadpis (SK)</label>
+                                <input type="text" name="title_sk"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->title_sk }}">
                             </div>
                         </div>
                         <p class="text-xs text-gray-500 -mt-2">Nadpis se zobrazí jen v pokladně, v záhlaví se ignoruje.</p>
@@ -454,8 +513,20 @@
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                                     value="{{ $banner->link_url_en }}">
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Odkaz – text (SK)</label>
+                                <input type="text" name="link_label_sk" maxlength="80"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->link_label_sk }}">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Odkaz – adresa (SK)</label>
+                                <input type="text" name="link_url_sk"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                                    value="{{ $banner->link_url_sk }}">
+                            </div>
                         </div>
-                        <p class="text-xs text-gray-500 -mt-2">Odkaz za textem hlášky v záhlaví. Adresa začíná „/“ nebo „https://“.</p>
+                        <p class="text-xs text-gray-500 -mt-2">Odkaz za textem hlášky v záhlaví. Adresa začíná „/“ nebo „https://“. Slovenská verze bez vlastního odkazu použije český.</p>
 
                         <!-- Icon Selection -->
                         <div>

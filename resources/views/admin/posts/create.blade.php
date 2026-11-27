@@ -3,7 +3,7 @@
 @section('title', 'Přidat článek - Admin')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-8">
         <h1 class="font-display text-4xl font-bold text-coffee-900 mb-2">Přidat nový článek</h1>
         <p class="text-coffee-600">Vytvořte nový blogový článek</p>
@@ -14,7 +14,7 @@
 
         <div class="space-y-6">
             <!-- Title -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Název článku 🇨🇿 *</label>
                     <input type="text" name="title_cs" id="title_cs" value="{{ old('title_cs') }}" required 
@@ -32,10 +32,19 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Název článku 🇸🇰</label>
+                    <input type="text" name="title_sk" id="title_sk" value="{{ old('title_sk') }}"
+                           placeholder="Slovenský název článku"
+                           class="input @error('title_sk') border-red-500 @enderror">
+                    @error('title_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <!-- Slugs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇨🇿</label>
                     <input type="text" name="slug_cs" value="{{ old('slug_cs') }}" 
@@ -55,6 +64,16 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                     <p class="text-xs text-coffee-600 mt-1">e.g. "how-to-brew-coffee"</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇸🇰</label>
+                    <input type="text" name="slug_sk" value="{{ old('slug_sk') }}"
+                           placeholder="Automaticky ze SK názvu"
+                           class="input @error('slug_sk') border-red-500 @enderror">
+                    @error('slug_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">napr. "ako-spravne-varit-kavu"</p>
                 </div>
             </div>
 
@@ -78,7 +97,7 @@
             </div>
 
             <!-- Perex -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Perex 🇨🇿</label>
                     <textarea name="perex_cs" id="perex_cs" rows="3" 
@@ -97,10 +116,19 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Perex 🇸🇰</label>
+                    <textarea name="perex_sk" id="perex_sk" rows="3"
+                              placeholder="Krátky úvod k článku..."
+                              class="input @error('perex_sk') border-red-500 @enderror">{{ old('perex_sk') }}</textarea>
+                    @error('perex_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <!-- Content -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Obsah článku 🇨🇿 *</label>
                     <textarea name="content_cs" id="content_cs" rows="15" required 
@@ -116,6 +144,15 @@
                               placeholder="English content..."
                               class="input @error('content_en') border-red-500 @enderror">{{ old('content_en') }}</textarea>
                     @error('content_en')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Obsah článku 🇸🇰</label>
+                    <textarea name="content_sk" id="content_sk" rows="15"
+                              placeholder="Slovenský obsah..."
+                              class="input @error('content_sk') border-red-500 @enderror">{{ old('content_sk') }}</textarea>
+                    @error('content_sk')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>

@@ -18,8 +18,10 @@
 </head>
 @php
     $currentLocale = $locale ?? 'cs';
-    $siteName = $currentLocale === 'en' ? 'KAVIbox.com' : 'KAVI.cz';
-    $contactEmail = $currentLocale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz';
+    // Notifikace název webu nepředává. Site::name() je pro en „KAVI“, tento e-mail ale vždy
+    // ukazoval „KAVIbox.com“, proto název z překladů (emails.common.site_name)
+    $siteName = __('emails.common.site_name', [], $currentLocale);
+    $contactEmail = \App\Helpers\Site::forLocale($currentLocale)->contactEmail();
 @endphp
 <body>
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #bcbeb1; padding: 32px 16px;">
@@ -48,68 +50,57 @@
                             <!-- Request info -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $currentLocale === 'cs' ? 'Žádost o reset' : 'Reset request' }}
+                                    {{ __('emails.reset_password.reset_request', [], $currentLocale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
-                                    {{ $currentLocale === 'cs' ? 'Někdo (doufáme, že vy) požádal o reset hesla k účtu spojenému s touto emailovou adresou.' : 'Someone (hopefully you) requested a password reset for the account associated with this email address.' }}
+                                    {{ __('emails.reset_password.request_text', [], $currentLocale) }}
                                 </p>
                             </div>
                             
                             <!-- Expiration info -->
                             <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
                                 <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $currentLocale === 'cs' ? 'Platnost odkazu' : 'Link validity' }}
+                                    {{ __('emails.reset_password.link_validity', [], $currentLocale) }}
                                 </div>
                                 <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
-                                    {{ $count }} {{ $currentLocale === 'cs' ? 'minut' : 'minutes' }}
+                                    {{ __('emails.reset_password.minutes', ['count' => $count], $currentLocale) }}
                                 </div>
                             </div>
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 40px 0;">
                                 <a href="{{ $url }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                                    {{ $currentLocale === 'cs' ? 'Nastavit nové heslo' : 'Set new password' }} →
+                                    {{ __('emails.reset_password.set_new_password', [], $currentLocale) }} →
                                 </a>
                             </div>
                             
                             <!-- Security warning -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $currentLocale === 'cs' ? 'Důležité' : 'Important' }}
+                                    {{ __('emails.reset_password.important', [], $currentLocale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
-                                    @if($currentLocale === 'cs')
-                                    Pokud jste o reset hesla nežádali, NEKLIKEJTE na tlačítko výše a ignorujte tento email. Vaše heslo zůstane beze změny.
-                                    @else
-                                    If you did not request a password reset, DO NOT click the button above and ignore this email. Your password will remain unchanged.
-                                    @endif
+                                    {{ __('emails.reset_password.warning_text', [], $currentLocale) }}
                                 </p>
                             </div>
                             
                             <!-- Tips -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $currentLocale === 'cs' ? 'Tipy pro silné heslo' : 'Tips for a strong password' }}
+                                    {{ __('emails.reset_password.tips_title', [], $currentLocale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
-                                    @if($currentLocale === 'cs')
-                                    <span style="color: #CA4136;">→</span> Použijte alespoň 8 znaků<br>
-                                    <span style="color: #CA4136;">→</span> Kombinujte velká a malá písmena<br>
-                                    <span style="color: #CA4136;">→</span> Přidejte čísla a speciální znaky<br>
-                                    <span style="color: #CA4136;">→</span> Nepoužívejte běžná slova
-                                    @else
-                                    <span style="color: #CA4136;">→</span> Use at least 8 characters<br>
-                                    <span style="color: #CA4136;">→</span> Combine uppercase and lowercase letters<br>
-                                    <span style="color: #CA4136;">→</span> Add numbers and special characters<br>
-                                    <span style="color: #CA4136;">→</span> Avoid common words
-                                    @endif
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.reset_password.tip_1', [], $currentLocale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.reset_password.tip_2', [], $currentLocale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.reset_password.tip_3', [], $currentLocale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.reset_password.tip_4', [], $currentLocale) }}
                                 </p>
                             </div>
                             
                             <!-- Alternative link -->
                             <div style="margin: 32px 0; padding: 16px 20px; background-color: #d5d7ca;">
                                 <p style="font-size: 11px; color: #76716C; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.1em;">
-                                    {{ $currentLocale === 'cs' ? 'Pokud nefunguje tlačítko výše' : 'If the button above doesn\'t work' }}
+                                    {{ __('emails.reset_password.button_not_working', [], $currentLocale) }}
                                 </p>
                                 <p style="font-size: 12px; color: #1c1c1c; word-break: break-all; margin: 0; font-family: monospace;">
                                     {{ $url }}
@@ -119,10 +110,10 @@
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $currentLocale === 'cs' ? 'Bezpečný reset' : 'Secure reset' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.reset_password.feature_secure', [], $currentLocale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $currentLocale === 'cs' ? 'Šifrované spojení' : 'Encrypted connection' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.reset_password.feature_encrypted', [], $currentLocale) }}
                                 </span>
                             </div>
                             
@@ -140,7 +131,7 @@
                             <p style="font-size: 12px; color: #5a5a5a; margin: 0 0 24px 0;">{{ __('emails.common.tagline', [], $currentLocale) }}</p>
                             <div style="margin: 20px 0;">
                                 <a href="{{ $homeUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $currentLocale) }}</a>
-                                <a href="{{ $loginUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ $currentLocale === 'cs' ? 'Přihlášení' : 'Login' }}</a>
+                                <a href="{{ $loginUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.reset_password.login', [], $currentLocale) }}</a>
                             </div>
                             <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
                                 <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $currentLocale) }}</p>

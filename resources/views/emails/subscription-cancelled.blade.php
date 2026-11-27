@@ -53,47 +53,40 @@
                             <!-- Confirmation -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #5a5a5a; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Potvrzeno' : 'Confirmed' }}
+                                    {{ __('emails.subscription_cancelled.confirmed', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Vaše předplatné bylo zrušeno. Nebudou prováděny žádné další platby ani zásilky.
-                                    @else
-                                    Your subscription has been cancelled. No further payments or shipments will be made.
-                                    @endif
+                                    {{ __('emails.subscription_cancelled.confirmed_text', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- We're sad message -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Budete nám chybět' : 'We\'ll miss you' }}
+                                    {{ __('emails.subscription_cancelled.miss_you', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    @if($locale === 'cs')
-                                    Mrzí nás, že odcházíte. Pokud byste si to rozmysleli nebo měli jakoukoliv zpětnou vazbu, která by nám pomohla se zlepšit, budeme rádi za váš názor.
-                                    @else
-                                    We're sorry to see you go. If you change your mind or have any feedback that could help us improve, we'd love to hear from you.
-                                    @endif
+                                    {{-- Text s apostrofy byl v šabloně bez escapování, proto {!! !!} --}}
+                                    {!! __('emails.subscription_cancelled.miss_you_text', [], $locale) !!}
                                 </p>
                             </div>
                             
                             <!-- Return anytime -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Dveře máte vždy otevřené' : 'The door is always open' }}
+                                    {{ __('emails.subscription_cancelled.door_open', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Můžete se kdykoliv vrátit' : 'You can come back anytime' }}<br>
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Nakupujte v obchodě bez předplatného' : 'Shop without subscription' }}<br>
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Sledujte nás na sociálních sítích' : 'Follow us on social media' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_cancelled.door_come_back', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_cancelled.door_shop', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_cancelled.door_social', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 40px 0;">
                                 <a href="{{ $subscriptionsUrl }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                                    {{ $locale === 'cs' ? 'Obnovit předplatné' : 'Resubscribe' }} →
+                                    {{ __('emails.subscription_cancelled.resubscribe', [], $locale) }} →
                                 </a>
                             </div>
                             
@@ -103,7 +96,7 @@
                                     <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Bez závazků' : 'No commitments' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_cancelled.feature_no_commitments', [], $locale) }}
                                 </span>
                             </div>
                             

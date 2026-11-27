@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', ($currentLocale === 'en' ? 'Blog' : 'Blog') . ' - ' . ($currentLocale === 'en' ? 'KAVI' : 'KAVI.cz'))
+@section('title', __('blog.title') . ' - ' . \App\Helpers\Site::current()->name())
 
 @section('meta_description')
-{{ $currentLocale === 'en' ? 'Coffee blog with tips, recipes, and stories from the world of specialty coffee. Discover the art of brewing and learn from the best roasters.' : 'Kávový blog s tipy, recepty a příběhy ze světa výběrové kávy. Objevte umění přípravy kávy a učte se od nejlepších pražíren.' }}
+{{ __('blog.index.meta_description') }}
 @endsection
 
 @section('og_title')
-{{ $currentLocale === 'en' ? 'Coffee Blog | KAVI' : 'Kávový blog | KAVI.cz' }}
+{{ __('blog.index.og_title', ['site' => \App\Helpers\Site::current()->name()]) }}
 @endsection
 
 @section('og_description')
-{{ $currentLocale === 'en' ? 'Discover the art of specialty coffee. Tips, recipes, and stories from the best roasters.' : 'Objevte umění výběrové kávy. Tipy, recepty a příběhy od nejlepších pražíren.' }}
+{{ __('blog.index.og_description') }}
 @endsection
 
 @section('content')
@@ -21,14 +21,14 @@
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
     <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
-      <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Coffee' : 'Kávový' }}</span><br>
-      <span class="text-primary-500">{{ $currentLocale === 'en' ? 'blog' : 'blog' }}</span>
+      <span class="text-dark-800">{{ __('blog.index.heading_line1') }}</span><br>
+      <span class="text-primary-500">{{ __('blog.index.heading_line2') }}</span>
     </h1>
       
     <!-- Description - Right aligned -->
     <div class="flex justify-end">
       <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
-        {{ $currentLocale === 'en' ? 'Tips, recipes, and stories from the world of specialty coffee. Discover the art of brewing.' : 'Tipy, recepty a příběhy ze světa výběrové kávy. Objevte umění přípravy kávy.' }}
+        {{ __('blog.index.intro') }}
       </p>
     </div>
   </div>
@@ -45,7 +45,7 @@
         <div class="flex flex-wrap items-center gap-x-8 gap-y-2">
           <a href="{{ localizedRoute('blog.index') }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ !$currentTag ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
-            {{ $currentLocale === 'en' ? 'All' : 'Vše' }}<sup class="ml-0.5 text-[10px]">{{ str_pad($posts->total(), 2, '0', STR_PAD_LEFT) }}</sup>
+            {{ __('blog.index.filter_all') }}<sup class="ml-0.5 text-[10px]">{{ str_pad($posts->total(), 2, '0', STR_PAD_LEFT) }}</sup>
           </a>
           @foreach($tags as $tag)
           <a href="{{ localizedRoute('blog.index', ['tag' => $tag->getSlug()]) }}" 
@@ -62,7 +62,7 @@
     @if($currentTag)
     <div class="mb-8">
       <p class="text-xs uppercase tracking-widest text-warm-500">
-        {{ $currentLocale === 'en' ? 'Showing articles tagged' : 'Zobrazeny články s tagem' }}
+        {{ __('blog.index.showing_tag') }}
       </p>
       <h2 class="font-display text-2xl text-dark-800 uppercase mt-1">{{ $currentTag->getName() }}</h2>
     </div>
@@ -120,7 +120,7 @@
             <!-- Author -->
             @if($post->author)
             <p class="text-xs uppercase tracking-widest text-warm-400 mt-3">
-              {{ $currentLocale === 'en' ? 'By' : 'Autor' }} {{ $post->author }}
+              {{ __('blog.author') }} {{ $post->author }}
             </p>
             @endif
           </div>
@@ -140,8 +140,8 @@
           <svg class="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
           </svg>
-          <p class="text-gray-600 text-lg font-bold">{{ $currentLocale === 'en' ? 'No articles found.' : 'Zatím žádné články.' }}</p>
-          <p class="text-gray-500 mt-2">{{ $currentLocale === 'en' ? 'Check back soon for new content.' : 'Brzy přidáme nový obsah.' }}</p>
+          <p class="text-gray-600 text-lg font-bold">{{ __('blog.index.empty') }}</p>
+          <p class="text-gray-500 mt-2">{{ __('blog.index.empty_text') }}</p>
         </div>
       </div>
       @endforelse
@@ -153,18 +153,18 @@
       <div class="flex items-center justify-end gap-6">
         <!-- Page Counter -->
         <span class="text-xs uppercase tracking-widest text-warm-500">
-          {{ $currentLocale === 'en' ? 'Page' : 'Strana' }} {{ str_pad($posts->currentPage(), 2, '0', STR_PAD_LEFT) }} / {{ str_pad($posts->lastPage(), 2, '0', STR_PAD_LEFT) }}
+          {{ __('blog.pagination.page') }} {{ str_pad($posts->currentPage(), 2, '0', STR_PAD_LEFT) }} / {{ str_pad($posts->lastPage(), 2, '0', STR_PAD_LEFT) }}
         </span>
         
         <!-- Navigation -->
         <div class="flex items-center">
           @if($posts->onFirstPage())
             <span class="text-xs uppercase tracking-widest text-warm-300 cursor-not-allowed">
-              {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
+              {{ __('blog.pagination.previous') }}
             </span>
           @else
             <a href="{{ $posts->previousPageUrl() }}" class="text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 transition-colors">
-              {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
+              {{ __('blog.pagination.previous') }}
             </a>
           @endif
           
@@ -172,11 +172,11 @@
 
           @if($posts->hasMorePages())
             <a href="{{ $posts->nextPageUrl() }}" class="text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 transition-colors">
-              {{ $currentLocale === 'en' ? 'Next' : 'Další' }}
+              {{ __('blog.pagination.next') }}
             </a>
           @else
             <span class="text-xs uppercase tracking-widest text-warm-300 cursor-not-allowed">
-              {{ $currentLocale === 'en' ? 'Next' : 'Další' }}
+              {{ __('blog.pagination.next') }}
             </span>
           @endif
         </div>
@@ -191,15 +191,15 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-        {{ $currentLocale === 'en' ? 'Want to try our coffee?' : 'Chcete ochutnat naši kávu?' }}
+        {{ __('blog.index.cta_heading') }}
       </h2>
-      
+
       <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
-        {{ $currentLocale === 'en' ? 'Discover our selection of specialty coffee from the best European roasteries.' : 'Objevte naši kolekci výběrové kávy z nejlepších evropských pražíren.' }}
+        {{ __('blog.index.cta_text') }}
       </p>
 
       <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-        <span>{{ $currentLocale === 'en' ? 'Browse coffee shop' : 'Prohlédnout obchod' }}</span>
+        <span>{{ __('blog.index.cta_link') }}</span>
         <span class="text-primary-500 group-hover:translate-x-1 transition-transform">→</span>
       </a>
     </div>

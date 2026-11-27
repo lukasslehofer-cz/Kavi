@@ -14,6 +14,9 @@ return [
         'badge' => 'Help & FAQ',
         'heading' => 'How does it work?',
         'subtitle' => 'Everything you need to know about coffee subscription',
+        // Large page heading: first line, second line highlighted
+        'hero_title' => 'How it',
+        'hero_accent' => 'works',
         
         // Quick links
         'subscription' => 'Subscription',
@@ -98,6 +101,12 @@ return [
         'badge' => 'Meet us',
         'heading' => 'How was KAVI born?',
         'subtitle' => 'A story about love for coffee and the desire to share the best flavors',
+        // Large page heading: first line, second line highlighted (empty in Czech)
+        'hero_title' => 'About',
+        'hero_accent' => 'KAVI',
+        'founder_alt' => 'founder of KAVI',
+        'founder' => 'Founder',
+        'story_title' => 'Our Story',
         
         'story1' => 'During his career in an <strong class="text-gray-900 font-medium">advertising agency</strong>, our founder Lukáš needed regular doses of caffeine for optimal work performance. And that\'s when he discovered the magic of <strong class="text-gray-900 font-medium">specialty coffee</strong>.',
         'story2' => 'Driven by his newly discovered curiosity to learn as much as possible about specialty coffee and discover as many cafés in Czech Republic that served it, he founded KAVI as a place to share his personal café recommendations.',
@@ -125,6 +134,9 @@ return [
         'badge' => 'Have a question?',
         'heading' => 'Contact us',
         'subtitle' => 'We\'re happy to answer your questions and help you with anything',
+        // Large page heading: first line, second line highlighted
+        'hero_title' => 'Get in',
+        'hero_accent' => 'touch',
         
         'form_title' => 'Write to us',
         'form_subtitle' => 'Fill out the form and we\'ll get back to you as soon as possible',

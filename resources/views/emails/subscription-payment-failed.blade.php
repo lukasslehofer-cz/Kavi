@@ -53,14 +53,10 @@
                             <!-- Warning -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Vyžadována akce' : 'Action required' }}
+                                    {{ __('emails.subscription_payment_failed.action_required', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Pravidelná platba za vaše předplatné se nezdařila. Zkontrolujte prosím svou platební metodu a aktualizujte ji, abychom mohli pokračovat v doručování kávy.
-                                    @else
-                                    The recurring payment for your subscription has failed. Please check your payment method and update it so we can continue delivering your coffee.
-                                    @endif
+                                    {{ __('emails.subscription_payment_failed.action_text', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -68,7 +64,7 @@
                             @if(isset($failureReason))
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Důvod selhání' : 'Failure reason' }}
+                                    {{ __('emails.subscription_payment_failed.failure_reason', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     <span style="color: #CA4136;">→</span> {{ $failureReason }}
@@ -79,35 +75,35 @@
                             <!-- What to do -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Co můžete udělat' : 'What you can do' }}
+                                    {{ __('emails.subscription_payment_failed.what_to_do', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Zkontrolujte zůstatek na kartě' : 'Check your card balance' }}<br>
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Ověřte platnost karty' : 'Verify card expiration' }}<br>
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Aktualizujte platební metodu ve svém účtu' : 'Update payment method in your account' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_payment_failed.todo_balance', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_payment_failed.todo_expiration', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_payment_failed.todo_update', [], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- CTA Button -->
                             <div style="text-align: center; margin: 40px 0;">
                                 <a href="{{ $manageUrl }}" style="display: inline-block; background-color: #CA4136; color: #ffffff !important; text-decoration: none; padding: 16px 32px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-                                    {{ $locale === 'cs' ? 'Aktualizovat platbu' : 'Update payment' }} →
+                                    {{ __('emails.subscription_payment_failed.update_button', [], $locale) }} →
                                 </a>
                             </div>
                             
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Bezpečná platba' : 'Secure payment' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_payment_failed.feature_secure', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Jsme tu pro vás' : 'We\'re here to help' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_payment_failed.feature_help', [], $locale) }}
                                 </span>
                             </div>
                             
                             <!-- Help Text -->
                             <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
-                                {{ $locale === 'cs' ? 'Pokud máte jakékoliv dotazy nebo potřebujete pomoc, kontaktujte nás na' : 'If you have any questions or need help, contact us at' }}
+                                {{ __('emails.subscription_payment_failed.help_contact', [], $locale) }}
                                 <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             

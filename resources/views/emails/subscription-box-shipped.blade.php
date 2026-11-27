@@ -57,7 +57,7 @@
                                     {{ __('emails.subscription_box_shipped.track_package', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    {{ $locale === 'cs' ? 'Zásilku můžete sledovat v reálném čase:' : 'You can track your package in real-time:' }}
+                                    {{ __('emails.subscription_box_shipped.track_text', [], $locale) }}
                                 </p>
                                 <div style="margin: 16px 0;">
                                     <a href="{{ $subscription->packeta_tracking_url }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 12px 24px; font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
@@ -90,18 +90,13 @@
                             <!-- What's next -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Co se stane dále' : 'What happens next' }}
+                                    {{ __('emails.subscription_box_shipped.next_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0; line-height: 1.8;">
-                                    @if($locale === 'cs')
-                                    <span style="color: #CA4136;">01</span> Zásilka dorazí na výdejní místo během 1-3 pracovních dnů<br>                            
-                                    <span style="color: #CA4136;">02</span> Vyzvedněte si balík na výdejním místě<br>
-                                    <span style="color: #CA4136;">03</span> Vychutnejte si čerstvou kávu
-                                    @else
-                                    <span style="color: #CA4136;">01</span> The box will arrive at the pickup point within 2-4 business days<br>                                    
-                                    <span style="color: #CA4136;">02</span> Pick up your box at the pickup point<br>
-                                    <span style="color: #CA4136;">03</span> Enjoy your fresh coffee
-                                    @endif
+                                    {{-- Počet dní doručení je součástí textu: cs 1-3, en 2-4 (zahraničí) --}}
+                                    <span style="color: #CA4136;">01</span> {{ __('emails.subscription_box_shipped.next_1', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">02</span> {{ __('emails.subscription_box_shipped.next_2', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">03</span> {{ __('emails.subscription_box_shipped.next_3', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -124,7 +119,7 @@
                             
                             <!-- Help Text -->
                             <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin-top: 32px;">
-                                {{ $locale === 'cs' ? 'Těšíme se na vaši zpětnou vazbu! Napište nám na' : 'We look forward to your feedback! Write to us at' }}
+                                {{ __('emails.subscription_box_shipped.feedback_contact', [], $locale) }}
                                 <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                             </p>
                             

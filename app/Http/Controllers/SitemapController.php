@@ -188,7 +188,8 @@ class SitemapController extends Controller
 
         // Get all products (active and inactive) except coffee_of_month.
         // Jen s cenou v měně webu – bez ní vrací detail 404 (ProductController::show)
-        $priceColumn = $locale === 'en' ? 'price_eur' : 'price';
+        // Produkty s cenou v měně webu (kavibox.com i kavibox.sk = EUR)
+        $priceColumn = \App\Helpers\Site::forLocale($locale)->currency() === 'EUR' ? 'price_eur' : 'price';
         $products = Product::with('roastery')
             ->where('is_coffee_of_month', false)
             ->where($priceColumn, '>', 0)
@@ -269,14 +270,14 @@ class SitemapController extends Controller
 
         // Get all published blog posts
         $posts = Post::published()
-            ->select(['id', 'slug_cs', 'slug_en', 'published_at', 'updated_at'])
+            ->select(['id', 'slug_cs', 'slug_en', 'slug_sk', 'published_at', 'updated_at'])
             ->orderBy('published_at', 'desc')
             ->get();
 
         foreach ($posts as $post) {
             try {
                 // URL se slugem (ne s ID): /blog/{id} jen přesměrovává
-                $slug = ($locale === 'en' && !empty($post->slug_en)) ? $post->slug_en : $post->slug_cs;
+                $slug = $post->localizedValue('slug', $locale, 'slug_cs');
                 $url = localizedRoute('blog.show', ['post' => $slug]);
 
                 // Skutečná poslední změna článku

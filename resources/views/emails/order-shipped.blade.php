@@ -85,7 +85,7 @@
                                     {{ __('emails.order_shipped.track_package', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #5a5a5a; margin: 0 0 16px 0;">
-                                    {{ $locale === 'cs' ? 'Zásilku můžete sledovat kliknutím na tlačítko níže:' : 'You can track your package by clicking the button below:' }}
+                                    {{ __('emails.order_shipped.track_text', [], $locale) }}
                                 </p>
                                 <a href="{{ $order->packeta_tracking_url }}" style="display: inline-block; background-color: #1c1c1c; color: #ffffff !important; text-decoration: none; padding: 14px 28px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
                                     {{ __('emails.order_shipped.track_package', [], $locale) }} →
@@ -141,20 +141,13 @@
                             <!-- What's Next -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Co se stane dále' : 'What happens next' }}
+                                    {{ __('emails.order_shipped.next_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #5a5a5a; margin: 0; line-height: 1.8;">
-                                    @if($locale === 'cs')
-                                    <span style="color: #CA4136;">01</span> Zásilka dorazí na výdejní místo během 1-2 dnů<br>
-                                    <span style="color: #CA4136;">02</span> Dostanete SMS s kódem pro vyzvednutí<br>
-                                    <span style="color: #CA4136;">03</span> Vyzvedněte si balík na výdejním místě<br>
-                                    <span style="color: #CA4136;">04</span> Vychutnejte si čerstvou kávu
-                                    @else
-                                    <span style="color: #CA4136;">01</span> The package will arrive at the pickup point within 1-2 days<br>
-                                    <span style="color: #CA4136;">02</span> You will receive an SMS with the pickup code<br>
-                                    <span style="color: #CA4136;">03</span> Pick up your package at the pickup point<br>
-                                    <span style="color: #CA4136;">04</span> Enjoy your fresh coffee
-                                    @endif
+                                    <span style="color: #CA4136;">01</span> {{ __('emails.order_shipped.next_1', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">02</span> {{ __('emails.order_shipped.next_2', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">03</span> {{ __('emails.order_shipped.next_3', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">04</span> {{ __('emails.order_shipped.next_4', [], $locale) }}
                                 </p>
                             </div>
                             

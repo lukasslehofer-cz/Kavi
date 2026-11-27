@@ -1167,15 +1167,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (nameEl) nameEl.textContent = point.name;
                         if (addressEl) addressEl.textContent = address;
                         
-                        alert(data.message || (locale === 'en' ? 'Pickup point changed successfully!' : 'Výdejní místo bylo úspěšně změněno!'));
+                        alert(data.message || @json(__('dashboard.packeta_change.success')));
                     } else {
                         // Server umí vrátit konkrétní důvod (např. nepovolený dopravce).
-                        alert(data.message || (locale === 'en' ? 'Failed to change pickup point. Please try again.' : 'Nepodařilo se změnit výdejní místo. Zkuste to prosím znovu.'));
+                        alert(data.message || @json(__('dashboard.packeta_change.failed')));
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert(locale === 'en' ? 'An error occurred while saving the pickup point.' : 'Došlo k chybě při ukládání výdejního místa.');
+                    alert(@json(__('dashboard.packeta_change.error')));
                 });
             }
         }, widgetOptionsFor(subscriptionId));
@@ -1252,16 +1252,16 @@ document.addEventListener('DOMContentLoaded', function() {
         container.style.display = 'none';
         container.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4';
         
-        const pauseTitle = locale === 'en' ? 'Pause subscription' : 'Pozastavit předplatné';
-        const pauseDesc = locale === 'en' ? 'Select how many shipments you want to skip.' : 'Vyberte, na kolik rozesílek chcete pauzu.';
-        const pauseLength = locale === 'en' ? 'Pause length (shipments)' : 'Délka pauzy (počet rozesílek)';
-        const shipment1 = locale === 'en' ? '1 shipment' : '1 rozesílka';
-        const shipment2 = locale === 'en' ? '2 shipments' : '2 rozesílky';
-        const shipment3 = locale === 'en' ? '3 shipments' : '3 rozesílky';
-        const monthsLabel = locale === 'en' ? 'Actual months:' : 'Reálně měsíců:';
-        const nextBoxLabel = locale === 'en' ? 'Next box after pause:' : 'Další box po pauze:';
-        const cancelBtn = locale === 'en' ? 'Cancel' : 'Zrušit';
-        const confirmBtn = locale === 'en' ? 'Confirm pause' : 'Potvrdit pauzu';
+        const pauseTitle = @json(__('dashboard.pause_subscription'));
+        const pauseDesc = @json(__('dashboard.pause_modal.description'));
+        const pauseLength = @json(__('dashboard.pause_modal.length'));
+        const shipment1 = @json(__('dashboard.pause_modal.shipment_1'));
+        const shipment2 = @json(__('dashboard.pause_modal.shipment_2'));
+        const shipment3 = @json(__('dashboard.pause_modal.shipment_3'));
+        const monthsLabel = @json(__('dashboard.pause_modal.months'));
+        const nextBoxLabel = @json(__('dashboard.pause_modal.next_box'));
+        const cancelBtn = @json(__('dashboard.cancel'));
+        const confirmBtn = @json(__('dashboard.pause_modal.confirm'));
         // Texty okna: první pauza, nebo prodloužení už běžící pauzy
         const modeTexts = {
             pause: { title: pauseTitle, desc: pauseDesc, confirm: confirmBtn },
@@ -1324,7 +1324,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (state.firstUnpaid instanceof Date && !isNaN(state.firstUnpaid)) {
                     const next = new Date(state.firstUnpaid);
                     next.setMonth(next.getMonth() + months);
-                    nextDateText = next.toLocaleDateString(locale === 'en' ? 'en-GB' : 'cs-CZ');
+                    nextDateText = next.toLocaleDateString(@json(__('dashboard.pause_modal.date_locale')));
                 }
             } catch (e) {}
             container.querySelector('#pause-next-box-date').textContent = nextDateText;

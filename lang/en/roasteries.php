@@ -37,6 +37,53 @@ return [
     'cta_heading' => 'Discover More Roasteries',
     'cta_description' => 'Join our subscription and taste the best coffees from roasteries across Europe.',
     'cta_button' => 'Build Your Box',
+
+    // Pagination and bottom subscription call to action
+    'pagination' => [
+        'page' => 'Page',
+        'previous' => 'Previous',
+        'next' => 'Next',
+    ],
+    'learn_more_subscription' => 'Learn more about subscription',
+
+    // Roastery listing
+    'index' => [
+        'title' => 'Our Roasters',
+        'meta_description' => 'Discover our partner roasters from across Europe. Premium specialty coffee from Belgium, Poland, Germany and more. Quality, tradition and love for coffee.',
+        'og_title' => 'Our Partner Roasters | :site',
+        'og_description' => 'We work with the best roasters from all over Europe. Discover premium specialty coffee from Belgium, Poland, Germany and more.',
+        'heading_line1' => 'Our',
+        'heading_line2' => 'roasters',
+        'intro' => 'We work with the best roasters from all over Europe. Quality, tradition and love for coffee.',
+        'coffee_count' => '{1} :count coffee|[0,*] :count coffees',
+        'more_about' => 'More about roaster',
+        'empty_heading' => 'No roasters',
+        'empty_country' => 'We have no roasters from :country. Try selecting another country.',
+        'empty_text' => 'We currently have no roasters available.',
+        'show_all' => 'Show all roasters',
+        'cta_heading' => 'Want to try their coffees?',
+        'cta_text' => 'With our subscription, you can taste coffees from various European roasters every month. Fresh specialty coffee delivered to your door.',
+    ],
+
+    // Roastery detail
+    'show' => [
+        'meta_description' => 'Discover :name - premium coffee roaster from :country. Explore their exceptional coffees at :site.',
+        'og_description' => 'Premium coffee roaster from :country. Discover their exceptional specialty coffees.',
+        'address' => 'Address',
+        'coffees_from' => 'Coffees from',
+        'section_current' => 'CURRENT EDIT',
+        'section_shop' => 'SHOP COLLECTION',
+        'section_past' => 'PAST CURATIONS',
+        'attributes' => [
+            'origin' => 'Origin',
+            'altitude' => 'Altitude',
+            'processing' => 'Processing',
+            'variety' => 'Variety',
+            'flavor_notes' => 'Flavor notes',
+        ],
+        'cta_heading' => 'Want to taste coffees from :name?',
+        'cta_text' => 'With our subscription, you can taste coffees from various European roasters every month. Fresh specialty coffee delivered right to your door.',
+    ],
 ];
 
 

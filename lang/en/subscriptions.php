@@ -113,4 +113,110 @@ return [
         ['q' => 'Do you send ground coffee?', 'a' => 'No, we only send whole beans. Coffee tastes best freshly ground, so we recommend grinding it just before brewing.'],
     ],
 
+    // Box configurator (/subscription, subscriptions/index.blade.php)
+    'builder' => [
+        'seo' => [
+            'title' => 'Build your coffee box – size, coffee, frequency | KAVI',
+            'description' => 'Choose your box size, coffee type and how often you want it delivered. No commitment, free shipping.',
+            'og_title' => 'Build Your Coffee Subscription Box | KAVI',
+            'og_description' => 'Flexible coffee subscription with free shipping. Choose your box size, coffee type, and delivery frequency. Cancel anytime.',
+            // inLanguage in JSON-LD
+            'in_language' => 'en-US',
+        ],
+        'hero' => [
+            'title_1' => 'Build your',
+            'title_2' => 'coffee box',
+            'intro' => 'Every month we send you coffees from three European roasteries you rarely find in local shops. Here you set the size and frequency. New to KAVI?',
+            'intro_link' => 'See how KAVI works',
+            'lead' => 'Choose the quantity, coffee type and delivery frequency. Flexible subscription tailored to your needs. Cancel anytime without fee.',
+        ],
+        'preparing' => [
+            'title' => 'We\'re preparing new coffees for you',
+            'text' => 'We\'re working on selecting the best coffees for the upcoming month. New coffees will be available in the coming days.',
+        ],
+        'sold_out' => [
+            'title' => 'Sorry, our coffees are sold out this month',
+            'text' => 'Thank you for your interest! All our coffees for this month are unfortunately already taken.',
+            'next_month' => 'Subscription for next month available from',
+            'date_format' => 'm/d/Y',
+        ],
+        'browse_shop' => 'Browse shop',
+        'amount' => [
+            'title' => 'Coffee quantity',
+            'subtitle' => 'Choose the package that suits you',
+            // "500g · 2 bags" (2–4 bags)
+            'bags' => 'bags',
+            'popular' => 'Popular',
+            'm_desc' => 'Ideal for individuals or couples',
+            'l_desc' => 'Most popular choice',
+            'xl_desc' => 'For coffee enthusiasts',
+        ],
+        'type' => [
+            'title' => 'Preferred coffee type',
+            'subtitle' => 'Choose your favorite brewing method',
+            'espresso' => 'Espresso',
+            'espresso_desc' => 'Full body, darker roast',
+            'filter' => 'Filter',
+            'filter_desc' => 'Lighter body, lighter roast',
+            'mix' => 'Mix',
+            'mix_desc' => 'Espresso and filter',
+            'decaf' => '1x decaf',
+            'distribution' => 'Coffee distribution',
+        ],
+        'frequency' => [
+            'title' => 'Delivery frequency',
+            'subtitle' => 'How often do you want to receive coffee?',
+            'monthly' => 'Every month',
+            'monthly_desc' => 'For regular consumption',
+            'bimonthly' => 'Every 2 months',
+            'bimonthly_desc' => 'For medium consumption',
+            'quarterly' => 'Every 3 months',
+            'quarterly_desc' => 'For occasional drinking',
+            'one_time' => 'One-time',
+            'one_time_badge' => 'Try it',
+            'one_time_desc' => 'No subscription',
+            // In the summary once selected
+            'one_time_summary' => 'One-time (no subscription)',
+            // :amount = one-time box surcharge (100 Kč / €5)
+            'upsell' => 'With a subscription you save :amount on every box. You can cancel it anytime with one click.',
+            'switch' => 'Switch to subscription',
+        ],
+        'summary' => [
+            'order_title' => 'Order summary',
+            'subscription_title' => 'Subscription summary',
+            'quantity' => 'Quantity:',
+            'type' => 'Coffee type:',
+            'frequency' => 'Frequency:',
+            'one_time_surcharge' => 'One-time surcharge:',
+            'price_per_box' => 'Price per box:',
+            'total_price' => 'Total price:',
+            'per_delivery' => 'per delivery',
+            // Below the price once a frequency is selected (0 = one-time). Free shipping is promised on kavi.cz only.
+            'frequency_notes' => [
+                0 => 'one-time order',
+                1 => 'every month',
+                2 => 'every 2 months',
+                3 => 'every 3 months',
+            ],
+            // "750g (3 bags)"
+            'bags' => 'bags',
+            'sold_out' => 'Sold out this month',
+            'submit' => 'Continue to checkout',
+            'no_commitment' => 'No commitment',
+            'cancel_anytime' => 'Cancel anytime',
+            // Number format of the price in JS (toLocaleString)
+            'number_locale' => 'en-US',
+        ],
+        'shipping' => [
+            'title' => 'Next shipping date',
+            'text' => 'Orders for this box close <strong class="text-dark-800">:cutoff at midnight</strong>. The coffee ships on <strong class="text-dark-800">:shipment</strong>.',
+        ],
+        // Coffees of the month below the configurator; :month = months.adjective_locative
+        'lineup' => [
+            'title' => 'In the :month box',
+            'lead' => 'Your box will contain two to four of these coffees, depending on its size.',
+            'link' => 'More about the coffee of the month',
+        ],
+    ],
+
 ];

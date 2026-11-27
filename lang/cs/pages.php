@@ -14,6 +14,9 @@ return [
         'badge' => 'Nápověda & FAQ',
         'heading' => 'Jak to funguje?',
         'subtitle' => 'Vše, co potřebujete vědět o kávovém předplatném',
+        // Velký nadpis stránky: první řádek, druhý řádek barevně
+        'hero_title' => 'Jak to',
+        'hero_accent' => 'funguje',
         
         // Quick links
         'subscription' => 'Předplatné',
@@ -98,6 +101,12 @@ return [
         'badge' => 'Seznamte se',
         'heading' => 'Jak vzniklo KAVI?',
         'subtitle' => 'Příběh o lásce ke kávě a touze sdílet ty nejlepší chutě',
+        // Velký nadpis stránky: první řádek, druhý řádek barevně (v češtině prázdný)
+        'hero_title' => 'O nás',
+        'hero_accent' => '',
+        'founder_alt' => 'zakladatel KAVI',
+        'founder' => 'Zakladatel',
+        'story_title' => 'Náš příběh',
         
         'story1' => 'Během své pracovní kariéry v <strong class="text-gray-900 font-medium">reklamní agentuře</strong> potřeboval náš zakladatel Lukáš pravidelné dávky kofeinu pro ideální pracovní výkon. A právě v té době objevil kouzlo <strong class="text-gray-900 font-medium">výběrové kávy</strong>.',
         'story2' => 'Poháněn nově objevenou zvědavostí dozvědět se co nejvíce o výběrové kávě a odhalit co nejvíce kaváren v ČR, které ji podávaly, založil KAVI jako místo, kde bude sdílet svá osobní doporučení kaváren.',
@@ -125,6 +134,9 @@ return [
         'badge' => 'Máte dotaz?',
         'heading' => 'Kontaktujte nás',
         'subtitle' => 'Rádi odpovíme na vaše dotazy a pomůžeme vám s čímkoliv',
+        // Velký nadpis stránky: první řádek, druhý řádek barevně
+        'hero_title' => 'Kontaktujte',
+        'hero_accent' => 'nás',
         
         'form_title' => 'Napište nám',
         'form_subtitle' => 'Vyplňte formulář a my se vám ozveme co nejdříve',

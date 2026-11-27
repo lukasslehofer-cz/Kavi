@@ -3,30 +3,36 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\HasLocalizedColumns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Roastery extends Model
 {
-    use HasFactory;
+    use HasFactory, HasLocalizedColumns;
 
     protected $fillable = [
         'name',
         'name_en',
+        'name_sk',
         'slug',
         'website_url',
         'instagram',
         'image',
         'country',
         'country_en',
+        'country_sk',
         'country_flag',
         'city',
         'city_en',
+        'city_sk',
         'address',
         'short_description',
         'short_description_en',
+        'short_description_sk',
         'full_description',
         'full_description_en',
+        'full_description_sk',
         'gallery',
         'is_active',
         'sort_order',
@@ -43,10 +49,7 @@ class Roastery extends Model
      */
     public function getName(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->name_en)) {
-            return $this->name_en;
-        }
-        return $this->name;
+        return $this->localizedValue('name');
     }
 
     /**
@@ -54,10 +57,7 @@ class Roastery extends Model
      */
     public function getShortDescription(): ?string
     {
-        if (app()->getLocale() === 'en' && !empty($this->short_description_en)) {
-            return $this->short_description_en;
-        }
-        return $this->short_description;
+        return $this->localizedValue('short_description');
     }
 
     /**
@@ -65,10 +65,7 @@ class Roastery extends Model
      */
     public function getFullDescription(): ?string
     {
-        if (app()->getLocale() === 'en' && !empty($this->full_description_en)) {
-            return $this->full_description_en;
-        }
-        return $this->full_description;
+        return $this->localizedValue('full_description');
     }
 
     /**
@@ -76,10 +73,12 @@ class Roastery extends Model
      */
     public function getCountry(): ?string
     {
-        // If EN locale, try country_en first, then translation file, then fallback to original
-        if (app()->getLocale() === 'en') {
-            if (!empty($this->country_en)) {
-                return $this->country_en;
+        // Outside Czech try country_{locale} first, then translation file, then fallback to original
+        $locale = app()->getLocale();
+        if ($locale !== \App\Helpers\Site::PRIMARY_LOCALE) {
+            $localized = $this->getAttribute('country_' . $locale);
+            if (!empty($localized)) {
+                return $localized;
             }
             // Try translation file
             $translated = __('countries.' . $this->country);
@@ -95,10 +94,7 @@ class Roastery extends Model
      */
     public function getCity(): ?string
     {
-        if (app()->getLocale() === 'en' && !empty($this->city_en)) {
-            return $this->city_en;
-        }
-        return $this->city;
+        return $this->localizedValue('city');
     }
 
     protected static function boot()

@@ -207,6 +207,25 @@ return [
     'extend_pause' => 'Prodloužit pauzu',
     'extend_pause_description' => 'Vyberte, o kolik dalších rozesílek chcete pauzu prodloužit.',
     'extend_pause_confirm' => 'Prodloužit pauzu',
+    // Okno pauzy v JS (nadpis = pause_subscription, tlačítko zpět = cancel)
+    'pause_modal' => [
+        'description' => 'Vyberte, na kolik rozesílek chcete pauzu.',
+        'length' => 'Délka pauzy (počet rozesílek)',
+        'shipment_1' => '1 rozesílka',
+        'shipment_2' => '2 rozesílky',
+        'shipment_3' => '3 rozesílky',
+        'months' => 'Reálně měsíců:',
+        'next_box' => 'Další box po pauze:',
+        'confirm' => 'Potvrdit pauzu',
+        // Formát data dalšího boxu v JS (toLocaleDateString)
+        'date_locale' => 'cs-CZ',
+    ],
+    // Změna výdejního místa v JS (když server nevrátí vlastní hlášku)
+    'packeta_change' => [
+        'success' => 'Výdejní místo bylo úspěšně změněno!',
+        'failed' => 'Nepodařilo se změnit výdejní místo. Zkuste to prosím znovu.',
+        'error' => 'Došlo k chybě při ukládání výdejního místa.',
+    ],
     'paused_by_admin' => 'Pozastaveno správcem',
     'paused_by_admin_help' => 'Toto předplatné pozastavil náš tým. Pro obnovení nás prosím kontaktujte.',
     'payment_failure_pause_title' => 'Platba se nezdařila',

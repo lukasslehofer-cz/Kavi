@@ -61,4 +61,19 @@ return [
     'updated' => 'Cart updated',
     'removed' => 'Item removed',
 
+    // Cart page (upper case by design)
+    'hero' => [
+        'title_1' => 'SHOPPING',
+        'title_2' => 'CART',
+    ],
+    'free_shipping_achieved' => 'GRATIS SHIPPING ACHIEVED',
+    'remove_caps' => 'REMOVE',
+    'clear_all_caps' => 'CLEAR ALL',
+    'free_caps' => 'FREE',
+    'proceed_to_payment' => 'PROCEED TO PAYMENT',
+    'recommendations_heading' => [
+        'title_1' => 'YOU MIGHT',
+        'title_2' => 'ALSO LIKE',
+    ],
+
 ];

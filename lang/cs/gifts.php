@@ -117,6 +117,7 @@ return [
         'send_at' => 'Kdy odeslat',
 
         'gets_title' => 'Co obdarovaný dostane',
+        'gets_image_alt' => 'Otevřený KAVI box se třemi balíčky kávy',
         'gets_lead' => 'Každý měsíc box s výběrovou kávou z evropských pražíren, které v Česku běžně nekoupí.',
         'gets_arrows' => [
             '2 až 4 balíčky po 250 g podle velikosti boxu',

@@ -43,15 +43,15 @@
                             <!-- Email change details -->
                             <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
                                 <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Změna emailu' : 'Email change' }}
+                                    {{ __('emails.email_change.change_label', [], $locale) }}
                                 </div>
                                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Současný email' : 'Current email' }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.email_change.current_email', [], $locale) }}:</td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">{{ $user->email }}</td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Nový email' : 'New email' }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.email_change.new_email_label', [], $locale) }}:</td>
                                         <td style="padding: 8px 0; font-size: 16px; color: #1c1c1c; text-align: right; font-weight: 500;">{{ $newEmail }}</td>
                                     </tr>
                                 </table>
@@ -60,28 +60,20 @@
                             <!-- Security warning -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Důležité pro bezpečnost' : 'Security notice' }}
+                                    {{ __('emails.email_change.security_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Pokud jste o tuto změnu nežádali, NEKLIKEJTE na tlačítko níže a okamžitě nás kontaktujte na <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
-                                    @else
-                                    If you did not request this change, DO NOT click the button below and contact us immediately at <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
-                                    @endif
+                                    {{ __('emails.email_change.security_text', [], $locale) }} <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                                 </p>
                             </div>
                             
                             <!-- Expiration -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Potvrďte změnu' : 'Confirm change' }}
+                                    {{ __('emails.email_change.confirm_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #4a6741; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Pro dokončení změny klikněte na tlačítko níže. Tento odkaz je platný <strong>24 hodin</strong>.
-                                    @else
-                                    To complete the change, click the button below. This link is valid for <strong>24 hours</strong>.
-                                    @endif
+                                    {!! __('emails.email_change.confirm_text', [], $locale) !!}
                                 </p>
                             </div>
                             
@@ -95,25 +87,19 @@
                             <!-- Wasn't you -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Nebylo to od vás?' : 'Wasn\'t you?' }}
+                                    {{ __('emails.email_change.not_you_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
-                                    @if($locale === 'cs')
-                                    <span style="color: #CA4136;">→</span> Ignorujte tento email<br>
-                                    <span style="color: #CA4136;">→</span> Změňte si heslo k účtu<br>
-                                    <span style="color: #CA4136;">→</span> Kontaktujte nás na <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
-                                    @else
-                                    <span style="color: #CA4136;">→</span> Ignore this email<br>
-                                    <span style="color: #CA4136;">→</span> Change your account password<br>
-                                    <span style="color: #CA4136;">→</span> Contact us at <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
-                                    @endif
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.email_change.not_you_ignore', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.email_change.not_you_password', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.email_change.not_you_contact', [], $locale) }} <a href="mailto:{{ $contactEmail }}" style="color: #CA4136; text-decoration: none;">{{ $contactEmail }}</a>
                                 </p>
                             </div>
                             
                             <!-- Alternative link -->
                             <div style="margin: 32px 0; padding: 16px 20px; background-color: #d5d7ca;">
                                 <p style="font-size: 11px; color: #76716C; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.1em;">
-                                    {{ $locale === 'cs' ? 'Pokud nefunguje tlačítko výše' : 'If the button above doesn\'t work' }}
+                                    {{ __('emails.email_change.button_not_working', [], $locale) }}
                                 </p>
                                 <p style="font-size: 12px; color: #1c1c1c; word-break: break-all; margin: 0; font-family: monospace;">
                                     {{ $verificationUrl }}
@@ -123,10 +109,10 @@
                             <!-- Features -->
                             <div style="margin: 40px 0 32px 0; padding-top: 24px; border-top: 1px solid #bcbeb1;">
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Bezpečná změna' : 'Secure change' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.email_change.feature_secure', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Vyžaduje potvrzení' : 'Requires confirmation' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.email_change.feature_confirmation', [], $locale) }}
                                 </span>
                             </div>
                             

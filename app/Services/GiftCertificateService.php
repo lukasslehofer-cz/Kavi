@@ -85,7 +85,7 @@ class GiftCertificateService
 
     public function fileName(GiftPurchase $gift): string
     {
-        $prefix = $gift->locale === 'en' ? 'kavi-gift-' : 'kavi-darek-';
+        $prefix = __('shop.files.gift_certificate_prefix', [], $gift->locale);
 
         return $prefix . strtolower($gift->code ?? (string) $gift->id) . '.pdf';
     }

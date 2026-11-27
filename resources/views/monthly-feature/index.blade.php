@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', ($currentLocale === 'en' ? 'Coffee of the Month ' : 'Káva měsíce ') . $monthNameWithYear)
+@section('title', __('monthly.title', ['month' => $monthNameWithYear]))
 
 @section('meta_description')
-{{ $currentLocale === 'en' ? 'Discover our coffee selection for ' . $monthNameWithYear . '. Exceptional specialty coffees from the best European roasters, freshly roasted and delivered to your door.' : 'Objevte náš kávový výběr na ' . $monthNameWithYear . '. Výjimečné výběrové kávy z nejlepších evropských pražíren, čerstvě pražené a doručené až k vám.' }}
+{{ __('monthly.meta_description', ['month' => $monthNameWithYear]) }}
 @endsection
 
 @section('og_title')
-{{ $currentLocale === 'en' ? 'Coffee of the Month ' . $monthNameWithYear . ' | KAVI' : 'Káva měsíce ' . $monthNameWithYear . ' | KAVI.cz' }}
+{{ __('monthly.og_title', ['month' => $monthNameWithYear, 'site' => \App\Helpers\Site::current()->name()]) }}
 @endsection
 
 @section('og_description')
-{{ $currentLocale === 'en' ? 'Every month we select exceptional coffees from the best European roasters. Discover what awaits you in ' . $monthNameWithYear . '.' : 'Každý měsíc pro vás vybíráme výjimečné kávy z nejlepších evropských pražíren. Objevte, co vás čeká v ' . $monthNameWithYear . '.' }}
+{{ __('monthly.og_description', ['month' => $monthNameWithYear]) }}
 @endsection
 
 @section('content')
@@ -22,8 +22,8 @@
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
     <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
-      <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Coffee of' : 'Pražírny a kávy' }}</span><br>
-      <span class="text-primary-500">{{ $currentLocale === 'en' ? 'the month' : 'měsíce' }}</span>
+      <span class="text-dark-800">{{ __('monthly.heading_line1') }}</span><br>
+      <span class="text-primary-500">{{ __('monthly.heading_line2') }}</span>
             </h1>
             
     <!-- Description - Right aligned -->
@@ -33,7 +33,7 @@
           {{ $monthNameWithYear }}
         </p>
         <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 leading-relaxed">
-          {{ $currentLocale === 'en' ? 'Every month we select exceptional coffees from the best European roasters. Discover what awaits you.' : 'Každý měsíc pro vás vybíráme výjimečné kávy z nejlepších evropských pražíren. Objevte, co vás čeká.' }}
+          {{ __('monthly.intro') }}
             </p>
         </div>
     </div>
@@ -52,18 +52,10 @@
                 <!-- Section Header - Large Editorial Typography -->
             <div class="mb-12 sm:mb-16">
                     <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight leading-tight sm:leading-[0.95]">
-                        @if($currentLocale === 'en')
-                            {{ $roasteries->count() === 1 ? 'Roaster of the Month' : 'Roasters of the Month' }}
-                        @else
-                            {{ $roasteries->count() === 1 ? 'Pražírna měsíce' : 'Pražírny měsíce' }}
-                        @endif
+                        {{ trans_choice('monthly.roasteries.heading', $roasteries->count()) }}
                     </h2>
                     <p class="text-sm uppercase tracking-widest text-warm-500 mt-3">
-                        @if($currentLocale === 'en')
-                            {{ $roasteries->count() === 1 ? 'This time we selected coffees from this exceptional roaster' : 'This time we selected coffees from these exceptional roasters' }}
-                        @else
-                            {{ $roasteries->count() === 1 ? 'Tentokrát jsme vybrali kávy od této výjimečné pražírny' : 'Tentokrát jsme vybrali kávy od těchto výjimečných pražíren' }}
-                        @endif
+                        {{ trans_choice('monthly.roasteries.subheading', $roasteries->count()) }}
                     </p>
                 </div>
 
@@ -104,7 +96,7 @@
                             <div class="flex items-center justify-between">
                                 <a href="{{ localizedRoute('roasteries.show', $roastery) }}" 
                                    class="group/link inline-flex items-center gap-2 text-dark-800 text-sm uppercase tracking-widest hover:text-primary-500 transition-colors">
-                                    <span>{{ $currentLocale === 'en' ? 'More about roaster' : 'Více o pražírně' }}</span>
+                                    <span>{{ __('monthly.roasteries.more_about') }}</span>
                                     <svg class="w-4 h-4 group-hover/link:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                     </svg>
@@ -137,10 +129,10 @@
                 <!-- Section Header - Large Editorial Typography -->
                 <div class="mb-12 sm:mb-16">
                     <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight leading-tight sm:leading-[0.95]">
-                        {{ $currentLocale === 'en' ? 'Coffees of the Month' : 'Kávy měsíce' }}
+                        {{ __('monthly.coffees.heading') }}
                     </h2>
                     <p class="text-sm uppercase tracking-widest text-warm-500 mt-3">
-                        {{ $currentLocale === 'en' ? 'These specialty coffees are part of our current subscription' : 'Tyto výběrové kávy jsou součástí našeho aktuálního předplatného' }}
+                        {{ __('monthly.coffees.subheading') }}
                     </p>
                 </div>
 
@@ -153,7 +145,7 @@
                             <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden">
                             @if($coffee->image)
                             <img src="{{ asset($coffee->image) }}" 
-                                 alt="{{ $coffee->name }}"
+                                 alt="{{ $coffee->getName() }}"
                                      class="w-full h-full object-contain">
                             @else
                                 <div class="w-full h-full flex items-center justify-center">
@@ -224,7 +216,7 @@
                                 @if($coffee->image)
                                 <div class="aspect-[4/3] w-full overflow-hidden">
                                   <img src="{{ asset($coffee->image) }}" 
-                                       alt="{{ $coffee->name }}"
+                                       alt="{{ $coffee->getName() }}"
                                        class="w-full h-full object-contain">
                                 </div>
                                 @endif
@@ -238,7 +230,7 @@
 
                                 <div class="absolute top-4 left-4">
                                     <span class="bg-dark-800 text-white text-xs uppercase tracking-widest px-3 py-1.5">
-                                        {{ $currentLocale === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}
+                                        {{ __('monthly.modal.badge') }}
                                     </span>
                                 </div>
                             </div>
@@ -271,12 +263,16 @@
 
                                 @if($coffee->attributes && is_array($coffee->attributes) && count($coffee->attributes) > 0)
                                 <div class="border-t border-dark-800 pt-6 mb-6">
-                                    <h4 class="font-display text-lg font-normal text-dark-800 uppercase tracking-widest mb-6">{{ $currentLocale === 'en' ? 'Parameters' : 'Parametry' }}</h4>
-                                    
+                                    <h4 class="font-display text-lg font-normal text-dark-800 uppercase tracking-widest mb-6">{{ __('monthly.modal.parameters') }}</h4>
+
                                     @php
-                                        $mainAttributes = $currentLocale === 'en' ? 
-                                            ['origin' => 'Origin', 'altitude' => 'Altitude', 'processing' => 'Processing', 'variety' => 'Variety', 'flavor_notes' => 'Flavor notes'] :
-                                            ['origin' => 'Původ', 'altitude' => 'Nadmořská výška', 'processing' => 'Zpracování', 'variety' => 'Odrůda', 'flavor_notes' => 'Chuťové tóny'];
+                                        $mainAttributes = [
+                                            'origin' => __('monthly.modal.attributes.origin'),
+                                            'altitude' => __('monthly.modal.attributes.altitude'),
+                                            'processing' => __('monthly.modal.attributes.processing'),
+                                            'variety' => __('monthly.modal.attributes.variety'),
+                                            'flavor_notes' => __('monthly.modal.attributes.flavor_notes'),
+                                        ];
                                     @endphp
                                     
                                     <!-- Main Attributes - Grid Layout -->
@@ -295,7 +291,7 @@
                                         
                                         <!-- Other attributes -->
                                         @foreach($coffee->attributes as $key => $value)
-                                            @if($value && !is_array($value) && !in_array($key, ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date', 'origin_en', 'altitude_en', 'processing_en', 'variety_en', 'flavor_notes_en']))
+                                            @if($value && !is_array($value) && !in_array($key, ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date']) && !preg_match('/_(en|sk)$/', $key))
                                             <div>
                                                 <span class="text-xs uppercase tracking-widest text-warm-500 block mb-1">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
                                                 <span class="text-sm font-medium text-dark-800">{{ $value }}</span>
@@ -310,16 +306,16 @@
                                         <div class="grid grid-cols-2 gap-4">
                                             @if(isset($coffee->attributes['weight']) && !empty($coffee->attributes['weight']))
                                             <div>
-                                                <span class="text-xs uppercase tracking-widest text-warm-500 block mb-1">{{ $currentLocale === 'en' ? 'Weight' : 'Hmotnost' }}</span>
+                                                <span class="text-xs uppercase tracking-widest text-warm-500 block mb-1">{{ __('monthly.modal.weight') }}</span>
                                                 <span class="text-sm font-medium text-dark-800">{{ $coffee->attributes['weight'] }} g</span>
                                             </div>
                                             @endif
                                             
                                             @if(isset($coffee->attributes['roast_date']) && !empty($coffee->attributes['roast_date']))
                                             <div>
-                                                <span class="text-xs uppercase tracking-widest text-warm-500 block mb-1">{{ $currentLocale === 'en' ? 'Roast date' : 'Datum pražení' }}</span>
+                                                <span class="text-xs uppercase tracking-widest text-warm-500 block mb-1">{{ __('monthly.modal.roast_date') }}</span>
                                                 <span class="text-sm font-medium text-dark-800">
-                                                    {{ \Carbon\Carbon::parse($coffee->attributes['roast_date'])->format($currentLocale === 'en' ? 'm/d/Y' : 'd.m.Y') }}
+                                                    {{ \Carbon\Carbon::parse($coffee->attributes['roast_date'])->format(__('monthly.modal.roast_date_format')) }}
                                                 </span>
                                             </div>
                                             @endif
@@ -332,14 +328,14 @@
                                 <!-- CTA Section -->
                                 <div class="border-t-2 border-primary-500 pt-6 text-center">
                                     <p class="font-display text-lg font-normal text-dark-800 uppercase tracking-tight mb-2">
-                                        {{ $currentLocale === 'en' ? 'Part of the current subscription' : 'Součástí aktuálního předplatného' }}
+                                        {{ __('monthly.modal.cta_heading') }}
                                     </p>
                                     <p class="text-warm-500 mb-6 text-sm">
-                                        {{ $currentLocale === 'en' ? 'Get it together with other specialty coffees' : 'Získejte ji společně s dalšími výběrovými kávami' }}
+                                        {{ __('monthly.modal.cta_text') }}
                                     </p>
                                     <a href="{{ localizedRoute('subscriptions.index') }}" 
                                        class="inline-flex items-center gap-3 px-8 py-3 bg-dark-800 text-white font-display uppercase tracking-widest hover:bg-dark-900 transition-all duration-200 text-sm">
-                                        <span>{{ $currentLocale === 'en' ? 'Learn more' : 'Zjistit více' }}</span>
+                                        <span>{{ __('monthly.modal.cta_link') }}</span>
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                         </svg>
@@ -374,14 +370,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12h.01M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <h2 class="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
-                    {{ $currentLocale === 'en' ? 'Coffee of the Month coming soon' : 'Káva měsíce připravujeme' }}
+                    {{ __('monthly.empty.heading') }}
                 </h2>
                 <p class="text-lg text-gray-600 mb-8 font-light">
-                    {{ $currentLocale === 'en' ? 'We are currently selecting exceptional coffees for ' . $monthNameWithYear . '. We will surprise you soon!' : 'Právě vybíráme výjimečné kávy pro měsíc ' . $monthNameWithYear . '. Brzy vás překvapíme!' }}
+                    {{ __('monthly.empty.text', ['month' => $monthNameWithYear]) }}
                 </p>
-                <a href="{{ localizedRoute('home') }}" 
+                <a href="{{ localizedRoute('home') }}"
                    class="btn-fill">
-                    <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
+                    <span>{{ __('monthly.learn_more_subscription') }}</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -398,16 +394,16 @@
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->
       <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-        {{ $currentLocale === 'en' ? 'Want to receive similar coffees regularly?' : 'Chcete dostávat podobné kávy pravidelně?' }}
+        {{ __('monthly.cta.heading') }}
       </h2>
 
       <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
-        {{ $currentLocale === 'en' ? 'Subscribe to our subscription and a box with selected coffee specials will be waiting for you at the pickup point.' : 'Přihlaste se k našemu předplatnému a box s vybranými kávovými speciály na vás bude pravidelně čekat ve výdejním místě.' }}
+        {{ __('monthly.cta.text') }}
       </p>
 
       <!-- CTA Link -->
       <a href="{{ localizedRoute('home') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-        <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
+        <span>{{ __('monthly.learn_more_subscription') }}</span>
         <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
       </a>
     </div>

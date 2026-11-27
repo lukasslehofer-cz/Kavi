@@ -4,9 +4,18 @@
 // Ceny se tu počítají jen pro zobrazení. Skutečnou cenu dárku počítá server
 // (GiftCartService) z aktuálních cen při vložení do košíku a znovu v pokladně.
 
+// EUR podle jazyka stránky: slovensky „25 €“, anglicky „€25“ (stejně jako CurrencyHelper v PHP)
+const isSlovak = () => document.documentElement.lang === 'sk';
+
+function formatEurNumber(amount, enSeparator) {
+    return isSlovak()
+        ? Math.round(amount).toLocaleString('sk-SK')
+        : Math.round(amount).toLocaleString('en-US').replace(/,/g, enSeparator);
+}
+
 function formatPrice(amount, currency) {
     if (currency === 'EUR') {
-        return '€' + Math.round(amount).toLocaleString('en-US').replace(/,/g, ' ');
+        return isSlovak() ? formatEurNumber(amount, ' ') + ' €' : '€' + formatEurNumber(amount, ' ');
     }
     return Math.round(amount).toLocaleString('cs-CZ').replace(/ /g, ' ') + ' Kč';
 }
@@ -113,7 +122,7 @@ function initGiftForm(form) {
         setField('headline', config.monthsWords?.[months] || '');
         setField('box', config.boxLabels?.[bags] || '');
         setField('amount', config.currency === 'EUR'
-            ? Math.round(amount).toLocaleString('en-US').replace(/,/g, ' ')
+            ? formatEurNumber(amount, ' ')
             : Math.round(amount).toLocaleString('cs-CZ'));
 
         const sample = config.sample || {};

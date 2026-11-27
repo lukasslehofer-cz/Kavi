@@ -40,7 +40,7 @@ class DigitalProductDelivery extends LocalizedMailable
 
     public function attachments(): array
     {
-        $prefix = $this->emailLocale === 'cs' ? 'Voucher-' : 'Voucher-';
+        $prefix = __('shop.files.voucher_prefix', [], $this->emailLocale);
 
         return [
             \Illuminate\Mail\Mailables\Attachment::fromStorage($this->pdfPath)

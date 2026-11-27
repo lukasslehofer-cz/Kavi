@@ -113,4 +113,110 @@ return [
         ['q' => 'Posíláte kávu mletou?', 'a' => 'Ne, posíláme jen zrnkovou kávu. Nejlépe chutná čerstvě namletá, proto ji doporučujeme mlít až těsně před přípravou.'],
     ],
 
+    // Konfigurátor boxu (/predplatne, subscriptions/index.blade.php)
+    'builder' => [
+        'seo' => [
+            'title' => 'Sestavte si kávový box – velikost, káva, frekvence | KAVI.cz',
+            'description' => 'Vyberte velikost boxu, typ kávy a jak často ho chcete dostávat. Bez závazků, doprava zdarma.',
+            'og_title' => 'Sestavte si svůj kávový box | KAVI.cz',
+            'og_description' => 'Flexibilní kávové předplatné s dopravou zdarma. Vyberte si velikost boxu, typ kávy a frekvenci dodání. Zrušte kdykoliv.',
+            // inLanguage v JSON-LD
+            'in_language' => 'cs-CZ',
+        ],
+        'hero' => [
+            'title_1' => 'Sestavte si',
+            'title_2' => 'kávový box',
+            'intro' => 'Každý měsíc vám pošleme kávy ze tří evropských pražíren, které v Česku běžně nekoupíte. Tady si nastavíte velikost a frekvenci. Poprvé u nás?',
+            'intro_link' => 'Podívejte se, jak KAVI funguje',
+            'lead' => 'Vyberte si množství, typ kávy a frekvenci dodání. Flexibilní předplatné přizpůsobené vašim potřebám. Zrušte kdykoliv bez poplatku.',
+        ],
+        'preparing' => [
+            'title' => 'Připravujeme pro vás nové kávy',
+            'text' => 'Pracujeme na výběru těch nejlepších káv pro nadcházející měsíc. Nové kávy budou dostupné v nejbližších dnech.',
+        ],
+        'sold_out' => [
+            'title' => 'Omlouváme se, tento měsíc jsou naše kávy vyprodané',
+            'text' => 'Děkujeme za velký zájem! Všechny naše kávy pro tento měsíc jsou bohužel již rozebrané.',
+            'next_month' => 'Předplatné na další měsíc k dispozici od',
+            'date_format' => 'd.m.Y',
+        ],
+        'browse_shop' => 'Prohlédnout obchod',
+        'amount' => [
+            'title' => 'Množství kávy',
+            'subtitle' => 'Vyberte balíček, který vám vyhovuje',
+            // „500g · 2 balíčky“ (2–4 balíčky)
+            'bags' => 'balíčky',
+            'popular' => 'Oblíbené',
+            'm_desc' => 'Ideální pro jednotlivce nebo páry',
+            'l_desc' => 'Nejpopulárnější volba',
+            'xl_desc' => 'Pro kávové nadšence',
+        ],
+        'type' => [
+            'title' => 'Preferovaný typ kávy',
+            'subtitle' => 'Vyberte si váš oblíbený způsob přípravy',
+            'espresso' => 'Espresso',
+            'espresso_desc' => 'Plné tělo, tmavší pražení',
+            'filter' => 'Filtr',
+            'filter_desc' => 'Lehčí tělo, světlejší pražení',
+            'mix' => 'Kombinace',
+            'mix_desc' => 'Espresso i filtr',
+            'decaf' => '1x bez kofeinu',
+            'distribution' => 'Rozdělení kávy',
+        ],
+        'frequency' => [
+            'title' => 'Frekvence dodání',
+            'subtitle' => 'Jak často chcete kávu dostávat?',
+            'monthly' => 'Každý měsíc',
+            'monthly_desc' => 'Pro pravidelnou spotřebu',
+            'bimonthly' => 'Jednou za 2 měsíce',
+            'bimonthly_desc' => 'Pro střední spotřebu',
+            'quarterly' => 'Jednou za 3 měsíce',
+            'quarterly_desc' => 'Pro občasné pití',
+            'one_time' => 'Jednorázově',
+            'one_time_badge' => 'Zkuste to',
+            'one_time_desc' => 'Bez předplatného',
+            // Ve shrnutí po výběru
+            'one_time_summary' => 'Jednorázově (bez předplatného)',
+            // :amount = příplatek za jednorázový box (100 Kč / €5)
+            'upsell' => 'S předplatným ušetříte :amount za každý box. Zrušit ho můžete kdykoli, jedním klikem.',
+            'switch' => 'Přepnout na předplatné',
+        ],
+        'summary' => [
+            'order_title' => 'Shrnutí objednávky',
+            'subscription_title' => 'Shrnutí předplatného',
+            'quantity' => 'Množství:',
+            'type' => 'Typ kávy:',
+            'frequency' => 'Frekvence:',
+            'one_time_surcharge' => 'Příplatek jednorázový:',
+            'price_per_box' => 'Cena za box:',
+            'total_price' => 'Celková cena:',
+            'per_delivery' => 'při každé dodávce',
+            // Pod cenou po výběru frekvence (0 = jednorázově). Dopravu zdarma slibuje jen kavi.cz.
+            'frequency_notes' => [
+                0 => 'jednorázová objednávka · doprava zdarma',
+                1 => 'každý měsíc · doprava zdarma',
+                2 => 'jednou za 2 měsíce · doprava zdarma',
+                3 => 'jednou za 3 měsíce · doprava zdarma',
+            ],
+            // „750g (3 balení)“
+            'bags' => 'balení',
+            'sold_out' => 'Tento měsíc vyprodáno',
+            'submit' => 'Pokračovat k objednávce',
+            'no_commitment' => 'Bez závazků',
+            'cancel_anytime' => 'Kdykoli zrušte',
+            // Formát čísel ceny v JS (toLocaleString)
+            'number_locale' => 'cs-CZ',
+        ],
+        'shipping' => [
+            'title' => 'Termín následující rozesílky',
+            'text' => 'Objednávky na tento box uzavíráme <strong class="text-dark-800">:cutoff o půlnoci</strong>. Rozesílka kávy proběhne <strong class="text-dark-800">:shipment</strong>.',
+        ],
+        // Kávy měsíce pod konfigurátorem; :month = months.adjective_locative
+        'lineup' => [
+            'title' => 'V :month boxu',
+            'lead' => 'Do boxu vám přijdou dvě až čtyři z těchto káv podle velikosti.',
+            'link' => 'Více o kávě měsíce',
+        ],
+    ],
+
 ];

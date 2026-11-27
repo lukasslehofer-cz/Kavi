@@ -69,9 +69,9 @@
                                 <div style="display: flex; align-items: start; gap: 12px;">
                                     <div style="font-size: 24px; line-height: 1;">⭐</div>
                                     <div>
-                                        <h3 class="info-title" style="color: #92400e; margin-bottom: 8px;">{{ $locale === 'cs' ? 'Jednorázový nákup bez předplatného' : 'One-time purchase, no subscription' }}</h3>
+                                        <h3 class="info-title" style="color: #92400e; margin-bottom: 8px;">{{ __('emails.onetime_box.info_title', [], $locale) }}</h3>
                                         <p class="info-text" style="color: #78350f;">
-                                            {{ $locale === 'cs' ? 'Tento box vám doručíme jednorázově. Žádné další platby ani dodávky neproběhnou. Nemusíte nic rušit ani odhlašovat.' : 'This box will be delivered once. No further payments or deliveries will occur. You don\'t need to cancel anything.' }}
+                                            {{ __('emails.onetime_box.info_text', [], $locale) }}
                                         </p>
                                     </div>
                                 </div>
@@ -82,14 +82,14 @@
                                 <h2 class="info-title">📦 {{ __('emails.onetime_box.your_config', [], $locale) }}</h2>
                                 
                                 <div class="config-item">
-                                    <span class="config-label">{{ $locale === 'cs' ? 'Typ kávy' : 'Coffee type' }}:</span>
+                                    <span class="config-label">{{ __('emails.onetime_box.coffee_type', [], $locale) }}:</span>
                                     <span class="config-value">
                                         @if($subscription->configuration['type'] === 'espresso')
                                             Espresso
                                         @elseif($subscription->configuration['type'] === 'filter')
-                                            {{ $locale === 'cs' ? 'Filtr' : 'Filter' }}
+                                            {{ __('emails.onetime_box.type_filter', [], $locale) }}
                                         @else
-                                            Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× {{ $locale === 'cs' ? 'Filtr' : 'Filter' }})
+                                            Mix ({{ $subscription->configuration['mix']['espresso'] ?? 0 }}× Espresso, {{ $subscription->configuration['mix']['filter'] ?? 0 }}× {{ __('emails.onetime_box.type_filter', [], $locale) }})
                                         @endif
                                         @if($subscription->configuration['isDecaf'] ?? false)
                                             <span style="color: #059669;"> • Decaf</span>
@@ -162,8 +162,8 @@
                             
                             <div class="trust-badges">
                                 <div class="badge">✓ {{ __('emails.common.freshly_roasted', [], $locale) }}</div>
-                                <div class="badge">✓ {{ $locale === 'cs' ? 'Jednorázový nákup' : 'One-time purchase' }}</div>
-                                <div class="badge">✓ {{ $locale === 'cs' ? 'Žádné závazky' : 'No commitment' }}</div>
+                                <div class="badge">✓ {{ __('emails.onetime_box.feature_one_time', [], $locale) }}</div>
+                                <div class="badge">✓ {{ __('emails.onetime_box.feature_no_commitment', [], $locale) }}</div>
                             </div>
                             
                             <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin-top: 32px; font-weight: 300;">

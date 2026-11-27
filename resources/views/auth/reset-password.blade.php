@@ -56,7 +56,7 @@
 <div class="pt-8 pb-12 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20" style="background-color: #e5e6df;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-tight leading-[0.9] text-dark-800">
-            {{ $currentLocale === 'en' ? 'NEW PASSWORD' : 'NOVÉ HESLO' }}
+            {{ __('auth.headings.reset') }}
         </h1>
     </div>
 </div>
@@ -70,7 +70,7 @@
                 <!-- Reset Form Section -->
                 <div class="mb-16 border-t-2 border-primary-500 pt-6">
                     <h2 class="font-display text-2xl sm:text-3xl md:text-4xl font-normal uppercase tracking-tight mb-8">
-                        <span class="text-dark-800">{{ $currentLocale === 'en' ? 'SET NEW ' : 'NASTAVTE NOVÉ ' }}</span><span class="text-primary-500">{{ $currentLocale === 'en' ? 'PASSWORD' : 'HESLO' }}</span>
+                        <span class="text-dark-800">{{ __('auth.headings.reset_password') }}</span><span class="text-primary-500">{{ __('auth.headings.reset_password_accent') }}</span>
                     </h2>
                     
                     <form method="POST" action="{{ localizedRoute('password.update') }}" class="space-y-6">

@@ -53,57 +53,47 @@
                             <!-- Timeline -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #CA4136; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Postup přípravy' : 'Preparation progress' }}
+                                    {{ __('emails.subscription_box_preparing.progress_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #5a5a5a; margin: 0; line-height: 1.8;">
-                                    @if($locale === 'cs')
-                                    <span style="color: #4a6741;">01</span> Výběr kávy – Pečlivě jsme vybrali kávy z nejlepších pražíren<br>
-                                    <span style="color: #4a6741;">02</span> Káva dorazila – Zrna z celé Evropy jsou v našem skladu<br>
-                                    <span style="color: #CA4136;">03</span> <strong>Balení boxu</strong> – Právě teď balíme váš kávový box<br>
-                                    <span style="color: #76716C;">04</span> Expedice – Za pár dní odešleme k vám
-                                    @else
-                                    <span style="color: #4a6741;">01</span> Coffee selection – We carefully selected coffees from the best roasteries<br>
-                                    <span style="color: #4a6741;">02</span> Coffee arrived – Beans from across Europe are in our warehouse<br>
-                                    <span style="color: #CA4136;">03</span> <strong>Packing your box</strong> – We're packing your coffee box right now<br>
-                                    <span style="color: #76716C;">04</span> Shipping – We'll ship to you in few days
-                                    @endif
+                                    {{-- Kroky byly v šabloně bez escapování (HTML, apostrofy), proto {!! !!} --}}
+                                    <span style="color: #4a6741;">01</span> {!! __('emails.subscription_box_preparing.progress_1', [], $locale) !!}<br>
+                                    <span style="color: #4a6741;">02</span> {!! __('emails.subscription_box_preparing.progress_2', [], $locale) !!}<br>
+                                    <span style="color: #CA4136;">03</span> {!! __('emails.subscription_box_preparing.progress_3', [], $locale) !!}<br>
+                                    <span style="color: #76716C;">04</span> {!! __('emails.subscription_box_preparing.progress_4', [], $locale) !!}
                                 </p>
                             </div>
                             
                             <!-- What's inside -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Co vás čeká v boxu' : 'What\'s in your box' }}
+                                    {{ __('emails.subscription_box_preparing.inside_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     <span style="color: #CA4136;">→</span> 
                                     @if($subscription->configuration['type'] === 'espresso')
                                         Espresso
                                     @elseif($subscription->configuration['type'] === 'filter')
-                                        {{ $locale === 'cs' ? 'Filtrovaná káva' : 'Filter coffee' }}
+                                        {{ __('emails.subscription_box_preparing.type_filter_coffee', [], $locale) }}
                                     @else
-                                        Mix Espresso & {{ $locale === 'cs' ? 'Filtr' : 'Filter' }}
+                                        Mix Espresso & {{ __('emails.subscription_box_preparing.type_filter', [], $locale) }}
                                     @endif
                                 </p>
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
-                                    {{ $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2 }} {{ $locale === 'cs' ? 'balíčky × 250g' : 'packages × 250g' }}
+                                    {{ __('emails.subscription_box_preparing.packages', ['count' => $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- Expected shipment -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Očekávaná expedice' : 'Expected shipment' }}
+                                    {{ __('emails.subscription_box_preparing.expected_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    @if($locale === 'cs')
-                                    <span style="color: #CA4136;">→</span> Váš box odešleme přibližně za <strong>2-3 dny</strong>
-                                    @else
-                                    <span style="color: #CA4136;">→</span> Your box will be shipped in approximately <strong>2-3 days</strong>
-                                    @endif
+                                    <span style="color: #CA4136;">→</span> {!! __('emails.subscription_box_preparing.expected_text', [], $locale) !!}
                                 </p>
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 12px 0 4px 18px;">
-                                    {{ $locale === 'cs' ? 'O expedici vás budeme informovat dalším e-mailem.' : 'We\'ll notify you with another email.' }}
+                                    {{ __('emails.subscription_box_preparing.expected_note', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -120,7 +110,7 @@
                                     <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Baleno s láskou' : 'Packed with love' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_box_preparing.feature_packed', [], $locale) }}
                                 </span>
                             </div>
                             

@@ -99,6 +99,7 @@ return [
     // Coupon
     'coupon' => [
         'activated' => 'Discount :code activated',
+        'gift_voucher_activated' => 'Gift voucher activated',
         'discount' => 'Discount',
         'discounted_price' => 'Discounted price',
         'valid_until' => 'Discount valid until',

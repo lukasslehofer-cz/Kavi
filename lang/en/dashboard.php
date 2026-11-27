@@ -207,6 +207,25 @@ return [
     'extend_pause' => 'Extend pause',
     'extend_pause_description' => 'Select how many more shipments you want to skip.',
     'extend_pause_confirm' => 'Extend pause',
+    // Pause modal in JS (title = pause_subscription, back button = cancel)
+    'pause_modal' => [
+        'description' => 'Select how many shipments you want to skip.',
+        'length' => 'Pause length (shipments)',
+        'shipment_1' => '1 shipment',
+        'shipment_2' => '2 shipments',
+        'shipment_3' => '3 shipments',
+        'months' => 'Actual months:',
+        'next_box' => 'Next box after pause:',
+        'confirm' => 'Confirm pause',
+        // Date format of the next box in JS (toLocaleDateString)
+        'date_locale' => 'en-GB',
+    ],
+    // Pickup point change in JS (when the server sends no message of its own)
+    'packeta_change' => [
+        'success' => 'Pickup point changed successfully!',
+        'failed' => 'Failed to change pickup point. Please try again.',
+        'error' => 'An error occurred while saving the pickup point.',
+    ],
     'paused_by_admin' => 'Paused by our team',
     'paused_by_admin_help' => 'This subscription was paused by our team. Please contact us to resume it.',
     'payment_failure_pause_title' => 'Payment failed',

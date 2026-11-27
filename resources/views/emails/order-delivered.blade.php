@@ -81,20 +81,17 @@
                             <!-- Thank You Message -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Děkujeme za nákup' : 'Thank you for your purchase' }}
+                                    {{ __('emails.order_delivered.thanks_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #4a6741; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Doufáme, že si kávu vychutnáte! Pokud budete mít jakékoli dotazy nebo připomínky, neváhejte nás kontaktovat.
-                                    @else
-                                    We hope you enjoy your coffee! If you have any questions or feedback, don't hesitate to contact us.
-                                    @endif
+                                    {{-- Text s apostrofem byl v šabloně bez escapování, proto {!! !!} --}}
+                                    {!! __('emails.order_delivered.thanks_text', [], $locale) !!}
                                 </p>
                             </div>
                             
                             <!-- Order Items -->
                             <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 32px 0 20px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                {{ $locale === 'cs' ? 'Co jste si vyzvedli' : 'What you picked up' }}
+                                {{ __('emails.order_delivered.picked_up_title', [], $locale) }}
                             </div>
                             
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-top: 1px solid #bcbeb1;">

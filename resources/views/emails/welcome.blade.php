@@ -43,7 +43,7 @@
                             <!-- Greeting -->
                             <div style="border-top: 2px solid #CA4136; padding: 24px 0; margin: 32px 0;">
                                 <div style="font-size: 11px; color: #76716C; font-weight: 400; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Dobrý den' : 'Hello' }}
+                                    {{ __('emails.common.hello', [], $locale) }}
                                 </div>
                                 <div style="font-size: 28px; font-weight: 400; color: #1c1c1c; letter-spacing: -0.02em;">
                                     {{ $user->name }}
@@ -53,7 +53,7 @@
                             <!-- Welcome message -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Vítejte v KAVI' : 'Welcome to KAVI' }}
+                                    {{ __('emails.welcome.title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #4a6741; margin: 0;">
                                     {{ __('emails.welcome.intro', [], $locale) }}
@@ -127,7 +127,7 @@
                                     <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Výběrová káva' : 'Specialty coffee' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.welcome.feature_specialty', [], $locale) }}
                                 </span>
                             </div>
                             

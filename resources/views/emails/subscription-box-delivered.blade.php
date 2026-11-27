@@ -53,48 +53,41 @@
                             <!-- Thank You Message -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Děkujeme' : 'Thank you' }}
+                                    {{ __('emails.common.thank_you', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #4a6741; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Doufáme, že si tento měsíc vychutnáte výběr káv, které jsme pro vás připravili. Každá káva má svůj jedinečný příběh a chuťový profil.
-                                    @else
-                                    We hope you enjoy this month's selection of coffees we've prepared for you. Each coffee has its unique story and flavor profile.
-                                    @endif
+                                    {{-- Text s apostrofy byl v šabloně bez escapování, proto {!! !!} --}}
+                                    {!! __('emails.subscription_box_delivered.thanks_text', [], $locale) !!}
                                 </p>
                             </div>
                             
                             <!-- What's inside -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Co jste si vyzvedli' : 'What you picked up' }}
+                                    {{ __('emails.subscription_box_delivered.picked_up_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
                                     <span style="color: #CA4136;">→</span> 
                                     @if($subscription->configuration['type'] === 'espresso')
                                         Espresso
                                     @elseif($subscription->configuration['type'] === 'filter')
-                                        {{ $locale === 'cs' ? 'Filtrovaná káva' : 'Filter coffee' }}
+                                        {{ __('emails.subscription_box_delivered.type_filter_coffee', [], $locale) }}
                                     @else
-                                        Mix Espresso & {{ $locale === 'cs' ? 'Filtr' : 'Filter' }}
+                                        Mix Espresso & {{ __('emails.subscription_box_delivered.type_filter', [], $locale) }}
                                     @endif
                                 </p>
                                 <p style="font-size: 14px; color: #5a5a5a; line-height: 1.6; margin: 4px 0 4px 18px;">
-                                    {{ $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2 }} {{ $locale === 'cs' ? 'balení' : 'packages' }}
+                                    {{ __('emails.subscription_box_delivered.packages', ['count' => $subscription->configuration['quantity'] ?? $subscription->configuration['amount'] ?? 2], $locale) }}
                                 </p>
                             </div>
                             
                             <!-- Feedback request -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Jak vám káva chutná?' : 'How do you like your coffee?' }}
+                                    {{ __('emails.subscription_box_delivered.feedback_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.6; margin: 4px 0;">
-                                    @if($locale === 'cs')
-                                    Vaše zpětná vazba nám pomáhá vybírat ty nejlepší kávy. Napište nám, co vám chutnalo nejvíce!
-                                    @else
-                                    Your feedback helps us select the best coffees. Let us know what you liked the most!
-                                    @endif
+                                    {{ __('emails.subscription_box_delivered.feedback_text', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -111,7 +104,7 @@
                                     <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Flexibilní předplatné' : 'Flexible subscription' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_box_delivered.feature_flexible', [], $locale) }}
                                 </span>
                             </div>
                             

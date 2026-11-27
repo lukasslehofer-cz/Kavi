@@ -53,14 +53,10 @@
                             <!-- Payment Confirmed -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px;">
-                                    {{ $locale === 'cs' ? 'Platba přijata' : 'Payment received' }}
+                                    {{ __('emails.subscription_payment_success.received_label', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #4a6741; margin: 0;">
-                                    @if($locale === 'cs')
-                                    Vaše pravidelná platba byla úspěšně zpracována. Děkujeme za vaši podporu!
-                                    @else
-                                    Your recurring payment has been successfully processed. Thank you for your support!
-                                    @endif
+                                    {{ __('emails.subscription_payment_success.received_text', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -71,22 +67,22 @@
                                 </div>
                                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Částka' : 'Amount' }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.subscription_payment_success.amount_label', [], $locale) }}:</td>
                                         <td style="padding: 8px 0; font-size: 16px; color: #1c1c1c; text-align: right; font-weight: 400;">
                                             {{-- Bez pevného počtu desetinných míst – EUR se strhává na centy --}}
                                             {{ \App\Helpers\CurrencyHelper::formatByCurrency($payment->amount, $payment->currency ?: $subscription->currency) }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Datum platby' : 'Payment date' }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.subscription_payment_success.payment_date_label', [], $locale) }}:</td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">
                                             {{ $payment->paid_at ? $payment->paid_at->format('j. n. Y') : now()->format('j. n. Y') }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ $locale === 'cs' ? 'Platební metoda' : 'Payment method' }}:</td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #76716C;">{{ __('emails.subscription_payment_success.payment_method', [], $locale) }}:</td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1c1c1c; text-align: right;">
-                                            {{ $locale === 'cs' ? 'Karta' : 'Card' }}
+                                            {{ __('emails.subscription_payment_success.card', [], $locale) }}
                                         </td>
                                     </tr>
                                 </table>
@@ -95,11 +91,11 @@
                             <!-- What's next -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em;">
-                                    {{ $locale === 'cs' ? 'Co se stane dále' : 'What happens next' }}
+                                    {{ __('emails.subscription_payment_success.next_title', [], $locale) }}
                                 </div>
                                 <p style="font-size: 15px; color: #1c1c1c; line-height: 1.8; margin: 4px 0;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Pečlivě vybíráme kávy do vašeho boxu' : 'We\'re carefully selecting coffees for your box' }}<br>
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'O expedici vás budeme informovat emailem' : 'We\'ll notify you when we ship' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_payment_success.next_selecting', [], $locale) }}<br>
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_payment_success.next_notify', [], $locale) }}
                                 </p>
                             </div>
                             
@@ -116,7 +112,7 @@
                                     <span style="color: #CA4136;">→</span> {{ __('emails.common.freshly_roasted', [], $locale) }}
                                 </span>
                                 <span style="display: inline-block; margin: 0 24px 8px 0; font-size: 12px; color: #5a5a5a;">
-                                    <span style="color: #CA4136;">→</span> {{ $locale === 'cs' ? 'Bezpečná platba' : 'Secure payment' }}
+                                    <span style="color: #CA4136;">→</span> {{ __('emails.subscription_payment_success.feature_secure', [], $locale) }}
                                 </span>
                             </div>
                             

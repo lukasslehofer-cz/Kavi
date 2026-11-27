@@ -21,8 +21,11 @@ class BlogController extends Controller
         // Filter by tag if provided
         if ($request->filled('tag')) {
             $query->withTag($request->tag);
-            $currentTag = Tag::where('slug_cs', $request->tag)
-                            ->orWhere('slug_en', $request->tag)
+            $currentTag = Tag::where(function ($query) use ($request) {
+                                foreach (Tag::slugColumns() as $column) {
+                                    $query->orWhere($column, $request->tag);
+                                }
+                            })
                             ->first();
         } else {
             $currentTag = null;

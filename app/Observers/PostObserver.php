@@ -12,7 +12,8 @@ class PostObserver
      */
     public function updated(Post $post): void
     {
-        foreach (['cs' => 'slug_cs', 'en' => 'slug_en'] as $locale => $column) {
+        foreach (\App\Helpers\Site::locales() as $locale) {
+            $column = 'slug_' . $locale;
             if (! $post->wasChanged($column)) {
                 continue;
             }
@@ -28,7 +29,7 @@ class PostObserver
         }
 
         // Slug, který se znovu stal aktuálním, už se nepřesměrovává
-        $currentSlugs = array_filter([$post->slug_cs, $post->slug_en]);
+        $currentSlugs = array_filter(array_map(fn ($column) => $post->getAttribute($column), Post::slugColumns()));
         if ($currentSlugs) {
             PostSlugRedirect::whereIn('old_slug', $currentSlugs)->delete();
         }

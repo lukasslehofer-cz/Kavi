@@ -80,13 +80,17 @@ class AnnouncementBannerController extends Controller
         $validated = $request->validate([
             'message_cs' => 'required|string|max:500',
             'message_en' => 'nullable|string|max:500',
+            'message_sk' => 'nullable|string|max:500',
             'title_cs' => 'nullable|string|max:120',
             'title_en' => 'nullable|string|max:120',
+            'title_sk' => 'nullable|string|max:120',
             // Odkaz: relativní cesta (/darky) nebo https adresa
             'link_label_cs' => 'nullable|string|max:80|required_with:link_url_cs',
             'link_url_cs' => ['nullable', 'string', 'max:255', 'required_with:link_label_cs', 'regex:/^(\/(?!\/)|https:\/\/)/'],
             'link_label_en' => 'nullable|string|max:80|required_with:link_url_en',
             'link_url_en' => ['nullable', 'string', 'max:255', 'required_with:link_label_en', 'regex:/^(\/(?!\/)|https:\/\/)/'],
+            'link_label_sk' => 'nullable|string|max:80|required_with:link_url_sk',
+            'link_url_sk' => ['nullable', 'string', 'max:255', 'required_with:link_label_sk', 'regex:/^(\/(?!\/)|https:\/\/)/'],
             'icon' => 'required|string|in:' . implode(',', array_keys(AnnouncementBanner::ICONS)),
             'active_from' => 'nullable|date',
             'active_until' => 'nullable|date|after_or_equal:active_from',

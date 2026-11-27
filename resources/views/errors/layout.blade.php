@@ -2,15 +2,17 @@
     // Detect locale from domain for error pages (middleware may not run for some errors)
     $host = request()->getHost();
     $detectedLocale = $currentLocale ?? (\App\Helpers\Site::forHost($host)?->locale ?? 'cs');
+    // Odkazy v jazyce webu i bez middleware (localizedRoute() by vzal jazyk aplikace)
+    $routeFor = fn (string $name) => route(\App\Services\EmailService::routeName($detectedLocale, $name));
 @endphp
 <!DOCTYPE html>
-<html lang="{{ $detectedLocale === 'en' ? 'en' : 'cs' }}">
+<html lang="{{ $detectedLocale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', $detectedLocale === 'en' ? 'Error | KAVI' : 'Chyba | KAVI.cz')</title>
-    
+    <title>@yield('title', __('errors.layout.title', [], $detectedLocale))</title>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen flex flex-col bg-[#e5e6df] text-[#1c1c1c]">
@@ -26,27 +28,27 @@
                 <!-- Navigation -->
                 <nav class="hidden md:flex items-center gap-8">
                     <a href="{{ route('home') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Home' : 'Úvod' }}
+                        {{ __('errors.links.home', [], $detectedLocale) }}
                     </a>
-                    <a href="{{ localizedRoute('subscriptions.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Coffee Boxes' : 'Kávové boxy' }}
+                    <a href="{{ $routeFor('subscriptions.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ __('errors.links.coffee_boxes', [], $detectedLocale) }}
                     </a>
-                    <a href="{{ localizedRoute('products.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Shop' : 'Obchod' }}
+                    <a href="{{ $routeFor('products.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ __('errors.links.shop', [], $detectedLocale) }}
                     </a>
                     @if(\App\Helpers\GiftHelper::enabled())
-                    <a href="{{ localizedRoute('gifts.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Gifts' : 'Dárky' }}
+                    <a href="{{ $routeFor('gifts.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ __('errors.links.gifts', [], $detectedLocale) }}
                     </a>
                     @endif
-                    <a href="{{ localizedRoute('contact') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Contact' : 'Kontakt' }}
+                    <a href="{{ $routeFor('contact') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ __('errors.links.contact', [], $detectedLocale) }}
                     </a>
                 </nav>
 
                 <!-- Mobile menu button -->
                 <a href="{{ route('home') }}" class="md:hidden text-xs uppercase tracking-widest border-b border-[#1c1c1c]">
-                    {{ $detectedLocale === 'en' ? 'Home' : 'Úvod' }}
+                    {{ __('errors.links.home', [], $detectedLocale) }}
                 </a>
             </div>
         </div>
@@ -63,19 +65,19 @@
             <div class="py-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-xs uppercase tracking-widest">© {{ date('Y') }} KAVI</p>
                 <div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
-                    <a href="{{ localizedRoute('terms-of-service') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Terms' : 'Podmínky' }}
+                    <a href="{{ $routeFor('terms-of-service') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ __('errors.links.terms', [], $detectedLocale) }}
                     </a>
-                    <a href="{{ localizedRoute('privacy-policy') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Privacy' : 'Ochrana údajů' }}
+                    <a href="{{ $routeFor('privacy-policy') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ __('errors.links.privacy', [], $detectedLocale) }}
                     </a>
                     @if(\App\Helpers\GiftHelper::enabled())
-                    <a href="{{ localizedRoute('gifts.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Gifts' : 'Dárky' }}
+                    <a href="{{ $routeFor('gifts.index') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ __('errors.links.gifts', [], $detectedLocale) }}
                     </a>
                     @endif
-                    <a href="{{ localizedRoute('contact') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
-                        {{ $detectedLocale === 'en' ? 'Contact' : 'Kontakt' }}
+                    <a href="{{ $routeFor('contact') }}" class="text-xs uppercase tracking-widest hover:text-red-600 transition-colors">
+                        {{ __('errors.links.contact', [], $detectedLocale) }}
                     </a>
                 </div>
             </div>

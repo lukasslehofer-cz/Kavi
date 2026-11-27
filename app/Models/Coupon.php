@@ -322,10 +322,10 @@ class Coupon extends Model
         }
 
         if ($this->free_shipping) {
-            return CurrencyHelper::isCzk() ? 'Doprava zdarma' : 'Free shipping';
+            return __('shop.coupon.free_shipping');
         }
 
-        return CurrencyHelper::isCzk() ? 'Žádná sleva' : 'No discount';
+        return __('shop.coupon.no_discount');
     }
 
     /**
@@ -339,17 +339,13 @@ class Coupon extends Model
             $value = $this->getSubscriptionDiscountValue();
             $desc = '-'.CurrencyHelper::formatAmount($value);
         } else {
-            return CurrencyHelper::isCzk() ? 'Žádná sleva' : 'No discount';
+            return __('shop.coupon.no_discount');
         }
 
         if ($this->subscription_discount_months) {
-            if (CurrencyHelper::isCzk()) {
-                $desc .= " po dobu {$this->subscription_discount_months} ".$this->getMonthsWord($this->subscription_discount_months);
-            } else {
-                $desc .= " for {$this->subscription_discount_months} ".($this->subscription_discount_months === 1 ? 'month' : 'months');
-            }
+            $desc .= trans_choice('shop.coupon.for_months', $this->subscription_discount_months, ['count' => $this->subscription_discount_months]);
         } else {
-            $desc .= CurrencyHelper::isCzk() ? ' neomezeně' : ' unlimited';
+            $desc .= __('shop.coupon.unlimited');
         }
 
         return $desc;

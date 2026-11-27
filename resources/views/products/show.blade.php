@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $product->getName() . ($product->roastery ? ' – ' . $product->roastery->getName() : '') . ' | ' . ($currentLocale === 'en' ? 'KAVI' : 'KAVI.cz'))
+@section('title', $product->getName() . ($product->roastery ? ' – ' . $product->roastery->getName() : '') . ' | ' . \App\Helpers\Site::current()->name())
 
 @php
     $productDescription = Str::limit(strip_tags($product->getDescription()), 160);
@@ -27,7 +27,7 @@
 @section('meta_description', $productDescription)
 
 @section('og_title')
-{{ $product->getName() }}{{ $product->roastery ? ' – ' . $product->roastery->getName() : '' }} | {{ $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz' }}
+{{ $product->getName() }}{{ $product->roastery ? ' – ' . $product->roastery->getName() : '' }} | {{ \App\Helpers\Site::current()->name() }}
 @endsection
 
 @section('og_description', $productDescription)
@@ -40,8 +40,10 @@
 
 @section('structured_data')
 @php
-    $productPrice = $product->isOnSale() ? $product->sale_price : $product->price;
-    $currency = $currentLocale === 'en' ? 'EUR' : 'CZK';
+    $productPrice = \App\Helpers\CurrencyHelper::isEur()
+        ? $product->getPrice()
+        : ($product->isOnSale() ? $product->sale_price : $product->price);
+    $currency = \App\Helpers\CurrencyHelper::code();
 
     // Determine availability status for Schema.org
     if (!$product->is_active) {
@@ -78,7 +80,7 @@
                 "availability": "{{ $availability }}",
                 "seller": {
                     "@type": "Organization",
-                    "name": "{{ $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz' }}"
+                    "name": "{{ \App\Helpers\Site::current()->name() }}"
                 }
             }
             @if($product->roastery)
@@ -101,13 +103,13 @@
                 {
                     "@type": "ListItem",
                     "position": 1,
-                    "name": "{{ $currentLocale === 'en' ? 'Home' : 'Domů' }}",
+                    "name": "{{ __('messages.general.home') }}",
                     "item": "{{ $siteUrl }}"
                 },
                 {
                     "@type": "ListItem",
                     "position": 2,
-                    "name": "{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}",
+                    "name": "{{ __('products.shop') }}",
                     "item": "{{ localizedRoute('products.index') }}"
                 },
                 {
@@ -195,9 +197,9 @@
         <!-- Microscopic Breadcrumbs - at top -->
         <nav class="mb-24">
           <ol class="flex items-center gap-1 text-warm-400" style="font-size: 10px; letter-spacing: 0.1em;">
-            <li><a href="{{ route('home') }}" class="uppercase hover:text-dark-800 transition-colors">{{ $currentLocale === 'en' ? 'Home' : 'Domů' }}</a></li>
+            <li><a href="{{ route('home') }}" class="uppercase hover:text-dark-800 transition-colors">{{ __('messages.general.home') }}</a></li>
             <li>/</li>
-            <li><a href="{{ localizedRoute('products.index') }}" class="uppercase hover:text-dark-800 transition-colors">{{ $currentLocale === 'en' ? 'Shop' : 'Obchod' }}</a></li>
+            <li><a href="{{ localizedRoute('products.index') }}" class="uppercase hover:text-dark-800 transition-colors">{{ __('products.shop') }}</a></li>
             <li>/</li>
             <li class="text-dark-800 uppercase">{{ Str::limit($product->getName(), 30) }}</li>
           </ol>
@@ -208,17 +210,17 @@
           @if(!$product->is_active)
           <span class="text-xs uppercase tracking-widest text-dark-800">
             <span class="inline-block w-1.5 h-1.5 bg-gray-500 rounded-full mr-1"></span>
-            {{ $currentLocale === 'en' ? 'NO LONGER AVAILABLE' : 'UŽ NENÍ V NABÍDCE' }}
+            {{ __('products.show.availability.discontinued') }}
           </span>
           @elseif($product->stock > 0)
           <span class="text-xs uppercase tracking-widest text-dark-800">
             <span class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
-            {{ $currentLocale === 'en' ? 'AVAILABILITY: IN STOCK' : 'DOSTUPNOST: SKLADEM' }}
+            {{ __('products.show.availability.in_stock') }}
           </span>
           @else
           <span class="text-xs uppercase tracking-widest text-dark-800">
             <span class="inline-block w-1.5 h-1.5 bg-red-500 rounded-full mr-1"></span>
-            {{ $currentLocale === 'en' ? 'AVAILABILITY: OUT OF STOCK' : 'DOSTUPNOST: VYPRODÁNO' }}
+            {{ __('products.show.availability.out_of_stock') }}
           </span>
           @endif
         </div>
@@ -277,7 +279,7 @@
           <!-- Quantity Selector - Simple Row -->
           <div class="mb-6">
             <span class="block text-xs uppercase tracking-widest text-warm-500 mb-3">
-              {{ $currentLocale === 'en' ? 'Quantity' : 'Množství' }}
+              {{ __('products.show.quantity') }}
             </span>
             <div class="flex items-center gap-4">
               @for($i = 1; $i <= min(5, $product->stock); $i++)
@@ -293,23 +295,20 @@
 
           <!-- Add to Cart - Black Button -->
           <button type="submit" class="inline-flex items-center justify-center gap-2 bg-dark-800 text-white font-display uppercase tracking-widest px-8 py-4 hover:bg-dark-900 transition-all">
-            <span>{{ $currentLocale === 'en' ? 'Add to Cart' : 'Přidat do košíku' }}</span>
+            <span>{{ __('products.show.add_to_cart') }}</span>
             <span>→</span>
           </button>
         </form>
         @elseif(!$product->is_active)
         <div class="mb-12">
           <p class="text-sm text-warm-600 font-light leading-relaxed max-w-lg">
-            {{ $currentLocale === 'en'
-              ? 'This product is no longer available for purchase. You can explore similar products in the recommended section below or browse our current selection.'
-              : 'Tento produkt již není v prodeji. Můžete prozkoumat podobné produkty v doporučené sekci níže nebo procházet naši aktuální nabídku.'
-            }}
+            {{ __('products.show.discontinued_text') }}
           </p>
         </div>
         @else
         <div class="mb-12">
           <p class="text-xs uppercase tracking-widest text-warm-500">
-            {{ $currentLocale === 'en' ? 'This product is currently unavailable.' : 'Tento produkt je momentálně nedostupný.' }}
+            {{ __('products.show.unavailable_text') }}
           </p>
         </div>
         @endif
@@ -320,15 +319,15 @@
           @if(is_array($product->category) && !empty($product->category))
           <div class="border-b border-dark-800 py-4 flex items-baseline">
             <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">
-              {{ $currentLocale === 'en' ? 'Category' : 'Kategorie' }}
+              {{ __('products.show.category') }}
             </span>
             <span class="text-xs uppercase tracking-widest text-dark-800">—
               @php
                 $categoryLabels = [
-                  'espresso' => 'Espresso',
-                  'filter' => $currentLocale === 'en' ? 'Filter' : 'Filtr',
-                  'decaf' => $currentLocale === 'en' ? 'Decaf' : 'Bezkofeinová',
-                  'accessories' => $currentLocale === 'en' ? 'Accessories' : 'Příslušenství',
+                  'espresso' => __('products.categories.espresso'),
+                  'filter' => __('products.categories.filter'),
+                  'decaf' => __('products.categories.decaf'),
+                  'accessories' => __('products.categories.accessories'),
                 ];
                 $cats = array_map(fn($c) => $categoryLabels[$c] ?? $c, $product->category);
                 echo implode(', ', $cats);
@@ -342,9 +341,13 @@
             @if($product->isCoffee())
               {{-- Coffee: Fixed attributes --}}
               @php
-                $mainAttributes = $currentLocale === 'en'
-                  ? ['origin' => 'Origin', 'processing' => 'Processing', 'flavor_notes' => 'Flavor', 'altitude' => 'Altitude', 'variety' => 'Variety']
-                  : ['origin' => 'Původ', 'processing' => 'Zpracování', 'flavor_notes' => 'Chuť', 'altitude' => 'Nadm. výška', 'variety' => 'Odrůda'];
+                $mainAttributes = [
+                  'origin' => __('products.show.attributes.origin'),
+                  'processing' => __('products.show.attributes.processing'),
+                  'flavor_notes' => __('products.show.attributes.flavor_notes'),
+                  'altitude' => __('products.show.attributes.altitude'),
+                  'variety' => __('products.show.attributes.variety'),
+                ];
               @endphp
 
               @foreach($mainAttributes as $key => $label)
@@ -360,7 +363,7 @@
               @if(!empty($product->attributes['weight']))
               <div class="border-b border-dark-800 py-4 flex items-baseline">
                 <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">
-                  {{ $currentLocale === 'en' ? 'Weight' : 'Hmotnost' }}
+                  {{ __('products.show.weight') }}
                 </span>
                 <span class="text-xs uppercase tracking-widest text-dark-800">— {{ $product->attributes['weight'] }}g</span>
               </div>
@@ -369,10 +372,10 @@
               @if(!empty($product->attributes['roast_date']))
               <div class="border-b border-dark-800 py-4 flex items-baseline">
                 <span class="text-xs uppercase tracking-widest text-warm-500 w-32 flex-shrink-0">
-                  {{ $currentLocale === 'en' ? 'Roast date' : 'Datum pražení' }}
+                  {{ __('products.show.roast_date') }}
                 </span>
                 <span class="text-xs uppercase tracking-widest text-dark-800">
-                  — {{ \Carbon\Carbon::parse($product->attributes['roast_date'])->format($currentLocale === 'en' ? 'm/d/Y' : 'd.m.Y') }}
+                  — {{ \Carbon\Carbon::parse($product->attributes['roast_date'])->format(__('products.show.roast_date_format')) }}
                 </span>
               </div>
               @endif
@@ -383,13 +386,9 @@
 
               @foreach($customAttrs as $attr)
                 @php
-                  // Get translated label and value
-                  $label = $currentLocale === 'en' && !empty($attr['label_en'])
-                    ? $attr['label_en']
-                    : $attr['label_cs'];
-                  $value = $currentLocale === 'en' && !empty($attr['value_en'])
-                    ? $attr['value_en']
-                    : $attr['value_cs'];
+                  // Popisek a hodnota v jazyce webu (Product::getCustomAttributes)
+                  $label = $attr['label'];
+                  $value = $attr['value'];
                 @endphp
 
                 @if(!empty($value))
@@ -454,7 +453,7 @@
     
     <!-- Section Heading -->
     <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 uppercase tracking-tight leading-tight sm:leading-[0.95] mb-10">
-      {{ $currentLocale === 'en' ? 'You might also like' : 'Mohlo by vás také zajímat' }}
+      {{ __('products.show.related_heading') }}
     </h2>
     
     <!-- Products Grid -->
@@ -523,15 +522,15 @@
     <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
       <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
         <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-          {{ $currentLocale === 'en' ? 'Want regular coffee delivery?' : 'Chcete pravidelnou dodávku kávy?' }}
+          {{ __('products.cta.heading') }}
         </h2>
 
         <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
-          {{ $currentLocale === 'en' ? 'With our subscription, you save time and money. Fresh coffee delivered to your door, cancel anytime.' : 'S naším předplatným ušetříte čas i peníze. Čerstvá káva přímo k vám domů, kdykoliv zrušitelné.' }}
+          {{ __('products.cta.text') }}
         </p>
 
         <a href="{{ localizedRoute('home') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-          <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
+          <span>{{ __('products.cta.link') }}</span>
           <span class="text-primary-500 group-hover:translate-x-1 transition-transform">→</span>
         </a>
       </div>

@@ -110,7 +110,7 @@ class ShippingService
     public function formatShippingCost(float $cost): string
     {
         if ($cost == 0) {
-            return CurrencyHelper::isCzk() ? 'Zdarma' : 'Free';
+            return __('shop.shipping.free');
         }
 
         return CurrencyHelper::formatAmount($cost);

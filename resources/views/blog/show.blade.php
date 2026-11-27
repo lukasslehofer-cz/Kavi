@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', $post->getTitle() . ' - ' . ($currentLocale === 'en' ? 'KAVI' : 'KAVI.cz'))
+@section('title', $post->getTitle() . ' - ' . \App\Helpers\Site::current()->name())
 
 @section('meta_description')
 {{ $post->getPerex() ?? Str::limit(strip_tags($post->getContent()), 160) }}
 @endsection
 
 @section('og_title')
-{{ $post->getTitle() }} | {{ $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz' }}
+{{ $post->getTitle() }} | {{ \App\Helpers\Site::current()->name() }}
 @endsection
 
 @section('og_description')
@@ -37,7 +37,7 @@
       <ol class="flex items-center gap-2 text-xs uppercase tracking-widest text-warm-500">
         <li>
           <a href="{{ localizedRoute('home') }}" class="hover:text-dark-800 transition-colors">
-            {{ $currentLocale === 'en' ? 'Home' : 'Domů' }}
+            {{ __('messages.general.home') }}
           </a>
         </li>
         <li class="text-warm-300">—</li>
@@ -62,7 +62,7 @@
       @if($post->author)
       <span class="text-warm-300">·</span>
       <span class="text-xs uppercase tracking-widest text-warm-500">
-        {{ $currentLocale === 'en' ? 'By' : 'Autor' }} {{ $post->author }}
+        {{ __('blog.author') }} {{ $post->author }}
       </span>
       @endif
 
@@ -108,7 +108,7 @@
       @if($post->tags->isNotEmpty())
       <div class="mt-12 pt-8 border-t border-warm-300">
         <p class="text-xs uppercase tracking-widest text-warm-500 mb-4">
-          {{ $currentLocale === 'en' ? 'Tags' : 'Tagy' }}
+          {{ __('blog.show.tags') }}
         </p>
         <div class="flex flex-wrap gap-2">
           @foreach($post->tags as $tag)
@@ -125,7 +125,7 @@
       <div class="mt-12">
         <a href="{{ localizedRoute('blog.index') }}" class="group inline-flex items-center gap-2 text-warm-500 font-display uppercase tracking-widest hover:text-dark-800 transition-all">
           <span class="text-primary-500 group-hover:-translate-x-1 transition-transform">←</span>
-          <span>{{ $currentLocale === 'en' ? 'Back to blog' : 'Zpět na blog' }}</span>
+          <span>{{ __('blog.show.back') }}</span>
         </a>
       </div>
     </div>
@@ -137,7 +137,7 @@
 <div class="py-12 sm:py-16 lg:py-20 border-t border-warm-300" style="background-color: #e5e6df;">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8">
     <h2 class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight mb-10">
-      {{ $currentLocale === 'en' ? 'Related articles' : 'Související články' }}
+      {{ __('blog.show.related') }}
     </h2>
 
     <div class="grid gap-x-4 sm:gap-x-8 lg:gap-x-10 gap-y-10 sm:gap-y-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -197,29 +197,29 @@
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->
       <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-        {{ $currentLocale === 'en' ? 'Start your coffee journey today' : 'Začněte svou kávovou cestu ještě dnes' }}
+        {{ __('blog.show.promo_heading') }}
       </h2>
 
       <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
-        {{ $currentLocale === 'en' ? 'Get access to the best coffee from all over Europe. Flexible subscription, no commitment.' : 'Získejte přístup k nejlepší kávě z celé Evropy. Flexibilní předplatné, bez závazků.' }}
+        {{ __('blog.show.promo_text') }}
       </p>
 
       <!-- CTA Links -->
       <div class="flex flex-col sm:flex-row gap-6 sm:gap-10">
         <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-          <span>{{ $currentLocale === 'en' ? 'Build your coffee box' : 'Sestavit kávový box' }}</span>
+          <span>{{ __('blog.show.promo_subscription') }}</span>
           <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
 
         @if(\App\Helpers\GiftHelper::blogCtaVisible())
         <a href="{{ localizedRoute('gifts.index') }}" class="group inline-flex items-center gap-2 text-warm-400 font-display uppercase tracking-widest hover:text-dark-800 transition-all">
-          <span>{{ $currentLocale === 'en' ? 'Gift subscription' : 'Dárkové předplatné' }}</span>
+          <span>{{ __('blog.show.promo_gift') }}</span>
           <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
         @endif
 
         <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-warm-400 font-display uppercase tracking-widest hover:text-dark-800 transition-all">
-          <span>{{ $currentLocale === 'en' ? 'Browse coffees' : 'Procházet kávy' }}</span>
+          <span>{{ __('blog.show.promo_shop') }}</span>
           <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
       </div>

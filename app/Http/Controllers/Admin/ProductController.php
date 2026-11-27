@@ -204,10 +204,13 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'name_en' => 'nullable|string|max:255',
+            'name_sk' => 'nullable|string|max:255',
             'description' => 'required|string',
             'description_en' => 'nullable|string',
+            'description_sk' => 'nullable|string',
             'short_description' => 'nullable|string',
             'short_description_en' => 'nullable|string',
+            'short_description_sk' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'price_eur' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
@@ -247,12 +250,19 @@ class ProductController extends Controller
             'processing_en' => 'nullable|string|max:255',
             'variety_en' => 'nullable|string|max:255',
             'flavor_notes_en' => 'nullable|string|max:1000',
+            // Attributes for coffee products (SK)
+            'origin_sk' => 'nullable|string|max:255',
+            'processing_sk' => 'nullable|string|max:255',
+            'variety_sk' => 'nullable|string|max:255',
+            'flavor_notes_sk' => 'nullable|string|max:1000',
             // Custom attributes for accessories
             'custom_attributes' => 'nullable|array',
             'custom_attributes.*.label_cs' => 'required_with:custom_attributes|string|max:100',
             'custom_attributes.*.label_en' => 'nullable|string|max:100',
+            'custom_attributes.*.label_sk' => 'nullable|string|max:100',
             'custom_attributes.*.value_cs' => 'required_with:custom_attributes|string|max:500',
             'custom_attributes.*.value_en' => 'nullable|string|max:500',
+            'custom_attributes.*.value_sk' => 'nullable|string|max:500',
         ]);
 
         if (!empty($validated['altitude'])) {
@@ -302,7 +312,8 @@ class ProductController extends Controller
         if ($isCoffee) {
             // Coffee: use fixed attributes
             $attributeFields = ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date',
-                               'origin_en', 'processing_en', 'variety_en', 'flavor_notes_en'];
+                               'origin_en', 'processing_en', 'variety_en', 'flavor_notes_en',
+                               'origin_sk', 'processing_sk', 'variety_sk', 'flavor_notes_sk'];
 
             foreach ($attributeFields as $field) {
                 if (!empty($validated[$field])) {
@@ -322,11 +333,17 @@ class ProductController extends Controller
                         if (!empty($attr['label_en'])) {
                             $attributes[$key . '_label_en'] = $attr['label_en'];
                         }
+                        if (!empty($attr['label_sk'])) {
+                            $attributes[$key . '_label_sk'] = $attr['label_sk'];
+                        }
 
                         // Store values
                         $attributes[$key] = $attr['value_cs'];
                         if (!empty($attr['value_en'])) {
                             $attributes[$key . '_en'] = $attr['value_en'];
+                        }
+                        if (!empty($attr['value_sk'])) {
+                            $attributes[$key . '_sk'] = $attr['value_sk'];
                         }
                     }
                 }
@@ -340,7 +357,8 @@ class ProductController extends Controller
         // Remove individual attribute fields
         $fieldsToRemove = array_merge(
             ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date',
-             'origin_en', 'processing_en', 'variety_en', 'flavor_notes_en'],
+             'origin_en', 'processing_en', 'variety_en', 'flavor_notes_en',
+             'origin_sk', 'processing_sk', 'variety_sk', 'flavor_notes_sk'],
             ['custom_attributes']
         );
 
@@ -410,10 +428,13 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'name_en' => 'nullable|string|max:255',
+            'name_sk' => 'nullable|string|max:255',
             'description' => 'required|string',
             'description_en' => 'nullable|string',
+            'description_sk' => 'nullable|string',
             'short_description' => 'nullable|string',
             'short_description_en' => 'nullable|string',
+            'short_description_sk' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'price_eur' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
@@ -456,12 +477,19 @@ class ProductController extends Controller
             'processing_en' => 'nullable|string|max:255',
             'variety_en' => 'nullable|string|max:255',
             'flavor_notes_en' => 'nullable|string|max:1000',
+            // Attributes for coffee products (SK)
+            'origin_sk' => 'nullable|string|max:255',
+            'processing_sk' => 'nullable|string|max:255',
+            'variety_sk' => 'nullable|string|max:255',
+            'flavor_notes_sk' => 'nullable|string|max:1000',
             // Custom attributes for accessories
             'custom_attributes' => 'nullable|array',
             'custom_attributes.*.label_cs' => 'required_with:custom_attributes|string|max:100',
             'custom_attributes.*.label_en' => 'nullable|string|max:100',
+            'custom_attributes.*.label_sk' => 'nullable|string|max:100',
             'custom_attributes.*.value_cs' => 'required_with:custom_attributes|string|max:500',
             'custom_attributes.*.value_en' => 'nullable|string|max:500',
+            'custom_attributes.*.value_sk' => 'nullable|string|max:500',
         ]);
 
         if (!empty($validated['altitude'])) {
@@ -508,7 +536,8 @@ class ProductController extends Controller
         if ($isCoffee) {
             // Coffee: use fixed attributes
             $attributeFields = ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date',
-                               'origin_en', 'processing_en', 'variety_en', 'flavor_notes_en'];
+                               'origin_en', 'processing_en', 'variety_en', 'flavor_notes_en',
+                               'origin_sk', 'processing_sk', 'variety_sk', 'flavor_notes_sk'];
 
             foreach ($attributeFields as $field) {
                 if (!empty($validated[$field])) {
@@ -528,11 +557,17 @@ class ProductController extends Controller
                         if (!empty($attr['label_en'])) {
                             $attributes[$key . '_label_en'] = $attr['label_en'];
                         }
+                        if (!empty($attr['label_sk'])) {
+                            $attributes[$key . '_label_sk'] = $attr['label_sk'];
+                        }
 
                         // Store values
                         $attributes[$key] = $attr['value_cs'];
                         if (!empty($attr['value_en'])) {
                             $attributes[$key . '_en'] = $attr['value_en'];
+                        }
+                        if (!empty($attr['value_sk'])) {
+                            $attributes[$key . '_sk'] = $attr['value_sk'];
                         }
                     }
                 }
@@ -546,7 +581,8 @@ class ProductController extends Controller
         // Remove individual attribute fields
         $fieldsToRemove = array_merge(
             ['origin', 'altitude', 'processing', 'variety', 'flavor_notes', 'weight', 'roast_date',
-             'origin_en', 'processing_en', 'variety_en', 'flavor_notes_en'],
+             'origin_en', 'processing_en', 'variety_en', 'flavor_notes_en',
+             'origin_sk', 'processing_sk', 'variety_sk', 'flavor_notes_sk'],
             ['custom_attributes']
         );
 

@@ -43,7 +43,7 @@ class OrderConfirmation extends LocalizedMailable
         
         // Attach invoice PDF if available
         if ($this->order->invoice_pdf_path && \Storage::exists($this->order->invoice_pdf_path)) {
-            $invoicePrefix = $this->emailLocale === 'cs' ? 'Faktura-' : 'Invoice-';
+            $invoicePrefix = __('shop.files.invoice_prefix', [], $this->emailLocale);
             $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromStorage($this->order->invoice_pdf_path)
                 ->as($invoicePrefix . $this->order->order_number . '.pdf')
                 ->withMime('application/pdf');

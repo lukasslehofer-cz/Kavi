@@ -3,22 +3,27 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\HasLocalizedColumns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 class AnnouncementBanner extends Model
 {
-    use HasFactory;
+    use HasFactory, HasLocalizedColumns;
 
     protected $fillable = [
         'message_cs',
         'message_en',
+        'message_sk',
         'title_cs',
         'title_en',
+        'title_sk',
         'link_label_cs',
         'link_url_cs',
         'link_label_en',
+        'link_label_sk',
         'link_url_en',
+        'link_url_sk',
         'icon',
         'show_in_header',
         'show_in_checkout',
@@ -150,11 +155,7 @@ class AnnouncementBanner extends Model
      */
     public function getMessage(string $locale = 'cs'): string
     {
-        if ($locale === 'en' && !empty($this->message_en)) {
-            return $this->message_en;
-        }
-        
-        return $this->message_cs;
+        return $this->localizedValue('message', $locale, 'message_cs');
     }
 
     /**
@@ -162,11 +163,9 @@ class AnnouncementBanner extends Model
      */
     public function getTitle(string $locale = 'cs'): ?string
     {
-        if ($locale === 'en' && ! empty($this->title_en)) {
-            return $this->title_en;
-        }
+        $title = $this->localizedValue('title', $locale, 'title_cs');
 
-        return ! empty($this->title_cs) ? $this->title_cs : null;
+        return ! empty($title) ? $title : null;
     }
 
     /**
@@ -176,8 +175,14 @@ class AnnouncementBanner extends Model
      */
     public function getLink(string $locale = 'cs'): ?array
     {
-        $label = $locale === 'en' ? $this->link_label_en : $this->link_label_cs;
-        $url = $locale === 'en' ? $this->link_url_en : $this->link_url_cs;
+        $label = $this->getAttribute('link_label_' . $locale);
+        $url = $this->getAttribute('link_url_' . $locale);
+
+        // Slovenská hláška bez vlastního odkazu bere český (jako text hlášky); anglická ne
+        if ((empty($label) || empty($url)) && ! in_array($locale, [\App\Helpers\Site::PRIMARY_LOCALE, 'en'], true)) {
+            $label = $this->link_label_cs;
+            $url = $this->link_url_cs;
+        }
 
         if (empty($label) || empty($url)) {
             return null;

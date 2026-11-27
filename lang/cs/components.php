@@ -32,6 +32,7 @@ return [
     ],
 
     'tiers' => [
+        'title' => 'Vyberte si ideální kávový box',
         'bags' => ':grams g · :count balíčky',
         'kinds' => [
             2 => '2 druhy výběrové kávy',

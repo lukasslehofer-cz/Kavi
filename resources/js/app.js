@@ -155,7 +155,12 @@ function initSubscriptionConfigurator() {
 
         // Handle Decaf availability - visually dim but keep clickable for tooltip
         if (!availability.decaf && decafCheckboxes.length > 0) {
-            const isEn = document.documentElement.lang === 'en';
+            // Text podle jazyka stránky (<html lang>), neznámý jazyk = čeština
+            const decafSoldOutText = {
+                cs: 'Bezkofeinová káva je pro tento měsíc vyprodaná',
+                en: 'Decaf is sold out this month',
+                sk: 'Bezkofeínová káva je tento mesiac vypredaná',
+            }[document.documentElement.lang] || 'Bezkofeinová káva je pro tento měsíc vyprodaná';
             decafCheckboxes.forEach((checkbox) => {
                 const decafContainer = checkbox.closest('label');
 
@@ -179,7 +184,7 @@ function initSubscriptionConfigurator() {
                             const decafBottom = decafContainer.offsetTop + decafContainer.offsetHeight;
                             tip.style.top = (decafBottom + 4) + 'px';
                             tip.style.right = '0px';
-                            tip.textContent = isEn ? 'Decaf is sold out this month' : 'Bezkofeinová káva je pro tento měsíc vyprodaná';
+                            tip.textContent = decafSoldOutText;
                             tipAnchor.appendChild(tip);
 
                             setTimeout(() => {

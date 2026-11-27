@@ -3,23 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\HasLocalizedColumns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Stevebauman\Purify\Facades\Purify;
 
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory, HasLocalizedColumns;
 
     protected $fillable = [
         'title_cs',
         'title_en',
+        'title_sk',
         'slug_cs',
         'slug_en',
+        'slug_sk',
         'perex_cs',
         'perex_en',
+        'perex_sk',
         'content_cs',
         'content_en',
+        'content_sk',
         'featured_image',
         'author',
         'status',
@@ -35,10 +40,7 @@ class Post extends Model
      */
     public function getTitle(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->title_en)) {
-            return $this->title_en;
-        }
-        return $this->title_cs;
+        return $this->localizedValue('title', null, 'title_cs');
     }
 
     /**
@@ -46,10 +48,7 @@ class Post extends Model
      */
     public function getPerex(): ?string
     {
-        if (app()->getLocale() === 'en' && !empty($this->perex_en)) {
-            return $this->perex_en;
-        }
-        return $this->perex_cs;
+        return $this->localizedValue('perex', null, 'perex_cs');
     }
 
     /**
@@ -57,9 +56,7 @@ class Post extends Model
      */
     public function getContent(): string
     {
-        $content = (app()->getLocale() === 'en' && !empty($this->content_en))
-            ? $this->content_en
-            : ($this->content_cs ?? '');
+        $content = $this->localizedValue('content', null, 'content_cs') ?? '';
 
         // Sanitize admin-authored HTML to strip any <script>, event handlers,
         // javascript: URLs etc. while keeping normal blog formatting (stored XSS).
@@ -71,10 +68,7 @@ class Post extends Model
      */
     public function getSlug(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->slug_en)) {
-            return $this->slug_en;
-        }
-        return $this->slug_cs;
+        return $this->localizedValue('slug', null, 'slug_cs');
     }
 
     /**
@@ -127,9 +121,13 @@ class Post extends Model
      */
     public static function findBySlug(string $slug): ?self
     {
-        [$first, $second] = app()->getLocale() === 'en' ? ['slug_en', 'slug_cs'] : ['slug_cs', 'slug_en'];
+        foreach (self::slugColumns(app()->getLocale()) as $column) {
+            if ($post = self::where($column, $slug)->first()) {
+                return $post;
+            }
+        }
 
-        return self::where($first, $slug)->first() ?? self::where($second, $slug)->first();
+        return null;
     }
 
     /**
@@ -151,13 +149,16 @@ class Post extends Model
     }
 
     /**
-     * Scope to filter by tag (checks both slug_cs and slug_en)
+     * Scope to filter by tag (checks slugs of all languages)
      */
     public function scopeWithTag($query, $tagSlug)
     {
         return $query->whereHas('tags', function ($q) use ($tagSlug) {
-            $q->where('slug_cs', $tagSlug)
-              ->orWhere('slug_en', $tagSlug);
+            $q->where(function ($q) use ($tagSlug) {
+                foreach (Tag::slugColumns() as $column) {
+                    $q->orWhere($column, $tagSlug);
+                }
+            });
         });
     }
 
@@ -173,16 +174,12 @@ class Post extends Model
         
         $locale = app()->getLocale();
         
-        // Try locale-specific slug first, then fallback to other locale
-        if ($locale === 'en') {
-            return $this->where('slug_en', $value)
-                        ->orWhere('slug_cs', $value)
-                        ->first();
-        }
-        
-        return $this->where('slug_cs', $value)
-                    ->orWhere('slug_en', $value)
-                    ->first();
+        // Slug kteréhokoli jazyka (přednost jazyka domény řeší findBySlug / BlogController)
+        return $this->where(function ($query) use ($value, $locale) {
+            foreach (self::slugColumns($locale) as $column) {
+                $query->orWhere($column, $value);
+            }
+        })->first();
     }
 
     /**
@@ -193,7 +190,7 @@ class Post extends Model
         $slug = Str::slug($title);
         $originalSlug = $slug;
         $counter = 1;
-        $column = $locale === 'en' ? 'slug_en' : 'slug_cs';
+        $column = self::slugColumns($locale)[0];
 
         $query = self::where($column, $slug);
         if ($excludeId) {
@@ -236,5 +233,18 @@ class Post extends Model
         }
         
         return $this->published_at->format('j. n. Y');
+    }
+
+    /**
+     * Sloupce slugů všech jazyků webu, jazyk $locale první (slug_cs, slug_en, slug_sk).
+     *
+     * @return list<string>
+     */
+    public static function slugColumns(?string $locale = null): array
+    {
+        $locales = \App\Helpers\Site::locales();
+        $locale = in_array($locale, $locales, true) ? $locale : \App\Helpers\Site::PRIMARY_LOCALE;
+
+        return array_values(array_unique(array_map(fn ($l) => 'slug_' . $l, [$locale, ...$locales])));
     }
 }

@@ -12,20 +12,17 @@
 <div class="relative py-16 sm:py-20 lg:py-24 border-b border-dark-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal uppercase tracking-tight leading-[0.9]">
-            <span class="text-dark-800">{{ $currentLocale === 'en' ? 'SHOPPING' : 'NÁKUPNÍ' }}</span> <span class="text-primary-500">{{ $currentLocale === 'en' ? 'CART' : 'KOŠÍK' }}</span>
+            <span class="text-dark-800">{{ __('cart.hero.title_1') }}</span> <span class="text-primary-500">{{ __('cart.hero.title_2') }}</span>
         </h1>
         <div class="mt-6 flex flex-wrap items-baseline gap-x-6 gap-y-2">
             @php
                 $count = count($cartItems ?? []) + count($giftItems ?? []);
-                if ($currentLocale === 'en') {
-                    $itemsWord = $count === 1 ? __('cart.items_count_1') : __('cart.items_count_5plus');
-                } else {
-                    $itemsWord = match(true) {
-                        $count === 1 => __('cart.items_count_1'),
-                        $count >= 2 && $count <= 4 => __('cart.items_count_234'),
-                        default => __('cart.items_count_5plus')
-                    };
-                }
+                // Tři tvary (1 / 2–4 / 5+) jako v češtině a slovenštině; angličtina má items_count_234 = items_count_5plus
+                $itemsWord = match(true) {
+                    $count === 1 => __('cart.items_count_1'),
+                    $count >= 2 && $count <= 4 => __('cart.items_count_234'),
+                    default => __('cart.items_count_5plus')
+                };
             @endphp
             <span class="text-xs uppercase tracking-widest text-warm-500">
                 <span class="text-dark-800 font-display text-sm">{{ $count }}</span> {{ $itemsWord }}
@@ -74,7 +71,7 @@
             <div class="mb-8">
                 <span class="text-xs uppercase tracking-widest text-dark-800">
                     <span class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
-                    {{ $currentLocale === 'en' ? 'GRATIS SHIPPING ACHIEVED' : 'DOPRAVA ZDARMA DOSAŽENA' }}
+                    {{ __('cart.free_shipping_achieved') }}
                 </span>
             </div>
             @else
@@ -153,7 +150,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-warm-400 hover:text-dark-800 transition-colors uppercase tracking-widest" style="font-size: 8px;">
-                                            {{ $currentLocale === 'en' ? 'REMOVE' : 'ODSTRANIT' }}
+                                            {{ __('cart.remove_caps') }}
                                         </button>
                                     </form>
                                 </div>
@@ -164,11 +161,7 @@
                                 @if($item['product']->isOnSale())
                                 <div class="flex sm:flex-col items-baseline sm:items-end gap-2">
                                     <span class="font-display text-lg sm:text-xl text-dark-800 uppercase tracking-tight">
-                                        @if($currentLocale === 'en')
-                                            €{{ number_format($item['subtotal_eur'] ?? 0, 2, '.', ' ') }} —
-                                        @else
-                                            {{ number_format($item['subtotal'], 0, ',', ' ') }} Kč —
-                                        @endif
+                                        {{ \App\Helpers\CurrencyHelper::format($item['subtotal'], $item['subtotal_eur'] ?? 0) }} —
                                     </span>
                                     <span class="text-xs uppercase tracking-widest text-warm-400 line-through">
                                         {{ $item['product']->getFormattedOriginalPrice() }}
@@ -176,11 +169,7 @@
                                 </div>
                                 @else
                                 <span class="font-display text-lg sm:text-xl text-dark-800 uppercase tracking-tight">
-                                    @if($currentLocale === 'en')
-                                        €{{ number_format($item['subtotal_eur'] ?? 0, 2, '.', ' ') }} —
-                                    @else
-                                        {{ number_format($item['subtotal'], 0, ',', ' ') }} Kč —
-                                    @endif
+                                    {{ \App\Helpers\CurrencyHelper::format($item['subtotal'], $item['subtotal_eur'] ?? 0) }} —
                                 </span>
                                 @endif
                             </div>
@@ -230,7 +219,7 @@
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="text-warm-400 hover:text-dark-800 transition-colors uppercase tracking-widest" style="font-size: 8px;">
-                        {{ $currentLocale === 'en' ? 'CLEAR ALL' : 'VYPRÁZDNIT VŠE' }}
+                        {{ __('cart.clear_all_caps') }}
                     </button>
                 </form>
             </div>
@@ -248,11 +237,7 @@
                     <div class="flex justify-between items-baseline">
                         <dt class="text-xs uppercase tracking-widest text-olive-600">{{ __('cart.subtotal') }}</dt>
                         <dd class="text-sm text-dark-800 uppercase tracking-wide">
-                            @if($currentLocale === 'en')
-                                €{{ number_format($totalEur ?? 0, 2, '.', ' ') }}
-                            @else
-                                {{ number_format($total, 0, ',', ' ') }} Kč
-                            @endif
+                            {{ \App\Helpers\CurrencyHelper::format($total, $totalEur ?? 0) }}
                         </dd>
                     </div>
                     
@@ -262,14 +247,10 @@
                         <dd class="text-sm uppercase tracking-wide">
                             @if($shipping !== null)
                                 @if($shipping == 0)
-                                    <span class="text-dark-800">{{ $currentLocale === 'en' ? 'FREE' : 'ZDARMA' }}</span>
+                                    <span class="text-dark-800">{{ __('cart.free_caps') }}</span>
                                 @else
                                     <span class="text-dark-800">
-                                        @if($currentLocale === 'en')
-                                            €{{ number_format($shippingEur ?? 0, 2, '.', ' ') }}
-                                        @else
-                                            {{ number_format($shipping, 0, ',', ' ') }} Kč
-                                        @endif
+                                        {{ \App\Helpers\CurrencyHelper::format($shipping, $shippingEur ?? 0) }}
                                     </span>
                                 @endif
                             @else
@@ -284,11 +265,7 @@
                     <dt class="font-display text-2xl sm:text-3xl font-normal text-dark-800 uppercase tracking-tight">{{ __('cart.grand_total') }}</dt>
                     <dd class="font-display text-2xl sm:text-3xl text-dark-800 uppercase tracking-tight">
                         @if($shipping !== null)
-                            @if($currentLocale === 'en')
-                                €{{ number_format(($totalEur ?? 0) + ($shippingEur ?? 0), 2, '.', ' ') }} —
-                            @else
-                                {{ number_format($total + $shipping, 0, ',', ' ') }} Kč —
-                            @endif
+                            {{ \App\Helpers\CurrencyHelper::format($total + $shipping, ($totalEur ?? 0) + ($shippingEur ?? 0)) }} —
                         @else
                             <span class="text-olive-500 text-sm">{{ __('cart.at_checkout') }}</span>
                         @endif
@@ -298,7 +275,7 @@
                 <!-- CTA Buttons -->
                 <div class="mt-8 space-y-4">
                     <a href="{{ localizedRoute('checkout.index') }}" class="group w-full flex items-center justify-center gap-3 bg-dark-800 hover:bg-dark-900 text-white font-display uppercase tracking-widest px-6 py-4 transition-all duration-200">
-                        <span>{{ $currentLocale === 'en' ? 'PROCEED TO PAYMENT' : 'POKRAČOVAT K PLATBĚ' }}</span>
+                        <span>{{ __('cart.proceed_to_payment') }}</span>
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
@@ -333,7 +310,7 @@
 <section class="py-16 sm:py-20 lg:py-24 border-t border-dark-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal uppercase tracking-tight mb-4">
-            <span class="text-dark-800">{{ $currentLocale === 'en' ? 'YOU MIGHT' : 'MOHLO BY VÁS' }}</span> <span class="text-primary-500">{{ $currentLocale === 'en' ? 'ALSO LIKE' : 'TAKÉ ZAJÍMAT' }}</span>
+            <span class="text-dark-800">{{ __('cart.recommendations_heading.title_1') }}</span> <span class="text-primary-500">{{ __('cart.recommendations_heading.title_2') }}</span>
         </h2>
         <p class="text-warm-500 text-sm uppercase tracking-widest mb-12">{{ __('cart.recommendations_subtitle') }}</p>
         

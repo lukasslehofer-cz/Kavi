@@ -70,9 +70,7 @@ class FacebookCatalogFeedController extends Controller
         // Channel metadata
         $this->addElement($dom, $channel, 'title', $shopName);
         $this->addElement($dom, $channel, 'link', $baseUrl);
-        $this->addElement($dom, $channel, 'description', $locale === 'en' 
-            ? 'Premium specialty coffee from European roasteries' 
-            : 'Prémiová výběrová káva z evropských pražíren');
+        $this->addElement($dom, $channel, 'description', __('feeds.description'));
 
         // Add products
         foreach ($products as $product) {
@@ -94,26 +92,22 @@ class FacebookCatalogFeedController extends Controller
         $this->addGoogleElement($dom, $item, 'id', (string) $product->id);
 
         // g:title - Product name with roastery (required, max 200 chars)
-        $productName = $locale === 'en' && !empty($product->name_en) ? $product->name_en : $product->name;
+        $productName = $product->getName();
         $title = $productName;
         if ($product->roastery) {
-            $roasteryName = $locale === 'en' && !empty($product->roastery->name_en) 
-                ? $product->roastery->name_en 
-                : $product->roastery->name;
+            $roasteryName = $product->roastery->getName();
             $title = $productName . ' - ' . $roasteryName;
         }
         $this->addGoogleElement($dom, $item, 'title', mb_substr($title, 0, 200));
 
         // g:description - Product description (required, max 9999 chars)
-        $description = $locale === 'en' && !empty($product->description_en) 
-            ? $product->description_en 
-            : $product->description;
+        $description = $product->getDescription();
         $cleanDescription = $this->cleanDescription($description);
         $this->addGoogleElement($dom, $item, 'description', mb_substr($cleanDescription, 0, 9999));
 
         // g:link - Product URL (required)
-        $productPath = $locale === 'en' ? '/product/' : '/produkt/';
-        $this->addGoogleElement($dom, $item, 'link', $baseUrl . $productPath . $product->slug);
+        $productPath = route(\App\Services\EmailService::routeName($locale, 'products.show'), ['product' => $product->slug], false);
+        $this->addGoogleElement($dom, $item, 'link', $baseUrl . $productPath);
 
         // g:image_link - Use dedicated Facebook image (PNG/JPG) if available, then the Google image, then main image
         $mainImage = $product->facebook_image ?? $product->google_image ?? $product->image;
@@ -143,9 +137,7 @@ class FacebookCatalogFeedController extends Controller
 
         // g:brand - Roastery name
         if ($product->roastery) {
-            $roasteryName = $locale === 'en' && !empty($product->roastery->name_en) 
-                ? $product->roastery->name_en 
-                : $product->roastery->name;
+            $roasteryName = $product->roastery->getName();
             $this->addGoogleElement($dom, $item, 'brand', $roasteryName);
         }
 
@@ -217,38 +209,26 @@ class FacebookCatalogFeedController extends Controller
     private function getProductType(?array $categories, string $locale): string
     {
         if (empty($categories)) {
-            return $locale === 'en' 
-                ? 'Food & Beverages > Coffee > Whole Bean Coffee' 
-                : 'Jídlo a nápoje > Káva > Zrnková káva';
+            return __('feeds.product_types.whole_bean');
         }
 
         if (in_array('accessories', $categories)) {
-            return $locale === 'en'
-                ? 'Home & Garden > Kitchen > Coffee Accessories'
-                : 'Dům a zahrada > Kuchyně > Příslušenství na kávu';
+            return __('feeds.product_types.accessories');
         }
 
         if (in_array('espresso', $categories)) {
-            return $locale === 'en'
-                ? 'Food & Beverages > Coffee > Espresso Coffee Beans'
-                : 'Jídlo a nápoje > Káva > Espresso zrnková káva';
+            return __('feeds.product_types.espresso');
         }
 
         if (in_array('filter', $categories)) {
-            return $locale === 'en'
-                ? 'Food & Beverages > Coffee > Filter Coffee Beans'
-                : 'Jídlo a nápoje > Káva > Filtrovaná zrnková káva';
+            return __('feeds.product_types.filter');
         }
 
         if (in_array('decaf', $categories)) {
-            return $locale === 'en'
-                ? 'Food & Beverages > Coffee > Decaf Coffee Beans'
-                : 'Jídlo a nápoje > Káva > Bezkofeinová zrnková káva';
+            return __('feeds.product_types.decaf');
         }
 
-        return $locale === 'en'
-            ? 'Food & Beverages > Coffee > Whole Bean Coffee'
-            : 'Jídlo a nápoje > Káva > Zrnková káva';
+        return __('feeds.product_types.whole_bean');
     }
 
     /**

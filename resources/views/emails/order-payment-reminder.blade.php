@@ -84,18 +84,13 @@
                             <!-- Message -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #D4A053; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Nedokončená platba' : 'Incomplete payment' }}
+                                    {{ __('emails.order_payment_reminder.incomplete_label', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #5a5a5a; margin: 0; line-height: 1.8;">
-                                    @if($locale === 'cs')
-                                    Všimli jsme si, že platba za vaši objednávku nebyla dokončena. Pokud jste se jen nestihli dostat k platbě, nic se neděje.<br><br>
-                                    <span style="color: #D4A053;">&#8594;</span> Klikněte na tlačítko níže a dokončete platbu<br>
-                                    <span style="color: #D4A053;">&#8594;</span> <strong style="color: #1c1c1c;">Objednávka bude automaticky zrušena do 24 hodin</strong> od jejího vytvoření, pokud nebude zaplacena
-                                    @else
-                                    We noticed that the payment for your order was not completed. If you just didn't get around to it, no worries.<br><br>
-                                    <span style="color: #D4A053;">&#8594;</span> Click the button below to complete your payment<br>
-                                    <span style="color: #D4A053;">&#8594;</span> <strong style="color: #1c1c1c;">Your order will be automatically cancelled within 24 hours</strong> of creation if left unpaid
-                                    @endif
+                                    {{-- Texty byly v šabloně bez escapování (apostrof, HTML), proto {!! !!} --}}
+                                    {!! __('emails.order_payment_reminder.intro', [], $locale) !!}<br><br>
+                                    <span style="color: #D4A053;">&#8594;</span> {{ __('emails.order_payment_reminder.step_pay', [], $locale) }}<br>
+                                    <span style="color: #D4A053;">&#8594;</span> {!! __('emails.order_payment_reminder.step_cancel', [], $locale) !!}
                                 </p>
                             </div>
 
@@ -137,7 +132,7 @@
                             <div style="margin: 20px 0;">
                                 <a href="{{ $homeUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.home', [], $locale) }}</a>
                                 <a href="{{ $shopUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.shop', [], $locale) }}</a>
-                                <a href="{{ $ordersUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ $locale === 'cs' ? 'Objednávky' : 'Orders' }}</a>
+                                <a href="{{ $ordersUrl }}" style="color: #1c1c1c; text-decoration: none; margin: 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">{{ __('emails.common.orders', [], $locale) }}</a>
                             </div>
                             <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #bcbeb1; font-size: 11px; color: #76716C;">
                                 <p style="margin: 0;">{{ __('emails.common.copyright', ['year' => date('Y')], $locale) }}</p>

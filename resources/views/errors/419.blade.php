@@ -5,7 +5,7 @@
     $locale = $currentLocale ?? (\App\Helpers\Site::forHost($host)?->locale ?? 'cs');
 @endphp
 
-@section('title', $locale === 'en' ? 'Page Expired | KAVI' : 'Platnost stránky vypršela | KAVI.cz')
+@section('title', __('errors.page_expired.title', [], $locale))
 
 @section('content')
 <div class="mx-auto max-w-screen-xl px-4 md:px-8 py-12 md:py-20">
@@ -21,24 +21,22 @@
 
             <!-- Heading -->
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold uppercase tracking-tight mb-6 leading-[0.95]">
-                {{ $locale === 'en' ? 'Page' : 'Platnost' }}<br>
-                <span class="text-red-600">{{ $locale === 'en' ? 'Expired' : 'Vypršela' }}</span>
+                {{ __('errors.page_expired.heading_1', [], $locale) }}<br>
+                <span class="text-red-600">{{ __('errors.page_expired.heading_2', [], $locale) }}</span>
             </h1>
 
             <!-- Description -->
             <p class="text-lg md:text-xl text-[#1c1c1c]/70 mb-10 max-w-xl leading-relaxed">
-                {{ $locale === 'en' 
-                    ? 'Your session has expired for security reasons. Please refresh the page and try again.' 
-                    : 'Vaše relace vypršela z bezpečnostních důvodů. Obnovte prosím stránku a zkuste to znovu.' }}
+                {{ __('errors.page_expired.description', [], $locale) }}
             </p>
 
             <!-- CTA Buttons -->
             <div class="flex flex-wrap gap-4 mb-12">
                 <button onclick="window.location.reload()" class="inline-flex items-center justify-center bg-[#1c1c1c] text-white text-xs uppercase tracking-widest px-8 py-4 hover:bg-[#1c1c1c]/80 transition-colors">
-                    {{ $locale === 'en' ? 'Refresh Page' : 'Obnovit stránku' }}
+                    {{ __('errors.page_expired.refresh', [], $locale) }}
                 </button>
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-xs uppercase tracking-widest border-b border-[#1c1c1c] pb-1 hover:text-red-600 hover:border-red-600 transition-colors">
-                    {{ $locale === 'en' ? 'Back to Home' : 'Zpět na úvod' }}
+                    {{ __('errors.links.back_home', [], $locale) }}
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -48,12 +46,10 @@
             <!-- Info -->
             <div class="pt-8 border-t border-[#1c1c1c]/20">
                 <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50 mb-4">
-                    {{ $locale === 'en' ? 'Why did this happen?' : 'Proč se to stalo?' }}
+                    {{ __('errors.page_expired.why_title', [], $locale) }}
                 </p>
                 <p class="text-sm text-[#1c1c1c]/70 max-w-lg">
-                    {{ $locale === 'en' 
-                        ? 'This error occurs when a page has been open for too long without activity. It\'s a security feature to protect your data. Simply refresh the page to continue.' 
-                        : 'K této chybě dochází, když stránka zůstane otevřená příliš dlouho bez aktivity. Je to bezpečnostní opatření pro ochranu vašich dat. Stačí stránku obnovit a pokračovat.' }}
+                    {{ __('errors.page_expired.why_text', [], $locale) }}
                 </p>
             </div>
         </div>
@@ -62,7 +58,7 @@
         <div class="lg:col-span-1">
             <div class="bg-[#BCBEB1] p-8 h-full">
                 <h2 class="text-xs uppercase tracking-widest mb-6 border-b border-[#1c1c1c] pb-4">
-                    {{ $locale === 'en' ? 'Quick Fix' : 'Rychlé řešení' }}
+                    {{ __('errors.page_expired.quick_fix', [], $locale) }}
                 </h2>
 
                 <div class="space-y-6">
@@ -71,7 +67,7 @@
                         <span class="text-red-600 mt-1">01</span>
                         <div>
                             <p class="text-sm">
-                                {{ $locale === 'en' ? 'Click the "Refresh Page" button above' : 'Klikněte na tlačítko "Obnovit stránku" výše' }}
+                                {{ __('errors.page_expired.step_1', [], $locale) }}
                             </p>
                         </div>
                     </div>
@@ -81,7 +77,7 @@
                         <span class="text-red-600 mt-1">02</span>
                         <div>
                             <p class="text-sm">
-                                {{ $locale === 'en' ? 'Or press Ctrl+R (Cmd+R on Mac)' : 'Nebo stiskněte Ctrl+R (Cmd+R na Macu)' }}
+                                {{ __('errors.page_expired.step_2', [], $locale) }}
                             </p>
                         </div>
                     </div>
@@ -91,7 +87,7 @@
                         <span class="text-red-600 mt-1">03</span>
                         <div>
                             <p class="text-sm">
-                                {{ $locale === 'en' ? 'Fill out the form again' : 'Vyplňte formulář znovu' }}
+                                {{ __('errors.page_expired.step_3', [], $locale) }}
                             </p>
                         </div>
                     </div>
@@ -100,9 +96,9 @@
                 <!-- Error Info -->
                 <div class="mt-8 pt-6 border-t border-[#1c1c1c]/20">
                     <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50">
-                        {{ $locale === 'en' ? 'Error Code' : 'Kód chyby' }}
+                        {{ __('errors.common.error_code', [], $locale) }}
                     </p>
-                    <p class="text-sm mt-1">419 / {{ $locale === 'en' ? 'Session Expired' : 'Relace vypršela' }}</p>
+                    <p class="text-sm mt-1">419 / {{ __('errors.page_expired.code_label', [], $locale) }}</p>
                 </div>
             </div>
         </div>

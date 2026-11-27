@@ -14,7 +14,7 @@
 
         <div class="space-y-6">
             <!-- Name -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">Název tagu 🇨🇿 *</label>
                     <input type="text" name="name_cs" id="name_cs" value="{{ old('name_cs') }}" required 
@@ -33,10 +33,19 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">Název tagu 🇸🇰</label>
+                    <input type="text" name="name_sk" id="name_sk" value="{{ old('name_sk') }}"
+                           placeholder="napr. Recepty, Tipy, Pražiarne..."
+                           class="input @error('name_sk') border-red-500 @enderror">
+                    @error('name_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <!-- Slugs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇨🇿</label>
                     <input type="text" name="slug_cs" value="{{ old('slug_cs') }}" 
@@ -56,6 +65,16 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                     <p class="text-xs text-coffee-600 mt-1">e.g. "recipes"</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-coffee-900 mb-2">URL slug 🇸🇰</label>
+                    <input type="text" name="slug_sk" value="{{ old('slug_sk') }}"
+                           placeholder="Automaticky ze SK názvu"
+                           class="input @error('slug_sk') border-red-500 @enderror">
+                    @error('slug_sk')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                    <p class="text-xs text-coffee-600 mt-1">napr. "recepty"</p>
                 </div>
             </div>
         </div>

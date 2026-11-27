@@ -4,20 +4,24 @@ namespace App\Models;
 
 use App\Helpers\CurrencyHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\HasLocalizedColumns;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, HasLocalizedColumns;
 
     protected $fillable = [
         'name',
         'name_en',
+        'name_sk',
         'slug',
         'description',
         'description_en',
+        'description_sk',
         'short_description',
         'short_description_en',
+        'short_description_sk',
         'price',
         'price_eur',
         'vat_rate',
@@ -269,10 +273,7 @@ class Product extends Model
      */
     public function getName(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->name_en)) {
-            return $this->name_en;
-        }
-        return $this->name;
+        return $this->localizedValue('name');
     }
 
     /**
@@ -280,10 +281,7 @@ class Product extends Model
      */
     public function getDescription(): string
     {
-        if (app()->getLocale() === 'en' && !empty($this->description_en)) {
-            return $this->description_en;
-        }
-        return $this->description ?? '';
+        return $this->localizedValue('description') ?? '';
     }
 
     /**
@@ -291,15 +289,12 @@ class Product extends Model
      */
     public function getShortDescription(): ?string
     {
-        if (app()->getLocale() === 'en' && !empty($this->short_description_en)) {
-            return $this->short_description_en;
-        }
-        return $this->short_description;
+        return $this->localizedValue('short_description');
     }
 
     /**
      * Get translated attribute value based on current locale
-     * Looks for {key}_en in attributes array when in EN mode
+     * Looks for {key}_{locale} (origin_en, origin_sk) in attributes array outside Czech
      * 
      * @param string $key The attribute key (e.g., 'origin', 'processing')
      * @return mixed
@@ -310,10 +305,10 @@ class Product extends Model
         $locale = app()->getLocale();
 
         $value = null;
-        if ($locale === 'en') {
-            $enKey = $key . '_en';
-            if (!empty($attributes[$enKey])) {
-                $value = $attributes[$enKey];
+        if ($locale !== \App\Helpers\Site::PRIMARY_LOCALE) {
+            $localizedKey = $key . '_' . $locale;
+            if (!empty($attributes[$localizedKey])) {
+                $value = $attributes[$localizedKey];
             }
         }
         if ($value === null) {
@@ -321,7 +316,7 @@ class Product extends Model
         }
 
         if ($key === 'altitude' && !empty($value)) {
-            return $value . ($locale === 'en' ? ' masl' : ' m n.m.');
+            return $value . __('shop.product.altitude_unit');
         }
 
         return $value;
@@ -582,12 +577,21 @@ class Product extends Model
         $result = [];
 
         foreach ($keys as $key) {
+            $labelCs = $attrs[$key . '_label'] ?? ucfirst(str_replace('_', ' ', $key));
+            $valueCs = $attrs[$key] ?? '';
+            $locale = app()->getLocale();
+
             $result[] = [
                 'key' => $key,
-                'label_cs' => $attrs[$key . '_label'] ?? ucfirst(str_replace('_', ' ', $key)),
+                'label_cs' => $labelCs,
                 'label_en' => $attrs[$key . '_label_en'] ?? null,
-                'value_cs' => $attrs[$key] ?? '',
+                'label_sk' => $attrs[$key . '_label_sk'] ?? null,
+                'value_cs' => $valueCs,
                 'value_en' => $attrs[$key . '_en'] ?? null,
+                'value_sk' => $attrs[$key . '_sk'] ?? null,
+                // V jazyce requestu, prázdný překlad = čeština
+                'label' => ! empty($attrs[$key . '_label_' . $locale] ?? null) ? $attrs[$key . '_label_' . $locale] : $labelCs,
+                'value' => ! empty($attrs[$key . '_' . $locale] ?? null) ? $attrs[$key . '_' . $locale] : $valueCs,
             ];
         }
 

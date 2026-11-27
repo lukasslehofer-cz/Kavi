@@ -36,7 +36,18 @@ return [
     'total_per_month' => 'Celkem / měsíc',
     'incl_vat' => '(včetně DPH)',
     'plus_shipping' => '+ doprava',
-    
+    'gift_voucher' => 'Dárkový voucher',
+    'vat_before_voucher' => 'DPH je vypočtena z ceny před odečtením voucheru',
+
+    // Pokladna (velkými písmeny podle designu)
+    'hero_title' => 'POKLADNA',
+    'hero_title_subscription' => 'POKLADNA',
+    'free_caps' => 'ZDARMA',
+    'complete_order_caps' => 'DOKONČIT OBJEDNÁVKU',
+
+    // Formát čísel ceny v JS (toLocaleString)
+    'number_locale' => 'cs-CZ',
+
     // Contact information
     'contact_info' => 'Kontaktní údaje',
     'have_account' => 'Máte již účet?',

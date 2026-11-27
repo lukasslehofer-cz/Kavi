@@ -81,7 +81,7 @@
                             <!-- Voucher Message -->
                             <div style="margin: 32px 0; padding: 20px 24px; border-left: 3px solid #4a6741; background-color: #d5d7ca;">
                                 <div style="font-size: 11px; font-weight: 400; color: #1c1c1c; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 12px;">
-                                    {{ $locale === 'cs' ? 'Digitální produkt' : 'Digital product' }}
+                                    {{ __('emails.digital_delivery.product_label', [], $locale) }}
                                 </div>
                                 <p style="font-size: 14px; color: #5a5a5a; margin: 0 0 8px 0; line-height: 1.6;">
                                     {{ __('emails.digital_delivery.message', [], $locale) }}

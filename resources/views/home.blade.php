@@ -1,26 +1,24 @@
 @extends('layouts.app')
 
-@section('title', $currentLocale === 'en' ? 'Coffee Subscription | Specialty Coffee | KAVI' : 'Kávové předplatné | Výběrová káva | KAVI.cz')
+@section('title', __('home.meta.title'))
 
 @section('meta_description')
-{{ $currentLocale === 'en' ? 'Discover the best specialty coffee from all over Europe. Freshly roasted, carefully selected, delivered to your door. Flexible subscription, shipped with care.' : 'Objevte tu nejlepší výběrovou kávu z celé Evropy. Čerstvě pražená, pečlivě vybraná, doručená přímo k vám. Flexibilní předplatné s dopravou zdarma.' }}
+{{ __('home.meta.description') }}
 @endsection
 
 @section('og_title')
-{{ $currentLocale === 'en' ? 'KAVI - Specialty Coffee Subscription from Europe' : 'KAVI.cz - Kávové předplatné s výběrovou kávou z Evropy' }}
+{{ __('home.meta.og_title') }}
 @endsection
 
 @section('og_description')
-{{ $currentLocale === 'en' ? 'Premium specialty coffee delivered monthly. Discover unique flavors from the best European roasteries. Shipped with care, cancel anytime.' : 'Prémiová výběrová káva doručovaná měsíčně. Objevte jedinečné chutě z nejlepších evropských pražíren. Doprava zdarma, zrušení kdykoliv.' }}
+{{ __('home.meta.og_description') }}
 @endsection
 
 @section('structured_data')
 @php
     $siteUrl = \App\Helpers\Site::current()->url();
-    $siteName = $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz';
-    $siteDescription = $currentLocale === 'en' 
-        ? 'Premium specialty coffee subscription. Freshly roasted coffee from the best European roasteries delivered to your door.'
-        : 'Prémiové kávové předplatné s výběrovou kávou. Čerstvě pražená káva z nejlepších evropských pražíren doručená přímo k vám.';
+    $siteName = \App\Helpers\Site::current()->name();
+    $siteDescription = __('home.schema.description');
 @endphp
 <script type="application/ld+json">
 {
@@ -39,14 +37,14 @@
             },
             "description": "{{ $siteDescription }}",
             "sameAs": [
-                "{{ $currentLocale === 'en' ? 'https://www.instagram.com/kavibox_com' : 'https://www.instagram.com/kavi.cz' }}",
+                "{{ __('layout.social.instagram') }}",
                 "https://www.facebook.com/kavovepredplatne"
             ],
             "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
                 "email": "{{ \App\Helpers\Site::current()->contactEmail() }}",
-                "availableLanguage": ["{{ $currentLocale === 'en' ? 'English' : 'Czech' }}"]
+                "availableLanguage": ["{{ __('home.schema.language') }}"]
             }
         },
         {
@@ -58,13 +56,13 @@
             "publisher": {
                 "@id": "{{ $siteUrl }}/#organization"
             },
-            "inLanguage": "{{ $currentLocale === 'en' ? 'en-US' : 'cs-CZ' }}"
+            "inLanguage": "{{ __('home.schema.in_language') }}"
         },
         {
             "@type": "WebPage",
             "@id": "{{ $siteUrl }}/#webpage",
             "url": "{{ $siteUrl }}",
-            "name": "{{ $currentLocale === 'en' ? 'Coffee Subscription | Specialty Coffee | KAVI' : 'Kávové předplatné | Výběrová káva | KAVI.cz' }}",
+            "name": "{{ __('home.meta.title') }}",
             "isPartOf": {
                 "@id": "{{ $siteUrl }}/#website"
             },
@@ -72,7 +70,7 @@
                 "@id": "{{ $siteUrl }}/#organization"
             },
             "description": "{{ $siteDescription }}",
-            "inLanguage": "{{ $currentLocale === 'en' ? 'en-US' : 'cs-CZ' }}"
+            "inLanguage": "{{ __('home.schema.in_language') }}"
         },
         {!! json_encode([
             '@type' => 'FAQPage',
@@ -159,7 +157,7 @@
                 @if(! $lineup->isEmpty())
                 {{ \Illuminate\Support\Str::ucfirst($lineup->monthName('adjective')) }} box: {{ $lineup->roasteryNames() }}
                 @else
-                {{ $currentLocale === 'en' ? 'Specialty coffee subscription from Europe\'s finest roasters.' : 'Předplatné výběrové kávy z nejlepších evropských pražíren.' }}
+                {{ __('home.hero.tagline') }}
                 @endif
             </div>
         </div>
@@ -168,26 +166,18 @@
         <div class="flex-1 flex flex-col justify-center py-6">
             <!-- Kicker = jediné H1 stránky (SEO), headline pod ním je jen vizuální -->
             <h1 class="mb-6 text-xs uppercase tracking-widest text-white/60 leading-5">
-                {{ $currentLocale === 'en' ? 'Coffee subscription' : 'Kávové předplatné' }}
+                {{ __('home.hero.kicker') }}
             </h1>
 
             <!-- Large headline -->
             <p class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal text-white uppercase leading-[0.95] sm:leading-[0.9] tracking-tight">
-                @if($currentLocale === 'en')
-                Three European<br/>
-                <span class="text-primary-500">roasters</span><br/>
-                every month
-                @else
-                Tři evropské<br/>
-                <span class="text-primary-500">pražírny</span><br/>
-                každý měsíc
-                @endif
+                {{ __('home.hero.headline_top') }}<br/>
+                <span class="text-primary-500">{{ __('home.hero.headline_accent') }}</span><br/>
+                {{ __('home.hero.headline_bottom') }}
             </p>
 
             <p class="mt-6 text-xs uppercase tracking-widest text-white/60 max-w-[280px] leading-5">
-                {{ $currentLocale === 'en'
-                    ? 'Specialty coffee from micro-roasters you rarely find in local shops. No commitment.'
-                    : 'Výběrová káva z mikropražíren, které v Česku běžně nekoupíte. Doprava zdarma, bez závazku.' }}
+                {{ __('home.hero.lead') }}
             </p>
         </div>
 
@@ -195,17 +185,17 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
             <div class="flex flex-col sm:flex-row gap-4 sm:gap-8">
                 <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-white font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-                    <span>{{ $currentLocale === 'en' ? 'Build your box' : 'Sestavit box' }}</span>
+                    <span>{{ __('home.hero.cta_box') }}</span>
                     <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
                 </a>
                 @if($giftsEnabled)
                 <a href="{{ localizedRoute('gifts.index') }}" class="group inline-flex items-center gap-2 text-white/60 font-display uppercase tracking-widest hover:text-white transition-all">
-                    <span>{{ $currentLocale === 'en' ? 'Give a subscription' : 'Darovat předplatné' }}</span>
+                    <span>{{ __('home.hero.cta_gift') }}</span>
                     <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
                 </a>
                 @else
                 <a href="{{ localizedRoute('products.index') }}" class="group inline-flex items-center gap-2 text-white/60 font-display uppercase tracking-widest hover:text-white transition-all">
-                    <span>{{ $currentLocale === 'en' ? 'Shop coffee' : 'Obchod' }}</span>
+                    <span>{{ __('home.hero.cta_shop') }}</span>
                     <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
                 </a>
                 @endif
@@ -238,7 +228,7 @@
     <div class="relative bg-primary-500">
       <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
         <div class="relative aspect-[5/4] overflow-hidden">
-          <img src="/images/kavi-box.jpg" loading="lazy" alt="{{ $currentLocale === 'en' ? 'An open KAVI box with three bags of coffee' : 'Otevřený KAVI box se třemi balíčky kávy' }}" class="h-full w-full object-cover grayscale" />
+          <img src="/images/kavi-box.jpg" loading="lazy" alt="{{ __('home.box.image_alt') }}" class="h-full w-full object-cover grayscale" />
           <div class="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noise%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%275%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noise)%27/%3E%3C/svg%3E');"></div>
         </div>
       </div>
@@ -248,27 +238,15 @@
       <div class="space-y-8">
         <div>
           <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-6 leading-tight tracking-tight uppercase">
-            {{ $currentLocale === 'en' ? 'What arrives at your door' : 'Co přijde domů' }}
+            {{ __('home.box.title') }}
           </h2>
           <p class="text-lg sm:text-xl text-warm-500 leading-relaxed font-light">
-            {{ $currentLocale === 'en'
-              ? 'Whole-bean coffee from European roasters, freshly roasted and delivered to your pickup point.'
-              : 'Zrnková káva z evropských pražíren, čerstvě pražená a doručená na výdejní místo.' }}
+            {{ __('home.box.lead') }}
           </p>
         </div>
 
         @php
-          $homeArrows = $currentLocale === 'en' ? [
-            '2 to 4 bags of 250 g, depending on the box size',
-            'Coffees from three European roasters, different every month',
-            'A postcard with the coffee and roaster profile for every coffee',
-            'Delivered by Packeta, pause or cancel with one click',
-          ] : [
-            '2 až 4 balíčky po 250 g podle velikosti boxu',
-            'Kávy ze tří evropských pražíren, každý měsíc jiných',
-            'Pohlednice s profilem kávy a pražírny ke každé kávě',
-            'Doprava Zásilkovnou zdarma, pauza nebo zrušení jedním klikem',
-          ];
+          $homeArrows = __('home.box.items');
         @endphp
         <div class="space-y-4">
           @foreach($homeArrows as $arrow)
@@ -283,11 +261,11 @@
       <div class="mt-auto pt-12 border-t border-stone-300">
         <div class="flex items-center justify-between gap-4">
           <a href="{{ localizedRoute('subscriptions.index') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-            <span>{{ $currentLocale === 'en' ? 'Build your box' : 'Sestavit box' }}</span>
+            <span>{{ __('home.box.cta_box') }}</span>
             <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
           </a>
           <a href="{{ $lineup->isEmpty() ? localizedRoute('monthly-feature.index') : '#kava-mesice' }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-            <span>{{ $currentLocale === 'en' ? 'Coffee of the Month' : 'Káva měsíce' }}</span>
+            <span>{{ __('home.box.cta_coffee_of_month') }}</span>
             <span class="group-hover:translate-x-1 transition-transform" aria-hidden="true">&rarr;</span>
           </a>
         </div>
@@ -305,8 +283,8 @@
   <div class="relative mx-auto max-w-screen-xl px-4 md:px-8">
     <!-- Section Header -->
     <div class="mb-16 sm:mb-20 max-w-2xl">
-      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ $currentLocale === 'en' ? 'How it works' : 'Jak to funguje' }}</h2>
-      <p class="text-lg sm:text-xl text-warm-500 font-light">{{ $currentLocale === 'en' ? 'Four simple steps to perfect coffee' : 'Čtyři jednoduché kroky k perfektní kávě' }}</p>
+      <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-normal text-dark-800 mb-4 tracking-tight uppercase leading-tight sm:leading-[0.95]">{{ __('home.how.title') }}</h2>
+      <p class="text-lg sm:text-xl text-warm-500 font-light">{{ __('home.how.subtitle') }}</p>
           </div>
           
     <!-- Steps Grid -->
@@ -315,29 +293,29 @@
       <!-- Step 1 -->
       <div class="group border-t-2 border-primary-500 pt-8">
         <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">01</span>
-        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Choose your plan' : 'Vyberte si plán' }}</h3>
-        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Select coffee quantity and delivery frequency according to your needs' : 'Zvolte množství kávy a frekvenci dodání podle vašich potřeb' }}</p>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ __('home.how.steps.1.title') }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ __('home.how.steps.1.text') }}</p>
         </div>
         
       <!-- Step 2 -->
       <div class="group border-t-2 border-primary-500 pt-8">
         <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">02</span>
-        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Personalize' : 'Personalizujte' }}</h3>
-        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Choose coffee type, brewing method and delivery address' : 'Vyberte typ kávy, způsob přípravy a doručovací adresu' }}</p>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ __('home.how.steps.2.title') }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ __('home.how.steps.2.text') }}</p>
         </div>
 
       <!-- Step 3 -->
       <div class="group border-t-2 border-primary-500 pt-8">
         <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">03</span>
-        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Pick up your box' : 'Vyzvedněte si box' }}</h3>
-        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'We deliver freshly roasted coffee to your chosen location' : 'Čerstvě praženou kávu doručíme na vámi vybrané místo' }}</p>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ __('home.how.steps.3.title') }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ __('home.how.steps.3.text') }}</p>
       </div>
 
       <!-- Step 4 -->
       <div class="group border-t-2 border-primary-500 pt-8">
         <span class="text-primary-500 font-display text-5xl font-normal mb-4 block">04</span>
-        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ $currentLocale === 'en' ? 'Enjoy' : 'Vychutnejte si' }}</h3>
-        <p class="text-warm-500 leading-relaxed font-light">{{ $currentLocale === 'en' ? 'Enjoy great specialty coffee and look forward to your next coffee box' : 'Užijte si skvělou výběrovou kávu a těšte se na další kávový box' }}</p>
+        <h3 class="mb-3 text-xl font-normal text-dark-800 uppercase tracking-wide">{{ __('home.how.steps.4.title') }}</h3>
+        <p class="text-warm-500 leading-relaxed font-light">{{ __('home.how.steps.4.text') }}</p>
           </div>
           
         </div>
@@ -354,31 +332,32 @@
   $formatGift = fn ($amount) => \App\Helpers\CurrencyHelper::formatByCurrency($amount, $giftCurrency, 0);
   $voucherAmounts = config('gifts.voucher_amounts.' . $giftCurrency, []);
   $isGiftSeason = now()->month >= 10 && now()->lte(now()->setDate(now()->year, 12, 24)->endOfDay());
-  $typeParam = $currentLocale === 'en' ? 'type' : 'typ';
+  $typeParam = __('home.gifts.query_param');
+  $giftOr = ' ' . __('home.gifts.or') . ' ';
   if ($giftCurrency === 'EUR') {
-      $voucherList = implode(', ', array_map($formatGift, array_slice($voucherAmounts, 0, -1))) . ' or ' . $formatGift(end($voucherAmounts));
+      $voucherList = implode(', ', array_map($formatGift, array_slice($voucherAmounts, 0, -1))) . $giftOr . $formatGift(end($voucherAmounts));
   } else {
-      $voucherList = implode(', ', array_map(fn ($a) => number_format($a, 0, ',', ' '), array_slice($voucherAmounts, 0, -1))) . ' nebo ' . $formatGift(end($voucherAmounts));
+      $voucherList = implode(', ', array_map(fn ($a) => number_format($a, 0, ',', ' '), array_slice($voucherAmounts, 0, -1))) . $giftOr . $formatGift(end($voucherAmounts));
   }
-  $giftFromLabel = fn ($price) => ($currentLocale === 'en' ? 'from' : 'od') . ' ' . $formatGift($price);
+  $giftFromLabel = fn ($price) => __('home.gifts.from', ['price' => $formatGift($price)]);
   $giftRows = [
       [
-          'name' => $currentLocale === 'en' ? '3 months' : '3 měsíce',
-          'desc' => $currentLocale === 'en' ? '3 boxes, one every month' : '3 boxy, jeden každý měsíc',
+          'name' => __('home.gifts.months_3'),
+          'desc' => __('home.gifts.months_3_desc'),
           'right' => $giftFromLabel($giftFrom['subscription'] * 3),
           'href' => localizedRoute('gifts.index') . '?' . $typeParam . '=3m',
       ],
       [
-          'name' => $currentLocale === 'en' ? '6 months' : '6 měsíců',
-          'desc' => $currentLocale === 'en' ? '6 boxes, one every month' : '6 boxů, jeden každý měsíc',
+          'name' => __('home.gifts.months_6'),
+          'desc' => __('home.gifts.months_6_desc'),
           'right' => $giftFromLabel($giftFrom['subscription'] * 6),
           'href' => localizedRoute('gifts.index') . '?' . $typeParam . '=6m',
       ],
       [
-          'name' => $currentLocale === 'en' ? 'Voucher' : 'Poukaz',
-          'desc' => $currentLocale === 'en' ? $voucherList . ' for the shop and boxes' : $voucherList . ' na e-shop i boxy',
+          'name' => __('home.gifts.voucher'),
+          'desc' => __('home.gifts.voucher_desc', ['amounts' => $voucherList]),
           'right' => $giftFromLabel($giftFrom['voucher']),
-          'href' => localizedRoute('gifts.index') . '?' . $typeParam . '=' . ($currentLocale === 'en' ? 'voucher' : 'poukaz'),
+          'href' => localizedRoute('gifts.index') . '?' . $typeParam . '=' . __('home.gifts.query_voucher'),
       ],
   ];
   // Firemní dárky jen na kavi.cz
@@ -391,22 +370,18 @@
       ];
   }
 @endphp
-<section aria-label="{{ $currentLocale === 'en' ? 'Gifts' : 'Dárky' }}" class="bg-dark-800 text-white">
+<section aria-label="{{ __('home.gifts.aria') }}" class="bg-dark-800 text-white">
   <div class="mx-auto max-w-screen-xl px-4 md:px-8 py-24 lg:py-32 flex flex-wrap items-end gap-x-24 gap-y-16">
     <div class="flex-[1_1_400px] min-w-0">
       @if($isGiftSeason)
-      <p class="text-xs uppercase tracking-widest text-warm-300 mb-6">{{ $currentLocale === 'en' ? 'Christmas' : 'Vánoce' }} {{ now()->year }}</p>
+      <p class="text-xs uppercase tracking-widest text-warm-300 mb-6">{{ __('home.gifts.season', ['year' => now()->year]) }}</p>
       @endif
       <h2 class="font-display uppercase text-[64px] sm:text-[96px] leading-[0.9] tracking-tight text-white">
-        {{ $currentLocale === 'en' ? 'Give' : 'Darujte' }}<br>
-        <span class="text-primary-500">{{ $currentLocale === 'en' ? 'coffee' : 'kávu' }}</span>
+        {{ __('home.gifts.title') }}<br>
+        <span class="text-primary-500">{{ __('home.gifts.title_accent') }}</span>
       </h2>
       <p class="mt-8 max-w-[440px] text-lg sm:text-xl leading-relaxed font-light text-warm-300">
-        @if($currentLocale === 'en')
-        The certificate arrives by email straight away as a printable PDF{{ $isGiftSeason ? ', in time even on Christmas Eve' : '' }}. You pay once, nothing renews by itself.
-        @else
-        Certifikát přijde hned e-mailem v PDF k tisku{{ $isGiftSeason ? ', stihnete ho i na Štědrý den' : '' }}. Platíte jednou, nic se samo neobnoví.
-        @endif
+        {{ __('home.gifts.text', ['season_note' => $isGiftSeason ? __('home.gifts.season_note') : '']) }}
       </p>
     </div>
 
@@ -440,22 +415,14 @@
     <!-- Top Text - Mission Statement -->
     <div class="max-w-3xl">
       <p class="text-primary-500 text-xs sm:text-sm font-display uppercase leading-relaxed tracking-wide">
-            @if($currentLocale === 'en')
-        At KAVI, we believe specialty coffee can change the world. From every coffee box, we donate to Water.org, which provides access to clean water in developing countries.
-            @else
-        V KAVI věříme, že výběrová káva může měnit svět. Z každého kávového boxu věnujeme 5 Kč organizaci Water.org, která zajišťuje přístup k čisté vodě v rozvojových zemích.
-            @endif
+        {{ __('home.impact.mission') }}
           </p>
         </div>
 
     <!-- Center - Large Headline -->
     <div class="my-auto py-8 sm:py-12">
       <h2 class="font-display text-primary-500 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal uppercase leading-[0.95] tracking-tight max-w-3xl">
-        @if($currentLocale === 'en')
-        Every box provides one person with water for half a year
-        @else
-        Každý box poskytne jednomu člověku vodu na půl roku
-        @endif
+        {{ __('home.impact.headline') }}
       </h2>
       </div>
 
@@ -463,8 +430,8 @@
     <div class="flex flex-wrap items-center justify-between gap-4 border-t-2 border-primary-500 pt-4">
       <div class="flex flex-wrap items-center gap-6 sm:gap-10 text-xs uppercase tracking-widest text-primary-500">
         <a href="https://water.org" target="_blank" rel="noopener" class="font-display hover:text-primary-600 transition-colors">Water.org</a>
-        <span>{{ $currentLocale === 'en' ? '6 months of water' : '6 měsíců vody' }}</span>
-        <span>{{ $currentLocale === 'en' ? 'Direct donation' : 'Přímá podpora' }}</span>
+        <span>{{ __('home.impact.water_months') }}</span>
+        <span>{{ __('home.impact.direct') }}</span>
       </div>
       <div class="flex items-center gap-6 sm:gap-10 text-xs uppercase tracking-widest text-primary-500">
         <span>kavi.cz</span>

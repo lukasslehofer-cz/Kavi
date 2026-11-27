@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', ($currentLocale === 'en' ? 'Shop' : 'Obchod') . ' - ' . ($currentLocale === 'en' ? 'KAVI' : 'KAVI.cz'))
+@section('title', __('products.shop') . ' - ' . \App\Helpers\Site::current()->name())
 
 @section('meta_description')
-{{ $currentLocale === 'en' ? 'Shop specialty coffee from the best European roasteries. Espresso, filter, decaf and accessories. Fresh, quality, exceptional. Free shipping available.' : 'Nakupujte výběrovou kávu z nejlepších evropských pražíren. Espresso, filtr, bezkofeinová káva a příslušenství. Čerstvá, kvalitní, výjimečná. Doprava zdarma.' }}
+{{ __('products.index.meta_description') }}
 @endsection
 
 @section('og_title')
-{{ $currentLocale === 'en' ? 'Coffee Shop | KAVI' : 'Kávový obchod | KAVI.cz' }}
+{{ __('products.index.og_title', ['site' => \App\Helpers\Site::current()->name()]) }}
 @endsection
 
 @section('og_description')
-{{ $currentLocale === 'en' ? 'Carefully selected specialty coffee from the best European roasteries. Fresh, quality, exceptional.' : 'Pečlivě vybraná výběrová káva z nejlepších evropských pražíren. Čerstvá, kvalitní, výjimečná.' }}
+{{ __('products.index.og_description') }}
 @endsection
 
 @section('content')
@@ -23,14 +23,14 @@
     
     <!-- Main Heading - Large Editorial Typography, Left aligned -->
     <h1 class="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.95] sm:leading-[0.9] tracking-tight uppercase mb-12 lg:mb-16">
-      <span class="text-dark-800">{{ $currentLocale === 'en' ? 'Coffee' : 'Objevte naši' }}</span><br>
-      <span class="text-primary-500">{{ $currentLocale === 'en' ? 'shop' : 'kávovou kolekci' }}</span>
+      <span class="text-dark-800">{{ __('products.index.heading_line1') }}</span><br>
+      <span class="text-primary-500">{{ __('products.index.heading_line2') }}</span>
       </h1>
       
     <!-- Description - Right aligned -->
     <div class="flex justify-end">
       <p class="text-xs sm:text-sm uppercase tracking-widest text-warm-500 max-w-md text-right leading-relaxed">
-        {{ $currentLocale === 'en' ? 'Carefully selected specialty coffee from the best European roasteries. Fresh, quality, exceptional.' : 'Pečlivě vybraná výběrová káva z nejlepších evropských pražíren. Čerstvá, kvalitní, výjimečná.' }}
+        {{ __('products.index.intro') }}
       </p>
   </div>
   
@@ -43,16 +43,11 @@
 
     <!-- Filters - Minimalist Tab Bar -->
     @php
-      $categoryLabelsLocalized = $currentLocale === 'en' ? [
-        'espresso' => 'Espresso',
-        'filter' => 'Filter',
-        'decaf' => 'Decaf',
-        'accessories' => 'Accessories',
-      ] : [
-        'espresso' => 'Espresso',
-        'filter' => 'Filtr',
-        'decaf' => 'Bezkofeinová',
-        'accessories' => 'Příslušenství',
+      $categoryLabelsLocalized = [
+        'espresso' => __('products.categories.espresso'),
+        'filter' => __('products.categories.filter'),
+        'decaf' => __('products.categories.decaf'),
+        'accessories' => __('products.categories.accessories'),
       ];
     @endphp
     <div class="mb-10 sm:mb-12">
@@ -60,7 +55,7 @@
         <div class="flex flex-wrap items-center gap-x-8 gap-y-2">
         <a href="{{ localizedRoute('products.index') }}" 
              class="text-sm uppercase tracking-widest transition-colors {{ !request('category') ? 'text-primary-500 border-b border-primary-500 pb-0.5' : 'text-warm-500 hover:text-dark-800' }}">
-            {{ $currentLocale === 'en' ? 'All' : 'Vše' }}<sup class="ml-0.5 text-[10px]">{{ str_pad($totalCount, 2, '0', STR_PAD_LEFT) }}</sup>
+            {{ __('products.index.filter_all') }}<sup class="ml-0.5 text-[10px]">{{ str_pad($totalCount, 2, '0', STR_PAD_LEFT) }}</sup>
         </a>
         @foreach($categories as $key => $categoryData)
         <a href="{{ localizedRoute('products.index', ['category' => $key]) }}" 
@@ -172,7 +167,7 @@
           <svg class="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
           </svg>
-          <p class="text-gray-600 text-lg font-bold">{{ $currentLocale === 'en' ? 'No products found.' : 'Žádné produkty nebyly nalezeny.' }}</p>
+          <p class="text-gray-600 text-lg font-bold">{{ __('products.index.empty') }}</p>
         </div>
       </div>
       @endforelse
@@ -184,18 +179,18 @@
       <div class="flex items-center justify-end gap-6">
         <!-- Page Counter -->
         <span class="text-xs uppercase tracking-widest text-warm-500">
-          {{ $currentLocale === 'en' ? 'Page' : 'Strana' }} {{ str_pad($products->currentPage(), 2, '0', STR_PAD_LEFT) }} / {{ str_pad($products->lastPage(), 2, '0', STR_PAD_LEFT) }}
+          {{ __('products.pagination.page') }} {{ str_pad($products->currentPage(), 2, '0', STR_PAD_LEFT) }} / {{ str_pad($products->lastPage(), 2, '0', STR_PAD_LEFT) }}
           </span>
         
         <!-- Navigation -->
         <div class="flex items-center">
           @if($products->onFirstPage())
             <span class="text-xs uppercase tracking-widest text-warm-300 cursor-not-allowed">
-              {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
+              {{ __('products.pagination.previous') }}
             </span>
           @else
             <a href="{{ $products->previousPageUrl() }}" class="text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 transition-colors">
-              {{ $currentLocale === 'en' ? 'Previous' : 'Předchozí' }}
+              {{ __('products.pagination.previous') }}
             </a>
           @endif
           
@@ -203,11 +198,11 @@
 
         @if($products->hasMorePages())
             <a href="{{ $products->nextPageUrl() }}" class="text-xs uppercase tracking-widest text-warm-500 hover:text-dark-800 transition-colors">
-              {{ $currentLocale === 'en' ? 'Next' : 'Další' }}
+              {{ __('products.pagination.next') }}
           </a>
         @else
             <span class="text-xs uppercase tracking-widest text-warm-300 cursor-not-allowed">
-              {{ $currentLocale === 'en' ? 'Next' : 'Další' }}
+              {{ __('products.pagination.next') }}
           </span>
         @endif
         </div>
@@ -223,16 +218,16 @@
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       <!-- Large Editorial Heading -->
       <h2 class="font-display mb-8 text-3xl sm:text-4xl md:text-5xl font-normal text-primary-500 tracking-tight uppercase leading-tight sm:leading-[0.95]">
-        {{ $currentLocale === 'en' ? 'Want regular coffee delivery?' : 'Chcete pravidelnou dodávku kávy?' }}
+        {{ __('products.cta.heading') }}
       </h2>
       
       <p class="mb-10 sm:mb-12 text-lg sm:text-xl text-warm-500 max-w-2xl leading-relaxed font-light">
-        {{ $currentLocale === 'en' ? 'With our subscription, you save time and money. Fresh coffee delivered to your door, cancel anytime.' : 'S naším předplatným ušetříte čas i peníze. Čerstvá káva přímo k vám domů, kdykoliv zrušitelné.' }}
+        {{ __('products.cta.text') }}
       </p>
 
       <!-- CTA Link -->
       <a href="{{ localizedRoute('home') }}" class="group inline-flex items-center gap-2 text-dark-800 font-display uppercase tracking-widest hover:text-primary-500 transition-all">
-        <span>{{ $currentLocale === 'en' ? 'Learn more about subscription' : 'Zjistit více o předplatném' }}</span>
+        <span>{{ __('products.cta.link') }}</span>
         <span class="text-primary-500 group-hover:translate-x-1 transition-transform">→</span>
       </a>
     </div>

@@ -12,7 +12,7 @@
 ])
 
 @php
-    $title = $title ?? ($currentLocale === 'en' ? 'Choose your ideal coffee box' : 'Vyberte si ideální kávový box');
+    $title = $title ?? __('components.tiers.title');
     $href = $href ?? fn (int $bags) => localizedRoute('subscriptions.index', ['plan' => $bags]);
     $currency = \App\Helpers\CurrencyHelper::code();
     $leadShipping = __('components.tiers.lead_shipping');

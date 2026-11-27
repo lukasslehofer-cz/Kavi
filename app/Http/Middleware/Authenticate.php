@@ -12,7 +12,15 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('login');
+        if ($request->expectsJson()) {
+            return null;
+        }
+
+        // Přihlášení v jazyce webu (kavibox.com/login, kavibox.sk/prihlasenie), ne vždy české.
+        // Jazyk podle domény: auth běží před DetectRegion, app()->getLocale() je tu ještě výchozí.
+        $locale = (\App\Helpers\Site::forHost($request->getHost()) ?? \App\Helpers\Site::forLocale(null))->locale;
+
+        return route(\App\Services\EmailService::routeName($locale, 'login'));
     }
 }
 

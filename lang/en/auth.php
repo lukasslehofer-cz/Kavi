@@ -75,6 +75,25 @@ return [
     'secure_encryption' => 'Secure encryption',
     'ssl_protected' => 'SSL protected',
     
+    // Large headings of the login, registration and password pages. *_accent is the
+    // highlighted part after the previous text (which therefore ends with a space).
+    'headings' => [
+        'login' => 'LOGIN',
+        'login_credentials' => 'LOGIN ',
+        'login_credentials_accent' => 'CREDENTIALS',
+        'login_magic' => 'PASSWORDLESS ',
+        'login_magic_accent' => 'LOGIN',
+        'register' => 'REGISTER',
+        'register_details' => 'YOUR ',
+        'register_details_accent' => 'DETAILS',
+        'forgot' => 'RESET PASSWORD',
+        'forgot_email' => 'YOUR ',
+        'forgot_email_accent' => 'EMAIL',
+        'reset' => 'NEW PASSWORD',
+        'reset_password' => 'SET NEW ',
+        'reset_password_accent' => 'PASSWORD',
+    ],
+
     // Messages
     'failed' => 'These credentials do not match our records.',
     'password_incorrect' => 'The provided password is incorrect.',

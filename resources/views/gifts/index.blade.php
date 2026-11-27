@@ -294,7 +294,7 @@
             <div class="relative bg-primary-500">
                 <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
                     <div class="relative aspect-[5/4] overflow-hidden">
-                        <img src="/images/kavi-box.jpg" loading="lazy" alt="{{ $currentLocale === 'en' ? 'An open KAVI box with three bags of coffee' : 'Otevřený KAVI box se třemi balíčky kávy' }}" class="h-full w-full object-cover grayscale" />
+                        <img src="/images/kavi-box.jpg" loading="lazy" alt="{{ __('gifts.page.gets_image_alt') }}" class="h-full w-full object-cover grayscale" />
                         <div class="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%270 0 200 200%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27noise%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%275%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23noise)%27/%3E%3C/svg%3E');"></div>
                     </div>
                 </div>

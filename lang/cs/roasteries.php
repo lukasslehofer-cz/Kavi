@@ -37,6 +37,53 @@ return [
     'cta_heading' => 'Objevte další pražírny',
     'cta_description' => 'Připojte se k předplatnému a ochutnejte ty nejlepší kávy z pražíren z celé Evropy.',
     'cta_button' => 'Sestavit box',
+
+    // Stránkování a spodní výzva k předplatnému
+    'pagination' => [
+        'page' => 'Strana',
+        'previous' => 'Předchozí',
+        'next' => 'Další',
+    ],
+    'learn_more_subscription' => 'Zjistit více o předplatném',
+
+    // Výpis pražíren
+    'index' => [
+        'title' => 'Naše pražírny',
+        'meta_description' => 'Objevte naše partnerské pražírny z celé Evropy. Prémiová výběrová káva z Belgie, Polska, Německa a dalších zemí. Kvalita, tradice a láska ke kávě.',
+        'og_title' => 'Naše partnerské pražírny | :site',
+        'og_description' => 'Spolupracujeme s nejlepšími pražírnami z celé Evropy. Objevte prémiovou výběrovou kávu z Belgie, Polska, Německa a dalších zemí.',
+        'heading_line1' => 'Naše',
+        'heading_line2' => 'pražírny',
+        'intro' => 'Spolupracujeme s těmi nejlepšími pražírnami z celé Evropy. Kvalita, tradice a láska ke kávě.',
+        'coffee_count' => '{1} :count káva|[2,4] :count kávy|[0,*] :count káv',
+        'more_about' => 'Více o pražírně',
+        'empty_heading' => 'Žádné pražírny',
+        'empty_country' => 'Pro zemi :country nemáme žádné pražírny. Zkuste vybrat jinou zemi.',
+        'empty_text' => 'Momentálně nemáme žádné pražírny v nabídce.',
+        'show_all' => 'Zobrazit všechny pražírny',
+        'cta_heading' => 'Chcete ochutnat jejich kávy?',
+        'cta_text' => 'S naším předplatným můžete každý měsíc ochutnat kávy od různých evropských pražíren. Čerstvá výběrová káva přímo k vám domů.',
+    ],
+
+    // Detail pražírny
+    'show' => [
+        'meta_description' => 'Objevte :name - prémiovou pražírnu z :country. Prozkoumejte jejich výjimečné kávy na :site.',
+        'og_description' => 'Prémiová pražírna z :country. Objevte jejich výjimečné výběrové kávy.',
+        'address' => 'Adresa',
+        'coffees_from' => 'Kávy od',
+        'section_current' => 'V AKTUÁLNÍM PŘEDPLATNÉM',
+        'section_shop' => 'DALŠÍ KÁVY',
+        'section_past' => 'MINULÉ KÁVY',
+        'attributes' => [
+            'origin' => 'Původ',
+            'altitude' => 'Nadmořská výška',
+            'processing' => 'Zpracování',
+            'variety' => 'Odrůda',
+            'flavor_notes' => 'Chuťové tóny',
+        ],
+        'cta_heading' => 'Chcete ochutnat kávy od :name?',
+        'cta_text' => 'S naším předplatným můžete každý měsíc ochutnat kávy od různých evropských pražíren. Čerstvá výběrová káva přímo k vám domů.',
+    ],
 ];
 
 

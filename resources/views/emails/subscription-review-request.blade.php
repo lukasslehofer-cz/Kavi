@@ -84,7 +84,7 @@
                                 <tr>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top;">
                                         <div style="font-size: 11px; color: #76716C; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">
-                                            {{ $locale === 'cs' ? 'Doručené boxy' : 'Boxes delivered' }}
+                                            {{ __('emails.subscription_review.boxes_delivered', [], $locale) }}
                                         </div>
                                         <div style="font-size: 15px; color: #1c1c1c;">{{ $deliveredOrdersCount }}</div>
                                     </td>
@@ -94,9 +94,9 @@
                                 <tr>
                                     <td style="padding: 16px 0; border-bottom: 1px solid #bcbeb1; vertical-align: top;">
                                         <div style="font-size: 11px; color: #76716C; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px;">
-                                            {{ $locale === 'cs' ? 'Členem od' : 'Member since' }}
+                                            {{ __('emails.subscription_review.member_since', [], $locale) }}
                                         </div>
-                                        <div style="font-size: 15px; color: #1c1c1c;">{{ $subscription->starts_at->format($locale === 'cs' ? 'd.m.Y' : 'M d, Y') }}</div>
+                                        <div style="font-size: 15px; color: #1c1c1c;">{{ $subscription->starts_at->format(__('emails.subscription_review.date_format', [], $locale)) }}</div>
                                     </td>
                                 </tr>
                                 @endif
@@ -109,11 +109,11 @@
                             <!-- Explore More -->
                             <div style="margin: 32px 0; padding-top: 24px; border-top: 2px solid #CA4136;">
                                 <div style="font-size: 11px; font-weight: 400; color: #76716C; margin: 0 0 16px 0; text-transform: uppercase; letter-spacing: 0.15em; text-align: center;">
-                                    {{ $locale === 'cs' ? 'Objevujte další kávy' : 'Discover more coffees' }}
+                                    {{ __('emails.review_request.discover_title', [], $locale) }}
                                 </div>
                                 <div style="text-align: center;">
                                     <a href="{{ $shopUrl }}" style="display: inline-block; background-color: transparent; color: #1c1c1c !important; text-decoration: none; padding: 14px 28px; font-weight: 400; font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; border: 2px solid #1c1c1c;">
-                                        {{ $locale === 'cs' ? 'Prohlédnout nabídku' : 'Browse selection' }} &rarr;
+                                        {{ __('emails.review_request.browse_button', [], $locale) }} &rarr;
                                     </a>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
                             </p>
 
                             <p style="font-size: 13px; color: #5a5a5a; margin-top: 24px;">
-                                {{ $locale === 'cs' ? 'Děkujeme za vaši důvěru' : 'Thank you for your trust' }},<br>
+                                {{ __('emails.review_request.thanks_trust', [], $locale) }},<br>
                                 <span style="color: #1c1c1c;">{{ __('emails.common.team', [], $locale) }}</span>
                             </p>
 
