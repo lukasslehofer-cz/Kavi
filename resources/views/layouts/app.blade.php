@@ -259,17 +259,17 @@
                 <!-- Account Section -->
                 <div class="pt-6 mt-4 border-t border-warm-200 space-y-1">
                     @auth
-                        <a href="{{ localizedRoute('dashboard.index') }}" class="block text-dark-800 hover:text-primary-500 py-3 transition-colors duration-200">
+                        <a href="{{ localizedRoute('dashboard.index') }}" class="btn-outline flex w-full px-6 py-4">
                             {{ ($currentLocale ?? 'cs') === 'en' ? 'My Account' : 'Můj účet' }}
                         </a>
                         @if(auth()->user()->is_admin)
-                        <a href="{{ route('admin.dashboard') }}" class="block text-dark-800 hover:text-primary-500 py-3 transition-colors duration-200">
+                        <a href="{{ route('admin.dashboard') }}" class="block text-dark-800 hover:text-primary-500 py-3 mt-2 uppercase tracking-wide transition-colors duration-200">
                             Admin
                         </a>
                         @endif
                         <form action="{{ localizedRoute('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="w-full flex items-center gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 font-medium py-3 px-4 rounded-full transition-all">
+                            <button type="submit" class="w-full flex items-center gap-3 text-red-600 hover:text-red-700 py-3 uppercase tracking-wide transition-colors duration-200">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
@@ -277,10 +277,10 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ localizedRoute('login') }}" class="block text-dark-800 hover:text-primary-500 py-3 transition-colors duration-200">
+                        <a href="{{ localizedRoute('login') }}" class="btn-outline flex w-full px-6 py-4">
                             {{ ($currentLocale ?? 'cs') === 'en' ? 'Sign In' : 'Přihlásit se' }}
                         </a>
-                        <a href="{{ localizedRoute('register') }}" class="btn-type flex items-center justify-center gap-2 bg-dark-800 hover:bg-black text-white px-6 py-4 transition-all duration-200 text-center mt-4">
+                        <a href="{{ localizedRoute('register') }}" class="btn-type flex items-center justify-center gap-2 bg-dark-800 hover:bg-black text-white px-6 py-4 transition-all duration-200 text-center mt-3">
                             {{ ($currentLocale ?? 'cs') === 'en' ? 'Register' : 'Registrovat' }}
                         </a>
                     @endauth
