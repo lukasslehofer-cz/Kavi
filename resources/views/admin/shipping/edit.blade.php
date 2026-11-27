@@ -91,12 +91,30 @@
                             <p class="text-xs text-gray-500">Mezinárodní EN verze</p>
                         </div>
                     </label>
+
+                    <label class="flex items-center gap-3 cursor-pointer bg-emerald-50 rounded-lg px-4 py-3 border border-emerald-200">
+                        <input type="hidden" name="available_on_sk" value="0">
+                        <input
+                            type="checkbox"
+                            name="available_on_sk"
+                            value="1"
+                            {{ old('available_on_sk', $rate->available_on_sk) ? 'checked' : '' }}
+                            class="w-5 h-5 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 cursor-pointer"
+                        >
+                        <div>
+                            <span class="text-sm font-medium text-gray-900">🇸🇰 kavibox.sk</span>
+                            <p class="text-xs text-gray-500">Slovenská verze (ceny v EUR jako kavibox.com)</p>
+                        </div>
+                    </label>
                 </div>
                 
                 @error('available_on_cz')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
                 @error('available_on_com')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+                @error('available_on_sk')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>

@@ -181,7 +181,7 @@ class DashboardController extends Controller
      * Sazba dopravy, podle které se určují povolená výdejní místa předplatného.
      *
      * Záměrně NEjde přes ShippingService::getPacketaWidgetVendorsForCountry() – ta používá
-     * ShippingRate::getForCountry(), která filtruje podle available_on_cz/available_on_com
+     * ShippingRate::getForCountry(), která filtruje podle available_on_cz/_com/_sk
      * dle AKTUÁLNÍ domény. Zákazník kavibox.com prohlížející si účet na kavi.cz by dostal
      * prázdný seznam a tím zase nefiltrovaný widget.
      */

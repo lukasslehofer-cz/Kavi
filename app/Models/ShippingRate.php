@@ -16,6 +16,7 @@ class ShippingRate extends Model
         'enabled',
         'available_on_cz',
         'available_on_com',
+        'available_on_sk',
         'price_czk',
         'price_eur',
         'applies_to_subscriptions',
@@ -29,6 +30,7 @@ class ShippingRate extends Model
         'enabled' => 'boolean',
         'available_on_cz' => 'boolean',
         'available_on_com' => 'boolean',
+        'available_on_sk' => 'boolean',
         'applies_to_subscriptions' => 'boolean',
         'price_czk' => 'decimal:2',
         'price_eur' => 'decimal:2',
@@ -84,12 +86,8 @@ class ShippingRate extends Model
         $query = static::where('country_code', strtoupper($countryCode))
             ->where('enabled', true);
         
-        // Filter by region availability (EUR weby kavibox.com a kavibox.sk sdílí available_on_com)
-        if (CurrencyHelper::isCzRegion()) {
-            $query->where('available_on_cz', true);
-        } else {
-            $query->where('available_on_com', true);
-        }
+        // Filter by region availability (kavi.cz / kavibox.com / kavibox.sk)
+        $query->where(self::availabilityColumn(), true);
         
         return $query->first();
     }
@@ -111,12 +109,8 @@ class ShippingRate extends Model
     {
         $query = static::where('enabled', true);
         
-        // Filter by region availability (EUR weby kavibox.com a kavibox.sk sdílí available_on_com)
-        if (CurrencyHelper::isCzRegion()) {
-            $query->where('available_on_cz', true);
-        } else {
-            $query->where('available_on_com', true);
-        }
+        // Filter by region availability (kavi.cz / kavibox.com / kavibox.sk)
+        $query->where(self::availabilityColumn(), true);
         
         return $query->orderBy('country_name')->get();
     }
@@ -252,5 +246,17 @@ class ShippingRate extends Model
     {
         return $this->packetaCarriers->pluck('name')->join(', ');
     }
-}
 
+    /**
+     * Sloupec dostupnosti pro region aktuálního webu (CurrencyHelper::region()).
+     * Neznámý region bere mezinárodní kavibox.com.
+     */
+    public static function availabilityColumn(?string $region = null): string
+    {
+        return match ($region ?? CurrencyHelper::region()) {
+            'cz' => 'available_on_cz',
+            'sk' => 'available_on_sk',
+            default => 'available_on_com',
+        };
+    }
+}

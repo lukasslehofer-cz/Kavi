@@ -47,6 +47,7 @@ class ShippingRateController extends Controller
             'enabled' => 'required|boolean',
             'available_on_cz' => 'required|boolean',
             'available_on_com' => 'required|boolean',
+            'available_on_sk' => 'required|boolean',
             'price_czk' => 'required|numeric|min:0',
             'price_eur' => 'required|numeric|min:0',
             'applies_to_subscriptions' => 'required|boolean',
@@ -60,6 +61,7 @@ class ShippingRateController extends Controller
         $validated['enabled'] = $request->has('enabled') && $request->enabled == '1';
         $validated['available_on_cz'] = $request->has('available_on_cz') && $request->available_on_cz == '1';
         $validated['available_on_com'] = $request->has('available_on_com') && $request->available_on_com == '1';
+        $validated['available_on_sk'] = $request->has('available_on_sk') && $request->available_on_sk == '1';
         $validated['applies_to_subscriptions'] = $request->has('applies_to_subscriptions') && $request->applies_to_subscriptions == '1';
         
         // Handle nullable fields
