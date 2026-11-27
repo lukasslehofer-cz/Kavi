@@ -358,7 +358,7 @@ $giftDates = $gift?->boxDates();
                     <!-- Contact Info -->
                     <div class="mt-8 pt-6 border-t border-dark-800/20 text-center">
                         <span class="text-xs uppercase tracking-widest text-dark-800/60 block mb-2">{{ __('confirmation.help.need_help') }}</span>
-                        <a href="mailto:info@kavi.cz" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 transition-colors">info@kavi.cz</a>
+                        @php($helpEmail = \App\Helpers\Site::current()->contactEmail())<a href="mailto:{{ $helpEmail }}" class="text-xs uppercase tracking-widest text-dark-800 hover:text-primary-500 transition-colors">{{ $helpEmail }}</a>
                     </div>
                 </div>
             </div>

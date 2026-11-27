@@ -38,16 +38,7 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
-    /*
-    | Základ URL pro každý region. V e-mailech se URL nesmí odvozovat od
-    | hostitele requestu (admin posílá EN maily z kavi.cz) ani od APP_URL
-    | (cron, .env.example). Defaulty odpovídají feedům a sitemapě.
-    */
-
-    'site_urls' => [
-        'cs' => env('APP_URL_CS', 'https://kavi.cz'),
-        'en' => env('APP_URL_EN', 'https://kavibox.com'),
-    ],
+    // Adresy jednotlivých jazykových webů jsou v config/sites.php (SITE_URL_*).
 
     /*
     |--------------------------------------------------------------------------
@@ -74,45 +65,16 @@ return [
     | Multi-Region Configuration
     |--------------------------------------------------------------------------
     |
-    | Configuration for multi-region support. Each domain maps to a locale
-    | and currency. The region_code is used internally to identify the region.
+    | Domény, jazyky a měny jednotlivých webů jsou v config/sites.php.
+    | Tady jen výchozí hodnoty pro kontext bez requestu (cron, artisan).
     |
     */
-
-    'regions' => [
-        'kavi.cz' => [
-            'locale' => 'cs',
-            'currency' => 'CZK',
-            'region_code' => 'cz',
-        ],
-        'kavi.local' => [  // pro localhost
-            'locale' => 'cs',
-            'currency' => 'CZK',
-            'region_code' => 'cz',
-        ],
-        'kavibox.com' => [
-            'locale' => 'en',
-            'currency' => 'EUR',
-            'region_code' => 'com',
-        ],
-        'kavibox.local' => [  // pro localhost
-            'locale' => 'en',
-            'currency' => 'EUR',
-            'region_code' => 'com',
-        ],
-    ],
 
     // Default currency (used when region detection fails)
     'currency' => env('APP_CURRENCY', 'CZK'),
 
     // Default region code
     'region' => env('APP_REGION', 'cz'),
-
-    // Kanonické adresy jazykových verzí (hreflang a přepínač jazyka, bez lomítka na konci)
-    'site_urls' => [
-        'cs' => env('SITE_URL_CS', 'https://kavi.cz'),
-        'en' => env('SITE_URL_EN', 'https://kavibox.com'),
-    ],
 
     /*
     |--------------------------------------------------------------------------

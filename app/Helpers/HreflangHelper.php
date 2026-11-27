@@ -8,14 +8,14 @@ use App\Models\Roastery;
 use Illuminate\Support\Facades\Route;
 
 /**
- * Jazykové protějšky stránek kavi.cz (cs) ↔ kavibox.com (en).
+ * Jazykové protějšky stránek mezi weby z config/sites.php (kavi.cz, kavibox.com, kavibox.sk).
  *
- * Oba weby běží z jedné aplikace a databáze, takže existence protějšku se ověřuje
+ * Všechny weby běží z jedné aplikace a databáze, takže existence protějšku se ověřuje
  * přímo v DB. Používá se pro <link rel="alternate" hreflang> a přepínač jazyka.
+ * Počítá se jen se zapnutými weby (Site::enabled()).
  */
 class HreflangHelper
 {
-    public const LOCALES = ['cs', 'en'];
 
     /**
      * Stránky, které mají protějšek vždy (základní název routy bez přípony .en).
@@ -43,7 +43,7 @@ class HreflangHelper
     private static array $memo = [];
 
     /**
-     * hreflang značky aktuální stránky: ['cs' => url, 'en' => url], nebo [] když se nemají vložit
+     * hreflang značky aktuální stránky: ['cs' => url, 'en' => url, …], nebo [] když se nemají vložit
      * (stránka bez protějšku nebo s parametry jako ?page=, ?category=, ?plan=, ?type=).
      *
      * @return array<string, string>
@@ -58,23 +58,61 @@ class HreflangHelper
     }
 
     /**
-     * Cíl přepínače jazyka: protějšek aktuální stránky (bez parametrů), jinak homepage druhého webu.
+     * Cíle přepínače jazyka pro ostatní zapnuté weby: protějšek aktuální stránky
+     * (bez parametrů), jinak homepage daného webu.
+     *
+     * @return array<string, string> locale => url
      */
-    public static function switchUrl(): string
+    public static function switchUrls(): array
     {
-        $other = self::otherLocale();
+        $current = app()->getLocale();
+        $counterparts = self::counterparts() ?? [];
+        $urls = [];
 
-        return self::counterparts()[$other] ?? self::siteUrl($other);
+        foreach (self::locales() as $locale) {
+            if ($locale !== $current) {
+                $urls[$locale] = $counterparts[$locale] ?? self::siteUrl($locale);
+            }
+        }
+
+        return $urls;
     }
 
-    public static function otherLocale(): string
+    /**
+     * Zapnuté jazykové weby (pořadí z config/sites.php).
+     *
+     * @return list<string>
+     */
+    public static function locales(): array
     {
-        return app()->getLocale() === 'en' ? 'cs' : 'en';
+        return Site::locales(true);
     }
 
     public static function siteUrl(string $locale): string
     {
-        return rtrim((string) config('app.site_urls.' . $locale), '/');
+        return Site::forLocale($locale)->url();
+    }
+
+    /**
+     * Název routy pro daný jazyk: jazyky se shodnou cestou jako čeština sdílejí českou routu.
+     */
+    public static function routeNameFor(string $base, string $locale): string
+    {
+        return ($locale !== Site::PRIMARY_LOCALE && Route::has($base . '.' . $locale)) ? $base . '.' . $locale : $base;
+    }
+
+    /**
+     * Základní název routy bez jazykové přípony (.en, .sk).
+     */
+    public static function baseRouteName(string $name): string
+    {
+        foreach (Site::locales() as $locale) {
+            if (str_ends_with($name, '.' . $locale)) {
+                return substr($name, 0, -strlen('.' . $locale));
+            }
+        }
+
+        return $name;
     }
 
     /**
@@ -105,16 +143,14 @@ class HreflangHelper
         }
 
         $locale = app()->getLocale();
-        if (! in_array($locale, self::LOCALES, true)) {
+        if (! in_array($locale, self::locales(), true)) {
             return null;
         }
 
-        $base = preg_replace('/\.en$/', '', $name);
+        $base = self::baseRouteName($name);
 
-        // Routa druhého jazyka na této doméně (LocalizedUrlRedirect by ji měl přesměrovat)
-        $routeLocale = str_ends_with($name, '.en') ? 'en' : 'cs';
-        $hasEnVariant = Route::has($base . '.en');
-        if ($hasEnVariant && $routeLocale !== $locale) {
+        // Routa jiného jazyka na této doméně (LocalizedUrlRedirect by ji měl přesměrovat)
+        if ($name !== self::routeNameFor($base, $locale)) {
             return null;
         }
 
@@ -155,7 +191,8 @@ class HreflangHelper
     }
 
     /**
-     * Článek má protějšek, když je publikovaný a má vyplněnou anglickou verzi.
+     * Článek má protějšky v jazycích, ve kterých je publikovaný a přeložený
+     * (vyplněný slug, titulek i obsah). Bez aspoň dvou jazyků se hreflang nevkládá.
      *
      * @return array<string, string>|null
      */
@@ -170,20 +207,23 @@ class HreflangHelper
             return null;
         }
 
-        if (blank($post->slug_cs) || blank($post->slug_en) || blank($post->title_en) || blank($post->content_en)) {
+        $urls = [];
+        foreach (self::locales() as $postLocale) {
+            $postSlug = $post->getAttribute('slug_' . $postLocale);
+            if (blank($postSlug)
+                || blank($post->getAttribute('title_' . $postLocale))
+                || blank($post->getAttribute('content_' . $postLocale))) {
+                continue;
+            }
+            $urls[$postLocale] = self::siteUrl($postLocale) . '/' . ltrim(route('blog.show', ['post' => $postSlug], false), '/');
+        }
+
+        // Slug jiného jazyka (BlogController ho přesměruje na slug této domény)
+        if (! isset($urls[$locale]) || $slug !== $post->getAttribute('slug_' . $locale) || count($urls) < 2) {
             return null;
         }
 
-        // Slug druhého jazyka (BlogController ho přesměruje na slug této domény)
-        $ownSlug = $locale === 'en' ? $post->slug_en : $post->slug_cs;
-        if ($slug !== $ownSlug) {
-            return null;
-        }
-
-        return [
-            'cs' => self::siteUrl('cs') . '/' . ltrim(route('blog.show', ['post' => $post->slug_cs], false), '/'),
-            'en' => self::siteUrl('en') . '/' . ltrim(route('blog.show', ['post' => $post->slug_en], false), '/'),
-        ];
+        return $urls;
     }
 
     /**
@@ -193,9 +233,8 @@ class HreflangHelper
     {
         $urls = [];
 
-        foreach (self::LOCALES as $locale) {
-            $name = ($locale === 'cs' || ! Route::has($base . '.en')) ? $base : $base . '.en';
-            $path = trim(route($name, $parameters, false), '/');
+        foreach (self::locales() as $locale) {
+            $path = trim(route(self::routeNameFor($base, $locale), $parameters, false), '/');
             $urls[$locale] = self::siteUrl($locale) . ($path === '' ? '' : '/' . $path);
         }
 

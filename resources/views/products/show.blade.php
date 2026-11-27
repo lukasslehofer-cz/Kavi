@@ -4,7 +4,7 @@
 
 @php
     $productDescription = Str::limit(strip_tags($product->getDescription()), 160);
-    $siteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+    $siteUrl = \App\Helpers\Site::current()->url();
     
     // Country codes mapping
     $countryCodes = [

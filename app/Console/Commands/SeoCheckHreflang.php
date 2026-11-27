@@ -20,10 +20,11 @@ class SeoCheckHreflang extends Command
     protected $signature = 'seo:check-hreflang
                             {--cs=https://kavi.cz : Česká verze (bez lomítka na konci)}
                             {--en=https://kavibox.com : Anglická verze (bez lomítka na konci)}
+                            {--sk= : Slovenská verze, např. https://kavibox.sk (prázdné = bez SK)}
                             {--via= : Posílat požadavky na tento server (např. http://127.0.0.1:8124) s hlavičkou Host}
                             {--delay=150 : Pauza mezi požadavky v ms}';
 
-    protected $description = 'Ověří vzájemné hreflang značky kavi.cz ↔ kavibox.com podle sitemap obou webů';
+    protected $description = 'Ověří vzájemné hreflang značky mezi kavi.cz, kavibox.com (a kavibox.sk) podle jejich sitemap';
 
     /** @var array<string, array{status:int, location:?string, body:string}> */
     private array $cache = [];
@@ -31,12 +32,17 @@ class SeoCheckHreflang extends Command
     /** @var array<int, array{0:string, 1:string}> */
     private array $errors = [];
 
+    /** @var list<string> */
+    private array $siteLocales = [];
+
     public function handle(): int
     {
-        $sites = [
+        $sites = array_filter([
             'cs' => rtrim((string) $this->option('cs'), '/'),
             'en' => rtrim((string) $this->option('en'), '/'),
-        ];
+            'sk' => rtrim((string) $this->option('sk'), '/'),
+        ]);
+        $this->siteLocales = array_keys($sites);
 
         $pages = [];
         foreach ($sites as $lang => $base) {
@@ -124,10 +130,11 @@ class SeoCheckHreflang extends Command
             }
         }
 
+        // Článek nemusí být přeložený do všech jazyků, ale aspoň dva a jen z kontrolovaných webů
         $langs = array_keys($alternates);
         sort($langs);
-        if ($langs !== ['cs', 'en']) {
-            $this->problem($url, 'hreflang jazyky jsou [' . implode(', ', $langs) . '], očekává se [cs, en]');
+        if (count($langs) < 2 || array_diff($langs, $this->siteLocales) !== []) {
+            $this->problem($url, 'hreflang jazyky jsou [' . implode(', ', $langs) . '], očekávají se aspoň dva z [' . implode(', ', $this->siteLocales) . ']');
         }
 
         if (($alternates[$lang][0] ?? null) !== $url) {

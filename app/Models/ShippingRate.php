@@ -84,7 +84,7 @@ class ShippingRate extends Model
         $query = static::where('country_code', strtoupper($countryCode))
             ->where('enabled', true);
         
-        // Filter by region availability
+        // Filter by region availability (EUR weby kavibox.com a kavibox.sk sdílí available_on_com)
         if (CurrencyHelper::isCzRegion()) {
             $query->where('available_on_cz', true);
         } else {
@@ -111,7 +111,7 @@ class ShippingRate extends Model
     {
         $query = static::where('enabled', true);
         
-        // Filter by region availability
+        // Filter by region availability (EUR weby kavibox.com a kavibox.sk sdílí available_on_com)
         if (CurrencyHelper::isCzRegion()) {
             $query->where('available_on_cz', true);
         } else {

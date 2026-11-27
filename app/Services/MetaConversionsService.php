@@ -63,7 +63,7 @@ class MetaConversionsService
     public static function sendOrderPurchase(Order $order, ?string $fallbackIp = null, ?string $fallbackUserAgent = null): void
     {
         try {
-            $service = self::forRegion(MetaPixelHelper::regionFromCurrency($order->currency));
+            $service = self::forRegion(MetaPixelHelper::regionFor($order));
             if (! $service->isConfigured() || $order->meta_capi_sent_at) {
                 return;
             }
@@ -114,7 +114,7 @@ class MetaConversionsService
     public static function sendSubscriptionPurchase(Subscription $subscription): void
     {
         try {
-            $service = self::forRegion(MetaPixelHelper::regionFromCurrency($subscription->currency));
+            $service = self::forRegion(MetaPixelHelper::regionFor($subscription));
             if (! $service->isConfigured() || $subscription->meta_capi_sent_at) {
                 return;
             }

@@ -141,7 +141,7 @@ if (!function_exists('alternateLocaleUrl')) {
         }
         
         // Extract base name (remove locale suffix if present)
-        $baseName = preg_replace('/\.(cs|en)$/', '', $currentName);
+        $baseName = \App\Helpers\HreflangHelper::baseRouteName($currentName);
         
         // Non-localized routes
         if (str_starts_with($baseName, 'admin.') || $baseName === 'home') {
@@ -187,7 +187,7 @@ if (!function_exists('localizedRouteIs')) {
         }
         
         // Extract base name (remove locale suffix if present)
-        $baseName = preg_replace('/\.(cs|en)$/', '', $currentName);
+        $baseName = \App\Helpers\HreflangHelper::baseRouteName($currentName);
         
         foreach ($patterns as $pattern) {
             // Check against both the full name and the base name

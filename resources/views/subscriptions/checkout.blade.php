@@ -205,7 +205,7 @@
                         <select id="billing_country" name="billing_country" required class="swiss-field-select">
                             <option value="">{{ __('checkout.fields.select_country') }}</option>
                             @foreach($availableCountries as $code => $name)
-                                <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? ($code === 'CZ' ? 'CZ' : '')) == $code ? 'selected' : '' }}>{{ $name }}</option>
+                                <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? \App\Helpers\Site::current()->defaultCountry()) == $code ? 'selected' : '' }}>{{ $name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -288,7 +288,7 @@
                                     >
                                         <option value="">{{ __('checkout.fields.select_country') }}</option>
                                         @foreach($availableCountries as $code => $name)
-                                            <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? ($code === 'CZ' ? 'CZ' : '')) == $code ? 'selected' : '' }}>
+                                            <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? \App\Helpers\Site::current()->defaultCountry()) == $code ? 'selected' : '' }}>
                                                 {{ $name }}
                                             </option>
                                         @endforeach

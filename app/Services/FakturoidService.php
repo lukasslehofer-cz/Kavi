@@ -50,6 +50,20 @@ class FakturoidService
     }
 
     /**
+     * Jazyk faktury podle jazyka webu, na kterém objednávka / předplatné vzniklo
+     * (sloupec locale: cs → cz, en, sk), u starých záznamů bez jazyka podle měny.
+     */
+    private function getInvoiceLanguageFor(Order|\App\Models\Subscription $entity): string
+    {
+        return match ($entity->locale) {
+            'cs' => 'cz',
+            'en' => 'en',
+            'sk' => 'sk',
+            default => $this->getInvoiceLanguageFromCurrency($entity->currency),
+        };
+    }
+
+    /**
      * Get invoice language code based on current locale (fallback for session-based)
      * Returns 'cz' for Czech or 'en' for English
      * Note: Fakturoid uses 'cz' (not 'cs') for Czech language
@@ -70,7 +84,7 @@ class FakturoidService
     /**
      * Get localized text for invoice items
      */
-    private function getLocalizedText(string $key, ?string $currency = null): string
+    private function getLocalizedText(string $key, ?string $currency = null, ?string $language = null): string
     {
         $texts = [
             'cz' => [
@@ -93,9 +107,19 @@ class FakturoidService
                 'subscription_note' => 'Kavi subscription payment',
                 'customer' => 'Customer',
             ],
+            'sk' => [
+                'shipping' => 'Doprava',
+                'discount' => 'Zľava',
+                'gift_voucher' => 'Darčekový poukaz',
+                'unit' => 'ks',
+                'subscription' => 'Predplatné kávy',
+                'note' => 'Objednávka z e-shopu Kavi',
+                'subscription_note' => 'Platba predplatného Kavi',
+                'customer' => 'Zákazník',
+            ],
         ];
 
-        $lang = $currency ? $this->getInvoiceLanguageFromCurrency($currency) : $this->getInvoiceLanguage();
+        $lang = $language ?? ($currency ? $this->getInvoiceLanguageFromCurrency($currency) : $this->getInvoiceLanguage());
 
         return $texts[$lang][$key] ?? $texts['cz'][$key] ?? $key;
     }
@@ -192,8 +216,9 @@ class FakturoidService
 
             // Use order's currency for invoice (stored at order creation time)
             $orderCurrency = $order->currency ?? 'CZK';
+            $invoiceLanguage = $this->getInvoiceLanguageFor($order);
 
-            $unitName = $this->getLocalizedText('unit', $orderCurrency);
+            $unitName = $this->getLocalizedText('unit', $orderCurrency, $invoiceLanguage);
             $lines = $order->items->map(function ($item) use ($unitName) {
                 return [
                     'name' => $item->product_name,
@@ -226,7 +251,7 @@ class FakturoidService
                 // Vytvořit line item pro každou DPH sazbu
                 foreach ($shippingByVat as $vatRate => $shippingPortion) {
                     if ($shippingPortion > 0) {
-                        $shippingLabel = $this->getLocalizedText('shipping', $orderCurrency);
+                        $shippingLabel = $this->getLocalizedText('shipping', $orderCurrency, $invoiceLanguage);
                         if (count($shippingByVat) > 1) {
                             // Pokud je více DPH sazeb, rozlišit je v názvu
                             $shippingLabel .= ' (DPH '.$vatRate.'%)';
@@ -252,8 +277,8 @@ class FakturoidService
                 $discountedItems = $order->items->where('is_gift', false);
                 $discountVatRate = $isGiftVoucher ? 0 : (($discountedItems->isNotEmpty() ? $discountedItems : $order->items)->max('vat_rate') ?? 21);
                 $discountName = $isGiftVoucher
-                    ? $this->getLocalizedText('gift_voucher', $orderCurrency)
-                    : $this->getLocalizedText('discount', $orderCurrency);
+                    ? $this->getLocalizedText('gift_voucher', $orderCurrency, $invoiceLanguage)
+                    : $this->getLocalizedText('discount', $orderCurrency, $invoiceLanguage);
                 $lines[] = [
                     'name' => $discountName.($order->coupon_code ? ' ('.$order->coupon_code.')' : ''),
                     'quantity' => '1',
@@ -274,9 +299,9 @@ class FakturoidService
                 'payment_method' => 'card',
                 'vat_price_mode' => 'with_vat', // Prices include VAT, Fakturoid calculates base price
                 'currency' => $orderCurrency,
-                'language' => $this->getInvoiceLanguageFromCurrency($orderCurrency),
+                'language' => $invoiceLanguage,
                 'lines' => $lines,
-                'note' => $this->getLocalizedText('note', $orderCurrency),
+                'note' => $this->getLocalizedText('note', $orderCurrency, $invoiceLanguage),
             ];
 
             // Add number format ID if configured
@@ -857,11 +882,12 @@ class FakturoidService
 
         $breakdown = SubscriptionPricing::forPayment($payment);
         $subscriptionCurrency = $breakdown->currency;
+        $invoiceLanguage = $this->getInvoiceLanguageFor($subscription);
 
-        $unitName = $this->getLocalizedText('unit', $subscriptionCurrency);
-        $subscriptionName = $this->getLocalizedText('subscription', $subscriptionCurrency);
-        $shippingName = $this->getLocalizedText('shipping', $subscriptionCurrency);
-        $discountName = $this->getLocalizedText('discount', $subscriptionCurrency);
+        $unitName = $this->getLocalizedText('unit', $subscriptionCurrency, $invoiceLanguage);
+        $subscriptionName = $this->getLocalizedText('subscription', $subscriptionCurrency, $invoiceLanguage);
+        $shippingName = $this->getLocalizedText('shipping', $subscriptionCurrency, $invoiceLanguage);
+        $discountName = $this->getLocalizedText('discount', $subscriptionCurrency, $invoiceLanguage);
 
         $numberSuffix = $subscription->subscription_number
             ? ' ('.$subscription->subscription_number.')'
@@ -906,7 +932,7 @@ class FakturoidService
             $isGiftVoucher = $subscription->coupon?->is_gift_voucher ?? false;
             $discountVatRate = $isGiftVoucher ? 0 : $vatRate;
             $discountLabel = $isGiftVoucher
-                ? $this->getLocalizedText('gift_voucher', $subscriptionCurrency)
+                ? $this->getLocalizedText('gift_voucher', $subscriptionCurrency, $invoiceLanguage)
                 : $discountName;
 
             $lines[] = [
@@ -929,9 +955,9 @@ class FakturoidService
             'payment_method' => 'card',
             'vat_price_mode' => 'with_vat', // Prices include VAT, Fakturoid calculates base price
             'currency' => $subscriptionCurrency,
-            'language' => $this->getInvoiceLanguageFromCurrency($subscriptionCurrency),
+            'language' => $invoiceLanguage,
             'lines' => $lines,
-            'note' => $this->getLocalizedText('subscription_note', $subscriptionCurrency),
+            'note' => $this->getLocalizedText('subscription_note', $subscriptionCurrency, $invoiceLanguage),
         ];
 
         // Add number format ID if configured

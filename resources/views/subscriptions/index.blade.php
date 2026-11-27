@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @php
-    $seoSiteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+    $seoSiteUrl = \App\Helpers\Site::current()->url();
     // Konfigurátor necílí na „kávové předplatné“, na ten dotaz má Google ukazovat HP
     $seoTitle = $currentLocale === 'en' ? 'Build your coffee box – size, coffee, frequency | KAVI' : 'Sestavte si kávový box – velikost, káva, frekvence | KAVI.cz';
     $seoDescription = $currentLocale === 'en' ? 'Choose your box size, coffee type and how often you want it delivered. No commitment, free shipping.' : 'Vyberte velikost boxu, typ kávy a jak často ho chcete dostávat. Bez závazků, doprava zdarma.';

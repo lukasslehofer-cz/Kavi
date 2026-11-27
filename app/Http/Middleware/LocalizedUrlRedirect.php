@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\Site;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -84,16 +85,20 @@ class LocalizedUrlRedirect
 
         $currentLocale = app()->getLocale();
         $path = $request->path();
-        
-        // Get the opposite locale
-        $oppositeLocale = $currentLocale === 'cs' ? 'en' : 'cs';
-        
-        // Try to find if current path matches a route from the opposite locale
-        $redirectUrl = $this->findRedirectUrl($path, $currentLocale, $oppositeLocale);
-        
-        if ($redirectUrl) {
-            $queryString = $request->getQueryString();
-            return redirect($redirectUrl . ($queryString ? '?' . $queryString : ''), 301);
+
+        // Odpovídá cesta routě jiného jazyka (např. /cart na kavi.cz)? Přesměrovat na cestu
+        // tohoto webu. Jazyky se shodnou cestou (sk "kosik" = cs "kosik") se nepřesměrovávají.
+        foreach (Site::locales() as $otherLocale) {
+            if ($otherLocale === $currentLocale) {
+                continue;
+            }
+
+            $redirectUrl = $this->findRedirectUrl($path, $currentLocale, $otherLocale);
+
+            if ($redirectUrl && trim($redirectUrl, '/') !== trim($path, '/')) {
+                $queryString = $request->getQueryString();
+                return redirect($redirectUrl . ($queryString ? '?' . $queryString : ''), 301);
+            }
         }
 
         return $next($request);
@@ -199,12 +204,13 @@ class LocalizedUrlRedirect
     protected function getRouteTranslations(string $locale): array
     {
         $path = lang_path($locale . '/routes.php');
-        
+
         if (file_exists($path)) {
             return require $path;
         }
-        
-        return [];
+
+        // Stejně jako RouteServiceProvider: jazyk bez vlastních cest používá české
+        return require lang_path(Site::PRIMARY_LOCALE . '/routes.php');
     }
 }
 

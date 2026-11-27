@@ -350,7 +350,7 @@
           <!-- Brand Section -->
           <div class="lg:col-span-2">
             <a href="{{ route('home') }}" class="inline-flex items-center gap-2 mb-5 group" aria-label="logo">
-              <img src="/images/kavi-logo-black.png" alt="{{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}" class="h-9 w-auto transform group-hover:scale-105 transition-transform duration-200">
+              <img src="/images/kavi-logo-black.png" alt="{{ \App\Helpers\Site::current()->name() }}" class="h-9 w-auto transform group-hover:scale-105 transition-transform duration-200">
             </a>
             
             <p class="text-gray-600 mb-5 leading-relaxed max-w-sm text-sm font-light">
@@ -413,7 +413,7 @@
                 </svg>
                 <span>{{ ($currentLocale ?? 'cs') === 'en' ? 'Write Us' : 'Napište nám' }}</span>
               </a>
-              @php $footerEmail = ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz'; @endphp
+              @php $footerEmail = \App\Helpers\Site::current()->contactEmail(); @endphp
               <a href="mailto:{{ $footerEmail }}" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-light">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -441,7 +441,7 @@
         <!-- Bottom Bar -->
         <div class="border-t border-gray-100 py-6">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-light">
-            <p>© {{ date('Y') }} {{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}. {{ ($currentLocale ?? 'cs') === 'en' ? 'All rights reserved.' : 'Všechna práva vyhrazena.' }}</p>
+            <p>© {{ date('Y') }} {{ \App\Helpers\Site::current()->name() }}. {{ ($currentLocale ?? 'cs') === 'en' ? 'All rights reserved.' : 'Všechna práva vyhrazena.' }}</p>
             <div class="flex gap-6">
             <a href="{{ localizedRoute('terms-of-service') }}" class="hover:text-gray-900 transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Terms of Service' : 'Obchodní podmínky' }}</a>
             <a href="{{ localizedRoute('privacy-policy') }}" class="hover:text-gray-900 transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Privacy Policy' : 'Ochrana osobních údajů' }}</a>              

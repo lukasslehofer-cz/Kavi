@@ -2,7 +2,7 @@
 
 @php
     $host = request()->getHost();
-    $locale = $currentLocale ?? (str_contains($host, 'kavibox.com') ? 'en' : 'cs');
+    $locale = $currentLocale ?? (\App\Helpers\Site::forHost($host)?->locale ?? 'cs');
 @endphp
 
 @section('title', $locale === 'en' ? 'Maintenance | KAVI' : 'Údržba | KAVI.cz')
@@ -123,8 +123,8 @@
                     <p class="text-xs uppercase tracking-widest text-[#1c1c1c]/50 mb-2">
                         {{ $locale === 'en' ? 'Questions?' : 'Dotazy?' }}
                     </p>
-                    <a href="mailto:{{ $locale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}" class="text-sm hover:text-red-600 transition-colors">
-                        {{ $locale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}
+                    <a href="mailto:{{ \App\Helpers\Site::forLocale($locale)->contactEmail() }}" class="text-sm hover:text-red-600 transition-colors">
+                        {{ \App\Helpers\Site::forLocale($locale)->contactEmail() }}
                     </a>
                 </div>
 

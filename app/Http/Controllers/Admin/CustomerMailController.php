@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Site;
 use App\Http\Controllers\Controller;
 use App\Mail\AdminCustomMessage;
 use App\Models\User;
@@ -169,7 +170,7 @@ class CustomerMailController extends Controller
     private function validateMessage(Request $request, bool $recipientsRequired = true): array
     {
         return $request->validate([
-            'locale' => 'required|in:cs,en',
+            'locale' => 'required|in:' . implode(',', Site::locales()),
             'segment' => 'nullable|in:'.implode(',', self::SEGMENTS),
             'recipients' => ($recipientsRequired ? 'required' : 'nullable').'|array|max:'.self::MAX_RECIPIENTS,
             'recipients.*' => 'integer|exists:users,id',
@@ -184,7 +185,7 @@ class CustomerMailController extends Controller
 
     private function resolveLocale(?string $locale): string
     {
-        return $locale === 'en' ? 'en' : 'cs';
+        return in_array($locale, Site::locales(), true) ? $locale : Site::PRIMARY_LOCALE;
     }
 
     private function resolveSegment(?string $segment): string
@@ -209,26 +210,28 @@ class CustomerMailController extends Controller
      * Příjemci pro daný jazyk a segment.
      *
      * users.locale je NOT NULL DEFAULT 'cs'. Migrace 2026_01_21_093243 doplnila
-     * 'en' všem, kdo měli EUR objednávku nebo předplatné; EXISTS na EUR je
-     * pojistka pro EUR nákupy vzniklé až po ní. CS množina je přesný doplněk
-     * EN, takže se výběry nepřekrývají a jejich součet je celek.
+     * 'en' všem, kdo měli EUR objednávku nebo předplatné; EXISTS na jazyk
+     * objednávky / předplatného (sloupec locale, starší řádky doplněné podle měny)
+     * je pojistka pro nákupy, u kterých se jazyk účtu neuložil. CS množina je
+     * doplněk ostatních jazyků, takže součet výběrů je celek.
      */
     private function recipientsQuery(string $locale, string $segment = 'all')
     {
         $query = $this->baseQuery();
 
         // Obalující where() je nutný – bez něj by orWhere* obešlo filtry výše
-        if ($locale === 'en') {
-            $query->where(function ($q) {
-                $q->where('locale', 'en')
-                    ->orWhereHas('subscriptions', fn ($s) => $s->where('currency', 'EUR'))
-                    ->orWhereHas('orders', fn ($o) => $o->where('currency', 'EUR'));
+        if ($locale !== Site::PRIMARY_LOCALE) {
+            $query->where(function ($q) use ($locale) {
+                $q->where('locale', $locale)
+                    ->orWhereHas('subscriptions', fn ($s) => $s->where('locale', $locale))
+                    ->orWhereHas('orders', fn ($o) => $o->where('locale', $locale));
             });
         } else {
-            $query->where(function ($q) {
-                $q->where('locale', '!=', 'en')
-                    ->whereDoesntHave('subscriptions', fn ($s) => $s->where('currency', 'EUR'))
-                    ->whereDoesntHave('orders', fn ($o) => $o->where('currency', 'EUR'));
+            $foreign = array_values(array_diff(Site::locales(), [Site::PRIMARY_LOCALE]));
+            $query->where(function ($q) use ($foreign) {
+                $q->whereNotIn('locale', $foreign)
+                    ->whereDoesntHave('subscriptions', fn ($s) => $s->whereIn('locale', $foreign))
+                    ->whereDoesntHave('orders', fn ($o) => $o->whereIn('locale', $foreign));
             });
         }
 

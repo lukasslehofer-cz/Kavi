@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Services\EmailService;
 use App\Helpers\DateFormat;
 use App\Models\GiftPurchase;
 use Illuminate\Mail\Mailables\Attachment;
@@ -46,7 +47,7 @@ class GiftCertificateForBuyer extends LocalizedMailable
                 'sendAt' => $gift->send_at ? DateFormat::full($gift->send_at, $this->emailLocale) : null,
                 'redeemDisplay' => $gift->redeemDisplay(),
                 'downloadUrl' => $this->siteUrl . URL::temporarySignedRoute(
-                    $this->emailLocale === 'en' ? 'gifts.certificate.en' : 'gifts.certificate',
+                    EmailService::routeName($this->emailLocale, 'gifts.certificate'),
                     now()->addDays(60),
                     ['gift' => $gift->id],
                     false

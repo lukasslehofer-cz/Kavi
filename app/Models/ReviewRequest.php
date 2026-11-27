@@ -106,16 +106,19 @@ class ReviewRequest extends Model
     }
 
     /**
-     * Každá doména má vlastní Google profil, vybírá se podle měny objednávky
-     * nebo předplatného - stejně jako jazyk e-mailu.
+     * Každá doména má vlastní Google profil, vybírá se podle jazyka objednávky
+     * nebo předplatného - stejně jako jazyk e-mailu. Web bez vlastního profilu
+     * (kavibox.sk, dokud nemá odkaz v services.review_links) používá český.
      */
     public function profileLocale(): string
     {
-        $currency = $this->order?->currency
-            ?? $this->subscription?->currency
-            ?? 'CZK';
+        $locale = match (true) {
+            $this->order !== null => EmailService::getLocaleFromOrder($this->order),
+            $this->subscription !== null => EmailService::getLocaleFromSubscription($this->subscription),
+            default => 'cs',
+        };
 
-        return EmailService::getLocaleFromCurrency($currency);
+        return config('services.review_links.'.$locale) ? $locale : 'cs';
     }
 
     /**

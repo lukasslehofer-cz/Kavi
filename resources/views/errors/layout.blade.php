@@ -1,7 +1,7 @@
 @php
     // Detect locale from domain for error pages (middleware may not run for some errors)
     $host = request()->getHost();
-    $detectedLocale = $currentLocale ?? (str_contains($host, 'kavibox.com') ? 'en' : 'cs');
+    $detectedLocale = $currentLocale ?? (\App\Helpers\Site::forHost($host)?->locale ?? 'cs');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $detectedLocale === 'en' ? 'en' : 'cs' }}">

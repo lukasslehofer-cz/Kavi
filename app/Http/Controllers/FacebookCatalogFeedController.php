@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Site;
 use App\Models\Product;
 use Illuminate\Http\Response;
 
@@ -15,17 +16,18 @@ class FacebookCatalogFeedController extends Controller
      */
     public function index(): Response
     {
-        $host = request()->getHost();
-        $isEur = str_contains($host, 'kavibox.com') || str_contains($host, 'kavibox.local');
-        
-        $locale = $isEur ? 'en' : 'cs';
-        $currency = $isEur ? 'EUR' : 'CZK';
-        $baseUrl = $isEur ? 'https://kavibox.com' : 'https://kavi.cz';
+        // Web podle domény (config/sites.php), neznámá doména = kavi.cz
+        $site = Site::forHost(request()->getHost()) ?? Site::forLocale(Site::PRIMARY_LOCALE);
+        $isEur = $site->currency() === 'EUR';
+
+        $locale = $site->locale;
+        $currency = $site->currency();
+        $baseUrl = $site->url();
         $shopName = $isEur ? 'Kavibox' : 'Kavi';
-        
+
         // Set locale for translations and currency for price calculations
         app()->setLocale($locale);
-        session(['currency' => $currency, 'region' => $isEur ? 'com' : 'cz']);
+        session(['currency' => $currency, 'region' => $site->region()]);
 
         // Get active products with stock > 0, valid price in currency, excluding coffee of month
         $products = Product::with('roastery')

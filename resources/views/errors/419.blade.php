@@ -2,7 +2,7 @@
 
 @php
     $host = request()->getHost();
-    $locale = $currentLocale ?? (str_contains($host, 'kavibox.com') ? 'en' : 'cs');
+    $locale = $currentLocale ?? (\App\Helpers\Site::forHost($host)?->locale ?? 'cs');
 @endphp
 
 @section('title', $locale === 'en' ? 'Page Expired | KAVI' : 'Platnost stránky vypršela | KAVI.cz')

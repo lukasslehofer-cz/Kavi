@@ -58,6 +58,7 @@ class StripeService
         $customer = StripeCustomer::create([
             'email' => $user->email,
             'name' => $user->name,
+            'preferred_locales' => [self::checkoutLocale()],
             'metadata' => [
                 'user_id' => $user->id,
             ],
@@ -90,6 +91,7 @@ class StripeService
                 'postal_code' => $shippingAddress['billing_postal_code'] ?? null,
                 'country' => $shippingAddress['billing_country'] ?? $shippingAddress['country'] ?? 'CZ',
             ],
+            'preferred_locales' => [self::checkoutLocale()],
             'metadata' => [
                 'source' => 'guest_checkout',
             ],
@@ -199,6 +201,7 @@ class StripeService
             'customer' => $customerId,
             'payment_method_types' => ['card'],
             'line_items' => $lineItems,
+            'locale' => self::checkoutLocale(),
             'mode' => 'payment',
             'success_url' => route('order.confirmation', $order).'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('checkout.index').'?order_id='.$order->id,
@@ -306,6 +309,7 @@ class StripeService
             'customer' => $customerId,
             'payment_method_types' => ['card'],
             'line_items' => $lineItems,
+            'locale' => self::checkoutLocale(),
             'mode' => 'payment',
             'success_url' => localizedRoute('subscriptions.checkout').'?session_id={CHECKOUT_SESSION_ID}&success=1',
             'cancel_url' => localizedRoute('subscriptions.index').'?payment=cancelled',
@@ -365,6 +369,8 @@ class StripeService
             'gift_voucher_shipping_credit' => $giftVoucherShippingCredit,
             'shipping_country' => $shippingAddress['billing_country'] ?? 'CZ',
             'shipping_rate_id' => $shippingRate?->id,
+            // Jazyk webu (kavibox.com i kavibox.sk platí v EUR) – webhook ho uloží k předplatnému
+            'locale' => app()->getLocale(),
         ];
 
         // Add Meta tracking cookies for CAPI deduplication
@@ -445,6 +451,7 @@ class StripeService
         $sessionData = [
             'payment_method_types' => ['card'],
             'line_items' => $lineItems,
+            'locale' => self::checkoutLocale(),
             'mode' => 'payment', // ONE-TIME payment, NOT subscription!
             'metadata' => $subscriptionMetadata, // Metadata directly in session for webhook handling
             'payment_intent_data' => [
@@ -1933,6 +1940,7 @@ class StripeService
                 'configuration' => $configuration,
                 'configured_price' => $metadata['configured_price'] ?? null,
                 'currency' => strtoupper($paymentIntentCurrency),
+                'locale' => \App\Helpers\Site::exists($metadata['locale'] ?? null) ? $metadata['locale'] : null,
                 'shipping_address' => $shippingAddress,
                 'invoice_details' => InvoiceDetails::fromStripeMetadata($metadata),
                 'meta_event_id' => (string) \Illuminate\Support\Str::uuid(),
@@ -2596,6 +2604,7 @@ class StripeService
                     ],
                     'quantity' => 1,
                 ]],
+                'locale' => self::checkoutLocale(),
                 'mode' => 'payment',
                 'success_url' => route('dashboard.subscription').'?payment=success',
                 'cancel_url' => route('dashboard.subscription').'?payment=cancelled',
@@ -2655,6 +2664,7 @@ class StripeService
                     ],
                     'quantity' => 1,
                 ]],
+                'locale' => self::checkoutLocale(),
                 'mode' => 'payment',
                 'payment_intent_data' => [
                     'setup_future_usage' => 'off_session',
@@ -3637,5 +3647,13 @@ class StripeService
         ]);
 
         return $nextBillingDate;
+    }
+
+    /**
+     * Jazyk stránek Stripe (Checkout, e-maily) podle webu requestu: cs, en, sk.
+     */
+    private static function checkoutLocale(): string
+    {
+        return \App\Helpers\Site::current()->locale;
     }
 }

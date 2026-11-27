@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Site;
 use Illuminate\Http\Response;
 
 class RobotsTxtController extends Controller
@@ -76,7 +77,6 @@ class RobotsTxtController extends Controller
      */
     private function getBaseUrl(string $host): string
     {
-        $isEur = str_contains($host, 'kavibox.com') || str_contains($host, 'kavibox.local');
-        return $isEur ? 'https://kavibox.com' : 'https://kavi.cz';
+        return (Site::forHost($host) ?? Site::forLocale(Site::PRIMARY_LOCALE))->url();
     }
 }

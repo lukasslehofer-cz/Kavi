@@ -2,12 +2,23 @@
 
 namespace App\Models;
 
+use App\Helpers\Site;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        // Jazyk webu, na kterém vzniklo (jazyk e-mailů a faktury), viz Site::localeForNewRecord()
+        static::creating(function (self $model) {
+            if (blank($model->locale)) {
+                $model->locale = Site::localeForNewRecord($model->currency);
+            }
+        });
+    }
 
     protected $fillable = [
         'order_number',
@@ -27,6 +38,7 @@ class Order extends Model
         'tax',
         'total',
         'currency',
+        'locale',
         'status',
         'payment_status',
         'payment_failure_count',

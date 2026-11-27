@@ -86,4 +86,8 @@ return [
         'contact' => 'Nenašli jste odpověď? Napište na :email.',
     ],
 
+    'language_switcher' => [
+        'label' => 'Jazyk',
+    ],
+
 ];

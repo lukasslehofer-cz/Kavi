@@ -37,7 +37,7 @@ class CurrencyHelper
     }
     
     /**
-     * Get the current region code (cz or com)
+     * Get the current region code (cz, com or sk)
      */
     public static function region(): string
     {
@@ -58,6 +58,14 @@ class CurrencyHelper
     public static function isComRegion(): bool
     {
         return self::region() === 'com';
+    }
+
+    /**
+     * Check if current region is SK (kavibox.sk)
+     */
+    public static function isSkRegion(): bool
+    {
+        return self::region() === 'sk';
     }
     
     /**
@@ -109,7 +117,7 @@ class CurrencyHelper
         if (self::isEur()) {
             // EUR format: €29.00 (default 2 decimals)
             $decimals = $decimals ?? 2;
-            return '€' . number_format($price, $decimals, '.', ' ');
+            return self::formatEur($price, $decimals);
         }
         
         // CZK format: 690 Kč (default 0 decimals)
@@ -130,7 +138,7 @@ class CurrencyHelper
         if (self::isEur()) {
             // EUR: default to 2 decimals (e.g., €11.40)
             $decimals = $decimals ?? 2;
-            return '€' . number_format($amount, $decimals, '.', ' ');
+            return self::formatEur($amount, $decimals);
         }
         // CZK: default to 0 decimals
         $decimals = $decimals ?? 0;
@@ -183,12 +191,23 @@ class CurrencyHelper
         if (strtoupper($currency) === 'EUR') {
             // EUR: default 2 decimals
             $decimals = $decimals ?? 2;
-            return '€' . number_format($amount, $decimals, '.', ' ');
+            return self::formatEur($amount, $decimals);
         }
         
         // CZK: default 0 decimals
         $decimals = $decimals ?? 0;
         return number_format($amount, $decimals, ',', ' ') . ' Kč';
     }
-}
 
+    /**
+     * EUR podle jazyka webu: slovensky „35,00 €“, jinak (angličtina, admin na kavi.cz) „€35.00“.
+     */
+    private static function formatEur(float $amount, int $decimals): string
+    {
+        if (app()->getLocale() === 'sk') {
+            return number_format($amount, $decimals, ',', ' ') . ' €';
+        }
+
+        return '€' . number_format($amount, $decimals, '.', ' ');
+    }
+}

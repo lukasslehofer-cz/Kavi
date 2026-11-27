@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Helpers\Site;
 use Illuminate\Support\Facades\Route;
 
 class EmailService
@@ -23,19 +24,19 @@ class EmailService
     }
     
     /**
-     * Get locale from Order
+     * Get locale from Order: jazyk webu, na kterém vznikla (sloupec locale), jinak podle měny
      */
     public static function getLocaleFromOrder(Order $order): string
     {
-        return self::getLocaleFromCurrency($order->currency);
+        return Site::exists($order->locale) ? $order->locale : self::getLocaleFromCurrency($order->currency);
     }
     
     /**
-     * Get locale from Subscription
+     * Get locale from Subscription: jazyk webu, na kterém vzniklo (sloupec locale), jinak podle měny
      */
     public static function getLocaleFromSubscription(Subscription $subscription): string
     {
-        return self::getLocaleFromCurrency($subscription->currency);
+        return Site::exists($subscription->locale) ? $subscription->locale : self::getLocaleFromCurrency($subscription->currency);
     }
     
     /**
@@ -51,14 +52,14 @@ class EmailService
         
         // Priority 2: Try to get locale from user's most recent subscription
         $subscription = $user->subscriptions()->latest()->first();
-        if ($subscription && $subscription->currency) {
-            return self::getLocaleFromCurrency($subscription->currency);
+        if ($subscription) {
+            return self::getLocaleFromSubscription($subscription);
         }
         
         // Priority 3: Try to get locale from user's most recent order
         $order = $user->orders()->latest()->first();
-        if ($order && $order->currency) {
-            return self::getLocaleFromCurrency($order->currency);
+        if ($order) {
+            return self::getLocaleFromOrder($order);
         }
         
         // Default to Czech
@@ -66,40 +67,27 @@ class EmailService
     }
     
     /**
-     * Get the "from" email address based on locale
+     * Get the "from" email address based on locale (config/sites.php)
      */
     public static function getFromAddress(string $locale): array
     {
-        if ($locale === 'en') {
-            return [
-                'address' => env('MAIL_FROM_ADDRESS_EN', 'info@kavibox.com'),
-                'name' => env('MAIL_FROM_NAME_EN', 'KAVI'),
-            ];
-        }
-        
-        return [
-            'address' => env('MAIL_FROM_ADDRESS', 'info@kavi.cz'),
-            'name' => env('MAIL_FROM_NAME', 'KAVI.cz'),
-        ];
+        return Site::forLocale($locale)->mailFrom();
     }
-    
+
     /**
      * Get site name based on locale
      */
     public static function getSiteName(string $locale): string
     {
-        return $locale === 'en' ? 'KAVI' : 'KAVI.cz';
+        return Site::forLocale($locale)->name();
     }
-    
+
     /**
-     * Get site URL based on locale
+     * Get site URL based on locale (bez lomítka na konci)
      */
     public static function getSiteUrl(string $locale): string
     {
-        // config(), ne env() – env() vrací pod config:cache null
-        $urls = config('app.site_urls', []);
-
-        return rtrim($urls[$locale] ?? $urls['cs'] ?? config('app.url'), '/');
+        return Site::forLocale($locale)->url();
     }
 
     /**
@@ -115,13 +103,18 @@ class EmailService
      */
     public static function routeUrl(string $locale, string $name, array $parameters = []): string
     {
+        return self::getSiteUrl($locale).route(self::routeName($locale, $name), $parameters, false);
+    }
+
+    /**
+     * Název jazykové varianty routy (login.en); jazyky se stejnou cestou jako
+     * čeština (většina slovenských) sdílejí českou routu bez přípony.
+     */
+    public static function routeName(string $locale, string $name): string
+    {
         $localized = "{$name}.{$locale}";
 
-        $path = Route::has($localized)
-            ? route($localized, $parameters, false)
-            : route($name, $parameters, false);
-
-        return self::getSiteUrl($locale).$path;
+        return Route::has($localized) ? $localized : $name;
     }
 
     /**
@@ -137,16 +130,15 @@ class EmailService
      */
     public static function getContactEmail(string $locale): string
     {
-        return $locale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz';
+        return Site::forLocale($locale)->contactEmail();
     }
-    
+
     /**
      * Get the mailer name based on locale
      * Different SMTP credentials are needed for each domain
      */
     public static function getMailer(string $locale): string
     {
-        return $locale === 'en' ? 'smtp_en' : 'smtp';
+        return Site::forLocale($locale)->mailer();
     }
 }
-

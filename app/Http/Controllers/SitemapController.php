@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Site;
 use App\Models\Product;
 use App\Models\Roastery;
 use App\Models\Post;
@@ -350,11 +351,11 @@ class SitemapController extends Controller
     {
         $host = request()->getHost();
 
-        // Detect if this is the English/EUR domain
-        $isEur = str_contains($host, 'kavibox.com') || str_contains($host, 'kavibox.local');
+        // Web podle domény (config/sites.php), neznámá doména = kavi.cz
+        $site = Site::forHost($host) ?? Site::forLocale(Site::PRIMARY_LOCALE);
 
-        $locale = $isEur ? 'en' : 'cs';
-        $baseUrl = $isEur ? 'https://kavibox.com' : 'https://kavi.cz';
+        $locale = $site->locale;
+        $baseUrl = $site->url();
 
         // Set application locale for route generation
         app()->setLocale($locale);

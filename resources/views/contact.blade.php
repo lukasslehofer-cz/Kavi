@@ -120,7 +120,7 @@
                         <div class="flex items-center gap-4">
                             <span class="text-xs uppercase tracking-widest text-dark-800/60">{{ __('pages.contact.info_email') }}</span>
                             @php
-                                $contactEmail = app()->getLocale() === 'en' ? 'info@kavibox.com' : 'info@kavi.cz';
+                                $contactEmail = \App\Helpers\Site::current()->contactEmail();
                             @endphp
                             <a href="mailto:{{ $contactEmail }}" class="text-dark-800 hover:text-primary-500 transition-colors font-display uppercase tracking-tight">
                                 {{ $contactEmail }}

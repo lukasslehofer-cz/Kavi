@@ -14,7 +14,7 @@
         $defaultOgTitle = ($currentLocale ?? 'cs') === 'en' 
             ? 'KAVI - Specialty Coffee Subscription'
             : 'KAVI.cz - Kávové předplatné s výběrovou kávou';
-        $siteUrl = ($currentLocale ?? 'cs') === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+        $siteUrl = \App\Helpers\Site::current()->url();
         $defaultOgImage = $siteUrl . '/images/og-image.jpg';
     @endphp
     <meta name="description" content="@yield('meta_description', $defaultMetaDescription)">
@@ -25,8 +25,8 @@
     <meta property="og:image" content="@yield('og_image', $defaultOgImage)">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:site_name" content="{{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}">
-    <meta property="og:locale" content="{{ ($currentLocale ?? 'cs') === 'en' ? 'en_US' : 'cs_CZ' }}">
+    <meta property="og:site_name" content="{{ \App\Helpers\Site::current()->name() }}">
+    <meta property="og:locale" content="{{ \App\Helpers\Site::current()->ogLocale() }}">
     @if(config('services.facebook.app_id'))
     <meta property="fb:app_id" content="{{ config('services.facebook.app_id') }}">
     @endif
@@ -331,7 +331,7 @@
           <!-- Brand Section -->
           <div class="lg:col-span-2">
             <a href="{{ route('home') }}" class="inline-flex items-center gap-2 mb-6" aria-label="logo">
-              <img src="/images/kavi-logo-white.png" alt="{{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}" class="h-9 w-auto">
+              <img src="/images/kavi-logo-white.png" alt="{{ \App\Helpers\Site::current()->name() }}" class="h-9 w-auto">
             </a>
             
             <p class="text-white/60 mb-6 leading-relaxed max-w-sm text-sm font-light">
@@ -418,7 +418,7 @@
               <a href="{{ localizedRoute('contact') }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">
                 {{ ($currentLocale ?? 'cs') === 'en' ? 'Write Us' : 'Napište nám' }}
               </a>
-              @php $footerEmail = ($currentLocale ?? 'cs') === 'en' ? 'info@kavibox.com' : 'info@kavi.cz'; @endphp
+              @php $footerEmail = \App\Helpers\Site::current()->contactEmail(); @endphp
               <a href="mailto:{{ $footerEmail }}" class="block text-white/60 hover:text-primary-500 transition-colors duration-200 text-sm font-light">
                 {{ $footerEmail }}
               </a>
@@ -452,7 +452,7 @@
         <!-- Bottom Bar -->
         <div class="border-t border-white/10 py-6">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40 font-light">
-            <p>© {{ date('Y') }} {{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}. {{ ($currentLocale ?? 'cs') === 'en' ? 'All rights reserved.' : 'Všechna práva vyhrazena.' }}</p>
+            <p>© {{ date('Y') }} {{ \App\Helpers\Site::current()->name() }}. {{ ($currentLocale ?? 'cs') === 'en' ? 'All rights reserved.' : 'Všechna práva vyhrazena.' }}</p>
             <div class="flex flex-wrap justify-center items-center gap-6">
               <a href="{{ localizedRoute('terms-of-service') }}" class="hover:text-white transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Terms of Service' : 'Obchodní podmínky' }}</a>
               <a href="{{ localizedRoute('privacy-policy') }}" class="hover:text-white transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Privacy Policy' : 'Ochrana osobních údajů' }}</a>

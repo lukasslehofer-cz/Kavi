@@ -57,6 +57,17 @@ return [
             'timeout' => null,
         ],
 
+        // SK mailer (kavibox.sk)
+        'smtp_sk' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_HOST_SK', env('MAIL_HOST', 'heracles.mxrouting.net')),
+            'port' => env('MAIL_PORT_SK', env('MAIL_PORT', 587)),
+            'encryption' => env('MAIL_ENCRYPTION_SK', 'tls'),
+            'username' => env('MAIL_USERNAME_SK'),
+            'password' => env('MAIL_PASSWORD_SK'),
+            'timeout' => null,
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],

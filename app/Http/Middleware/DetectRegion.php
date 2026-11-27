@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\Site;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,79 +12,53 @@ class DetectRegion
     /**
      * Handle an incoming request.
      *
-     * Detects the region based on the domain and sets locale/currency accordingly.
+     * Detects the site (config/sites.php) by domain and sets locale/currency accordingly.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $host = $request->getHost();
-        
-        // Get region configuration
-        $regions = config('app.regions', []);
-        
-        // Find matching region by domain (supports subdomains like www.)
-        $region = null;
-        foreach ($regions as $domain => $config) {
-            if ($host === $domain || str_ends_with($host, '.' . $domain) || $host === 'www.' . $domain) {
-                $region = $config;
-                break;
-            }
-        }
-        
-        // Default to Czech if no region matched (for localhost, etc.)
-        if (!$region) {
-            $region = [
-                'locale' => 'cs',
-                'currency' => 'CZK',
-                'region_code' => 'cz',
-            ];
-        }
-        
+        // Neznámá doména (localhost apod.) = český web
+        $site = Site::forHost($request->getHost()) ?? Site::forLocale(Site::PRIMARY_LOCALE);
+
         // Set application locale
-        app()->setLocale($region['locale']);
-        
+        app()->setLocale($site->locale);
+
         // Store currency and region in session and config for easy access
-        session(['currency' => $region['currency']]);
-        session(['region' => $region['region_code'] ?? 'cz']);
-        
+        session(['currency' => $site->currency()]);
+        session(['region' => $site->region()]);
+
         // Also set in config for non-session contexts (API, commands, etc.)
-        config(['app.currency' => $region['currency']]);
-        config(['app.region' => $region['region_code'] ?? 'cz']);
-        
-        // Configure email settings based on locale/domain
-        $this->configureMailSettings($region['locale'], $host);
-        
+        config(['app.currency' => $site->currency()]);
+        config(['app.region' => $site->region()]);
+
+        // Configure email settings based on the site
+        $this->configureMailSettings($site);
+
         // Share with all views
-        view()->share('currentCurrency', $region['currency']);
-        view()->share('currentRegion', $region['region_code'] ?? 'cz');
-        view()->share('currentLocale', $region['locale']);
-        
+        view()->share('currentCurrency', $site->currency());
+        view()->share('currentRegion', $site->region());
+        view()->share('currentLocale', $site->locale);
+
         return $next($request);
     }
-    
+
     /**
-     * Configure mail settings based on locale and domain.
+     * Odesílatel a mailer pro e-maily odeslané v rámci requestu (podle webu).
      */
-    protected function configureMailSettings(string $locale, string $host): void
+    protected function configureMailSettings(Site $site): void
     {
-        // Set mail from address and name based on locale/domain
-        if ($locale === 'en' || str_contains($host, 'kavibox.com')) {
-            // English domain - use kavibox.com email
-            config([
-                'mail.from.address' => env('MAIL_FROM_ADDRESS_EN', 'info@kavibox.com'),
-                'mail.from.name' => env('MAIL_FROM_NAME_EN', 'KAVIbox'),
-            ]);
-            
-            // Use EN mailer if configured
-            if (config('mail.mailers.smtp_en')) {
-                config(['mail.default' => 'smtp_en']);
-            }
-        } else {
-            // Czech domain - use kavi.cz email (default)
-            config([
-                'mail.from.address' => env('MAIL_FROM_ADDRESS', 'info@kavi.cz'),
-                'mail.from.name' => env('MAIL_FROM_NAME', 'KAVI.cz'),
-            ]);
+        if ($site->isPrimary()) {
+            // Czech domain - default mail config (MAIL_FROM_*)
+            return;
+        }
+
+        config([
+            'mail.from.address' => $site->mailFrom()['address'],
+            'mail.from.name' => $site->mailFrom()['name'],
+        ]);
+
+        // Use the site's mailer if configured
+        if (config('mail.mailers.' . $site->mailer())) {
+            config(['mail.default' => $site->mailer()]);
         }
     }
 }
-

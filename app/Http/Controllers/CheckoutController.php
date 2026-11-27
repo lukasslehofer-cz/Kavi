@@ -120,7 +120,7 @@ class CheckoutController extends Controller
         $physicalSubtotal = $subtotal;
 
         // Calculate shipping dynamically based on user country
-        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : 'CZ'; // Default to Czech Republic for guests
+        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : \App\Helpers\Site::current()->defaultCountry(); // Výchozí země webu (CZ, na kavibox.sk SK)
         $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
         $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry);
 
@@ -659,6 +659,7 @@ class CheckoutController extends Controller
                 $newUser = \App\Models\User::create([
                     'name' => $request->name,
                     'email' => $request->email,
+                    'locale' => app()->getLocale(),
                     'password' => \Hash::make(\Str::random(32)), // Random password
                     'password_set_by_user' => false, // User didn't set this password
                     'phone' => $request->phone,

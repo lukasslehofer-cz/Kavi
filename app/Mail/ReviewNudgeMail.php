@@ -46,7 +46,9 @@ class ReviewNudgeMail extends LocalizedMailable implements ShouldQueue
             $this->subscription = $subject;
         }
 
-        $this->setLocale($locale ?? EmailService::getLocaleFromCurrency($subject->currency));
+        $this->setLocale($locale ?? ($subject instanceof Order
+            ? EmailService::getLocaleFromOrder($subject)
+            : EmailService::getLocaleFromSubscription($subject)));
     }
 
     public function envelope(): Envelope

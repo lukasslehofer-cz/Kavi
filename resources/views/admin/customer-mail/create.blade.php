@@ -10,7 +10,7 @@
         'subscribers' => 'Aktivní předplatitelé',
         'no_orders' => 'Registrovaní bez objednávky',
     ];
-    $domainLabel = $locale === 'en' ? 'kavibox.com' : 'kavi.cz';
+    $domainLabel = \App\Helpers\Site::forLocale($locale)->domains()[0];
 @endphp
 <div class="p-6">
     <div class="max-w-5xl mx-auto">
@@ -27,7 +27,7 @@
             <p class="text-sm text-gray-500 mb-4">Volba zároveň filtruje seznam příjemců. Smíšené publikum se posílá dvakrát.</p>
 
             <div class="flex flex-wrap gap-3">
-                @foreach(['cs' => 'kavi.cz (česky)', 'en' => 'kavibox.com (English)'] as $key => $label)
+                @foreach(collect(\App\Helpers\Site::all())->map(fn ($site) => $site->domains()[0] . ' (' . $site->languageName() . ')') as $key => $label)
                 <a href="{{ route('admin.customer-mail.create', ['locale' => $key, 'segment' => $segment]) }}"
                    class="px-4 py-2 rounded-full text-sm font-medium border transition-colors {{ $locale === $key ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
                     {{ $label }}

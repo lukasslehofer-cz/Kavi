@@ -897,13 +897,18 @@ class SubscriptionController extends Controller
             
             // Convert value to target currency if needed
             $value = ($subscription->configured_price > 0) ? $subscription->configured_price : 500;
-            if ($currency !== 'CZK') {
-                // Simple conversion: CZK to EUR (~25:1), CZK to USD (~23:1)
-                $value = match($currency) {
-                    'EUR' => round($value / 25, 2),
-                    'USD' => round($value / 23, 2),
+            // Hodnota je v měně objednávky/předplatného (EUR z kavibox.com/.sk, Kč z kavi.cz),
+            // Packeta ji chce v měně cílové země. Převod hrubým kurzem stačí pro pojištění.
+            $sourceCurrency = strtoupper((string) ($subscription->currency ?: 'CZK'));
+            if ($sourceCurrency !== $currency) {
+                $value = match ($sourceCurrency . '>' . $currency) {
+                    'CZK>EUR' => round($value / 25, 2),
+                    'CZK>USD' => round($value / 23, 2),
+                    'EUR>CZK' => round($value * 25),
                     default => $value
                 };
+            }
+            if ($currency !== 'CZK') {
                 // Cap at reasonable insurance value for international shipments
                 $value = min($value, 100);
             }

@@ -245,9 +245,7 @@ class GiftPurchase extends Model
      */
     public static function redeemBaseUrl(string $locale): string
     {
-        $name = $locale === 'en' && Route::has('gifts.redeem.en') ? 'gifts.redeem.en' : 'gifts.redeem';
-
-        return EmailService::getSiteUrl($locale) . route($name, [], false);
+        return EmailService::routeUrl($locale, 'gifts.redeem');
     }
 
     /**

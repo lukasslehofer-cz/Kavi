@@ -53,7 +53,7 @@ class SubscriptionSkippedShipmentPayment extends LocalizedMailable
                 'summaryRows' => SubscriptionSummary::rows($this->subscription, $this->emailLocale),
                 // Relativní podpis jako u dárkového certifikátu - doména se liší podle jazyka
                 'payUrl' => $this->siteUrl.URL::temporarySignedRoute(
-                    $this->emailLocale === 'en' ? 'subscriptions.pay-skipped.en' : 'subscriptions.pay-skipped',
+                    EmailService::routeName($this->emailLocale, 'subscriptions.pay-skipped'),
                     now()->endOfDay(),
                     ['shipment' => $this->shipment->id],
                     false

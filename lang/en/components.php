@@ -86,4 +86,8 @@ return [
         'contact' => 'Didn\'t find your answer? Write to :email.',
     ],
 
+    'language_switcher' => [
+        'label' => 'Language',
+    ],
+
 ];

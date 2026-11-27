@@ -42,6 +42,17 @@ class MetaPixelHelper
         return strtoupper((string) $currency) === 'EUR' ? 'com' : 'cz';
     }
 
+    /**
+     * Region pixelu podle webu, na kterém objednávka / předplatné vzniklo
+     * (kavibox.sk má vlastní pixel), u starých záznamů bez jazyka podle měny.
+     */
+    public static function regionFor(\App\Models\Order|\App\Models\Subscription $entity): string
+    {
+        return Site::exists($entity->locale)
+            ? Site::forLocale($entity->locale)->region()
+            : self::regionFromCurrency($entity->currency);
+    }
+
     // IP a prohlížeč zákazníka se ukládají v pokladně (meta_client_*), protože Purchase
     // pro CAPI často odchází až z webhooku Stripe, kde request() patří Stripe.
     public static function clientIp(): ?string

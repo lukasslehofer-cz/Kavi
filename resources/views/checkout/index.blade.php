@@ -299,7 +299,7 @@
                                     >
                                         <option value="">{{ __('checkout.fields.select_country') }}</option>
                                         @foreach($availableCountries as $code => $name)
-                                            <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? ($code === 'CZ' ? 'CZ' : '')) == $code ? 'selected' : '' }}>
+                                            <option value="{{ $code }}" {{ old('billing_country', auth()->user()->country ?? \App\Helpers\Site::current()->defaultCountry()) == $code ? 'selected' : '' }}>
                                                 {{ $name }}
                                             </option>
                                         @endforeach

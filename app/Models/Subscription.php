@@ -2,12 +2,23 @@
 
 namespace App\Models;
 
+use App\Helpers\Site;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        // Jazyk webu, na kterém vzniklo (jazyk e-mailů a faktury), viz Site::localeForNewRecord()
+        static::creating(function (self $model) {
+            if (blank($model->locale)) {
+                $model->locale = Site::localeForNewRecord($model->currency);
+            }
+        });
+    }
 
     /**
      * Pauza vyvolaná adminem. Na rozdíl od ostatních důvodů nemá koncové datum
@@ -80,6 +91,7 @@ class Subscription extends Model
         'configured_price',
         'vat_rate',
         'currency',
+        'locale',
         'frequency_months',
         'paused_iterations',
         'paused_until_date',

@@ -80,6 +80,11 @@ return [
                 'conversions_api_token' => env('META_CONVERSIONS_API_TOKEN_COM'),
                 'test_event_code' => env('META_TEST_EVENT_CODE_COM'),
             ],
+            'sk' => [
+                'pixel_id' => env('META_PIXEL_ID_SK'),
+                'conversions_api_token' => env('META_CONVERSIONS_API_TOKEN_SK'),
+                'test_event_code' => env('META_TEST_EVENT_CODE_SK'),
+            ],
         ],
     ],
 
@@ -91,6 +96,9 @@ return [
             ],
             'com' => [
                 'measurement_id' => env('GA_MEASUREMENT_ID_COM'),
+            ],
+            'sk' => [
+                'measurement_id' => env('GA_MEASUREMENT_ID_SK'),
             ],
         ],
     ],

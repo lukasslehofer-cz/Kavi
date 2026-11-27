@@ -1090,7 +1090,7 @@
     <!-- Help Section -->
     <div class="mt-8 p-4 bg-gray-50 rounded-lg text-center">
         <p class="text-sm text-gray-600">
-            @php $supportEmail = app()->getLocale() === 'en' ? 'info@kavibox.com' : 'info@kavi.cz'; @endphp
+            @php $supportEmail = \App\Helpers\Site::current()->contactEmail(); @endphp
             <a href="mailto:{{ $supportEmail }}" class="text-blue-600 hover:text-blue-700">{{ $supportEmail }}</a>
         </p>
     </div>

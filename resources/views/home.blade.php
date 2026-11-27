@@ -16,7 +16,7 @@
 
 @section('structured_data')
 @php
-    $siteUrl = $currentLocale === 'en' ? 'https://kavibox.com' : 'https://kavi.cz';
+    $siteUrl = \App\Helpers\Site::current()->url();
     $siteName = $currentLocale === 'en' ? 'KAVI' : 'KAVI.cz';
     $siteDescription = $currentLocale === 'en' 
         ? 'Premium specialty coffee subscription. Freshly roasted coffee from the best European roasteries delivered to your door.'
@@ -45,7 +45,7 @@
             "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
-                "email": "{{ $currentLocale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz' }}",
+                "email": "{{ \App\Helpers\Site::current()->contactEmail() }}",
                 "availableLanguage": ["{{ $currentLocale === 'en' ? 'English' : 'Czech' }}"]
             }
         },
@@ -475,7 +475,7 @@
 </div>
 
 <!-- Časté dotazy -->
-<x-faq :items="$faq" :lead="__('components.faq.contact', ['email' => $currentLocale === 'en' ? 'info@kavibox.com' : 'info@kavi.cz'])" />
+<x-faq :items="$faq" :lead="__('components.faq.contact', ['email' => \App\Helpers\Site::current()->contactEmail()])" />
 
 </div>
 @endsection
