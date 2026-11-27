@@ -72,6 +72,11 @@ class BlogController extends Controller
             abort(404);
         }
 
+        // Slug druhého jazyka (kavi.cz/blog/how-to-make-espresso) → 301 na slug jazyka domény
+        if ($slug !== $post->getSlug()) {
+            return redirect()->to(localizedRoute('blog.show', ['post' => $post->getSlug()]), 301);
+        }
+
         // Load tags relationship
         $post->load('tags');
 

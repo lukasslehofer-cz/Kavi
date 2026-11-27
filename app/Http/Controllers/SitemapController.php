@@ -185,9 +185,12 @@ class SitemapController extends Controller
         $urlset->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
         $dom->appendChild($urlset);
 
-        // Get all products (active and inactive) except coffee_of_month
+        // Get all products (active and inactive) except coffee_of_month.
+        // Jen s cenou v měně webu – bez ní vrací detail 404 (ProductController::show)
+        $priceColumn = $locale === 'en' ? 'price_eur' : 'price';
         $products = Product::with('roastery')
             ->where('is_coffee_of_month', false)
+            ->where($priceColumn, '>', 0)
             ->select(['id', 'slug', 'updated_at', 'is_active'])
             ->orderBy('updated_at', 'desc')
             ->get();

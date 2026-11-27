@@ -108,6 +108,12 @@ return [
     // Default region code
     'region' => env('APP_REGION', 'cz'),
 
+    // Kanonické adresy jazykových verzí (hreflang a přepínač jazyka, bez lomítka na konci)
+    'site_urls' => [
+        'cs' => env('SITE_URL_CS', 'https://kavi.cz'),
+        'en' => env('SITE_URL_EN', 'https://kavibox.com'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

@@ -39,6 +39,9 @@
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ url()->current() }}">
+    @foreach(\App\Helpers\HreflangHelper::alternates() as $hreflangLocale => $hreflangUrl)
+    <link rel="alternate" hreflang="{{ $hreflangLocale }}" href="{{ $hreflangUrl }}">
+    @endforeach
     @hasSection('robots')
     <meta name="robots" content="@yield('robots')">
     @endif
@@ -244,7 +247,7 @@
                     {{ ($currentLocale ?? 'cs') === 'en' ? 'Gifts' : 'Dárky' }}
                 </a>
                 @endif
-                
+
                 <!-- Mobile CTA Button -->
                 <div class="pt-6">
                     <a href="{{ localizedRoute('subscriptions.index') }}" class="btn-type flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-4 transition-all duration-200">
@@ -281,6 +284,11 @@
                             {{ ($currentLocale ?? 'cs') === 'en' ? 'Register' : 'Registrovat' }}
                         </a>
                     @endauth
+                </div>
+
+                <!-- Language Switcher - Mobile (poslední položka menu) -->
+                <div class="pt-3 mt-4 border-t border-warm-200">
+                    @include('partials.language-switcher', ['variant' => 'menu'])
                 </div>
             </div>
         </div>
@@ -332,7 +340,7 @@
 
             <!-- Social Links -->
             <div class="flex gap-4">
-              <a href="https://www.instagram.com/kavi.cz" target="_blank" class="text-white/60 hover:text-primary-500 transition-colors duration-200">
+              <a href="{{ ($currentLocale ?? 'cs') === 'en' ? 'https://www.instagram.com/kavibox_com' : 'https://www.instagram.com/kavi.cz' }}" target="_blank" class="text-white/60 hover:text-primary-500 transition-colors duration-200">
                 Instagram
               </a>
               <a href="https://www.facebook.com/kavovepredplatne" target="_blank" class="text-white/60 hover:text-primary-500 transition-colors duration-200">
@@ -445,9 +453,10 @@
         <div class="border-t border-white/10 py-6">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40 font-light">
             <p>© {{ date('Y') }} {{ ($currentLocale ?? 'cs') === 'en' ? 'KAVI' : 'KAVI.cz' }}. {{ ($currentLocale ?? 'cs') === 'en' ? 'All rights reserved.' : 'Všechna práva vyhrazena.' }}</p>
-            <div class="flex gap-6">
+            <div class="flex flex-wrap justify-center items-center gap-6">
               <a href="{{ localizedRoute('terms-of-service') }}" class="hover:text-white transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Terms of Service' : 'Obchodní podmínky' }}</a>
-              <a href="{{ localizedRoute('privacy-policy') }}" class="hover:text-white transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Privacy Policy' : 'Ochrana osobních údajů' }}</a>              
+              <a href="{{ localizedRoute('privacy-policy') }}" class="hover:text-white transition-colors duration-200">{{ ($currentLocale ?? 'cs') === 'en' ? 'Privacy Policy' : 'Ochrana osobních údajů' }}</a>
+              @include('partials.language-switcher', ['variant' => 'footer'])
             </div>
           </div>
         </div>

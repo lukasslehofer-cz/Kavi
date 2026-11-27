@@ -39,7 +39,7 @@
             },
             "description": "{{ $siteDescription }}",
             "sameAs": [
-                "https://www.instagram.com/kavi.cz",
+                "{{ $currentLocale === 'en' ? 'https://www.instagram.com/kavibox_com' : 'https://www.instagram.com/kavi.cz' }}",
                 "https://www.facebook.com/kavovepredplatne"
             ],
             "contactPoint": {
