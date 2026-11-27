@@ -28,6 +28,7 @@ return [
     'shipping_free_digital' => 'Free (digital product)',
     'shipping_calculating' => 'Calculating...',
     'shipping_at_checkout' => 'Will be calculated at checkout',
+    'shipping_by_country' => 'Depends on country',
     'shipping_unavailable' => 'Unavailable',
     'shipping_error' => 'Error',
     'discount' => 'Discount',

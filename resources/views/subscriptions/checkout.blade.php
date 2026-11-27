@@ -533,7 +533,7 @@
                                 @elseif(isset($shipping) && $shipping > 0)
                                 <span class="text-dark-800">{{ \App\Helpers\CurrencyHelper::formatAmount($shipping) }}</span>
                                 @else
-                                <span class="text-olive-500">{{ __('checkout.shipping_at_checkout') }}</span>
+                                <span class="text-olive-500">{{ __('checkout.shipping_by_country') }}</span>
                                 @endif
                             </span>
                         </dd>

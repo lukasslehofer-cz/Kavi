@@ -117,9 +117,9 @@ return [
     'builder' => [
         'seo' => [
             'title' => 'Build your coffee box – size, coffee, frequency | KAVI',
-            'description' => 'Choose your box size, coffee type and how often you want it delivered. No commitment, free shipping.',
+            'description' => 'Choose your box size, coffee type and how often you want it delivered. No commitment, cancel anytime.',
             'og_title' => 'Build Your Coffee Subscription Box | KAVI',
-            'og_description' => 'Flexible coffee subscription with free shipping. Choose your box size, coffee type, and delivery frequency. Cancel anytime.',
+            'og_description' => 'Flexible coffee subscription. Choose your box size, coffee type, and delivery frequency. Cancel anytime.',
             // inLanguage in JSON-LD
             'in_language' => 'en-US',
         ],

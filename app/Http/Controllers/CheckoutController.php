@@ -120,9 +120,13 @@ class CheckoutController extends Controller
         $physicalSubtotal = $subtotal;
 
         // Calculate shipping dynamically based on user country
-        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : \App\Helpers\Site::current()->defaultCountry(); // Výchozí země webu (CZ, na kavibox.sk SK)
-        $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
-        $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry);
+        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : \App\Helpers\Site::current()->defaultCountry(); // Výchozí země webu (kavi.cz CZ, kavibox.sk SK, kavibox.com žádná)
+        // Bez země nebo bez sazby pro ni na tomto webu se cena dopravy ukáže až po výběru země
+        // (pro výpočty součtů zatím 0, šablona ale nesmí psát „zdarma“)
+        $shippingKnown = $cartQualifiesForFreeShipping
+            || ($userCountry && $this->shippingService->getShippingRate($userCountry) !== null);
+        $shipping = ($cartQualifiesForFreeShipping || ! $shippingKnown) ? 0 : $this->shippingService->calculateShippingCost($userCountry, $subtotal, false);
+        $packetaVendors = $userCountry ? $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry) : [];
 
         // Odebrat kupón pokud je požadováno
         if (request()->has('remove_coupon')) {
@@ -163,6 +167,8 @@ class CheckoutController extends Controller
 
                 $discount = $couponResult['discount'];
                 $shipping = $couponResult['shipping'];
+                // Kupón s dopravou zdarma: doprava je známá (0) i bez vybrané země
+                $shippingKnown = $shippingKnown || $appliedCoupon->free_shipping;
                 $totalWithVat = $couponResult['total'];
                 $totalWithoutVat = $couponResult['total_without_vat'];
                 $vat = $couponResult['vat'];
@@ -291,6 +297,7 @@ class CheckoutController extends Controller
             'cartItems',
             'subtotal',
             'shipping',
+            'shippingKnown',
             'totalWithVat',
             'totalWithoutVat',
             'vat',
@@ -326,9 +333,12 @@ class CheckoutController extends Controller
             return response()->json(['error' => 'Country is required'], 400);
         }
 
-        // Check if cart qualifies for free shipping (all products have free_shipping flag)
+        // Check if cart qualifies for free shipping (all products have free_shipping flag).
+        // Jen u jednorázové objednávky – pokladna předplatného má jednorázový košík prázdný
+        // a prázdný košík (nákup jen dárků) znamená dopravu zdarma; předplatné se řídí sazbou.
         $cart = session()->get('cart', []);
-        $cartQualifiesForFreeShipping = empty($cart) || Product::cartQualifiesForFreeShipping($cart);
+        $cartQualifiesForFreeShipping = ! $isSubscription
+            && (empty($cart) || Product::cartQualifiesForFreeShipping($cart));
 
         // Calculate shipping (0 if all products have free_shipping)
         $shipping = $cartQualifiesForFreeShipping ? 0 : $this->shippingService->calculateShippingCost($country, $subtotal, $isSubscription);

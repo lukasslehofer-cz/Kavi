@@ -28,6 +28,7 @@ return [
     'shipping_free_digital' => 'Zadarmo (digitálny produkt)',
     'shipping_calculating' => 'Počítam...',
     'shipping_at_checkout' => 'Dopočíta sa v pokladni',
+    'shipping_by_country' => 'Podľa zvolenej krajiny',
     'shipping_unavailable' => 'Nedostupné',
     'shipping_error' => 'Chyba',
     'discount' => 'Zľava',

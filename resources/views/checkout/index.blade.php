@@ -913,7 +913,9 @@
                         <dt class="text-xs uppercase tracking-widest text-olive-600">{{ __('checkout.shipping') }}</dt>
                         <dd class="text-sm uppercase tracking-wide">
                             <span id="shipping-cost">
-                                @if($shipping == 0)
+                                @if(! ($shippingKnown ?? true))
+                                <span class="text-olive-500">{{ __('checkout.shipping_by_country') }}</span>
+                                @elseif($shipping == 0)
                                 <span class="text-dark-800">{{ __('checkout.free_caps') }}</span>
                                 @else
                                 <span class="text-dark-800">{{ \App\Helpers\CurrencyHelper::formatAmount($shipping) }}</span>

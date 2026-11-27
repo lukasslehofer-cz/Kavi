@@ -49,7 +49,8 @@ return [
         'mailer' => 'smtp_en',
         'mail_from_address' => env('MAIL_FROM_ADDRESS_EN', 'info@kavibox.com'),
         'mail_from_name' => env('MAIL_FROM_NAME_EN', 'KAVI'),
-        'default_country' => 'CZ',
+        // Mezinárodní web: v pokladně žádná předvybraná země, zákazník ji vybere
+        'default_country' => '',
         'enabled' => true,
     ],
 

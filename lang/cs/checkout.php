@@ -28,6 +28,7 @@ return [
     'shipping_free_digital' => 'Zdarma (digitální produkt)',
     'shipping_calculating' => 'Počítám...',
     'shipping_at_checkout' => 'Bude dopočítána v pokladně',
+    'shipping_by_country' => 'Podle vybrané země',
     'shipping_unavailable' => 'Nedostupné',
     'shipping_error' => 'Chyba',
     'discount' => 'Sleva',

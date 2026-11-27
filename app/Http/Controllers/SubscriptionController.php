@@ -504,15 +504,18 @@ class SubscriptionController extends Controller
         // Get shipping date info
         $shippingInfo = \App\Helpers\SubscriptionHelper::getShippingDateInfo();
 
-        // Calculate shipping based on user country (if known)
-        $userCountry = auth()->check() && auth()->user()->country ? auth()->user()->country : null;
+        // Doprava pro zemi předvybranou v pokladně (stejně jako výběr v šabloně): zadaná země,
+        // země zákazníka, jinak výchozí země webu (kavi.cz CZ, kavibox.sk SK, kavibox.com žádná).
+        // Bez země (nebo bez sazby pro ni na tomto webu) je doprava neznámá (null), ne zdarma.
+        $initialCountry = old('billing_country', auth()->user()?->country ?? \App\Helpers\Site::current()->defaultCountry());
         $packetaVendors = [];
-        $shipping = 0;
+        $shipping = null;
 
-        if ($userCountry) {
-            $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($userCountry);
-            $shipping = $this->shippingService->calculateShippingCost($userCountry, $price, true); // true = is subscription
+        if ($initialCountry && $this->shippingService->getShippingRate($initialCountry)) {
+            $packetaVendors = $this->shippingService->getPacketaWidgetVendorsForCountry($initialCountry);
+            $shipping = $this->shippingService->calculateShippingCost($initialCountry, $price, true); // true = is subscription
         }
+        $shippingAmount = $shipping ?? 0;
 
         // Pokud je chyba, uložit do session pro zobrazení
         if ($errorMessage) {
@@ -522,18 +525,18 @@ class SubscriptionController extends Controller
         // For gift vouchers, apply remaining credit to shipping
         // Gift voucher = money/credit, so it covers total (product + shipping)
         $giftVoucherShippingCredit = 0;
-        if ($appliedCoupon && ($isGiftVoucher ?? false) && $discount > 0 && $shipping > 0) {
+        if ($appliedCoupon && ($isGiftVoucher ?? false) && $discount > 0 && $shippingAmount > 0) {
             $voucherValue = $appliedCoupon->getSubscriptionDiscountValue();
             $remainingCredit = max(0, $voucherValue - $discount);
-            $giftVoucherShippingCredit = min($remainingCredit, $shipping);
+            $giftVoucherShippingCredit = min($remainingCredit, $shippingAmount);
         }
 
         // Calculate adjusted discount for display (same as sent to Stripe)
         // This ensures the displayed discount matches what Stripe receives
         $adjustedDiscount = 0;
         if ($discount > 0) {
-            $grossTotal = $originalPrice + $shipping;
-            $effectiveShipping = $shipping - $giftVoucherShippingCredit;
+            $grossTotal = $originalPrice + $shippingAmount;
+            $effectiveShipping = $shippingAmount - $giftVoucherShippingCredit;
             $displayedTotal = round($price + $effectiveShipping);
             $adjustedDiscount = $grossTotal - $displayedTotal;
         }
