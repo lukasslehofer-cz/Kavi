@@ -574,6 +574,9 @@ class SubscriptionController extends Controller
                 ->with('error', __('flash.subscription.config_missing'));
         }
 
+        // Nákup na firmu jen při doručení do ČR (InvoiceDetails::COMPANY_COUNTRIES)
+        InvoiceDetails::ignoreUnlessAllowed($request);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',

@@ -11,9 +11,15 @@
     $hasOldInput = session()->hasOldInput();
     $isCompany = $hasOldInput ? (bool) old('is_company') : (bool) $companyPrefill;
     $companyDifferentAddress = $hasOldInput ? (bool) old('invoice_different_address') : ! empty($companyPrefill['street']);
+    // Nákup na firmu jen při doručení do ČR (InvoiceDetails::COMPANY_COUNTRIES); výchozí
+    // země stejně jako předvýběr v selectu billing_country, JS pak hlídá její změny.
+    $companyCountry = old('billing_country', auth()->user()->country ?? \App\Helpers\Site::current()->defaultCountry());
+    $companyAllowed = \App\Helpers\InvoiceDetails::allowedForCountry($companyCountry);
 @endphp
 
-<div class="mt-6">
+<div class="mt-6" id="company-purchase"
+     data-company-countries='@json(\App\Helpers\InvoiceDetails::COMPANY_COUNTRIES)'
+     style="{{ $companyAllowed ? '' : 'display: none;' }}">
     <div class="flex items-start py-4 border-b border-[#BCBEB1]">
         <input
             type="checkbox"
@@ -183,22 +189,34 @@
 
 <script>
 (function () {
+    const companyWrapper = document.getElementById('company-purchase');
     const companyToggle = document.getElementById('is_company');
     const addressToggle = document.getElementById('invoice_different_address');
     const companyPanel = document.getElementById('company-fields');
     const addressPanel = document.getElementById('company-address-fields');
+    const countrySelect = document.getElementById('billing_country');
 
-    if (!companyToggle || !companyPanel || !addressPanel) {
+    if (!companyWrapper || !companyToggle || !companyPanel || !addressPanel) {
         return;
+    }
+
+    // Nákup na firmu jen při doručení do povolených zemí (zatím ČR); server
+    // firemní údaje mimo ně stejně zahodí (InvoiceDetails::ignoreUnlessAllowed).
+    const companyCountries = JSON.parse(companyWrapper.dataset.companyCountries || '[]');
+
+    function companyAllowed() {
+        return !countrySelect || companyCountries.includes((countrySelect.value || '').toUpperCase());
     }
 
     // Povinná pole ve skrytém panelu by prohlížeči zablokovala odeslání formuláře,
     // proto se `required` nastavuje jen polím, která jsou právě vidět. Posloucháme
     // `change`, protože ho spouští i obnova formuláře po uplatnění kupónu.
     function syncCompanyFields() {
-        const companyOn = companyToggle.checked;
+        const allowed = companyAllowed();
+        const companyOn = allowed && companyToggle.checked;
         const addressOn = companyOn && addressToggle.checked;
 
+        companyWrapper.style.display = allowed ? '' : 'none';
         companyPanel.style.display = companyOn ? '' : 'none';
         addressPanel.style.display = addressOn ? '' : 'none';
 
@@ -208,6 +226,9 @@
 
     companyToggle.addEventListener('change', syncCompanyFields);
     addressToggle.addEventListener('change', syncCompanyFields);
+    if (countrySelect) {
+        countrySelect.addEventListener('change', syncCompanyFields);
+    }
     document.addEventListener('DOMContentLoaded', syncCompanyFields);
     syncCompanyFields();
 })();

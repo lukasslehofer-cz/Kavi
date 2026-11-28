@@ -404,8 +404,9 @@ class CheckoutController extends Controller
             $rules['packeta_point_address'] = 'nullable|string';
         }
 
-        // Volitelný nákup na firmu (název, IČ, DIČ, případně jiné sídlo)
+        // Volitelný nákup na firmu (název, IČ, DIČ, případně jiné sídlo) – jen při doručení do ČR
         $rules = array_merge($rules, InvoiceDetails::rules());
+        InvoiceDetails::ignoreUnlessAllowed($request);
 
         $request->validate($rules);
 

@@ -32,6 +32,29 @@ class InvoiceDetails
     ];
 
     /**
+     * Nákup na firmu jen při doručení do těchto zemí (billing_country v pokladně).
+     * Proces s DPH pro firmy z jiných zemí zatím není dotažený (rozhodnutí 28. 11. 2026).
+     */
+    public const COMPANY_COUNTRIES = ['CZ'];
+
+    public static function allowedForCountry(?string $country): bool
+    {
+        return in_array(strtoupper((string) $country), self::COMPANY_COUNTRIES, true);
+    }
+
+    /**
+     * Mimo povolené země pokladna volbu „Nakupuji na firmu“ skryje; tady se firemní
+     * údaje zahodí i na serveru (odeslání bez JS, předvyplnění z profilu, podvržený
+     * formulář). Volat před validací – exclude_unless pak firemní pole vynechá.
+     */
+    public static function ignoreUnlessAllowed(\Illuminate\Http\Request $request): void
+    {
+        if (! self::allowedForCountry($request->input('billing_country'))) {
+            $request->merge(['is_company' => '0']);
+        }
+    }
+
+    /**
      * Validační pravidla pro pokladnu. Díky exclude_unless se firemní pole
      * mimo nákup na firmu vůbec nevalidují ani nepropisují do $validated.
      */

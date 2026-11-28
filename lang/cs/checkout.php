@@ -221,7 +221,7 @@ return [
         'coffee_from_europe' => 'Káva z celé Evropy',
         'no_commitment' => 'Bez závazků - kdykoli zrušte',
         'fresh_coffee' => 'Čerstvě pražená káva',
-        'free_shipping_always' => 'Doprava vždy zdarma',
+        'free_shipping_always' => 'Doprava do ČR zdarma',
     ],
     
     // Errors

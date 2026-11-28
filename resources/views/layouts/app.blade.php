@@ -436,12 +436,15 @@
         <!-- Bottom Bar -->
         <div class="border-t border-white/10 py-6">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40 font-light">
-            <p>© {{ date('Y') }} {{ \App\Helpers\Site::current()->name() }}. {{ __('layout.footer.rights') }}</p>
-            <div class="flex flex-wrap justify-center items-center gap-6">
-              <a href="{{ localizedRoute('terms-of-service') }}" class="hover:text-white transition-colors duration-200">{{ __('layout.footer.terms') }}</a>
-              <a href="{{ localizedRoute('privacy-policy') }}" class="hover:text-white transition-colors duration-200">{{ __('layout.footer.privacy') }}</a>
-              @include('partials.language-switcher', ['variant' => 'footer'])
+            {{-- Vlevo copyright a právní odkazy, vpravo samotný přepínač jazyků --}}
+            <div class="flex flex-col md:flex-row items-center gap-x-6 gap-y-3">
+              <p>© {{ date('Y') }} {{ \App\Helpers\Site::current()->name() }}. {{ __('layout.footer.rights') }}</p>
+              <div class="flex flex-wrap justify-center items-center gap-6">
+                <a href="{{ localizedRoute('terms-of-service') }}" class="hover:text-white transition-colors duration-200">{{ __('layout.footer.terms') }}</a>
+                <a href="{{ localizedRoute('privacy-policy') }}" class="hover:text-white transition-colors duration-200">{{ __('layout.footer.privacy') }}</a>
+              </div>
             </div>
+            @include('partials.language-switcher', ['variant' => 'footer'])
           </div>
         </div>
       </div>
