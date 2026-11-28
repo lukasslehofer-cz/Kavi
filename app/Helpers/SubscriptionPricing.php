@@ -24,8 +24,9 @@ use App\Models\SubscriptionPayment;
  *    běží mimo request zákazníka, takže CurrencyHelper::code() by tam vrátil měnu
  *    podle hostname serveru.
  * 4. Doprava se účtuje u KAŽDÉ platby, ne jen u první. Sloupec shipping_cost je už
- *    0 pro země, kde se doprava k předplatnému neúčtuje (ShippingRate::calculateShipping
- *    respektuje applies_to_subscriptions), takže tady se na to není potřeba ptát znovu.
+ *    0 pro země, kde se doprava k předplatnému v měně předplatného neúčtuje
+ *    (ShippingRate::calculateShipping → appliesToSubscriptionsFor, zvlášť CZK a EUR),
+ *    takže tady se na to není potřeba ptát znovu.
  */
 class SubscriptionPricing
 {

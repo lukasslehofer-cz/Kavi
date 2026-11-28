@@ -234,25 +234,52 @@
                 </div>
             </div>
 
-            <!-- Subscription Checkbox -->
+            <!-- Subscription Checkboxes (zvlášť CZK a EUR) -->
             <div class="mb-6 pb-6 border-b border-gray-200">
-                <label class="flex items-center gap-3 cursor-pointer">
-                    <input type="hidden" name="applies_to_subscriptions" value="0">
-                    <input 
-                        type="checkbox" 
-                        name="applies_to_subscriptions" 
-                        value="1" 
-                        {{ old('applies_to_subscriptions', $rate->applies_to_subscriptions) ? 'checked' : '' }}
-                        class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
-                    >
+                <h4 class="text-lg font-bold text-gray-900 mb-2">Předplatné</h4>
+                <p class="text-sm text-gray-600 mb-4">Pokud zapnuto, cena dopravy se v dané měně účtuje i k předplatnému (u každé platby). Platí jen pro nová předplatná – stávající mají dopravu uloženou.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <span class="text-sm font-medium text-gray-900">Aplikovat na předplatné</span>
-                        <p class="text-xs text-gray-500 mt-0.5">Pokud zapnuto, cena dopravy se uplatní i na objednávky předplatného</p>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="hidden" name="applies_to_subscriptions" value="0">
+                            <input
+                                type="checkbox"
+                                name="applies_to_subscriptions"
+                                value="1"
+                                {{ old('applies_to_subscriptions', $rate->applies_to_subscriptions) ? 'checked' : '' }}
+                                class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
+                            >
+                            <div>
+                                <span class="text-sm font-medium text-gray-900">Účtovat k předplatnému v CZK</span>
+                                <p class="text-xs text-gray-500 mt-0.5">kavi.cz</p>
+                            </div>
+                        </label>
+                        @error('applies_to_subscriptions')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                </label>
-                @error('applies_to_subscriptions')
-                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                @enderror
+
+                    <div>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="hidden" name="applies_to_subscriptions_eur" value="0">
+                            <input
+                                type="checkbox"
+                                name="applies_to_subscriptions_eur"
+                                value="1"
+                                {{ old('applies_to_subscriptions_eur', $rate->applies_to_subscriptions_eur) ? 'checked' : '' }}
+                                class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
+                            >
+                            <div>
+                                <span class="text-sm font-medium text-gray-900">Účtovat k předplatnému v EUR</span>
+                                <p class="text-xs text-gray-500 mt-0.5">kavibox.com a kavibox.sk</p>
+                            </div>
+                        </label>
+                        @error('applies_to_subscriptions_eur')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
             </div>
 
             <!-- Packeta Carriers (Multiple Selection) -->

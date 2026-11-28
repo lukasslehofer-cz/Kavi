@@ -20,6 +20,7 @@ class ShippingRate extends Model
         'price_czk',
         'price_eur',
         'applies_to_subscriptions',
+        'applies_to_subscriptions_eur',
         'free_shipping_threshold_czk',
         'free_shipping_threshold_eur',
         'packeta_carrier_id',
@@ -32,6 +33,7 @@ class ShippingRate extends Model
         'available_on_com' => 'boolean',
         'available_on_sk' => 'boolean',
         'applies_to_subscriptions' => 'boolean',
+        'applies_to_subscriptions_eur' => 'boolean',
         'price_czk' => 'decimal:2',
         'price_eur' => 'decimal:2',
         'free_shipping_threshold_czk' => 'decimal:2',
@@ -68,6 +70,19 @@ class ShippingRate extends Model
             : $this->free_shipping_threshold_czk;
 
         return $threshold !== null && (float) $threshold > 0 ? (float) $threshold : null;
+    }
+
+    /**
+     * Účtuje se doprava k předplatnému v dané měně?
+     *
+     * applies_to_subscriptions platí pro CZK (kavi.cz), applies_to_subscriptions_eur
+     * pro EUR (kavibox.com a kavibox.sk) – EUR ceny předplatného počítají s dopravou.
+     */
+    public function appliesToSubscriptionsFor(?string $currency = null): bool
+    {
+        return strtoupper($currency ?: CurrencyHelper::code()) === 'EUR'
+            ? (bool) $this->applies_to_subscriptions_eur
+            : (bool) $this->applies_to_subscriptions;
     }
 
     /**
@@ -130,8 +145,8 @@ class ShippingRate extends Model
      */
     public function calculateShipping(float $subtotal, bool $isSubscription = false, ?string $currency = null): float
     {
-        // If shipping doesn't apply to subscriptions and this is a subscription, return 0
-        if ($isSubscription && !$this->applies_to_subscriptions) {
+        // Doprava se k předplatnému v této měně neúčtuje (admin Doprava, zvlášť CZK a EUR)
+        if ($isSubscription && ! $this->appliesToSubscriptionsFor($currency)) {
             return 0;
         }
 

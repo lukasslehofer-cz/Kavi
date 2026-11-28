@@ -321,6 +321,9 @@ class ShippingRateSeeder extends Seeder
         ];
 
         foreach ($rates as $rate) {
+            // V EUR se doprava k předplatnému účtuje i do ČR – EUR ceny počítají s dopravou
+            $rate['applies_to_subscriptions_eur'] = $rate['country_code'] === 'CZ' || $rate['applies_to_subscriptions'];
+
             ShippingRate::updateOrCreate(
                 ['country_code' => $rate['country_code']],
                 $rate

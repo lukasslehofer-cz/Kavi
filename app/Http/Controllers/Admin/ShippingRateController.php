@@ -51,6 +51,7 @@ class ShippingRateController extends Controller
             'price_czk' => 'required|numeric|min:0',
             'price_eur' => 'required|numeric|min:0',
             'applies_to_subscriptions' => 'required|boolean',
+            'applies_to_subscriptions_eur' => 'required|boolean',
             'free_shipping_threshold_czk' => 'nullable|numeric|min:0',
             'free_shipping_threshold_eur' => 'nullable|numeric|min:0',
             'packeta_carrier_ids' => 'nullable|array',
@@ -63,6 +64,7 @@ class ShippingRateController extends Controller
         $validated['available_on_com'] = $request->has('available_on_com') && $request->available_on_com == '1';
         $validated['available_on_sk'] = $request->has('available_on_sk') && $request->available_on_sk == '1';
         $validated['applies_to_subscriptions'] = $request->has('applies_to_subscriptions') && $request->applies_to_subscriptions == '1';
+        $validated['applies_to_subscriptions_eur'] = $request->has('applies_to_subscriptions_eur') && $request->applies_to_subscriptions_eur == '1';
         
         // Handle nullable fields
         if (empty($validated['free_shipping_threshold_czk'])) {
