@@ -44,7 +44,7 @@ return [
                 'Tři pražírny z různých zemí Evropy, každý měsíc jiné',
                 'Kávy, které v Česku běžně nekoupíte',
                 'Pohlednice s profilem kávy a pražírny ke každé kávě',
-                'Káva přijde sama :day. dne, doprava vždy zdarma',
+                'Káva přijde sama :day. dne, doprava do ČR zdarma',
             ],
             'cta' => 'Sestavit box',
             'prices' => 'Ceny',
