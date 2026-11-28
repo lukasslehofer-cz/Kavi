@@ -80,10 +80,17 @@ return [
                 'conversions_api_token' => env('META_CONVERSIONS_API_TOKEN_COM'),
                 'test_event_code' => env('META_TEST_EVENT_CODE_COM'),
             ],
+            // kavibox.sk měří do CZ pixelu (SK reklamy jdou přes český Instagram a účet KAVIcz),
+            // dokud META_PIXEL_ID_SK nenastaví vlastní pixel. Token a testovací kód patří
+            // k pixelu, takže se přepínají s ním. `?:` – prázdná hodnota v .env = nenastaveno.
             'sk' => [
-                'pixel_id' => env('META_PIXEL_ID_SK'),
-                'conversions_api_token' => env('META_CONVERSIONS_API_TOKEN_SK'),
-                'test_event_code' => env('META_TEST_EVENT_CODE_SK'),
+                'pixel_id' => env('META_PIXEL_ID_SK') ?: env('META_PIXEL_ID_CZ', env('META_PIXEL_ID')),
+                'conversions_api_token' => env('META_PIXEL_ID_SK')
+                    ? env('META_CONVERSIONS_API_TOKEN_SK')
+                    : env('META_CONVERSIONS_API_TOKEN_CZ', env('META_CONVERSIONS_API_TOKEN')),
+                'test_event_code' => env('META_PIXEL_ID_SK')
+                    ? env('META_TEST_EVENT_CODE_SK')
+                    : env('META_TEST_EVENT_CODE_CZ', env('META_TEST_EVENT_CODE')),
             ],
         ],
     ],

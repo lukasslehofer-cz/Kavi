@@ -96,11 +96,12 @@
         t.src=v;s=b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t,s)}(window,document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
+        // Bez souhlasu s marketingovými cookies pixel nic neposílá; události drží ve frontě
+        // a odešle je až po fbq('consent', 'grant') z cookie lišty (resources/js/app.js).
+        fbq('consent', 'revoke');
         fbq('init', '{{ $metaPixelId }}');
         fbq('track', 'PageView');
     </script>
-    <noscript><img height="1" width="1" style="display:none"
-        src="https://www.facebook.com/tr?id={{ $metaPixelId }}&ev=PageView&noscript=1"/></noscript>
     @endif
 
     <!-- Cookie Consent Configuration -->

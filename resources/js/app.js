@@ -5,31 +5,51 @@ import { initCountdowns } from './components/countdown';
 import { initGiftPreview } from './components/gift-preview';
 import { initGiftRedeem } from './components/gift-redeem';
 
-// Google Consent Mode v2 - Update consent state
-function updateGoogleConsent() {
-    // Ensure gtag is available
+// Souhlas z cookie lišty -> Google Consent Mode v2 a Meta pixel
+function applyConsent(analyticsAccepted, marketingAccepted) {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
-    
-    // Check accepted categories
-    const analyticsAccepted = CookieConsent.acceptedCategory('analytics');
-    const marketingAccepted = CookieConsent.acceptedCategory('marketing');
-    
-    // Update consent state
+
     gtag('consent', 'update', {
         'analytics_storage': analyticsAccepted ? 'granted' : 'denied',
         'ad_storage': marketingAccepted ? 'granted' : 'denied',
         'ad_user_data': marketingAccepted ? 'granted' : 'denied',
         'ad_personalization': marketingAccepted ? 'granted' : 'denied'
     });
-    
+
+    // Pixel startuje s fbq('consent', 'revoke') v layoutu; grant odešle události z fronty
+    if (typeof window.fbq === 'function') {
+        window.fbq('consent', marketingAccepted ? 'grant' : 'revoke');
+    }
+}
+
+function updateGoogleConsent() {
+    applyConsent(
+        CookieConsent.acceptedCategory('analytics'),
+        CookieConsent.acceptedCategory('marketing')
+    );
+}
+
+// Stránky bez cookie lišty (layout dashboard): souhlas jen přečíst z uložené cookie
+function applyStoredConsent() {
+    const match = document.cookie.match(/(?:^|;\s*)cc_cookie=([^;]*)/);
+    if (!match) {
+        return;
+    }
+
+    try {
+        const categories = JSON.parse(decodeURIComponent(match[1])).categories || [];
+        applyConsent(categories.includes('analytics'), categories.includes('marketing'));
+    } catch (e) {
+        // Poškozená cookie = bez souhlasu, výchozí stav zůstává denied / revoke
+    }
 }
 
 // Initialize Cookie Consent
 function initCookieConsent() {
     // Get config from window (injected by Laravel)
     if (typeof window.cookieConsentConfig === 'undefined') {
-        console.warn('Cookie consent config not found');
+        applyStoredConsent();
         return;
     }
 
